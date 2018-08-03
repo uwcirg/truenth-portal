@@ -1006,26 +1006,36 @@
                     }
                 });
             },
-            getEmailContent: function(userId, messageId) {
+            getEmailContent: function(userId, messageId, callback) {
+                callback = callback || function() {};
+                $("#messageLoader_"+messageId).show();
+                $("#messageLink_"+messageId).css("visibility", "hidden");
                 this.modules.tnthAjax.emailLog(userId, false, function(data) {
-                    if (data.messages) {
-                        (data.messages).forEach(function(item) {
-                            if (parseInt(item.id) === parseInt(messageId)) {
-                                $("#emailBodyModal .body-content").html(item.body);
-                                $("#emailBodyModal .body-content a").each(function() { // email content contains clickable link/button - need to prevent click event of those from being triggered
-                                    $(this).on("click", function(e) {
-                                        e.preventDefault();
-                                        return false;
-                                    });
-                                });
-                                $("#emailBodyModal .body-content style").remove(); //need to remove inline style specifications - as they can be applied globally and override the classes specified in stylesheet
-                                $("#emailBodyModal .body-content a.btn").addClass("btn-tnth-primary");
-                                $("#emailBodyModal .body-content td.btn, #emailBodyModal .body-content td.btn a").addClass("btn-tnth-primary").removeAttr("width").removeAttr("style");
-                                $("#emailBodyModal").modal("show"); //remove inline style in email body, style here is already applied via css
-                                return true;
-                            }
-                        });
+                    setTimeout(function() {
+                        $("#messageLoader_"+messageId).hide();
+                        $("#messageLink_"+messageId).css("visibility", "visible");
+                    }, 550);
+                    if (!data.messages) {
+                        callback(data);
+                        return false;
                     }
+                    var targetMessages = $.grep(data.messages, function(item) {
+                        return parseInt(item.id) === parseInt(messageId);
+                    });
+                    targetMessages.forEach(function(item) {
+                        $("#emailBodyModal .body-content").html(item.body);
+                        $("#emailBodyModal .body-content a").each(function() { // email content contains clickable link/button - need to prevent click event of those from being triggered
+                            $(this).on("click", function(e) {
+                                e.preventDefault();
+                                return false;
+                            });
+                        });
+                        $("#emailBodyModal .body-content style").remove(); //need to remove inline style specifications - as they can be applied globally and override the classes specified in stylesheet
+                        $("#emailBodyModal .body-content a.btn").addClass("btn-tnth-primary");
+                        $("#emailBodyModal .body-content td.btn, #emailBodyModal .body-content td.btn a").addClass("btn-tnth-primary").removeAttr("width").removeAttr("style");
+                        $("#emailBodyModal").modal("show"); //remove inline style in email body, style here is already applied via css
+                    });
+                    callback(data);
                 });
             },
             getEmailLog: function(userId, data) {
@@ -1034,7 +1044,8 @@
                     if (data.messages && data.messages.length > 0) {
                         (data.messages).forEach(function(item) {
                             item.sent_at = self.modules.tnthDates.formatDateString(item.sent_at, "iso");
-                            item.subject = "<a class='item-link' data-user-id='" + userId + "' data-item-id='" + item.id + "'><u>" + item.subject + "</u></a>";
+                            item.subject = "<i id='messageLoader_" + item.id + "' class='message-loader fa fa-spinner fa-spin tnth-hide'></i>" +
+                                           "<a id='messageLink_" + item.id + "' class='item-link' data-user-id='" + userId + "' data-item-id='" + item.id + "'><u>" + item.subject + "</u></a>";
                         });
                         $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                         $("#profileEmailLogTable").bootstrapTable(this.setBootstrapTableConfig({
@@ -1051,6 +1062,7 @@
                             }, {
                                 field: "subject",
                                 title: i18next.t("Subject"),
+                                class: "message-subject",
                                 searchable: true,
                                 sortable: true
                             }, {
@@ -2611,7 +2623,7 @@
                                 __self.consent.saveLoading = false;
                                 __self.reloadConsentList(self.attr("data-userId"));
                             });
-    
+
                         }
                     });
                 });
@@ -2775,14 +2787,6 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
-
-                if (self.isConsentEditable()) {
-                    self.initConsentItemEvent();
-                }
-                if (self.isConsentEditable() && self.isTestEnvironment()) {
-                    self.initConsentDateEvents();
-                }
-
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");
@@ -2792,7 +2796,13 @@
                         if (!self.isConsentWithTopLevelOrg()) {
                             $("#consentListTable .agreement").each(function() { $(this).parent().hide(); });
                         }
-                        $("#consentListTable").animate({opacity: 1});
+                        if (self.isConsentEditable()) {
+                            self.initConsentItemEvent();
+                        }
+                        if (self.isConsentEditable() && self.isTestEnvironment()) {
+                            self.initConsentDateEvents();
+                        }
+                        $("#consentListTable").animate({opacity: 1}, 1500);
                         clearInterval(self.consentListReadyIntervalId);
                     }
                     if (self.showConsentHistory()) {
