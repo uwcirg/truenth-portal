@@ -28,6 +28,7 @@ class DisplayDetails(object):
         status_text: Text to inform user of status, or why it's disabled
 
     """
+
     def __init__(self, access, intervention, user_intervention):
         """Build best set available, prefering values in user_intervention"""
         ui = user_intervention
@@ -255,7 +256,8 @@ class UserIntervention(db.Model):
     link_url = db.Column(db.Text)
     status_text = db.Column(db.Text)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    intervention_id = db.Column(db.ForeignKey('interventions.id'), nullable=False)
+    intervention_id = db.Column(
+        db.ForeignKey('interventions.id'), nullable=False)
 
     def as_json(self, include_empties=True):
         d = {'user_id': self.user_id}
