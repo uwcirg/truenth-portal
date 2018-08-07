@@ -95,7 +95,7 @@ Create a configuration file if one does not already exist
 
 Facebook
 ~~~~~~~~
-To enable Facebook OAuth, create a new app on `Facebook's App page <https://developers.facebook.com/apps>`_ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
+To enable Facebook OAuth, create a new app on `Facebook's App page <https://developers.facebook.com/apps>`__ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
 
 .. code:: bash
 
@@ -109,7 +109,7 @@ To enable Facebook OAuth, create a new app on `Facebook's App page <https://deve
 
 Google
 ~~~~~~
-To enable Google OAuth, create a new app on `Google's API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`_ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
+To enable Google OAuth, create a new app on `Google's API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`__ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
 
 .. code:: bash
 
@@ -120,7 +120,9 @@ To enable Google OAuth, create a new app on `Google's API page <https://console.
 
 -  Under APIs Credentials, select ``OAuth 2.0 client ID``
 -  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/google/``
--  Enable the ``Google+ API`.. _pip:
+-  Enable the ``Google+ API``
+
+.. _pip:
 
 Install the Latest Package and Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
