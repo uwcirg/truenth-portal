@@ -129,7 +129,7 @@ class BaseConfig(object):
 
     STAFF_BULK_DATA_ACCESS = True
     PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
-    
+
     FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_OAUTH_CLIENT_ID')
     FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_OAUTH_CLIENT_SECRET')
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
