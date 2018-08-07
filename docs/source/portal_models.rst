@@ -17,6 +17,9 @@ Portal.Models
 .. automodule:: portal.models.fhir
     :members:
 
+.. automodule:: portal.models.flaskdanceprovider
+    :members:
+
 .. automodule:: portal.models.identifier
     :members:
 

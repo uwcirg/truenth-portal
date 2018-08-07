@@ -85,35 +85,42 @@ of date.  Best to update first, for optimal results:
 CONFIGURE
 ---------
 
-Copy the default to the named configuration file
+Create the configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create a configuration file if one does not already exist
 
 .. code:: bash
 
     $ cp $PROJECT_HOME/instance/application.cfg{.default,}
 
-Obtain ``consumer_key`` and ``consumer_secret`` values from
-`Facebook App page <https://developers.facebook.com/apps>`__ and write the values to
-``application.cfg``:
+Facebook
+~~~~~~~~
+To enable Facebook OAuth, create a new app on `Facebook's App page <https://developers.facebook.com/apps>`_ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
 
 .. code:: bash
 
     # application.cfg
     [...]
-    FB_CONSUMER_KEY = '<App ID From FB>'
-    FB_CONSUMER_SECRET = '<App Secret From FB>'
+    FACEBOOK_OAUTH_CLIENT_ID = '<App ID From FB>'
+    FACEBOOK_OAUTH_CLIENT_SECRET = '<App Secret From FB>'
 
-To enable Google OAuth, obtain similar values from the `Google API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`__.
+-  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/facebook/``
+-  Set the deauthorize callback. Go to your app, then choose **Products**, then **Facebook Login**, and finally **Settings**. A text field is provided for the Deauthorize Callback URL. Enter ``<scheme>://<hostname>/deauthorized``
+
+Google
+~~~~~~
+To enable Google OAuth, create a new app on `Google's API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`_ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
+
+.. code:: bash
+
+    # application.cfg
+    [...]
+    GOOGLE_OAUTH_CLIENT_ID = '<App ID From Google>'
+    GOOGLE_OAUTH_CLIENT_SECRET = '<App Secret From Google>'
 
 -  Under APIs Credentials, select ``OAuth 2.0 client ID``
--  Set the ``Authorized redirect URIs`` to exactly match the location of
-   ``<scheme>://<hostname>/login/google/``
--  Enable the ``Google+ API``
-
-Write to the respective GOOGLE\_CONSUMER\_KEY and
-GOOGLE\_CONSUMER\_SECRET variables in the same ``application.cfg``
-configuration file.
-
-.. _pip:
+-  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/google/``
+-  Enable the ``Google+ API`.. _pip:
 
 Install the Latest Package and Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

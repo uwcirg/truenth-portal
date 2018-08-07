@@ -130,11 +130,6 @@ class BaseConfig(object):
     STAFF_BULK_DATA_ACCESS = True
     PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
 
-    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY')
-    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET')
-    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY')
-    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET')
-
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'
 
