@@ -49,7 +49,10 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
             '/me',
             params={
                 'fields':
-                    'id,email,birthday,first_name,last_name,gender,picture'})
+                    'id,email,birthday,first_name,last_name,gender,picture'
+            }
+        )
+
         if not resp.ok:
             current_app.logger.debug('Failed to fetch user info from Facebook')
             return False
@@ -122,8 +125,9 @@ class MockFlaskDanceProvider(FlaskDanceProvider):
         blueprint = type(str('MockBlueprint'), (object,), {})
         blueprint.name = provider_name
         super(MockFlaskDanceProvider, self).__init__(
-                blueprint,
-                token)
+            blueprint,
+            token
+        )
 
         self.user_info = user_info
         self.fail_to_get_user_info = fail_to_get_user_info

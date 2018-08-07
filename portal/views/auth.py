@@ -110,7 +110,7 @@ def oauth_test_backdoor():
 
         return mock_provider
 
-    if not current_app.config['TESTING']:
+    if not current_app.testing:
         return abort(404)
 
     # Validate the next arg
@@ -134,6 +134,8 @@ def login(blueprint, token):
     After successful authorization at the provider, control
     returns here. The blueprint and the oauth bearer
     token are used to log the user into the portal
+
+    :return returns False to disable saving oauth token
     """
     provider = None
     if blueprint.name == 'google':
@@ -266,8 +268,9 @@ def store_next_in_session(request, provider):
     next page after we're done authenticating
     """
     if request.args.get('next'):
-        session['next'] = request.args.get('next')
-        validate_origin(session['next'])
+        next_url = request.args.get('next')
+        validate_origin(next_url)
+        session['next'] = next_url
         current_app.logger.debug(
             "store-session['next'] <{}> from login/{}".format(
                 session['next'], provider.name))
@@ -281,7 +284,7 @@ def provider_oauth_error(
     error_description=None,
     error_uri=None
 ):
-    """handles outh errors
+    """handles oauth errors
 
     If there's an error during provider authentiation
     control returns here. This function attempts to retry
@@ -308,8 +311,10 @@ def provider_oauth_error(
     # (they're missing with such a setting on returning from
     # the 3rd party IdP redirect)
     current_app.logger.info("attempting reload on oauth error")
-    return render_template('force_reload.html',
-                           message=error_description)
+    return render_template(
+        'force_reload.html',
+        message=error_description
+    )
 
 
 @auth.route('/deauthorized', methods=('POST',))

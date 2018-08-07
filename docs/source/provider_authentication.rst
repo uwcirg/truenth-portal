@@ -14,13 +14,7 @@ Configuration
 =================
 In order to authenticate users the portal must know the public and private keys to each 3rd party application. If you haven't already, you'll need to create a third party app and copy its configuration values to ``instance/application.cfg`` by following the steps below:
 
-Create the configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Create a configuration file if one does not already exist
-
-.. code:: bash
-
-    $ cp $PROJECT_HOME/instance/application.cfg{.default,}
+.. _oauthconfig:
 
 Facebook
 ~~~~~~~~
@@ -51,16 +45,16 @@ To enable Google OAuth, create a new app on `Google's API page <https://console.
 -  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/google/``
 -  Enable the ``Google+ API``
 
-managep.py
+activate
 ~~~~~~~~~~
-In a **non-production** environment add the following to ``manage.py``:
+In a **non-production** environment add the following to the bottom of ``env/bin/activate``:
 
 .. code:: bash
 
     export OAUTHLIB_RELAX_TOKEN_SCOPE=1
     export OAUTHLIB_INSECURE_TRANSPORT=1
 
-In a **production** environment you should **only** add the following to ``manage.py``:
+In a **production** environment you should **only** add the following to the bottom of ``env/bin/activate``:
 
 .. code:: bash
 

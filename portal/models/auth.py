@@ -29,8 +29,13 @@ class AuthProvider(OAuthConsumerMixin, db.Model):
                         nullable=False)
     user = db.relationship('User')
 
-    __table_args__ = (UniqueConstraint('provider', 'provider_id',
-                                       name='auth_providers_by_provider'),)
+    __table_args__ = (
+        UniqueConstraint(
+            'provider',
+            'provider_id',
+            name='auth_providers_by_provider'
+        ),
+    )
 
     def as_fhir(self):
         # produce a FHIR identifier entry for the provider

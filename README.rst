@@ -93,34 +93,9 @@ Create a configuration file if one does not already exist
 
     $ cp $PROJECT_HOME/instance/application.cfg{.default,}
 
-Facebook
-~~~~~~~~
-To enable Facebook OAuth, create a new app on `Facebook's App page <https://developers.facebook.com/apps>`__ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
-
-.. code:: bash
-
-    # application.cfg
-    [...]
-    FACEBOOK_OAUTH_CLIENT_ID = '<App ID From FB>'
-    FACEBOOK_OAUTH_CLIENT_SECRET = '<App Secret From FB>'
-
--  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/facebook/``
--  Set the deauthorize callback. Go to your app, then choose **Products**, then **Facebook Login**, and finally **Settings**. A text field is provided for the Deauthorize Callback URL. Enter ``<scheme>://<hostname>/deauthorized``
-
-Google
-~~~~~~
-To enable Google OAuth, create a new app on `Google's API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`__ and copy the ``consumer_key`` and ``consumer_secret`` to ``application.cfg``:
-
-.. code:: bash
-
-    # application.cfg
-    [...]
-    GOOGLE_OAUTH_CLIENT_ID = '<App ID From Google>'
-    GOOGLE_OAUTH_CLIENT_SECRET = '<App Secret From Google>'
-
--  Under APIs Credentials, select ``OAuth 2.0 client ID``
--  Set the ``Authorized redirect URIs`` to exactly match the location of ``<scheme>://<hostname>/login/google/``
--  Enable the ``Google+ API``
+Add Support For 3rd Party Logins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See :ref:`OAuth Config <oauthconfig>`
 
 .. _pip:
 

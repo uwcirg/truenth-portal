@@ -14,7 +14,6 @@ from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
-import urllib
 
 from portal.factories.app import create_app
 from portal.config.config import TestConfig
@@ -206,12 +205,12 @@ class TestCase(Base):
         if not oauth_info:
             oauth_info = {'user_id': user_id}
 
-        # Use the key value pairs in oauth_info dict
-        # as query params
-        oauth_url = 'test/oauth?' + urllib.parse.urlencode(oauth_info)
-
-        # Finally, attempt to login using the test backdoor
-        return self.client.get(oauth_url, follow_redirects=follow_redirects)
+        # Attempt to login using the test backdoor
+        return self.client.get(
+            'test/oauth',
+            query_string=oauth_info,
+            follow_redirects=follow_redirects
+        )
 
     def add_client(self):
         """Prep db with a test client for test user"""
