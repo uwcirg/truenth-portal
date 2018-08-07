@@ -26,74 +26,48 @@
             <div id="termsCheckbox">
                <div class="terms-checkbox-container">
                {% set tou_url = terms['url'] if terms else '' %}
-               <!-- note these checkboxes are selectively hidden based on user role-->
-               {% if user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.STAFF_ADMIN.value) %}
-                    <label class="terms-label tnth-hide">
-                        <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                        {% trans
-                           privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true"
-                        %}
-                          <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a
-                            href="{{privacy_url}}" class="required-link">privacy policy</a> and <a
-                            href="{{terms_url}}" class="required-link">terms</a></span>
-                        {% endtrans %}
-                        <input type="hidden"
-                          data-type="terms"
-                          data-agree="false"
-                          data-core-data-type="privacy_policy"
-                          data-tou-type="privacy policy"
-                          data-url="/privacy"/>
-                        <input type="hidden"
-                          data-agree="false"
-                          data-type="terms"
-                          data-tou-type="website terms of use"
-                          data-core-data-type="website_terms_of_use"
-                          data-url="{{tou_url}}" />
-                    </label>
-                {% else %}
-                     <label
-                      class="terms-label tnth-hide">
-                        <i class="fa fa-square-o fa-lg terms-tick-box edit-view"></i>
-                        <span class="edit-view"><span class="terms-tick-box-text">{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.") }}</span></span>
-                        <!-- display message specific to patient who has already consented - possible in EPROMs -->
-                        {% if "subject_website_consent" in config.REQUIRED_CORE_DATA %}
-                          <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
-                          <input type="hidden"
-                          data-agree="false"
-                          data-type="terms"
-                          data-tou-type="subject website consent"
-                          data-core-data-type="subject_website_consent"
-                          data-url="{{tou_url}}" />
-                        {% else %}
-                          <input type="hidden"
-                            data-agree="false"
-                            data-type="terms"
-                            data-tou-type="website terms of use"
-                            data-core-data-type="website_terms_of_use"
-                            data-url="{{tou_url}}" />
-                        {% endif %}
-                    </label>
-                     <label class="terms-label tnth-hide">
-                        <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                        {% trans
-                          privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" %}
-                          <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
-                            <a href="{{terms_url}}" class="required-link">terms</a>.</span>
-                        {% endtrans %}
-                        <input type="hidden"
-                          data-agree="false"
-                          data-type="terms"
-                          data-core-data-type="privacy_policy"
-                          data-tou-type="privacy policy"
-                          data-url="/privacy" />
-                        <input type="hidden"
-                            data-agree="false"
-                            data-type="terms"
-                            data-tou-type="website terms of use"
-                            data-core-data-type="website_terms_of_use"
-                            data-url="{{tou_url}}" />
-                    </label>
-                {% endif %}
+                <!-- note these checkboxes are selectively hidden based on user role-->
+                <label class="terms-label tnth-hide">
+                  <i class="fa fa-square-o fa-lg terms-tick-box edit-view"></i>
+                  <span class="edit-view"><span class="terms-tick-box-text">{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.") }}</span></span>
+                  <!-- display message specific to patient who has already consented - possible in EPROMs -->
+                  {% if "subject_website_consent" in config.REQUIRED_CORE_DATA %}
+                    <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
+                    <input type="hidden"
+                    data-agree="false"
+                    data-type="terms"
+                    data-tou-type="subject website consent"
+                    data-core-data-type="subject_website_consent"
+                    data-url="{{tou_url}}" />
+                  {% else %}
+                    <input type="hidden"
+                      data-agree="false"
+                      data-type="terms"
+                      data-tou-type="website terms of use"
+                      data-core-data-type="website_terms_of_use"
+                      data-url="{{tou_url}}" />
+                  {% endif %}
+                </label>
+                <label class="terms-label tnth-hide">
+                  <i class="fa fa-square-o fa-lg terms-tick-box"></i>
+                  {% trans
+                    privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" %}
+                    <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
+                      <a href="{{terms_url}}" class="required-link">terms</a>.</span>
+                  {% endtrans %}
+                  <input type="hidden"
+                    data-agree="false"
+                    data-type="terms"
+                    data-core-data-type="privacy_policy"
+                    data-tou-type="privacy policy"
+                    data-url="/privacy"/>
+                  <input type="hidden"
+                      data-agree="false"
+                      data-type="terms"
+                      data-tou-type="website terms of use"
+                      data-core-data-type="website_terms_of_use"
+                      data-url="{{tou_url}}"/>
+                </label>
               </div>
             </div>
             <br/>
