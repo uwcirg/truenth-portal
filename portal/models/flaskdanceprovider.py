@@ -162,4 +162,3 @@ class FlaskProviderUserInfo(object):
         self.birthdate = None
         self.gender = None
         self.image_url = None
-
