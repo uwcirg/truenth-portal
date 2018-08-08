@@ -1,5 +1,6 @@
 """Module for i18n methods and functionality"""
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
@@ -75,7 +76,8 @@ def get_static_strings():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
-            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(enum.name, value)}
+            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(
+                enum.name, value)}
     return msgid_map
 
 
@@ -105,7 +107,7 @@ def upsert_to_template_file():
                     continue
                 for location in db_translatables[msgid]:
                     locstring = "# " + location + "\n"
-                    if not any(t == locstring for t in potlines[i-4:i]):
+                    if not any(t == locstring for t in potlines[i - 4:i]):
                         potlines.insert(i, locstring)
                 del db_translatables[msgid]
             for entry, locations in db_translatables.items():
@@ -121,7 +123,8 @@ def upsert_to_template_file():
             potfile.writelines(potlines)
     except:
         exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-        sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
+        sys.exit(
+            "Could not write to translation file!\n ->%s" % (exceptionValue))
 
 
 def fix_references(pot_fpath):
@@ -139,10 +142,13 @@ def fix_references(pot_fpath):
         delete=False,
     ) as tmpfile:
         for line in infile:
-            tmpfile.write(path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line))
+            tmpfile.write(
+                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url,
+                               line))
 
     os.rename(tmpfile.name, pot_fpath)
     current_app.logger.debug("messages.pot file references fixed")
+
 
 def smartling_authenticate():
     url = 'https://api.smartling.com/auth-api/v2/authenticate'
@@ -167,7 +173,8 @@ def smartling_upload():
     config_fname = current_app.config['BABEL_CONFIG_FILENAME']
     translation_fpath = os.path.join(current_app.root_path, "translations")
     messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
-    config_fpath = os.path.join(current_app.root_path, "../instance/", config_fname)
+    config_fpath = os.path.join(
+        current_app.root_path, "../instance/", config_fname)
 
     # create new .pot file from code
     check_call((
@@ -274,7 +281,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state):
                 sys.exit('invalid po file for {}'.format(langcode))
             extract_po_file(langcode, data, fname)
     current_app.logger.debug(
-            "{}.po files updated, mo files compiled".format(fname))
+        "{}.po files updated, mo files compiled".format(fname))
 
 
 def download_po_file(language, headers, project_id, uri, state):
@@ -358,10 +365,12 @@ def merge_po_into_master(po_path, language, fname):
                 master_po.append(entry)
 
         master_po.save(mpo_path)
-        master_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
+        master_po.save_as_mofile(
+            os.path.join(master_path, '{}.mo'.format(fname)))
     else:
         incoming_po.save(mpo_path)
-        incoming_po.save_as_mofile(os.path.join(master_path, '{}.mo'.format(fname)))
+        incoming_po.save_as_mofile(
+            os.path.join(master_path, '{}.mo'.format(fname)))
 
 
 @babel.localeselector
