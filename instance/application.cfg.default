@@ -6,7 +6,8 @@ SERVER_NAME = '<the name and port number of the server (e.g.: 'myapp.dev:5000')>
 
 # CONTACT_SENDTO_EMAIL = '<email address(es) that should receive contact form submissions>'
 # LOG_FOLDER = '/home/username/example/path'
-# FB_CONSUMER_KEY = '<App ID from Facebook>'
-# FB_CONSUMER_SECRET = '<App Secret from Facebook>'
-# GOOGLE_CONSUMER_KEY = '<App ID from Google>'
-# GOOGLE_CONSUMER_SECRET = '<App Secret from Google>'
+# FACEBOOK_OAUTH_CLIENT_ID = '<App ID from Facebook>'
+# FACEBOOK_OAUTH_CLIENT_SECRET = '<App Secret from Facebook>'
+# GOOGLE_OAUTH_CLIENT_ID = '<App ID from Google>'
+# GOOGLE_OAUTH_CLIENT_SECRET = '<App Secret from Google>'
+

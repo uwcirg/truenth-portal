@@ -210,10 +210,10 @@
             <div class="box-modal-or__divider"></div>
             <br/>
             <div>
-            <a href="{{url_for('auth.login', provider_name='facebook')}}" class="button button--facebook button-large button--teal button--has-svg">
+            <a href="{{url_for('facebook.login', provider_name='facebook')}}" class="button button--facebook button-large button--teal button--has-svg">
               <svg width="15" height="31">
                 <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#Facebook-Icon"></use>
-              </svg>{{_("Log in with Facebook")}}</a><a href="{{url_for('auth.login',provider_name='google')}}" class="button button--google button-large button--teal button--has-svg">
+              </svg>{{_("Log in with Facebook")}}</a><a href="{{url_for('google.login',provider_name='google')}}" class="button button--google button-large button--teal button--has-svg">
               <svg width="20" height="31">
                 <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#Google-Icon"></use>
               </svg>{{_("Log in with Google")}}</a>

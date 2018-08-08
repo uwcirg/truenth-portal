@@ -21,7 +21,6 @@ from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
 from ..extensions import (
-    authomatic,
     babel,
     mail,
     oauth,
@@ -35,7 +34,12 @@ from ..models.coredata import configure_coredata
 from ..models.role import ROLE
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
-from ..views.auth import auth, capture_next_view_function
+from ..views.auth import (
+    auth,
+    capture_next_view_function,
+    facebook_blueprint,
+    google_blueprint,
+)
 from ..views.client import client_api
 from ..views.clinical import clinical_api
 from ..views.coredata import coredata_api
@@ -71,8 +75,10 @@ DEFAULT_BLUEPRINTS = (
     clinical_api,
     csrf_blueprint,
     demographics_api,
+    facebook_blueprint,
     fhir_api,
     filters_blueprint,
+    google_blueprint,
     group_api,
     identifier_api,
     intervention_api,
@@ -193,9 +199,6 @@ def configure_extensions(app):
         reset_password_view_function=reset_password_view_function,
         register_view_function=capture_next_view_function(register),
         login_view_function=capture_next_view_function(login))
-
-    # authomatic - OAuth lib between Portal and other external IdPs
-    authomatic.init_app(app)
 
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
