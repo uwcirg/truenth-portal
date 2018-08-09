@@ -233,7 +233,6 @@ def configure_blueprints(app, blueprints):
         app.register_blueprint(blueprint)
 
 
-
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):

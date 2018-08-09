@@ -27,5 +27,3 @@ def after_cursor_execute(conn, cursor, statement,
     current_app.logger.debug(
         "Time: %.02fms Query: <%s> Parameters: <%s>" % (
             total*1000, context._stmt, context._params))
-
-
