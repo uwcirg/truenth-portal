@@ -12,8 +12,8 @@ from flask import current_app
 
 
 @event.listens_for(Engine, "before_cursor_execute")
-def before_cursor_execute(conn, cursor, statement,
-                        parameters, context, executemany):
+def before_cursor_execute(
+        conn, cursor, statement, parameters, context, executemany):
     # Store state in context for logging after cursor execute
     context._query_start_time = time.time()
     context._stmt = statement
@@ -21,8 +21,8 @@ def before_cursor_execute(conn, cursor, statement,
 
 
 @event.listens_for(Engine, "after_cursor_execute")
-def after_cursor_execute(conn, cursor, statement,
-                        parameters, context, executemany):
+def after_cursor_execute(
+        conn, cursor, statement, parameters, context, executemany):
     total = time.time() - context._query_start_time
     current_app.logger.debug(
         "Time: %.02fms Query: <%s> Parameters: <%s>" % (
