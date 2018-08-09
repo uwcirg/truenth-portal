@@ -39,10 +39,7 @@ var SessionMonitorObj = function() { /* global $ */
                     },
                     onwarning: function() {
                         var n = Math.round(l.timeBeforeWarning / 60 / 1e3),
-                            o = $("<div id='jqsm-warning'>Your session will expire in " + n + " minutes. <button id='jqsm-stay-logged-in'>Stay Logged In</button><button id='jqsm-log-out'>Log Out</button></div>");
-                        if (!$("body").children("div#jqsm-warning").length) {
-                            $("body").prepend(o);
-                        }
+                            o = $("#jqsm-warning"); //default place holder element, content of which should be provided by consumer
                         $("div#jqsm-warning").show();
                         $("button#stay-logged-in").on("click", function(n) {
                             if (n) {
