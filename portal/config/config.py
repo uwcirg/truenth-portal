@@ -93,8 +93,10 @@ class BaseConfig(object):
     LOG_LEVEL = 'DEBUG'
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
-    SS_TIMEOUT = 60 * 60  # seconds for session cookie, reset on ping
-    PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
+    DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
+    PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
+    SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
+
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
