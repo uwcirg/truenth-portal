@@ -144,7 +144,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="sessionMonitorProps" data-baseurl="{{PORTAL}}" data-crsftoken="{{csrf_token()}}" data-sessionlifetime="{{config.PERMANENT_SESSION_LIFETIME}}" data-cookie-timeout="{{request.cookies.get('SS_INACTIVITY_TIMEOUT')}}"/>
+<input type="hidden" id="sessionMonitorProps" data-baseurl="{{PORTAL}}" data-crsftoken="{{csrf_token()}}" data-expires-in="{{expires_in}}"/>
 <div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
