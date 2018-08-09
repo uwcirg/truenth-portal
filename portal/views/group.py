@@ -8,11 +8,13 @@ from ..extensions import oauth
 from ..models.group import Group
 from ..models.role import ROLE
 from ..models.user import current_user
+from .crossdomain import crossdomain
 
 group_api = Blueprint('group_api', __name__, url_prefix='/api/group')
 
 
-@group_api.route('/')
+@group_api.route('/', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def current_groups():
     """Returns simple JSON defining all current groups
@@ -44,13 +46,16 @@ def current_groups():
               description: Plain text describing the group.
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     results = [g.as_json() for g in Group.query.all()]
     return jsonify(groups=results)
 
 
-@group_api.route('/<string:group_name>')
+@group_api.route('/<string:group_name>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def group_by_name(group_name):
     """Returns simple JSON for the requested group
@@ -87,6 +92,8 @@ def group_by_name(group_name):
         description: if missing valid OAuth token
       404:
         description: if named group doesn't exist
+    security:
+      - Authorization: []
 
     """
     g = Group.query.filter_by(name=group_name).first()
