@@ -233,18 +233,11 @@ def configure_blueprints(app, blueprints):
         app.register_blueprint(blueprint)
 
 
+
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):
-        sql_log_file = '/tmp/sql_log'
-        sql_file_handler = handlers.RotatingFileHandler(
-            sql_log_file, maxBytes=1000000, backupCount=20)
-        sql_file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(thread)d: %(message)s'
-        ))
-        sql_log = logging.getLogger('sqlalchemy.engine')
-        sql_log.setLevel(logging.INFO)
-        sql_log.addHandler(sql_file_handler)
+        import portal.sql_logging
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
     from ..tasks import logger as task_logger
