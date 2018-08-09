@@ -13,7 +13,8 @@ class TestIntervention(TestCase):
         self.login()
         response = self.client.get('/next-after-login', follow_redirects=False)
         cookies = SimpleCookie()
-        [cookies.load(item[1]) for item in response.headers if item[0] == 'Set-Cookie']
+        [cookies.load(item[1]) for item in response.headers
+            if item[0] == 'Set-Cookie']
         assert int(cookies['SS_INACTIVITY_TIMEOUT'].value) == 30 * 60
 
     def test_SR_timeout(self):
@@ -28,7 +29,8 @@ class TestIntervention(TestCase):
         self.login()
         response = self.client.get('/next-after-login', follow_redirects=False)
         cookies = SimpleCookie()
-        [cookies.load(item[1]) for item in response.headers if item[0] == 'Set-Cookie']
+        [cookies.load(item[1]) for item in response.headers
+            if item[0] == 'Set-Cookie']
         assert int(cookies['SS_INACTIVITY_TIMEOUT'].value) == 60 * 60
 
     def test_kiosk_mode(self):
@@ -38,8 +40,10 @@ class TestIntervention(TestCase):
             self.client.set_cookie(
                 self._app.config['SERVER_NAME'], 'SS_TIMEOUT', system_timeout)
             self.login()
-            response = self.client.get('/next-after-login', follow_redirects=False)
+            response = self.client.get(
+                '/next-after-login', follow_redirects=False)
 
         cookies = SimpleCookie()
-        [cookies.load(item[1]) for item in response.headers if item[0] == 'Set-Cookie']
+        [cookies.load(item[1]) for item in response.headers
+         if item[0] == 'Set-Cookie']
         assert cookies['SS_INACTIVITY_TIMEOUT'].value == system_timeout
