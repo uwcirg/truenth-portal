@@ -6,7 +6,7 @@ var SessionMonitorObj = function() {
     // Set default sessionLifetime from Flask config
     // Subtract 10 seconds to ensure the backend doesn't expire the session first
     var DEFAULT_SESSION_LIFETIME;
-    var cookieTimeout = this.readCookie("SS_TIMEOUT") || $("#sessionMonitorProps").attr("data-cookie-timeout"); //for debugging and also a workaround when cookie is not accessible via call to document.cookie
+    var cookieTimeout = this.readCookie("SS_INACTIVITY_TIMEOUT") || $("#sessionMonitorProps").attr("data-cookie-timeout"); //for debugging and also a workaround when cookie is not accessible via call to document.cookie
     cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
     var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
     var __BASE_URL = $("#sessionMonitorProps").attr("data-baseurl") || "";
