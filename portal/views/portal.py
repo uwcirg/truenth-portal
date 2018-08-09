@@ -900,6 +900,13 @@ def spec():
             },
         },
         "schemes": ("http", "https"),
+        "securityDefinitions": {
+            "Authorization": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            }
+        },
     })
 
     # Todo: figure out why description isn't always set

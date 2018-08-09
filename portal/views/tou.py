@@ -11,11 +11,14 @@ from ..models.app_text import InitialConsent_ATMA, VersionedResource, app_text
 from ..models.audit import Audit
 from ..models.tou import ToU, tou_types
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 
-@tou_api.route('/tou')
+@tou_api.route('/tou', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
+@oauth.require_oauth()
 def get_current_tou_url():
     """Return current ToU URL
 
@@ -30,6 +33,8 @@ def get_current_tou_url():
         description:
           Returns URL for current Terms Of Use, with respect to current
           system configuration in simple json {url:"http..."}
+    security:
+      - Authorization: []
 
     """
     terms = VersionedResource(
