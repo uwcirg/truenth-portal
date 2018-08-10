@@ -2019,6 +2019,15 @@ body.portal .copyright-container  {
       display: block;
     }
   }
+  .section-loader {
+    position: absolute;
+    top: 2.5em;
+    right: 2.5em;
+    z-index: 5;
+    letter-spacing: .05rem;
+    font-size: 0.95em;
+    opacity: 0.8;
+  }
   .profile-item-edit-btn {
     display: none;
     position: absolute;
@@ -2036,6 +2045,13 @@ body.portal .copyright-container  {
     border-color: @btnColor;
     text-transform: uppercase;
     letter-spacing: 2px;
+    opacity: 0;
+    -webkit-transition: opacity 550ms ease;
+    -o-transition: opacity 550ms ease;
+    transition: opacity 550ms ease;
+  }
+  .profile-item-edit-btn.active {
+    opacity: 1;
   }
   .profile-item-edit-btn:hover,
   .profile-item-edit-btn:active,

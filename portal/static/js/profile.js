@@ -515,6 +515,7 @@
             onBeforeSectionsLoad: function() {
                 if ($("#profileForm").length > 0) {
                     $("#mainDiv").addClass("profile");
+                    $("#profileForm .section-loader").removeClass("tnth-hide");
                 }
             },
             onSectionsDidLoad: function() {
@@ -527,6 +528,10 @@
                         self.fillViews = self.setView();
                         self.initEditButtons();
                     }, 50);
+                    $(document).ajaxStop(function() { //show edit button after all ajax calls are done, NOTE this also accounts for failed/cancelled requests
+                        $("#profileForm .section-loader").addClass("tnth-hide");
+                        $("#profileForm .profile-item-edit-btn").addClass("active");
+                    });
                 }
             },
             initLoginAsButtons: function() {
@@ -611,7 +616,7 @@
                     }
                 });
                 if (callback) {
-                    setTimeout(function() {callback();}, initCount);
+                    setTimeout(function() {callback();}, initCount+20);
                 }
             },
             handleOptionalCoreData: function() {
