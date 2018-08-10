@@ -62,12 +62,6 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        if user.is_registered():
-            return url_for(
-                'assessment_engine_api.present_needed', _external=True)
-
-        # generate an access token to enable user to go through standard
-        # registration as they haven't yet
         token = user_manager.token_manager.generate_token(user.id)
         auditable_event(
             "generated access token {} for ae_link".format(
