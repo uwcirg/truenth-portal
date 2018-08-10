@@ -70,9 +70,11 @@ class FlaskDanceProvider:
             Each provider returns json with different property values.
             For example, Facebook returns json that maps a user's first name to
             'first_name' while Google maps first names to 'given_name'.
+            In addition, a value could be nested. For example, Facebook's
+            profile picture is nested in json['picture']['data']['url'].
             self.standard_key_to_provider_key_map links standard keys to
-            provider specific keys which allows our parsing code to stay as
-            generic as possible.
+            provider specific keys, including those that are nested, which
+            allows our parsing code to stay as generic as possible.
 
             :param standard:key: the standard key
             :param required: is this property required?
@@ -83,13 +85,24 @@ class FlaskDanceProvider:
             user_json_key = \
                 self.standard_key_to_provider_key_map[standard_key]
 
-            # Certain properties can be undefined
-            # Handle these cases gracefully
-            if not required and user_json_key not in user_json:
-                return None
+            # The key could have multiple nested parts
+            # e.g. 'picture.data.url'
+            # Which means we'll need to get each part
+            # individually
+            parts = user_json_key.split('.');
 
-            # Get the value from the user's json
-            return user_json[user_json_key]
+            # Loop over each key to get the value
+            # from the user's json
+            value = user_json
+            for key in parts:
+                # Certain properties can be undefined
+                # Handle these cases gracefully
+                if not required and key not in value:
+                    return None
+
+                value = value[key]
+
+            return value
 
         # Attempt to parse the user's json
         try:
@@ -146,7 +159,7 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
                 'first_name': 'first_name',
                 'last_name': 'last_name',
                 'email': 'email',
-                'image_url': 'picture',
+                'image_url': 'picture.data.url',
                 'gender': 'gender',
                 'birthdate': 'birthday',
             }
