@@ -62,7 +62,8 @@ def system_roles():
     return jsonify(roles=[r.as_json() for r in Role.query.all()])
 
 
-@role_api.route('/api/user/<int:user_id>/roles')
+@role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def roles(user_id):
     """Returns simple JSON defining user roles
@@ -92,6 +93,8 @@ def roles(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()

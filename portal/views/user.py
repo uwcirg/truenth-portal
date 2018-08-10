@@ -1035,7 +1035,8 @@ def system_relationships():
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/<int:user_id>/relationships')
+@user_api.route('/user/<int:user_id>/relationships', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def relationships(user_id):
     """Returns simple JSON defining user relationships
@@ -1090,6 +1091,8 @@ def relationships(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1442,7 +1445,8 @@ def unique_email():
     return jsonify(unique=True)
 
 
-@user_api.route('/user/<int:user_id>/user_documents')
+@user_api.route('/user/<int:user_id>/user_documents', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_documents(user_id):
     """Returns simple JSON defining user documents
@@ -1517,6 +1521,8 @@ def user_documents(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1534,7 +1540,8 @@ def user_documents(user_id):
                                    results])
 
 
-@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>')
+@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def download_user_document(user_id, doc_id):
     """Download a user document belonging to a user
@@ -1573,6 +1580,8 @@ def download_user_document(user_id, doc_id):
           permission to edit requested user_id
       404:
         description: if user_id or doc_id doesn't exist
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1774,7 +1783,8 @@ def trigger_password_reset_email(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>')
+@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_table_preferences(user_id, table_name):
     """Returns simple JSON defining user table preferences
@@ -1833,6 +1843,8 @@ def get_table_preferences(user_id, table_name):
       404:
         description:
           if no TablePreference found for given user_id and table_name
+    security:
+      - Authorization: []
 
     """
     if not user_id or not table_name:
@@ -2091,6 +2103,7 @@ def get_user_messages(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+
     """
     user = current_user()
     if user.id != user_id:
@@ -2107,7 +2120,8 @@ def get_user_messages(user_id):
     return jsonify(messages=[m.as_json() for m in messages])
 
 
-@user_api.route('/user/<int:user_id>/questionnaire_bank')
+@user_api.route('/user/<int:user_id>/questionnaire_bank', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_current_user_qb(user_id):
     """Returns JSON defining user's current QuestionnaireBank
@@ -2143,6 +2157,9 @@ def get_current_user_qb(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
+
     """
     user = current_user()
     if user.id != user_id:

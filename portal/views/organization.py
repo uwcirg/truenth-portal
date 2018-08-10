@@ -22,6 +22,7 @@ from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import IETF_LANGUAGE_TAG, PRACTICE_REGION
+from .crossdomain import crossdomain
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
@@ -413,7 +414,8 @@ def organization_put(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/user/<int:user_id>/organization')
+@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_organizations(user_id):
     """Obtain list of organization references currently associated with user
@@ -454,6 +456,8 @@ def user_organizations(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='view', other_id=user_id)
