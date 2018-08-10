@@ -10,11 +10,13 @@ from ..models.audit import Audit
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxNotStartedConstants, TxStartedConstants
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
 
 
-@procedure_api.route('/patient/<int:patient_id>/procedure')
+@procedure_api.route('/patient/<int:patient_id>/procedure', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def procedure(patient_id):
     """Access procedure data as a FHIR bundle of procedures (in JSON)
@@ -50,6 +52,8 @@ def procedure(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     patient = get_user_or_abort(patient_id)
@@ -203,7 +207,8 @@ def procedure_delete(procedure_id):
     return jsonify(message='deleted procedure')
 
 
-@procedure_api.route('/procedure/valueset/<valueset>')
+@procedure_api.route('/procedure/valueset/<valueset>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 def procedure_value_sets(valueset):
     """Returns Valueset for treatment {started,not-started} codes
 
@@ -225,6 +230,8 @@ def procedure_value_sets(valueset):
         description:
           Returns FHIR like Valueset (https://www.hl7.org/FHIR/valueset.html)
           for requested coding type.
+    security:
+      - Authorization: []
 
     """
     options = ('tx-started', 'tx-not-started')

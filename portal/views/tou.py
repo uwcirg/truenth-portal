@@ -42,7 +42,8 @@ def get_current_tou_url():
     return jsonify(url=terms.url)
 
 
-@tou_api.route('/user/<int:user_id>/tou')
+@tou_api.route('/user/<int:user_id>/tou', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_tou(user_id):
     """Access all Terms Of Use info for given user
@@ -93,6 +94,8 @@ def get_tou(user_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     user = get_user_or_abort(user_id)
@@ -104,7 +107,8 @@ def get_tou(user_id):
     return jsonify(tous=[d.as_json() for d in tous])
 
 
-@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
+@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_tou_by_type(user_id, tou_type):
     """Access Terms Of Use info for given user & ToU type
@@ -159,6 +163,8 @@ def get_tou_by_type(user_id, tou_type):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     user = get_user_or_abort(user_id)

@@ -1731,7 +1731,8 @@ def batch_assessment_status():
     return jsonify(status=results)
 
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status')
+@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
     """Return current assessment status for a given patient
@@ -1758,6 +1759,8 @@ def patient_assessment_status(patient_id):
           to view requested patient
       404:
         description: if patient id is invalid
+    security:
+      - Authorization: []
 
     """
     patient = get_user_or_abort(patient_id)

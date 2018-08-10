@@ -4,11 +4,13 @@ from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.questionnaire_bank import Questionnaire, QuestionnaireBank
 from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+from .crossdomain import crossdomain
 
 questionnaire_api = Blueprint('questionnaire_api', __name__)
 
 
-@questionnaire_api.route('/api/questionnaire_bank')
+@questionnaire_api.route('/api/questionnaire_bank', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def questionnaire_bank_list():
     """Obtain a bundle (list) of all QuestionnaireBanks
@@ -26,13 +28,16 @@ def questionnaire_bank_list():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     bundle = QuestionnaireBank.generate_bundle()
     return jsonify(bundle)
 
 
-@questionnaire_api.route('/api/questionnaire')
+@questionnaire_api.route('/api/questionnaire', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def questionnaire_list():
     """Obtain a bundle (list) of all Questionnaires
@@ -50,13 +55,16 @@ def questionnaire_list():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     bundle = Questionnaire.generate_bundle()
     return jsonify(bundle)
 
 
-@questionnaire_api.route('/api/questionnaire/<string:value>')
+@questionnaire_api.route('/api/questionnaire/<string:value>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_questionnaire(value):
     """Return the specified Questionnaire
@@ -87,6 +95,8 @@ def get_questionnaire(value):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     try:
