@@ -53,7 +53,8 @@ from .crossdomain import crossdomain
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
 
-@user_api.route('/me')
+@user_api.route('/me', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def me():
     """Access basics for current user
@@ -87,6 +88,8 @@ def me():
               description: User's preferred email address, same as username
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -407,7 +410,8 @@ def access_url(user_id):
     return jsonify(access_url=url)
 
 
-@user_api.route('/user/<int:user_id>/consent')
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_consents(user_id):
     """Returns simple JSON listing user's valid consent agreements
@@ -501,6 +505,8 @@ def user_consents(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -986,7 +992,8 @@ def set_user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/relationships')
+@user_api.route('/relationships', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def system_relationships():
     """Returns simple JSON defining all system relationships
@@ -1019,6 +1026,8 @@ def system_relationships():
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view system relationships
+    security:
+      - Authorization: []
 
     """
     results = [{'name': r.name, 'description': r.description}
@@ -1298,7 +1307,8 @@ def set_relationships(user_id):
     return relationships(user.id)
 
 
-@user_api.route('/user/<int:user_id>/email_ready')
+@user_api.route('/user/<int:user_id>/email_ready', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def email_ready(user_id):
     """See if given user is 'email ready'
@@ -1341,6 +1351,8 @@ def email_ready(user_id):
                 to receive email
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     user = get_user_or_abort(user_id)
@@ -1352,7 +1364,8 @@ def email_ready(user_id):
         return jsonify(ready=ready, reason=reason)
 
 
-@user_api.route('/unique_email')
+@user_api.route('/unique_email', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 def unique_email():
     """Confirm a given email is unique
 
@@ -1398,6 +1411,8 @@ def unique_email():
         description: if email param is poorly defined
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     email = request.args.get('email')
