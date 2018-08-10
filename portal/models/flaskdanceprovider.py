@@ -89,7 +89,7 @@ class FlaskDanceProvider:
             # e.g. 'picture.data.url'
             # Which means we'll need to get each part
             # individually
-            parts = user_json_key.split('.');
+            parts = user_json_key.split('.')
 
             # Loop over each key to get the value
             # from the user's json
