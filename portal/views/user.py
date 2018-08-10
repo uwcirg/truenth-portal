@@ -48,6 +48,7 @@ from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
 from ..type_tools import check_int
 from .auth import logout
+from .crossdomain import crossdomain
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -824,7 +825,8 @@ def delete_user_consents(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/groups')
+@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_groups(user_id):
     """Returns simple JSON defining user's groups
@@ -865,6 +867,8 @@ def user_groups(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()
