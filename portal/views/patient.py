@@ -16,12 +16,14 @@ from ..extensions import oauth
 from ..models.identifier import Identifier, UserIdentifier
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
+from .crossdomain import crossdomain
 from .demographics import demographics
 
 patient_api = Blueprint('patient_api', __name__)
 
 
-@patient_api.route('/api/patient/')
+@patient_api.route('/api/patient/', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def patient_search():
     """Looks up patient from given parameters, returns FHIR Patient if found
@@ -68,6 +70,8 @@ def patient_search():
         description:
           if there is no match found, or the user lacks permission to look
           up details on the match.
+    security:
+      - Authorization: []
 
     """
     search_params = {}

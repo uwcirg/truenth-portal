@@ -17,12 +17,14 @@ from ..models.message import EmailMessage
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
 from ..models.user import User, current_user
+from .crossdomain import crossdomain
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
 
 @intervention_api.route(
-    '/intervention/<string:intervention_name>/user/<int:user_id>')
+    '/intervention/<string:intervention_name>/user/<int:user_id>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_intervention_get(intervention_name, user_id):
     """Get settings for named user and intervention
@@ -98,6 +100,8 @@ def user_intervention_get(intervention_name, user_id):
       404:
         description:
           if either the intervention name or the user_id given can't be found
+    security:
+      - Authorization: []
 
     """
     intervention = getattr(INTERVENTION, intervention_name)

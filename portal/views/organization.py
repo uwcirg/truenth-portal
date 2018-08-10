@@ -27,7 +27,8 @@ from .crossdomain import crossdomain
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
 
-@org_api.route('/organization')
+@org_api.route('/organization', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
@@ -84,6 +85,8 @@ def organization_search():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     filter = None

@@ -18,6 +18,7 @@ from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.coredata import Coredata
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
 
@@ -117,7 +118,8 @@ def optional(user_id):
     return jsonify(optional=results)
 
 
-@coredata_api.route('/acquire', methods=('GET',))
+@coredata_api.route('/acquire', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def acquire():
     """Redirection target to acquire coredata from the user
@@ -179,6 +181,8 @@ def acquire():
           to view requested patient
       403:
         description: if the next parameter origin is not recognized
+    security:
+      - Authorization: []
 
     """
     # Require and maintain a valid return address

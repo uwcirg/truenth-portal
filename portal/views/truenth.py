@@ -82,7 +82,7 @@ def auditlog_addevent():
 
 
 @truenth_api.route('/portal-wrapper-html/', methods=('GET', 'OPTIONS'))
-@crossdomain()
+@crossdomain(origin='*')
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
@@ -129,6 +129,8 @@ def portal_wrapper_html():
         description:
           if a login_url is provided with an origin other than one
           registered as a client app or intervention
+    security:
+      - Authorization: []
 
     """
     # Unlike all other oauth protected resources, we manually check
@@ -195,7 +197,7 @@ def portal_wrapper_html():
     return make_response(html)
 
 @truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
-@crossdomain()
+@crossdomain(origin='*')
 def portal_footer_html():
     """Returns portal footer for insertion at bottom of interventions
 
@@ -215,6 +217,8 @@ def portal_footer_html():
         description:
           html for direct insertion near the bottom of the intervention's
           page.
+    security:
+      - Authorization: []
 
     """
     # Unlike all other oauth protected resources, we manually check

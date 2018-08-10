@@ -43,6 +43,7 @@ from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from ..trace import dump_trace, establish_trace
 from ..type_tools import check_int
+from .crossdomain import crossdomain
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
@@ -51,10 +52,11 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
     defaults={'instrument_id': None},
-)
+    methods=('OPTIONS', 'GET'))
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment/<string:instrument_id>'
-)
+    '/patient/<int:patient_id>/assessment/<string:instrument_id>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def assessment(patient_id, instrument_id):
     """Return a patient's responses to questionnaire(s)
@@ -594,6 +596,8 @@ def assessment(patient_id, instrument_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
 
@@ -1588,7 +1592,8 @@ def deprecated_present_assessment(instrument_id):
 
     return present_assessment(instruments=[instrument_id,])
 
-@assessment_engine_api.route('/complete-assessment')
+@assessment_engine_api.route('/complete-assessment', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def complete_assessment():
     """Return to the last intervention that requested an assessment be presented
@@ -1613,6 +1618,8 @@ def complete_assessment():
             format: url
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
 
@@ -1640,7 +1647,8 @@ def complete_assessment():
     return redirect(next_url, code=303)
 
 
-@assessment_engine_api.route('/consent-assessment-status')
+@assessment_engine_api.route('/consent-assessment-status', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def batch_assessment_status():
     """Return a batch of consent and assessment states for list of users
@@ -1697,6 +1705,8 @@ def batch_assessment_status():
                           description: User's assessment status
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     acting_user = current_user()
