@@ -1398,7 +1398,8 @@ def unique_email():
     """
     email = request.args.get('email')
     validate_email(email)
-    match = User.query.filter_by(email=email)
+    # find matching account by email regardless of case
+    match = User.query.filter_by(email=email.lower())
     assert (match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
         # If the user is the authenticated user or provided user_id,
