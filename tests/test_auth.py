@@ -289,10 +289,32 @@ class TestAuth(TestCase):
         # Verify the response returned successfully
         assert response.status_code == 200
 
-    def test_oauth_when_mock_provider_fails_to_get_user_info(self):
-        # Make the mock provider fail to get user info
+    def test_oauth_when_mock_provider_fails_to_get_user_json(self):
+        # Make the mock provider fail to get user json
         oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
-        oauth_info['fail_to_get_user_info'] = True
+        oauth_info['fail_to_get_user_json'] = True
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify 500
+        assert response.status_code == 500
+
+    def test_oauth_when_non_required_value_undefined(self):
+        # Make the mock provider fail to get user json
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        del oauth_info['birthdate']
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+    def test_oauth_when_required_value_undefined(self):
+        # Make the mock provider fail to get user json
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        del oauth_info['provider_id']
 
         # Attempt to login through the test backdoor
         response = self.login(oauth_info=oauth_info)
