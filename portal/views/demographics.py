@@ -13,7 +13,7 @@ from .crossdomain import crossdomain
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 
 @demographics_api.route('/demographics', defaults={'patient_id': None}, methods=('OPTIONS', 'GET'))
-@demographics_api.route('/demographics/<int:patient_id>')
+@demographics_api.route('/demographics/<int:patient_id>', methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def demographics(patient_id):
