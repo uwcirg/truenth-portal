@@ -87,9 +87,11 @@ def oauth_test_backdoor():
         return login_user_with_provider(request, mock_provider)
 
     def create_mock_provider():
-        # Convert all request args into a dictionary of user json
-        # Some keys, like next, will be ignored if defined,
-        # and that's ok
+        # Convert all request args into a dictionary that's
+        # used to mock user json returned from a provider
+        # Certain keys, like next, will be included in this
+        # all inclusive brute force approach, but that's ok.
+        # These properties will be ignored
         user_json = request.args.to_dict()
 
         # If a token is set turn it into a json object

@@ -37,11 +37,10 @@ class FlaskDanceProvider:
         and returns an instance of FlaskProviderUserInfo that is
         filled with the user's information
 
-        :return an instance of FlaskProviderUserInfo with the
-            user's info
+        :return FlaskProviderUserInfo with the user's info
         """
 
-        # Get the user's json
+        # Ask the provider for details about the user
         resp = self.send_get_user_json_request()
 
         if not resp.ok:
@@ -58,7 +57,7 @@ class FlaskDanceProvider:
         """parses the user's json and returns it in a standard format
 
         Providers encode user information in json. This function parses
-        the json and stored values in an instance of FlaskProviderUserInfo
+        the json and stores values in an instance of FlaskProviderUserInfo
 
         :param user_json: info about the user encoded in json
 
@@ -70,16 +69,17 @@ class FlaskDanceProvider:
 
             Each provider returns json with different property values.
             For example, Facebook returns json that maps a user's first name to
-            'first_name' while Google maps it to 'given_name'.
-            self.standard_key_to_provider_key_map maps standard keys to
+            'first_name' while Google maps first names to 'given_name'.
+            self.standard_key_to_provider_key_map links standard keys to
             provider specific keys which allows our parsing code to stay as
             generic as possible.
 
-            :param standard:key: the standard key mapped to a provider key
+            :param standard:key: the standard key
             :param required: is this property required?
             :return value from the user's json or None
             """
 
+            # Ge the key used by the provider
             user_json_key = \
                 self.standard_key_to_provider_key_map[standard_key]
 
@@ -91,7 +91,7 @@ class FlaskDanceProvider:
             # Get the value from the user's json
             return user_json[user_json_key]
 
-        # Attempt to parse the provider json
+        # Attempt to parse the user's json
         try:
             user_info = FlaskProviderUserInfo()
             user_info.id = get_value_from_json('id')
@@ -100,7 +100,7 @@ class FlaskDanceProvider:
             user_info.email = get_value_from_json('email')
             user_info.image_url = get_value_from_json('image_url')
 
-            # These properties may not be defined in the provider json
+            # These properties may not be defined
             user_info.gender = get_value_from_json(
                 'gender',
                 required=False
@@ -122,7 +122,7 @@ class FlaskDanceProvider:
 
     @abstractmethod
     def send_get_user_json_request(self):
-        """sends a request to the provider to get user info json
+        """sends a request to the provider to get user json
 
         This function must be overriden in descendant classes
         to return a response with the user's json
@@ -233,9 +233,9 @@ class MockFlaskDanceProvider(FlaskDanceProvider):
     def send_get_user_json_request(self):
         """return a mock request based on test data passed into the constructor
 
-        This effectively mocks out requests that are normally sent to providers
-        that return a user's info. Instead, this function returns test data
-        passed through the backdoor allowing us to granularly test auth logic.
+        Normally a request is sent to a provider and user json is returned.
+        This function mocks out that request by returning a response
+        with the user json passed through the test backdoor
         """
 
         if self.fail_to_get_user_json:
