@@ -31,7 +31,8 @@ def ping():
     return 'OK'
 
 
-@truenth_api.route('/auditlog', methods=('POST',))
+@truenth_api.route('/auditlog', methods=('OPTIONS','POST',))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def auditlog_addevent():
     """Add event to audit log
@@ -71,6 +72,8 @@ def auditlog_addevent():
               description: Result, typically "ok"
       401:
         description: if missing valid OAuth token
+    security:
+      - Authorization: []
 
     """
     message = request.form.get('message')
