@@ -485,9 +485,10 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
+        params.async = params.sync ? false: params.async;
         var self = this;
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
@@ -523,16 +524,7 @@ var tnthAjax = {
                 "pragma": "no-cache"
             };
         }
-        $.ajax({
-            type: method ? method : "GET",
-            url: url,
-            contentType: params.contentType,
-            dataType: params.dataType,
-            cache: params.cache,
-            async: params.sync ? false: params.async,
-            data: params.data,
-            timeout: params.timeout //set default timeout to 5 seconds
-        }).done(function(data) {
+        $.ajax(params).done(function(data) {
             params.attempts = 0;
             if (data) {
                 callback(data);
