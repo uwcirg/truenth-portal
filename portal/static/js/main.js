@@ -2263,7 +2263,7 @@ var Global = {
                         addUserId = "&user_id=" + $el.attr("data-user-id");
                     }
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-                        tnthAjax.sendRequest("/api/unique_email?email=" + encodeURIComponent(emailVal.toLowerCase()) + addUserId, "GET", "", null, function(data) {
+                        tnthAjax.sendRequest("/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId, "GET", "", null, function(data) {
                             if (!data.error) {
                                 if (data.unique) {
                                     $("#erroremail").html("").parents(".form-group").removeClass("has-error");
