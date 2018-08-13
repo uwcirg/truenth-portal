@@ -29,10 +29,10 @@ def valueset_nhhd_291036():
         "id": NHHD_291036,
         "url": TRUENTH_VALUESET_NHHD_291036,
         "name": (
-            "Indigenous Status as defined by Australian Institute of Health "
-            "and Welfare's National Health Data Dictionary 2012 version 1A6 "
-            "Spec: http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=1073"
-            "7422824 METeOR identifier: 291036"),
+            "Indigenous Status as defined by Australian Institute of Health and"
+            " Welfare's National Health Data Dictionary 2012 version 1A6 Spec: "
+            "http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824 "
+            "METeOR identifier: 291036"),
         "meta": {
             "lastUpdated": "2016-11-03T00:00:00.000Z"
         },
