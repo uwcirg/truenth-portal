@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 from flask_user import roles_required
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
@@ -1399,7 +1399,7 @@ def unique_email():
     email = request.args.get('email')
     validate_email(email)
     # find matching account by email regardless of case
-    match = User.query.filter_by(email=email.lower())
+    match = User.query.filter(func.lower(User.email) == email.lower())
     assert (match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
         # If the user is the authenticated user or provided user_id,
