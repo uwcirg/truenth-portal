@@ -12,6 +12,7 @@ from portal.models.group import Group
 from portal.models.role import ROLE
 from tests import TEST_USER_ID, TestCase
 
+
 class TestGroup(TestCase):
     """Group model tests"""
 
@@ -61,9 +62,9 @@ class TestGroup(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        response = self.client.post('/api/group/',
-                          content_type='application/json',
-                          data=json.dumps(grp.as_json()))
+        response = self.client.post(
+            '/api/group/', content_type='application/json',
+            data=json.dumps(grp.as_json()))
         assert response.status_code == 200
 
         # Pull the posted group
@@ -81,9 +82,10 @@ class TestGroup(TestCase):
         self.login()
 
         improved_grp = Group(name='changed_name', description='Updated')
-        response = self.client.put('/api/group/{}'.format('test_grp_name'),
-                          content_type='application/json',
-                          data=json.dumps(improved_grp.as_json()))
+        response = self.client.put(
+            '/api/group/{}'.format('test_grp_name'),
+            content_type='application/json',
+            data=json.dumps(improved_grp.as_json()))
         assert response.status_code == 200
 
         # Pull the posted group
@@ -125,9 +127,10 @@ class TestGroup(TestCase):
 
         # put only the 2nd group, should end up being the only one for the user
         self.login()
-        response = self.client.put('/api/user/{}/groups'.format(TEST_USER_ID),
-                          content_type='application/json',
-                          data=json.dumps({'groups': [grp2.as_json()]}))
+        response = self.client.put(
+            '/api/user/{}/groups'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps({'groups': [grp2.as_json()]}))
         assert response.status_code == 200
         assert len(self.test_user.groups) == 1
         assert self.test_user.groups[0].name == 'test2'

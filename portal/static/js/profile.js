@@ -35,13 +35,13 @@
             var self = this;
             VueErrorHandling(); /*global VueErrorHandling */
             this.registerDependencies();
-            this.onBeforeSectionsLoad();
             this.getOrgTool();
             this.setUserSettings();
+            this.onBeforeSectionsLoad();
             this.setCurrentUserOrgs();
             this.initStartTime = new Date();
             this.initChecks.push({done: false});
-            this.setDemoData({useWorker: true}, function() {
+            this.setDemoData({beforeSend: self.setSectionLoaders}, function() { //this will initialize section loaders, only if ajax request is sent
                 self.onInitChecksDone();
             });
             if (this.currentUserId) { //get user roles - note using the current user Id - so we can determine: if user is an admin, if he/she can edit the consent, etc.
@@ -512,8 +512,15 @@
             getShowInMacro: function() {
                 return this.settings.SHOW_PROFILE_MACROS || [];
             },
+            setSectionLoaders: function() {
+                $("#profileForm .section-loader").removeClass("tnth-hide");
+            },
+            clearSectionLoaders: function() {
+                $("#profileForm .section-loader").addClass("tnth-hide");
+                $("#profileForm .profile-item-edit-btn").addClass("active");
+            },
             onBeforeSectionsLoad: function() {
-                if ($("#profileForm").length > 0) {
+                if (this.mode === "profile") {
                     $("#mainDiv").addClass("profile");
                 }
             },
@@ -527,6 +534,9 @@
                         self.fillViews = self.setView();
                         self.initEditButtons();
                     }, 50);
+                    $(document).ajaxStop(function() {
+                        self.clearSectionLoaders(); //clear section loaders after ajax calls completed, note this will account for failed/cancelled requests as well
+                    });
                 }
             },
             initLoginAsButtons: function() {
@@ -611,7 +621,7 @@
                     }
                 });
                 if (callback) {
-                    setTimeout(function() {callback();}, initCount);
+                    setTimeout(function() {callback();}, initCount+20);
                 }
             },
             handleOptionalCoreData: function() {

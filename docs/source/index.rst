@@ -19,6 +19,7 @@ Contents:
     interventions
     organizations
     user_experience
+    provider_authentication
     sessions
     development
     internationalization
