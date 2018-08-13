@@ -1360,7 +1360,7 @@ class User(db.Model, UserMixin):
         For example, users are created when invited by staff to participate,
         and when the same user later opts to register, a second account
         is generated during the registration process (either by flask-user
-        or other mechanisms like add_authomatic_user).
+        or other mechanisms like add_user).
 
         NB - caller MUST manage email due to unique constraints
 
@@ -1606,15 +1606,16 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
 
-def add_authomatic_user(authomatic_user, image_url):
+def add_user(user_info):
     """Given the result from an external IdP, create a new user"""
     user = User(
-        first_name=authomatic_user.first_name,
-        last_name=authomatic_user.last_name,
-        birthdate=authomatic_user.birth_date,
-        gender=authomatic_user.gender,
-        email=authomatic_user.email,
-        image_url=image_url)
+        first_name=user_info.first_name,
+        last_name=user_info.last_name,
+        birthdate=user_info.birthdate,
+        gender=user_info.gender,
+        email=user_info.email,
+        image_url=user_info.image_url
+    )
     db.session.add(user)
     return user
 

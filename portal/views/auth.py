@@ -7,20 +7,20 @@ import hashlib
 import hmac
 import json
 
-from authomatic.adapters import WerkzeugAdapter
-from authomatic.exceptions import CancellationError, ConfigError
 from flask import (
     Blueprint,
     abort,
     current_app,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
     session,
     url_for,
 )
+from flask_dance.consumer import oauth_authorized, oauth_error
+from flask_dance.contrib.facebook import make_facebook_blueprint
+from flask_dance.contrib.google import make_google_blueprint
 from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import (
@@ -30,25 +30,291 @@ from flask_user.signals import (
     user_reset_password,
 )
 import requests
-
+from sqlalchemy.orm.exc import NoResultFound
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
-from ..extensions import authomatic, oauth
+from ..extensions import oauth
 from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
+from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
+from ..models.flaskdanceprovider import (
+    FacebookFlaskDanceProvider,
+    FlaskProviderUserInfo,
+    GoogleFlaskDanceProvider,
+    MockFlaskDanceProvider,
+)
 from ..models.role import ROLE
 from ..models.user import (
     User,
-    add_authomatic_user,
+    add_user,
     current_user,
     get_user_or_abort,
 )
 
 auth = Blueprint('auth', __name__)
+
+google_blueprint = make_google_blueprint(
+    scope=['profile', 'email'],
+    login_url='/login/google/',
+)
+
+facebook_blueprint = make_facebook_blueprint(
+    scope=['email', 'user_birthday', 'user_gender'],
+    login_url='/login/facebook/',
+)
+
+
+@auth.route('/test/oauth')
+def oauth_test_backdoor():
+    """unit test backdoor
+
+    API that handles oauth related tasks for unit tests.
+    When a test needs to login or test oauth related logic
+    this API will likely be used.
+    """
+    def login_test_user_using_session(user_id):
+        session['id'] = user_id
+        user = current_user()
+        login_user(user, 'password_authenticated')
+        return next_after_login()
+
+    def login_test_user_with_mock_provider():
+        mock_provider = create_mock_provider()
+        return login_user_with_provider(request, mock_provider)
+
+    def create_mock_provider():
+        user_info = FlaskProviderUserInfo()
+        user_info.id = request.args.get('provider_id')
+        user_info.first_name = request.args.get('first_name')
+        user_info.last_name = request.args.get('last_name')
+        user_info.email = request.args.get('email')
+        user_info.image_url = request.args.get('image_url')
+        user_info.gender = request.args.get('gender')
+        user_info.birthday = request.args.get('birthday')
+
+        # If a token is set turn it into a json object
+        token = request.args.get('token')
+        if token:
+            token = json.loads(token)
+
+        mock_provider = MockFlaskDanceProvider(
+            request.args.get('provider_name'),
+            token,
+            user_info,
+            request.args.get('fail_to_get_user_info')
+        )
+
+        return mock_provider
+
+    if not current_app.testing:
+        return abort(404)
+
+    # Validate the next arg
+    if request.args.get('next'):
+        validate_origin(request.args.get('next'))
+
+    # If user_id is set log the user in by updating the session
+    user_id = request.args.get('user_id')
+    if user_id:
+        return login_test_user_using_session(user_id)
+
+    # Otherwise log the user in using the consumer flow
+    return login_test_user_with_mock_provider()
+
+
+@oauth_authorized.connect_via(facebook_blueprint)
+@oauth_authorized.connect_via(google_blueprint)
+def login(blueprint, token):
+    """successful provider login callback
+
+    After successful authorization at the provider, control
+    returns here. The blueprint and the oauth bearer
+    token are used to log the user into the portal
+
+    :return returns False to disable saving oauth token
+    """
+    provider = None
+    if blueprint.name == 'google':
+        provider = GoogleFlaskDanceProvider(blueprint, token)
+    elif blueprint.name == 'facebook':
+        provider = FacebookFlaskDanceProvider(blueprint, token)
+    else:
+        error_message = 'Unexpected provider {}'.format(blueprint.name)
+        current_app.logger.error(error_message)
+        return abort(500, error_message)
+
+    login_user_with_provider(request, provider)
+
+    # Disable Flask-Dance's default behavior that saves the oauth token
+    return False
+
+
+def login_user_with_provider(request, provider):
+    """provider login
+
+    A common login function for all providers. Once the provider
+    calls our server with the user's bearer token, the token
+    is wrapped in an instance of FlaskDanceProvider and passed here.
+    This function uses it to get more information about the user and,
+    if all goes well, log them in.
+    """
+    store_next_in_session(request, provider)
+
+    if not provider.token:
+        current_app.logger.info("User canceled IdP auth - send home")
+        return redirect('/')
+
+    # Use the auth token to get user info from the provider
+    user_info = provider.get_user_info()
+    if not user_info:
+        current_app.logger.error(
+            'Failed to get user info at %s',
+            provider.name
+        )
+        return abort(
+            500,
+            "unable to authorize with provider {}".format(provider.name)
+        )
+
+    current_app.logger.debug(
+        "Successful authentication at %s", provider.name)
+
+    try:
+        # Check to see if the user has logged in
+        # with this auth provider at any point in the past
+        auth_provider_query = AuthProvider.query.filter_by(
+            provider=provider.name,
+            provider_id=user_info.id,
+        )
+
+        auth_provider = auth_provider_query.one()
+    except NoResultFound:
+        # If this is the first time the user is logging with this provider
+        # create an entry in the provider table. This will be updated with
+        # more info below
+        auth_provider = AuthProvider(
+            provider=provider.name,
+            provider_id=user_info.id,
+            token=provider.token,
+        )
+
+    if auth_provider.user:
+        auditable_event(
+            "login via {0}".format(provider.name),
+            user_id=auth_provider.user_id,
+            subject_id=auth_provider.user.id,
+            context='login'
+        )
+    else:
+        # This is the user's first time logging in with this provider
+        # Check to see if a db entry already exists for the user's email
+        # address.
+        user_query = User.query.filter_by(email=user_info.email)
+        user = user_query.first()
+
+        if user:
+            auditable_event(
+                "login user via NEW IdP {0}".format(provider.name),
+                user_id=user.id,
+                subject_id=user.id,
+                context='login'
+            )
+        else:
+            # This user has never logged in before.
+            # Create a new entry in the user table.
+            user = add_user(user_info)
+
+            # Make sure the user is committed
+            db.session.commit()
+
+            auditable_event(
+                "register new user via {0}".format(provider.name),
+                user_id=user.id,
+                subject_id=user.id,
+                context='account'
+            )
+
+        # Associate this user with the new auth provider
+        # and prepare to save the changes
+        auth_provider.user = user
+        db.session.add(auth_provider)
+
+    # Update the user's image in case they're logging in from
+    # a different IDP or their image url changed
+    auth_provider.user.image_url = user_info.image_url
+
+    # Finally, commit all of our changes
+    db.session.commit()
+
+    # Update our session
+    session['id'] = auth_provider.user.id
+    session['remote_token'] = provider.token
+
+    # Log the user in
+    login_user(auth_provider.user, 'password_authenticated')
+
+    return next_after_login()
+
+
+def store_next_in_session(request, provider):
+    """store the 'next' request arg in session
+
+    If the 'next' arg is set on the request store its value
+    in the user's session so we can use it to navigate to the
+    next page after we're done authenticating
+    """
+    if request.args.get('next'):
+        next_url = request.args.get('next')
+        validate_origin(next_url)
+        session['next'] = next_url
+        current_app.logger.debug(
+            "store-session['next'] <{}> from login/{}".format(
+                session['next'], provider.name))
+
+
+@oauth_error.connect_via(google_blueprint)
+@oauth_error.connect_via(facebook_blueprint)
+def provider_oauth_error(
+    blueprint,
+    error,
+    error_description=None,
+    error_uri=None
+):
+    """handles oauth errors
+
+    If there's an error during provider authentiation
+    control returns here. This function attempts to retry
+    logging the user in several times before aborting.
+    """
+    reload_count = session.get('force_reload_count', 0)
+    if reload_count > 2:
+        current_app.logger.error(
+            "Failed 3 attempts: OAuth error from {name}! "
+            "error={error} description={description} uri={uri}"
+        ).format(
+            name=blueprint.name,
+            error=error,
+            description=error_description,
+            uri=error_uri,
+        )
+        abort(500, "unable to authorize with provider {}".format(
+            blueprint.name))
+
+    session['force_reload_count'] = reload_count + 1
+    current_app.logger.info(str(error))
+    # Work around for w/ Safari and cookies set to current site only
+    # forcing a reload brings the local cookies back into view
+    # (they're missing with such a setting on returning from
+    # the 3rd party IdP redirect)
+    current_app.logger.info("attempting reload on oauth error")
+    return render_template(
+        'force_reload.html',
+        message=error_description
+    )
 
 
 @auth.route('/deauthorized', methods=('POST',))
@@ -76,7 +342,7 @@ def deauthorized():
     sig = base64_url_decode(encoded_sig)
     data = base64_url_decode(payload)
 
-    secret = current_app.config['FB_CONSUMER_SECRET']
+    secret = current_app.config['FACEBOOK_OAUTH_CLIENT_SECRET']
     expected_sig = hmac.new(
         secret, msg=payload, digestmod=hashlib.sha256).digest()
     if expected_sig != sig:
@@ -257,181 +523,37 @@ def next_after_login():
         resp = redirect('/home')
 
     def update_timeout():
-        # make cookie max_age outlast the browser session
-        max_age = 60 * 60 * 24 * 365 * 5
-        # set timeout cookies
-        if session.get('login_as_id'):
-            if request.cookies.get('SS_TIMEOUT'):
-                resp.set_cookie('SS_TIMEOUT_REVERT',
-                                request.cookies['SS_TIMEOUT'],
-                                max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
-        elif request.cookies.get('SS_TIMEOUT_REVERT'):
-            resp.set_cookie('SS_TIMEOUT',
-                            request.cookies['SS_TIMEOUT_REVERT'],
-                            max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
-        else:
-            # TODO determine if this line should stay - it seems it
-            # would clear a value potentially set on the browser via
-            # /settings
-            resp.set_cookie('SS_TIMEOUT', '', expires=0)
+        """set inactivity timeout cookie depending on user context"""
 
-    ready_for_login_as_timeout = False
-    if ready_for_login_as_timeout:
-        update_timeout()
+        inactivity_cookie = 'SS_INACTIVITY_TIMEOUT'
+
+        # Login-as limited to 5 mins
+        if session.get('login_as_id'):
+            resp.set_cookie(inactivity_cookie, '300')
+            return
+
+        # Systems (i.e. kiosks) with custom timeout settings
+        custom_system_timeout = request.cookies.get('SS_TIMEOUT')
+        if custom_system_timeout:
+            resp.set_cookie(inactivity_cookie, custom_system_timeout)
+            return
+
+        # Otherwise, use default or max from user's interventions
+        max_found = current_app.config['DEFAULT_INACTIVITY_TIMEOUT']
+
+        for i in Intervention.query.join(UserIntervention).filter(
+                UserIntervention.user_id == user.id).with_entities(
+                Intervention.name):
+            intervention_timeout = current_app.config.get(
+                "{}_TIMEOUT".format(i.name.upper()), 0)
+            max_found = max(max_found, intervention_timeout)
+
+
+        resp.set_cookie(inactivity_cookie, str(max_found))
+
+    update_timeout()
 
     return resp
-
-
-@auth.route('/login/<provider_name>/')
-def login(provider_name):
-    """login view function
-
-    After successful authorization at OAuth server, control
-    returns here.  The user's ID and the remote oauth bearer
-    token are retained in the session for subsequent use.
-
-    """
-
-    def testing_backdoor(user_id):
-        "Unittesting backdoor - see tests.login() for use"
-        assert int(user_id) < 10  # allowed for test users only!
-        session['id'] = user_id
-        if request.args.get('next'):
-            validate_origin(request.args.get('next'))
-        user = current_user()
-        login_user(user, 'password_authenticated')
-        return next_after_login()
-
-    def picture_url(result):
-        """Using OAuth result, fetch the user's picture URL"""
-        image_url = result.user.picture
-        if provider_name == 'facebook':
-            # Additional request needed for FB profile image
-            url = '?'.join(
-                ("https://graph.facebook.com/{0}/picture",
-                 "redirect=false&width=160")).format(result.user.id)
-            response = result.provider.access(url)
-            if response.status == 200:
-                image_url = response.data['data']['url']
-        return image_url
-
-    if provider_name == 'TESTING' and current_app.config['TESTING']:
-        return testing_backdoor(request.args.get('user_id'))
-
-    if request.args.get('next'):
-        session['next'] = request.args.get('next')
-        validate_origin(session['next'])
-        current_app.logger.debug(
-            "store-session['next'] <{}> from login/{}".format(
-                session['next'], provider_name))
-        # The existance of any args (including 'next') breaks the authomatic
-        # login flow.  Clear out before passing on
-        from werkzeug.datastructures import ImmutableMultiDict
-        request.args = ImmutableMultiDict()
-
-    prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
-
-    if (not current_app.config.get('{}_CONSUMER_KEY'.format(prv)) or
-            not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
-        current_app.logger.info(
-            "Generating 404 on request for OAuth provider `{}` missing "
-            "configuration".format(provider_name))
-        abort(404)
-
-    response = make_response()
-    adapter = WerkzeugAdapter(request, response)
-    try:
-        result = authomatic.authomatic.login(adapter, provider_name)
-    except ConfigError:
-        # Raised for random requests for non-configured hosts.  Treat as 404
-        current_app.logger.info(
-            "Generating 404 on request for OAuth provider `{}` missing "
-            "configuration".format(provider_name))
-        abort(404)
-
-    if current_user():
-        if current_user().deleted:
-            abort(400, "deleted user - operation not permitted")
-        return next_after_login()
-    if result:
-        if result.error:
-            if isinstance(result.error, CancellationError):
-                current_app.logger.info("User canceled IdP auth - send home")
-                return redirect('/')
-
-            reload_count = session.get('force_reload_count', 0)
-            if reload_count > 2:
-                current_app.logger.warn("Failed 3 attempts: {}".format(
-                    result.error.message))
-                abort(500, "unable to authorize with provider {}".format(
-                    provider_name))
-            session['force_reload_count'] = reload_count + 1
-            current_app.logger.info(str(result.error))
-            # Work around for w/ Safari and cookies set to current site only
-            # forcing a reload brings the local cookies back into view
-            # (they're missing with such a setting on returning from
-            # the 3rd party IdP redirect)
-            current_app.logger.info("attempting reload on oauth error")
-            return render_template('force_reload.html',
-                                   message=result.error.message)
-        elif result.user:
-            current_app.logger.debug(
-                "Successful authentication at %s", provider_name)
-            if not (result.user.name and result.user.id):
-                result.user.update()
-                image_url = picture_url(result)
-
-            # Success - add or pull this user to/from database
-            ap = AuthProvider.query.filter_by(
-                provider=provider_name, provider_id=result.user.id).first()
-            if ap:
-                auditable_event("login via {0}".format(provider_name),
-                                user_id=ap.user_id, subject_id=ap.user.id,
-                                context='login')
-                user = User.query.filter_by(id=ap.user_id).first()
-                user.image_url = image_url
-                db.session.commit()
-            else:
-                # Experiencing problems pulling email from IdPs.
-                if not result.user.email:
-                    abort(500, "No email for user {} from {}".format(
-                        result.user.id, provider_name))
-
-                # Confirm we haven't seen user from a different IdP
-                user = (User.query.filter_by(
-                    email=result.user.email).first()
-                        if result.user.email else None)
-
-                if not user:
-                    user = add_authomatic_user(result.user, image_url)
-                    db.session.commit()
-                    auditable_event(
-                        "register new user via {0}".format(provider_name),
-                        user_id=user.id,
-                        subject_id=user.id,
-                        context='account')
-                else:
-                    auditable_event(
-                        "login user via NEW IdP {0}".format(provider_name),
-                        user_id=user.id,
-                        subject_id=user.id,
-                        context='login')
-                    user.image_url = image_url
-
-                ap = AuthProvider(
-                    provider=provider_name,
-                    provider_id=result.user.id,
-                    user_id=user.id)
-                db.session.add(ap)
-                db.session.commit()
-            session['id'] = user.id
-            session['remote_token'] = result.provider.credentials.token
-            login_user(user, 'password_authenticated')
-            return next_after_login()
-    else:
-        return response
 
 
 @auth.route('/login-as/<user_id>')
