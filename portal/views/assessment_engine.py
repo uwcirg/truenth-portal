@@ -896,6 +896,12 @@ def assessment_add(patient_id):
         required: true
         type: integer
         format: int64
+      - name: entry_method
+        in: query
+        description: Entry method such as `paper` if known
+        required: false
+        type: integer
+        format: string
       - in: body
         name: body
         schema:
@@ -1344,8 +1350,8 @@ def assessment_add(patient_id):
     })
 
     encounter = current_user().current_encounter
-    if 'entry_method' in session:
-        encounter_type = getattr(EC, session['entry_method'].upper()).codings[0]
+    if 'entry_method' in request.args:
+        encounter_type = getattr(EC, request.args['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
     qnr_qb = None
@@ -1549,6 +1555,7 @@ def present_assessment(instruments=None):
         "resume_identifier": ",".join(resume_identifiers),
         "subject_id": request.args.get('subject_id'),
         "authored": request.args.get('authored'),
+        "entry_method": request.args.get('entry_method'),
     }
     # Clear empty querystring params
     assessment_params = {k: v for k, v in assessment_params.items() if v}
@@ -1558,16 +1565,6 @@ def present_assessment(instruments=None):
         "/surveys/new_session?",
         requests.compat.urlencode(assessment_params),
     ))
-
-    # Temporarily persist entry method until QNR POSTed
-    entry_methods = {'paper'}
-    if ('entry_method' in request.args
-        and request.args.get('entry_method') in entry_methods
-    ):
-        session['entry_method'] = request.args.get('entry_method')
-        current_app.logger.debug(
-            'storing session[entry_method]: %s',
-            request.args.get('entry_method'))
 
     if 'next' in request.args:
         next_url = request.args.get('next')
@@ -1623,9 +1620,6 @@ def complete_assessment():
     """
 
     next_url = session.pop("assessment_return", "/")
-    entry_method = session.pop("entry_method", None)
-    if entry_method:
-        current_app.logger.debug("assessment complete via %s", entry_method)
 
     # Logout Assessment Engine after survey completion
     for token in INTERVENTION.ASSESSMENT_ENGINE.client.tokens:
