@@ -14,14 +14,14 @@
 
             <div class="row" style="margin-top: 2em">
                 <div class="col-xs-6 text-center">
-                    <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+                    <a href="{{ url_for('facebook.login', provider_name='facebook') }}"
                        class="btn btn-social btn-sm btn-facebook">
                         <i class="fa fa-facebook"></i>
                         Facebook
                     </a>
                 </div>
                 <div class="col-xs-6 text-center">
-                    <a href="{{ url_for('auth.login', provider_name='google') }}"
+                    <a href="{{ url_for('google.login', provider_name='google') }}"
                        class="btn btn-sm btn-social btn-google">
                         <i class="fa fa-google"></i>
                         Google
@@ -68,11 +68,11 @@
             <p style="margin-top: 2em">Log in with:</p>
 
             <div style="margin: 1em 0 1em 1em">
-                <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+                <a href="{{ url_for('facebook.login', provider_name='facebook') }}"
                    class="btn btn-social btn-facebook">
                     <i class="fa fa-facebook"></i> Facebook
                 </a><br /><br />
-                <a href="{{ url_for('auth.login', provider_name='google') }}"
+                <a href="{{ url_for('google.login', provider_name='google') }}"
                    class="btn btn-social btn-google">
                     <i class="fa fa-google"></i> Google
                 </a><br />
