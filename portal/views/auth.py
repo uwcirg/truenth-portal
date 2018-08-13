@@ -54,6 +54,7 @@ from ..models.user import (
     current_user,
     get_user_or_abort,
 )
+from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
 
@@ -334,7 +335,7 @@ def deauthorized():
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
         s += "="*padding_factor
-        return base64.b64decode(unicode(s).translate(
+        return base64.b64decode(str(s).translate(
             dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
@@ -652,7 +653,8 @@ def logout(prevent_redirect=False, reason=None):
 
 
 
-@auth.route('/oauth/token-status')
+@auth.route('/oauth/token-status', methods=('OPTIONS','GET'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def token_status():
     """Return remaining valid time and other info for oauth token
@@ -705,6 +707,8 @@ def token_status():
             scopes:
               type: string
               description: Deprecated version of `scope` containing identical data.
+    security:
+      - Authorization: []
 
     """
     authorization = request.headers.get('Authorization')
@@ -722,7 +726,8 @@ def token_status():
         scope=token._scopes, scopes=token._scopes)
 
 
-@auth.route('/oauth/errors', methods=('GET', 'POST'))
+@auth.route('/oauth/errors', methods=('OPTIONS', 'GET', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
@@ -746,13 +751,15 @@ def oauth_errors():
             error:
               type: string
               description: Known details of error situation.
+    security:
+      - Authorization: []
 
     """
     current_app.logger.warn(request.args.get('error'))
     return jsonify(error=request.args.get('error')), 400
 
 
-@auth.route('/oauth/token', methods=('GET', 'POST'))
+@auth.route('/oauth/token', methods=('OPTIONS','GET', 'POST'))
 @csrf.exempt
 @oauth.token_handler
 def access_token():
@@ -839,7 +846,8 @@ def access_token():
     return None
 
 
-@auth.route('/oauth/authorize', methods=('GET', 'POST'))
+@auth.route('/oauth/authorize', methods=('OPTIONS','GET', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
