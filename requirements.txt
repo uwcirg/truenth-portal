@@ -58,7 +58,7 @@ polib==1.1.0
 psycopg2==2.7.5
 py==1.5.4                 # via tox
 pycparser==2.18           # via cffi
-pycryptodome==3.6.4       # via flask-user
+pycryptodome==3.6.5       # via flask-user
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3
