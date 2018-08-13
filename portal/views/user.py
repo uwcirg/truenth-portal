@@ -2145,9 +2145,9 @@ def get_current_user_qb(user_id):
         expiry = qbd_questionnaire_bank.calculated_expiry(
             qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
 
-    if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
+    if date and qbd.relative_start and (date < qbd.relative_start):
         qbd_json['questionnaire_bank'] = None
-    elif date and expiry and (date.date() >= expiry.date()):
+    elif date and expiry and (date >= expiry):
         qbd_json['questionnaire_bank'] = None
     else:
         qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
