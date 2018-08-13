@@ -2038,8 +2038,10 @@ var Global = {
         callback = callback || function() {};
         var self = this;
         sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
+            console.log("get to callback?")
             if (!data || data.error) {
-                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+                tnthAjax.reportError("", PORTAL_NAV_PAGE, data.error || i18next.t("Error loading portal wrapper"), true);
+                $("#mainNavLoadingError").html(i18next.t("Error loading portal wrapper"))
                 restoreVis(); /*global restoreVis */
                 callback();
                 return false;
