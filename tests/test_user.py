@@ -1143,9 +1143,9 @@ class TestUser(TestCase):
         # example bogus data from msk testing
         data = {
             'agreement_url':
-                'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorU'
-                'rl=true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-'
-                '5339-e677353e694f',
+                'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?'
+                'editorUrl=true&version=1.6&groupId=20147&'
+                'uuid=09bb5690-d49b-a10e-5339-e677353e694f',
             'user_id': '{}'.format(TEST_USER_ID),
             'include_in_reports': True,
             'send_reminders': False,
