@@ -897,8 +897,7 @@ def assessment_add(patient_id):
         in: query
         description: Entry method such as `paper` if known
         required: false
-        type: integer
-        format: string
+        type: string
       - in: body
         name: body
         schema:
