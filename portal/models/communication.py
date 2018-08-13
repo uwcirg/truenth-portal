@@ -65,7 +65,7 @@ def load_template_args(user, questionnaire_bank_id=None):
         token = user_manager.token_manager.generate_token(user.id)
         auditable_event(
             "generated access token {} for ae_link".format(
-                token, user), user_id=user.id, subject_id=user.id,
+                token), user_id=user.id, subject_id=user.id,
             context='authentication')
 
         return url_for(
