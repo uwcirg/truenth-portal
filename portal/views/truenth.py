@@ -154,7 +154,7 @@ def portal_wrapper_html():
         login_url = None
 
     if user and user.image_url:
-            movember_profile = user.image_url
+        movember_profile = user.image_url
     else:
         movember_profile = ''.join((
             '//',
@@ -189,10 +189,11 @@ def portal_wrapper_html():
         movember_profile=movember_profile,
         login_url=login_url,
         branded_logos=branded_logos(),
-        enable_links = not disable_links,
-        expires_in = cookie_timeout if cookie_timeout else expires_in()
+        enable_links=not disable_links,
+        expires_in=cookie_timeout if cookie_timeout else expires_in()
     )
     return make_response(html)
+
 
 @truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
 @crossdomain()
@@ -222,9 +223,9 @@ def portal_footer_html():
     # to logging in.
     valid, req = oauth.verify_request(['email'])
     if valid:
-      user = req.user
+        user = req.user
     else:
-      user = current_user()
+        user = current_user()
 
     html = render_template(
         'portal_footer.html',
@@ -233,7 +234,8 @@ def portal_footer_html():
     )
     return make_response(html)
 
-### Depricated rewrites follow
+
+# Deprecated rewrites follow
 @truenth_api.route('/portal-wrapper-html/<username>',
                    methods=('GET', 'OPTIONS'))
 @crossdomain()
@@ -241,6 +243,7 @@ def depricated_portal_wrapper_html(username):
     current_app.logger.warning("use of depricated API %s from referer %s",
                                request.url, request.headers.get('Referer'))
     return portal_wrapper_html()
+
 
 @truenth_api.route('/protected-portal-wrapper-html', methods=('GET', 'OPTIONS'))
 @crossdomain()
