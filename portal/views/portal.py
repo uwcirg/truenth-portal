@@ -832,21 +832,12 @@ def config_settings(config_key):
         'MEDIDATA_RAVE_ORG',
         'LOCALIZED_AFFILIATE_ORG'
     )
-    if config_key:
-        key = config_key.upper()
-        if not any(
-            key.startswith(prefix) for prefix in config_prefix_whitelist
-        ):
-            abort(400, "Configuration key '{}' not available".format(key))
-        return jsonify({key: current_app.config.get(key)})
-    else:
-        config_settings = {}
-        # return selective keys - not all can be be viewed by users, e.g.secret key
-        for key in current_app.config:
-            if any(key.startswith(prefix) for prefix in
-                   config_prefix_whitelist):
-                config_settings[key] = current_app.config.get(key)
-        return jsonify(config_settings)
+    key = config_key.upper()
+    if not any(
+        key.startswith(prefix) for prefix in config_prefix_whitelist
+    ):
+        abort(400, "Configuration key '{}' not available".format(key))
+    return jsonify({key: current_app.config.get(key)})
 
 
 @portal.route('/research')
