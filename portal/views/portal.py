@@ -835,7 +835,8 @@ def config_settings(config_key):
     if config_key:
         key = config_key.upper()
         if not any(
-                key.startswith(prefix) for prefix in config_prefix_whitelist):
+            key.startswith(prefix) for prefix in config_prefix_whitelist
+        ):
             abort(400, "Configuration key '{}' not available".format(key))
         return jsonify({key: current_app.config.get(key)})
     config_settings = {}
