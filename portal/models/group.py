@@ -48,17 +48,18 @@ class Group(db.Model):
             "Group name may only contain lowercase letters and underscores")
 
 
-
 class UserGroup(db.Model):
     __tablename__ = 'user_groups'
     id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'), nullable=False)
-    group_id = db.Column(db.Integer(), db.ForeignKey('groups.id',
-        ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(
+        db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False)
+    group_id = db.Column(
+        db.Integer(), db.ForeignKey('groups.id', ondelete='CASCADE'),
+        nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'group_id',
-        name='_user_group'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'group_id', name='_user_group'),)
 
     def __str__(self):
         """Print friendly format for logging, etc."""

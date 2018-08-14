@@ -93,8 +93,10 @@ class BaseConfig(object):
     LOG_LEVEL = 'DEBUG'
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
-    SS_TIMEOUT = 60 * 60  # seconds for session cookie, reset on ping
-    PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
+    DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
+    PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
+    SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
+
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
@@ -130,10 +132,10 @@ class BaseConfig(object):
     STAFF_BULK_DATA_ACCESS = True
     PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
 
-    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY')
-    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET')
-    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY')
-    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET')
+    FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_OAUTH_CLIENT_ID')
+    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_OAUTH_CLIENT_SECRET')
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'

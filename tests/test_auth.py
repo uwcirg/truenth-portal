@@ -1,5 +1,6 @@
 """Unit test module for auth"""
 from __future__ import unicode_literals  # isort:skip
+from collections import namedtuple
 import datetime
 
 from flask import url_for
@@ -8,7 +9,11 @@ import pytest
 from werkzeug.exceptions import Unauthorized
 
 from portal.extensions import db
-from portal.models.auth import Token, create_service_token
+from portal.models.auth import (
+    AuthProvider,
+    Token,
+    create_service_token,
+)
 from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
@@ -16,15 +21,14 @@ from portal.models.user import (
     RoleError,
     User,
     UserRelationship,
-    add_authomatic_user,
     add_role,
+    add_user,
 )
-from tests import TEST_USER_ID, TestCase
-
-
-class AuthomaticMock(object):
-    """Simple container for mocking Authomatic response"""
-    pass
+from tests import (
+    OAUTH_INFO_PROVIDER_LOGIN,
+    TEST_USER_ID,
+    TestCase,
+)
 
 
 class TestAuth(TestCase):
@@ -115,25 +119,6 @@ class TestAuth(TestCase):
 
         client = Client.query.get('test_client')
         assert client.callback_url != invalid_url
-
-    def test_unicode_name(self):
-        """Test insertion of unicode name via add_authomatic_user"""
-        # Bug with unicode characters in a google user's name
-        # mock an authomatic class:
-
-        authomatic_user = AuthomaticMock()
-        authomatic_user.name = 'Test User'
-        authomatic_user.first_name = 'Test'
-        authomatic_user.last_name = 'Bugn\xed'
-        authomatic_user.birth_date = None
-        authomatic_user.gender = 'male'
-        authomatic_user.email = 'test@test.org'
-
-        new_user = add_authomatic_user(authomatic_user, None)
-
-        user = User.query.filter_by(email='test@test.org').first()
-        assert user.last_name == 'Bugn\xed'
-        assert new_user == user
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
@@ -233,3 +218,113 @@ class TestAuth(TestCase):
         assert validate_origin(client_url)
         assert validate_origin(local_url)
         assert pytest.raises(Unauthorized, validate_origin, invalid_url)
+
+    def test_oauth_with_new_auth_provider_and_new_user(self):
+        # Login using the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify a new user was created
+        user = User.query.filter_by(
+            email=OAUTH_INFO_PROVIDER_LOGIN['email']
+        ).first()
+        assert user
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+    def test_oauth_with_new_auth_provider_and_new_user_unicode_name(self):
+        # Set a unicode name
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['last_name'] = 'Bugn\xed'
+
+        # Login using the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify a new user was created
+        user = User.query.filter_by(
+            last_name=OAUTH_INFO_PROVIDER_LOGIN['last_name']
+        ).first()
+        assert user
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+        pass
+
+    def test_oauth_with_new_auth_provider_and_existing_user(self):
+        # Create the user
+        user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Login through the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+    def test_oauth_with_existing_auth_provider_and_existing_user(self):
+        # Create the user
+        user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Create the auth provider
+        add_auth_provider(OAUTH_INFO_PROVIDER_LOGIN, user)
+
+        # Login through the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+    def test_oauth_when_mock_provider_fails_to_get_user_info(self):
+        # Make the mock provider fail to get user info
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['fail_to_get_user_info'] = True
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify 500
+        assert response.status_code == 500
+
+    def test_oauth_with_invalid_token(self):
+        # Set an invalid token
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info.pop('token', None)
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info, follow_redirects=False)
+
+        # Verify force reload
+        self.assertRedirects(response, oauth_info['next'])
+
+
+def add_user_from_oauth_info(oauth_info):
+    user_to_add = namedtuple('Mock', oauth_info.keys())(*oauth_info.values())
+    user = add_user(user_to_add)
+    db.session.commit()
+    return user
+
+
+def add_auth_provider(oauth_info, user):
+    auth_provider = AuthProvider(
+        provider=oauth_info['provider_name'],
+        provider_id=oauth_info['provider_id'],
+        user=user,
+    )
+    db.session.add(auth_provider)
+    db.session.commit()
+    return auth_provider

@@ -172,10 +172,25 @@
                     if (data.error) {
                         self.__handleError(data.error);
                         self.__handleButton();
-                    } else {
-                        self.__setPcaLocalized();
-                        self.__setProcedures();
+                        return;
                     }
+                    self.__setPcaLocalized(function(data) {
+                        self.__setProcedures(function(data) {
+                            data = data || {};
+                            if (!data.error) {
+                                self.__handleDisplay();
+                                return true;
+                            }
+                            self.__handleError(data.error + " " + i18next.t("Account created. Redirecting to profile..."));
+                            self.__handleButton();
+                            /*
+                             * redirect to profile since account has been created
+                             */
+                            (function(self) {
+                                setTimeout(function() { self.__redirect(); }, 5000);
+                            })(self);
+                        });
+                    });
                 }
             });
         };
@@ -185,34 +200,42 @@
                 callback(result);
             }});
         };
-        this.__setPcaLocalized = function() {
+        this.__setPcaLocalized = function(callback) {
+            callback = callback || function() {};
             if (!this.userId || !this.__isPatient()) {
+                callback();
                 return false;
             }
             var userId = this.userId;
             var parentOrg = OT.getSelectedOrgTopLevelParentOrg();
             if (!parentOrg) {
+                callback();
                 return false;
             }
             this.__getSettings(function(result) { //check config
                 if (!result || !result.data.LOCALIZED_AFFILIATE_ORG) {
+                    callback();
                     return false;
                 }
-                tnthAjax.postClinical(userId,"pca_localized", OT.getOrgName(parentOrg) === result.data.LOCALIZED_AFFILIATE_ORG);
+                tnthAjax.postClinical(userId,"pca_localized", OT.getOrgName(parentOrg) === result.data.LOCALIZED_AFFILIATE_ORG, false, false, false, function(data) {
+                    callback(data);
+                });
             });
         };
-        this.__setProcedures = function() {
+        this.__setProcedures = function(callback) {
 
             var self = this;
-
+            callback = callback || function() {};
             var treatmentRows = $("#pastTreatmentsContainer tr[data-code]");
             if (treatmentRows.length === 0) {
+                callback();
                 self.__handleDisplay();
                 return false;
             }
             if (isNaN(self.userId)) {
                 self.__handleError(i18next.t("Invalid user id: %d").replace("%d", self.userId));
                 self.__handleButton();
+                callback();
                 return false;
             }
             // Submit the data
@@ -238,18 +261,7 @@
 
             self.treatmentIntervalVar = setInterval(function() {
                 if (self.counter === self.treatmentCount) {
-                    if (hasValue(errorMessage)) {
-                        self.__handleError(errorMessage + " " + i18next.t("Account created. Redirecting to profile..."));
-                        self.__handleButton();
-                        /*
-                         * redirect to profile since account has been created
-                         */
-                        (function(self) {
-                            setTimeout(function() { self.__redirect(); }, 5000);
-                        })(self);
-                    } else {
-                        self.__handleDisplay();
-                    }
+                    callback({error: errorMessage});
                     clearInterval(self.treatmentIntervalVar);
                 }
             }, 100);
@@ -259,10 +271,16 @@
             var err = responseObj && responseObj.error ? responseObj.error: null;
             var self = this;
             if (!hasValue(err)) {
-                $("#confirmMsg").fadeIn();
-                self.__handleButton();
-                setTimeout(function() { $("#confirmMsg").fadeOut(); }, 800);
-                setTimeout(function() { self.__redirect(self.userId); }, 1000);
+                setTimeout(function() { 
+                    self.__handleButton();
+                    $("#confirmMsg").fadeIn();
+                }, 800);
+                setTimeout(function() { 
+                    self.__redirect(self.userId); 
+                }, 1000);
+                setTimeout(function() {
+                    $("#confirmMsg").fadeOut();
+                }, 1500);
                 self.__clear();
             } else {
                 self.__handleError(err);

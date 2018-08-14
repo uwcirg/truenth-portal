@@ -226,7 +226,7 @@ def account():
         try:
             org_list = [Organization.query.filter_by(
                 id=org['organization_id']).one()
-                    for org in request.json['organizations']]
+                for org in request.json['organizations']]
             user.update_orgs(org_list, acting_user=acting_user,
                              excuse_top_check=True)
             if org_list:
@@ -716,7 +716,7 @@ def withdraw_user_consent(user_id):
 
     if not uc:
         abort(404, "no UserConsent found for user ID {} and org ID "
-              "{}".format(user.id, org_id))
+                   "{}".format(user.id, org_id))
     try:
         # Make a copy of the found UserConsent via `make_transient`
         # and setting the id to None, so update_consents can store as new
@@ -1577,7 +1577,8 @@ def download_user_document(user_id, doc_id):
 
     response = make_response(file_contents)
     response.headers["Content-Type"] = 'application/{}'.format(ud.filetype)
-    response.headers["Content-Disposition"] = 'attachment; filename={}'.format(ud.filename)
+    response.headers["Content-Disposition"] = 'attachment; filename={}'.format(
+        ud.filename)
 
     return response
 
@@ -2145,9 +2146,9 @@ def get_current_user_qb(user_id):
         expiry = qbd_questionnaire_bank.calculated_expiry(
             qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
 
-    if date and qbd.relative_start and (date.date() < qbd.relative_start.date()):
+    if date and qbd.relative_start and (date < qbd.relative_start):
         qbd_json['questionnaire_bank'] = None
-    elif date and expiry and (date.date() >= expiry.date()):
+    elif date and expiry and (date >= expiry):
         qbd_json['questionnaire_bank'] = None
     else:
         qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
