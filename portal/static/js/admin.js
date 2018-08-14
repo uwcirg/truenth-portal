@@ -129,7 +129,6 @@
                     var adminTable = $("div.admin-table"), orgMenu = $("#org-menu");
                     var calculatedHeight = h + padding;
                     $("#org-menu").height(calculatedHeight);
-                    console.log("table h? menu h? ", adminTable.height(), orgMenu.height())
                     if(adminTable.height() < orgMenu.height()) {
                         setTimeout(function() { adminTable.height(orgMenu.height() + calculatedHeight);}, 0);
                     }
@@ -402,13 +401,14 @@
                 var fa = fi && fi.orgs_filter_control ? fi.orgs_filter_control.split(",") : null;
                 orgFields.each(function() {
                     $(this).prop("checked", false);
-                    if(fa) {
-                        var oself = $(this), val = oself.val();
-                        fa = fa.map(function(item) {
-                            return String(item);
-                        });
-                        oself.prop("checked", fa.indexOf(String(val)) !== -1);
+                    if(!fa) {
+                        return true;
                     }
+                    var oself = $(this), val = oself.val();
+                    fa = fa.map(function(item) {
+                        return String(item);
+                    });
+                    oself.prop("checked", fa.indexOf(String(val)) !== -1);
                 });
                 if(this.orgTool.getHereBelowOrgs(this.getUserOrgs()).length === 1) {
                     orgFields.prop("checked", true);
