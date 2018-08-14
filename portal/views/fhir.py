@@ -29,10 +29,11 @@ def valueset_nhhd_291036():
         "id": NHHD_291036,
         "url": TRUENTH_VALUESET_NHHD_291036,
         "name": (
-            "Indigenous Status as defined by Australian Institute of Health and"
-            " Welfare's National Health Data Dictionary 2012 version 1A6 Spec: "
-            "http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824 "
-            "METeOR identifier: 291036"),
+            "Indigenous Status as defined by Australian Institute of Health "
+            "and Welfare's National Health Data Dictionary 2012 version 1A6 "
+            "Spec: "
+            "http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824"
+            " METeOR identifier: 291036"),
         "meta": {
             "lastUpdated": "2016-11-03T00:00:00.000Z"
         },
@@ -50,11 +51,12 @@ def valueset_nhhd_291036():
 
     concepts = valueset['codeSystem']['concept']
     for name, value in (
-            ('Aboriginal but not Torres Strait Islander origin', '1'),
-            ('Torres Strait Islander but not Aboriginal origin', '2'),
-            ('Both Aboriginal and Torres Strait Islander origin', '3'),
-            ('Neither Aboriginal nor Torres Strait Islander origin', '4'),
-            ('Not stated/inadequately described', '9')):
+        ('Aboriginal but not Torres Strait Islander origin', '1'),
+        ('Torres Strait Islander but not Aboriginal origin', '2'),
+        ('Both Aboriginal and Torres Strait Islander origin', '3'),
+        ('Neither Aboriginal nor Torres Strait Islander origin', '4'),
+        ('Not stated/inadequately described', '9')
+    ):
         concepts.append(
             {"code": value, "abstract": "false", "display": name,
              "definition": name})
