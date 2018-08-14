@@ -85,33 +85,17 @@ of date.  Best to update first, for optimal results:
 CONFIGURE
 ---------
 
-Copy the default to the named configuration file
+Create the configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create a configuration file if one does not already exist
 
 .. code:: bash
 
     $ cp $PROJECT_HOME/instance/application.cfg{.default,}
 
-Obtain ``consumer_key`` and ``consumer_secret`` values from
-`Facebook App page <https://developers.facebook.com/apps>`__ and write the values to
-``application.cfg``:
-
-.. code:: bash
-
-    # application.cfg
-    [...]
-    FB_CONSUMER_KEY = '<App ID From FB>'
-    FB_CONSUMER_SECRET = '<App Secret From FB>'
-
-To enable Google OAuth, obtain similar values from the `Google API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`__.
-
--  Under APIs Credentials, select ``OAuth 2.0 client ID``
--  Set the ``Authorized redirect URIs`` to exactly match the location of
-   ``<scheme>://<hostname>/login/google/``
--  Enable the ``Google+ API``
-
-Write to the respective GOOGLE\_CONSUMER\_KEY and
-GOOGLE\_CONSUMER\_SECRET variables in the same ``application.cfg``
-configuration file.
+Add Support For 3rd Party Logins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+See :ref:`OAuth Config <oauthconfig>`
 
 .. _pip:
 
@@ -124,7 +108,7 @@ correct libraries are installed:
 
 .. code:: bash
 
-    pip install --requirements requirements.txt
+    pip install --requirement requirements.txt
 
 COMMAND LINE INTERFACE
 ----------------------
@@ -311,7 +295,7 @@ Testing
 To run the tests, repeat the
 ``postgres createuser && postgres createdb`` commands as above with the
 values for the {user, password, database} as defined in the
-``TestConfig`` class within ``portal.config.py``
+``TestConfig`` class within ``portal\config\config.py``
 
 All test modules under the ``tests`` directory can be executed via
 ``py.test`` (again from project root with the virtual environment
@@ -449,7 +433,7 @@ Install requirements by running:
 
 .. code:: bash
 
-    $ pip install --requirements requirements.txt
+    $ pip install --requirement requirements.txt
 
 Configuration files
 ^^^^^^^^^^^^^^^^^^^

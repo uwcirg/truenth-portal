@@ -13,7 +13,7 @@ from flask import (
     url_for,
 )
 from flask_user import roles_required
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
@@ -226,7 +226,7 @@ def account():
         try:
             org_list = [Organization.query.filter_by(
                 id=org['organization_id']).one()
-                    for org in request.json['organizations']]
+                for org in request.json['organizations']]
             user.update_orgs(org_list, acting_user=acting_user,
                              excuse_top_check=True)
             if org_list:
@@ -716,7 +716,7 @@ def withdraw_user_consent(user_id):
 
     if not uc:
         abort(404, "no UserConsent found for user ID {} and org ID "
-              "{}".format(user.id, org_id))
+                   "{}".format(user.id, org_id))
     try:
         # Make a copy of the found UserConsent via `make_transient`
         # and setting the id to None, so update_consents can store as new
@@ -1398,7 +1398,8 @@ def unique_email():
     """
     email = request.args.get('email')
     validate_email(email)
-    match = User.query.filter_by(email=email)
+    # find matching account by email regardless of case
+    match = User.query.filter(func.lower(User.email) == email.lower())
     assert (match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
         # If the user is the authenticated user or provided user_id,
@@ -1577,7 +1578,8 @@ def download_user_document(user_id, doc_id):
 
     response = make_response(file_contents)
     response.headers["Content-Type"] = 'application/{}'.format(ud.filetype)
-    response.headers["Content-Disposition"] = 'attachment; filename={}'.format(ud.filename)
+    response.headers["Content-Disposition"] = 'attachment; filename={}'.format(
+        ud.filename)
 
     return response
 

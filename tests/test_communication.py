@@ -365,7 +365,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         # Confirm test user qualifies for ST QB
         assert QuestionnaireBank.qbs_for_user(
-                self.test_user, 'baseline', as_of_date=datetime.utcnow())
+            self.test_user, 'baseline', as_of_date=datetime.utcnow())
 
         # Being a day short, shouldn't fire
         update_patient_loop(update_cache=False, queue_messages=True)
