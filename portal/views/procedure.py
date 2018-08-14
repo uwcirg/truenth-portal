@@ -125,7 +125,8 @@ def post_procedure():
     if (any((
         not request.json,
         'resourceType' not in request.json,
-        request.json['resourceType'] != 'Procedure'))
+        request.json['resourceType'] != 'Procedure'
+        ))
     ):
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
