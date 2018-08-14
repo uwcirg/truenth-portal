@@ -81,6 +81,7 @@
 @notificationBgColor: #EB1939;
 @notificationLinkHoverBgColor: #CC112D;
 @alertColor: hsla(1, 44%, 46%, 0.9);
+@HRColor: #eeeeee;
 
 
 /**
@@ -264,7 +265,9 @@ a.btn,
   text-transform: uppercase;
   text-align: center;
 }
-
+.btn:hover {
+  cursor: pointer;
+}
 .btn:focus,
 a:focus {
   outline: none;
@@ -303,8 +306,8 @@ a:focus {
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
-    background-color: @linkHover;
     border-color: @linkHover;
+    cursor: pointer;
     text-decoration: none;
   }
   .glyphicon {
@@ -1131,10 +1134,18 @@ div.footer-wrapper.right-panel {
    .search .form-control {
      height: 3em !important;
   }
+  &.smaller-text {
+    .search .form-control {
+      height: 3.45em !important;
+    }
+  }
+  .deleted-button-cell {
+    vertical-align: middle;
+  }
   div.pull-right {
     width: 100%;
     max-width: 100%;
-    padding: 0 0.2em;
+    padding: 0 0.2em 0.2em;
     button {
       padding: 0.73em !important;
     }
@@ -1210,8 +1221,30 @@ div.footer-wrapper.right-panel {
  }
 
 #adminTableToolbar {
+  .orgs-filter-warning {
+    display: inline-block;
+    margin: 2px 8px;
+    letter-spacing: 0.1rem;
+    position: relative;
+    font-size: 1.25em;
+    opacity: 0.8;
+    top: 2px;
+    &:hover {
+      color: @errorMessageColor;
+      cursor: pointer;
+    }
+
+  }
   div.orglist-selector {
     display: inline-block;
+    width: 350px;
+    max-width: 100%;
+    legend {
+      letter-spacing: 1px;
+      font-weight: 500;
+      border-bottom: 0;
+      font-size: @mobileSize;
+    }
     .indent {
       padding: 0 0.2em;
     }
@@ -1242,6 +1275,9 @@ div.footer-wrapper.right-panel {
         font-size: @mobileOrgSize;
       }
       label.org-label {
+        &.selected {
+          font-weight: 500;
+        }
         display: inline-block;
         padding: 0 1em;
         line-height: 1.6em;
@@ -1321,6 +1357,28 @@ div.footer-wrapper.right-panel {
   }
 }
 #patientList {
+  #chkDeletedUsersFilter {
+    margin: 0 0 0 4px;
+    font-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .deletedUsersFilterContainer {
+    margin: 1em .25em;
+    display: inline-block;
+    padding: 0.5em 1em;
+    line-height: 1.2;
+    vertical-align: middle;
+    border: 1px dotted #eee;
+    .text {
+      color: @btnDefaultColor;
+      font-weight: normal;
+      margin: 0 8px;
+      display: inline-block;
+      vertical-align: middle;
+      letter-spacing: .1rem;
+    }
+  }
   div.or {
     display: inline-block;
     background-color: @orBackgroundColor;
@@ -1338,6 +1396,13 @@ div.footer-wrapper.right-panel {
     max-width: 200px;
     min-width: 180px;
     word-wrap: break-word;
+  }
+}
+@media (min-width: 705px) {
+  #patientList {
+    .deletedUsersFilterContainer {
+      margin: 0.5em 1.25em 0;
+    }
   }
 }
 #staffList {
@@ -1456,7 +1521,7 @@ div.footer-wrapper.right-panel {
     font-size: @mediumText;
   }
   .btn {
-    font-size: @mediumText;
+    font-size: @smallText;
   }
 }
 // For table rowlinks
@@ -3219,6 +3284,9 @@ div.timezone-warning.text-warning {
   }
 
   .fixed-table-toolbar .dropdown-menu {
+    label {
+      font-size: @mediumText;
+    }
     overflow-x: hidden;
   }
   .admin-table {
@@ -3313,7 +3381,8 @@ div.timezone-warning.text-warning {
         width: 400px;
         max-width: 400px;
         #userOrgs {
-          margin: 0 0.5em;
+          margin: 0;
+          padding: 0 1em;
         }
         div.org-container
         {

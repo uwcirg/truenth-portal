@@ -8,13 +8,6 @@
 <script src="{{ url_for('static', filename='js/bootstrap-datatables-extension.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
-{% block document_ready %}
-	var org_list = false;
-	{% if org_list %} //coming from backend, harder to fix, leave it here for now
-		org_list = {};
-		{% for org in org_list %}org_list["{{org}}"] = true;{% endfor %}
-	{% endif %}
-{% endblock %}
 {% macro orgsSelector() -%}
 	<div id="orglistSelector" class="dropdown btn-group orglist-selector">
 	    <button id="orglist-dropdown" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -24,7 +17,7 @@
 	      <div class="form-group smaller-text" id="userOrgs">
 	        <div id="fillOrgs"></div>
 	      </div>
-	      <hr>
+	      <hr class="divider">
 	      <div id='orglist-footer-container' v-show="!errorCollection.orgs">
 	      	<label><input type='checkbox' id='orglist-selectall-ckbox' v-bind:checked="orgsSelector.selectAll">&nbsp;<span class='text-muted'>{{_("Select All") }}</span></label>
 	      	<label><input type='checkbox' id='orglist-clearall-ckbox' v-bind:checked="orgsSelector.clearAll">&nbsp;<span class='text-muted'>{{_("Clear All")}}</span></label>
@@ -34,4 +27,11 @@
 	    </div>
   	</div>
 {%-endmacro %}
+{% macro deletedUsersFilter() -%}
+	<span class="deletedUsersFilterContainer">
+		<label>
+			<input id="chkDeletedUsersFilter" type="checkbox"/><span class="text">{{_("include deactivated accounts")}}</span>
+		</label>
+	</span>
+{%- endmacro %}
 

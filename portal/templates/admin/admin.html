@@ -47,7 +47,7 @@
                 <th data-field="email" data-sortable="true" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="roles" data-sortable="true" data-filter-control="input">{{ _("Roles") }}</th>
                 <th data-field="sites" data-sortable="true" data-filter-control="input">{{_("Sites")}}</th>
-                <th class="text-center" data-sortable="false" data-searchable="false"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
+                <th data-field="deactivate" data-card-visible="false" data-class="always-visible" class="text-center" data-sortable="false" data-searchable="false">{{_("Deactivate Account")}}</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
@@ -59,7 +59,7 @@
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN.value) and (not user.has_role(ROLE.STAFF.value))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>Delete</em></button>{% else %}-{% endif %}</td>
+                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN.value) and (not user.has_role(ROLE.STAFF.value))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>{{_("Deactivate")}}</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
