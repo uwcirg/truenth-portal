@@ -71,7 +71,7 @@ class TestUser(TestCase):
         response = self.client.get('/api/unique_email?email=h2@1')
         assert response.status_code == 400
 
-        email = 'john+test@example.com'
+        email = 'John+Test@example.com'
         request = '/api/unique_email?email={}'.format(urllib.parse.quote(
             email))
         response = self.client.get(request)
@@ -80,7 +80,8 @@ class TestUser(TestCase):
         results['unique'] is True
 
         # should still be unique if it's the current user's email
-        self.test_user.email = email
+        # test also the case insensitive match on user's email
+        self.test_user.email = email.upper()
         with SessionScope(db):
             db.session.commit()
         response = self.client.get(request)
