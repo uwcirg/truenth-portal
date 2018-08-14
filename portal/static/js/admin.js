@@ -29,11 +29,11 @@
                     self.setColumnSelections();
                     self.setTableFilters(self.userId); //set user's preference for filter(s)
                     self.initTableEvents();
-                    self.initOrgsList(org_list); /*global org_list*/
+                    self.initOrgsList();
                     self.handleDisableFields();
                     self.setRowItemEvent();
-                    $("#adminTableContainer input[data-field='id']:checkbox").hide(); //hide checkbox for hidden id field from side menu
-                    $("#patientReportModal").modal({"show": false});
+                    self.handleAffiliatedUIVis();
+                    self.addFilterPlaceHolders();
                 } else {
                     self.initOrgsList();
                     self.handleDownloadModal();
@@ -46,6 +46,7 @@
             configured: false,
             initIntervalId: 0,
             sortFilterEnabled: false,
+            showDeletedUsers: false,
             isAdmin: false,
             userId: null,
             userRoles: [],
@@ -90,6 +91,7 @@
                     return i18next.t("Export data");
                 }
             },
+            currentTablePreference: null,
             errorCollection: {orgs: "", demo: ""},
             instruments: {list: [], dataType: "csv", selected: "", message: ""},
             patientReports: {data: [], message: "", loading: false }
@@ -121,13 +123,15 @@
                 });
             },
             setOrgsMenuHeight: function(padding) {
-                padding = padding || 100;
+                padding = padding || 95;
                 var h = parseInt($("#fillOrgs").height());
                 if(h > 0) {
-                    $("#org-menu").height(h + padding);
                     var adminTable = $("div.admin-table"), orgMenu = $("#org-menu");
+                    var calculatedHeight = h + padding;
+                    $("#org-menu").height(calculatedHeight);
                     if(adminTable.height() < orgMenu.height()) {
-                        setTimeout(function() { adminTable.height(orgMenu.height() + padding);}, 0);
+                        $("#org-menu").css("max-height", calculatedHeight + 10);
+                        setTimeout(function() { adminTable.height(orgMenu.height() + calculatedHeight);}, 0);
                     }
                 }
             },
@@ -152,7 +156,6 @@
                         self.setIdentifier();
                         self.setSortFilterProp();
                         self.configTable();
-                        self.addFilterPlaceHolders();
                         self.configured = true;
                         setTimeout(function() {callback();}, 50);
                     } else {
@@ -185,13 +188,11 @@
             },
             configTable: function() {
                 var options = {};
-                if(this.tableIdentifier === "patientList") {
-                    var sortObj = this.getTablePreference(this.userId, this.tableIdentifier);
-                    sortObj = sortObj || this.getDefaultTablePreference();
-                    options.sortName = sortObj.sort_field;
-                    options.sortOrder = sortObj.sort_order;
-                    options.filterBy = sortObj;
-                }
+                var sortObj = this.getTablePreference(this.userId, this.tableIdentifier);
+                sortObj = sortObj || this.getDefaultTablePreference();
+                options.sortName = sortObj.sort_field;
+                options.sortOrder = sortObj.sort_order;
+                options.filterBy = sortObj;
                 options.exportOptions = { /* global  __getExportFileName*/
                     fileName: __getExportFileName($("#adminTableContainer").attr("data-export-prefix"))
                 };
@@ -210,18 +211,22 @@
                     self.addFilterPlaceHolders();
                     self.setRowItemEvent();
                 });
-                if (this.tableIdentifier === "patientList") {
-                    $("#adminTable").on("page-change.bs.table", function() {
-                        if(!$("#patientList .tnth-headline").isOnScreen()) { /*global isOnScreen */
-                            $("html, body").animate({  scrollTop: $(".fixed-table-toolbar").offset().top}, 2000);
-                        }
-                    });
-                    $(window).bind("scroll mousedown mousewheel keyup", function() {
-                        if ($("html, body").is(":animated")) {
-                            $("html, body").stop(true, true);
-                        }
-                    });
-                }
+                $("#adminTable").on("page-change.bs.table", function() {
+                    if(!$("#patientList .tnth-headline").isOnScreen()) { /*global isOnScreen */
+                        $("html, body").animate({  scrollTop: $(".fixed-table-toolbar").offset().top}, 2000);
+                    }
+                });
+                $(window).bind("scroll mousedown mousewheel keyup", function() {
+                    if ($("html, body").is(":animated")) {
+                        $("html, body").stop(true, true);
+                    }
+                });
+                $("#chkDeletedUsersFilter").on("click", function() {
+                    self.handleDeletedUsersVis();
+                });
+                $("#adminTable").on("reset-view.bs.table", function() {
+                    self.handleDeletedUsersVis();
+                });
                 if(this.sortFilterEnabled) {
                     $("#adminTable").on("sort.bs.table", function(e, name, order) {
                         setTimeout(function() { self.setTablePreference(self.userId, self.tableIdentifier, name, order); }, 10);
@@ -232,6 +237,18 @@
                     });
                 }
             },
+            handleDeletedUsersVis: function() {
+                this.showDeletedUsers = $("#chkDeletedUsersFilter").is(":checked");
+                if (this.showDeletedUsers) {
+                    $("#adminTable .deleted-user-row").removeClass("tnth-hide");
+                } else {
+                    $("#adminTable .deleted-user-row").addClass("tnth-hide");
+                }
+            },
+            handleAffiliatedUIVis: function() {
+                $("#adminTableContainer input[data-field='id']:checkbox, #adminTableContainer input[data-field='deactivate']:checkbox").closest("label").hide(); //hide checkbox for hidden id field and deactivate account field from side menu
+                $("#patientReportModal").modal({"show": false});
+            },
             setRowItemEvent: function() {
                 var self = this;
                 $("#adminTableContainer .btn-report").on("click", function(e) {
@@ -240,7 +257,7 @@
                 });
                 $("#adminTableContainer .btn-delete-user").off("click").on("click", function(e) {
                     e.stopPropagation();
-                    self.deleteUser($(this).attr("data-user-id"), true);
+                    self.deleteUser($(this).attr("data-user-id"), !self.showDeletedUsers);
                 });
             },
             addFilterPlaceHolders: function() {
@@ -350,7 +367,7 @@
                     return self.orgTool.getOrgName(self.orgTool.getTopLevelParentOrg(orgId));
                 });
             },
-            initOrgsList: function(requestOrgList) {
+            initOrgsList: function() {
                 if($("#orglistSelector").length === 0) {
                     return false;
                 }
@@ -368,39 +385,57 @@
                     self.orgTool.populateUI(); //populate orgs dropdown UI
                     var hbOrgs = self.orgTool.getHereBelowOrgs(self.getUserOrgs()); //filter orgs UI based on user's orgs
                     self.orgTool.filterOrgs(hbOrgs);
-                    self.initOrgsEvent(requestOrgList);
+                    self.initOrgsFilter();
+                    self.initOrgsEvent();
                     self.fadeLoader();
                 });
-                $("#orglist-dropdown").on("click touchstart", function() {
-                    setTimeout(function() {
-                        self.setOrgsMenuHeight(100);
-                        self.clearFilterButtons();
-                    }, 10);
-                });
             },
-            initOrgsEvent: function(requestOrgList) {
+            siteFilterApplied: function() {
+                return this.currentTablePreference
+                    && this.currentTablePreference.filters
+                    && this.currentTablePreference.filters.orgs_filter_control 
+                    && this.currentTablePreference.filters.orgs_filter_control.length;
+            },
+            initOrgsFilter: function() {
+                var orgFields = $("#userOrgs input[name='organization']");
+                var fi = this.currentTablePreference ? this.currentTablePreference.filters : {};
+                var fa = fi && fi.orgs_filter_control ? fi.orgs_filter_control.split(",") : null;
+                orgFields.each(function() {
+                    $(this).prop("checked", false);
+                    if(fa) {
+                        var oself = $(this), val = oself.val();
+                        fa = fa.map(function(item) {
+                            return String(item);
+                        });
+                        oself.prop("checked", fa.indexOf(String(val)) !== -1);
+                    }
+                });
+                if(this.orgTool.getHereBelowOrgs(this.getUserOrgs()).length === 1) {
+                    orgFields.prop("checked", true);
+                }
+            },
+            initOrgsEvent: function() {
                 var ofields = $("#userOrgs input[name='organization']");
                 if (ofields.length === 0) { return false;}
                 var self = this;
+
+                $("#orglistSelector .orgs-filter-warning").popover();
+                
+                $("body").on("click", function(e) {
+                    if ($(e.target).closest("#orglistSelector").length === 0) {
+                        $("#orglistSelector").removeClass("open");
+                    }
+                });
+
+                $("#orglist-dropdown").on("click touchstart", function() {
+                    $(this).find(".glyphicon-menu-up, .glyphicon-menu-down").toggleClass("tnth-hide"); //toggle menu up/down button
+                    setTimeout(function() {
+                        self.setOrgsMenuHeight(95);
+                        self.clearFilterButtons();
+                    }, 100);
+                });
                 /* attach orgs related events to UI components */
                 ofields.each(function() {
-                    if(self.currentTablePreference && self.currentTablePreference.filters) {
-                        var fi = self.currentTablePreference.filters;
-                        var fa = fi.orgs_filter_control ? fi.orgs_filter_control.split(",") : null;
-                        if(fa) {
-                            var oself = $(this), val = oself.val();
-                            fa.forEach(function(item) {
-                                if (String(item) === String(val)) {
-                                    oself.prop("checked", true);
-                                }
-                            });
-                        } else {
-                            $(this).prop("checked", false);
-                        }
-                    } else if((self.orgTool.getHereBelowOrgs(self.getUserOrgs())).length === 1 ||
-                        (requestOrgList && requestOrgList.hasOwnProperty($(this).val()))) {
-                        $(this).prop("checked", true);
-                    }
                     $(this).on("click touchstart", function(e) {
                         e.stopPropagation();
                         if($(this).is(":checked")) {
@@ -560,6 +595,9 @@
                 }
                 var visibleColumns = $("#adminTable").bootstrapTable("getVisibleColumns");
                 visibleColumns.forEach(function(c) { //hide visible columns
+                    if (String(c.class).toLowerCase() === "always-visible") {
+                        return true;
+                    }
                     $("#adminTable").bootstrapTable("hideColumn", c.field);
                 });
                 prefData.filters.column_selections.forEach(function(column) { //show column(s) based on preference
@@ -720,7 +758,7 @@
                         tnthAjax.deleteUser(userId, false, function(data) {
                             if(!data.error) {
                                 if(hideRow) {
-                                    $("#data_row_" + userId).fadeOut();
+                                    $("#data_row_" + userId).addClass("tnth-hide");
                                 }
                                 $("#data_row_" + userId).addClass("deleted-user-row").addClass("rowlink-skip")
                                     .find(".deleted-button-cell").html(i18next.t("Inactive"))
