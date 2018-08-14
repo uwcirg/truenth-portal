@@ -430,7 +430,7 @@
                 $("#orglist-dropdown").on("click touchstart", function() {
                     $(this).find(".glyphicon-menu-up, .glyphicon-menu-down").toggleClass("tnth-hide"); //toggle menu up/down button
                     setTimeout(function() {
-                        self.setOrgsMenuHeight(95);
+                        self.setOrgsMenuHeight(85);
                         self.clearFilterButtons();
                     }, 100);
                 });

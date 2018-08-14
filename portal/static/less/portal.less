@@ -509,6 +509,17 @@ select:not([multiple]) {
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
+  position: relative;
+}
+#mainNavLoadingError {
+  position: absolute;
+  color: @errorMessageColor;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 250px;
+  margin: auto;
+  padding: 1em 0;
 }
 @media all and (-ms-high-contrast: none),(-ms-high-contrast: active) {
   /* IE10+ */
@@ -3052,7 +3063,7 @@ div.timezone-warning.text-warning {
         max-width: 450px;
         #userOrgs {
           margin: 0 auto;
-          padding: 0 1em;
+          padding: 0 2em;
         }
         div.org-container
         {
