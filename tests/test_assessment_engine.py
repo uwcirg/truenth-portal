@@ -106,15 +106,16 @@ class TestAssessmentEngine(TestCase):
         assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
         assert test_user.questionnaire_responses.count() == 1
-        assert (test_user.questionnaire_responses[0].questionnaire_bank_id
-                == qb.id)
+        assert (
+            test_user.questionnaire_responses[0].questionnaire_bank_id
+            == qb.id)
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
             'example']
-        instrument_id = completed_qnr['questionnaire']['reference'].split('/')[
-            -1]
+        instrument_id = (completed_qnr['questionnaire']['reference']
+            .split('/')[-1])
 
         questions = completed_qnr['group']['question']
         incomplete_questions = []

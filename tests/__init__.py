@@ -48,6 +48,19 @@ FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
 
+OAUTH_INFO_PROVIDER_LOGIN = {
+    'birthdate': '10/04/1988',
+    'email': 'test@test.com',
+    'first_name': 'Firstname',
+    'gender': 'male',
+    'last_name': 'Lastname',
+    'image_url': 'pictureurl@example.com',
+    'next': '/',
+    'provider_id': '12345678910',
+    'provider_name': 'google',
+    'token': '{ "property": "value" }',
+}
+
 # import hidden relation classes needed to create database
 from portal.models.communication_request import CommunicationRequest
 
@@ -173,19 +186,33 @@ class TestCase(Base):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
-    def login(self, user_id=TEST_USER_ID):
-        """Bless the self.client session with a logged in user
+    def login(
+        self,
+        user_id=TEST_USER_ID,
+        oauth_info=None,
+        follow_redirects=True
+    ):
+        """login using the oauth backdoor
 
         A standard prerequisite in any test needed an authorized
-        user.  Call before subsequent calls to self.client.{get,post,put}
+        user. Call before subsequent calls to self.client.{get,post,put}
+        or call to test oauth logic.
 
-        Taking advantage of testing backdoor in views.auth.login()
+        Taking advantage of testing backdoor in
+        views.auth.oauth_test_backdoor()
 
         """
+        # By default log the user in through the session
+        # with the given id
+        if not oauth_info:
+            oauth_info = {'user_id': user_id}
+
+        # Attempt to login using the test backdoor
         return self.client.get(
-            '/login/TESTING',
-            query_string={'user_id': user_id},
-            follow_redirects=True)
+            'test/oauth',
+            query_string=oauth_info,
+            follow_redirects=follow_redirects
+        )
 
     def add_client(self):
         """Prep db with a test client for test user"""
@@ -267,12 +294,15 @@ class TestCase(Base):
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             procedure = Procedure(audit=audit)
-            coding = Coding(system=system,
-                            code=code,
-                            display=display).add_if_not_found(True)
-            code = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
-            enc = Encounter(status='planned', auth_method='url_authenticated',
-                            user_id=TEST_USER_ID, start_time=datetime.utcnow())
+            coding = Coding(
+                system=system,
+                code=code,
+                display=display).add_if_not_found(True)
+            code = CodeableConcept(codings=[coding]).add_if_not_found(True)
+            enc = Encounter(
+                status='planned',
+                auth_method='url_authenticated',
+                user_id=TEST_USER_ID, start_time=datetime.utcnow())
             db.session.add(enc)
             db.session.commit()
             enc = db.session.merge(enc)

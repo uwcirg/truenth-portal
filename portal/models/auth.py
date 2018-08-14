@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from smtplib import SMTPRecipientsRefused
 
 from flask import current_app, url_for
+from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
@@ -18,7 +20,7 @@ providers_list = ENUM(
     *SUPPORTED_OAUTH_PROVIDERS, name='providers', create_type=False)
 
 
-class AuthProvider(db.Model):
+class AuthProvider(OAuthConsumerMixin, db.Model):
     __tablename__ = 'auth_providers'
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column('provider', providers_list)
@@ -26,6 +28,14 @@ class AuthProvider(db.Model):
     user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
     user = db.relationship('User')
+
+    __table_args__ = (
+        UniqueConstraint(
+            'provider',
+            'provider_id',
+            name='auth_providers_by_provider'
+        ),
+    )
 
     def as_fhir(self):
         # produce a FHIR identifier entry for the provider

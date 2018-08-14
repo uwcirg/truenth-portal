@@ -70,7 +70,7 @@ function loader(show) {
             setTimeout(function() {
                 showMain();
             }, 100);
-            hideLoader(true);
+            hideLoader(true, 350);
         }
     }
 }
