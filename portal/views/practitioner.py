@@ -79,17 +79,23 @@ def practitioner_search():
                 d = {k: v}
                 query = query.filter_by(**d)
         else:
-            abort(400, "only `first_name`, `last_name`, and `system`/`value` "
-                       "search filters are available at this time")
+            abort(
+                400,
+                "only `first_name`, `last_name`, and `system`/`value` "
+                "search filters are available at this time")
 
     if system or value:
         if not (system and value):
-            abort(400, 'for identifier search, must provide both '
-                       '`system` and `value` params')
+            abort(
+                400,
+                'for identifier search, must provide both '
+                '`system` and `value` params')
         ident = Identifier.query.filter_by(system=system, _value=value).first()
         if not ident:
-            abort(404, 'no identifiers found for system `{}`, '
-                       'value `{}`'.format(system, value))
+            abort(
+                404,
+                'no identifiers found for system `{}`, '
+                'value `{}`'.format(system, value))
         query = query.join(PractitionerIdentifier).filter(and_(
             PractitionerIdentifier.identifier_id == ident.id,
             PractitionerIdentifier.practitioner_id == Practitioner.id))
