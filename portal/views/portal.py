@@ -794,8 +794,8 @@ def settings():
                 # Due to the infancy of JSON support in POSTGRES and SQLAlchemy
                 # one must force the update to get a JSON field change to stick
                 db.session.query(QuestionnaireResponse).filter(
-                    QuestionnaireResponse.id == qnr.id).update(
-                    {"document": document})
+                    QuestionnaireResponse.id == qnr.id
+                ).update({"document": document})
             db.session.commit()
             invalidate_assessment_status_cache(patient.id)
         except ValueError as e:
@@ -832,12 +832,18 @@ def config_settings(config_key):
         'MEDIDATA_RAVE_ORG',
         'LOCALIZED_AFFILIATE_ORG'
     )
-    key = config_key.upper()
-    if not any(
-        key.startswith(prefix) for prefix in config_prefix_whitelist
-    ):
-        abort(400, "Configuration key '{}' not available".format(key))
-    return jsonify({key: current_app.config.get(key)})
+    if config_key:
+        key = config_key.upper()
+        if not any(
+                key.startswith(prefix) for prefix in config_prefix_whitelist):
+            abort(400, "Configuration key '{}' not available".format(key))
+        return jsonify({key: current_app.config.get(key)})
+    config_settings = {}
+    # return selective keys - not all can be be viewed by users, e.g.secret key
+    for key in current_app.config:
+        if any(key.startswith(prefix) for prefix in config_prefix_whitelist):
+            config_settings[key] = current_app.config.get(key)
+    return jsonify(config_settings)
 
 
 @portal.route('/research')
