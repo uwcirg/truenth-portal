@@ -1590,7 +1590,7 @@ def deprecated_present_assessment(instrument_id):
         request.headers.get('Referer'),
     )
 
-    return present_assessment(instruments=[instrument_id, ])
+    return present_assessment(instruments=[instrument_id])
 
 
 @assessment_engine_api.route('/complete-assessment')
