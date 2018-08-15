@@ -1623,11 +1623,11 @@ class User(db.Model, UserMixin):
         if acting_user is None:
             raise ValueError("reactivate requires well defined acting_user")
 
-        # The email was masked during delete.  Need to confirm a user didn't sneak
-        # in with the same address while deleted.  The accessor returns the unmasked
-        # value.
+        # The email was masked during delete.  Need to confirm a user didn't
+        # sneak in with the same address while deleted.  The accessor returns
+        # the unmasked value.
         unmasked = self.email
-        if User.query.filter(User.email==unmasked).count() > 0:
+        if User.query.filter(User.email == unmasked).count() > 0:
             raise ValueError(
                 "A new account with same email {} in conflict. "
                 "Can't reactivate".format(unmasked))
