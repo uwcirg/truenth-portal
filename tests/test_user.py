@@ -427,7 +427,8 @@ class TestUser(TestCase):
                 {'organization_id': org2_id}],
             'consents': [{
                 'organization_id': org_id,
-                'agreement_url': 'http://fake.org',
+                'agreement_url':
+                    'http://fake.org',
                 'staff_editable': True,
                 'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT.value}],
