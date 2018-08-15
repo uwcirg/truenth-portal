@@ -432,13 +432,15 @@ class TestIntervention(TestCase):
                 {'name': 'strategy_1',
                  'value': 'allow_if_not_in_intervention'},
                 {'name': 'strategy_1_kwargs',
-                 'value': [{'name': 'intervention_name',
-                            'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 'value': [{
+                     'name': 'intervention_name',
+                     'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
                 {'name': 'strategy_2',
                  'value': 'not_in_role_list'},
                 {'name': 'strategy_2_kwargs',
-                 'value': [{'name': 'role_list',
-                            'value': [ROLE.WRITE_ONLY.value]}]}
+                 'value': [{
+                     'name': 'role_list',
+                     'value': [ROLE.WRITE_ONLY.value]}]}
             ]
         }
 
