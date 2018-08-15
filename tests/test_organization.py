@@ -328,8 +328,10 @@ class TestOrganization(TestCase):
         org_id = org.id
 
         # prepopulate database with matching locale
-        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                          'system': "urn:ietf:bcp:47"})
+        Coding.from_fhir({
+            'code': 'en_AU',
+            'display': 'Australian English',
+            'system': "urn:ietf:bcp:47"})
 
         response = self.client.put(
             '/api/organization/{}'.format(org_id),
