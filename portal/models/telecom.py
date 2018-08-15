@@ -84,8 +84,10 @@ class Telecom(object):
                 current_app.logger.warn(
                     "FHIR contains unexpected telecom use {use}"
                     " ignoring {value}".format(**item))
-            elif any((cp.system == system and cp.use == use)
-                     for cp in telecom.contact_points):
+            elif any(
+                (cp.system == system and cp.use == use)
+                for cp in telecom.contact_points
+            ):
                 current_app.logger.warn(
                     "FHIR contains multiple telecom entries for "
                     "{system} ignoring {value}".format(**item))

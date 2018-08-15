@@ -207,11 +207,6 @@ def post_patient_dob(patient_id):
             birthDate:
               type: string
               description: valid FHIR date string defining date of birth
-      - name: auth
-        in: header
-        description: an authorization header
-        required: true
-        type: string
     responses:
       200:
         description:
