@@ -104,7 +104,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
         return wrapper
 
-
+oauth = OAuthOrAlternateAuth()
 
 mail = Mail()
 
