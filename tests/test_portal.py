@@ -22,7 +22,11 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import User, get_user
-from tests import TEST_USER_ID, TestCase
+from tests import (
+    OAUTH_INFO_PROVIDER_LOGIN,
+    TEST_USER_ID,
+    TestCase
+)
 
 
 class TestPortal(TestCase):
@@ -284,24 +288,30 @@ class TestPortalEproms(TestCase):
             .format(TEST_USER_ID, invalid_url))
         assert response2.status_code == 401
 
-        # validate redirect of /login/<provider> GET
-        response3 = self.client.get(
-            '/login/TESTING',
-            query_string={'user_id': TEST_USER_ID, 'next': client_url},
-            follow_redirects=True)
+        # validate session login redirect with valid url
+        oauth_info = {
+            'user_id': TEST_USER_ID,
+            'next': client_url,
+        }
+        response3 = self.login(oauth_info=oauth_info)
         assert response3.status_code == 200
 
-        response4 = self.client.get(
-            '/login/TESTING?user_id={}&next={}'.format(
-                TEST_USER_ID, invalid_url),
-            follow_redirects=True)
+        # validate session login redirect with invalid url
+        oauth_info['next'] = invalid_url
+        response4 = self.login(oauth_info=oauth_info)
         assert response4.status_code == 401
+
+        # validate provider login redirect with invalid url
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['next'] = invalid_url
+        response5 = self.login(oauth_info=oauth_info)
+        assert response5.status_code == 401
 
         # validate redirect of /challenge POST
         formdata = {'user_id': TEST_USER_ID, 'next_url': local_url}
-        response5 = self.client.post('/challenge', data=formdata)
-        assert response5.status_code == 200
+        response6 = self.client.post('/challenge', data=formdata)
+        assert response6.status_code == 200
 
         formdata['next_url'] = invalid_url
-        response6 = self.client.post('/challenge', data=formdata)
-        assert response6.status_code == 401
+        response7 = self.client.post('/challenge', data=formdata)
+        assert response7.status_code == 401
