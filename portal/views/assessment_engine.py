@@ -618,8 +618,8 @@ def assessment(patient_id, instrument_id):
                 # todo: migrate towards FHIR spec in persisted data
                 if (
                     'extension' in answer.get('valueCoding', {}) and
-                    not isinstance(answer['valueCoding']['extension'],
-                                   (tuple, list))
+                    not isinstance(
+                        answer['valueCoding']['extension'], (tuple, list))
                 ):
                     answer['valueCoding']['extension'] = [
                         answer['valueCoding']['extension']]
@@ -1562,7 +1562,8 @@ def present_assessment(instruments=None):
     # Temporarily persist entry method until QNR POSTed
     entry_methods = {'paper'}
     if ('entry_method' in request.args
-            and request.args.get('entry_method') in entry_methods):
+        and request.args.get('entry_method') in entry_methods
+    ):
         session['entry_method'] = request.args.get('entry_method')
         current_app.logger.debug(
             'storing session[entry_method]: %s',
