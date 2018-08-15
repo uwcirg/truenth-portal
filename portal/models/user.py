@@ -737,8 +737,9 @@ class User(db.Model, UserMixin):
                            system=v.get('system'),
                            code=v.get('code')).add_if_not_found(True)
 
-        issued = (fhir.get('issued') and
-                  parser.parse(fhir.get('issued')) or None)
+        issued = (
+            fhir.get('issued') and
+            parser.parse(fhir.get('issued')) or None)
         status = fhir.get('status')
         observation = self.save_observation(cc, vq, audit, status, issued)
         if 'performer' in fhir:
@@ -1333,8 +1334,9 @@ class User(db.Model, UserMixin):
                     abort(400, "email address already in use")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = (telecom_cps.get(('phone', 'mobile'))
-                          or telecom_cps.get(('phone', None)))
+            self.phone = (
+                telecom_cps.get(('phone', 'mobile'))
+                or telecom_cps.get(('phone', None)))
             self.alt_phone = telecom_cps.get(('phone', 'home'))
         if fhir.get('communication'):
             for e in fhir['communication']:
@@ -1786,7 +1788,7 @@ class UserRelationship(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         return ("{0.relationship} between {0.user_id} and {0.other_user_id}"
-                .format(self))
+            .format(self))
 
     def as_json(self):
         """serialize the relationship - used to preserve service users"""
