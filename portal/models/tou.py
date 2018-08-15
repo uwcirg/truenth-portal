@@ -17,9 +17,8 @@ class ToU(db.Model):
     """SQLAlchemy class for `tou` table"""
     __tablename__ = 'tou'
     id = db.Column(db.Integer(), primary_key=True)
-    agreement_url = db.Column(db.Text,
-                              server_default='predates agreement_url',
-                              nullable=False)
+    agreement_url = db.Column(
+        db.Text, server_default='predates agreement_url', nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     organization_id = db.Column(db.ForeignKey('organizations.id'))
     type = db.Column('type', tou_types, nullable=False)
@@ -73,7 +72,8 @@ def update_tous(
 
     require_orgs = None
     if organization:
-        org = Organization.query.filter(Organization.name == organization).first()
+        org = Organization.query.filter(
+            Organization.name == organization).first()
         if not org:
             raise ValueError("No such organization: {}".format(organization))
         require_orgs = set(OrgTree().here_and_below_id(org.id))
