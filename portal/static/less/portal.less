@@ -509,6 +509,17 @@ select:not([multiple]) {
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
+  position: relative;
+}
+#mainNavLoadingError {
+  position: absolute;
+  color: @errorMessageColor;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 250px;
+  margin: auto;
+  padding: 1em 0;
 }
 @media all and (-ms-high-contrast: none),(-ms-high-contrast: active) {
   /* IE10+ */
@@ -846,6 +857,13 @@ div.pull-right {
   top: 0.35em;
 }
 .admin-table {
+  .deleted-button-cell {
+    vertical-align: middle;
+    .btn {
+      font-size: 0.8em;
+      padding: 0.7em 1em;
+    }
+  }
   div.pull-right {
     width: 100%;
     max-width: 100%;
@@ -897,7 +915,12 @@ div.pull-right {
     white-space: nowrap;
   }
   td.reports-field div.staff-html {
-    margin: 0.8em auto;
+    margin: 0.4em auto;
+    display: inline-block;
+    vertical-align: middle;
+    a {
+      padding: 0.2em;
+    }
   }
   td.reports-field {
     .intervention-btn-container {
@@ -948,10 +971,51 @@ div.pull-right {
     opacity: @disabledOpacity
   }
 }
+
+#chkDeletedUsersFilter {
+  margin: 0 0 0 4px;
+  font-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.deletedUsersFilterContainer {
+  margin: 1em 0.25em;
+  display: inline-block;
+  padding: .5em 1em;
+  line-height: 1.4;
+  vertical-align: middle;
+  border: 1px dotted #eee;
+  .text {
+    color: @sectionTitleColor;
+    font-weight: normal;
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: middle;
+    letter-spacing: .1rem;
+  }
+}
+@media (min-width: 714px) {
+  .deletedUsersFilterContainer {
+    margin: 0 1em;
+  }
+}
 #adminTableToolbar {
+  .orgs-filter-warning {
+    display: inline-block;
+    margin: 4px 8px;
+    letter-spacing: 0.1rem;
+    position: relative;
+    font-size: 1.25em;
+    opacity: 0.8;
+    top: 2px;
+    &:hover .alert-icon {
+      cursor: pointer;
+      color: @errorMessageColor;
+    }
+  }
   div.orglist-selector {
     display: inline-block;
-    width: 400px;
+    width: 350px;
     max-width: 100%;
     .indent {
       padding: 0 0.4em;
@@ -976,17 +1040,26 @@ div.pull-right {
         }
         legend {
           font-size: @baseMobileFontSize;
+          font-weight: 500;
+          border: 0;
+          line-height: 1.65;
+          border-bottom: 1px dotted #ececec;
+          margin-top: 1.25em;
         }
         span {
           display: inline-block;
           line-height: 1.6em;
-          vertical-align: middle;
-          max-width: 300px;
+          vertical-align: top;
+          max-width: 350px;
           font-size: @baseMobileFontSize;
         }
         .divider + label {
           margin-left: 0;
         }
+      }
+      hr.divider {
+        margin-top: 10px;
+        margin-bottom: 10px;
       }
     }
     div.org-container {
@@ -998,8 +1071,8 @@ div.pull-right {
       }
     }
     #orglist-footer-container {
-      padding: 0.5em 1em;
-      width: 250px;
+      padding: 1em;
+      width: 300px;
       max-width: 100%;
       margin: 0 auto;
       display: flex;
@@ -1343,7 +1416,7 @@ div.pull-right {
   }
 }
 .small-text {
-  font-size: @smallerText * 1.2;
+  font-size: @smallText;
 }
 
 // Used for admin tables or other place where we don't need the large font size
@@ -1708,7 +1781,15 @@ div.pull-right {
         max-width: 150px;
       }
    }
-
+  .section-loader {
+    position: absolute;
+    top: 2.5em;
+    right: 2.5em;
+    z-index: 5;
+    letter-spacing: .05rem;
+    font-size: 0.95em;
+    opacity: 0.8;
+  }
   .profile-item-edit-btn {
     position: absolute;
     top: 2.5em;
@@ -1725,6 +1806,13 @@ div.pull-right {
     border: 1px solid @featureBtnBgColor;
     text-transform: uppercase;
     letter-spacing: 2px;
+    opacity: 0;
+    -webkit-transition: opacity 550ms ease;
+    -o-transition: opacity 550ms ease;
+    transition: opacity 550ms ease;
+  }
+  .profile-item-edit-btn.active {
+    opacity: 1;
   }
   .profile-item-edit-btn:hover,
   .profile-item-edit-btn:active,
@@ -1955,7 +2043,7 @@ div.main-state-container .noOrg-container {
     margin: 0.5em 0 0.1em 0;
   }
   .parent-org-container {
-    margin: 0.4em 0 0.1em;
+    margin: 0.4em 0 0.5em;
     input {
       vertical-align: top;
     }
@@ -2794,6 +2882,7 @@ div.timezone-warning.text-warning {
 @media (min-width: 507px) {
   .admin-table {
     div.pull-right {
+      top: 2px;
       width: auto;
     }
     div.pull-right.search {
@@ -2961,15 +3050,20 @@ div.timezone-warning.text-warning {
      div.indent {
       padding: 0;
     }
-    .fixed-table-toolbar .dropdown-menu {
-      overflow-x: hidden !important;
+    .fixed-table-toolbar {
+      position: relative;
+      top: 4px;
+      .dropdown-menu {
+        overflow-x: hidden !important;
+      }
     }
     div.orglist-selector {
       div.dropdown-menu {
-        width: 400px;
-        max-width: 400px;
+        width: 450px;
+        max-width: 450px;
         #userOrgs {
-          margin: 0 1em;
+          margin: 0 auto;
+          padding: 0 2em;
         }
         div.org-container
         {
@@ -2979,7 +3073,8 @@ div.timezone-warning.text-warning {
         }
       }
       #orglist-footer-container {
-        padding: 0em 0.5em;
+        padding: 0.5em;
+        min-height: 3em;
         label {
           font-size: @baseMobileFontSize;
         }
