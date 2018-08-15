@@ -279,8 +279,9 @@ class TestPortalEproms(TestCase):
         )
         assert response.status_code == 200
 
-        response2 = self.client.get('/website-consent-script/{}?redirect_url='
-                                    '{}'.format(TEST_USER_ID, invalid_url))
+        response2 = self.client.get(
+            '/website-consent-script/{}?redirect_url={}'
+            .format(TEST_USER_ID, invalid_url))
         assert response2.status_code == 401
 
         # validate redirect of /login/<provider> GET

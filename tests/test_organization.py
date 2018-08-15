@@ -41,12 +41,15 @@ class TestOrganization(TestCase):
     """Organization model tests"""
 
     def test_from_fhir(self):
-        with open(os.path.join(
+        with (open(
+            os.path.join(
                 os.path.dirname(__file__),
-                'organization-example-f001-burgers.json'), 'r') as fhir_data:
+                'organization-example-f001-burgers.json'),
+            'r')
+        ) as fhir_data:
             data = json.load(fhir_data)
 
-        # prepopuate database with matching locale
+        # prepopulate database with matching locale
         Coding.from_fhir(
             {'code': 'en_AU', 'display': 'Australian English',
              'system': IETF_LANGUAGE_TAG})
@@ -71,10 +74,12 @@ class TestOrganization(TestCase):
         parent = db.session.merge(parent)
         parent_id = parent.id
 
-        with open(os.path.join(
+        with (open(
+            os.path.join(
                 os.path.dirname(__file__),
                 'organization-example-f002-burgers-card.json'),
-                'r') as fhir_data:
+            'r')
+        ) as fhir_data:
             data = json.load(fhir_data)
 
         # remove the id from the file - doesn't play well with ours
@@ -303,9 +308,12 @@ class TestOrganization(TestCase):
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
-        with open(os.path.join(
+        with (open(
+            os.path.join(
                 os.path.dirname(__file__),
-                'organization-example-f001-burgers.json'), 'r') as fhir_data:
+                'organization-example-f001-burgers.json'),
+            'r')
+        ) as fhir_data:
             data = json.load(fhir_data)
 
         # remove the id from the file - doesn't play well with ours
@@ -437,10 +445,12 @@ class TestOrganization(TestCase):
             assert len(e.keys()) > 1
 
     def test_organization_post(self):
-        with open(os.path.join(
+        with (open(
+            os.path.join(
                 os.path.dirname(__file__),
                 'organization-example-f002-burgers-card.json'),
-                'r') as fhir_data:
+            'r')
+        ) as fhir_data:
             data = json.load(fhir_data)
 
         # the 002-burgers-card org refers to another - should fail
