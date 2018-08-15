@@ -5,7 +5,7 @@ from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import StringIO
 import time
 
@@ -231,6 +231,10 @@ def validate_email(email):
         raise BadRequest("requires a valid email address")
 
 
+LOCKOUT_PERIOD = timedelta(minutes=30)
+PERMITTED_FAILED_LOGIN_ATTEMPTS = 5
+
+
 class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
@@ -269,6 +273,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
+
+    password_verification_failures = db.Column(db.Integer, default=0)
+    last_password_verification_failure = db.Column(db.DateTime, nullable=True)
 
     user_audits = db.relationship('Audit', cascade='delete',
                                   foreign_keys=[Audit.user_id])
@@ -680,6 +687,30 @@ class User(db.Model, UserMixin):
                     locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
 
         return locale_options
+
+    @property
+    def is_locked_out(self):
+        if self.password_verification_failures == 0:
+            return False
+
+        # If we're not in the lockout window reset everything
+        time_since_last_failure = \
+            datetime.utcnow() - self.last_password_verification_failure
+        if time_since_last_failure >= LOCKOUT_PERIOD:
+            self.reset_lockout()
+            return False
+
+        return self.password_verification_failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+
+    def reset_lockout(self):
+        self.password_verification_failures = 0
+        self.last_password_verification_failure = None
+        db.session.commit()
+
+    def add_password_verification_failure(self):
+        self.last_password_verification_failure = datetime.utcnow()
+        self.password_verification_failures += 1
+        db.session.commit()
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""

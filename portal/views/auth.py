@@ -26,6 +26,7 @@ from flask_user import roles_required
 from flask_user.signals import (
     user_changed_password,
     user_logged_in,
+    user_password_failed,
     user_registered,
     user_reset_password,
 )
@@ -363,6 +364,13 @@ def flask_user_login_event(app, user, **extra):
                     context='login')
     login_user(user, 'password_authenticated')
 
+def flask_user_password_failed_event(app, user, **extra):
+    auditable_event(
+        'local user failed password verification', user_id=user.id,
+        subject_id=user.id, context='account'
+    )
+    user.add_password_verification_failure()
+
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event(
@@ -384,9 +392,10 @@ def flask_user_changed_password(app, user, **extra):
 
 
 # Register functions to receive signals from flask_user
-user_logged_in.connect(flask_user_login_event)
-user_registered.connect(flask_user_registered_event)
 user_changed_password.connect(flask_user_changed_password)
+user_logged_in.connect(flask_user_login_event)
+user_password_failed.connect(flask_user_password_failed_event)
+user_registered.connect(flask_user_registered_event)
 user_reset_password.connect(flask_user_changed_password)
 
 

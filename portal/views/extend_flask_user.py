@@ -1,5 +1,7 @@
 """Module to extend or specialize flask user views for our needs"""
 from flask import abort, current_app, session, url_for
+from flask_user.forms import LoginForm
+from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
 
 from ..models.role import ROLE
@@ -40,3 +42,30 @@ def reset_password_view_function(token):
 
     next_url = url_for('user.reset_password', token=token)
     return challenge_identity(user_id=user_id, next_url=next_url)
+
+
+def login_view():
+    """Logs in users with unlocked accounts
+
+    If the user's account is unlocked call the default login view.
+    Otherwise, return a message to the user.
+    """
+    pass
+
+
+class LockoutLoginForm(LoginForm):
+    def validate(self):
+        # Find user by email address (email field)
+        user_manager =  current_app.user_manager
+        user, user_email = user_manager.find_user_by_email(self.email.data)
+
+        if user.is_locked_out:
+            current_app.logger.warn(
+                'User attempted to login but their account is locked'
+            )
+            error_message = 'Your account had been locked out'
+            self.password.errors.append(error_message)
+            return False
+
+        return super(LockoutLoginForm, self).validate()
+
