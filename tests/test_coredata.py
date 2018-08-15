@@ -171,7 +171,8 @@ class TestCoredata(TestCase):
                 in needed)
 
         self.login()
-        resp = self.client.get('/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
+        resp = self.client.get(
+            '/api/coredata/user/{}/still_needed'.format(TEST_USER_ID))
         assert resp.status_code == 200
         passed = False
         for entry in resp.json['still_needed']:

@@ -12,7 +12,6 @@ from flask import (
     abort,
     current_app,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -40,6 +39,7 @@ from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
+from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
 from ..models.flaskdanceprovider import (
     FacebookFlaskDanceProvider,
@@ -521,29 +521,34 @@ def next_after_login():
         resp = redirect('/home')
 
     def update_timeout():
-        # make cookie max_age outlast the browser session
-        max_age = 60 * 60 * 24 * 365 * 5
-        # set timeout cookies
-        if session.get('login_as_id'):
-            if request.cookies.get('SS_TIMEOUT'):
-                resp.set_cookie('SS_TIMEOUT_REVERT',
-                                request.cookies['SS_TIMEOUT'],
-                                max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
-        elif request.cookies.get('SS_TIMEOUT_REVERT'):
-            resp.set_cookie('SS_TIMEOUT',
-                            request.cookies['SS_TIMEOUT_REVERT'],
-                            max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
-        else:
-            # TODO determine if this line should stay - it seems it
-            # would clear a value potentially set on the browser via
-            # /settings
-            resp.set_cookie('SS_TIMEOUT', '', expires=0)
+        """set inactivity timeout cookie depending on user context"""
 
-    ready_for_login_as_timeout = False
-    if ready_for_login_as_timeout:
-        update_timeout()
+        inactivity_cookie = 'SS_INACTIVITY_TIMEOUT'
+
+        # Login-as limited to 5 mins
+        if session.get('login_as_id'):
+            resp.set_cookie(inactivity_cookie, '300')
+            return
+
+        # Systems (i.e. kiosks) with custom timeout settings
+        custom_system_timeout = request.cookies.get('SS_TIMEOUT')
+        if custom_system_timeout:
+            resp.set_cookie(inactivity_cookie, custom_system_timeout)
+            return
+
+        # Otherwise, use default or max from user's interventions
+        max_found = current_app.config['DEFAULT_INACTIVITY_TIMEOUT']
+
+        for i in Intervention.query.join(UserIntervention).filter(
+                UserIntervention.user_id == user.id).with_entities(
+                Intervention.name):
+            intervention_timeout = current_app.config.get(
+                "{}_TIMEOUT".format(i.name.upper()), 0)
+            max_found = max(max_found, intervention_timeout)
+
+        resp.set_cookie(inactivity_cookie, str(max_found))
+
+    update_timeout()
 
     return resp
 

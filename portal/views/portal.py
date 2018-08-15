@@ -748,8 +748,9 @@ def settings():
             # lack context to expand, show with format strings
             apptext[a.name] = a.custom_text
 
-    form = SettingsForm(
-        request.form, timeout=request.cookies.get('SS_TIMEOUT', 600))
+    default_timeout = current_app.config['DEFAULT_INACTIVITY_TIMEOUT']
+    current_timeout = request.cookies.get("SS_TIMEOUT", default_timeout)
+    form = SettingsForm(request.form, timeout=current_timeout)
     if not form.validate_on_submit():
 
         return render_template(
@@ -793,8 +794,6 @@ def settings():
             trace("Invalid date format {}".format(form.timestamp.data))
             trace("ERROR: {}".format(e))
 
-    # make max_age outlast the browser session
-    max_age = 60 * 60 * 24 * 365 * 5
     response = make_response(render_template(
         'settings.html',
         form=form,
@@ -802,7 +801,17 @@ def settings():
         organization_consents=organization_consents,
         trace_data=dump_trace(),
         wide_container="true"))
-    response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
+
+    # Only retain custom timeout if set different from default
+    if form.timeout.data != default_timeout:
+        if form.timeout.data > current_app.config.get(
+                'PERMANENT_SESSION_LIFETIME'):
+            abort(400, "Inactivity timeout value can't exceed"
+                       " PERMANENT_SESSION_LIFETIME")
+        # set cookie max_age to 5 years for config retention
+        max_age = 60 * 60 * 24 * 365 * 5
+        response.set_cookie(
+            'SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
 
 

@@ -70,7 +70,7 @@ function loader(show) {
             setTimeout(function() {
                 showMain();
             }, 100);
-            hideLoader(true);
+            hideLoader(true, 350);
         }
     }
 }
@@ -79,7 +79,9 @@ function _isTouchDevice() {
 }
 // populate portal banner content
 function embed_page(data) {
-    $("#mainNav").html(data);
+    if (data && !data.error) {
+        $("#mainNav").html(data);
+    }
     setTimeout(function() {
         loader();
     }, 0);
@@ -96,6 +98,7 @@ var request_attempts = 0;
 function newHttpRequest(url, params, callBack) {
     request_attempts++;
     var xmlhttp;
+    callBack = callBack || function() {};
     if (window.XDomainRequest) {
         xmlhttp = new XDomainRequest();
         xmlhttp.onload = function() {
@@ -109,15 +112,14 @@ function newHttpRequest(url, params, callBack) {
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState === 4) {
             if (xmlhttp.status === 200) {
-                if (callBack) {
-                    callBack(xmlhttp.responseText);
-                }
+                callBack(xmlhttp.responseText);
             } else {
                 if (request_attempts < 3) {
                     setTimeout(function() {
-                        newHttpRequest(url, callBack);
+                        newHttpRequest(url, params, callBack);
                     }, 3000);
                 } else {
+                    callBack({error: xmlhttp.responseText});
                     loader();
                 }
             }
@@ -155,16 +157,17 @@ function ajaxRequest(url, params, callback) {
     request_attempts++;
     $.ajax(params).done(function(data) {
         callback(data);
+        request_attempts = 0;
     }).fail(function(jqXHR, textStatus) {
-        if (request_attempts < 3) {
-            setTimeout(function() { ajaxRequest(url, callback);}, 3000);
+        if (request_attempts <= 3) {
+            setTimeout(function() { ajaxRequest(url, params, callback);}, 3000);
         } else {
             callback({error: i18next.t("Error occurred processing request")}); /*global i18next */
+            request_attempts = 0;
             loader();
         }
     }).always(function() {
         loader();
-        request_attempts = 0;
     });
 }
 function initWorker(url, params, callbackFunc) {
