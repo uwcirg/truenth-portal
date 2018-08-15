@@ -159,9 +159,10 @@ def practitioner_get(id_or_code):
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
-            abort(404,
-                  'no practitioner found with identifier: system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
+            abort(
+                404,
+                'no practitioner found with identifier: system `{}`, '
+                'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -298,9 +299,10 @@ def practitioner_put(id_or_code):
     if system:
         practitioner = lookup_practitioner_by_external_id(system, id_or_code)
         if not practitioner:
-            abort(404,
-                  'no practitioner found with identifier: system `{}`, '
-                  'value `{}`'.format(system, id_or_code))
+            abort(
+                404,
+                'no practitioner found with identifier: system `{}`, '
+                'value `{}`'.format(system, id_or_code))
     else:
         check_int(id_or_code)
         practitioner = Practitioner.query.get_or_404(id_or_code)
@@ -330,10 +332,14 @@ def check_for_existing_external_id(json, current_id=None):
         system = ident.get('system')
         value = ident.get('value')
         if not (system and value):
-            abort(400, 'Both system and value must be provided '
-                       'for identifier {}'.format(ident))
+            abort(
+                400,
+                'Both system and value must be provided '
+                'for identifier {}'.format(ident))
         practitioner = lookup_practitioner_by_external_id(system, value)
         if (practitioner and
                 (not current_id or (practitioner.id != current_id))):
-            abort(409, 'Practitioner with identifier {} already '
-                       'exists'.format(ident))
+            abort(
+                409,
+                'Practitioner with identifier {} already '
+                'exists'.format(ident))
