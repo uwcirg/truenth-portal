@@ -381,7 +381,7 @@ def reactivate_user(user_id):
     try:
         user.reactivate_user(acting_user=current_user())
     except ValueError as v:
-        response = jsonify(message=v.message)
+        response = jsonify(message="{}".format(v))
         response.status_code = 400
         return response
     return jsonify(message="reactivated")
