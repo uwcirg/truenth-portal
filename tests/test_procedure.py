@@ -25,6 +25,7 @@ from portal.models.reference import Reference
 from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase
 
+
 class TestProcedure(TestCase):
 
     def test_procedureGET_404(self):
@@ -207,7 +208,8 @@ class TestProcedure(TestCase):
         for code, display, system in not_started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            assert known_treatment_not_started(self.test_user),\
+            assert (
+                known_treatment_not_started(self.test_user),
                 "treatment '{}' didn't show as not started".format(
-                    (system, code))
+                    (system, code)))
             self.test_user.procedures.delete()  # reset for next iteration
