@@ -617,9 +617,10 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         self.login()
-        response = self.client.post('/api/user/%s/roles' % TEST_USER_ID,
-                                    content_type='application/json',
-                                    data=json.dumps(data))
+        response = self.client.post(
+            '/api/user/%s/roles' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(data))
 
         assert response.status_code == 409
         user = User.query.get(TEST_USER_ID)
@@ -974,9 +975,10 @@ class TestUser(TestCase):
 
     def test_set_relationships(self):
         other_user = self.add_user(username='other@foo.com')
-        data = {'relationships': [{'user': TEST_USER_ID,
-                                   'has the relationship': 'partner',
-                                   'with': other_user.id}, ]
+        data = {'relationships': [{
+            'user': TEST_USER_ID,
+            'has the relationship': 'partner',
+            'with': other_user.id}, ]
                 }
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
@@ -1023,9 +1025,10 @@ class TestUser(TestCase):
         "delete now done by PUTting less than all relationships"
         self.create_fake_relationships()
         other_user = User.query.filter_by(username='other@foo.com').first()
-        data = {'relationships': [{'user': other_user.id,
-                                   'has the relationship': 'sponsor',
-                                   'with': TEST_USER_ID}, ]
+        data = {'relationships': [{
+            'user': other_user.id,
+            'has the relationship': 'sponsor',
+            'with': TEST_USER_ID}, ]
                 }
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
@@ -1160,8 +1163,9 @@ class TestUser(TestCase):
 
     def test_locale_inheritance(self):
         # prepopuate database with matching locale
-        cd = Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                               'system': "urn:ietf:bcp:47"})
+        cd = Coding.from_fhir({
+            'code': 'en_AU', 'display': 'Australian English',
+            'system': "urn:ietf:bcp:47"})
         # create parent with locale
         parent_id = 101
         parent = Organization(id=parent_id, name='test parent')
