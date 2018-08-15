@@ -308,8 +308,8 @@ class Organization(db.Model):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
-        by_extension_url = {ext['url']: ext
-                            for ext in data.get('extension', [])}
+        by_extension_url = {
+            ext['url']: ext for ext in data.get('extension', [])}
         for kls in org_extension_classes:
             args = by_extension_url.get(
                 kls.extension_url, {'url': kls.extension_url})
