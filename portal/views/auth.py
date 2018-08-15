@@ -330,10 +330,11 @@ def deauthorized():
       app->settings->advanced->Deauthorize Callback URL
 
     """
+
     def base64_url_decode(s):
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
-        s += "="*padding_factor
+        s += "=" * padding_factor
         return base64.b64decode(unicode(s).translate(
             dict(zip(map(ord, '-_'), '+/'))))
 
@@ -416,6 +417,7 @@ def capture_next_view_function(real_function):
             session['suspend_initial_queries'] = request.args.get(
                 'suspend_initial_queries')
         return real_function()
+
     return capture_next
 
 
@@ -477,7 +479,7 @@ def next_after_login():
         if preserve_next_across_sessions:
             session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
-        assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
+        assert (not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
         user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
@@ -545,6 +547,7 @@ def next_after_login():
             intervention_timeout = current_app.config.get(
                 "{}_TIMEOUT".format(i.name.upper()), 0)
             max_found = max(max_found, intervention_timeout)
+
 
         resp.set_cookie(inactivity_cookie, str(max_found))
 
@@ -631,8 +634,8 @@ def logout(prevent_redirect=False, reason=None):
         if ap:
             headers = {
                 'Authorization': 'Bearer {0}'.format(session['remote_token'])}
-            url = "https://graph.facebook.com/{0}/permissions".\
-                format(ap.provider_id)
+            url = "https://graph.facebook.com/{0}/permissions".format(
+                ap.provider_id)
             requests.delete(url, headers=headers)
 
     if user_id:
@@ -653,8 +656,6 @@ def logout(prevent_redirect=False, reason=None):
     if prevent_redirect:
         return
     return redirect('/' if not timed_out else '/?timed_out=1')
-
-
 
 
 @auth.route('/oauth/token-status')
@@ -928,7 +929,8 @@ def authorize(*args, **kwargs):
     suspend_initial_queries = request.args.get('suspend_initial_queries')
     if suspend_initial_queries:
         session['suspend_initial_queries'] = True
-        current_app.logger.debug("/oauth/authorize told to suspend_initial_queries")
+        current_app.logger.debug(
+            "/oauth/authorize told to suspend_initial_queries")
 
     user = current_user()
     if not user:
