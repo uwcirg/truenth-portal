@@ -44,7 +44,7 @@ class FlaskDanceProvider:
         resp = self.send_get_user_json_request()
 
         if not resp.ok:
-            current_app.logger.debug(
+            current_app.logger.error(
                 'Failed to fetch user info from {}'.format(self.blueprint.name)
             )
             return None
@@ -81,7 +81,7 @@ class FlaskDanceProvider:
             :return value from the user's json or None
             """
 
-            # Ge the key used by the provider
+            # Get the key used by the provider
             user_json_key = \
                 self.standard_key_to_provider_key_map[standard_key]
 
@@ -89,20 +89,29 @@ class FlaskDanceProvider:
             # e.g. 'picture.data.url'
             # Which means we'll need to get each part
             # individually
-            parts = user_json_key.split('.')
+            key_parts = user_json_key.split('.')
 
-            # Loop over each key to get the value
-            # from the user's json
-            value = user_json
-            for key in parts:
-                # Certain properties can be undefined
-                # Handle these cases gracefully
-                if not required and key not in value:
-                    return None
+            try:
+                # Loop over each key's part to get the value
+                # from the user's json
+                value = user_json
+                for key_part in key_parts:
+                    # Certain properties can be undefined
+                    # Handle these cases gracefully
+                    if not required and key_part not in value:
+                        return None
 
-                value = value[key]
+                    value = value[key_part]
 
-            return value
+                return value
+            except KeyError as err:
+                current_app.logger.error(
+                    'Unable to parse {} from user json. Error {}'.format(
+                        user_json_key,
+                        err,
+                    )
+                )
+                raise err
 
         # Attempt to parse the user's json
         try:
@@ -124,9 +133,9 @@ class FlaskDanceProvider:
             )
 
             return user_info
-        except KeyError as err:
-            current_app.logger.debug(
-                'Key not found in {} user json. Error {}'.format(
+        except Exception as err:
+            current_app.logger.error(
+                'Unable to parse user json for provider {}. Error {}'.format(
                     self.blueprint.name,
                     err
                 )
@@ -234,7 +243,7 @@ class MockFlaskDanceProvider(FlaskDanceProvider):
                 'first_name': 'first_name',
                 'last_name': 'last_name',
                 'email': 'email',
-                'image_url': 'image_url',
+                'image_url': 'picture.data.url',
                 'gender': 'gender',
                 'birthdate': 'birthdate',
             }
@@ -242,6 +251,13 @@ class MockFlaskDanceProvider(FlaskDanceProvider):
 
         self.user_json = user_json
         self.fail_to_get_user_json = fail_to_get_user_json
+
+        # Facebook embeds image urls in json.picture.data.url
+        # Mimicing that behavior here so we can validate that
+        # parsing it works properly
+        if 'image_url' in self.user_json:
+            url = self.user_json['image_url']
+            self.user_json['picture'] = {'data': {'url': url}}
 
     def send_get_user_json_request(self):
         """return a mock request based on test data passed into the constructor
