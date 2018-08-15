@@ -151,8 +151,8 @@ def demographics_set(patient_id):
     if request.json.get('resourceType') != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
     if request.json.get('organizations'):
-        abort(400, "FHIR Patient Resource uses 'careProvider' "
-                   "for organizations")
+        abort(
+            400, "FHIR Patient Resource uses 'careProvider' for organizations")
     try:
         # As we allow partial updates, first create a full representation
         # of this user, and update with any provided elements
