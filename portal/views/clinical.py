@@ -126,7 +126,8 @@ def pca_localized(patient_id):
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/biopsy',
-                    methods=('POST', 'PUT'))
+                    methods=('OPTIONS','POST', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def biopsy_set(patient_id):
     """Simplified API for setting clinical biopsy data w/o FHIR
@@ -179,6 +180,8 @@ def biopsy_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -186,7 +189,8 @@ def biopsy_set(patient_id):
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/pca_diag',
-                    methods=('POST', 'PUT'))
+                    methods=('OPTIONS','POST', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def pca_diag_set(patient_id):
     """Simplified API for setting clinical PCa diagnosis status w/o FHIR
@@ -237,6 +241,8 @@ def pca_diag_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -244,10 +250,11 @@ def pca_diag_set(patient_id):
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/pca_localized',
-                    methods=('POST', 'PUT'))
+                    methods=('OPTIONS','POST', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def pca_localized_set(patient_id):
-    """Simplified API for setting clinical PCa localizedstatus w/o FHIR
+    """Simplified API for setting clinical PCa localized status w/o FHIR
 
     Requires simple JSON doc to set PCaLocalized diagnosis: '{"value": true}'
 
@@ -295,6 +302,8 @@ def pca_localized_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -343,7 +352,8 @@ def clinical(patient_id):
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical',
-                    methods=('POST', 'PUT'))
+                    methods=('OPTIONS','POST', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def clinical_set(patient_id):
     """Add clinical entry via FHIR Resource Observation
@@ -400,6 +410,8 @@ def clinical_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -421,7 +433,8 @@ def clinical_set(patient_id):
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/<int:observation_id>',
-                    methods=(['PUT']))
+                    methods=(['OPTIONS','PUT']))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def clinical_update(patient_id, observation_id):
     """Updates a FHIR Resource Observation clinical entry
@@ -475,6 +488,8 @@ def clinical_update(patient_id, observation_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
