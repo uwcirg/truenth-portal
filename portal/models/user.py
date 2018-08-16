@@ -274,7 +274,8 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
-    password_verification_failures = db.Column(db.Integer, default=0)
+    password_verification_failures = \
+            db.Column(db.Integer, default=0, nullable=False)
     last_password_verification_failure = db.Column(db.DateTime, nullable=True)
 
     user_audits = db.relationship('Audit', cascade='delete',
@@ -690,6 +691,12 @@ class User(db.Model, UserMixin):
 
     @property
     def is_locked_out(self):
+        """tells if user is temporarily locked out
+
+        To slow down brute force password attacks we temporarily
+        lock users out of the system for a short period of time.
+        This property tells whether or not the user is locked out.
+        """
         if self.password_verification_failures == 0:
             return False
 
@@ -698,19 +705,36 @@ class User(db.Model, UserMixin):
             datetime.utcnow() - self.last_password_verification_failure
         if time_since_last_failure >= LOCKOUT_PERIOD:
             self.reset_lockout()
-            return False
 
-        return self.password_verification_failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+        failures = self.password_verification_failures
+        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
 
     def reset_lockout(self):
+        """resets variables that track lockout
+
+        We track when the user fails password verification
+        to lockout users when they fail too many times.
+        This function resets those variables
+        """
         self.password_verification_failures = 0
         self.last_password_verification_failure = None
         db.session.commit()
 
     def add_password_verification_failure(self):
+        """remembers when a user fails password verification
+
+        Each time a user fails password verification
+        this function is called. Use user.is_locked_out
+        to tell whether this has been called enough times
+        to lock the user out of the system
+
+        :returns: total failures since last reset
+        """
         self.last_password_verification_failure = datetime.utcnow()
         self.password_verification_failures += 1
         db.session.commit()
+
+        return self.password_verification_failures
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""

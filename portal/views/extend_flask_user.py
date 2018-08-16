@@ -3,7 +3,9 @@ from flask import abort, current_app, session, url_for
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
+from flask_wtf import FlaskForm
 
+from ..audit import auditable_event
 from ..models.role import ROLE
 from ..models.user import get_user_or_abort
 from .portal import challenge_identity
@@ -44,28 +46,44 @@ def reset_password_view_function(token):
     return challenge_identity(user_id=user_id, next_url=next_url)
 
 
-def login_view():
-    """Logs in users with unlocked accounts
-
-    If the user's account is unlocked call the default login view.
-    Otherwise, return a message to the user.
-    """
-    pass
-
-
 class LockoutLoginForm(LoginForm):
+    """adds lockout functionality to the login process"""
+
     def validate(self):
+        """prevent locked out users from logging in
+
+        Before verifying the user's credentials
+        check to see if the user is locked out.
+        If the user is locked out display an error
+        message below the password field.
+        """
         # Find user by email address (email field)
-        user_manager =  current_app.user_manager
+        user_manager = current_app.user_manager
         user, user_email = user_manager.find_user_by_email(self.email.data)
 
+        # If the user is locked out display a message
+        # under the password field
         if user.is_locked_out:
-            current_app.logger.warn(
-                'User attempted to login but their account is locked'
+            # Make sure validators are run so we
+            # can populate self.password.errors
+            super(LoginForm, self).validate()
+
+            auditable_event(
+                'local user attempted to login after being locked out',
+                user_id=user.id,
+                subject_id=user.id,
+                context='login'
             )
-            error_message = 'Your account had been locked out'
+
+            error_message = _('We see you\'re having trouble - let us help. \
+                Your account will now be locked while we give it a refresh. \
+                Please try again in 30 minutes. \
+                If you\'re still having issues, please click \
+                "Having trouble logging in?" below.')
             self.password.errors.append(error_message)
+
             return False
 
+        # If the user is not locked out proceed with
+        # validating credentials
         return super(LockoutLoginForm, self).validate()
-

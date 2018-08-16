@@ -364,12 +364,22 @@ def flask_user_login_event(app, user, **extra):
                     context='login')
     login_user(user, 'password_authenticated')
 
+
 def flask_user_password_failed_event(app, user, **extra):
+    """tracks when a user fails password verification
+
+    If this happens too often, for security reasons,
+    the user will be locked out of the system.
+    """
+    count = user.add_password_verification_failure()
     auditable_event(
-        'local user failed password verification', user_id=user.id,
-        subject_id=user.id, context='account'
+        'local user failed password verification. Count "{}"'.format(
+            count
+        ),
+        user_id=user.id,
+        subject_id=user.id,
+        context='login'
     )
-    user.add_password_verification_failure()
 
 
 def flask_user_registered_event(app, user, **extra):
