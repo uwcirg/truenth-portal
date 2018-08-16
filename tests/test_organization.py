@@ -500,8 +500,9 @@ class TestOrganization(TestCase):
 
     def test_organization_identifiers_update(self):
         with open(os.path.join(
-                os.path.dirname(__file__),
-                'organization-example-gastro.json'), 'r') as fhir_data:
+            os.path.dirname(__file__),
+            'organization-example-gastro.json'), 'r'
+        ) as fhir_data:
             data = json.load(fhir_data)
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()

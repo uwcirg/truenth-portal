@@ -287,7 +287,7 @@ class TestPortalEproms(TestCase):
 
         response2 = self.client.get(
             '/website-consent-script/{}'.format(TEST_USER_ID),
-            query_string={'redirrect_url': invalid_url}
+            query_string={'redirect_url': invalid_url}
         )
         assert response2.status_code == 401
 
