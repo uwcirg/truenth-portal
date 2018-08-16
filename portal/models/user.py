@@ -17,7 +17,7 @@ from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
 import regex
-from sqlalchemy import UniqueConstraint, and_, or_, text
+from sqlalchemy import UniqueConstraint, and_, or_, text, func
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
@@ -1575,7 +1575,7 @@ class User(db.Model, UserMixin):
 
         if self == acting_user:
             raise ValueError("can't delete self")
-        if acting_user is None:
+        if not acting_user:
             raise ValueError("delete requires well defined acting_user")
 
         # Don't allow deletion of users with client applications
@@ -1619,15 +1619,15 @@ class User(db.Model, UserMixin):
         if not self.deleted:
             raise ValueError("can't reactivate active user")
         if self == acting_user:
-            raise ValueError("can't delete self")
-        if acting_user is None:
+            raise ValueError("can't reactivate self")
+        if not acting_user:
             raise ValueError("reactivate requires well defined acting_user")
 
         # The email was masked during delete.  Need to confirm a user didn't
         # sneak in with the same address while deleted.  The accessor returns
         # the unmasked value.
         unmasked = self.email
-        if User.query.filter(User.email == unmasked).count() > 0:
+        if User.query.filter(func.lower(User.email) == unmasked.lower()).count() > 0:
             raise ValueError(
                 "A new account with same email {} in conflict. "
                 "Can't reactivate".format(unmasked))
