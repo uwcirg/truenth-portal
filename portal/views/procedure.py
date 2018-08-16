@@ -61,7 +61,8 @@ def procedure(patient_id):
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
-@procedure_api.route('/procedure', methods=('POST',))
+@procedure_api.route('/procedure', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def post_procedure():
     """Add procedure via FHIR Procedure Resource
@@ -120,6 +121,8 @@ def post_procedure():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
+    security:
+      - Authorization: []
 
     """
 
@@ -155,7 +158,8 @@ def post_procedure():
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
-@procedure_api.route('/procedure/<int:procedure_id>', methods=('DELETE',))
+@procedure_api.route('/procedure/<int:procedure_id>', methods=('OPTIONS','DELETE'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def procedure_delete(procedure_id):
     """Delete a procedure by ID.
@@ -191,6 +195,8 @@ def procedure_delete(procedure_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
+    security:
+      - Authorization: []
 
     """
     procedure = Procedure.query.get_or_404(procedure_id)
