@@ -12,7 +12,8 @@ from ..models.client import validate_origin
 def crossdomain(
         origin=None,
         methods=None,
-        headers=('Authorization', 'X-Requested-With', 'X-CSRFToken','Content-Type'),
+        headers=(
+            'Authorization', 'X-Requested-With', 'X-CSRFToken','Content-Type'),
         max_age=21600, automatic_options=True):
     """Decorator to add specified crossdomain headers to response
 

@@ -12,7 +12,7 @@ notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 
 
 @notification_api.route('/user/<int:user_id>/notification', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def get_user_notification(user_id):
     """Retrieve Notifications for the given User
@@ -89,7 +89,7 @@ def get_user_notification(user_id):
 
 @notification_api.route(
     '/user/<int:user_id>/notification/<int:notification_id>',
-    methods=('DELETE',))
+    methods=('DELETE'))
 @oauth.require_oauth()
 def delete_user_notification(user_id, notification_id):
     """Remove the corresponding UserNotification for given User & Notification

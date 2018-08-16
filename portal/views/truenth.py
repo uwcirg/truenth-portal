@@ -31,7 +31,7 @@ def ping():
     return 'OK'
 
 
-@truenth_api.route('/auditlog', methods=('OPTIONS','POST',))
+@truenth_api.route('/auditlog', methods=('OPTIONS','POST'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def auditlog_addevent():
