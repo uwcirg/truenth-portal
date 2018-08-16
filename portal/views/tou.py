@@ -187,7 +187,8 @@ def get_tou_by_type(user_id, tou_type):
     return jsonify(accepted=False)
 
 
-@tou_api.route('/user/<user_id>/tou/accepted', methods=('POST',))
+@tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
     """Accept Terms Of Use on behalf of user
@@ -233,6 +234,8 @@ def post_user_accepted_tou(user_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
+    security:
+      - Authorization: []
 
     """
     authd_user = current_user()
@@ -245,7 +248,8 @@ def post_user_accepted_tou(user_id):
     return accept_tou(user_id)
 
 
-@tou_api.route('/tou/accepted', methods=('POST',))
+@tou_api.route('/tou/accepted', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def accept_tou(user_id=None):
     """Accept Terms Of Use info for authenticated user
@@ -283,6 +287,8 @@ def accept_tou(user_id=None):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
+    security:
+      - Authorization: []
 
     """
     if user_id:
