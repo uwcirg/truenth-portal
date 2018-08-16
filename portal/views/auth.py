@@ -87,14 +87,12 @@ def oauth_test_backdoor():
         return login_user_with_provider(request, mock_provider)
 
     def create_mock_provider():
-        user_info = FlaskProviderUserInfo()
-        user_info.id = request.args.get('provider_id')
-        user_info.first_name = request.args.get('first_name')
-        user_info.last_name = request.args.get('last_name')
-        user_info.email = request.args.get('email')
-        user_info.image_url = request.args.get('image_url')
-        user_info.gender = request.args.get('gender')
-        user_info.birthday = request.args.get('birthday')
+        # Convert all request args into a dictionary that's
+        # used to mock user json returned from a provider
+        # Certain keys, like next, will be included in this
+        # all inclusive brute force approach, but that's ok.
+        # These properties will be ignored
+        user_json = request.args.to_dict()
 
         # If a token is set turn it into a json object
         token = request.args.get('token')
@@ -104,8 +102,8 @@ def oauth_test_backdoor():
         mock_provider = MockFlaskDanceProvider(
             request.args.get('provider_name'),
             token,
-            user_info,
-            request.args.get('fail_to_get_user_info')
+            user_json,
+            request.args.get('fail_to_get_user_json')
         )
 
         return mock_provider
@@ -170,7 +168,7 @@ def login_user_with_provider(request, provider):
 
     # Use the auth token to get user info from the provider
     user_info = provider.get_user_info()
-    if not user_info:
+    if user_info is None:
         current_app.logger.error(
             'Failed to get user info at %s',
             provider.name
