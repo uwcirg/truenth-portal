@@ -645,7 +645,7 @@ def set_user_consents(user_id):
 
 
 @user_api.route('/user/<int:user_id>/consent/withdraw',
-                methods=('POST', 'PUT'))
+                methods=('OPTIONS', 'POST', 'PUT'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def withdraw_user_consent(user_id):
@@ -752,7 +752,7 @@ def withdraw_user_consent(user_id):
     return jsonify(uc.as_json())
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS','DELETE'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def delete_user_consents(user_id):
@@ -807,6 +807,8 @@ def delete_user_consents(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - Authorization: []
 
     """
     current_app.logger.debug('delete user consent called w/: {}'.format(
@@ -1620,7 +1622,7 @@ def download_user_document(user_id, doc_id):
     return response
 
 
-@user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
+@user_api.route('/user/<int:user_id>/patient_report', methods=('OPTIONS','POST'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def upload_user_document(user_id):
@@ -1669,6 +1671,8 @@ def upload_user_document(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1878,7 +1882,7 @@ def get_table_preferences(user_id, table_name):
 
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
-    methods=('PUT', 'POST'))
+    methods=('OPTIONS','PUT', 'POST'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
@@ -1958,6 +1962,8 @@ def set_table_preferences(user_id, table_name):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to edit requested user_id
+    security:
+      - Authorization: []
 
     """
     if not user_id or not table_name:

@@ -89,7 +89,8 @@ def get_user_notification(user_id):
 
 @notification_api.route(
     '/user/<int:user_id>/notification/<int:notification_id>',
-    methods=('DELETE'))
+    methods=('OPTIONS','DELETE'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def delete_user_notification(user_id, notification_id):
     """Remove the corresponding UserNotification for given User & Notification
@@ -132,6 +133,8 @@ def delete_user_notification(user_id, notification_id):
           permission to edit requested user_id
       404:
         description: if user_id or notification_id don't exist
+    security:
+      - Authorization: []
 
     """
     current_app.logger.debug(
