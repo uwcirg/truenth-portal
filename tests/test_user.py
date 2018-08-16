@@ -821,7 +821,8 @@ class TestUser(TestCase):
         staff_mid = db.session.merge(staff_mid)
         for perm in ('view', 'edit'):
             for patient in (
-                    patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id
+            ):
                 assert staff_mid.check_role(perm, other_id=patient)
 
         # low level staff can view/edit only those w/ same org
@@ -848,7 +849,8 @@ class TestUser(TestCase):
         # top level staff can view all, edit none
         staff_top = db.session.merge(staff_top)
         for patient in (
-                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id
+        ):
             assert staff_top.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
                 staff_top.check_role('edit', other_id=patient)
@@ -856,7 +858,8 @@ class TestUser(TestCase):
         # mid level staff can view all, edit none
         staff_mid = db.session.merge(staff_mid)
         for patient in (
-                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id
+        ):
             assert staff_mid.check_role('view', other_id=patient)
             with pytest.raises(Unauthorized):
                 staff_mid.check_role('edit', other_id=patient)
@@ -980,7 +983,7 @@ class TestUser(TestCase):
             'user': TEST_USER_ID,
             'has the relationship': 'partner',
             'with': other_user.id}, ]
-                }
+        }
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
             TEST_USER_ID),
