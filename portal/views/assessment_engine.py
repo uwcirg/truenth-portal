@@ -881,7 +881,8 @@ def assessment_update(patient_id):
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment', methods=('POST',))
+    '/patient/<int:patient_id>/assessment', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
@@ -1302,6 +1303,9 @@ def assessment_add(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
+
     """
 
     if not hasattr(request, 'json') or not request.json:
@@ -1596,8 +1600,7 @@ def deprecated_present_assessment(instrument_id):
 
     return present_assessment(instruments=[instrument_id,])
 
-@assessment_engine_api.route('/complete-assessment', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@assessment_engine_api.route('/complete-assessment')
 @oauth.require_oauth()
 def complete_assessment():
     """Return to the last intervention that requested an assessment be presented
@@ -1622,8 +1625,6 @@ def complete_assessment():
             format: url
       401:
         description: if missing valid OAuth token
-    security:
-      - Authorization: []
 
     """
 
