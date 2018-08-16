@@ -776,8 +776,9 @@ def get_assessments():
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
-    methods=('PUT',),
+    methods=('OPTIONS','PUT'),
 )
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def assessment_update(patient_id):
     """Update an existing questionnaire response on a patient's record
@@ -808,6 +809,9 @@ def assessment_update(patient_id):
           to view requested patient
       404:
         description: existing QuestionnaireResponse not found
+    security:
+      - Authorization: []
+
     """
 
     if not hasattr(request, 'json') or not request.json:
