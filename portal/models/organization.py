@@ -441,7 +441,7 @@ class OrganizationLocale(db.Model):
     __tablename__ = 'organization_locales'
     id = db.Column(db.Integer, primary_key=True)
     organization_id = db.Column(db.ForeignKey(
-            'organizations.id', ondelete='CASCADE'), nullable=False)
+        'organizations.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
     __table_args__ = (UniqueConstraint(
@@ -734,8 +734,9 @@ class OrgTree(object):
         def add_descendents(node):
             partOf_id = node.id
             for org in Organization.query.filter(and_(
-                    Organization.id != 0,  # none of the above doesn't apply
-                    Organization.partOf_id == partOf_id)):
+                Organization.id != 0,  # none of the above doesn't apply
+                Organization.partOf_id == partOf_id)
+            ):
                 new_node = node.insert(id=org.id, partOf_id=partOf_id)
                 if org.id in self.lookup_table:
                     raise ValueError(
