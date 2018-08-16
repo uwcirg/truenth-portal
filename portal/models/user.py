@@ -17,7 +17,7 @@ from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
 import regex
-from sqlalchemy import UniqueConstraint, and_, or_, text
+from sqlalchemy import UniqueConstraint, and_, or_, text, func
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
@@ -1584,8 +1584,8 @@ class User(db.Model, UserMixin):
 
         if self == acting_user:
             raise ValueError("can't delete self")
-        if self is None or acting_user is None:
-            raise ValueError("both user and acting_user must be well defined")
+        if not acting_user:
+            raise ValueError("delete requires well defined acting_user")
 
         # Don't allow deletion of users with client applications
         clients = Client.query.filter_by(user_id=self.id)
@@ -1612,6 +1612,40 @@ class User(db.Model, UserMixin):
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()
+        db.session.commit()
+
+    def reactivate_user(self, acting_user):
+        """Reactivate a previously deleted user
+
+        This method clears the deleted status - by removing the link from
+        the user to the audit recording the delete.  Audit itself is retained
+        for tracking purposes, and a new one will be created for posterity
+
+        :param self: user to reactivate
+        :param acting_user: individual executing the command, for audit trail
+
+        """
+        if not self.deleted:
+            raise ValueError("can't reactivate active user")
+        if self == acting_user:
+            raise ValueError("can't reactivate self")
+        if not acting_user:
+            raise ValueError("reactivate requires well defined acting_user")
+
+        # The email was masked during delete.  Need to confirm a user didn't
+        # sneak in with the same address while deleted.  The accessor returns
+        # the unmasked value.
+        unmasked = self.email
+        if User.query.filter(func.lower(User.email) == unmasked.lower()).count() > 0:
+            raise ValueError(
+                "A new account with same email {} in conflict. "
+                "Can't reactivate".format(unmasked))
+
+        # Circumvent restriction on editing deleted user attributes
+        super(User, self).__setattr__('deleted', None)
+
+        self.active = True
+        self._email = unmasked
         db.session.commit()
 
 
@@ -1676,11 +1710,14 @@ def get_user(uid):
         return User.query.get(uid)
 
 
-def get_user_or_abort(uid):
+def get_user_or_abort(uid, allow_deleted=False):
     """Wraps `get_user` and raises error if not found
 
     Safe to call with path or parameter info.  Confirms integer value before
     attempting lookup.
+
+    :param uid: integer value for user id to look up
+    :param allow_deleted: set true to allow access to deleted users
 
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: w/o a uid
 
@@ -1688,7 +1725,7 @@ def get_user_or_abort(uid):
         an integer, or if no matching user
 
     :raises :py:exc:`werkzeug.exceptions.Forbidden`: if the named user has
-        been deleted
+        been deleted, unless `allow_deleted` is set
 
     :returns: user if valid and found
 
@@ -1703,7 +1740,7 @@ def get_user_or_abort(uid):
     user = get_user(user_id)
     if not user:
         raise NotFound("User not found")
-    if user.deleted:
+    if not allow_deleted and user.deleted:
         raise Forbidden("deleted user - operation not permitted")
     return user
 

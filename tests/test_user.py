@@ -315,6 +315,34 @@ class TestUser(TestCase):
         assert not UserConsent.query.get(co_id)
         assert not Audit.query.get(ca_id)
 
+    def test_reactivate_user(self):
+        actor = self.add_user('actor')
+        user, actor = map(db.session.merge, (self.test_user, actor))
+        user_id, actor_id = user.id, actor.id
+        self.promote_user(user=actor, role_name=ROLE.ADMIN.value)
+        self.login(user_id=actor_id)
+        response = self.client.delete('/api/user/{}'.format(user_id))
+        assert response.status_code == 200
+        user = db.session.merge(user)
+        assert user.deleted_id
+        assert user._email.startswith("__deleted_")
+        assert user.email == TEST_USERNAME
+        ids = [id for id in user.identifiers if id.system == TRUENTH_USERNAME]
+        assert ids[0].value.startswith("__deleted_")
+
+        # Now bring back to life
+        response = self.client.post('/api/user/{}/reactivate'.format(user_id))
+        assert response.status_code == 200
+        user = db.session.merge(user)
+        assert user.deleted_id is None
+        assert user._email == TEST_USERNAME
+        assert user.active is True
+
+        # Second POST should fail
+        response = self.client.post('/api/user/{}/reactivate'.format(user_id))
+        assert response.status_code == 400
+
+
     def test_user_timezone(self):
         assert self.test_user.timezone == 'UTC'
         self.login()

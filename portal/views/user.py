@@ -323,11 +323,68 @@ def delete_user(user_id):
 
     """
     user = get_user_or_abort(user_id)
+    current_user().check_role('edit', other_id=user_id)
     try:
         user.delete_user(acting_user=current_user())
     except ValueError as v:
         return jsonify(message=v.message)
     return jsonify(message="deleted")
+
+
+@user_api.route('/user/<int:user_id>/reactivate', methods=['POST'])
+@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def reactivate_user(user_id):
+    """Reactivate a previously deleted user
+
+    Reactivate a previously deleted user - brings the account back to
+    valid status.
+
+    ---
+    tags:
+      - User
+    operationId: reactivate_user
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID to reactivate
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response_reactivated
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "reactivated"
+      400:
+        description:
+          Invalid requests, such as reactivating a user that wasn't in a
+          deleted state.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if the user isn't found
+
+    """
+    user = get_user_or_abort(user_id, allow_deleted=True)
+    current_user().check_role('edit', other_id=user_id)
+    try:
+        user.reactivate_user(acting_user=current_user())
+    except ValueError as v:
+        response = jsonify(message="{}".format(v))
+        response.status_code = 400
+        return response
+    return jsonify(message="reactivated")
 
 
 @user_api.route('/user/<int:user_id>/access_url')
