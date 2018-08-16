@@ -118,7 +118,8 @@ def patient_search():
     abort(404)
 
 
-@patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
+@patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def post_patient_deceased(patient_id):
     """POST deceased datetime or status for a patient
@@ -165,6 +166,8 @@ def post_patient_deceased(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -182,8 +185,9 @@ def post_patient_deceased(patient_id):
     return jsonify(patient.as_fhir(include_empties=False))
 
 
-@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
-@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
+@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('OPTIONS','POST'))
+@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def post_patient_dob(patient_id):
     """POST date of birth for a patient
@@ -223,6 +227,8 @@ def post_patient_dob(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested patient
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
