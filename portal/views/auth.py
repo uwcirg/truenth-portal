@@ -362,9 +362,9 @@ def deauthorized():
 def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
-    
+
     # After a successfull login make sure lockout is reset
-    user.reset_lockout();
+    user.reset_lockout()
 
     login_user(user, 'password_authenticated')
 
