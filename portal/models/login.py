@@ -20,7 +20,6 @@ def login_user(user, auth_method):
     if not _call_or_get(flask_login_current_user.is_authenticated):
         flask_user_login(user)
     initiate_encounter(user, auth_method)
-
     # remove session var used to capture locale_code prior to login, now
     # that we have a user.
     if 'locale_code' in session:
