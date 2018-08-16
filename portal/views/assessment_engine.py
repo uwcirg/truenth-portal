@@ -1347,7 +1347,8 @@ def assessment_add(patient_id):
 
     encounter = current_user().current_encounter
     if 'entry_method' in request.args:
-        encounter_type = getattr(EC, request.args['entry_method'].upper()).codings[0]
+        encounter_type = getattr(
+            EC, request.args['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
     qnr_qb = None
