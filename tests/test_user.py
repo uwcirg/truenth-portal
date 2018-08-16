@@ -813,7 +813,8 @@ class TestUser(TestCase):
         staff_top = db.session.merge(staff_top)
         for perm in ('view', 'edit'):
             for patient in (
-                    patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id
+            ):
                 assert staff_top.check_role(perm, other_id=patient)
 
         # mid level staff can view/edit all
@@ -1028,8 +1029,7 @@ class TestUser(TestCase):
         data = {'relationships': [{
             'user': other_user.id,
             'has the relationship': 'sponsor',
-            'with': TEST_USER_ID}, ]
-                }
+            'with': TEST_USER_ID}]}
         self.login()
         response = self.client.put('/api/user/{}/relationships'.format(
             TEST_USER_ID),
