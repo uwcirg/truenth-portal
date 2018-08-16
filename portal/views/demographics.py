@@ -75,7 +75,8 @@ def demographics(patient_id):
     return jsonify(patient.as_fhir(include_empties=False))
 
 
-@demographics_api.route('/demographics/<int:patient_id>', methods=('PUT',))
+@demographics_api.route('/demographics/<int:patient_id>', methods=('OPTIONS','PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient
@@ -141,6 +142,8 @@ def demographics_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
