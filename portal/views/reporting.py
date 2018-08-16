@@ -1,6 +1,7 @@
 from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
@@ -19,7 +20,7 @@ from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE
 from ..models.user import User, current_user
 
-reporting_api = Blueprint('reporting', __name__,)
+reporting_api = Blueprint('reporting', __name__)
 
 
 @reporting_api.route('/admin/overdue-table')

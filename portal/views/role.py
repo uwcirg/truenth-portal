@@ -6,7 +6,7 @@ from ..extensions import oauth
 from ..models.role import Role
 from ..models.user import current_user, get_user_or_abort
 
-role_api = Blueprint('role_api', __name__,)
+role_api = Blueprint('role_api', __name__)
 
 
 @role_api.route('/api/roles')
