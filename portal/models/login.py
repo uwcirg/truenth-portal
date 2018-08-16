@@ -21,9 +21,6 @@ def login_user(user, auth_method):
         flask_user_login(user)
     initiate_encounter(user, auth_method)
 
-    # After a successfull login make sure lockout is reset
-    user.reset_lockout();
-
     # remove session var used to capture locale_code prior to login, now
     # that we have a user.
     if 'locale_code' in session:

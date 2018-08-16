@@ -275,7 +275,7 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
 
     password_verification_failures = \
-            db.Column(db.Integer, default=0, nullable=False)
+        db.Column(db.Integer, default=0, nullable=False)
     last_password_verification_failure = db.Column(db.DateTime, nullable=True)
 
     user_audits = db.relationship('Audit', cascade='delete',
@@ -707,7 +707,7 @@ class User(db.Model, UserMixin):
             self.reset_lockout()
 
         failures = self.password_verification_failures
-        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+        return failures >= PERMITTED_FAILED_LOGIN_ATTEMPTS
 
     def reset_lockout(self):
         """resets variables that track lockout

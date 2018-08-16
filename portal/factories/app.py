@@ -197,7 +197,7 @@ def configure_extensions(app):
     user_manager.init_app(
         app,
         forgot_password_view_function=patch_forgot_password,
-        login_form =LockoutLoginForm,
+        login_form=LockoutLoginForm,
         send_email_function=patch_send_email,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
