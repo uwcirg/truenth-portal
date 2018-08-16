@@ -63,6 +63,7 @@ OAUTH_INFO_PROVIDER_LOGIN = {
 
 # import hidden relation classes needed to create database
 from portal.models.communication_request import CommunicationRequest
+
 CommunicationRequest
 
 
@@ -138,16 +139,17 @@ class TestCase(Base):
     def init_data(self):
         """Push minimal test data in test database"""
         try:
-            test_user = self.add_user(username=TEST_USERNAME,
-                    first_name=FIRST_NAME, last_name=LAST_NAME,
-                    image_url=IMAGE_URL)
+            test_user = self.add_user(
+                username=TEST_USERNAME, first_name=FIRST_NAME,
+                last_name=LAST_NAME, image_url=IMAGE_URL)
         except IntegrityError:
             db.session.rollback()
             test_user = User.query.filter_by(username=TEST_USERNAME).one()
             print("found existing test_user at {}".format(test_user.id))
 
         if test_user.id != TEST_USER_ID:
-            print("apparent cruft from last run (test_user_id: %d)" % test_user.id)
+            print("apparent cruft from last run (test_user_id: %d)"
+                  % test_user.id)
             print("try again...")
             self.tearDown()
             self.setUp()
@@ -178,8 +180,8 @@ class TestCase(Base):
             user = self.test_user
         user = db.session.merge(user)
         assert (role_name)
-        role_id = db.session.query(Role.id).\
-                filter(Role.name==role_name).first()[0]
+        role_id = db.session.query(Role.id).filter(
+            Role.name == role_name).first()[0]
         with SessionScope(db):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
@@ -216,9 +218,9 @@ class TestCase(Base):
         """Prep db with a test client for test user"""
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
         client_id = 'test_client'
-        client = Client(client_id=client_id,
-                _redirect_uris='http://localhost',
-                client_secret='tc_secret', user_id=TEST_USER_ID)
+        client = Client(
+            client_id=client_id, _redirect_uris='http://localhost',
+            client_secret='tc_secret', user_id=TEST_USER_ID)
         with SessionScope(db):
             db.session.add(client)
             db.session.commit()
@@ -292,12 +294,15 @@ class TestCase(Base):
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             procedure = Procedure(audit=audit)
-            coding = Coding(system=system,
-                            code=code,
-                            display=display).add_if_not_found(True)
-            code = CodeableConcept(codings=[coding,]).add_if_not_found(True)
-            enc = Encounter(status='planned', auth_method='url_authenticated',
-                            user_id=TEST_USER_ID, start_time=datetime.utcnow())
+            coding = Coding(
+                system=system,
+                code=code,
+                display=display).add_if_not_found(True)
+            code = CodeableConcept(codings=[coding]).add_if_not_found(True)
+            enc = Encounter(
+                status='planned',
+                auth_method='url_authenticated',
+                user_id=TEST_USER_ID, start_time=datetime.utcnow())
             db.session.add(enc)
             db.session.commit()
             enc = db.session.merge(enc)
@@ -373,10 +378,12 @@ class TestCase(Base):
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        tou = ToU(audit=audit, agreement_url='http://not.really.org',
-                  type='website terms of use')
-        privacy = ToU(audit=audit, agreement_url='http://not.really.org',
-                  type='privacy policy')
+        tou = ToU(
+            audit=audit, agreement_url='http://not.really.org',
+            type='website terms of use')
+        privacy = ToU(
+            audit=audit, agreement_url='http://not.really.org',
+            type='privacy policy')
         parent_org = OrgTree().find(org.id).top_level()
         options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                    SEND_REMINDERS_MASK)

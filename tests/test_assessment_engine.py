@@ -37,9 +37,9 @@ class TestAssessmentEngine(TestCase):
         assert response['ok']
         assert response['valid']
         assert self.test_user.questionnaire_responses.count() == 1
-        assert\
-            self.test_user.questionnaire_responses[0].encounter.auth_method ==\
-            'password_authenticated'
+        assert (
+            self.test_user.questionnaire_responses[0].encounter.auth_method
+            == 'password_authenticated')
 
     def test_submit_invalid_assessment(self):
         data = {'no_questionnaire_field': True}
@@ -107,13 +107,16 @@ class TestAssessmentEngine(TestCase):
         assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
         assert test_user.questionnaire_responses.count() == 1
-        assert test_user.questionnaire_responses[0].questionnaire_bank_id ==\
-            qb.id
+        assert (
+            test_user.questionnaire_responses[0].questionnaire_bank_id
+            == qb.id)
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)
-        completed_qnr = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        instrument_id = completed_qnr['questionnaire']['reference'].split('/')[-1]
+        completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
+            'example']
+        instrument_id = (completed_qnr['questionnaire']['reference']
+            .split('/')[-1])
 
         questions = completed_qnr['group']['question']
         incomplete_questions = []
@@ -121,7 +124,7 @@ class TestAssessmentEngine(TestCase):
         # Delete answers for second half of QuestionnaireResponse
         for index, question in enumerate(questions):
             question = question.copy()
-            if (index > len(questions)/2):
+            if (index > len(questions) / 2):
                 question.pop('answer', [])
             incomplete_questions.append(question)
         in_progress_qnr = completed_qnr.copy()
@@ -158,8 +161,9 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
         )
         assert update_qnr_response.status_code == 200
-        assert updated_qnr_response.json['entry'][0]['group'] ==\
-            completed_qnr['group']
+        assert (
+            updated_qnr_response.json['entry'][0]['group']
+            == completed_qnr['group'])
 
     def test_no_update_assessment(self):
         swagger_spec = swagger(self.app)
@@ -187,8 +191,10 @@ class TestAssessmentEngine(TestCase):
 
     def test_assessments_bundle(self):
         swagger_spec = swagger(self.app)
-        example_data = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
+        example_data = swagger_spec['definitions']['QuestionnaireResponse'][
+            'example']
+        instrument_id = example_data['questionnaire']['reference'].split('/')[
+            -1]
 
         self.login()
         self.bless_with_basics()
@@ -209,13 +215,15 @@ class TestAssessmentEngine(TestCase):
         response = response.json
 
         assert response['total'] == len(response['entry'])
-        assert response['entry'][0]['questionnaire']['reference']\
-            .endswith(instrument_id)
+        assert (response['entry'][0]['questionnaire']['reference']
+            .endswith(instrument_id))
 
     def test_assessments_csv(self):
         swagger_spec = swagger(self.app)
-        example_data = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
+        example_data = swagger_spec['definitions']['QuestionnaireResponse'][
+            'example']
+        instrument_id = example_data['questionnaire']['reference'].split('/')[
+            -1]
 
         self.login()
         upload_response = self.client.post(
@@ -226,7 +234,8 @@ class TestAssessmentEngine(TestCase):
         assert upload_response.status_code == 200
 
         download_response = self.client.get(
-            '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),
+            '/api/patient/assessment',
+            query_string={'format': 'csv', 'instrument_id': instrument_id}
         )
         csv_string = download_response.get_data(as_text=True)
         assert len(csv_string.split("\n")) > 1
