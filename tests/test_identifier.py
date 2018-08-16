@@ -10,6 +10,7 @@ from portal.models.identifier import Identifier
 from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
+
 class TestIdentifier(TestCase):
 
     def testGET(self):

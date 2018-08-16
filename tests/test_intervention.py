@@ -33,6 +33,7 @@ from tests.test_assessment_status import (
     mock_questionnairebanks,
 )
 
+
 class TestIntervention(TestCase):
 
     def test_intervention_wrong_service_user(self):
@@ -245,9 +246,12 @@ class TestIntervention(TestCase):
 
         with SessionScope(db):
             d = {'function': 'observation_check',
-                 'kwargs': [{'name': 'display', 'value':
-                             CC.PCaDIAG.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'true'}]}
+                 'kwargs': [
+                     {
+                         'name': 'display',
+                         'value': CC.PCaDIAG.codings[0].display
+                     },
+                     {'name': 'boolean_value', 'value': 'true'}]}
             strat = AccessStrategy(
                 name="has PCa diagnosis",
                 intervention_id=cp_id,
@@ -283,9 +287,10 @@ class TestIntervention(TestCase):
 
         with SessionScope(db):
             d = {'function': 'observation_check',
-                 'kwargs': [{'name': 'display', 'value':
-                             CC.PCaDIAG.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'true'}]}
+                 'kwargs': [
+                     {'name': 'display',
+                      'value': CC.PCaDIAG.codings[0].display},
+                     {'name': 'boolean_value', 'value': 'true'}]}
             strat = AccessStrategy(
                 name="has PCa diagnosis",
                 intervention_id=cp_id,
@@ -326,7 +331,6 @@ class TestIntervention(TestCase):
 
         assert not cp.display_for_user(user).access
         assert not cp.quick_access_check(user)
-
 
     def test_no_tx(self):
         """Test strategy for not starting treatment"""
@@ -384,8 +388,8 @@ class TestIntervention(TestCase):
 
         with SessionScope(db):
             d = {'function': 'allow_if_not_in_intervention',
-                 'kwargs': [{'name': 'intervention_name',
-                            'value': ds_wc.name}]}
+                 'kwargs': [{
+                     'name': 'intervention_name', 'value': ds_wc.name}]}
             strat = AccessStrategy(
                 name="exclusive decision support strategy",
                 intervention_id=ds_p3p.id,
@@ -423,20 +427,22 @@ class TestIntervention(TestCase):
         sm.public_access = False
         sr.public_access = False
         d = {
-             'function': 'combine_strategies',
-             'kwargs': [
-                 {'name': 'strategy_1',
-                  'value': 'allow_if_not_in_intervention'},
-                 {'name': 'strategy_1_kwargs',
-                  'value': [{'name': 'intervention_name',
-                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
-                 {'name': 'strategy_2',
-                  'value': 'not_in_role_list'},
-                 {'name': 'strategy_2_kwargs',
-                  'value': [{'name': 'role_list',
-                             'value': [ROLE.WRITE_ONLY.value]}]}
-                 ]
-            }
+            'function': 'combine_strategies',
+            'kwargs': [
+                {'name': 'strategy_1',
+                 'value': 'allow_if_not_in_intervention'},
+                {'name': 'strategy_1_kwargs',
+                 'value': [{
+                     'name': 'intervention_name',
+                     'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                {'name': 'strategy_2',
+                 'value': 'not_in_role_list'},
+                {'name': 'strategy_2_kwargs',
+                 'value': [{
+                     'name': 'role_list',
+                     'value': [ROLE.WRITE_ONLY.value]}]}
+            ]
+        }
 
         with SessionScope(db):
             strat = AccessStrategy(
@@ -485,11 +491,11 @@ class TestIntervention(TestCase):
         sm = INTERVENTION.SELF_MANAGEMENT
         sm.public_access = False
         d = {
-             'function': 'in_role_list',
-             'kwargs': [
-                 {'name': 'role_list',
-                  'value': [ROLE.PATIENT.value]}]
-            }
+            'function': 'in_role_list',
+            'kwargs': [
+                {'name': 'role_list',
+                 'value': [ROLE.PATIENT.value]}]
+        }
 
         with SessionScope(db):
             strat = AccessStrategy(
@@ -539,7 +545,8 @@ class TestIntervention(TestCase):
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
-        user, ae, metastatic_org = map(db.session.merge, (self.test_user, ae, metastatic_org))
+        user, ae, metastatic_org = map(
+            db.session.merge, (self.test_user, ae, metastatic_org))
 
         # without completing an assessment, card_html should include username
         assert user.display_name in ae.display_for_user(user).card_html
@@ -599,8 +606,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
 
-        assert("The assessment is no longer available"
-               in ae.display_for_user(user).card_html)
+        assert ("The assessment is no longer available"
+            in ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
@@ -1138,13 +1145,13 @@ class TestIntervention(TestCase):
             'group_name': 'test_email',
             'subject': "Just a test, ignore",
             'message':
-            'Review results at <a href="http://www.example.com">here</a>'
+                'Review results at <a href="http://www.example.com">here</a>'
         }
         self.login()
         response = self.client.post('/api/intervention/{}/communicate'.format(
-                INTERVENTION.DECISION_SUPPORT_P3P.name),
-                content_type='application/json',
-                data=json.dumps(data))
+            INTERVENTION.DECISION_SUPPORT_P3P.name),
+            content_type='application/json',
+            data=json.dumps(data))
         assert response.status_code == 200
         assert response.json['message'] == 'sent'
 
