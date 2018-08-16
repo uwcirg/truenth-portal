@@ -705,6 +705,8 @@ def withdraw_user_consent(user_id):
         description:
           if user_id doesn't exist, or it no consent found
           for given user org combination
+    security:
+      - Authorization: []
 
     """
     current_app.logger.debug('withdraw user consent called w/: '
@@ -895,7 +897,7 @@ def user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/user/<int:user_id>/groups', methods=('PUT',))
+@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS','PUT'))
 @crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def set_user_groups(user_id):
@@ -965,6 +967,8 @@ def set_user_groups(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1124,8 +1128,7 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/register-now')
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route('/user/register-now', methods=('OPTIONS','GET'))
 @oauth.require_oauth()
 def register_now():
     """Target for triggering registration of account
@@ -1183,7 +1186,8 @@ def register_now():
     return redirect(url_for('user.register', email=user.email))
 
 
-@user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
+@user_api.route('/user/<int:user_id>/relationships', methods=('OPTIONS','PUT'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def set_relationships(user_id):
     """Set relationships for user, returns JSON defining user relationships
@@ -1263,6 +1267,8 @@ def set_relationships(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - Authorization: []
 
     """
     user = current_user()
@@ -1883,7 +1889,6 @@ def get_table_preferences(user_id, table_name):
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
     methods=('OPTIONS','PUT', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
     """Add a consent agreement for the user with named organization
@@ -1962,8 +1967,6 @@ def set_table_preferences(user_id, table_name):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to edit requested user_id
-    security:
-      - Authorization: []
 
     """
     if not user_id or not table_name:

@@ -132,8 +132,6 @@ def portal_wrapper_html():
         description:
           if a login_url is provided with an origin other than one
           registered as a client app or intervention
-    security:
-      - Authorization: []
 
     """
     # Unlike all other oauth protected resources, we manually check
