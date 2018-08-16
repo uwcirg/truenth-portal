@@ -73,7 +73,8 @@ def identifiers(user_id):
     return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
 
 
-@identifier_api.route('/api/user/<int:user_id>/identifier', methods=('POST',))
+@identifier_api.route('/api/user/<int:user_id>/identifier', methods=('OPTIONS','POST'))
+@crossdomain(origin='*', headers=('Content-Type','Authorization'))
 @oauth.require_oauth()
 def add_identifier(user_id):
     """Add additional identifier(s) to a user
@@ -116,6 +117,8 @@ def add_identifier(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given identifiers are already assigned to the user
+    security:
+      - Authorization: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
