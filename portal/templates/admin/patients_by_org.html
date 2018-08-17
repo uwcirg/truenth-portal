@@ -10,10 +10,13 @@
       {%- endif -%}
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
+    {% set account_deactivation_enabled = user.has_role(ROLE.STAFF_ADMIN.value) and config.ALLOW_PATIENT_ACCOUNT_DEACTIVATION %}
     <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
-        <span id="tableCount"></span>
+        {% if account_deactivation_enabled %}
+          {{deletedUsersFilter()}}
+        {% endif %}
       </div>
       <table id="adminTable"
              data-table-id="adminTable"
@@ -29,7 +32,7 @@
              data-show-columns="true"
              data-smart-display="true"
              data-unique-id="id"
-             data-id-field="id"
+             data-id-field="userid"
              data-filter-control="true"
              data-show-export="true"
              data-export-data-type="all"
@@ -53,11 +56,15 @@
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
+                  {% if account_deactivation_enabled %}
+                    <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
+                  {% endif %}
+                  <th data-field="activationstatus" data-visible="false">{{_("activation status")}}</th>
               </tr>
           </thead>
           <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="id_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">
+                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%}>
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
@@ -83,11 +90,13 @@
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
-                          {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
+                          {{consent.audit.timestamp.strftime('%-d %b %Y')}}<br/>
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
+                      {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
+                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td>
                   </tr>
                {% endfor %}
           </tbody>

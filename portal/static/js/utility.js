@@ -312,7 +312,7 @@ function checkJQuery() {
         viewport.top = $(window).scrollTop();
         viewport.bottom = viewport.top + __winHeight;
         var bounds = {};
-        bounds.top = this.offset().top;
+        bounds.top = this.offset() ? this.offset().top : 0;
         bounds.bottom = bounds.top + this.outerHeight();
         return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
     };

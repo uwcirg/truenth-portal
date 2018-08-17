@@ -1,7 +1,6 @@
 {% extends "admin/admin_base.html" %}
 {% block main %}
 <div class="reduce-font-sizes">
-
     <h3 class="tnth-headline">{{ _("Admin Tools") }}</h3>
     <p>{{_("Click on each for details")}}</p>
     <div id="adminToolLinks">
@@ -21,12 +20,13 @@
     <div id="adminTableContainer" class="admin-view admin-table table-responsive smaller-text" data-export-prefix="{{_('AdminList_')}}">
         <div id="adminTableToolbar" class="admin-toolbar">
             {{orgsSelector()}}
-            <span id="tableCount"></span>
         </div>
         <table id="adminTable"
                class="table table-striped table-hover table-condensed"
                data-toggle="table"
-               data-sort-name="userid"
+               data-unique-id="id"
+               data-id-field="id"
+               data-sort-name="id"
                data-sort-order="desc"
                data-search="true"
                data-pagination="true"
@@ -41,6 +41,7 @@
                >
             <thead>
             <tr>
+                <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
                 <th data-field="firstname" data-sortable="true" data-filter-control="input">{{ _("First Name") }}</th>
                 <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
@@ -48,18 +49,25 @@
                 <th data-field="roles" data-sortable="true" data-filter-control="input">{{ _("Roles") }}</th>
                 <th data-field="sites" data-sortable="true" data-filter-control="input">{{_("Sites")}}</th>
                 <th data-field="deactivate" data-card-visible="false" data-class="always-visible" class="text-center" data-sortable="false" data-searchable="false">{{_("Deactivate Account")}}</th>
+                <th data-field="activationstatus" data-class="deleted-field" data-visible="false">{{_("activation status")}}</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in users %}
             <tr id="data_row_{{user.id}}">
+                <td>{{user.id}}</td>
                 <td><a href="{{ url_for('.profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a></td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                <td class="text-center deleted-button-cell">{% if not user.has_role(ROLE.ADMIN.value) and (not user.has_role(ROLE.STAFF.value))%}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>{{_("Deactivate")}}</em></button>{% else %}-{% endif %}</td>
+                {%- if not user.has_role(ROLE.ADMIN.value) and (not user.has_role(ROLE.STAFF.value)) -%}
+                  {{deletedUserCell(user)}}
+                {%- else -%}
+                  <td class="text-center">-</td>
+                {%- endif -%}
+                <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td>
             </tr>
             {% endfor %}
             </tbody>

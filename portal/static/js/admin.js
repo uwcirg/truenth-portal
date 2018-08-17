@@ -31,6 +31,7 @@
                     self.initTableEvents();
                     self.initOrgsList();
                     self.handleDisableFields();
+                    self.handleDeletedUsersVis();
                     self.setRowItemEvent();
                     self.handleAffiliatedUIVis();
                     self.addFilterPlaceHolders();
@@ -58,7 +59,9 @@
                 clearAll: false,
                 close: false
             },
+            ROW_ID_PREFIX: "data_row_",
             tableIdentifier: "adminList",
+            popoverEventInitiated: false,
             dependencies: {},
             tableConfig: {
                 formatShowingRows: function(pageFrom, pageTo, totalRows) {
@@ -208,7 +211,11 @@
                 var self = this;
                 $("#adminTable").on("reset-view.bs.table", function() {
                     self.addFilterPlaceHolders();
+                    self.resetRowVisByActivationStatus();
                     self.setRowItemEvent();
+                });
+                $("#adminTable").on("search.bs.table", function() {
+                    self.resetRowVisByActivationStatus();
                 });
                 $("#adminTable").on("page-change.bs.table", function() {
                     if(!$("#patientList .tnth-headline").isOnScreen()) { /*global isOnScreen */
@@ -223,9 +230,6 @@
                 $("#chkDeletedUsersFilter").on("click", function() {
                     self.handleDeletedUsersVis();
                 });
-                $("#adminTable").on("reset-view.bs.table", function() {
-                    self.handleDeletedUsersVis();
-                });
                 if(this.sortFilterEnabled) {
                     $("#adminTable").on("sort.bs.table", function(e, name, order) {
                         setTimeout(function() { self.setTablePreference(self.userId, self.tableIdentifier, name, order); }, 10);
@@ -236,27 +240,81 @@
                     });
                 }
             },
+            setShowDeletedUsersFlag: function() {
+            	if (!$("#chkDeletedUsersFilter").length) {
+            		return;
+            	}
+            	this.showDeletedUsers = $("#chkDeletedUsersFilter").is(":checked");
+            },
             handleDeletedUsersVis: function() {
-                this.showDeletedUsers = $("#chkDeletedUsersFilter").is(":checked");
+                this.setShowDeletedUsersFlag();
                 if (this.showDeletedUsers) {
-                    $("#adminTable .deleted-user-row").removeClass("tnth-hide");
+                    $("#adminTable").bootstrapTable("filterBy", {activationstatus: "deactivated"});
                 } else {
-                    $("#adminTable .deleted-user-row").addClass("tnth-hide");
+                    $("#adminTable").bootstrapTable("filterBy", {activationstatus: "activated"});
                 }
             },
             handleAffiliatedUIVis: function() {
-                $("#adminTableContainer input[data-field='id']:checkbox, #adminTableContainer input[data-field='deactivate']:checkbox").closest("label").hide(); //hide checkbox for hidden id field and deactivate account field from side menu
+                $("#adminTableContainer input[data-field='id']:checkbox, #adminTableContainer input[data-field='deactivate']:checkbox, #adminTableContainer input[data-field='deleted']:checkbox").closest("label").hide(); //hide checkbox for hidden id field and deactivate account field from side menu
                 $("#patientReportModal").modal({"show": false});
             },
             setRowItemEvent: function() {
                 var self = this;
-                $("#adminTableContainer .btn-report").on("click", function(e) {
+                $("#adminTableContainer .btn-report:not(.has-click-handelr)").on("click", function(e) {
                     e.stopPropagation();
                     self.getReportModal($(this).attr("data-patient-id"), {documentDataType:$(this).attr("data-document-type")});
+                }).addClass(".has-click-handler");
+                $("#adminTableContainer .btn-delete-user").each(function(){
+                    $(this).popover({
+                        container: "#adminTable",
+                        html: true,
+                        content: ["<div>{title}</div>",
+                                	"<div class='buttons-container'>",
+                                	"<button class='btn btn-small btn-default popover-btn-deactivate' data-user-id='{userid}'>{yes}</button>&nbsp;",
+                                	"<button class='btn btn-small btn-default popover-btn-cancel'>{no}</button>",
+                                	"</div>"
+                                ].join("")
+                                .replace("{title}", i18next.t("Are you sure you want to deactivate this account?"))
+                                .replace(/\{userid\}/g, $(this).attr("data-user-id"))
+                                .replace("{yes}", i18next.t("Yes"))
+                                .replace("{no}", i18next.t("No")),
+                        placement: "top"
+                    });
+                    $(this).off("click").on("click", function(e) {
+                        e.stopPropagation();
+                        $(this).popover("show");
+                        var userId = $(this).attr("data-user-id");
+                        if (!($("#data-delete-loader-"+userId).length)) {
+                        	$(this).parent().append("<i id=\"data-delete-loader-{userid}\" class=\"fa fa-spinner tnth-hide\"></i>".replace("{userid}", userId));
+                        }
+                    });
                 });
-                $("#adminTableContainer .btn-delete-user").off("click").on("click", function(e) {
+                $(document).off("click.popover-btn-deactivate").on("click", ".popover-btn-deactivate", function(e) {
                     e.stopPropagation();
-                    self.deleteUser($(this).attr("data-user-id"), !self.showDeletedUsers);
+                    var userId = $(this).attr("data-user-id");
+                    var loader = $("#data-delete-loader-" + userId);
+                    loader.show();
+                    $("#btnDeleted"+userId).hide();
+                    $(this).closest(".popover").popover("hide");
+                    setTimeout(function() {
+                    	self.deactivateUser(userId, !self.showDeletedUsers, function() {
+                    		loader.hide();
+                    		$("#btnDeleted"+userId).show();
+                    	});
+                    }, 150);
+                });
+
+                $("#adminTable .reactivate-icon").off("click").on("click", function(e) {
+                    e.stopPropagation();
+                    self.reactivateUser($(this).attr("data-user-id"));
+                });
+
+                $(document).on("click", ".popover-btn-cancel", function(e) {
+                    e.stopPropagation();
+                    $(this).closest(".popover").popover("hide");
+                });
+                $(document).on("click", function() {
+                    $("#adminTable .popover").popover("hide");
                 });
             },
             addFilterPlaceHolders: function() {
@@ -746,28 +804,116 @@
                     e.stopPropagation();
                     var row = $(this).closest("tr");
                     if(!row.hasClass("no-records-found")) {
+                        $("#adminTable .popover").popover("hide");
                         document.location = $(this).closest("tr").attr("data-link");
                     }
                 });
             },
-            deleteUser: function(userId, hideRow) {
-                if(userId) {
-                    var tnthAjax = this.getDependency("tnthAjax");
-                    var c = confirm(i18next.t("Are you sure you want to deactivate this user?"));
-                    if(c) {
-                        tnthAjax.deleteUser(userId, false, function(data) {
-                            if(!data.error) {
-                                if(hideRow) {
-                                    $("#data_row_" + userId).addClass("tnth-hide");
-                                }
-                                $("#data_row_" + userId).addClass("deleted-user-row").addClass("rowlink-skip")
-                                    .find(".deleted-button-cell").html(i18next.t("Inactive"))
-                                    .find("a.profile-link").remove();
-                            } else {
-                                alert(data.error);
-                            }
-                        });
+            deactivationEnabled: function() {
+                return $("#chkDeletedUsersFilter").length > 0;
+            },
+            reactivateUser: function(userId) {
+                var tnthAjax = this.getDependency("tnthAjax"), self = this;
+                if (!this.isDeactivatedRow(userId)) {
+                    return false;
+                }
+                tnthAjax.reactivateUser(userId, {"async": false}, function(data) {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
                     }
+                    self.handleReactivatedRow(userId);
+                });
+            },
+            deactivateUser: function(userId, hideRow, callback) {
+            	callback = callback || function() {};
+                if (!userId) {
+                	callback({error: i18next.t("User id is required.")});
+                    return false;
+                }
+                if (this.isDeactivatedRow(userId)) {
+                	callback();
+                    return false;
+                }
+                var tnthAjax = this.getDependency("tnthAjax"), self = this;
+                tnthAjax.deactivateUser(userId, {"async": false}, function(data) {
+                    if (data.error) {
+                    	callback({error: data.error});
+                        alert(data.error);
+                        return;
+                    }
+                    callback();
+                    if(hideRow) {
+                        $("#" + self.ROW_ID_PREFIX + userId).fadeOut();
+                    }
+                    self.handleDeactivatedRow(userId);
+                });
+            },
+            getRowData: function(userId) {
+                if (!userId) {
+                    return false;
+                }
+                return $("#adminTable").bootstrapTable("getRowByUniqueId", userId);
+            },
+            isDeactivatedRow: function(userId) {
+                var rowData = this.getRowData(userId);
+                return rowData && String(rowData.activationstatus).toLowerCase() === "deactivated";
+            },
+            resetRowVisByActivationStatus: function() {
+                var self = this;
+                $("#adminTable [data-index]").each(function() {
+                    var userId = $(this).attr("data-uniqueid");
+                    if (self.isDeactivatedRow(userId)) {
+                        self.handleDeactivatedRowVis(userId);
+                    } else {
+                        self.handleReactivatedRowVis(userId);
+                    }
+                });
+            },
+            updateFieldData: function(userId, data) {
+                if (!userId || !data) {
+                    return false;
+                }
+                $("#adminTable").bootstrapTable("updateCell", data);
+            },
+            getRowIndex: function(userId) {
+                if (!userId) {
+                    return false;
+                }
+                return $("#" + this.ROW_ID_PREFIX + userId).attr("data-index");
+            },
+            handleDeactivatedRow: function(userId) {
+                this.updateFieldData(userId, {index:this.getRowIndex(userId), field: "activationstatus", value: "deactivated", reinit: true});
+                this.handleDeactivatedRowVis(userId);
+            },
+            handleDeactivatedRowVis: function(userId) {
+                if (!userId) {
+                    return false;
+                }
+                $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip")
+                .find(".deleted-button-cell").html('<span class="text-display">Inactive</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon"></i>'.replace("{userid}", userId))
+                .find("a.profile-link").remove();
+                if (!this.showDeletedUsers) {
+                	$("#" + this.ROW_ID_PREFIX + userId).hide();
+                }
+            },
+            handleReactivatedRow: function(userId) {
+                if (!userId) {
+                    return false;
+                }
+                this.updateFieldData(userId, {index:this.getRowIndex(userId), field: "activationstatus", value: "activated", reinit: true});
+                this.handleReactivatedRowVis(userId);
+            },
+            handleReactivatedRowVis: function(userId) {
+                if (!userId) {
+                    return false;
+                }
+                $("#data_row_" + userId).removeClass("deleted-user-row").removeClass("rowlink-skip")
+                .find(".deleted-button-cell")
+                .html('<button id="btnDeleted{userid}" data-user-id="{userid}" type="button" class="btn btn-default btn-delete-user" data-original-title="" title=""><em>Deactivate</em></button>'.replace(/\{userid\}/g, userId))
+                .append("<a class='profile-link'></a>");
+                if (this.showDeletedUsers) {
+                	$("#"+ this.ROW_ID_PREFIX + userId).hide();
                 }
             }
         }
