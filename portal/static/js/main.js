@@ -1559,22 +1559,33 @@ var tnthAjax = {
             }
         });
     },
-    "deleteUser": function(userId, params, callback) {
+    "deactivateUser": function(userId, params, callback) {
         callback = callback||function() {};
         if (!userId) {
             callback({"error": i18next.t("User id is required")});
             return false;
         }
         this.sendRequest("/api/user/" + userId, "DELETE", userId, (params || {}), function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred deleting user.")});
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
+            callback = callback||function() {};
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred deactivating user.")});
+                return;
             }
+            callback(data);
+        });
+    },
+    "reactivateUser": function(userId, params, callback) {
+        callback = callback||function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User id is required")});
+            return false;
+        }
+        this.sendRequest("/api/user/" + userId + "/reactivate", "POST", userId, (params || {}), function(data) {
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred reactivating user.")});
+                return;
+            }
+            callback(data);
         });
     },
     "setConfigurationUI": function(configKey, value) {
@@ -2214,7 +2225,7 @@ var Global = {
             $("#notificationBanner").hide();
         } else {
             $("#notificationBanner .close").addClass("active");
-        } 
+        }
     },
     initValidator: function() {
         if (typeof $.fn.validator === "undefined") { return false; }

@@ -858,7 +858,7 @@ div.pull-right {
 }
 .admin-table {
   .deleted-button-cell {
-    vertical-align: middle;
+    vertical-align: top;
     .btn {
       font-size: 0.8em;
       padding: 0.7em 1em;
@@ -968,7 +968,41 @@ div.pull-right {
     display: none;
   }
   tr.deleted-user-row {
-    opacity: @disabledOpacity
+    td {
+      opacity: @disabledOpacity
+    }
+    td.deleted-button-cell {
+      opacity: 1;
+      & .text-display {
+        opacity: @disabledOpacity;
+      }
+      & .reactivate-icon {
+        opacity: 1;
+        margin: 0 0.5em;
+        border: 1px solid #ececec;
+        padding: 8px;
+        &:hover {
+          background: #FFF;
+        }
+      }
+    }
+  }
+  .popover {
+    .popover-content {
+      padding: 12px 14px 4px;
+    }
+    .buttons-container {
+      display: flex;
+      justify-content: center;
+      margin: 0.5em 0;
+      .btn {
+        font-size: 0.8em;
+        margin: 0.5em 0.25em;
+      }
+    }
+  }
+  select {
+    max-width: 300px;
   }
 }
 
