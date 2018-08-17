@@ -482,8 +482,9 @@ class OrganizationResearchProtocol(db.Model):
         name='_organization_research_protocol'),)
 
     def __init__(
-            self, research_protocol=None, organization=None,
-            retired_as_of=None):
+        self, research_protocol=None, organization=None,
+        retired_as_of=None
+    ):
         if research_protocol:
             assert isinstance(research_protocol, ResearchProtocol)
         if organization:
