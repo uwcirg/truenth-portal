@@ -744,7 +744,8 @@ class OrgTree(object):
                         "".format(org.id, self.lookup_table.keys()))
                 self.lookup_table[org.id] = new_node
                 if Organization.query.filter(
-                        Organization.partOf_id == new_node.id).count():
+                    Organization.partOf_id == new_node.id
+                ).count():
                     add_descendents(new_node)
 
         # Add top level orgs first, recurse on down
