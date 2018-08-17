@@ -14,6 +14,7 @@ from portal.models.role import ROLE
 from portal.models.user import User
 from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 
+
 class TestPatient(TestCase):
 
     def test_email_search(self):
@@ -127,7 +128,8 @@ class TestPatient(TestCase):
         with SessionScope(db):
             db.session.add(d_audit)
             db.session.commit()
-        self.test_user, d_audit = map(db.session.merge, (self.test_user, d_audit))
+        self.test_user, d_audit = map(
+            db.session.merge, (self.test_user, d_audit))
         self.test_user.deceased = d_audit
         self.login()
         data = {'deceasedBoolean': False}
