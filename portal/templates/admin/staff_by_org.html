@@ -59,7 +59,7 @@
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
                   {{deletedUserCell(user)}}
-                  <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td>
+                  <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
               </tr>
             {% endfor %}
             </tbody>

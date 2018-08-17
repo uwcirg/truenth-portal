@@ -90,13 +90,13 @@
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
-                          {{consent.audit.timestamp.strftime('%-d %b %Y')}}<br/>
+                          {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
-                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td>
+                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
                   </tr>
                {% endfor %}
           </tbody>

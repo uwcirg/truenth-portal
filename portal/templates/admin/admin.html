@@ -67,7 +67,7 @@
                 {%- else -%}
                   <td class="text-center">-</td>
                 {%- endif -%}
-                <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td>
+                <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
             </tr>
             {% endfor %}
             </tbody>

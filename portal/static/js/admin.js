@@ -303,7 +303,6 @@
                     	});
                     }, 150);
                 });
-
                 $("#adminTable .reactivate-icon").off("click").on("click", function(e) {
                     e.stopPropagation();
                     self.reactivateUser($(this).attr("data-user-id"));
@@ -488,7 +487,7 @@
                 $("#orglist-dropdown").on("click touchstart", function() {
                     $(this).find(".glyphicon-menu-up, .glyphicon-menu-down").toggleClass("tnth-hide"); //toggle menu up/down button
                     setTimeout(function() {
-                        self.setOrgsMenuHeight(85);
+                        self.setOrgsMenuHeight(95);
                         self.clearFilterButtons();
                     }, 100);
                 });
@@ -891,7 +890,7 @@
                     return false;
                 }
                 $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip")
-                .find(".deleted-button-cell").html('<span class="text-display">Inactive</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon"></i>'.replace("{userid}", userId))
+                .find(".deleted-button-cell").html('<span class="text-display">{inactivetext}</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon"></i>'.replace("{userid}", userId).replace("{inactivetext}", i18next.t("Inactive")))
                 .find("a.profile-link").remove();
                 if (!this.showDeletedUsers) {
                 	$("#" + this.ROW_ID_PREFIX + userId).hide();
@@ -910,7 +909,7 @@
                 }
                 $("#data_row_" + userId).removeClass("deleted-user-row").removeClass("rowlink-skip")
                 .find(".deleted-button-cell")
-                .html('<button id="btnDeleted{userid}" data-user-id="{userid}" type="button" class="btn btn-default btn-delete-user" data-original-title="" title=""><em>Deactivate</em></button>'.replace(/\{userid\}/g, userId))
+                .html('<button id="btnDeleted{userid}" data-user-id="{userid}" type="button" class="btn btn-default btn-delete-user" data-original-title="" title=""><em>{buttontext}</em></button>'.replace(/\{userid\}/g, userId).replace("{buttontext}", i18next.t("Deactivate")))
                 .append("<a class='profile-link'></a>");
                 if (this.showDeletedUsers) {
                 	$("#"+ this.ROW_ID_PREFIX + userId).hide();
