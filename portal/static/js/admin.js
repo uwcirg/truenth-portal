@@ -237,9 +237,8 @@
             getTableConfigOptions: function (options) {
                 if (!options) {
                     return this.tableConfig;
-                } else {
-                    return $.extend({}, this.tableConfig, options);
                 }
+                return $.extend({}, this.tableConfig, options);
             },
             initTableEvents: function () {
                 var self = this;
