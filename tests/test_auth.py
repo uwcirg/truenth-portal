@@ -55,6 +55,22 @@ class TestAuth(TestCase):
         new_user = User.query.filter_by(username=data['email']).first()
         assert new_user.active is True
 
+    def test_local_login_valid_username_and_password(self):
+        """login through the login form"""
+        username = 'localuser'
+        password = 'Password1'
+        user = self.add_user(username=username, password=password)
+        response = self.local_login(username, password)
+        assert response.status_code is 200
+
+    def test_local_login_valid_username_invalid_password(self):
+        """login through the login form"""
+        username = 'localuser'
+        password = 'Password1'
+        user = self.add_user(username=username, password=password)
+        response = self.local_login(username, 'invalidpassword')
+        assert response.status_code is 302
+
     def test_register_now(self):
         """Initiate process to register exiting account"""
         self.app.config['NO_CHALLENGE_WO_DATA'] = False
