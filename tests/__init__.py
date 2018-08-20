@@ -161,7 +161,7 @@ class TestCase(Base):
         """Create a user and add to test db, and return it"""
         # Hash the password
         password = self.app.user_manager.hash_password(password)
-        
+
         test_user = User(
             username=username, first_name=first_name, last_name=last_name,
             image_url=image_url, password=password)
