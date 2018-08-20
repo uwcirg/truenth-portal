@@ -38,7 +38,7 @@ flask-wtf==0.14.2         # via flask-user
 flask==1.0.2
 functools32==3.2.3.post2;python_version < '3'
 future==0.16.0
-fuzzywuzzy==0.16.0
+fuzzywuzzy==0.17.0
 gunicorn==19.8.1
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
