@@ -157,7 +157,7 @@ class TestCase(Base):
 
     def add_user(
             self, username, first_name="", last_name="", image_url=None,
-            password='fakePa$$'):
+            password='fakePa$$', email=None):
         """Create a user and add to test db, and return it"""
         # Hash the password
         password = self.app.user_manager.hash_password(password)
@@ -165,6 +165,8 @@ class TestCase(Base):
         test_user = User(
             username=username, first_name=first_name, last_name=last_name,
             image_url=image_url, password=password)
+        if email is not None:
+            test_user.email = email
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
@@ -213,16 +215,16 @@ class TestCase(Base):
             follow_redirects=follow_redirects
         )
 
-    def local_login(self, username, password):
+    def local_login(self, email, password, follow_redirects=True):
         """logs in a local user through user.login view"""
         url = url_for('user.login')
         return self.client.post(
             url,
             data={
-                'username': username,
+                'email': email,
                 'password': password,
             },
-            follow_redirects=True
+            follow_redirects=follow_redirects
         )
 
     def add_client(self):

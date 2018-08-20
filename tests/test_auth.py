@@ -18,6 +18,8 @@ from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import (
+    LOCKOUT_PERIOD,
+    PERMITTED_FAILED_LOGIN_ATTEMPTS,
     RoleError,
     User,
     UserRelationship,
@@ -57,19 +59,110 @@ class TestAuth(TestCase):
 
     def test_local_login_valid_username_and_password(self):
         """login through the login form"""
-        username = 'localuser'
+        # Create a user
+        email = 'localuser@test.com'
         password = 'Password1'
-        user = self.add_user(username=username, password=password)
-        response = self.local_login(username, password)
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Attempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Validate login was successful
+        assert response.status_code is 200
+        assert user.password_verification_failures == 0
+
+    def test_local_login_valid_username_invalid_password_increments_lockout(self):
+        """login through the login form"""
+        # Create a user
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Attempt to login with an invalid password
+        response = self.local_login(user.email, 'invalidpassword')
+
+        # Verify there was a password failure
+        db.session.refresh(user)
+        assert user.password_verification_failures == 1
+
+    def test_local_login_valid_username_and_password_resets_lockout(self):
+        """login through the login form"""
+        # Create a user
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Mock a failed password attempt
+        user.add_password_verification_failure()
+        assert user.password_verification_failures == 1
+
+        # Atempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Verify lockout was reset
+        db.session.refresh(user)
+        assert user.password_verification_failures == 0
+
+    def test_local_login_lockout_after_unsuccessful_attempts(self):
+        """login through the login form"""
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Use up all of the permitted login attempts
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS):
+            response = self.local_login(user.email, 'invalidpassword')
+            assert response.status_code is 200
+
+            db.session.refresh(user)
+            assert user.password_verification_failures == (failureIndex + 1)
+            assert user.is_locked_out == False
+
+        # Attempt to login with invalid creds
+        response = self.local_login(user.email, 'invalidpassword')
         assert response.status_code is 200
 
-    def test_local_login_valid_username_invalid_password(self):
+        # Validate that after another failed attempt
+        # the user is locked out
+        db.session.refresh(user)
+        assert user.is_locked_out == True
+
+    def test_local_login_verify_lockout_resets_after_lockout_period(self):
         """login through the login form"""
-        username = 'localuser'
+        email = 'localuser@test.com'
         password = 'Password1'
-        user = self.add_user(username=username, password=password)
-        response = self.local_login(username, 'invalidpassword')
-        assert response.status_code is 302
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Lock the user out
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+            user.add_password_verification_failure()
+
+        # Verify the user is locked out
+        assert user.is_locked_out == True
+
+        # Move time to the end of the lockout period
+        user.last_password_verification_failure = datetime.datetime.utcnow() - LOCKOUT_PERIOD
+
+        # Verify we are no longer locked out
+        assert user.is_locked_out == False
+
+    def test_local_login_verify_cant_login_when_locked_out(self):
+        """login through the login form"""
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(username='username', email=email, password=password)
+
+        # Lock the user out
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+            user.add_password_verification_failure()
+
+        assert user.is_locked_out == True
+
+        # Atempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Verify the user is still locked out
+        assert user.is_locked_out == True
 
     def test_register_now(self):
         """Initiate process to register exiting account"""
