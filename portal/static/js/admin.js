@@ -310,6 +310,9 @@
                 var self = this;
                 $("#adminTableContainer .btn-report").off("click").on("click", function (e) {
                     e.stopPropagation();
+                    if ($(this).closest(".deleted-user-row").length) { //prevent viewing of report for deleted users
+                        return false;
+                    }
                     self.getReportModal($(this).attr("data-patient-id"), {
                         documentDataType: $(this).attr("data-document-type")
                     });
