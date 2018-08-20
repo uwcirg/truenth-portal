@@ -237,9 +237,8 @@
             getTableConfigOptions: function (options) {
                 if (!options) {
                     return this.tableConfig;
-                } else {
-                    return $.extend({}, this.tableConfig, options);
                 }
+                return $.extend({}, this.tableConfig, options);
             },
             initTableEvents: function () {
                 var self = this;
@@ -250,6 +249,7 @@
                 });
                 $("#adminTable").on("search.bs.table", function () {
                     self.resetRowVisByActivationStatus();
+                    self.setRowItemEvent();
                 });
                 $("#adminTable").on("page-change.bs.table", function () {
                     if (!$("#patientList .tnth-headline").isOnScreen()) { /*global isOnScreen */
@@ -916,6 +916,9 @@
                         return;
                     }
                     self.handleReactivatedRow(userId);
+                    setTimeout(function() {
+                        self.handleDeletedUsersVis(); //reset rows displayed
+                    }, 150);
                 });
             },
             deactivateUser: function (userId, hideRow, callback) {
@@ -947,6 +950,9 @@
                         $("#" + self.ROW_ID_PREFIX + userId).fadeOut();
                     }
                     self.handleDeactivatedRow(userId);
+                    setTimeout(function() {
+                        self.handleDeletedUsersVis(); //reset rows displayed
+                    }, 150);
                 });
             },
             getRowData: function (userId) {
