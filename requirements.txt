@@ -78,7 +78,7 @@ snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.1
 sphinx==1.7.7
 sphinxcontrib-websupport==1.1.0  # via sphinx
-sqlalchemy==1.2.10         # via alembic, flask-sqlalchemy
+sqlalchemy==1.2.11         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.3.1
 tox==3.2.1
 typing==3.6.4             # via sphinx
