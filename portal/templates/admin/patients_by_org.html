@@ -75,7 +75,7 @@
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="btn btn-tnth-primary staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
-                            {% if patient.documents %}
+                            {% if not patient.deleted and patient.documents %}
                               <div class="intervention-btn-container">
                                 {% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<a class="btn btn-tnth-primary btn-report btn-report-{{loop.index}}" data-patient-id="{{patient.id}}" data-document-type="{{doc.intervention.description}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{_('ST')}}{% else %}{{ _('DS')}}{% endif %}</a>{% endif %}{% endfor %}
                               </div>

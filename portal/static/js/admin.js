@@ -308,12 +308,15 @@
             },
             setRowItemEvent: function () {
                 var self = this;
-                $("#adminTableContainer .btn-report:not(.has-click-handelr)").on("click", function (e) {
+                $("#adminTableContainer .btn-report").off("click").on("click", function (e) {
                     e.stopPropagation();
+                    if ($(this).closest(".deleted-user-row").length) { //prevent viewing of report for deleted users
+                        return false;
+                    }
                     self.getReportModal($(this).attr("data-patient-id"), {
                         documentDataType: $(this).attr("data-document-type")
                     });
-                }).addClass(".has-click-handler");
+                });
                 $("#adminTableContainer .btn-delete-user").each(function () {
                     $(this).popover({
                         container: "#adminTable",
@@ -340,7 +343,7 @@
                         }
                     });
                 });
-                $(document).off("click.popover-btn-deactivate").on("click", ".popover-btn-deactivate", function (e) {
+                $(document).undelegate(".popover-btn-deactivate", "click").on("click", ".popover-btn-deactivate", function (e) {
                     e.stopPropagation();
                     var userId = $(this).attr("data-user-id");
                     var loader = $("#data-delete-loader-" + userId);
@@ -359,7 +362,7 @@
                     self.reactivateUser($(this).attr("data-user-id"));
                 });
 
-                $(document).on("click", ".popover-btn-cancel", function (e) {
+                $(document).undelegate(".popover-btn-cancel", "click").on("click", ".popover-btn-cancel", function (e) {
                     e.stopPropagation();
                     $(this).closest(".popover").popover("hide");
                 });
@@ -936,7 +939,7 @@
                 var tnthAjax = this.getDependency("tnthAjax"),
                     self = this;
                 tnthAjax.deactivateUser(userId, {
-                    "async": false
+                    "async": true
                 }, function (data) {
                     if (data.error) {
                         callback({
