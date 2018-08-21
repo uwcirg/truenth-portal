@@ -896,6 +896,9 @@
                     e.preventDefault();
                     e.stopPropagation();
                     var row = $(this).closest("tr");
+                    if (row.hasClass("deleted-user-row")) {
+                        return false;
+                    }
                     if (!row.hasClass("no-records-found")) {
                         $("#adminTable .popover").popover("hide");
                         document.location = $(this).closest("tr").attr("data-link");
