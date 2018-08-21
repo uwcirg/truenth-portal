@@ -26,6 +26,7 @@ from flask_user import roles_required
 from flask_user.signals import (
     user_changed_password,
     user_logged_in,
+    user_password_failed,
     user_registered,
     user_reset_password,
 )
@@ -360,7 +361,28 @@ def deauthorized():
 def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
+
+    # After a successfull login make sure lockout is reset
+    user.reset_lockout()
+
     login_user(user, 'password_authenticated')
+
+
+def flask_user_password_failed_event(app, user, **extra):
+    """tracks when a user fails password verification
+
+    If this happens too often, for security reasons,
+    the user will be locked out of the system.
+    """
+    count = user.add_password_verification_failure()
+    auditable_event(
+        'local user failed password verification. Count "{}"'.format(
+            count
+        ),
+        user_id=user.id,
+        subject_id=user.id,
+        context='login'
+    )
 
 
 def flask_user_registered_event(app, user, **extra):
@@ -383,9 +405,10 @@ def flask_user_changed_password(app, user, **extra):
 
 
 # Register functions to receive signals from flask_user
-user_logged_in.connect(flask_user_login_event)
-user_registered.connect(flask_user_registered_event)
 user_changed_password.connect(flask_user_changed_password)
+user_logged_in.connect(flask_user_login_event)
+user_password_failed.connect(flask_user_password_failed_event)
+user_registered.connect(flask_user_registered_event)
 user_reset_password.connect(flask_user_changed_password)
 
 

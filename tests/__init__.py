@@ -11,6 +11,7 @@ options:
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
+from flask import url_for
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
@@ -158,14 +159,16 @@ class TestCase(Base):
 
     def add_user(
             self, username, first_name="", last_name="", image_url=None,
-            pre_registered=False):
+            password='fakePa$$', email=None):
         """Create a user and add to test db, and return it"""
-        # Unless testing a pre_registered case, give the user a fake password
-        # so they appear registered
-        password = None if pre_registered else 'fakePa$$'
+        # Hash the password
+        password = self.app.user_manager.hash_password(password)
+
         test_user = User(
             username=username, first_name=first_name, last_name=last_name,
             image_url=image_url, password=password)
+        if email is not None:
+            test_user.email = email
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
@@ -211,6 +214,18 @@ class TestCase(Base):
         return self.client.get(
             'test/oauth',
             query_string=oauth_info,
+            follow_redirects=follow_redirects
+        )
+
+    def local_login(self, email, password, follow_redirects=True):
+        """logs in a local user through user.login view"""
+        url = url_for('user.login')
+        return self.client.post(
+            url,
+            data={
+                'email': email,
+                'password': password,
+            },
             follow_redirects=follow_redirects
         )
 

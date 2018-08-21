@@ -44,7 +44,10 @@ from ..views.client import client_api
 from ..views.clinical import clinical_api
 from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
-from ..views.extend_flask_user import reset_password_view_function
+from ..views.extend_flask_user import (
+    LockoutLoginForm,
+    reset_password_view_function,
+)
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
@@ -194,6 +197,7 @@ def configure_extensions(app):
     user_manager.init_app(
         app,
         forgot_password_view_function=patch_forgot_password,
+        login_form=LockoutLoginForm,
         send_email_function=patch_send_email,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
