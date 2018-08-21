@@ -19,7 +19,7 @@
             </form>
             {% if user_manager.enable_forgot_password %}
                 <div class="divider">
-                    <a href="{{ url_for('user.forgot_password') }}">{%trans%}Having trouble logging in?{%endtrans%}</a>
+                    <span class="text-muted"><a href="{{ url_for('user.forgot_password') }}">{%trans%}Having trouble logging in?{%endtrans%}</a></span>
                 </div>
             {% endif %}
             <br/>
