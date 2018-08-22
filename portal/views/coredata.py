@@ -1,4 +1,5 @@
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from urllib.parse import parse_qsl, urlencode, urlparse
@@ -214,8 +215,9 @@ def acquire():
         parsed = urlparse(return_address)
         qs = parse_qsl(parsed.query)
         if qs:
-            url = "{0.scheme}://{0.netloc}{0.path}?".format(parsed) +\
-                    urlencode(qs)
+            url = (
+                "{0.scheme}://{0.netloc}{0.path}?".format(parsed) +
+                urlencode(qs))
         return url
 
     return render_template(

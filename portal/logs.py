@@ -6,12 +6,16 @@ from logging.handlers import SMTPHandler
 
 class SSLSMTPHandler(SMTPHandler):
     """Override SMTPHandler to support SSL"""
-    def __init__(self, username=None, password=None, mailport=None, use_ssl=None, **kwargs):
+
+    def __init__(
+            self, username=None, password=None, mailport=None,
+            use_ssl=None, **kwargs):
         """Override default to allow direct assignment of select attributes"""
         super(SSLSMTPHandler, self).__init__(**kwargs)
 
         for var, value in locals().items():
-            if var in ('username', 'password', 'mailport', 'use_ssl') and value is not None:
+            if (var in ('username', 'password', 'mailport', 'use_ssl')
+                    and value is not None):
                 setattr(self, var, value)
 
     def emit(self, record):

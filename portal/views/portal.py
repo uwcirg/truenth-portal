@@ -282,11 +282,11 @@ def access_via_token(token, next_step=None):
     # logout current user if one is logged in.
     if current_user():
         logout(prevent_redirect=True, reason="forced from /access_via_token")
-        assert(not current_user())
+        assert (not current_user())
 
     def verify_token(valid_seconds):
-        is_valid, has_expired, user_id =\
-                user_manager.token_manager.verify_token(token, valid_seconds)
+        is_valid, has_expired, user_id = (
+            user_manager.token_manager.verify_token(token, valid_seconds))
         if has_expired:
             current_app.logger.info("token access failed: "
                                     "expired token {}".format(token))
@@ -316,7 +316,9 @@ def access_via_token(token, next_step=None):
         target_url = getattr(NextStep, next_step)(user)
         if not target_url:
             # Due to access strategies, the next step may not (yet) apply
-            abort(400, "Patient doesn't qualify for '{}', can't continue".format(next_step))
+            abort(400,
+                  "Patient doesn't qualify for '{}', can't continue".format(
+                      next_step))
         session['next'] = target_url
         current_app.logger.debug(
             "/access with next_step, storing in session['next']: {}".format(
@@ -340,7 +342,7 @@ def access_via_token(token, next_step=None):
                 abort(400, "Invalid state - access denied")
 
             # only give such tokens 5 minutes - recheck validity
-            verify_token(valid_seconds=5*60)
+            verify_token(valid_seconds=5 * 60)
             auditable_event("promoting user without challenge via token, "
                             "pending registration", user_id=user.id,
                             subject_id=user.id, context='account')
@@ -370,7 +372,8 @@ def access_via_token(token, next_step=None):
             auditable_event("invited user entered using token, pending "
                             "registration", user_id=user.id, subject_id=user.id,
                             context='account')
-            session['challenge.next_url'] = url_for('user.register', email=user.email)
+            session['challenge.next_url'] = url_for(
+                'user.register', email=user.email)
             session['challenge.merging_accounts'] = True
         return redirect(url_for('portal.challenge_identity'))
 
@@ -549,11 +552,11 @@ def admin():
                 continue
             org_list.update(OrgTree().here_and_below_id(orgId))
 
-        users = User.query.join(UserOrganization).filter(
-                    and_(User.deleted_id.is_(None),
-                         UserOrganization.user_id == User.id,
-                         UserOrganization.organization_id != 0,
-                         UserOrganization.organization_id.in_(org_list)))
+        users = User.query.join(UserOrganization).filter(and_(
+            User.deleted_id.is_(None),
+            UserOrganization.user_id == User.id,
+            UserOrganization.organization_id != 0,
+            UserOrganization.organization_id.in_(org_list)))
     else:
         org_list = Organization.query.all()
         users = User.query.filter_by(deleted=None).all()
@@ -694,7 +697,8 @@ def explore():
 @portal.route('/shareyourstory')
 @portal.route('/shareYourStory')
 def share_story():
-    return redirect(url_for('static', filename='files/LivedExperienceVideo.pdf'))
+    return redirect(
+        url_for('static', filename='files/LivedExperienceVideo.pdf'))
 
 
 @portal.route('/robots.txt')
@@ -721,10 +725,14 @@ def psa_tracker():
 
 
 class SettingsForm(FlaskForm):
-    timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
-                           validators=[validators.DataRequired()])
-    patient_id = IntegerField('Patient to edit', validators=[validators.optional()])
-    timestamp = StringField("Datetime string for patient's questionnaire_responses, format YYYY-MM-DD")
+    timeout = IntegerField(
+        'Session Timeout for This Web Browser (in seconds)',
+        validators=[validators.DataRequired()])
+    patient_id = IntegerField(
+        'Patient to edit', validators=[validators.optional()])
+    timestamp = StringField(
+        "Datetime string for patient's questionnaire_responses, "
+        "format YYYY-MM-DD")
     import_orgs = BooleanField('Import Organizations from Site Persistence')
 
 
@@ -748,10 +756,10 @@ def settings():
             # lack context to expand, show with format strings
             apptext[a.name] = a.custom_text
 
-    form = SettingsForm(
-        request.form, timeout=request.cookies.get('SS_TIMEOUT', 600))
+    default_timeout = current_app.config['DEFAULT_INACTIVITY_TIMEOUT']
+    current_timeout = request.cookies.get("SS_TIMEOUT", default_timeout)
+    form = SettingsForm(request.form, timeout=current_timeout)
     if not form.validate_on_submit():
-
         return render_template(
             'settings.html',
             form=form,
@@ -779,22 +787,22 @@ def settings():
         patient = get_user_or_abort(form.patient_id.data)
         try:
             dt = FHIR_datetime.parse(form.timestamp.data)
-            for qnr in QuestionnaireResponse.query.filter_by(subject_id=patient.id):
+            for qnr in QuestionnaireResponse.query.filter_by(
+                    subject_id=patient.id):
                 qnr.authored = dt
                 document = qnr.document
                 document['authored'] = FHIR_datetime.as_fhir(dt)
                 # Due to the infancy of JSON support in POSTGRES and SQLAlchemy
                 # one must force the update to get a JSON field change to stick
                 db.session.query(QuestionnaireResponse).filter(
-                    QuestionnaireResponse.id == qnr.id).update({"document": document})
+                    QuestionnaireResponse.id == qnr.id
+                ).update({"document": document})
             db.session.commit()
             invalidate_assessment_status_cache(patient.id)
         except ValueError as e:
             trace("Invalid date format {}".format(form.timestamp.data))
             trace("ERROR: {}".format(e))
 
-    # make max_age outlast the browser session
-    max_age = 60 * 60 * 24 * 365 * 5
     response = make_response(render_template(
         'settings.html',
         form=form,
@@ -802,7 +810,17 @@ def settings():
         organization_consents=organization_consents,
         trace_data=dump_trace(),
         wide_container="true"))
-    response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
+
+    # Only retain custom timeout if set different from default
+    if form.timeout.data != default_timeout:
+        if form.timeout.data > current_app.config.get(
+                'PERMANENT_SESSION_LIFETIME'):
+            abort(400, "Inactivity timeout value can't exceed"
+                       " PERMANENT_SESSION_LIFETIME")
+        # set cookie max_age to 5 years for config retention
+        max_age = 60 * 60 * 24 * 365 * 5
+        response.set_cookie(
+            'SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
 
 
@@ -825,16 +843,17 @@ def config_settings(config_key):
     )
     if config_key:
         key = config_key.upper()
-        if not any(key.startswith(prefix) for prefix in config_prefix_whitelist):
+        if not any(
+            key.startswith(prefix) for prefix in config_prefix_whitelist
+        ):
             abort(400, "Configuration key '{}' not available".format(key))
         return jsonify({key: current_app.config.get(key)})
-    else:
-        config_settings = {}
-        # return selective keys - not all can be be viewed by users, e.g.secret key
-        for key in current_app.config:
-            if any(key.startswith(prefix) for prefix in config_prefix_whitelist):
-                config_settings[key] = current_app.config.get(key)
-        return jsonify(config_settings)
+    config_settings = {}
+    # return selective keys - not all can be be viewed by users, e.g.secret key
+    for key in current_app.config:
+        if any(key.startswith(prefix) for prefix in config_prefix_whitelist):
+            config_settings[key] = current_app.config.get(key)
+    return jsonify(config_settings)
 
 
 @portal.route('/research')
@@ -944,10 +963,12 @@ def spec():
             # Remove swagger path parameters from routes where it is optional
             for parameter in route.pop('parameters', ()):
 
-                if parameter['in'] == 'path' and ("{%s}" % parameter['name']) not in path:
+                if parameter['in'] == 'path' and (
+                        "{%s}" % parameter['name']) not in path:
                     # Prevent duplicate operationIds by adding suffix
                     # Assume "simple" version of API route if path parameter included but not in path
-                    swag['paths'][path][method]['operationId'] = "{}-simple".format(operation_id)
+                    swag['paths'][path][method][
+                        'operationId'] = "{}-simple".format(operation_id)
                     continue
 
                 parameters.append(parameter)
@@ -958,7 +979,8 @@ def spec():
 
             # Add method as suffix to prevent duplicate operationIds on synonymous routes
             if method == 'put' or method == 'post':
-                swag['paths'][path][method]['operationId'] = "{}-{}".format(operation_id, method)
+                swag['paths'][path][method]['operationId'] = "{}-{}".format(
+                    operation_id, method)
 
     return jsonify(swag)
 

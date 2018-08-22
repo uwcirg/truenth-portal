@@ -485,9 +485,10 @@ var tnthAjax = {
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
+        params.async = params.sync ? false: params.async;
         var self = this;
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
@@ -523,16 +524,7 @@ var tnthAjax = {
                 "pragma": "no-cache"
             };
         }
-        $.ajax({
-            type: method ? method : "GET",
-            url: url,
-            contentType: params.contentType,
-            dataType: params.dataType,
-            cache: params.cache,
-            async: params.sync ? false: params.async,
-            data: params.data,
-            timeout: params.timeout //set default timeout to 5 seconds
-        }).done(function(data) {
+        $.ajax(params).done(function(data) {
             params.attempts = 0;
             if (data) {
                 callback(data);
@@ -1567,22 +1559,33 @@ var tnthAjax = {
             }
         });
     },
-    "deleteUser": function(userId, params, callback) {
+    "deactivateUser": function(userId, params, callback) {
         callback = callback||function() {};
         if (!userId) {
             callback({"error": i18next.t("User id is required")});
             return false;
         }
         this.sendRequest("/api/user/" + userId, "DELETE", userId, (params || {}), function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred deleting user.")});
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
+            callback = callback||function() {};
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred deactivating user.")});
+                return;
             }
+            callback(data);
+        });
+    },
+    "reactivateUser": function(userId, params, callback) {
+        callback = callback||function() {};
+        if (!userId) {
+            callback({"error": i18next.t("User id is required")});
+            return false;
+        }
+        this.sendRequest("/api/user/" + userId + "/reactivate", "POST", userId, (params || {}), function(data) {
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred reactivating user.")});
+                return;
+            }
+            callback(data);
         });
     },
     "setConfigurationUI": function(configKey, value) {
@@ -2047,7 +2050,8 @@ var Global = {
         var self = this;
         sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
-                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+                tnthAjax.reportError("", PORTAL_NAV_PAGE, data.error || i18next.t("Error loading portal wrapper"), true);
+                $("#mainNavLoadingError").html(i18next.t("Error loading portal wrapper"))
                 restoreVis(); /*global restoreVis */
                 callback();
                 return false;
@@ -2221,7 +2225,7 @@ var Global = {
             $("#notificationBanner").hide();
         } else {
             $("#notificationBanner .close").addClass("active");
-        } 
+        }
     },
     initValidator: function() {
         if (typeof $.fn.validator === "undefined") { return false; }

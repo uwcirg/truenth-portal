@@ -33,8 +33,6 @@ db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
 
 
-
-
 class OAuthOrAlternateAuth(OAuth2Provider):
     """Specialize OAuth2Provider with alternate authorization"""
 
@@ -55,12 +53,14 @@ class OAuthOrAlternateAuth(OAuth2Provider):
            return the effecively undecorated function.
 
         """
+
         def wrapper(eff):
             """preserve name and docstrings on 'eff'
 
             see: http://stackoverflow.com/questions/308999/what-does-functools-wraps-do
 
             """
+
             @csrf.exempt
             @wraps(eff)
             def decorated(*args, **kwargs):  # pragma: no cover
@@ -99,7 +99,9 @@ class OAuthOrAlternateAuth(OAuth2Provider):
                 login_user(request.oauth.user, 'password_authenticated')
                 # End MOD
                 return eff(*args, **kwargs)
+
             return decorated
+
         return wrapper
 
 oauth = OAuthOrAlternateAuth()

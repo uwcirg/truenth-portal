@@ -7,7 +7,7 @@ from ..models.role import Role
 from ..models.user import current_user, get_user_or_abort
 from .crossdomain import crossdomain
 
-role_api = Blueprint('role_api', __name__,)
+role_api = Blueprint('role_api', __name__)
 
 
 @role_api.route('/api/roles', methods=('OPTIONS', 'GET'))

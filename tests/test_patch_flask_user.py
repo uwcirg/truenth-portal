@@ -4,6 +4,7 @@ from __future__ import unicode_literals  # isort:skip
 from portal.views.patch_flask_user import patch_make_safe_url
 from tests import TestCase
 
+
 class TestPathFlaskUser(TestCase):
 
     def test_no_path(self):

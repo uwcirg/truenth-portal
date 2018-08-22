@@ -86,7 +86,7 @@ class Organization(db.Model):
         addresses = '; '.join([str(a) for a in self.addresses])
 
         return 'Organization {0.name} {0.type} {0.phone} {0.email} '.format(
-                self) + part_of + addresses
+            self) + part_of + addresses
 
     @hybrid_property
     def use_specific_codings(self):
@@ -175,13 +175,13 @@ class Organization(db.Model):
         if coding:
             return coding.code
 
-
     @default_locale.setter
     def default_locale(self, value):
         if not value:
             self.default_locale_id = None
         else:
-            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=value).first()
+            coding = Coding.query.filter_by(
+                system=IETF_LANGUAGE_TAG, code=value).first()
             if not coding:
                 raise ValueError(
                     "Can't find locale code {value} - constrained to "
@@ -251,6 +251,7 @@ class Organization(db.Model):
         :return: research protocol for org (or parent org) valid as_of_date
 
         """
+
         def rp_from_org(org):
             best_candidate = None
             for rp, retired_as_of in org.rps_w_retired():
@@ -283,8 +284,9 @@ class Organization(db.Model):
             telecom = Telecom.from_fhir(data['telecom'])
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone', 'work')) \
-                or telecom_cps.get(('phone', None))
+            self.phone = (
+                telecom_cps.get(('phone', 'work'))
+                or telecom_cps.get(('phone', None)))
         if 'address' in data:
             if not data.get('address'):
                 for addr in self.addresses:
@@ -306,9 +308,11 @@ class Organization(db.Model):
             if attr in data:
                 setattr(self, attr, data.get(attr))
 
-        by_extension_url = {ext['url']: ext for ext in data.get('extension', [])}
+        by_extension_url = {
+            ext['url']: ext for ext in data.get('extension', [])}
         for kls in org_extension_classes:
-            args = by_extension_url.get(kls.extension_url, {'url': kls.extension_url})
+            args = by_extension_url.get(
+                kls.extension_url, {'url': kls.extension_url})
             instance = org_extension_map(self, args)
             instance.apply_fhir()
 
@@ -436,12 +440,12 @@ class Organization(db.Model):
 class OrganizationLocale(db.Model):
     __tablename__ = 'organization_locales'
     id = db.Column(db.Integer, primary_key=True)
-    organization_id = db.Column(db.ForeignKey('organizations.id', ondelete='CASCADE'),
-                        nullable=False)
+    organization_id = db.Column(db.ForeignKey(
+        'organizations.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'coding_id',
-        name='_organization_locale_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'coding_id', name='_organization_locale_coding'),)
 
 
 class LocaleExtension(CCExtension):
@@ -477,7 +481,10 @@ class OrganizationResearchProtocol(db.Model):
         'organization_id', 'research_protocol_id',
         name='_organization_research_protocol'),)
 
-    def __init__(self, research_protocol=None, organization=None, retired_as_of=None):
+    def __init__(
+        self, research_protocol=None, organization=None,
+        retired_as_of=None
+    ):
         if research_protocol:
             assert isinstance(research_protocol, ResearchProtocol)
         if organization:
@@ -590,10 +597,11 @@ class UserOrganization(db.Model):
     user_id = db.Column(db.ForeignKey(
         'users.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'organization_id',
-        name='_user_organization'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'organization_id', name='_user_organization'),)
 
     organization = db.relationship('Organization')
+
 
 class OrganizationAddress(db.Model):
     """link table for organization : n addresses"""
@@ -604,8 +612,8 @@ class OrganizationAddress(db.Model):
     address_id = db.Column(db.ForeignKey(
         'addresses.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'address_id',
-        name='_organization_address'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'address_id', name='_organization_address'),)
 
 
 class OrganizationIdentifier(db.Model):
@@ -617,8 +625,8 @@ class OrganizationIdentifier(db.Model):
     identifier_id = db.Column(db.ForeignKey(
         'identifiers.id', ondelete='cascade'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('organization_id', 'identifier_id',
-        name='_organization_identifier'),)
+    __table_args__ = (UniqueConstraint(
+        'organization_id', 'identifier_id', name='_organization_identifier'),)
 
 
 class OrgNode(object):
@@ -630,7 +638,8 @@ class OrgNode(object):
     as reference keys.
 
     """
-    def __init__(self, id, parent = None, children = None):
+
+    def __init__(self, id, parent=None, children=None):
         self.id = id  # root node alone has id = None
         self.parent = parent
         self.children = children if children else {}
@@ -663,7 +672,7 @@ class OrgNode(object):
             return node
         else:
             # Could be adding to root node, confirm it's top level
-            assert(self.id is None and partOf_id is None)
+            assert (self.id is None and partOf_id is None)
             node = OrgNode(id=id, parent=self)
             assert id not in self.children
             self.children[id] = node
@@ -727,7 +736,8 @@ class OrgTree(object):
             partOf_id = node.id
             for org in Organization.query.filter(and_(
                 Organization.id != 0,  # none of the above doesn't apply
-                Organization.partOf_id == partOf_id)):
+                Organization.partOf_id == partOf_id)
+            ):
                 new_node = node.insert(id=org.id, partOf_id=partOf_id)
                 if org.id in self.lookup_table:
                     raise ValueError(
@@ -735,7 +745,8 @@ class OrgTree(object):
                         "".format(org.id, self.lookup_table.keys()))
                 self.lookup_table[org.id] = new_node
                 if Organization.query.filter(
-                    Organization.partOf_id == new_node.id).count():
+                    Organization.partOf_id == new_node.id
+                ).count():
                     add_descendents(new_node)
 
         # Add top level orgs first, recurse on down
@@ -921,11 +932,11 @@ class OrgTree(object):
         now = datetime.utcnow()
         query = db.session.query(User.id).join(
             UserRoles).join(UserConsent).join(UserOrganization).filter(
-                User.deleted_id.is_(None),
-                UserRoles.role_id == patient_role_id,
-                UserConsent.deleted_id.is_(None),
-                UserConsent.expires > now,
-                UserOrganization.organization_id.in_(staff_user_orgs))
+            User.deleted_id.is_(None),
+            UserRoles.role_id == patient_role_id,
+            UserConsent.deleted_id.is_(None),
+            UserConsent.expires > now,
+            UserOrganization.organization_id.in_(staff_user_orgs))
 
         return [u[0] for u in query]  # flaten return tuples to list of ids
 

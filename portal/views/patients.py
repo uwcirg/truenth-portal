@@ -40,8 +40,8 @@ def patients_root():
     org_list = set()
     now = datetime.utcnow()
     consent_query = UserConsent.query.filter(and_(
-                         UserConsent.deleted_id.is_(None),
-                         UserConsent.expires > now))
+        UserConsent.deleted_id.is_(None),
+        UserConsent.expires > now))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
 
     if user.has_role(ROLE.STAFF.value):
@@ -78,7 +78,6 @@ def patients_root():
         org_patients = User.query.join(UserRoles).filter(
             and_(User.id == UserRoles.user_id,
                  UserRoles.role_id == patient_role_id,
-                 User.deleted_id.is_(None),
                  User.id.in_(consented_users)
                  )
             ).join(UserOrganization).filter(
@@ -96,12 +95,10 @@ def patients_root():
         ui_patients = User.query.join(UserRoles).filter(
             and_(User.id == UserRoles.user_id,
                  UserRoles.role_id == patient_role_id,
-                 User.deleted_id.is_(None),
                  User.id.in_(consented_users))
-                 ).join(UserIntervention).filter(
-                 and_(
-                     UserIntervention.user_id == User.id,
-                     UserIntervention.intervention_id.in_(ui_list)))
+        ).join(UserIntervention).filter(and_(
+            UserIntervention.user_id == User.id,
+            UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
     # only show test users to admins
@@ -114,6 +111,9 @@ def patients_root():
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
         patient_list = []
         for patient in patients:
+            if patient.deleted:
+                patient_list.append(patient)
+                continue
             a_s, qbd = overall_assessment_status(patient.id)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit_name(qbd)

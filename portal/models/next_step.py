@@ -12,6 +12,7 @@ class NextStep(object):
     contextual meaning of the named step.
 
     """
+
     @staticmethod
     def validate(step):
         if hasattr(NextStep, step):
