@@ -896,7 +896,7 @@
                     e.preventDefault();
                     e.stopPropagation();
                     var row = $(this).closest("tr");
-                    if (row.hasClass("deleted-user-row")) {
+                    if (row.hasClass("deleted-user-row") || row.hasClass("loading")) {
                         return false;
                     }
                     if (!row.hasClass("no-records-found")) {
@@ -941,9 +941,11 @@
                 }
                 var tnthAjax = this.getDependency("tnthAjax"),
                     self = this;
+                $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
                 tnthAjax.deactivateUser(userId, {
                     "async": true
                 }, function (data) {
+                    $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
                     if (data.error) {
                         callback({
                             error: data.error
