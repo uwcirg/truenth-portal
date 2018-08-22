@@ -15,7 +15,9 @@ from .crossdomain import crossdomain
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
 
 
-@procedure_api.route('/patient/<int:patient_id>/procedure', methods=('OPTIONS', 'GET'))
+@procedure_api.route(
+    '/patient/<int:patient_id>/procedure',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def procedure(patient_id):
@@ -61,8 +63,8 @@ def procedure(patient_id):
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
-@procedure_api.route('/procedure', methods=('OPTIONS','POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@procedure_api.route('/procedure', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def post_procedure():
     """Add procedure via FHIR Procedure Resource
@@ -163,8 +165,10 @@ def post_procedure():
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
-@procedure_api.route('/procedure/<int:procedure_id>', methods=('OPTIONS','DELETE'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@procedure_api.route(
+    '/procedure/<int:procedure_id>',
+    methods=('OPTIONS', 'DELETE'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def procedure_delete(procedure_id):
     """Delete a procedure by ID.
@@ -218,7 +222,9 @@ def procedure_delete(procedure_id):
     return jsonify(message='deleted procedure')
 
 
-@procedure_api.route('/procedure/valueset/<valueset>', methods=('OPTIONS', 'GET'))
+@procedure_api.route(
+    '/procedure/valueset/<valueset>',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 def procedure_value_sets(valueset):
     """Returns Valueset for treatment {started,not-started} codes

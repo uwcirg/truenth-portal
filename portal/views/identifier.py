@@ -12,7 +12,9 @@ from .crossdomain import crossdomain
 identifier_api = Blueprint('identifier_api', __name__)
 
 
-@identifier_api.route('/api/user/<int:user_id>/identifier', methods=('OPTIONS', 'GET'))
+@identifier_api.route(
+    '/api/user/<int:user_id>/identifier',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def identifiers(user_id):
@@ -73,8 +75,10 @@ def identifiers(user_id):
     return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
 
 
-@identifier_api.route('/api/user/<int:user_id>/identifier', methods=('OPTIONS','POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@identifier_api.route(
+    '/api/user/<int:user_id>/identifier',
+    methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def add_identifier(user_id):
     """Add additional identifier(s) to a user

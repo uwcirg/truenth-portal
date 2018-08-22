@@ -680,9 +680,8 @@ def logout(prevent_redirect=False, reason=None):
     return redirect('/' if not timed_out else '/?timed_out=1')
 
 
-
-@auth.route('/oauth/token-status', methods=('OPTIONS','GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@auth.route('/oauth/token-status', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def token_status():
     """Return remaining valid time and other info for oauth token
@@ -755,7 +754,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('OPTIONS', 'GET', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
@@ -787,7 +786,7 @@ def oauth_errors():
     return jsonify(error=request.args.get('error')), 400
 
 
-@auth.route('/oauth/token', methods=('OPTIONS','GET', 'POST'))
+@auth.route('/oauth/token', methods=('OPTIONS', 'GET', 'POST'))
 @csrf.exempt
 @oauth.token_handler
 def access_token():
@@ -874,8 +873,8 @@ def access_token():
     return None
 
 
-@auth.route('/oauth/authorize', methods=('OPTIONS','GET', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@auth.route('/oauth/authorize', methods=('OPTIONS', 'GET', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):

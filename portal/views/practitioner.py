@@ -122,7 +122,9 @@ def practitioner_search():
     return jsonify(bundle)
 
 
-@practitioner_api.route('/practitioner/<string:id_or_code>', methods=('OPTIONS', 'GET'))
+@practitioner_api.route(
+    '/practitioner/<string:id_or_code>',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def practitioner_get(id_or_code):

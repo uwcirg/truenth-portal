@@ -54,7 +54,7 @@ user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
 
 @user_api.route('/me', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def me():
     """Access basics for current user
@@ -98,7 +98,7 @@ def me():
 
 
 @user_api.route('/account', methods=('POST',))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
@@ -283,7 +283,7 @@ def account():
 
 
 @user_api.route('/user/<int:user_id>', methods=['DELETE'])
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def delete_user(user_id):
@@ -394,7 +394,7 @@ def reactivate_user(user_id):
 
 
 @user_api.route('/user/<int:user_id>/access_url')
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
@@ -471,7 +471,7 @@ def access_url(user_id):
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def user_consents(user_id):
     """Returns simple JSON listing user's valid consent agreements
@@ -578,8 +578,8 @@ def user_consents(user_id):
                                        user.all_consents])
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS','POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def set_user_consents(user_id):
     """Add a consent agreement for the user with named organization
@@ -703,7 +703,7 @@ def set_user_consents(user_id):
 
 @user_api.route('/user/<int:user_id>/consent/withdraw',
                 methods=('OPTIONS', 'POST', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def withdraw_user_consent(user_id):
     """Withdraw existing consent agreement for the user with named organization
@@ -811,8 +811,8 @@ def withdraw_user_consent(user_id):
     return jsonify(uc.as_json())
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS','DELETE'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'DELETE'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def delete_user_consents(user_id):
     """Delete a consent agreement between the user and the named organization
@@ -901,7 +901,7 @@ def delete_user_consents(user_id):
 
 
 @user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def user_groups(user_id):
     """Returns simple JSON defining user's groups
@@ -954,8 +954,8 @@ def user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS','PUT'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def set_user_groups(user_id):
     """Set groups for user, returns simple JSON defining user groups
@@ -1065,7 +1065,7 @@ def set_user_groups(user_id):
 
 
 @user_api.route('/relationships', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def system_relationships():
     """Returns simple JSON defining all system relationships
@@ -1107,8 +1107,10 @@ def system_relationships():
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/<int:user_id>/relationships', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/relationships',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def relationships(user_id):
     """Returns simple JSON defining user relationships
@@ -1185,7 +1187,7 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/register-now', methods=('OPTIONS','GET'))
+@user_api.route('/user/register-now', methods=('OPTIONS', 'GET'))
 @oauth.require_oauth()
 def register_now():
     """Target for triggering registration of account
@@ -1243,8 +1245,10 @@ def register_now():
     return redirect(url_for('user.register', email=user.email))
 
 
-@user_api.route('/user/<int:user_id>/relationships', methods=('OPTIONS','PUT'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/relationships',
+    methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def set_relationships(user_id):
     """Set relationships for user, returns JSON defining user relationships
@@ -1386,7 +1390,7 @@ def set_relationships(user_id):
 
 
 @user_api.route('/user/<int:user_id>/email_ready', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def email_ready(user_id):
     """See if given user is 'email ready'
@@ -1443,7 +1447,7 @@ def email_ready(user_id):
 
 
 @user_api.route('/unique_email', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 def unique_email():
     """Confirm a given email is unique
 
@@ -1521,8 +1525,10 @@ def unique_email():
     return jsonify(unique=True)
 
 
-@user_api.route('/user/<int:user_id>/user_documents', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/user_documents',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def user_documents(user_id):
     """Returns simple JSON defining user documents
@@ -1616,8 +1622,10 @@ def user_documents(user_id):
                                    results])
 
 
-@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/user_documents/<int:doc_id>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def download_user_document(user_id, doc_id):
     """Download a user document belonging to a user
@@ -1687,8 +1695,10 @@ def download_user_document(user_id, doc_id):
     return response
 
 
-@user_api.route('/user/<int:user_id>/patient_report', methods=('OPTIONS','POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/patient_report',
+    methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def upload_user_document(user_id):
     """Add a Patient Report for the user
@@ -1802,8 +1812,8 @@ def upload_user_document(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route('/user/<int:user_id>/password_reset', methods=('POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
@@ -1864,8 +1874,10 @@ def trigger_password_reset_email(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/table_preferences/<string:table_name>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def get_table_preferences(user_id, table_name):
     """Returns simple JSON defining user table preferences
@@ -1947,7 +1959,7 @@ def get_table_preferences(user_id, table_name):
 
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
-    methods=('OPTIONS','PUT', 'POST'))
+    methods=('OPTIONS', 'PUT', 'POST'))
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
     """Add a consent agreement for the user with named organization
@@ -2049,7 +2061,7 @@ def set_table_preferences(user_id, table_name):
 
 
 @user_api.route('/user/<int:user_id>/invite', methods=('POST',))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.SERVICE.value])
 def invite(user_id):
@@ -2133,7 +2145,7 @@ def invite(user_id):
 
 
 @user_api.route('/user/<int:user_id>/messages')
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
@@ -2203,8 +2215,10 @@ def get_user_messages(user_id):
     return jsonify(messages=[m.as_json() for m in messages])
 
 
-@user_api.route('/user/<int:user_id>/questionnaire_bank', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@user_api.route(
+    '/user/<int:user_id>/questionnaire_bank',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def get_current_user_qb(user_id):
     """Returns JSON defining user's current QuestionnaireBank

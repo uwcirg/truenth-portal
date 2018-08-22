@@ -63,7 +63,9 @@ def questionnaire_list():
     return jsonify(bundle)
 
 
-@questionnaire_api.route('/api/questionnaire/<string:value>', methods=('OPTIONS', 'GET'))
+@questionnaire_api.route(
+    '/api/questionnaire/<string:value>',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def get_questionnaire(value):
