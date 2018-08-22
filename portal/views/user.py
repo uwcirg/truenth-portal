@@ -97,7 +97,7 @@ def me():
         id=user.id, username=user.username, email=user.email)
 
 
-@user_api.route('/account', methods=('POST',))
+@user_api.route('/account', methods=('POST', ))
 @crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -1812,7 +1812,7 @@ def upload_user_document(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/password_reset', methods=('POST'))
+@user_api.route('/user/<int:user_id>/password_reset', methods=('POST', ))
 @crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
