@@ -896,6 +896,9 @@
                     e.preventDefault();
                     e.stopPropagation();
                     var row = $(this).closest("tr");
+                    if (row.hasClass("deleted-user-row") || row.hasClass("loading")) {
+                        return false;
+                    }
                     if (!row.hasClass("no-records-found")) {
                         $("#adminTable .popover").popover("hide");
                         document.location = $(this).closest("tr").attr("data-link");
@@ -911,9 +914,11 @@
                 if (!this.isDeactivatedRow(userId)) {
                     return false;
                 }
+                $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
                 tnthAjax.reactivateUser(userId, {
-                    "async": false
+                    "async": true
                 }, function (data) {
+                	$("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
                     if (data.error) {
                         alert(data.error);
                         return;
@@ -938,9 +943,11 @@
                 }
                 var tnthAjax = this.getDependency("tnthAjax"),
                     self = this;
+                $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
                 tnthAjax.deactivateUser(userId, {
                     "async": true
                 }, function (data) {
+                    $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
                     if (data.error) {
                         callback({
                             error: data.error
