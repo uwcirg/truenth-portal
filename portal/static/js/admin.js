@@ -914,9 +914,11 @@
                 if (!this.isDeactivatedRow(userId)) {
                     return false;
                 }
+                $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
                 tnthAjax.reactivateUser(userId, {
-                    "async": false
+                    "async": true
                 }, function (data) {
+                	$("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
                     if (data.error) {
                         alert(data.error);
                         return;
