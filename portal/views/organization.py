@@ -473,7 +473,7 @@ def user_organizations(user_id):
         for org in user.organizations])
 
 
-@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS','POST'))
+@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'POST'))
 @oauth.require_oauth()
 def add_user_organizations(user_id):
     """Associate organization with user via reference

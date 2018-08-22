@@ -12,8 +12,14 @@ from .crossdomain import crossdomain
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 
-@demographics_api.route('/demographics', defaults={'patient_id': None}, methods=('OPTIONS', 'GET'))
-@demographics_api.route('/demographics/<int:patient_id>', methods=('OPTIONS', 'GET'))
+
+@demographics_api.route(
+    '/demographics',
+    defaults={'patient_id': None},
+    methods=('OPTIONS', 'GET'))
+@demographics_api.route(
+    '/demographics/<int:patient_id>',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def demographics(patient_id):
@@ -75,8 +81,10 @@ def demographics(patient_id):
     return jsonify(patient.as_fhir(include_empties=False))
 
 
-@demographics_api.route('/demographics/<int:patient_id>', methods=('OPTIONS','PUT'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@demographics_api.route(
+    '/demographics/<int:patient_id>',
+    methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient

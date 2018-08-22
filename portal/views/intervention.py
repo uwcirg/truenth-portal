@@ -23,7 +23,8 @@ intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
 
 @intervention_api.route(
-    '/intervention/<string:intervention_name>/user/<int:user_id>', methods=('OPTIONS', 'GET'))
+    '/intervention/<string:intervention_name>/user/<int:user_id>',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def user_intervention_get(intervention_name, user_id):

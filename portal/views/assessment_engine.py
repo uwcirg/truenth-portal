@@ -776,9 +776,9 @@ def get_assessments():
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
-    methods=('OPTIONS','PUT'),
+    methods=('OPTIONS', 'PUT')
 )
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def assessment_update(patient_id):
     """Update an existing questionnaire response on a patient's record
@@ -881,8 +881,8 @@ def assessment_update(patient_id):
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment', methods=('OPTIONS','POST'))
-@crossdomain(origin='*', headers=('Content-Type','Authorization'))
+    '/patient/<int:patient_id>/assessment', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
 @oauth.require_oauth()
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
@@ -1652,7 +1652,9 @@ def complete_assessment():
     return redirect(next_url, code=303)
 
 
-@assessment_engine_api.route('/consent-assessment-status', methods=('OPTIONS', 'GET'))
+@assessment_engine_api.route(
+    '/consent-assessment-status',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def batch_assessment_status():
@@ -1736,7 +1738,9 @@ def batch_assessment_status():
     return jsonify(status=results)
 
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status', methods=('OPTIONS', 'GET'))
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment-status',
+    methods=('OPTIONS', 'GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
