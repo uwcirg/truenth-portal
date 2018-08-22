@@ -39,7 +39,8 @@
                 <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
                 <th data-field="email" data-sortable="true" class="email-data-field" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="organization" data-sortable="true" class="org-data-field" data-filter-control="select">{{ _("Site(s)") }}</th>
-                <th class="text-center"><em>{{ _("Deactivate") }}</em> {{ _("User") }}</span></th>
+                <th class="text-center" data-field="deactivate" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate Account") }}</th>
+                <th data-field="activationstatus" data-class="deleted-field" data-visible="false">{{_("activation status")}}</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
@@ -57,7 +58,8 @@
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
-                  <td class="text-center deleted-button-cell">{%if not user.deleted %}<button data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>{{_("Deactivate")}}</em></button>{%else%}{{ _("Inactive") }}{%endif%}</td>
+                  {{deletedUserCell(user)}}
+                  <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
               </tr>
             {% endfor %}
             </tbody>

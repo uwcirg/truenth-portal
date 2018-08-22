@@ -12,6 +12,7 @@ from portal.models.scheduled_job import ScheduledJob
 from portal.tasks import test as test_task
 from tests import TestCase
 
+
 class TestScheduledJob(TestCase):
     """Scheduled Job tests"""
 

@@ -12,7 +12,6 @@ from flask import (
     abort,
     current_app,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -27,6 +26,7 @@ from flask_user import roles_required
 from flask_user.signals import (
     user_changed_password,
     user_logged_in,
+    user_password_failed,
     user_registered,
     user_reset_password,
 )
@@ -40,6 +40,7 @@ from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
+from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
 from ..models.flaskdanceprovider import (
     FacebookFlaskDanceProvider,
@@ -88,14 +89,12 @@ def oauth_test_backdoor():
         return login_user_with_provider(request, mock_provider)
 
     def create_mock_provider():
-        user_info = FlaskProviderUserInfo()
-        user_info.id = request.args.get('provider_id')
-        user_info.first_name = request.args.get('first_name')
-        user_info.last_name = request.args.get('last_name')
-        user_info.email = request.args.get('email')
-        user_info.image_url = request.args.get('image_url')
-        user_info.gender = request.args.get('gender')
-        user_info.birthday = request.args.get('birthday')
+        # Convert all request args into a dictionary that's
+        # used to mock user json returned from a provider
+        # Certain keys, like next, will be included in this
+        # all inclusive brute force approach, but that's ok.
+        # These properties will be ignored
+        user_json = request.args.to_dict()
 
         # If a token is set turn it into a json object
         token = request.args.get('token')
@@ -105,8 +104,8 @@ def oauth_test_backdoor():
         mock_provider = MockFlaskDanceProvider(
             request.args.get('provider_name'),
             token,
-            user_info,
-            request.args.get('fail_to_get_user_info')
+            user_json,
+            request.args.get('fail_to_get_user_json')
         )
 
         return mock_provider
@@ -171,7 +170,7 @@ def login_user_with_provider(request, provider):
 
     # Use the auth token to get user info from the provider
     user_info = provider.get_user_info()
-    if not user_info:
+    if user_info is None:
         current_app.logger.error(
             'Failed to get user info at %s',
             provider.name
@@ -331,6 +330,7 @@ def deauthorized():
       app->settings->advanced->Deauthorize Callback URL
 
     """
+
     def base64_url_decode(s):
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
@@ -362,7 +362,28 @@ def deauthorized():
 def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
+
+    # After a successfull login make sure lockout is reset
+    user.reset_lockout()
+
     login_user(user, 'password_authenticated')
+
+
+def flask_user_password_failed_event(app, user, **extra):
+    """tracks when a user fails password verification
+
+    If this happens too often, for security reasons,
+    the user will be locked out of the system.
+    """
+    count = user.add_password_verification_failure()
+    auditable_event(
+        'local user failed password verification. Count "{}"'.format(
+            count
+        ),
+        user_id=user.id,
+        subject_id=user.id,
+        context='login'
+    )
 
 
 def flask_user_registered_event(app, user, **extra):
@@ -385,9 +406,10 @@ def flask_user_changed_password(app, user, **extra):
 
 
 # Register functions to receive signals from flask_user
-user_logged_in.connect(flask_user_login_event)
-user_registered.connect(flask_user_registered_event)
 user_changed_password.connect(flask_user_changed_password)
+user_logged_in.connect(flask_user_login_event)
+user_password_failed.connect(flask_user_password_failed_event)
+user_registered.connect(flask_user_registered_event)
 user_reset_password.connect(flask_user_changed_password)
 
 
@@ -417,6 +439,7 @@ def capture_next_view_function(real_function):
             session['suspend_initial_queries'] = request.args.get(
                 'suspend_initial_queries')
         return real_function()
+
     return capture_next
 
 
@@ -478,7 +501,7 @@ def next_after_login():
         if preserve_next_across_sessions:
             session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
-        assert(not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
+        assert (not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
         user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
@@ -522,29 +545,35 @@ def next_after_login():
         resp = redirect('/home')
 
     def update_timeout():
-        # make cookie max_age outlast the browser session
-        max_age = 60 * 60 * 24 * 365 * 5
-        # set timeout cookies
-        if session.get('login_as_id'):
-            if request.cookies.get('SS_TIMEOUT'):
-                resp.set_cookie('SS_TIMEOUT_REVERT',
-                                request.cookies['SS_TIMEOUT'],
-                                max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
-        elif request.cookies.get('SS_TIMEOUT_REVERT'):
-            resp.set_cookie('SS_TIMEOUT',
-                            request.cookies['SS_TIMEOUT_REVERT'],
-                            max_age=max_age)
-            resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
-        else:
-            # TODO determine if this line should stay - it seems it
-            # would clear a value potentially set on the browser via
-            # /settings
-            resp.set_cookie('SS_TIMEOUT', '', expires=0)
+        """set inactivity timeout cookie depending on user context"""
 
-    ready_for_login_as_timeout = False
-    if ready_for_login_as_timeout:
-        update_timeout()
+        inactivity_cookie = 'SS_INACTIVITY_TIMEOUT'
+
+        # Login-as limited to 5 mins
+        if session.get('login_as_id'):
+            resp.set_cookie(inactivity_cookie, '300')
+            return
+
+        # Systems (i.e. kiosks) with custom timeout settings
+        custom_system_timeout = request.cookies.get('SS_TIMEOUT')
+        if custom_system_timeout:
+            resp.set_cookie(inactivity_cookie, custom_system_timeout)
+            return
+
+        # Otherwise, use default or max from user's interventions
+        max_found = current_app.config['DEFAULT_INACTIVITY_TIMEOUT']
+
+        for i in Intervention.query.join(UserIntervention).filter(
+                UserIntervention.user_id == user.id).with_entities(
+                Intervention.name):
+            intervention_timeout = current_app.config.get(
+                "{}_TIMEOUT".format(i.name.upper()), 0)
+            max_found = max(max_found, intervention_timeout)
+
+
+        resp.set_cookie(inactivity_cookie, str(max_found))
+
+    update_timeout()
 
     return resp
 
@@ -627,8 +656,8 @@ def logout(prevent_redirect=False, reason=None):
         if ap:
             headers = {
                 'Authorization': 'Bearer {0}'.format(session['remote_token'])}
-            url = "https://graph.facebook.com/{0}/permissions".\
-                format(ap.provider_id)
+            url = "https://graph.facebook.com/{0}/permissions".format(
+                ap.provider_id)
             requests.delete(url, headers=headers)
 
     if user_id:
@@ -649,7 +678,6 @@ def logout(prevent_redirect=False, reason=None):
     if prevent_redirect:
         return
     return redirect('/' if not timed_out else '/?timed_out=1')
-
 
 
 
@@ -931,7 +959,8 @@ def authorize(*args, **kwargs):
     suspend_initial_queries = request.args.get('suspend_initial_queries')
     if suspend_initial_queries:
         session['suspend_initial_queries'] = True
-        current_app.logger.debug("/oauth/authorize told to suspend_initial_queries")
+        current_app.logger.debug(
+            "/oauth/authorize told to suspend_initial_queries")
 
     user = current_user()
     if not user:

@@ -7,6 +7,7 @@ from portal.models.reference import Reference
 from portal.system_uri import US_NPI
 from tests import TEST_USER_ID, TestCase
 
+
 class TestReference(TestCase):
 
     def test_patient(self):

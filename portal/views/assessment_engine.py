@@ -622,9 +622,11 @@ def assessment(patient_id, instrument_id):
                 # todo: migrate towards FHIR spec in persisted data
                 if (
                     'extension' in answer.get('valueCoding', {}) and
-                    not isinstance(answer['valueCoding']['extension'], (tuple, list))
+                    not isinstance(
+                        answer['valueCoding']['extension'], (tuple, list))
                 ):
-                    answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+                    answer['valueCoding']['extension'] = [
+                        answer['valueCoding']['extension']]
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
@@ -764,7 +766,6 @@ def get_assessments():
     if request.args.get('format', 'json') == 'json':
         return jsonify(bundle)
 
-
     return Response(
         generate_qnr_csv(bundle),
         mimetype='text/csv',
@@ -773,6 +774,7 @@ def get_assessments():
                 "attachment;filename=qnr_data-%s.csv" % FHIR_datetime.now()
         }
     )
+
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
@@ -858,7 +860,8 @@ def assessment_update(patient_id):
     # Todo: enforce identifier uniqueness at initial submission
     try:
         existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["identifier"] == updated_qnr["identifier"]
+            QuestionnaireResponse.document["identifier"]
+            == updated_qnr["identifier"]
         ).one()
     # except NoResultException:
     except NoResultFound:
@@ -1365,16 +1368,19 @@ def assessment_add(patient_id):
     qbd = QuestionnaireBank.most_current_qb(
         patient, as_of_date=authored)
     qb = qbd.questionnaire_bank
-    if (qb and qn and (qn.id in [qbq.questionnaire.id
-                       for qbq in qb.questionnaires])):
+    if (
+        qb and qn and
+        (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+    ):
         qnr_qb = qb
     # if a valid qb wasn't found, try the indefinite option
     if not qnr_qb:
-        qbd = QuestionnaireBank.indefinite_qb(
-            patient, as_of_date=authored)
+        qbd = QuestionnaireBank.indefinite_qb(patient, as_of_date=authored)
         qb = qbd.questionnaire_bank
-        if (qb and qn and (qn.id in [qbq.questionnaire.id
-                           for qbq in qb.questionnaires])):
+        if (
+            qb and qn and
+            (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+        ):
             qnr_qb = qb
 
     questionnaire_response = QuestionnaireResponse(
@@ -1439,7 +1445,7 @@ def present_needed():
     # the list of external document ids for reliable resume
     # behavior at external assessment intervention.
     resume_ids = assessment_status.instruments_in_progress(
-            classification='all')
+        classification='all')
     if resume_ids:
         args['resume_identifier'] = resume_ids
 
@@ -1567,14 +1573,13 @@ def present_assessment(instruments=None):
 
     # Temporarily persist entry method until QNR POSTed
     entry_methods = {'paper'}
-    if (
-        'entry_method' in request.args and
-        request.args.get('entry_method') in entry_methods
+    if ('entry_method' in request.args
+        and request.args.get('entry_method') in entry_methods
     ):
         session['entry_method'] = request.args.get('entry_method')
         current_app.logger.debug(
-            'storing session[entry_method]: %s', request.args.get('entry_method')
-        )
+            'storing session[entry_method]: %s',
+            request.args.get('entry_method'))
 
     if 'next' in request.args:
         next_url = request.args.get('next')
@@ -1598,7 +1603,8 @@ def deprecated_present_assessment(instrument_id):
         request.headers.get('Referer'),
     )
 
-    return present_assessment(instruments=[instrument_id,])
+    return present_assessment(instruments=[instrument_id])
+
 
 @assessment_engine_api.route('/complete-assessment')
 @oauth.require_oauth()
@@ -1638,7 +1644,8 @@ def complete_assessment():
         if token.user != current_user():
             continue
 
-        current_app.logger.debug("assessment complete, logging out user: %s", token.user.id)
+        current_app.logger.debug(
+            "assessment complete, logging out user: %s", token.user.id)
         INTERVENTION.ASSESSMENT_ENGINE.client.notify({
             'event': 'logout',
             'user_id': token.user.id,
@@ -1774,14 +1781,16 @@ def patient_assessment_status(patient_id):
     now = datetime.utcnow()
     trace = request.args.get('trace', False)
     if trace:
-        establish_trace("BEGIN trace for assessment-status on {}".format(patient_id))
+        establish_trace(
+            "BEGIN trace for assessment-status on {}".format(patient_id))
     assessment_status = AssessmentStatus(user=patient, as_of_date=now)
     assessment_overall_status = assessment_status.overall_status if assessment_status else None
 
     # indefinite assessments don't affect overall status, but need to
     # be available if unfinished
     outstanding_indefinite_work = len(
-        assessment_status.instruments_needing_full_assessment(classification='indefinite') +
+        assessment_status.instruments_needing_full_assessment(
+            classification='indefinite') +
         assessment_status.instruments_in_progress(classification='indefinite')
     )
 
@@ -1791,8 +1800,10 @@ def patient_assessment_status(patient_id):
         'questionnaires_ids': assessment_status.instruments_needing_full_assessment(
             classification='all'
         ),
-        'resume_ids': assessment_status.instruments_in_progress(classification='all'),
-        'completed_ids': assessment_status.instruments_completed(classfication='all'),
+        'resume_ids': assessment_status.instruments_in_progress(
+            classification='all'),
+        'completed_ids': assessment_status.instruments_completed(
+            classfication='all'),
         'qb_name': assessment_status.qb_name
     }
 

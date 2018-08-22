@@ -17,15 +17,15 @@ class TestAccessUrl(TestCase):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
         onetime = db.session.merge(onetime)
-        response =\
-            self.client.get('/api/user/{}/access_url'.format(onetime.id))
+        response = self.client.get('/api/user/{}/access_url'.format(
+            onetime.id))
         assert response.status_code == 200
 
         # confirm we obtained a valid token
         access_url = response.json['access_url']
         token = access_url.split('/')[-1]
-        is_valid, has_expired, id =\
-                user_manager.token_manager.verify_token(token, 10)
+        is_valid, has_expired, id = user_manager.token_manager.verify_token(
+            token, 10)
         assert is_valid
         assert not has_expired
         assert id == onetime.id

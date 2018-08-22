@@ -19,7 +19,8 @@ class Performer(db.Model):
 
     # nullable due to FHIR inconsistencies in performer attributes
     codeable_concept = db.relationship('CodeableConcept', cascade="save-update")
-    __table_args__ = (UniqueConstraint('reference_txt', 'codeable_concept_id',
+    __table_args__ = (UniqueConstraint(
+        'reference_txt', 'codeable_concept_id',
         name='_reftxt_codeable_concept'),)
 
     def __str__(self):
@@ -97,15 +98,17 @@ class ObservationPerformer(db.Model):
     """Link table for observation to list of performers"""
     __tablename__ = 'observation_performers'
     id = db.Column(db.Integer(), primary_key=True)
-    observation_id = db.Column(db.Integer(), db.ForeignKey('observations.id',
-        ondelete='CASCADE'), nullable=False)
-    performer_id = db.Column(db.Integer(), db.ForeignKey('performers.id',
-        ondelete='CASCADE'), nullable=False)
+    observation_id = db.Column(
+        db.Integer(), db.ForeignKey('observations.id', ondelete='CASCADE'),
+        nullable=False)
+    performer_id = db.Column(
+        db.Integer(), db.ForeignKey('performers.id', ondelete='CASCADE'),
+        nullable=False)
 
-    __table_args__ = (UniqueConstraint('observation_id', 'performer_id',
-        name='_obs_performer'),)
+    __table_args__ = (UniqueConstraint(
+        'observation_id', 'performer_id', name='_obs_performer'),)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "ObservationPerformer {0.observation_id}:{0.performer_id}".\
-                format(self)
+        return "ObservationPerformer {0.observation_id}:{0.performer_id}". \
+            format(self)

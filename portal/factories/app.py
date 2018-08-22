@@ -44,7 +44,10 @@ from ..views.client import client_api
 from ..views.clinical import clinical_api
 from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
-from ..views.extend_flask_user import reset_password_view_function
+from ..views.extend_flask_user import (
+    LockoutLoginForm,
+    reset_password_view_function,
+)
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
@@ -194,6 +197,7 @@ def configure_extensions(app):
     user_manager.init_app(
         app,
         forgot_password_view_function=patch_forgot_password,
+        login_form=LockoutLoginForm,
         send_email_function=patch_send_email,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
@@ -236,15 +240,7 @@ def configure_blueprints(app, blueprints):
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):
-        sql_log_file = '/tmp/sql_log'
-        sql_file_handler = handlers.RotatingFileHandler(
-            sql_log_file, maxBytes=1000000, backupCount=20)
-        sql_file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(thread)d: %(message)s'
-        ))
-        sql_log = logging.getLogger('sqlalchemy.engine')
-        sql_log.setLevel(logging.INFO)
-        sql_log.addHandler(sql_file_handler)
+        import portal.sql_logging
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
     from ..tasks import logger as task_logger

@@ -20,7 +20,6 @@ def log_message(message, app):
 
 email_dispatched.connect(log_message)
 
-
 EMAIL_HEADER = (
     "<!DOCTYPE html><html>"
     "<head><title>TrueNTH email</title><style>"
@@ -119,7 +118,8 @@ class EmailMessage(db.Model):
         if cc_address:
             message.cc.append(cc_address)
         body = self.style_message(self.body)
-        message.html = fill(body, width=280, break_long_words=False, break_on_hyphens=False)
+        message.html = fill(
+            body, width=280, break_long_words=False, break_on_hyphens=False)
         mail.send(message)
 
         user = User.query.filter_by(email='__system__').first()

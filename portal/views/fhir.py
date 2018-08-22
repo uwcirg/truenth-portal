@@ -5,6 +5,7 @@ from ..system_uri import NHHD_291036, TRUENTH_VALUESET_NHHD_291036
 
 fhir_api = Blueprint('fhir_api', __name__, url_prefix='/fhir')
 
+
 @fhir_api.route('/valueset/{}'.format(NHHD_291036))
 def valueset_nhhd_291036():
     """Returns JSON representation of the TrueNTH subset of the valueset
@@ -27,11 +28,12 @@ def valueset_nhhd_291036():
         "resourceType": "ValueSet",
         "id": NHHD_291036,
         "url": TRUENTH_VALUESET_NHHD_291036,
-        "name": ("Indigenous Status as defined by "
-            "Australian Institute of Health and Welfare's "
-            "National Health Data Dictionary 2012 version 1A6 Spec: "
-            "http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824 "
-            "METeOR identifier: 291036"),
+        "name": (
+            "Indigenous Status as defined by Australian Institute of Health "
+            "and Welfare's National Health Data Dictionary 2012 version 1A6 "
+            "Spec: "
+            "http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824"
+            " METeOR identifier: 291036"),
         "meta": {
             "lastUpdated": "2016-11-03T00:00:00.000Z"
         },
@@ -39,7 +41,7 @@ def valueset_nhhd_291036():
             "extension": [
                 {"url": "http://hl7.org/fhir/StructureDefinition/valueset-oid",
                  "valueUri": "urn:oid:2.16.840.1.113883.5.104"
-                }
+                 }
             ],
             "system": TRUENTH_VALUESET_NHHD_291036,
             "caseSensitive": "true",
@@ -55,10 +57,8 @@ def valueset_nhhd_291036():
         ('Neither Aboriginal nor Torres Strait Islander origin', '4'),
         ('Not stated/inadequately described', '9')
     ):
-        concepts.append({"code": value,
-                         "abstract": "false",
-                         "display": name,
-                         "definition": name
-                        })
+        concepts.append(
+            {"code": value, "abstract": "false", "display": name,
+             "definition": name})
 
     return jsonify(**valueset)

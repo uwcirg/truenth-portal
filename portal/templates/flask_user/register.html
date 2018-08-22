@@ -2,9 +2,9 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
-<form id="regForm" action="" method="POST" novalidate class="form to-validate" style="margin-left: 1em">
+<form id="regForm" action="" method="POST" novalidate class="form to-validate">
     <div class="row">
-        <div class="col-md-push-3 col-md-5 col-xs-11">
+        <div class="col-md-push-3 col-md-5 col-xs-12">
              <div class="btn-social-container">
                 <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
                 {{ form.hidden_tag() }}

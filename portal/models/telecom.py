@@ -44,7 +44,6 @@ class ContactPoint(db.Model):
             self.rank = data['rank']
         return self
 
-
     def as_fhir(self):
         d = {}
         d['system'] = self.system
@@ -63,7 +62,6 @@ class Telecom(object):
 
     """
 
-
     def __init__(self, email=None, contact_points=None):
         self.email = email
         self.contact_points = contact_points or []
@@ -80,16 +78,18 @@ class Telecom(object):
             use = item.get('use')
             if system not in cp_sys_list:
                 current_app.logger.warn(
-                    "FHIR contains unexpected telecom system {system}"\
+                    "FHIR contains unexpected telecom system {system}"
                     " ignoring {value}".format(**item))
             elif use and use not in cp_use_list:
                 current_app.logger.warn(
-                    "FHIR contains unexpected telecom use {use}"\
+                    "FHIR contains unexpected telecom use {use}"
                     " ignoring {value}".format(**item))
-            elif any((cp.system == system and
-                        cp.use == use) for cp in telecom.contact_points):
+            elif any(
+                (cp.system == system and cp.use == use)
+                for cp in telecom.contact_points
+            ):
                 current_app.logger.warn(
-                    "FHIR contains multiple telecom entries for "\
+                    "FHIR contains multiple telecom entries for "
                     "{system} ignoring {value}".format(**item))
             else:
                 if system == 'email':

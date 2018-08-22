@@ -1,6 +1,7 @@
 """workarounds to flask_user problems"""
 from __future__ import unicode_literals  # isort:skip
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 
 from urllib.parse import urlsplit, urlunsplit
@@ -61,7 +62,8 @@ def patch_forgot_password():
                 "reset your password.", email=email), 'success')
 
         # Redirect to the login page
-        return redirect(_endpoint_url(user_manager.after_forgot_password_endpoint))
+        return redirect(
+            _endpoint_url(user_manager.after_forgot_password_endpoint))
 
     # Process GET or invalid POST
     return user_manager.render_function(

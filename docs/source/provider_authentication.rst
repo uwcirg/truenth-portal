@@ -68,5 +68,5 @@ To add a new provider you'll need to
 
 1.  Create a new blueprint in ``portal/views/auth.py`` (see the ``google_blueprint`` and ``facebook_blueprint`` as examples and use `Flask-Dance Documentation <https://flask-dance.readthedocs.io/en/latest/>`_ as a reference)
 2.  Update the existing callback API functions ``login()`` and ``provider_oauth_error`` to use your new blueprint (see examples from Google and Facebook blueprints in ``portal/views/auth.py``)
-3.  Create a new class in ``portal/models/flaskdanceprovider.py`` that inherits from FlaskDanceProvider and overrides get_user_info to get user info from the provider (see ``FacebookFlaskDanceProvider`` and ``GoogleFlaskDanceProvider`` for examples)
+3.  Create a new class in ``portal/models/flaskdanceprovider.py`` that inherits from FlaskDanceProvider and overrides send_get_user_json_request( to get user info from the provider (see ``FacebookFlaskDanceProvider`` and ``GoogleFlaskDanceProvider`` for examples)
 4.  Import the class created in #3 into ``portal/views/auth.py`` and create a new instance of it when ``login()`` is called by the new provider (see how ``FacebookFlaskDanceProvider`` and ``GoogleFlaskDanceProvider`` are used in ``login()`` for reference)
