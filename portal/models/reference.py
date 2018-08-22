@@ -113,30 +113,27 @@ class Reference(object):
 
         def get_object_by_identifier(obj, system, value):
             if obj == Organization:
-                query = obj.query.join(OrganizationIdentifier).join(
-                    Identifier).filter(and_(
-                        Organization.id ==
-                        OrganizationIdentifier.organization_id,
-                        Identifier.id ==
-                        OrganizationIdentifier.identifier_id,
+                query = obj.query.join(
+                    OrganizationIdentifier).join(Identifier).filter(and_(
+                        Organization.id
+                        == OrganizationIdentifier.organization_id,
+                        Identifier.id == OrganizationIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
             elif obj == Practitioner:
-                query = obj.query.join(PractitionerIdentifier).join(
-                    Identifier).filter(and_(
-                        Practitioner.id ==
-                        PractitionerIdentifier.practitioner_id,
-                        Identifier.id ==
-                        PractitionerIdentifier.identifier_id,
+                query = obj.query.join(
+                    PractitionerIdentifier).join(Identifier).filter(and_(
+                        Practitioner.id
+                        == PractitionerIdentifier.practitioner_id,
+                        Identifier.id == PractitionerIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
             elif obj == Questionnaire:
-                query = obj.query.join(QuestionnaireIdentifier).join(
-                    Identifier).filter(and_(
+                query = obj.query.join(
+                    QuestionnaireIdentifier).join(Identifier).filter(and_(
                         Questionnaire.id ==
                         QuestionnaireIdentifier.questionnaire_id,
-                        Identifier.id ==
-                        QuestionnaireIdentifier.identifier_id,
+                        Identifier.id == QuestionnaireIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
             else:
