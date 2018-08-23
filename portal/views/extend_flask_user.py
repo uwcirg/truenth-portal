@@ -51,14 +51,18 @@ class LockoutLoginForm(LoginForm):
     def validate(self):
         """prevent locked out users from logging in
 
-        Before verifying the user's credentials
-        check to see if the user is locked out.
-        If the user is locked out display an error
+        If user has exceeded failed attempts, display an error
         message below the password field.
+
         """
+        success = super(LockoutLoginForm, self).validate()
+
         # Find user by email address (email field)
         user_manager = current_app.user_manager
         user = user_manager.find_user_by_email(self.email.data)[0]
+
+        if not success:
+            user.add_password_verification_failure()
 
         # If the user is locked out display a message
         # under the password field
@@ -83,6 +87,4 @@ class LockoutLoginForm(LoginForm):
 
             return False
 
-        # If the user is not locked out proceed with
-        # validating credentials
-        return super(LockoutLoginForm, self).validate()
+        return success

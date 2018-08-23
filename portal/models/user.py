@@ -230,7 +230,7 @@ def validate_email(email):
 
 
 LOCKOUT_PERIOD = timedelta(minutes=30)
-PERMITTED_FAILED_LOGIN_ATTEMPTS = 5
+PERMITTED_FAILED_LOGIN_ATTEMPTS = (5 - 1)  # account for zero index
 
 
 class User(db.Model, UserMixin):
