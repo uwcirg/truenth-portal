@@ -127,18 +127,14 @@ class TestAuth(TestCase):
 
         # Use up all of the permitted login attempts
         for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS):
+            assert not user.is_locked_out
             response = self.local_login(user.email, 'invalidpassword')
             assert response.status_code is 200
 
             db.session.refresh(user)
             assert user.password_verification_failures == (failureIndex + 1)
-            assert not user.is_locked_out
 
-        # Attempt to login with invalid creds
-        response = self.local_login(user.email, 'invalidpassword')
-        assert response.status_code is 200
-
-        # Validate that after another failed attempt
+        # Validate that after using up all permitted attempts
         # the user is locked out
         db.session.refresh(user)
         assert user.is_locked_out
