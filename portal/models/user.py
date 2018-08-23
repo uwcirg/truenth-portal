@@ -710,7 +710,7 @@ class User(db.Model, UserMixin):
             self.reset_lockout()
 
         failures = self.password_verification_failures
-        return failures >= PERMITTED_FAILED_LOGIN_ATTEMPTS
+        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
 
     def reset_lockout(self):
         """resets variables that track lockout
