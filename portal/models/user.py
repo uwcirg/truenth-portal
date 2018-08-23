@@ -230,7 +230,7 @@ def validate_email(email):
 
 
 LOCKOUT_PERIOD = timedelta(minutes=30)
-PERMITTED_FAILED_LOGIN_ATTEMPTS = 5
+PERMITTED_FAILED_LOGIN_ATTEMPTS = (5 - 1)  # account for zero index
 
 
 class User(db.Model, UserMixin):
@@ -710,7 +710,7 @@ class User(db.Model, UserMixin):
             self.reset_lockout()
 
         failures = self.password_verification_failures
-        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+        return failures >= PERMITTED_FAILED_LOGIN_ATTEMPTS
 
     def reset_lockout(self):
         """resets variables that track lockout
