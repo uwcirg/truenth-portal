@@ -43,8 +43,7 @@
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
                      <p class="profile-item-title">{{ _("Register using:")}}</p>
-                    <!-- hiding this temporarily -->
-                    <div class="tnth-hide">
+                    <div class="divider">
                         <a href="{{ url_for('facebook.login', provider_name='facebook', next=request.args.get('next')) }}"
                            class="btn btn-social btn-facebook">
                             <i class="fa fa-facebook"></i>{{_("Log In With Facebook")}}
