@@ -61,12 +61,12 @@ class LockoutLoginForm(LoginForm):
         user_manager = current_app.user_manager
         user = user_manager.find_user_by_email(self.email.data)[0]
 
-        if not success:
+        if user and not success:
             user.add_password_verification_failure()
 
         # If the user is locked out display a message
         # under the password field
-        if user is not None and user.is_locked_out:
+        if user and user.is_locked_out:
             # Make sure validators are run so we
             # can populate self.password.errors
             super(LoginForm, self).validate()
