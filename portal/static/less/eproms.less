@@ -862,6 +862,10 @@ div.footer-wrapper.right-panel {
   display: none;
 }
 #topTerms {
+  .save-info {
+    top: 4px;
+    left: 12px;
+  }
   .well {
     margin-top: 1em;
   }
@@ -1082,6 +1086,28 @@ div.footer-wrapper.right-panel {
     border-top: 1px solid rgba(203, 210, 217, 0.2);
     border-left: 1px solid rgba(203, 210, 217, 0.2);
     font-size: @subheadSize;
+  }
+}
+#dataSavingLoadingIndicator {
+  position: relative;
+  z-index: 5;
+  min-height: 3.5em;
+  background: hsla(0, 0%, 100%, 0.8);
+  margin: 1em 0;
+  padding: 0.5em 0;
+}
+#topTerms, #aboutForm {
+  .save-loader-wrapper {
+    display: none;
+  }
+}
+#iqRefresh {
+  .refresh-icon {
+    margin-right: 8px;
+  }
+  &:hover {
+    cursor: pointer;
+    color: darken(@errorMessageColor, 5%);
   }
 }
 #iqErrorMessage {

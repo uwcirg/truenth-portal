@@ -1,5 +1,23 @@
+{% macro saveLoaderDiv(container_id="") -%}
+    <div class="load-container save-loader-wrapper">
+      <i id="{{container_id}}_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" aria-hidden="true"></i>
+      <i id="{{container_id}}_success" class="fa fa-check success-icon save-info" aria-hidden="true">{{_("Data Saved")}}</i>
+      <i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Save Data. System error.")}}</i>
+    </div>
+{%- endmacro %}
+{% macro sectionContent(sectionId, title) -%}
+    <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true">
+      <div class="content">
+          <div class="heading"><h3 class="tnth-headline">{{title}}</h3></div>
+          <div class="content-body">
+              {{ caller() }}
+          </div>
+      </div>
+      {{saveLoaderDiv(sectionId)}}
+    </div>
+{%- endmacro %}
 {% macro tou(terms, user) -%}
-    <div id="topTerms" class="hide-terms">
+    <div id="topTerms" class="section-container hide-terms">
         <br/>
         <div class="terms-of-use-intro">
           <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
@@ -12,7 +30,7 @@
               {{ terms['asset']|safe if terms}}
             </div>
             <div id="termsExpand" class="tnth-hide">
-              <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
+              <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Termsƒ") }}</a>
             </div>
             <div id="termsCheckbox_default" class="tnth-hide">
               {% trans privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true" %}
@@ -66,6 +84,7 @@
                       data-url="{{tou_url}}"/>
                 </label>
               </div>
+              {{saveLoaderDiv("topTerms")}}
             </div>
             <br/>
         </div>
@@ -186,7 +205,7 @@
   {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup" data-profile-section-id="demo">
-        <div class="col-md-5 col-sm-6 col-xs-10">
+        <div id="firstNameContainer" class="col-md-5 col-sm-6 col-xs-10">
           <div class="form-group float-input-label">
             <label>Name</label>
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}" v-model="demo.data.name.given" lazy />
@@ -194,7 +213,7 @@
           </div>
         </div>
         <div class="col-md-5 col-sm-6 col-xs-10">
-          <div class="form-group float-input-label">
+          <div id="lastNameContainer" class="form-group float-input-label">
             <label>&nbsp;</label>
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" v-model="demo.data.name.family" lazy/>
             <div class="help-block with-errors"></div>
@@ -202,7 +221,6 @@
         </div>
     </div>
   {%- endmacro %}
-
   {% macro rolesGroup() -%}
       <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist">
           <div class="radio">
@@ -216,8 +234,9 @@
             </label>
           </div>
       </div>
+      {{saveLoaderDiv("rolesGroup")}}
       <div class="get-roles-error error-message"></div>
-      <div class="put-roles-error error-message"></div>
+      <div class="put-roles-error  error-message"></div>
   {%- endmacro %}
   {% macro dobGroup() -%}
       <div id="bdGroup" data-profile-section-id="demo">
@@ -249,8 +268,8 @@
                 <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" aria-label="Birth year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-trigger-event="change" data-error="{{_('The birth year is required and must be in valid format')}}" v-model="demo.data.birthYear" lazy required />
               </div>
             </div>
-            <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>
-            <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
+            <div class="help-block with-errors"></div>
+            <span id="errorbirthday" class="help-block tnth-hide custom-error"></span>
         </div>
       </div>
   {%- endmacro %}
@@ -368,6 +387,7 @@
             </div>
           </div>
         </div>
+        {{saveLoaderDiv("patientQ")}}
         <br/>
         <div class="get-clinical-error error-message"></div>
         <div class="put-clinical-error error-message"></div>

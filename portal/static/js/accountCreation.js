@@ -393,9 +393,10 @@
         };
         this.getOrgs = function(callback, params) {
             var self = this;
-            self.attempts++;
             callback = callback || function() {};
+            $("#clinicsLoader").removeClass("tnth-hide");
             tnthAjax.getOrgs(self.userId, params, function(data) {
+                $("#clinicsLoader").addClass("tnth-hide");
                 if (!data) {
                     callback.call(self, {"error": i18next.t("no data returned")});
                     return false;

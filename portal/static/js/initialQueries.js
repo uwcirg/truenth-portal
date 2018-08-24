@@ -228,7 +228,7 @@
         };
     };
 
-    FieldsChecker.prototype.postDemoData = function() {
+    FieldsChecker.prototype.postDemoData = function(targetField) {
         var demoArray = {}, tnthAjax = this.__getDependency("tnthAjax");
         demoArray.resourceType = "Patient";
         var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
@@ -237,7 +237,8 @@
         if (y && m && d) {
             demoArray.birthDate = y + "-" + m + "-" + d;
         }
-        tnthAjax.putDemo(this.userId, demoArray);
+        tnthAjax.putDemo(this.userId, demoArray, targetField);
+        this.handlePostEvent(this.getSectionContainerId(targetField));
     };
 
     FieldsChecker.prototype.initEvent = function(field) {
@@ -256,8 +257,6 @@
             $(fields).each(function() {
                 if (events[subSectionId]) {
                     events[subSectionId]([$(this)]);
-                } else {
-                    return true;
                 }
             });
         }
@@ -509,16 +508,26 @@
         return completed;
     };
 
+    FieldsChecker.prototype.scrollTo = function(element) {
+        if (!element) {
+            return;
+        }
+        setTimeout(function() {
+            $("html, body").stop().animate({
+                scrollTop: $(element).offset().top
+            }, 1500);
+        }(), 500);
+    };
+
     FieldsChecker.prototype.continueToFinish = function() {
         if ($("div.reg-complete-container").hasClass("inactive")) {
             return false;
         }
         this.setProgressBar();
         $("#buttonsContainer").addClass("continue");
+        $("#aboutForm").show();
         $("div.reg-complete-container").fadeIn();
-        $("html, body").stop().animate({
-            scrollTop: $("div.reg-complete-container").offset().top
-        }, 1500);
+        this.scrollTo($("div.reg-complete-container"));
         $("#next").attr("disabled", true).removeClass("open");
         $("#iqErrorMessage").text("");
         $("#updateProfile").removeAttr("disabled").addClass("open");
@@ -536,16 +545,13 @@
         if (sectionId) {
             this.setProgressBar(sectionId);
         }
+        if ($("#"+sectionId).closest("aboutForm").length) {
+            $("aboutForm").show();
+        }
         $("#buttonsContainer").removeClass("continue");
         $("div.reg-complete-container").fadeOut();
         $("#next").removeAttr("disabled").addClass("open");
-        if (!$("#next").isOnScreen()) {
-            setTimeout(function() {
-                $("html, body").stop().animate({
-                    scrollTop: $("#next").offset().top
-                }, 1500);
-            }(), 500);
-        }
+        this.scrollTo($("#next"));
         $("#updateProfile").attr("disabled", true).removeClass("open");
     };
 
@@ -611,18 +617,9 @@
         var self = this;
         /****** prep work after initializing incomplete fields -set visuals e.g. top terms ************************/
         self.constructProgressBar();
-        var i18next = self.__getDependency("i18next");
-        $("#queriesForm").validator().on("submit", function(e) {
-            if (e.isDefaultPrevented()) {
-                $("#iqErrorMessage").text(i18next.t("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid."));
-            } else {
-                $("#updateProfile").hide();
-                $("#next").hide();
-                $(".loading-message-indicator").show();
-                setTimeout(function() {
-                    self.postDemoData();
-                }, 250);
-            }
+
+        $("#iqRefresh").on("click", function() {
+            window.location.reload();
         });
         /*** event for the next button ***/
         $("#next").on("click", function() {
@@ -653,8 +650,10 @@
         } else {
             if (!self.sectionCompleted("topTerms")) {
                 self.handleIncomplete("topTerms");
+                $("#topTerms").append(self.getSavingDataIndicatorHTML());
             } else {
                 $("#aboutForm").removeClass("full-size");
+                $("#aboutForm").append(self.getSavingDataIndicatorHTML());
                 self.getNext();
                 $("#aboutForm").fadeIn();
                 if ($("#aboutForm").length === 0 || self.allFieldsCompleted()) {
@@ -667,18 +666,87 @@
         }, 500);
     };
 
-    FieldsChecker.prototype.handlePostEvent = function(sectionId) {
-        if (sectionId) {
-            if (this.allFieldsCompleted()) {
-                this.continueToFinish();
-            } else {
-                if (this.sectionCompleted(sectionId)) {
-                    this.continueToNext(sectionId);
-                } else {
-                    this.stopContinue(sectionId);
-                }
-            }
+    FieldsChecker.prototype.getSectionContainerId = function(field) {
+        return $(field).closest(".section-container").attr("id");
+    };
+
+    FieldsChecker.prototype.getSavingDataIndicatorHTML = function() {
+        var i18next = this.__getDependency("i18next");
+        return "<div id='dataSavingLoadingIndicator' class='tnth-hide'><i class='fa fa-spinner fa-spin'></i> {text}</div>".replace("{text}", i18next.t("saving data..."));
+    };
+
+    FieldsChecker.prototype.handleRefreshElement = function(sectionId) {
+        if ($("#iqRefresh").length) {
+            return;
         }
+        var i18next = this.__getDependency("i18next");
+        $("#"+sectionId).append("<div id='iqRefresh' class='error-message tnth-hide'><i class='fa fa-refresh refresh-icon' aria-hidden='true'></i><span>{text}</span></div>".replace("{text}", i18next.t("Try Again")));
+        $("#iqRefresh").on("click", function() {
+            window.location.reload();
+        });
+    };
+
+    FieldsChecker.prototype.isSavingInProgress = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        var loadingInProgress = false;
+        $("#"+sectionId).find(".save-loader-wrapper").each(function() {
+            if (!loadingInProgress && $(this).hasClass("loading")) {
+                loadingInProgress = true;
+                return false;
+            }
+        });
+        return loadingInProgress;
+    };
+
+    FieldsChecker.prototype.handlePostEvent = function(sectionId) {
+        var self = this, elapsedSaveTime = 0;
+        window.startDataSavingTime = new Date();
+        window.endDataSavingTime = new Date();
+        if (this.sectionCompleted(sectionId)) {
+            $("#dataSavingLoadingIndicator").removeClass("tnth-hide");
+            this.scrollTo($("#dataSavingLoadingIndicator"));
+        }
+        clearInterval(window.dataSavingIntervalId);
+        window.dataSavingIntervalId = setInterval(function() {
+            window.endDataSavingTime = new Date();
+            elapsedSaveTime = window.endDataSavingTime - window.startDataSavingTime;
+            elapsedSaveTime  /= 1000;
+            var loadingInProgress = self.isSavingInProgress(sectionId);
+            if (!loadingInProgress || (elapsedSaveTime  >= 10)) {
+                setTimeout(function() {
+                    $("#dataSavingLoadingIndicator").addClass("tnth-hide");
+                }, 50);
+                window.startDataSavingTime = 0;
+                window.endDataSavingTime = 0;
+                elapsedSaveTime  = 0;
+                clearInterval(window.dataSavingIntervalId);
+                var hasError = false;
+                $("#" + sectionId + " .error-message").each(function() { //check for errors
+                    hasError = hasValue($(this).text());
+                    if (hasError) {
+                        self.stopContinue(sectionId);
+                        self.handleRefreshElement();
+                        $("#iqRefresh").removeClass("tnth-hide");
+                        return false;
+                    }
+                });
+                if (hasError || !sectionId) {
+                    return false;
+                }
+                $("#iqRefresh").addClass("tnth-hide");
+                if (self.allFieldsCompleted()) { //all sections finished
+                    self.continueToFinish();
+                    return true;
+                }
+                if (self.sectionCompleted(sectionId)) { //current section completed
+                    self.continueToNext(sectionId);
+                    return;
+                }
+                self.stopContinue(sectionId);
+            }
+        }, 100);
     };
 
     FieldsChecker.prototype.updateTerms = function(data) {
@@ -770,7 +838,7 @@
                                 theTerms["organization_id"] = topOrg;
                             }
                         }
-                        tnthAjax.postTerms(theTerms); // Post terms agreement via API
+                        tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
                     });
                 }
                 // Update UI
@@ -801,15 +869,7 @@
                         }
                     });
                 }
-            }
-
-            if (__self.sectionCompleted("topTerms")) {
-                $("#aboutForm").fadeIn();
-            }
-            if (__self.allFieldsCompleted()) {
-                __self.continueToFinish();
-            } else {
-                __self.continueToNext("topTerms");
+                __self.handlePostEvent(__self.getSectionContainerId($(this)));
             }
         };
         $("#topTerms label.terms-label").each(function() { //account for the fact that some terms items are hidden as child elements to a label
@@ -839,11 +899,8 @@
         var self = this;
         fields.forEach(function(item) {
             $(item).on(self.getFieldEventType(item), function() {
-                self.handlePostEvent("demographicsContainer");
-            });
-            $(item).on("blur", function() {
                 if ($(this).val() !== "") {
-                    self.postDemoData();
+                    self.postDemoData($(this));
                 }
             });
         });
@@ -855,14 +912,12 @@
             $(item).on(self.getFieldEventType(item), function() {
                 var d = $("#date"), m = $("#month"), y = $("#year");
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
-                if (isValid) {
-                    $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                    $("#errorbirthday").text("").hide();
-                    self.postDemoData();
-                    self.handlePostEvent("demographicsContainer");
-                } else {
-                    self.stopContinue("demographicsContainer");
+                if (!isValid) {
+                    return false;
                 }
+                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                $("#errorbirthday").text("").hide();
+                self.postDemoData($(this));
             });
         });
     };
@@ -873,7 +928,8 @@
             $(item).on("click", function() {
                 var roles = [], theVal = $(this).val();
                 roles.push({name: theVal});
-                tnthAjax.putRoles(self.userId,{"roles": roles});
+                tnthAjax.putRoles(self.userId,{"roles": roles}, $("#rolesGroup"));
+                self.handlePostEvent(self.getSectionContainerId($(this)));
                 if (theVal === "patient") {
                     $("#clinicalContainer").attr("skipped", "false");
                     $("#orgsContainer").attr("skipped", "false");
@@ -891,7 +947,6 @@
                         $(".bd-optional").show();
                     }
                 }
-                self.handlePostEvent("demographicsContainer");
             });
         });
     };
@@ -928,7 +983,7 @@
                 } else {
                     thisItem.parents(".pat-q").nextAll().fadeOut();
                 }
-                self.handlePostEvent("clinicalContainer");
+                self.handlePostEvent(self.getSectionContainerId($(this)));
 
             });
         });
@@ -983,10 +1038,16 @@
                     } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
                         return true;
                     } else {
-                        self.continueToFinish();
+                        self.handlePostEvent(self.getSectionContainerId($(this)));
                     }
                 }
             });
+        });
+        $("#stateSelector").on("change", function() {
+            if (!$(this).val()) {
+                return;
+            }
+            self.scrollTo($("#clinics .state-selector-container.selector-show"));
         });
         /*** event for consent popups **/
         $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
@@ -995,7 +1056,7 @@
                     $("#userOrgs input[name='organization']").each(function() {
                         $(this).removeAttr("data-require-validate");
                     });
-                    self.continueToFinish();
+                    self.handlePostEvent(self.getSectionContainerId($(this)));
                 }
             });
         });
@@ -1011,7 +1072,7 @@
          * note: need to delay gathering incomplete fields to allow fields to be render
          */
         if ($("#aboutForm").length > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
-            var fc = new window.FieldsChecker({
+            var fc = window.fc = new window.FieldsChecker({
                 i18next: i18next,
                 tnthAjax: tnthAjax,
                 orgTool: new OrgTool(),
@@ -1020,6 +1081,7 @@
             fc.init(function() {
                 fc.startTime = new Date();
                 DELAY_LOADING = true; /*global DELAY_LOADING */
+                clearInterval(fc.intervalId);
                 fc.intervalId = setInterval(function() {
                     fc.endTime = new Date();
                     var elapsedTime = fc.endTime - fc.startTime;

@@ -135,6 +135,7 @@ body {
     min-height: 8px;
   }
 }
+
 .form-control,
 input,
 select,
@@ -775,6 +776,28 @@ div.right-panel {
     margin-left: 0.8em;
   }
 }
+.iq-container {
+  #bdGroup {
+    .with-errors {
+      margin-top: 1em;
+      padding-left: 1em;
+    }
+    .custom-error {
+      margin-top: 1em;
+      padding-left: 1em;
+      color: @errorMessageColor;
+    }
+  }
+}
+#iqRefresh {
+  .refresh-icon {
+    margin-right: 8px;
+  }
+  &:hover {
+    cursor: pointer;
+    color: darken(@errorMessageColor, 5%);
+  }
+}
 #iqFooterWrapper.footerWrapper {
   display: none;
   border-top: solid 1px #eee;
@@ -839,6 +862,15 @@ div.right-panel {
       background-color: #55b776;
     }
   }
+}
+
+#dataSavingLoadingIndicator {
+  position: relative;
+  z-index: 5;
+  min-height: 3.5em;
+  background: hsla(0, 0%, 100%, 0.8);
+  margin: 1em 0;
+  padding: 0.5em 0;
 }
 
 .orglist-download-container {
@@ -3325,6 +3357,9 @@ div.timezone-warning.text-warning {
     .terms-checkbox-container {
       margin-left: 1em;
     }
+    .save-info {
+      left: 1em;
+    }
   }
   #termsText {
     padding: 1em;
@@ -3396,6 +3431,11 @@ div.timezone-warning.text-warning {
     #emailGroup {
       margin-top: 1em;
     }
+  }
+}
+#topTerms, #aboutForm {
+  .save-loader-wrapper {
+    display: none;
   }
 }
 @media (min-width: 1200px) {
