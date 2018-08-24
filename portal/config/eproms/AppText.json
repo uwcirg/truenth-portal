@@ -11,11 +11,6 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=09bb5690-d49b-a10e-5339-e677353e694f&editorUrl=true",
-      "name": "IRONMAN organization consent URL",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true",
       "name": "IRONMAN organization website consent URL",
       "resourceType": "AppText"
@@ -157,7 +152,12 @@
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34",
-      "name": "patient reminder email",
+      "name": "patient reminder email IRONMAN",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea",
+      "name": "patient reminder email TrueNTH Global Registry",
       "resourceType": "AppText"
     },
     {

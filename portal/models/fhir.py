@@ -28,6 +28,8 @@ from .performer import Performer
 from .reference import Reference
 
 """ TrueNTH Clinical Codes """
+
+
 class ClinicalConstants(object):
 
     def __iter__(self):
@@ -81,7 +83,9 @@ class ClinicalConstants(object):
             value='false', units='boolean').add_if_not_found(True)
         return value_quantity
 
+
 CC = ClinicalConstants()
+
 
 class EncounterConstants(object):
     """ TrueNTH Encounter type Codes
@@ -111,6 +115,17 @@ class EncounterConstants(object):
             system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
             code='phone',
             display='Information collected over telephone system',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def INTERVIEW_ASSISTED(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='interview_assisted',
+            display='Information collected in-person',
         ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
         assert coding in cc.codings
@@ -147,9 +162,9 @@ class ValueQuantity(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        components = ','.join([str(x) for x in
-                               (self.value, self.units, self.system,
-                               self.code) if x is not None])
+        components = ','.join(
+            [str(x) for x in (self.value, self.units, self.system, self.code)
+             if x is not None])
         return "ValueQuantity " + components
 
     def as_fhir(self):
@@ -172,8 +187,8 @@ class ValueQuantity(db.Model):
             return self
 
         lookup_value = self.value and str(self.value) or None
-        match = self.query.filter_by(value=lookup_value,
-                units=self.units, system=self.system).first()
+        match = self.query.filter_by(
+            value=lookup_value, units=self.units, system=self.system).first()
         if not match:
             db.session.add(self)
             if commit_immediately:
@@ -188,16 +203,15 @@ class Observation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     issued = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(80))
-    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'),
-                                   nullable=False)
-    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
-                                 nullable=False)
+    codeable_concept_id = db.Column(
+        db.ForeignKey('codeable_concepts.id'), nullable=False)
+    value_quantity_id = db.Column(
+        db.ForeignKey('value_quantities.id'), nullable=False)
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
-    performers = db.relationship('Performer', lazy='dynamic',
-                                 cascade="save-update",
-                                 secondary="observation_performers",
-                                 backref=db.backref('observations'))
+    performers = db.relationship(
+        'Performer', lazy='dynamic', cascade="save-update",
+        secondary="observation_performers", backref=db.backref('observations'))
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -223,7 +237,8 @@ class Observation(db.Model):
 
     def update_from_fhir(self, data):
         if 'issued' in data:
-            issued = FHIR_datetime.parse(data['issued']) if data['issued'] else None
+            issued = FHIR_datetime.parse(data['issued']) if data[
+                'issued'] else None
             setattr(self, 'issued', issued)
         if 'status' in data:
             setattr(self, 'status', data['status'])
@@ -272,10 +287,10 @@ class Observation(db.Model):
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                       nullable=False)
-    observation_id = db.Column(db.ForeignKey('observations.id'),
-                              nullable=False)
+    user_id = db.Column(db.ForeignKey(
+        'users.id', ondelete='CASCADE'), nullable=False)
+    observation_id = db.Column(
+        db.ForeignKey('observations.id'), nullable=False)
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
@@ -291,33 +306,35 @@ class UserObservation(db.Model):
 class UserIndigenous(db.Model):
     __tablename__ = 'user_indigenous'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-        name='_indigenous_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_indigenous_user_coding'),)
 
 
 class UserEthnicity(db.Model):
     __tablename__ = 'user_ethnicities'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-        name='_ethnicity_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_ethnicity_user_coding'),)
+
 
 class UserRace(db.Model):
     __tablename__ = 'user_races'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
-                        nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
-        name='_race_user_coding'),)
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_race_user_coding'),)
+
 
 class QuestionnaireResponse(db.Model):
 
@@ -360,8 +377,8 @@ class QuestionnaireResponse(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
-                "{0.status} {0.authored}".format(self)
+        return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
+               "{0.status} {0.authored}".format(self)
 
 
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
@@ -378,7 +395,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
-            QuestionnaireResponse.authored.desc())
+        QuestionnaireResponse.authored.desc())
 
     if instrument_ids:
         instrument_filters = (
@@ -387,7 +404,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             ].astext.endswith(instrument_id)
             for instrument_id in instrument_ids
         )
-        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
+        questionnaire_responses = questionnaire_responses.filter(
+            or_(*instrument_filters))
 
     patient_fields = ("careProvider", "identifier")
 
@@ -420,7 +438,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
                 ),
             }
 
-        annotated_questionnaire_responses.append(questionnaire_response.document)
+        annotated_questionnaire_responses.append(
+            questionnaire_response.document)
 
     bundle = {
         'resourceType': 'Bundle',
@@ -469,6 +488,7 @@ def generate_qnr_csv(qnr_bundle):
 
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
+
         def __init__(self):
             self.reset()
             self.strict = False
@@ -499,6 +519,7 @@ def generate_qnr_csv(qnr_bundle):
             else:
                 return identifier['value']
         return None
+
     def get_site(qnr_data):
         """Return name of first organization, else None"""
         try:
@@ -521,12 +542,13 @@ def generate_qnr_csv(qnr_bundle):
         # Exit early if assumptions not met
         if (
             len(answers) % 2 or
-            answer_types.count('valueCoding') != answer_types.count('valueString')
+            answer_types.count('valueCoding')
+                != answer_types.count('valueString')
         ):
             return answers
 
         filtered_answers = []
-        for pair in zip(*[iter(answers)]*2):
+        for pair in zip(*[iter(answers)] * 2):
             # Sort so first pair is always valueCoding
             pair = sorted(pair, key=lambda k: k.keys()[0])
             coded_answer, string_answer = pair
@@ -540,8 +562,9 @@ def generate_qnr_csv(qnr_bundle):
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
         if (
-            'type' in qnr_data['encounter'] and
-            'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+                'type' in qnr_data['encounter'] and
+                'paper' in (c.get('code') for c in
+                            qnr_data['encounter']['type'])
         ):
             return 'enter manually - paper'
         if row_data.get('truenth_subject_id') == row_data.get('author_id'):
@@ -554,7 +577,8 @@ def generate_qnr_csv(qnr_bundle):
             row_data.get('truenth_subject_id') == row_data.get('author_id') or
             (
                 'type' in qnr_data['encounter'] and
-                'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+                'paper' in
+                (c.get('code') for c in qnr_data['encounter']['type'])
             )
         ):
             return 'Subject'
@@ -623,7 +647,8 @@ def generate_qnr_csv(qnr_bundle):
 
                             # Add supplementary text added earlier
                             # Todo: lookup option text from stored Questionnaire
-                            'option_text': strip_tags(answer['valueCoding'].get('text', None)),
+                            'option_text': strip_tags(
+                                answer['valueCoding'].get('text', None)),
                             'other_text': None,
                         })
                     row_data.update(answer_data)
@@ -639,6 +664,7 @@ def generate_qnr_csv(qnr_bundle):
                     row.append('"' + column + '"')
 
                 yield ','.join(row) + '\n'
+
 
 def parse_concepts(elements, system):
     """recursive function to build array of concepts from nested structure"""
@@ -660,6 +686,7 @@ def fetch_HL7_V3_Namespace(valueSet):
     load = response.text
     return parse_concepts(response.json()['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
+
 
 def fetch_local_valueset(valueSet):
     """Pull and parse the named valueSet from our local definition"""
@@ -696,9 +723,12 @@ def add_static_concepts(only_quick=False):
         if not encounter_type in db.session():
             db.session.add(encounter_type)
 
-    for concept in LocaleConstants(): pass # looping is adequate
-    for concept in TxStartedConstants(): pass  # looping is adequate
-    for concept in TxNotStartedConstants(): pass  # looping is adequate
+    for concept in LocaleConstants():
+        pass  # looping is adequate
+    for concept in TxStartedConstants():
+        pass  # looping is adequate
+    for concept in TxNotStartedConstants():
+        pass  # looping is adequate
 
 
 def v_or_n(value):

@@ -1,6 +1,7 @@
 """Unit test module for portal views"""
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import tempfile
@@ -21,10 +22,16 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import User, get_user
-from tests import TEST_USER_ID, TestCase
+from tests import (
+    OAUTH_INFO_PROVIDER_LOGIN,
+    TEST_USER_ID,
+    TestCase
+)
+
 
 class TestPortal(TestCase):
     """Portal view tests"""
+
     def test_card_html(self):
         """Interventions can customize the button text """
         client = self.add_client()
@@ -49,8 +56,8 @@ class TestPortal(TestCase):
         intervention = INTERVENTION.DECISION_SUPPORT_P3P
         intervention.public_access = True  # make the card avail for the test
         client.intervention = intervention
-        ui = UserIntervention(user_id=TEST_USER_ID,
-                              intervention_id=intervention.id)
+        ui = UserIntervention(
+            user_id=TEST_USER_ID, intervention_id=intervention.id)
         ui.card_html = "<b>Bold Card Text</b>"
         ui.link_label = "Custom User Label"
         ui.link_url = 'http://example.com/?test=param1'
@@ -71,16 +78,18 @@ class TestPortal(TestCase):
         assert ui.link_label in response.get_data(as_text=True)
         assert ui.link_url in response.get_data(as_text=True)
         intervention = db.session.merge(intervention)
-        assert (intervention.display_for_user(user).link_label
-                in response.get_data(as_text=True))
+        assert (
+            intervention.display_for_user(user).link_label
+            in response.get_data(as_text=True))
 
     def test_staff_html(self):
         """Interventions can customize the staff text """
         client = self.add_client()
         intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
-        ui = UserIntervention(user_id=TEST_USER_ID,
-                              intervention_id=intervention.id)
+        ui = UserIntervention(
+            user_id=TEST_USER_ID,
+            intervention_id=intervention.id)
         ui.staff_html = "Custom text for <i>staff</i>"
         with SessionScope(db):
             db.session.add(ui)
@@ -93,8 +102,7 @@ class TestPortal(TestCase):
 
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
-        self.app.config['PATIENT_LIST_ADDL_FIELDS'] = [
-            'reports']
+        self.app.config['PATIENT_LIST_ADDL_FIELDS'] = ['reports']
         response = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
@@ -117,9 +125,10 @@ class TestPortal(TestCase):
 
         # now give just the test user access
         intervention = db.session.merge(intervention)
-        ui = UserIntervention(user_id=TEST_USER_ID,
-                              intervention_id=intervention.id,
-                              access="granted")
+        ui = UserIntervention(
+            user_id=TEST_USER_ID,
+            intervention_id=intervention.id,
+            access="granted")
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
@@ -152,17 +161,18 @@ class TestPortal(TestCase):
         db.session.commit()
 
         self.login()
-        postdata = { 'subject': 'unittest subject',
-                'recipients': 'test_user@yahoo.com test_user@uw.edu',
-                'body': "Ode to joy" }
+        postdata = {
+            'subject': 'unittest subject',
+            'recipients': 'test_user@yahoo.com test_user@uw.edu',
+            'body': "Ode to joy"}
         response = self.client.post('/invite', data=postdata,
                                     follow_redirects=True)
         assert "Email Invite Sent" in response.get_data(as_text=True)
 
     def test_message_sent(self):
         """Email invites - test view for sent messages"""
-        sent_at = datetime.strptime("2000/01/01 12:31:00",
-                "%Y/%m/%d %H:%M:%S")
+        sent_at = datetime.strptime(
+            "2000/01/01 12:31:00", "%Y/%m/%d %H:%M:%S")
         message = EmailMessage(
             subject='a subject', user_id=TEST_USER_ID,
             sender="testuser@email.com",
@@ -264,34 +274,47 @@ class TestPortalEproms(TestCase):
 
         client = self.add_client()
         client_url = client._redirect_uris
-        local_url = "http://{}/home?test".format(self.app.config.get('SERVER_NAME'))
+        local_url = "http://{}/home?test".format(
+            self.app.config.get('SERVER_NAME'))
         invalid_url = 'http://invalid.org'
 
         # validate redirect of /website-consent-script GET
-        response = self.client.get('/website-consent-script/{}?redirect_url='
-                             '{}'.format(TEST_USER_ID, local_url))
+        response = self.client.get(
+            '/website-consent-script/{}'.format(TEST_USER_ID),
+            query_string={'redirect_url': local_url}
+        )
         assert response.status_code == 200
 
-        response2 = self.client.get('/website-consent-script/{}?redirect_url='
-                              '{}'.format(TEST_USER_ID, invalid_url))
+        response2 = self.client.get(
+            '/website-consent-script/{}'.format(TEST_USER_ID),
+            query_string={'redirect_url': invalid_url}
+        )
         assert response2.status_code == 401
 
-        # validate redirect of /login/<provider> GET
-        response3 = self.client.get('/login/TESTING?user_id={}&next='
-                              '{}'.format(TEST_USER_ID, client_url),
-                              follow_redirects=True)
+        # validate session login redirect with valid url
+        oauth_info = {
+            'user_id': TEST_USER_ID,
+            'next': client_url,
+        }
+        response3 = self.login(oauth_info=oauth_info)
         assert response3.status_code == 200
 
-        response4 = self.client.get('/login/TESTING?user_id={}&next='
-                              '{}'.format(TEST_USER_ID, invalid_url),
-                              follow_redirects=True)
+        # validate session login redirect with invalid url
+        oauth_info['next'] = invalid_url
+        response4 = self.login(oauth_info=oauth_info)
         assert response4.status_code == 401
+
+        # validate provider login redirect with invalid url
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['next'] = invalid_url
+        response5 = self.login(oauth_info=oauth_info)
+        assert response5.status_code == 401
 
         # validate redirect of /challenge POST
         formdata = {'user_id': TEST_USER_ID, 'next_url': local_url}
-        response5 = self.client.post('/challenge', data=formdata)
-        assert response5.status_code == 200
+        response6 = self.client.post('/challenge', data=formdata)
+        assert response6.status_code == 200
 
         formdata['next_url'] = invalid_url
-        response6 = self.client.post('/challenge', data=formdata)
-        assert response6.status_code == 401
+        response7 = self.client.post('/challenge', data=formdata)
+        assert response7.status_code == 401

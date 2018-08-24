@@ -391,8 +391,8 @@ def clinical_set(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    if not request.json or 'resourceType' not in request.json or\
-            request.json['resourceType'] != 'Observation':
+    if (not request.json or 'resourceType' not in request.json
+            or request.json['resourceType'] != 'Observation'):
         abort(400, "Requires FHIR resourceType of 'Observation'")
     audit = Audit(
         user_id=current_user().id, subject_id=patient.id,

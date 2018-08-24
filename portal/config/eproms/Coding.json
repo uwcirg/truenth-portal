@@ -5965,6 +5965,12 @@
       "system": "http://us.truenth.org/encounter-types"
     },
     {
+      "code": "interview_assisted",
+      "display": "Information collected in-person",
+      "resourceType": "Coding",
+      "system": "http://us.truenth.org/encounter-types"
+    },
+    {
       "code": "1",
       "display": "Aboriginal but not Torres Strait Islander origin",
       "resourceType": "Coding",

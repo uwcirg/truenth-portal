@@ -21,7 +21,6 @@ from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
 from ..extensions import (
-    authomatic,
     babel,
     mail,
     oauth,
@@ -35,12 +34,20 @@ from ..models.coredata import configure_coredata
 from ..models.role import ROLE
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
-from ..views.auth import auth, capture_next_view_function
+from ..views.auth import (
+    auth,
+    capture_next_view_function,
+    facebook_blueprint,
+    google_blueprint,
+)
 from ..views.client import client_api
 from ..views.clinical import clinical_api
 from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
-from ..views.extend_flask_user import reset_password_view_function
+from ..views.extend_flask_user import (
+    LockoutLoginForm,
+    reset_password_view_function,
+)
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
@@ -71,8 +78,10 @@ DEFAULT_BLUEPRINTS = (
     clinical_api,
     csrf_blueprint,
     demographics_api,
+    facebook_blueprint,
     fhir_api,
     filters_blueprint,
+    google_blueprint,
     group_api,
     identifier_api,
     intervention_api,
@@ -188,14 +197,12 @@ def configure_extensions(app):
     user_manager.init_app(
         app,
         forgot_password_view_function=patch_forgot_password,
+        login_form=LockoutLoginForm,
         send_email_function=patch_send_email,
         make_safe_url_function=patch_make_safe_url,
         reset_password_view_function=reset_password_view_function,
         register_view_function=capture_next_view_function(register),
         login_view_function=capture_next_view_function(login))
-
-    # authomatic - OAuth lib between Portal and other external IdPs
-    authomatic.init_app(app)
 
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
@@ -233,15 +240,7 @@ def configure_blueprints(app, blueprints):
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.config.get('LOG_SQL'):
-        sql_log_file = '/tmp/sql_log'
-        sql_file_handler = handlers.RotatingFileHandler(
-            sql_log_file, maxBytes=1000000, backupCount=20)
-        sql_file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(thread)d: %(message)s'
-        ))
-        sql_log = logging.getLogger('sqlalchemy.engine')
-        sql_log.setLevel(logging.INFO)
-        sql_log.addHandler(sql_file_handler)
+        import portal.sql_logging
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
     from ..tasks import logger as task_logger

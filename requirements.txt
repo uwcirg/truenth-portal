@@ -3,16 +3,15 @@
 --no-binary billiard,cffi,psycopg2
 
 alabaster==0.7.11         # via sphinx
-alembic==1.0.0           # via flask-migrate
+alembic==1.0.0            # via flask-migrate
 amqp==2.3.2               # via kombu
-authomatic==0.1.0.post1
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.4             # via flask-user
-beautifulsoup4==4.6.1     # via webtest
+beautifulsoup4==4.6.3     # via webtest
 billiard==3.5.0.4         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
-certifi==2018.4.16        # via requests
+certifi==2018.8.13        # via requests
 cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
 click==6.7                # via flask
@@ -22,6 +21,7 @@ docutils==0.14            # via sphinx
 dogpile.cache==0.6.7      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.11.2
+flask-dance[sqla]==1.0.0
 git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache
 flask-login==0.4.1        # via flask-user
 flask-mail==0.9.1         # via flask-user
@@ -32,13 +32,13 @@ flask-session==0.3.1
 flask-sqlalchemy==2.3.2
 flask-swagger==0.2.13
 flask-testing==0.7.1
-flask-user==0.6.21 # pyup: <0.7 # pin until 1.0 is ready for prod
+git+https://github.com/uwcirg/Flask-User.git@v0.6.21.1#egg=flask-user==0.6.21.1 # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-webtest==0.0.9
 flask-wtf==0.14.2         # via flask-user
 flask==1.0.2
 functools32==3.2.3.post2;python_version < '3'
 future==0.16.0
-fuzzywuzzy==0.16.0
+fuzzywuzzy==0.17.0
 gunicorn==19.8.1
 idna==2.7                 # via requests
 imagesize==1.0.0          # via sphinx
@@ -58,7 +58,7 @@ polib==1.1.0
 psycopg2==2.7.5
 py==1.5.4                 # via tox
 pycparser==2.18           # via cffi
-pycryptodome==3.6.4       # via flask-user
+pycryptodome==3.6.6       # via flask-user
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.0          # via packaging
 python-dateutil==2.7.3
@@ -68,19 +68,19 @@ python-memcached==1.59    # via flask-dogpile-cache
 pytz==2018.5              # via babel, celery
 pyyaml==3.13              # via flask-swagger, swagger-spec-validator
 redis==2.10.6
-regex==2018.06.21
+regex==2018.08.17
 requests-cache==0.4.13
 requests-oauthlib==1.0.0  # via flask-oauthlib
 requests==2.19.1          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
-selenium==3.13.0
+selenium==3.14.0
 six==1.11.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.1
-sphinx==1.7.6
+sphinx==1.7.7
 sphinxcontrib-websupport==1.1.0  # via sphinx
-sqlalchemy==1.2.10         # via alembic, flask-sqlalchemy
+sqlalchemy==1.2.11         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.3.1
-tox==3.1.2
+tox==3.2.1
 typing==3.6.4             # via sphinx
 urllib3==1.23             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again

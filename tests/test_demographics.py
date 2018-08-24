@@ -23,6 +23,7 @@ from tests import (
     TestCase,
 )
 
+
 class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
@@ -92,13 +93,14 @@ class TestDemographics(TestCase):
                     }],
                 "extension": [{
                     "url":
-                    "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                        "http://hl7.org/fhir/StructureDefinition/us-core-race",
                     "valueCodeableConcept": {
                         "coding": [{
                             "system": "http://hl7.org/fhir/v3/Race",
                             "code": "1096-7"}]}},
                     {"url":
-                     "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                        "http://hl7.org/fhir/StructureDefinition/us-core-"
+                        "ethnicity",
                      "valueCodeableConcept": {
                          "coding": [{
                              "system": "http://hl7.org/fhir/v3/Ethnicity",
@@ -109,12 +111,13 @@ class TestDemographics(TestCase):
                     {"reference": "api/organization/{}".format(org2_id)},
                     {"reference": "Practitioner/{}".format(pract_id)},
                 ]
-               }
+                }
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(data))
 
         assert response.status_code == 200
         fhir = response.json
@@ -139,8 +142,8 @@ class TestDemographics(TestCase):
         assert 2 == len([ext for ext in fhir['extension']
                          if 'valueCodeableConcept' in ext])
         assert 3 == len(fhir['careProvider'])
-        assert Reference.practitioner(pract_id).as_fhir()\
-            in fhir['careProvider']
+        assert (
+            Reference.practitioner(pract_id).as_fhir() in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         assert user._email.startswith('__no_email__')
@@ -156,10 +159,10 @@ class TestDemographics(TestCase):
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
-        ap_fb = AuthProvider(provider='facebook', provider_id='fb-123',
-                             user_id=TEST_USER_ID)
-        ap_g = AuthProvider(provider='google', provider_id='google-123',
-                             user_id=TEST_USER_ID)
+        ap_fb = AuthProvider(
+            provider='facebook', provider_id='fb-123', user_id=TEST_USER_ID)
+        ap_g = AuthProvider(
+            provider='google', provider_id='google-123', user_id=TEST_USER_ID)
         with SessionScope(db):
             db.session.add(ap_fb)
             db.session.add(ap_g)
@@ -172,12 +175,12 @@ class TestDemographics(TestCase):
 
         # put a study identifier
         study_id = {
-            "system":"http://us.truenth.org/identity-codes/external-study-id",
-            "use":"secondary","value":"Test Study Id"}
+            "system": "http://us.truenth.org/identity-codes/external-study-id",
+            "use": "secondary", "value": "Test Study Id"}
         fhir['identifier'].append(study_id)
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(fhir))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(fhir))
         user = User.query.get(TEST_USER_ID)
         assert len(user.identifiers) == 5
 
@@ -209,7 +212,7 @@ class TestDemographics(TestCase):
                         "system": 'email',
                         'value': 'updated@email.com'
                     }],
-               }
+                }
 
         self.login()
         response = self.client.put(
@@ -238,14 +241,12 @@ class TestDemographics(TestCase):
         assert user._email == NO_EMAIL_PREFIX
 
     def test_demographics_bad_dob(self):
-        data = {"resourceType": "Patient",
-                "birthDate": '10/20/1980'
-               }
+        data = {"resourceType": "Patient", "birthDate": '10/20/1980'}
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 400
 
     def test_demographics_list_names(self):
@@ -257,9 +258,9 @@ class TestDemographics(TestCase):
             ]}
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
         assert response.status_code == 200
         user = User.query.get(TEST_USER_ID)
         assert user.last_name == 'family'
@@ -269,12 +270,12 @@ class TestDemographics(TestCase):
         # reference clinic must exist or expect a 400
         data = {"careProvider": [{"reference": "Organization/1"}],
                 "resourceType": "Patient",
-               }
+                }
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 400
         assert 'Reference' in response.get_data(as_text=True)
@@ -294,14 +295,14 @@ class TestDemographics(TestCase):
             db.session.commit()
 
         data = {"careProvider": [{"reference": "Organization/{}".format(
-                org_id)}],
-                "resourceType": "Patient",
-               }
+            org_id)}],
+            "resourceType": "Patient",
+        }
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         user = db.session.merge(self.test_user)
@@ -334,13 +335,13 @@ class TestDemographics(TestCase):
 
         # now push only the first org in via the api
         data = {"careProvider": [{"reference": "Organization/{}".format(
-                org_id)}],
-                "resourceType": "Patient",
-               }
+            org_id)}],
+            "resourceType": "Patient",
+        }
 
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         user = db.session.merge(self.test_user)
@@ -369,18 +370,18 @@ class TestDemographics(TestCase):
             first_name="Indiana", last_name="Jones", id_value='practval')
 
         data = {"careProvider": [
-                    {"reference": "Organization/{}?system={}".format(
-                        org_id_value, org_id_system)},
-                    {"reference": "Practitioner/{}?system={}".format(
-                        'practval', US_NPI)}
-                ],
-                "resourceType": "Patient",
-               }
+            {"reference": "Organization/{}?system={}".format(
+                org_id_value, org_id_system)},
+            {"reference": "Practitioner/{}?system={}".format(
+                'practval', US_NPI)}
+        ],
+            "resourceType": "Patient",
+        }
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         user, pract = map(db.session.merge, (self.test_user, pract))
@@ -400,9 +401,9 @@ class TestDemographics(TestCase):
         # Attempt to add the top-level org should raise
         self.login()
         data = {"careProvider": [{"reference": "Organization/{}".format(
-                top)}],
-                "resourceType": "Patient",
-               }
+            top)}],
+            "resourceType": "Patient",
+        }
 
         response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
@@ -427,12 +428,12 @@ class TestDemographics(TestCase):
                         "system": 'email',
                         'value': '__no_email__'
                     }]
-               }
+                }
 
         self.login()
-        response = self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                content_type='application/json',
-                data=json.dumps(data))
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(data))
 
         assert response.status_code == 200
         fhir = response.json
@@ -458,7 +459,8 @@ class TestDemographics(TestCase):
         with SessionScope(db):
             db.session.add(d_audit)
             db.session.commit()
-        self.test_user, d_audit = map(db.session.merge, (self.test_user, d_audit))
+        self.test_user, d_audit = map(
+            db.session.merge, (self.test_user, d_audit))
         self.test_user.deceased = d_audit
         self.login()
         data = {"resourceType": "Patient",

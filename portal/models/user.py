@@ -5,7 +5,7 @@ from future import standard_library # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import StringIO
 import time
 
@@ -17,7 +17,7 @@ from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
 import regex
-from sqlalchemy import UniqueConstraint, and_, or_, text
+from sqlalchemy import UniqueConstraint, and_, or_, text, func
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
@@ -86,8 +86,7 @@ class UserEthnicityExtension(CCExtension):
     def __init__(self, user, extension):
         self.user, self.extension = user, extension
 
-    extension_url =\
-        "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
+    extension_url = "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
 
     @property
     def children(self):
@@ -98,8 +97,7 @@ class UserRaceExtension(CCExtension):
     def __init__(self, user, extension):
         self.user, self.extension = user, extension
 
-    extension_url =\
-        "http://hl7.org/fhir/StructureDefinition/us-core-race"
+    extension_url = "http://hl7.org/fhir/StructureDefinition/us-core-race"
 
     @property
     def children(self):
@@ -231,6 +229,10 @@ def validate_email(email):
         raise BadRequest("requires a valid email address")
 
 
+LOCKOUT_PERIOD = timedelta(minutes=30)
+PERMITTED_FAILED_LOGIN_ATTEMPTS = (5 - 1)  # account for zero index
+
+
 class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
@@ -269,6 +271,10 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
+
+    password_verification_failures = \
+        db.Column(db.Integer, default=0, nullable=False)
+    last_password_verification_failure = db.Column(db.DateTime, nullable=True)
 
     user_audits = db.relationship('Audit', cascade='delete',
                                   foreign_keys=[Audit.user_id])
@@ -484,7 +490,7 @@ class User(db.Model, UserMixin):
             pass
         else:
             self._email = email
-        assert(self._email and len(self._email))
+        assert (self._email and len(self._email))
 
     def email_ready(self):
         """Returns (True, None) IFF user has valid email and necessary criteria
@@ -595,6 +601,7 @@ class User(db.Model, UserMixin):
         :returns: list of implicit identifiers
 
         """
+
         def primary():
             return [Identifier(
                 use='official', system=TRUENTH_ID, value=self.id)]
@@ -602,7 +609,8 @@ class User(db.Model, UserMixin):
         def secondary():
             if self.username:
                 return [Identifier(
-                    use='secondary', system=TRUENTH_USERNAME, value=self._email)]
+                    use='secondary', system=TRUENTH_USERNAME,
+                    value=self._email)]
             return []
 
         def providers():
@@ -661,7 +669,8 @@ class User(db.Model, UserMixin):
         to establish which should be visible to the user"""
 
         def locale_name_from_code(locale_code):
-            coding = Coding.query.filter_by(system=IETF_LANGUAGE_TAG, code=locale_code).first()
+            coding = Coding.query.filter_by(
+                system=IETF_LANGUAGE_TAG, code=locale_code).first()
             return coding.display
 
         locale_options = {}
@@ -671,15 +680,64 @@ class User(db.Model, UserMixin):
             for locale in org.locales:
                 locale_options[locale.code] = locale.display
             if org.default_locale and org.default_locale not in locale_options:
-                locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
+                locale_options[org.default_locale] = locale_name_from_code(
+                    org.default_locale)
             while org.partOf_id:
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
                     locale_options[locale.code] = locale.display
                 if org.default_locale and org.default_locale not in locale_options:
-                    locale_options[org.default_locale] = locale_name_from_code(org.default_locale)
+                    locale_options[org.default_locale] = locale_name_from_code(
+                        org.default_locale)
 
         return locale_options
+
+    @property
+    def is_locked_out(self):
+        """tells if user is temporarily locked out
+
+        To slow down brute force password attacks we temporarily
+        lock users out of the system for a short period of time.
+        This property tells whether or not the user is locked out.
+        """
+        if self.password_verification_failures == 0:
+            return False
+
+        # If we're not in the lockout window reset everything
+        time_since_last_failure = \
+            datetime.utcnow() - self.last_password_verification_failure
+        if time_since_last_failure >= LOCKOUT_PERIOD:
+            self.reset_lockout()
+
+        failures = self.password_verification_failures
+        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+
+    def reset_lockout(self):
+        """resets variables that track lockout
+
+        We track when the user fails password verification
+        to lockout users when they fail too many times.
+        This function resets those variables
+        """
+        self.password_verification_failures = 0
+        self.last_password_verification_failure = None
+        db.session.commit()
+
+    def add_password_verification_failure(self):
+        """remembers when a user fails password verification
+
+        Each time a user fails password verification
+        this function is called. Use user.is_locked_out
+        to tell whether this has been called enough times
+        to lock the user out of the system
+
+        :returns: total failures since last reset
+        """
+        self.last_password_verification_failure = datetime.utcnow()
+        self.password_verification_failures += 1
+        db.session.commit()
+
+        return self.password_verification_failures
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
@@ -734,8 +792,9 @@ class User(db.Model, UserMixin):
                            system=v.get('system'),
                            code=v.get('code')).add_if_not_found(True)
 
-        issued = fhir.get('issued') and\
-            parser.parse(fhir.get('issued')) or None
+        issued = (
+            fhir.get('issued') and
+            parser.parse(fhir.get('issued')) or None)
         status = fhir.get('status')
         observation = self.save_observation(cc, vq, audit, status, issued)
         if 'performer' in fhir:
@@ -841,7 +900,8 @@ class User(db.Model, UserMixin):
                     [o.id for o in matching_obs]),
                 UserObservation.audit_id == Audit.id)).order_by(
                 Audit.timestamp.desc()).first()
-            bestmatch = [o for o in matching_obs if o.id == newest.observation_id][0]
+            bestmatch = [
+                o for o in matching_obs if o.id == newest.observation_id][0]
         else:
             bestmatch = matching_obs[0]
 
@@ -924,6 +984,7 @@ class User(db.Model, UserMixin):
         :return: JSON representation of a FHIR Patient resource
 
         """
+
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
@@ -1005,9 +1066,9 @@ class User(db.Model, UserMixin):
             for existing_consent in self.valid_consents:
                 if existing_consent.organization_id == int(
                         consent.organization_id):
-                    current_app.logger.debug("deleting matching consent {} "
-                                             "replacing with {} ".format(
-                                                 existing_consent, consent))
+                    current_app.logger.debug(
+                        "deleting matching consent {} replacing with {} ".
+                        format(existing_consent, consent))
                     delete_consents.append(existing_consent)
 
             consent.audit = audit
@@ -1080,10 +1141,12 @@ class User(db.Model, UserMixin):
             change their own org affiliations.
 
             """
-            if (not acting_user.has_role(ROLE.ADMIN.value)
+            if (
+                not acting_user.has_role(ROLE.ADMIN.value)
                 and (acting_user.has_role(ROLE.STAFF.value)
                      or acting_user.has_role(ROLE.STAFF_ADMIN.value))
-                    and user.id == acting_user.id):
+                and user.id == acting_user.id
+            ):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
             return True
@@ -1116,7 +1179,7 @@ class User(db.Model, UserMixin):
         # reuse update_roles() by including the current set now that input
         # has been validated
         self.update_roles(
-            role_list=role_list+self.roles, acting_user=acting_user)
+            role_list=role_list + self.roles, acting_user=acting_user)
 
     def delete_roles(self, role_list, acting_user):
         """Delete one or more roles from user's existing roles
@@ -1272,7 +1335,8 @@ class User(db.Model, UserMixin):
                 try:
                     new_id = Identifier.from_fhir(identifier)
                     if new_id in seen:
-                        abort(400, 'Duplicate identifiers found, should be unique set')
+                        abort(400, 'Duplicate identifiers found, should be '
+                                   'unique set')
                     seen.append(new_id)
                 except KeyError as e:
                     abort(400, "{} field not found for identifier".format(e))
@@ -1325,8 +1389,9 @@ class User(db.Model, UserMixin):
                     abort(400, "email address already in use")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
-            self.phone = telecom_cps.get(('phone', 'mobile')) \
-                or telecom_cps.get(('phone', None))
+            self.phone = (
+                telecom_cps.get(('phone', 'mobile'))
+                or telecom_cps.get(('phone', None)))
             self.alt_phone = telecom_cps.get(('phone', 'home'))
         if fhir.get('communication'):
             for e in fhir['communication']:
@@ -1342,11 +1407,11 @@ class User(db.Model, UserMixin):
             # of serial form
             if self.id and self.id != fhir['id']:
                 raise ValueError(
-                    "unexpected, non-matching 'id' found in FHIR for {}".format(self))
+                    "unexpected, non-matching 'id' found in FHIR for {}"
+                    .format(self))
             self.id = fhir['id']
 
         return self
-
 
     @classmethod
     def column_names(cls):
@@ -1360,7 +1425,7 @@ class User(db.Model, UserMixin):
         For example, users are created when invited by staff to participate,
         and when the same user later opts to register, a second account
         is generated during the registration process (either by flask-user
-        or other mechanisms like add_authomatic_user).
+        or other mechanisms like add_user).
 
         NB - caller MUST manage email due to unique constraints
 
@@ -1388,8 +1453,8 @@ class User(db.Model, UserMixin):
             if relationship == 'roles':
                 # We don't copy over the roles used to mark the weak account
                 append_list = [
-                    item for item in other_entity if item not in self_entity
-                    and item.name not in
+                    item for item in other_entity
+                    if item not in self_entity and item.name not in
                     current_app.config['PRE_REGISTERED_ROLES']]
             elif relationship == '_identifiers':
                 # Don't copy internal identifiers
@@ -1445,7 +1510,7 @@ class User(db.Model, UserMixin):
         other_id can't be found, otherwise raise a 401
 
         """
-        assert(permission in ('view', 'edit'))  # limit vocab for now
+        assert (permission in ('view', 'edit'))  # limit vocab for now
         if self.id == other_id:
             return True
         try:
@@ -1510,9 +1575,8 @@ class User(db.Model, UserMixin):
                 if orgtree.at_or_below_ids(sa_org.id, others_ids):
                     return True
 
-        if self.has_role(
-                ROLE.INTERVENTION_STAFF.value) and other.has_role(
-                ROLE.PATIENT.value):
+        if (self.has_role(ROLE.INTERVENTION_STAFF.value)
+                and other.has_role(ROLE.PATIENT.value)):
             # Intervention staff can access patients within that intervention
             for intervention in self.interventions:
                 if intervention in other.interventions:
@@ -1575,8 +1639,8 @@ class User(db.Model, UserMixin):
 
         if self == acting_user:
             raise ValueError("can't delete self")
-        if self is None or acting_user is None:
-            raise ValueError("both user and acting_user must be well defined")
+        if not acting_user:
+            raise ValueError("delete requires well defined acting_user")
 
         # Don't allow deletion of users with client applications
         clients = Client.query.filter_by(user_id=self.id)
@@ -1605,16 +1669,51 @@ class User(db.Model, UserMixin):
         Token.query.filter_by(user_id=self.id).delete()
         db.session.commit()
 
+    def reactivate_user(self, acting_user):
+        """Reactivate a previously deleted user
 
-def add_authomatic_user(authomatic_user, image_url):
+        This method clears the deleted status - by removing the link from
+        the user to the audit recording the delete.  Audit itself is retained
+        for tracking purposes, and a new one will be created for posterity
+
+        :param self: user to reactivate
+        :param acting_user: individual executing the command, for audit trail
+
+        """
+        if not self.deleted:
+            raise ValueError("can't reactivate active user")
+        if self == acting_user:
+            raise ValueError("can't reactivate self")
+        if not acting_user:
+            raise ValueError("reactivate requires well defined acting_user")
+
+        # The email was masked during delete.  Need to confirm a user didn't
+        # sneak in with the same address while deleted.  The accessor returns
+        # the unmasked value.
+        unmasked = self.email
+        if User.query.filter(func.lower(User.email) == unmasked.lower()).count() > 0:
+            raise ValueError(
+                "A new account with same email {} in conflict. "
+                "Can't reactivate".format(unmasked))
+
+        # Circumvent restriction on editing deleted user attributes
+        super(User, self).__setattr__('deleted', None)
+
+        self.active = True
+        self._email = unmasked
+        db.session.commit()
+
+
+def add_user(user_info):
     """Given the result from an external IdP, create a new user"""
     user = User(
-        first_name=authomatic_user.first_name,
-        last_name=authomatic_user.last_name,
-        birthdate=authomatic_user.birth_date,
-        gender=authomatic_user.gender,
-        email=authomatic_user.email,
-        image_url=image_url)
+        first_name=user_info.first_name,
+        last_name=user_info.last_name,
+        birthdate=user_info.birthdate,
+        gender=user_info.gender,
+        email=user_info.email,
+        image_url=user_info.image_url
+    )
     db.session.add(user)
     return user
 
@@ -1625,7 +1724,7 @@ class RoleError(ValueError):
 
 def add_role(user, role_name):
     role = Role.query.filter_by(name=role_name).first()
-    assert(role)
+    assert (role)
     # don't allow promotion of service users
     if user.has_role(ROLE.SERVICE.value):
         raise RoleError("service accounts can't be promoted")
@@ -1666,11 +1765,14 @@ def get_user(uid):
         return User.query.get(uid)
 
 
-def get_user_or_abort(uid):
+def get_user_or_abort(uid, allow_deleted=False):
     """Wraps `get_user` and raises error if not found
 
     Safe to call with path or parameter info.  Confirms integer value before
     attempting lookup.
+
+    :param uid: integer value for user id to look up
+    :param allow_deleted: set true to allow access to deleted users
 
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: w/o a uid
 
@@ -1678,7 +1780,7 @@ def get_user_or_abort(uid):
         an integer, or if no matching user
 
     :raises :py:exc:`werkzeug.exceptions.Forbidden`: if the named user has
-        been deleted
+        been deleted, unless `allow_deleted` is set
 
     :returns: user if valid and found
 
@@ -1693,7 +1795,7 @@ def get_user_or_abort(uid):
     user = get_user(user_id)
     if not user:
         raise NotFound("User not found")
-    if user.deleted:
+    if not allow_deleted and user.deleted:
         raise Forbidden("deleted user - operation not permitted")
     return user
 
@@ -1778,8 +1880,8 @@ class UserRelationship(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "{0.relationship} between {0.user_id} and "\
-            "{0.other_user_id}".format(self)
+        return ("{0.relationship} between {0.user_id} and {0.other_user_id}"
+            .format(self))
 
     def as_json(self):
         """serialize the relationship - used to preserve service users"""

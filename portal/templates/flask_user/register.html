@@ -2,9 +2,9 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
-<form id="regForm" action="" method="POST" novalidate class="form to-validate" style="margin-left: 1em">
+<form id="regForm" action="" method="POST" novalidate class="form to-validate">
     <div class="row">
-        <div class="col-md-push-3 col-md-5 col-xs-11">
+        <div class="col-md-push-3 col-md-5 col-xs-12">
              <div class="btn-social-container">
                 <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
                 {{ form.hidden_tag() }}
@@ -45,14 +45,14 @@
                      <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <!-- hiding this temporarily -->
                     <div class="tnth-hide">
-                        <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
+                        <a href="{{ url_for('facebook.login', provider_name='facebook', next=request.args.get('next')) }}"
                            class="btn btn-social btn-facebook">
                             <i class="fa fa-facebook"></i>{{_("Log In With Facebook")}}
                         </a>
                     </div>
                     <div class="divider"></div>
                     <div>
-                        <a href="{{ url_for('auth.login', provider_name='google', next=request.args.get('next')) }}"
+                        <a href="{{ url_for('google.login', provider_name='google', next=request.args.get('next')) }}"
                            class="btn btn-social btn-google">
                             <i class="fa fa-google"></i>{{_("Log In With Google")}}
                         </a>

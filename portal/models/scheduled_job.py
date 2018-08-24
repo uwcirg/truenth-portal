@@ -70,12 +70,11 @@ class ScheduledJob(db.Model):
     def crontab_schedule(self):
         svals = self.schedule.split()
         return crontab(
-                       minute=svals[0],
-                       hour=svals[1],
-                       day_of_month=svals[2],
-                       month_of_year=svals[3],
-                       day_of_week=svals[4]
-                      )
+            minute=svals[0],
+            hour=svals[1],
+            day_of_month=svals[2],
+            month_of_year=svals[3],
+            day_of_week=svals[4])
 
     def trigger(self):
         from .. import tasks

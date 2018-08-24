@@ -1,6 +1,7 @@
 """Unit test module for user document logic"""
 from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
+
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import os
@@ -49,9 +50,9 @@ class TestUserDocument(TestCase):
         assert (response.json['user_documents'][0]['uploaded_at']
                 == FHIR_datetime.as_fhir(now))
 
-
     def test_post_patient_report(self):
-        #tests whether we can successfully post a patient report -type user doc file
+        # tests whether we can successfully post a patient report -type
+        # user doc file
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY
         create_service_token(client=client, user=get_user(TEST_USER_ID))
@@ -64,7 +65,8 @@ class TestUserDocument(TestCase):
             data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
 
         assert response.status_code == 200
-        udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
+        udoc = db.session.query(UserDocument).order_by(
+            UserDocument.id.desc()).first()
         fpath = os.path.join(
             current_app.root_path, current_app.config.get("FILE_UPLOAD_DIR"),
             str(udoc.uuid))
@@ -85,7 +87,8 @@ class TestUserDocument(TestCase):
             data={'file': (BytesIO(test_contents), 'udoc_test.pdf')})
         assert response.status_code == 200
 
-        udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
+        udoc = db.session.query(UserDocument).order_by(
+            UserDocument.id.desc()).first()
         response = self.client.get('/api/user/{}/user_documents/{}'.format(
             TEST_USER_ID, udoc.id))
         assert response.status_code == 200

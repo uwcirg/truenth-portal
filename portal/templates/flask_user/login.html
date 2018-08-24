@@ -4,7 +4,7 @@
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, render_submit_field %}
 <br/><br/><div class="divider"></div>
 <div id="loginForm" class="row">
-    <div class="col-md-push-2 col-md-8 col-xs-11">
+    <div class="col-md-push-2 col-md-8 col-xs-12">
         <div class="btn-social-container">
             <form action="" method="POST" class="form" role="form">
                 {{ form.hidden_tag() }}
@@ -19,7 +19,7 @@
             </form>
             {% if user_manager.enable_forgot_password %}
                 <div class="divider">
-                    <a href="{{ url_for('user.forgot_password') }}"><small>{%trans%}Having trouble logging in?{%endtrans%}</small></a>
+                    <span class="text-muted"><a href="{{ url_for('user.forgot_password') }}">{%trans%}Having trouble logging in?{%endtrans%}</a></span>
                 </div>
             {% endif %}
             <br/>
@@ -31,7 +31,7 @@
         <div id="socialMediaLoginContainer">
             <div class="btn-social-container">
                 <div>
-                    <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+                    <a href="{{ url_for('facebook.login', provider_name='facebook') }}"
                        class="btn btn-social btn-facebook">
                         <i class="fa fa-facebook"></i>
                        {{_("Login With Facebook")}}
@@ -39,7 +39,7 @@
                 </div>
                 <div class="divider"></div>
                 <div>
-                    <a href="{{ url_for('auth.login', provider_name='google') }}"
+                    <a href="{{ url_for('google.login', provider_name='google') }}"
                        class="btn btn-social btn-google">
                         <i class="fa fa-google"></i>
                         {{_("Login With Google")}}

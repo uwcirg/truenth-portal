@@ -10,6 +10,7 @@ from portal.models.role import ROLE
 from portal.system_uri import US_NPI
 from tests import TestCase
 
+
 class TestPractitioner(TestCase):
     """Practitioner model and view tests"""
 
@@ -168,7 +169,8 @@ class TestPractitioner(TestCase):
         pract = self.add_practitioner(first_name="John", last_name="Watson")
         pract.phone = '555-1234'
         pract.email = 'test1@notarealsite.com'
-        pract2 = self.add_practitioner(first_name="Indiana", last_name="Jones", id_value='testval')
+        pract2 = self.add_practitioner(
+            first_name="Indiana", last_name="Jones", id_value='testval')
         pract, pract2 = map(db.session.merge, (pract, pract2))
         pract_id = pract.id
         pract2_id = pract2.id

@@ -1,5 +1,6 @@
 """Unit test module for auth"""
 from __future__ import unicode_literals  # isort:skip
+from collections import namedtuple
 import datetime
 
 from flask import url_for
@@ -8,23 +9,28 @@ import pytest
 from werkzeug.exceptions import Unauthorized
 
 from portal.extensions import db
-from portal.models.auth import Token, create_service_token
+from portal.models.auth import (
+    AuthProvider,
+    Token,
+    create_service_token,
+)
 from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import (
+    LOCKOUT_PERIOD,
+    PERMITTED_FAILED_LOGIN_ATTEMPTS,
     RoleError,
     User,
     UserRelationship,
-    add_authomatic_user,
     add_role,
+    add_user,
 )
-from tests import TEST_USER_ID, TestCase
-
-
-class AuthomaticMock(object):
-    """Simple container for mocking Authomatic response"""
-    pass
+from tests import (
+    OAUTH_INFO_PROVIDER_LOGIN,
+    TEST_USER_ID,
+    TestCase,
+)
 
 
 class TestAuth(TestCase):
@@ -50,6 +56,135 @@ class TestAuth(TestCase):
         assert response.status_code == 302
         new_user = User.query.filter_by(username=data['email']).first()
         assert new_user.active is True
+
+    def test_local_login_valid_username_and_password(self):
+        """login through the login form"""
+        # Create a user
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Attempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Validate login was successful
+        assert response.status_code is 200
+        assert user.password_verification_failures == 0
+
+    def test_local_login_failure_increments_lockout(self):
+        """login through the login form"""
+        # Create a user
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Attempt to login with an invalid password
+        response = self.local_login(user.email, 'invalidpassword')
+
+        # Verify there was a password failure
+        db.session.refresh(user)
+        assert user.password_verification_failures == 1
+
+    def test_local_login_valid_username_and_password_resets_lockout(self):
+        """login through the login form"""
+        # Create a user
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Mock a failed password attempt
+        user.add_password_verification_failure()
+        assert user.password_verification_failures == 1
+
+        # Atempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Verify lockout was reset
+        db.session.refresh(user)
+        assert user.password_verification_failures == 0
+
+    def test_local_login_lockout_after_unsuccessful_attempts(self):
+        """login through the login form"""
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Use up all of the permitted login attempts
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS):
+            response = self.local_login(user.email, 'invalidpassword')
+            assert response.status_code is 200
+
+            db.session.refresh(user)
+            assert user.password_verification_failures == (failureIndex + 1)
+            assert not user.is_locked_out
+
+        # Validate that after using up all permitted attempts
+        # the next is locked out
+        response = self.local_login(user.email, 'invalidpassword')
+        db.session.refresh(user)
+        assert user.is_locked_out
+
+    def test_local_login_verify_lockout_resets_after_lockout_period(self):
+        """login through the login form"""
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Lock the user out
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+            user.add_password_verification_failure()
+
+        # Verify the user is locked out
+        assert user.is_locked_out
+
+        # Move time to the end of the lockout period
+        user.last_password_verification_failure = \
+            datetime.datetime.utcnow() - LOCKOUT_PERIOD
+
+        # Verify we are no longer locked out
+        assert not user.is_locked_out
+
+    def test_local_login_verify_cant_login_when_locked_out(self):
+        """login through the login form"""
+        email = 'localuser@test.com'
+        password = 'Password1'
+        user = self.add_user(
+            username='username',
+            email=email,
+            password=password
+        )
+
+        # Lock the user out
+        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+            user.add_password_verification_failure()
+
+        assert user.is_locked_out
+
+        # Atempt to login with valid creds
+        response = self.local_login(user.email, password)
+
+        # Verify the user is still locked out
+        assert user.is_locked_out
 
     def test_register_now(self):
         """Initiate process to register exiting account"""
@@ -115,25 +250,6 @@ class TestAuth(TestCase):
 
         client = Client.query.get('test_client')
         assert client.callback_url != invalid_url
-
-    def test_unicode_name(self):
-        """Test insertion of unicode name via add_authomatic_user"""
-        # Bug with unicode characters in a google user's name
-        # mock an authomatic class:
-
-        authomatic_user = AuthomaticMock()
-        authomatic_user.name = 'Test User'
-        authomatic_user.first_name = 'Test'
-        authomatic_user.last_name = 'Bugn\xed'
-        authomatic_user.birth_date = None
-        authomatic_user.gender = 'male'
-        authomatic_user.email = 'test@test.org'
-
-        new_user = add_authomatic_user(authomatic_user, None)
-
-        user = User.query.filter_by(email='test@test.org').first()
-        assert user.last_name == 'Bugn\xed'
-        assert new_user == user
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
@@ -233,3 +349,135 @@ class TestAuth(TestCase):
         assert validate_origin(client_url)
         assert validate_origin(local_url)
         assert pytest.raises(Unauthorized, validate_origin, invalid_url)
+
+    def test_oauth_with_new_auth_provider_and_new_user(self):
+        # Login using the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify a new user was created
+        user = User.query.filter_by(
+            email=OAUTH_INFO_PROVIDER_LOGIN['email']
+        ).first()
+        assert user
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+    def test_oauth_with_new_auth_provider_and_new_user_unicode_name(self):
+        # Set a unicode name
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['last_name'] = 'Bugn\xed'
+
+        # Login using the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify a new user was created
+        user = User.query.filter_by(
+            last_name=OAUTH_INFO_PROVIDER_LOGIN['last_name']
+        ).first()
+        assert user
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+        pass
+
+    def test_oauth_with_new_auth_provider_and_existing_user(self):
+        # Create the user
+        user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Login through the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+        # Verify a new auth provider was created
+        assert AuthProvider.query.filter_by(
+            provider=OAUTH_INFO_PROVIDER_LOGIN['provider_name'],
+            provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
+            user_id=user.id,
+        ).first()
+
+    def test_oauth_with_existing_auth_provider_and_existing_user(self):
+        # Create the user
+        user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Create the auth provider
+        add_auth_provider(OAUTH_INFO_PROVIDER_LOGIN, user)
+
+        # Login through the test backdoor
+        response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+    def test_oauth_when_mock_provider_fails_to_get_user_json(self):
+        # Make the mock provider fail to get user json
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info['fail_to_get_user_json'] = True
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify 500
+        assert response.status_code == 500
+
+    def test_oauth_when_non_required_value_undefined(self):
+        # Make the mock provider fail to get user json
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        del oauth_info['birthdate']
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify the response returned successfully
+        assert response.status_code == 200
+
+    def test_oauth_when_required_value_undefined(self):
+        # Make the mock provider fail to get user json
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        del oauth_info['provider_id']
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info)
+
+        # Verify 500
+        assert response.status_code == 500
+
+    def test_oauth_with_invalid_token(self):
+        # Set an invalid token
+        oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
+        oauth_info.pop('token', None)
+
+        # Attempt to login through the test backdoor
+        response = self.login(oauth_info=oauth_info, follow_redirects=False)
+
+        # Verify force reload
+        self.assertRedirects(response, oauth_info['next'])
+
+
+def add_user_from_oauth_info(oauth_info):
+    user_to_add = namedtuple('Mock', oauth_info.keys())(*oauth_info.values())
+    user = add_user(user_to_add)
+    db.session.commit()
+    return user
+
+
+def add_auth_provider(oauth_info, user):
+    auth_provider = AuthProvider(
+        provider=oauth_info['provider_name'],
+        provider_id=oauth_info['provider_id'],
+        user=user,
+    )
+    db.session.add(auth_provider)
+    db.session.commit()
+    return auth_provider

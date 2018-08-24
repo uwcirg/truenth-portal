@@ -11,6 +11,7 @@ import click
 from flask_migrate import Migrate
 from past.builtins import basestring
 import redis
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event
@@ -195,11 +196,13 @@ def add_user(email, role, password):
 def password_reset(email, password, actor):
     """Reset given user's password """
     try:
-        acting_user = User.query.filter(User.email == actor).one()
+        acting_user = User.query.filter(
+            func.lower(User.email) == actor.lower()).one()
     except NoResultFound:
-        raise ValueError("email for acting user not found")
+        raise ValueError("email for acting user <{}> not found".format(actor))
     try:
-        target_user = User.query.filter(User.email == email).one()
+        target_user = User.query.filter(
+            func.lower(User.email) == email.lower()).one()
     except NoResultFound:
         raise ValueError("email for target user not found")
     if not acting_user.has_role(ROLE.ADMIN.value):
