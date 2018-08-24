@@ -120,6 +120,17 @@ class EncounterConstants(object):
         assert coding in cc.codings
         return cc
 
+    @lazyprop
+    def INTERVIEW_ASSISTED(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='interview_assisted',
+            display='Information collected in-person',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
 
 EC = EncounterConstants()
 
