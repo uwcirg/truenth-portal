@@ -75,12 +75,14 @@ class LockoutLoginForm(LoginForm):
                 context='login'
             )
 
-            error_message = _('We see you\'re having trouble - let us help. \
+            error_message = _(
+                'We see you\'re having trouble - let us help. \
                 Your account will now be locked while we give it a refresh. \
                 Please try again in %(time)d minutes. \
                 If you\'re still having issues, please click \
                 "Having trouble logging in?" below.',
-                time=user.lockout_period_minutes)
+                time=user.lockout_period_minutes
+            )
             self.password.errors.append(error_message)
 
             return False
