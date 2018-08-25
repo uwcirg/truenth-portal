@@ -589,14 +589,13 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
                     errorField.text("").css("opacity", 0);
                     successField.text(i18next.t("success"));
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                successField.animate({"opacity": 0}, __timeout * 2, function() {
-                                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
-                                });
+                                successField.animate({"opacity": 0}, __timeout * 2);
                             }, __timeout * 2);
                         });
                     });
@@ -613,14 +612,13 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
                     errorField.text(i18next.t("Unable to update. System/Server Error."));
                     successField.text("").css("opacity", 0);
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         errorField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                errorField.animate({"opacity": 0}, __timeout * 2, function() {
-                                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
-                                });
+                                errorField.animate({"opacity": 0}, __timeout * 2);
                             }, __timeout * 2);
                         });
                     });

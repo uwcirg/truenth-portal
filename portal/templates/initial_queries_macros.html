@@ -5,6 +5,9 @@
       <i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Save Data. System error.")}}</i>
     </div>
 {%- endmacro %}
+{% macro dataSavingIndicator() -%}
+    <div class="data-saving-indicator tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
+{%- endmacro %}
 {% macro sectionContent(sectionId, title) -%}
     <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true">
       <div class="content">
@@ -14,6 +17,7 @@
           </div>
       </div>
       {{saveLoaderDiv(sectionId)}}
+      {{dataSavingIndicator()}}
     </div>
 {%- endmacro %}
 {% macro tou(terms, user) -%}
@@ -30,7 +34,7 @@
               {{ terms['asset']|safe if terms}}
             </div>
             <div id="termsExpand" class="tnth-hide">
-              <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Termsƒ") }}</a>
+              <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div id="termsCheckbox_default" class="tnth-hide">
               {% trans privacy_url="/privacy?disableLinks=true", terms_url="/terms?disableLinks=true" %}
@@ -90,6 +94,7 @@
         </div>
         <div class="get-tou-error error-message"></div>
         <div class="post-tou-error error-message"></div>
+        {{dataSavingIndicator()}}
     </div>
     <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
@@ -205,7 +210,7 @@
   {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup" data-profile-section-id="demo">
-        <div id="firstNameContainer" class="col-md-5 col-sm-6 col-xs-10">
+        <div class="col-md-5 col-sm-6 col-xs-10">
           <div class="form-group float-input-label">
             <label>Name</label>
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}" v-model="demo.data.name.given" lazy />
@@ -213,7 +218,7 @@
           </div>
         </div>
         <div class="col-md-5 col-sm-6 col-xs-10">
-          <div id="lastNameContainer" class="form-group float-input-label">
+          <div class="form-group float-input-label">
             <label>&nbsp;</label>
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" v-model="demo.data.name.family" lazy/>
             <div class="help-block with-errors"></div>
@@ -236,7 +241,7 @@
       </div>
       {{saveLoaderDiv("rolesGroup")}}
       <div class="get-roles-error error-message"></div>
-      <div class="put-roles-error  error-message"></div>
+      <div class="put-roles-error error-message"></div>
   {%- endmacro %}
   {% macro dobGroup() -%}
       <div id="bdGroup" data-profile-section-id="demo">

@@ -516,7 +516,7 @@
             $("html, body").stop().animate({
                 scrollTop: $(element).offset().top
             }, 1500);
-        }(), 500);
+        }(), 800);
     };
 
     FieldsChecker.prototype.continueToFinish = function() {
@@ -524,11 +524,12 @@
             return false;
         }
         this.setProgressBar();
+        $("#iqRefresh").addClass("tnth-hide");
+        $("#next").attr("disabled", true).hide();
         $("#buttonsContainer").addClass("continue");
-        $("#aboutForm").show();
-        $("div.reg-complete-container").fadeIn();
+        $("#aboutForm").removeClass("tnth-hide");
+        $("div.reg-complete-container").fadeIn(150);
         this.scrollTo($("div.reg-complete-container"));
-        $("#next").attr("disabled", true).removeClass("open");
         $("#iqErrorMessage").text("");
         $("#updateProfile").removeAttr("disabled").addClass("open");
     };
@@ -545,9 +546,8 @@
         if (sectionId) {
             this.setProgressBar(sectionId);
         }
-        if ($("#"+sectionId).closest("aboutForm").length) {
-            $("aboutForm").show();
-        }
+        $("#aboutForm").removeClass("tnth-hide");
+        $("#iqRefresh").addClass("tnth-hide");
         $("#buttonsContainer").removeClass("continue");
         $("div.reg-complete-container").fadeOut();
         $("#next").removeAttr("disabled").addClass("open");
@@ -618,6 +618,13 @@
         /****** prep work after initializing incomplete fields -set visuals e.g. top terms ************************/
         self.constructProgressBar();
 
+        $("#updateProfile").on("click", function() {
+            $(this).hide();
+            $("#next").hide();
+            $(".loading-message-indicator").show();
+            $("#queriesForm").submit();
+        });
+
         $("#iqRefresh").on("click", function() {
             window.location.reload();
         });
@@ -650,10 +657,8 @@
         } else {
             if (!self.sectionCompleted("topTerms")) {
                 self.handleIncomplete("topTerms");
-                $("#topTerms").append(self.getSavingDataIndicatorHTML());
             } else {
                 $("#aboutForm").removeClass("full-size");
-                $("#aboutForm").append(self.getSavingDataIndicatorHTML());
                 self.getNext();
                 $("#aboutForm").fadeIn();
                 if ($("#aboutForm").length === 0 || self.allFieldsCompleted()) {
@@ -670,13 +675,8 @@
         return $(field).closest(".section-container").attr("id");
     };
 
-    FieldsChecker.prototype.getSavingDataIndicatorHTML = function() {
-        var i18next = this.__getDependency("i18next");
-        return "<div id='dataSavingLoadingIndicator' class='tnth-hide'><i class='fa fa-spinner fa-spin'></i> {text}</div>".replace("{text}", i18next.t("saving data..."));
-    };
-
     FieldsChecker.prototype.handleRefreshElement = function(sectionId) {
-        if ($("#iqRefresh").length) {
+        if (!sectionId || $("#iqRefresh").length) {
             return;
         }
         var i18next = this.__getDependency("i18next");
@@ -694,7 +694,6 @@
         $("#"+sectionId).find(".save-loader-wrapper").each(function() {
             if (!loadingInProgress && $(this).hasClass("loading")) {
                 loadingInProgress = true;
-                return false;
             }
         });
         return loadingInProgress;
@@ -704,9 +703,10 @@
         var self = this, elapsedSaveTime = 0;
         window.startDataSavingTime = new Date();
         window.endDataSavingTime = new Date();
+        var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
         if (this.sectionCompleted(sectionId)) {
-            $("#dataSavingLoadingIndicator").removeClass("tnth-hide");
-            this.scrollTo($("#dataSavingLoadingIndicator"));
+            dataSavingElement.removeClass("tnth-hide");
+            this.scrollTo(dataSavingElement);
         }
         clearInterval(window.dataSavingIntervalId);
         window.dataSavingIntervalId = setInterval(function() {
@@ -714,39 +714,39 @@
             elapsedSaveTime = window.endDataSavingTime - window.startDataSavingTime;
             elapsedSaveTime  /= 1000;
             var loadingInProgress = self.isSavingInProgress(sectionId);
-            if (!loadingInProgress || (elapsedSaveTime  >= 10)) {
-                setTimeout(function() {
-                    $("#dataSavingLoadingIndicator").addClass("tnth-hide");
-                }, 50);
-                window.startDataSavingTime = 0;
-                window.endDataSavingTime = 0;
-                elapsedSaveTime  = 0;
-                clearInterval(window.dataSavingIntervalId);
-                var hasError = false;
-                $("#" + sectionId + " .error-message").each(function() { //check for errors
-                    hasError = hasValue($(this).text());
-                    if (hasError) {
-                        self.stopContinue(sectionId);
-                        self.handleRefreshElement();
-                        $("#iqRefresh").removeClass("tnth-hide");
-                        return false;
-                    }
-                });
-                if (hasError || !sectionId) {
+            if (loadingInProgress && elapsedSaveTime < 10) {
+                return false;
+            }
+            setTimeout(function() {
+                dataSavingElement.addClass("tnth-hide");
+            }, 50);
+            window.startDataSavingTime = 0;
+            window.endDataSavingTime = 0;
+            elapsedSaveTime  = 0;
+            clearInterval(window.dataSavingIntervalId);
+            var hasError = false;
+            $("#" + sectionId + " .error-message").each(function() { //check for errors
+                hasError = hasValue($(this).text());
+                if (hasError) {
+                    self.stopContinue(sectionId);
+                    self.handleRefreshElement(sectionId);
+                    $("#iqRefresh").removeClass("tnth-hide");
                     return false;
                 }
-                $("#iqRefresh").addClass("tnth-hide");
-                if (self.allFieldsCompleted()) { //all sections finished
-                    self.continueToFinish();
-                    return true;
-                }
-                if (self.sectionCompleted(sectionId)) { //current section completed
-                    self.continueToNext(sectionId);
-                    return;
-                }
-                self.stopContinue(sectionId);
+            });
+            if (hasError || !sectionId) {
+                return false;
             }
-        }, 100);
+            if (self.allFieldsCompleted()) { //all sections finished
+                self.continueToFinish();
+                return true;
+            }
+            if (self.sectionCompleted(sectionId)) { //current section completed
+                self.continueToNext(sectionId);
+                return;
+            }
+            self.stopContinue(sectionId);
+        }, 150);
     };
 
     FieldsChecker.prototype.updateTerms = function(data) {

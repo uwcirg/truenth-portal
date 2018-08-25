@@ -862,9 +862,21 @@ div.footer-wrapper.right-panel {
   display: none;
 }
 #topTerms {
+  position: relative;
   .save-info {
     top: 4px;
     left: 12px;
+  }
+  .data-saving-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 2.25em;
+    margin: 1.5em 0 0.5em;
+    padding: .5em 0;
+    z-index: 5;
+    .indicator-icon {
+      margin-right: 8px;
+    }
   }
   .well {
     margin-top: 1em;
@@ -888,6 +900,7 @@ div.footer-wrapper.right-panel {
     }
   }
 }
+
 .terms-tick-box {
   float: left;
   width: 2%;
@@ -1087,14 +1100,6 @@ div.footer-wrapper.right-panel {
     border-left: 1px solid rgba(203, 210, 217, 0.2);
     font-size: @subheadSize;
   }
-}
-#dataSavingLoadingIndicator {
-  position: relative;
-  z-index: 5;
-  min-height: 3.5em;
-  background: hsla(0, 0%, 100%, 0.8);
-  margin: 1em 0;
-  padding: 0.5em 0;
 }
 #topTerms, #aboutForm {
   .save-loader-wrapper {
