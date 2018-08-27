@@ -861,22 +861,25 @@ div.footer-wrapper.right-panel {
 .terms-of-use-intro {
   display: none;
 }
+.data-saving-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 2.25em;
+  margin: 1.5em 0 0.5em;
+  padding: .5em 0;
+  z-index: 5;
+  .indicator-icon {
+    margin-right: 8px;
+  }
+}
 #topTerms {
   position: relative;
+  .well {
+    position: relative;
+  }
   .save-info {
     top: 4px;
     left: 12px;
-  }
-  .data-saving-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 2.25em;
-    margin: 1.5em 0 0.5em;
-    padding: .5em 0;
-    z-index: 5;
-    .indicator-icon {
-      margin-right: 8px;
-    }
   }
   .well {
     margin-top: 1em;
@@ -924,11 +927,15 @@ div.footer-wrapper.right-panel {
   .terms-tick-box-text {
     width: 95%;
   }
+  .data-saving-indicator {
+    position: relative;
+  }
 }
 #termsCheckbox {
   width: 1000px;
   max-width: 100%;
   margin-top: 2em;
+  position: relative;
   .display-view {
     font-weight: normal;
     display: none;

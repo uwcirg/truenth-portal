@@ -92,16 +92,19 @@
                             if (topOrgId) {
                                 theTerms["organization_id"] = topOrgId;
                             }
-
-                            tnthAjax.postTermsByUser(patientId, theTerms);
+                            $("#termsCheckbox .data-saving-indicator").removeClass("tnth-hide");
+                            tnthAjax.postTermsByUser(patientId, theTerms, function(data) {
+                                if (!data.error && $("[data-agree='false']").length === 0) {
+                                    $(".continue-msg-wrapper").fadeIn();
+                                }
+                                $("#termsCheckbox .data-saving-indicator").addClass("tnth-hide");
+                            });
                         }
                         tickBox.removeClass("fa-square-o").addClass("fa-check-square-o"); // Update UI
                         $(this).attr("data-agree", "true");
                     }
                 });
-                if ($("[data-agree='false']").length === 0) {
-                    $(".continue-msg-wrapper").fadeIn();
-                }
+               
             });
         });
         $(".button-container").each(function() {

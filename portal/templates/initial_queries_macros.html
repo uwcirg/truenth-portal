@@ -91,10 +91,10 @@
               {{saveLoaderDiv("topTerms")}}
             </div>
             <br/>
+            {{dataSavingIndicator()}}
         </div>
         <div class="get-tou-error error-message"></div>
         <div class="post-tou-error error-message"></div>
-        {{dataSavingIndicator()}}
     </div>
     <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
@@ -123,7 +123,9 @@
     <hr/>
     <br/>
     <div>
-        <div id="termsText" class="well">{{ terms['asset']|safe if terms}}</div>
+        <div id="termsText" class="well">
+          {{ terms['asset']|safe if terms}}
+        </div>
     </div>
     <div id="termsCheckbox">
       <label class="custom-tou terms-label">
@@ -133,6 +135,7 @@
             </div>
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
+      {{dataSavingIndicator()}}
     </div>
     <div class="get-tou-error error-message"></div>
     <div class="post-tou-error error-message"></div>
@@ -204,6 +207,7 @@
           </div>
           <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
+        {{dataSavingIndicator()}}
       </div>
       <div class="get-tou-error error-message hidden-print"></div>
       <div class="post-tou-error error-message hidden-print"></div>

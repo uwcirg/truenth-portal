@@ -1305,15 +1305,16 @@ var tnthAjax = {
             }
         });
     },
-    "postTermsByUser": function(userId, toSend) {
+    "postTermsByUser": function(userId, toSend, callback) {
+        callback = callback || function() {};
         this.sendRequest("/api/user/" + userId + "/tou/accepted", "POST", userId, {data: JSON.stringify(toSend)}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-tou-error").html("");
-                } else {
-                    $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
-                }
+            if (!data || data.error) {
+                $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
+                callback(data);
+                return
             }
+            $(".post-tou-error").html("");
+            callback(data);
         });
     },
     "postTerms": function(toSend, targetField, callback) {

@@ -500,7 +500,7 @@
         }
         this.setProgressBar();
         $("#iqRefresh").addClass("tnth-hide");
-        $("#next").attr("disabled", true).addClass("open");
+        $("#next").attr("disabled", true).removeClass("open");
         $("#buttonsContainer").addClass("continue");
         $("#aboutForm").removeClass("tnth-hide");
         $("div.reg-complete-container").fadeIn();
@@ -655,7 +655,13 @@
             return;
         }
         var i18next = this.__getDependency("i18next");
-        $("#"+sectionId).append("<div id='iqRefresh' class='error-message tnth-hide'><i class='fa fa-refresh refresh-icon' aria-hidden='true'></i><span>{text}</span></div>".replace("{text}", i18next.t("Try Again")));
+        var contentHTML = "<div id='iqRefresh' class='error-message tnth-hide'><i class='fa fa-refresh refresh-icon' aria-hidden='true'></i><span>{text}</span></div>".replace("{text}", i18next.t("Try Again"));
+        var contentElement = $("#"+sectionId).find(".content-body");
+        if (contentElement.length) {
+            contentElement.append(contentHTML);
+        } else {
+            $("#"+sectionId).append(contentHTML);
+        }
         $("#iqRefresh").on("click", function() {
             window.location.reload();
         });
@@ -673,6 +679,20 @@
         });
         return loadingInProgress;
     };
+
+    FieldsChecker.prototype.sectionHasError = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        var hasError = false;
+        $("#" + sectionId + " .error-message").each(function() { //check for errors
+            if (!hasError) { //short circuit the loop through elements
+                hasError = hasValue($(this).text());
+            }
+           
+        });
+        return hasError;
+    }
 
     FieldsChecker.prototype.handlePostEvent = function(sectionId) {
         var self = this, elapsedSaveTime = 0;
@@ -693,23 +713,16 @@
             if (loadingInProgress && elapsedSaveTime < 10) {
                 return false;
             }
-            setTimeout(function() {
-                dataSavingElement.addClass("tnth-hide");
-            }, 50);
+            dataSavingElement.addClass("tnth-hide");
             window.startDataSavingTime = 0;
             window.endDataSavingTime = 0;
             clearInterval(window.dataSavingIntervalId);
-            var hasError = false;
-            $("#" + sectionId + " .error-message").each(function() { //check for errors
-                hasError = hasValue($(this).text());
-                if (hasError) {
-                    self.stopContinue(sectionId);
-                    self.handleRefreshElement(sectionId);
-                    $("#iqRefresh").removeClass("tnth-hide");
-                    return false;
-                }
-            });
-            if (hasError || !sectionId) {
+
+            var hasError = self.sectionHasError(sectionId);
+            if (hasError) {
+                self.stopContinue(sectionId);
+                self.handleRefreshElement(sectionId);
+                $("#iqRefresh").removeClass("tnth-hide");
                 return false;
             }
             if (self.allFieldsCompleted()) { //all sections finished
