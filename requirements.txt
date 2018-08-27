@@ -81,7 +81,7 @@ sphinxcontrib-websupport==1.1.0  # via sphinx
 sqlalchemy==1.2.11         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.3.1
 tox==3.2.1
-typing==3.6.4             # via sphinx
+typing==3.6.6             # via sphinx
 urllib3==1.23             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4               # via amqp
