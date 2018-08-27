@@ -185,31 +185,9 @@
             "orgsContainer": {
                 display: i18next.t("your clinic"),
                 config: "org",
-                required: hasValue(preselectClinic) ? true : false,
                 subsections: {
                     "clinics": {
                         fields: ["#userOrgs input[name='organization']"]
-                    }
-                },
-                initData: function() {
-                    if (!hasValue($("#iqPatientEditable").val())) { //for patient, clinic is drawn in orgs state selector template
-                        tnthAjax.getOrgs(self.userId, {sync: true}, function() {
-                            var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
-                            if (userOrgs.length === 0) {
-                                userOrgs = $("#userOrgs input[name='organization']");
-                            }
-                            var checkedOrgs = {};
-                            userOrgs.each(function() {
-                                if ($(this).prop("checked")) {
-                                    checkedOrgs[$(this).val()] = true;
-                                }
-                                $(this).attr("type", "radio");
-                                if (checkedOrgs[$(this).val()]) {
-                                    $(this).prop("checked", true);
-                                }
-                            });
-                            $("#clinics").attr("loaded", true);
-                        });
                     }
                 },
                 handleIncomplete: function() {
@@ -480,6 +458,9 @@
                     case "select":
                         isComplete = field.val() !== "";
                         break;
+                    case "hidden":
+                        isComplete = (field.val() !== "");
+                        break;
                     case "text":
                         isComplete = (field.val() !== "") && (field.get(0).validity.valid);
                         break;
@@ -525,7 +506,7 @@
         }
         this.setProgressBar();
         $("#iqRefresh").addClass("tnth-hide");
-        $("#next").attr("disabled", true).hide();
+        $("#next").attr("disabled", true).fadeOut();
         $("#buttonsContainer").addClass("continue");
         $("#aboutForm").removeClass("tnth-hide");
         $("div.reg-complete-container").fadeIn(150);
@@ -538,7 +519,7 @@
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
         $("div.reg-complete-container").fadeOut();
-        $("#next").attr("disabled", true).addClass("open");
+        $("#next").attr("disabled", true).fadeIn();
         this.setProgressBar(sectionId);
     };
 
@@ -634,7 +615,7 @@
             $(".loading-message-indicator").show();
             setTimeout(function() {
                 window.location.reload();
-            }, 500);
+            }, 150);
         });
         /*** event for the arrow in the header**/
         $("div.heading").on("click", function() {
@@ -705,8 +686,12 @@
         window.endDataSavingTime = new Date();
         var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
         if (this.sectionCompleted(sectionId)) {
+            if (this.allFieldsCompleted()) {
+                $("#next").fadeOut();
+            }
             dataSavingElement.removeClass("tnth-hide");
             this.scrollTo(dataSavingElement);
+
         }
         clearInterval(window.dataSavingIntervalId);
         window.dataSavingIntervalId = setInterval(function() {
@@ -722,7 +707,6 @@
             }, 50);
             window.startDataSavingTime = 0;
             window.endDataSavingTime = 0;
-            elapsedSaveTime  = 0;
             clearInterval(window.dataSavingIntervalId);
             var hasError = false;
             $("#" + sectionId + " .error-message").each(function() { //check for errors
@@ -1086,7 +1070,7 @@
                     fc.endTime = new Date();
                     var elapsedTime = fc.endTime - fc.startTime;
                     elapsedTime /= 1000;
-                    if (fc.sectionsLoaded() || elapsedTime >= 3) {
+                    if (fc.sectionsLoaded() || elapsedTime >= 5) {
                         setTimeout(function() {
                             fc.initIncompleteFields();
                             fc.onIncompleteFieldsDidInit();

@@ -33,9 +33,6 @@
       {% else %}
         {{clinic(consent_agreements)}}
       {% endif %}
-      {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
-        <input type="hidden" id="iqPatientEditable" value="true" />
-      {% endif %}
     {%- endcall %}
     <div class="reg-buttons-msg-wrapper">
         <div class="reg-complete-container">
