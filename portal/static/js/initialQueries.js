@@ -680,9 +680,6 @@
         window.endDataSavingTime = new Date();
         var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
         if (this.sectionCompleted(sectionId)) {
-            if (this.allFieldsCompleted()) {
-                $("#next").fadeOut();
-            }
             dataSavingElement.removeClass("tnth-hide");
             this.scrollTo(dataSavingElement);
 
