@@ -506,10 +506,10 @@
         }
         this.setProgressBar();
         $("#iqRefresh").addClass("tnth-hide");
-        $("#next").attr("disabled", true).fadeOut();
+        $("#next").attr("disabled", true).addClass("open");
         $("#buttonsContainer").addClass("continue");
         $("#aboutForm").removeClass("tnth-hide");
-        $("div.reg-complete-container").fadeIn(150);
+        $("div.reg-complete-container").fadeIn();
         this.scrollTo($("div.reg-complete-container"));
         $("#iqErrorMessage").text("");
         $("#updateProfile").removeAttr("disabled").addClass("open");
@@ -519,7 +519,7 @@
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
         $("div.reg-complete-container").fadeOut();
-        $("#next").attr("disabled", true).fadeIn();
+        $("#next").attr("disabled", true);
         this.setProgressBar(sectionId);
     };
 
