@@ -95,9 +95,7 @@
         } else {
             var defaultSections = this.defaultSections;
             for (var section in defaultSections) {
-                if (defaultSections[section].required) {
-                    this.mainSections[section] = defaultSections[section];
-                } else if (self.inConfig(defaultSections[section].config)) {
+                if (self.inConfig(defaultSections[section].config)) {
                     this.mainSections[section] = defaultSections[section];
                 }
             }
@@ -128,23 +126,19 @@
                 handleIncomplete: function() {
                     $("#aboutForm").addClass("full-size");
                     $("#topTerms").removeClass("hide-terms").show();
-                    if (!$("#termsText").hasClass("agreed")) {
-                        if (window.performance) {
-                            if (performance.navigation.type === 1) {
-                                //page has been reloaded;
-                                var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
-                                if (agreedCheckboxes.length > 1) {
-                                    $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-                                }
-                                if (agreedCheckboxes.length === 0) {
-                                    $("#termsText").addClass("agreed");
-                                }
-                                $("#termsReminderModal").modal("show");
-                            }
+                    if (!window.performance) {
+                        return false;
+                    }
+                    if (performance.navigation.type === 1) {
+                        //page has been reloaded;
+                        var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
+                        if (agreedCheckboxes.length > 1) {
+                            $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
                         }
-                    } else {
-                        $("#aboutForm").removeClass("tnth-hide");
-                        self.continueToNext();
+                        if (agreedCheckboxes.length === 0) {
+                            $("#termsText").addClass("agreed");
+                        }
+                        $("#termsReminderModal").modal("show");
                     }
                     setTimeout(function() {disableHeaderFooterLinks();}, 1000);
                 }
