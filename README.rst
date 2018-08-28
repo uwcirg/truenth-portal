@@ -379,7 +379,6 @@ Run Tests
 
     $ tox -e ui
 
-
 Dependency Management
 ---------------------
 
@@ -398,7 +397,6 @@ Documentation
 Docs are built separately via sphinx. Change to the docs directory and
 use the contained Makefile to build - then view in browser starting with
 the ``docs/build/html/index.html`` file
-
 
 .. code:: bash
 
