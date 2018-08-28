@@ -754,22 +754,6 @@
             roles.push({name: theVal});
             tnthAjax.putRoles(self.userId,{"roles": roles}, $("#rolesGroup"));
             self.handlePostEvent(self.getSectionContainerId($(this)));
-            if (theVal === "patient") {
-                $("#clinicalContainer").attr("skipped", "false");
-                $("#orgsContainer").attr("skipped", "false");
-                $("#date").attr("required", "required").attr("skipped", "false");
-                $("#month").attr("required", "required").attr("skipped", "false");
-                $("#year").attr("required", "required").attr("skipped", "false");
-                $(".bd-optional").hide();
-            } 
-            if (theVal === "partner") { // If partner, skip all questions
-                $("#clinicalContainer").attr("skipped", "true");
-                $("#orgsContainer").attr("skipped", "true");
-                $("#date").removeAttr("required").attr("skipped", "true");
-                $("#month").removeAttr("required").attr("skipped", "true");
-                $("#year").removeAttr("required").attr("skipped", "true");
-                $(".bd-optional").show();
-            }
         });
     };
 
@@ -791,15 +775,6 @@
                     if (!(checkedRadio.length > 0)) {
                         $("html, body").animate({scrollTop: nextItem.offset().top}, 1000);
                     }
-                    nextItem.find("input[type='radio']").each(function() {
-                        $(this).attr("skipped", "false");
-                    });
-                    thisItem.closest(".pat-q").nextAll().each(function() {
-                        var dataTopic = $(this).attr("data-topic");
-                        $(this).find("input[name='" + dataTopic + "']").each(function() {
-                            $(this).attr("skipped", "false");
-                        });
-                    });
                 }
             } else {
                 thisItem.parents(".pat-q").nextAll().fadeOut(150);
