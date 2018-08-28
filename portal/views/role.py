@@ -56,7 +56,7 @@ def system_roles():
           if missing valid OAuth token or if the authorized user lacks
           permission to view roles
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return jsonify(roles=[r.as_json() for r in Role.query.all()])
@@ -94,7 +94,7 @@ def roles(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()

@@ -735,7 +735,7 @@ def token_status():
               type: string
               description: Deprecated version of `scope` containing identical data.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     authorization = request.headers.get('Authorization')
@@ -779,7 +779,7 @@ def oauth_errors():
               type: string
               description: Known details of error situation.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_app.logger.warn(request.args.get('error'))

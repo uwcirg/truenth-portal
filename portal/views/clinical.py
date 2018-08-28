@@ -44,7 +44,7 @@ def biopsy(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_get(patient_id=patient_id,
@@ -84,7 +84,7 @@ def pca_diag(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_get(patient_id=patient_id,
@@ -124,7 +124,7 @@ def pca_localized(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_get(patient_id=patient_id,
@@ -187,7 +187,7 @@ def biopsy_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -248,7 +248,7 @@ def pca_diag_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -309,7 +309,7 @@ def pca_localized_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
@@ -351,7 +351,7 @@ def clinical(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='view', other_id=patient_id)
@@ -419,7 +419,7 @@ def clinical_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -497,7 +497,7 @@ def clinical_update(patient_id, observation_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)

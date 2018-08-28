@@ -597,7 +597,7 @@ def assessment(patient_id, instrument_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
 
@@ -812,7 +812,7 @@ def assessment_update(patient_id):
       404:
         description: existing QuestionnaireResponse not found
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
 
@@ -1307,7 +1307,7 @@ def assessment_add(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
 
@@ -1720,7 +1720,7 @@ def batch_assessment_status():
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     acting_user = current_user()
@@ -1776,7 +1776,7 @@ def patient_assessment_status(patient_id):
       404:
         description: if patient id is invalid
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     patient = get_user_or_abort(patient_id)

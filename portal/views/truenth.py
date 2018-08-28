@@ -73,7 +73,7 @@ def auditlog_addevent():
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     message = request.form.get('message')
@@ -220,7 +220,7 @@ def portal_footer_html():
           html for direct insertion near the bottom of the intervention's
           page.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     # Unlike all other oauth protected resources, we manually check

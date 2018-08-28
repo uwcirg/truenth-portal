@@ -86,7 +86,7 @@ def organization_search():
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     filter = None
@@ -460,7 +460,7 @@ def user_organizations(user_id):
       404:
         description: if user_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='view', other_id=user_id)

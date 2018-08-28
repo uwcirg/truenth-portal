@@ -183,7 +183,7 @@ def acquire():
       403:
         description: if the next parameter origin is not recognized
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     # Require and maintain a valid return address

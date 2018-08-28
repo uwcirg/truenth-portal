@@ -89,7 +89,7 @@ def me():
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -566,7 +566,7 @@ def user_consents(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -669,7 +669,7 @@ def set_user_consents(user_id):
       404:
         description: if user_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_app.logger.debug('post user consent called w/: {}'.format(
@@ -763,7 +763,7 @@ def withdraw_user_consent(user_id):
           if user_id doesn't exist, or it no consent found
           for given user org combination
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_app.logger.debug('withdraw user consent called w/: '
@@ -867,7 +867,7 @@ def delete_user_consents(user_id):
       404:
         description: if user_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_app.logger.debug('delete user consent called w/: {}'.format(
@@ -943,7 +943,7 @@ def user_groups(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1025,7 +1025,7 @@ def set_user_groups(user_id):
       404:
         description: if user_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1099,7 +1099,7 @@ def system_relationships():
           if missing valid OAuth token or if the authorized user lacks
           permission to view system relationships
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     results = [{'name': r.name, 'description': r.description}
@@ -1166,7 +1166,7 @@ def relationships(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1329,7 +1329,7 @@ def set_relationships(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1434,7 +1434,7 @@ def email_ready(user_id):
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -1494,7 +1494,7 @@ def unique_email():
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     email = request.args.get('email')
@@ -1604,7 +1604,7 @@ def user_documents(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1665,7 +1665,7 @@ def download_user_document(user_id, doc_id):
       404:
         description: if user_id or doc_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1747,7 +1747,7 @@ def upload_user_document(user_id):
       404:
         description: if user_id doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1937,7 +1937,7 @@ def get_table_preferences(user_id, table_name):
         description:
           if no TablePreference found for given user_id and table_name
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     if not user_id or not table_name:
@@ -2255,7 +2255,7 @@ def get_current_user_qb(user_id):
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = current_user()

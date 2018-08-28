@@ -71,7 +71,7 @@ def patient_search():
           if there is no match found, or the user lacks permission to look
           up details on the match.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     search_params = {}
@@ -169,7 +169,7 @@ def post_patient_deceased(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -234,7 +234,7 @@ def post_patient_dob(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)

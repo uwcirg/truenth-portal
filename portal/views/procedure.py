@@ -55,7 +55,7 @@ def procedure(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     patient = get_user_or_abort(patient_id)
@@ -124,7 +124,7 @@ def post_procedure():
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
 
@@ -205,7 +205,7 @@ def procedure_delete(procedure_id):
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     procedure = Procedure.query.get_or_404(procedure_id)
@@ -248,7 +248,7 @@ def procedure_value_sets(valueset):
           Returns FHIR like Valueset (https://www.hl7.org/FHIR/valueset.html)
           for requested coding type.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     options = ('tx-started', 'tx-not-started')
