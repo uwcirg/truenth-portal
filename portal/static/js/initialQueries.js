@@ -356,10 +356,8 @@
                     if (__modal) {
                         __modal.modal("show");
                     }
-                    $("#orgsContainer").fadeIn(500).addClass("open");
-                } else {
-                    $("#orgsContainer").fadeIn(500).addClass("open");
-                }
+                } 
+                $("#orgsContainer").fadeIn(500).addClass("open");
             }
         };
         if (!this.mainSections[section]) {
