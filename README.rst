@@ -364,7 +364,7 @@ Tox the virtual environment that corresponds to the UI tests (``ui``).
 Setup
 ^^^^^
 - ``sudo apt-get install xvfb python-xvfbwrapper``
-* Install geckodriver from https://github.com/mozilla/geckodriver/releases.  For example
+- Install geckodriver from https://github.com/mozilla/geckodriver/releases.  For example
 .. code:: bash
 
     $ wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz
