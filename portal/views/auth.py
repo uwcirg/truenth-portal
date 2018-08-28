@@ -376,7 +376,7 @@ def flask_user_password_failed_event(app, user, **extra):
     If this happens too often, for security reasons,
     the user will be locked out of the system.
     """
-    count = user.password_verification_failures
+    count = user.add_password_verification_failure()
     auditable_event(
         'local user failed password verification. Count "{}"'.format(
             count

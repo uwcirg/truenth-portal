@@ -23,11 +23,7 @@
         {{profileConsentDate()}}
         {{profileProcedures(False, user)}}
         <div class="divider"></div>
-        <div class="form-group profile-section" id="userOrgs">
-            <label>{{ _("Clinics") }}</label>
-            <div id="fillOrgs"></div>
-            <div class="help-block with-errors get-orgs-error error-message"></div>
-        </div>
+        {{addClinics()}}
     </div>
     {% endblock %}
 {% block additional_scripts %}{{super()}}{% endblock %}

@@ -135,6 +135,7 @@ body {
     min-height: 8px;
   }
 }
+
 .form-control,
 input,
 select,
@@ -582,6 +583,11 @@ div.right-panel {
 #termsText.agreed {
   display: block;
 }
+#topTerms {
+  .well {
+    position: relative;
+  }
+}
 #topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
@@ -666,6 +672,7 @@ div.right-panel {
     min-height: 30vh;
     margin-top: 20%;
     display: none;
+    position: relative;
   }
   .iq-container .tnth-headline:first-of-type {
     transform: translateY(-100%);
@@ -728,7 +735,6 @@ div.right-panel {
   }
   #next,  #updateProfile {
     opacity: 0;
-    transition: opacity 200ms ease-in;
     position: absolute;
     left: 0;
     top: 0;
@@ -736,6 +742,7 @@ div.right-panel {
     text-transform: uppercase;
     padding: 1em;
     font-size: @smallBtnSize;
+    transition: opacity 350ms ease;
   }
   #next {
     width: 110px;
@@ -773,6 +780,28 @@ div.right-panel {
   }
   .iq-container .noOrg-container {
     margin-left: 0.8em;
+  }
+}
+.iq-container {
+  #bdGroup {
+    .with-errors {
+      margin-top: 1em;
+      padding-left: 1em;
+    }
+    .custom-error {
+      margin-top: 1em;
+      padding-left: 1em;
+      color: @errorMessageColor;
+    }
+  }
+}
+#iqRefresh {
+  .refresh-icon {
+    margin-right: 8px;
+  }
+  &:hover {
+    cursor: pointer;
+    color: darken(@errorMessageColor, 5%);
   }
 }
 #iqFooterWrapper.footerWrapper {
@@ -841,6 +870,18 @@ div.right-panel {
   }
 }
 
+#topTerms .data-saving-indicator,
+.iq-container .data-saving-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 2.25em;
+  margin: 1em 0 0.5em;
+  padding: .5em 0;
+  z-index: 5;
+  .indicator-icon {
+    margin-right: 8px;
+  }
+}
 .orglist-download-container {
   display: inline-block;
   div {
@@ -3335,12 +3376,16 @@ div.timezone-warning.text-warning {
     }
   }
   #topTerms {
+    position: relative;
     .terms-tick-box-text {
       margin-left: 0;
       width: 96.5%;
     }
     .terms-checkbox-container {
       margin-left: 1em;
+    }
+    .save-info {
+      left: 1em;
     }
   }
   #termsText {
@@ -3389,6 +3434,11 @@ div.timezone-warning.text-warning {
   }
   #aboutForm.full-size {
     max-width: 100%;
+    margin: 2em 0;
+    padding: 1em 0;
+    #next {
+      margin-left: 0;
+    }
   }
   #aboutForm .iq-container {
     margin-top: 5%;
@@ -3413,6 +3463,11 @@ div.timezone-warning.text-warning {
     #emailGroup {
       margin-top: 1em;
     }
+  }
+}
+#topTerms, #aboutForm {
+  .save-loader-wrapper {
+    display: none;
   }
 }
 @media (min-width: 1200px) {

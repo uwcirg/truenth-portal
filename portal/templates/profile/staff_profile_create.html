@@ -19,11 +19,7 @@
         {{profileAltPhone(False)}}
         <div class="divider"></div>
         <hr/>
-        <div class="form-group profile-section" id="userOrgs">
-            <label>{{ _("Clinics") }}</label>
-            <div id="fillOrgs"></div>
-            <div class="help-block with-errors get-orgs-error error-message"></div>
-        </div>
+        {{addClinics()}}
     </div>
 {% endblock %}
 {% block back_button %}

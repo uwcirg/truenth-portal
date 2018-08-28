@@ -527,11 +527,11 @@ var tnthAjax = {
         $.ajax(params).done(function(data) {
             params.attempts = 0;
             if (data) {
-                callback(data);
                 fieldHelper.showUpdate(targetField);
+                callback(data);
             } else {
-                callback({"error": true, "data": "no data returned"});
                 fieldHelper.showError(targetField);
+                callback({"error": true, "data": "no data returned"});
             }
         }).fail(function(xhr) {
             if (params.attempts < params.max_attempts) {
@@ -542,8 +542,8 @@ var tnthAjax = {
                 })(self, url, method, userId, params, callback);
             } else {
                 params.attempts = 0;
-                callback({"error": true, "data": xhr});
                 fieldHelper.showError(targetField);
+                callback({"error": true, "data": xhr});
                 self.sendError(xhr, url, userId);
             }
         });
@@ -576,7 +576,9 @@ var tnthAjax = {
         delayDuration: 300,
         showLoader: function(targetField) {
             if (!targetField || targetField.length === 0) { return false; }
-            $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
+            var el = $("#" + (targetField.attr("data-save-container-id") || targetField.attr("id")) + "_load");
+            el.css("opacity", 1);
+            el.closest(".save-loader-wrapper").addClass("loading");
         },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
@@ -587,11 +589,14 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
                     errorField.text("").css("opacity", 0);
                     successField.text(i18next.t("success"));
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
-                            setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);}, __timeout * 2);
+                            setTimeout(function() {
+                                successField.animate({"opacity": 0}, __timeout * 2);
+                            }, __timeout * 2);
                         });
                     });
                 })(targetField);
@@ -603,10 +608,11 @@ var tnthAjax = {
             if (!targetField || targetField.length === 0) { return false; }
             setTimeout(function() {
                 (function(targetField) {
-                    var containerId = targetField.attr("data-save-container-id");
+                    var containerId = targetField.attr("data-save-container-id") || targetField.attr("id");
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
                     errorField.text(i18next.t("Unable to update. System/Server Error."));
                     successField.text("").css("opacity", 0);
                     loadingField.animate({"opacity": 0}, __timeout, function() {
@@ -796,6 +802,10 @@ var tnthAjax = {
         }
         var consented = this.hasConsent(userId, params.org, status);
         var __url = "/api/user/" + userId + "/consent";
+        if (consented) {
+            callback({error: false});
+            return;
+        }
         if (!consented || params.testPatient) {
             var data = {};
             data.user_id = userId;
@@ -1102,22 +1112,23 @@ var tnthAjax = {
     "removeCachedRoles": function(userId) {
         sessionStorage.removeItem("userRole_"+userId);
     },
-    "putRoles": function(userId, toSend, targetField) {
+    "putRoles": function(userId, toSend, targetField, callback) {
+        callback = callback || function() {};
         if (!userId) {
+            callback({error: i18next.t("User Id is required.")});
             return false;
         }
         this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId + "/roles", "PUT", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".put-roles-error").html("");
-                    if (sessionStorage.getItem("userRole_" + userId)) {
-                        sessionStorage.setItem("userRole_" + userId, "");
-                    }
-                } else {
-                    $(".put-roles-error").html(i18next.t("Server error occurred setting user role information."));
-                }
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred setting user role information.");
+                $(".put-roles-error").html(errorMessage);
+                callback({error: errorMessage});
+                return;
             }
+            $(".put-roles-error").html("");
+            sessionStorage.setItem("userRole_" + userId, "");
+            callback(data);
         });
     },
     "deleteRoles": function(userId, toSend) {
@@ -1203,13 +1214,13 @@ var tnthAjax = {
         }
         callback = callback || function() {};
         this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-clinical-error").html("");
-                } else {
-                    $(".post-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
-                }
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred updating clinical data.");
+                $(".post-clinical-error").html(errorMessage).show();
+                callback({error: errorMessage});
+                return;
             }
+            $(".post-clinical-error").html("").hide();
             callback(data);
         });
     },
@@ -1294,26 +1305,29 @@ var tnthAjax = {
             }
         });
     },
-    "postTermsByUser": function(userId, toSend) {
+    "postTermsByUser": function(userId, toSend, callback) {
+        callback = callback || function() {};
         this.sendRequest("/api/user/" + userId + "/tou/accepted", "POST", userId, {data: JSON.stringify(toSend)}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-tou-error").html("");
-                } else {
-                    $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
-                }
+            if (!data || data.error) {
+                $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
+                callback(data);
+                return
             }
+            $(".post-tou-error").html("");
+            callback(data);
         });
     },
-    "postTerms": function(toSend) {
-        this.sendRequest("/api/tou/accepted", "POST", null, {data: JSON.stringify(toSend)}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-tou-error").html("");
-                } else {
-                    $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
-                }
+    "postTerms": function(toSend, targetField, callback) {
+        callback = callback || function() {};
+        this.sendRequest("/api/tou/accepted", "POST", null, {data: JSON.stringify(toSend), targetField: targetField}, function(data) {
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+                $(".post-tou-error").html(errorMessage);
+                callback({error: errorMessage});
+                return;
             }
+            $(".post-tou-error").html("");
+            callback(data);
         });
     },
     "accessUrl": function(userId, sync, callback) {

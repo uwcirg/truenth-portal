@@ -171,6 +171,9 @@ class BaseConfig(object):
         ('707266006', 'http://snomed.info/sct'),
         ('999999999', 'http://snomed.info/sct')]
 
+    LOCKOUT_PERIOD_MINUTES = 30
+    FAILED_LOGIN_ATTEMPTS_BEFORE_LOCKOUT = 5
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
