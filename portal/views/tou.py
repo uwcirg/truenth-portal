@@ -190,7 +190,7 @@ def get_tou_by_type(user_id, tou_type):
 
 
 @tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
     """Accept Terms Of Use on behalf of user
@@ -251,7 +251,7 @@ def post_user_accepted_tou(user_id):
 
 
 @tou_api.route('/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def accept_tou(user_id=None):
     """Accept Terms Of Use info for authenticated user

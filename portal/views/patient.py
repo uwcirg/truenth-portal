@@ -121,7 +121,7 @@ def patient_search():
 @patient_api.route(
     '/api/patient/<int:patient_id>/deceased',
     methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_patient_deceased(patient_id):
     """POST deceased datetime or status for a patient
@@ -193,7 +193,7 @@ def post_patient_deceased(patient_id):
 @patient_api.route(
     '/api/patient/<int:patient_id>/birthDate',
     methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_patient_dob(patient_id):
     """POST date of birth for a patient

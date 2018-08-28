@@ -64,7 +64,7 @@ def procedure(patient_id):
 
 
 @procedure_api.route('/procedure', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_procedure():
     """Add procedure via FHIR Procedure Resource
@@ -168,7 +168,7 @@ def post_procedure():
 @procedure_api.route(
     '/procedure/<int:procedure_id>',
     methods=('OPTIONS', 'DELETE'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def procedure_delete(procedure_id):
     """Delete a procedure by ID.

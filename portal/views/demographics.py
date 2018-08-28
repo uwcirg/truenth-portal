@@ -84,7 +84,7 @@ def demographics(patient_id):
 @demographics_api.route(
     '/demographics/<int:patient_id>',
     methods=('OPTIONS', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient

@@ -78,7 +78,7 @@ def identifiers(user_id):
 @identifier_api.route(
     '/api/user/<int:user_id>/identifier',
     methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def add_identifier(user_id):
     """Add additional identifier(s) to a user

@@ -780,7 +780,7 @@ def get_assessments():
     '/patient/<int:patient_id>/assessment',
     methods=('OPTIONS', 'PUT')
 )
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def assessment_update(patient_id):
     """Update an existing questionnaire response on a patient's record
@@ -885,7 +885,7 @@ def assessment_update(patient_id):
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record

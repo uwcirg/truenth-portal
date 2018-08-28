@@ -133,7 +133,7 @@ def pca_localized(patient_id):
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/biopsy',
                     methods=('OPTIONS', 'POST', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def biopsy_set(patient_id):
     """Simplified API for setting clinical biopsy data w/o FHIR
@@ -196,7 +196,7 @@ def biopsy_set(patient_id):
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/pca_diag',
                     methods=('OPTIONS', 'POST', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def pca_diag_set(patient_id):
     """Simplified API for setting clinical PCa diagnosis status w/o FHIR
@@ -257,7 +257,7 @@ def pca_diag_set(patient_id):
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/pca_localized',
                     methods=('OPTIONS', 'POST', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def pca_localized_set(patient_id):
     """Simplified API for setting clinical PCa localized status w/o FHIR
@@ -361,7 +361,7 @@ def clinical(patient_id):
 
 @clinical_api.route('/patient/<int:patient_id>/clinical',
                     methods=('OPTIONS', 'POST', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def clinical_set(patient_id):
     """Add clinical entry via FHIR Resource Observation
@@ -442,7 +442,7 @@ def clinical_set(patient_id):
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/<int:observation_id>',
                     methods=(['OPTIONS', 'PUT']))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def clinical_update(patient_id, observation_id):
     """Updates a FHIR Resource Observation clinical entry
