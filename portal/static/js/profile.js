@@ -2095,7 +2095,7 @@
                         self.onBeforeInitClinicalQuestionsSection();
                         $("#patientQ [name='biopsy']").on("click", function() {
                             var toSend = String($(this).val()), biopsyDate = $("#biopsyDate").val(), thisItem = $(this), userId = self.subjectId;
-                            var toCall = thisItem.attr("name") || thisItem.attr("data-name"), targetField = $("#patientQContainer");
+                            var toCall = thisItem.attr("name") || thisItem.attr("data-name"), targetField = $("#patientQ");
                             var arrQ = ["pca_diag", "pca_localized", "tx"];
                             if (toSend === "true") {
                                 $("#biopsyDateContainer").show();
@@ -2122,8 +2122,8 @@
                                 });
                                 setTimeout(function() {
                                     self.modules.tnthAjax.postClinical(userId, toCall, "false", thisItem.attr("data-status"), targetField);
-                                    self.modules.tnthAjax.postClinical(userId, "pca_diag", "false");
-                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                    self.modules.tnthAjax.postClinical(userId, "pca_diag", "false", "", targetField);
+                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
                                     self.modules.tnthAjax.deleteTreatment(userId);
                                 }, 50);
 
@@ -2143,20 +2143,20 @@
                         });
 
                         $("#patientQ input[name='tx']").on("click", function() {
-                            self.modules.tnthAjax.postTreatment(self.subjectId, (String($(this).val()) === "true"), "", $("#patientQContainer"));
+                            self.modules.tnthAjax.postTreatment(self.subjectId, (String($(this).val()) === "true"), "", $("#patientQ"));
                         });
 
                         $("#patientQ input[name='pca_localized']").on("click", function() {
                             var o = $(this);
                             setTimeout(function() {
-                                self.modules.tnthAjax.postClinical(self.subjectId, o.attr("name"), o.val(), o.attr("data-status"), $("#patientQContainer"));
+                                self.modules.tnthAjax.postClinical(self.subjectId, o.attr("name"), o.val(), o.attr("data-status"), $("#patientQ"));
                             }, 50);
                         });
 
                         $("#patientQ input[name='pca_diag']").on("click", function() {
-                            var toSend = String($(this).val()), userId = self.subjectId, o = $(this);
+                            var toSend = String($(this).val()), userId = self.subjectId, o = $(this), targetField = $("#patientQ");
                             setTimeout(function() {
-                                self.modules.tnthAjax.postClinical(userId, o.attr("name"), toSend, o.attr("data-status"), $("#patientQContainer"));
+                                self.modules.tnthAjax.postClinical(userId, o.attr("name"), toSend, o.attr("data-status"), targetField);
                             }, 50);
                             if (toSend !== "true") {
                                 ["pca_localized", "tx"].forEach(function(fieldName) {
@@ -2165,7 +2165,7 @@
                                     field.attr("skipped", "true");
                                 });
                                 setTimeout(function() {
-                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
                                     self.modules.tnthAjax.deleteTreatment(userId);
                                 }, 50);
                             }

@@ -2,6 +2,14 @@
 {%- from "flask_user/_macros.html" import back_btn, footer -%}
 {%- from "profile/profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
+{% macro addClinics() -%}
+  <div class="form-group profile-section" id="userOrgs">
+    <label>{{ _("Clinics") }}</label>
+    <div id="fillOrgs"></div>
+    <div id="clinicsLoader" class="tnth-hide"><i class="fa fa-spinner fa-spin"></i></div>
+    <div class="help-block with-errors get-orgs-error error-message"></div>
+  </div>
+{%- endmacro %}
 {% block main %}
     <br/>
     <form id="createProfileForm" class="form tnth-form to-validate" data-toggle="validator">

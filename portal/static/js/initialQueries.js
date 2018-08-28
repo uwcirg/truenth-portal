@@ -95,9 +95,7 @@
         } else {
             var defaultSections = this.defaultSections;
             for (var section in defaultSections) {
-                if (defaultSections[section].required) {
-                    this.mainSections[section] = defaultSections[section];
-                } else if (self.inConfig(defaultSections[section].config)) {
+                if (self.inConfig(defaultSections[section].config)) {
                     this.mainSections[section] = defaultSections[section];
                 }
             }
@@ -128,23 +126,19 @@
                 handleIncomplete: function() {
                     $("#aboutForm").addClass("full-size");
                     $("#topTerms").removeClass("hide-terms").show();
-                    if (!$("#termsText").hasClass("agreed")) {
-                        if (window.performance) {
-                            if (performance.navigation.type === 1) {
-                                //page has been reloaded;
-                                var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
-                                if (agreedCheckboxes.length > 1) {
-                                    $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-                                }
-                                if (agreedCheckboxes.length === 0) {
-                                    $("#termsText").addClass("agreed");
-                                }
-                                $("#termsReminderModal").modal("show");
-                            }
+                    if (!window.performance) {
+                        return false;
+                    }
+                    if (performance.navigation.type === 1) {
+                        //page has been reloaded;
+                        var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
+                        if (agreedCheckboxes.length > 1) {
+                            $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
                         }
-                    } else {
-                        $("#aboutForm").removeClass("tnth-hide");
-                        self.continueToNext();
+                        if (agreedCheckboxes.length === 0) {
+                            $("#termsText").addClass("agreed");
+                        }
+                        $("#termsReminderModal").modal("show");
                     }
                     setTimeout(function() {disableHeaderFooterLinks();}, 1000);
                 }
@@ -185,31 +179,9 @@
             "orgsContainer": {
                 display: i18next.t("your clinic"),
                 config: "org",
-                required: hasValue(preselectClinic) ? true : false,
                 subsections: {
                     "clinics": {
                         fields: ["#userOrgs input[name='organization']"]
-                    }
-                },
-                initData: function() {
-                    if (!hasValue($("#iqPatientEditable").val())) { //for patient, clinic is drawn in orgs state selector template
-                        tnthAjax.getOrgs(self.userId, {sync: true}, function() {
-                            var userOrgs = $("#userOrgs input[name='organization']").not("[parent_org]");
-                            if (userOrgs.length === 0) {
-                                userOrgs = $("#userOrgs input[name='organization']");
-                            }
-                            var checkedOrgs = {};
-                            userOrgs.each(function() {
-                                if ($(this).prop("checked")) {
-                                    checkedOrgs[$(this).val()] = true;
-                                }
-                                $(this).attr("type", "radio");
-                                if (checkedOrgs[$(this).val()]) {
-                                    $(this).prop("checked", true);
-                                }
-                            });
-                            $("#clinics").attr("loaded", true);
-                        });
                     }
                 },
                 handleIncomplete: function() {
@@ -228,7 +200,7 @@
         };
     };
 
-    FieldsChecker.prototype.postDemoData = function() {
+    FieldsChecker.prototype.postDemoData = function(targetField) {
         var demoArray = {}, tnthAjax = this.__getDependency("tnthAjax");
         demoArray.resourceType = "Patient";
         var fname = $("input[name=firstname]").val(), lname = $("input[name=lastname]").val();
@@ -237,7 +209,8 @@
         if (y && m && d) {
             demoArray.birthDate = y + "-" + m + "-" + d;
         }
-        tnthAjax.putDemo(this.userId, demoArray);
+        tnthAjax.putDemo(this.userId, demoArray, targetField);
+        this.handlePostEvent(this.getSectionContainerId(targetField));
     };
 
     FieldsChecker.prototype.initEvent = function(field) {
@@ -256,8 +229,6 @@
             $(fields).each(function() {
                 if (events[subSectionId]) {
                     events[subSectionId]([$(this)]);
-                } else {
-                    return true;
                 }
             });
         }
@@ -481,6 +452,9 @@
                     case "select":
                         isComplete = field.val() !== "";
                         break;
+                    case "hidden":
+                        isComplete = (field.val() !== "");
+                        break;
                     case "text":
                         isComplete = (field.val() !== "") && (field.get(0).validity.valid);
                         break;
@@ -509,17 +483,28 @@
         return completed;
     };
 
+    FieldsChecker.prototype.scrollTo = function(element) {
+        if (!element) {
+            return;
+        }
+        setTimeout(function() {
+            $("html, body").stop().animate({
+                scrollTop: $(element).offset().top
+            }, 1500);
+        }(), 800);
+    };
+
     FieldsChecker.prototype.continueToFinish = function() {
         if ($("div.reg-complete-container").hasClass("inactive")) {
             return false;
         }
         this.setProgressBar();
-        $("#buttonsContainer").addClass("continue");
-        $("div.reg-complete-container").fadeIn();
-        $("html, body").stop().animate({
-            scrollTop: $("div.reg-complete-container").offset().top
-        }, 1500);
+        $("#iqRefresh").addClass("tnth-hide");
         $("#next").attr("disabled", true).removeClass("open");
+        $("#buttonsContainer").addClass("continue");
+        $("#aboutForm").removeClass("tnth-hide");
+        $("div.reg-complete-container").fadeIn();
+        this.scrollTo($("div.reg-complete-container"));
         $("#iqErrorMessage").text("");
         $("#updateProfile").removeAttr("disabled").addClass("open");
     };
@@ -528,7 +513,7 @@
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
         $("div.reg-complete-container").fadeOut();
-        $("#next").attr("disabled", true).addClass("open");
+        $("#next").attr("disabled", true);
         this.setProgressBar(sectionId);
     };
 
@@ -536,16 +521,12 @@
         if (sectionId) {
             this.setProgressBar(sectionId);
         }
+        $("#aboutForm").removeClass("tnth-hide");
+        $("#iqRefresh").addClass("tnth-hide");
         $("#buttonsContainer").removeClass("continue");
         $("div.reg-complete-container").fadeOut();
         $("#next").removeAttr("disabled").addClass("open");
-        if (!$("#next").isOnScreen()) {
-            setTimeout(function() {
-                $("html, body").stop().animate({
-                    scrollTop: $("#next").offset().top
-                }, 1500);
-            }(), 500);
-        }
+        this.scrollTo($("#next"));
         $("#updateProfile").attr("disabled", true).removeClass("open");
     };
 
@@ -611,18 +592,16 @@
         var self = this;
         /****** prep work after initializing incomplete fields -set visuals e.g. top terms ************************/
         self.constructProgressBar();
-        var i18next = self.__getDependency("i18next");
-        $("#queriesForm").validator().on("submit", function(e) {
-            if (e.isDefaultPrevented()) {
-                $("#iqErrorMessage").text(i18next.t("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid."));
-            } else {
-                $("#updateProfile").hide();
-                $("#next").hide();
-                $(".loading-message-indicator").show();
-                setTimeout(function() {
-                    self.postDemoData();
-                }, 250);
-            }
+
+        $("#updateProfile").on("click", function() {
+            $(this).hide();
+            $("#next").hide();
+            $(".loading-message-indicator").show();
+            $("#queriesForm").submit();
+        });
+
+        $("#iqRefresh").on("click", function() {
+            window.location.reload();
         });
         /*** event for the next button ***/
         $("#next").on("click", function() {
@@ -630,7 +609,7 @@
             $(".loading-message-indicator").show();
             setTimeout(function() {
                 window.location.reload();
-            }, 500);
+            }, 150);
         });
         /*** event for the arrow in the header**/
         $("div.heading").on("click", function() {
@@ -667,18 +646,95 @@
         }, 500);
     };
 
-    FieldsChecker.prototype.handlePostEvent = function(sectionId) {
-        if (sectionId) {
-            if (this.allFieldsCompleted()) {
-                this.continueToFinish();
-            } else {
-                if (this.sectionCompleted(sectionId)) {
-                    this.continueToNext(sectionId);
-                } else {
-                    this.stopContinue(sectionId);
-                }
-            }
+    FieldsChecker.prototype.getSectionContainerId = function(field) {
+        return $(field).closest(".section-container").attr("id");
+    };
+
+    FieldsChecker.prototype.handleRefreshElement = function(sectionId) {
+        if (!sectionId || $("#iqRefresh").length) {
+            return;
         }
+        var i18next = this.__getDependency("i18next");
+        var contentHTML = "<div id='iqRefresh' class='error-message tnth-hide'><i class='fa fa-refresh refresh-icon' aria-hidden='true'></i><span>{text}</span></div>".replace("{text}", i18next.t("Try Again"));
+        var contentElement = $("#"+sectionId).find(".content-body");
+        if (contentElement.length) {
+            contentElement.append(contentHTML);
+        } else {
+            $("#"+sectionId).append(contentHTML);
+        }
+        $("#iqRefresh").on("click", function() {
+            window.location.reload();
+        });
+    };
+
+    FieldsChecker.prototype.isSavingInProgress = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        var loadingInProgress = false;
+        $("#"+sectionId).find(".save-loader-wrapper").each(function() {
+            if (!loadingInProgress && $(this).hasClass("loading")) {
+                loadingInProgress = true;
+            }
+        });
+        return loadingInProgress;
+    };
+
+    FieldsChecker.prototype.sectionHasError = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        var hasError = false;
+        $("#" + sectionId + " .error-message").each(function() { //check for errors
+            if (!hasError) { //short circuit the loop through elements
+                hasError = hasValue($(this).text());
+            }
+           
+        });
+        return hasError;
+    }
+
+    FieldsChecker.prototype.handlePostEvent = function(sectionId) {
+        var self = this, elapsedSaveTime = 0;
+        window.startDataSavingTime = new Date();
+        window.endDataSavingTime = new Date();
+        var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
+        if (this.sectionCompleted(sectionId)) {
+            dataSavingElement.removeClass("tnth-hide");
+            this.scrollTo(dataSavingElement);
+
+        }
+        clearInterval(window.dataSavingIntervalId);
+        window.dataSavingIntervalId = setInterval(function() {
+            window.endDataSavingTime = new Date();
+            elapsedSaveTime = window.endDataSavingTime - window.startDataSavingTime;
+            elapsedSaveTime  /= 1000;
+            var loadingInProgress = self.isSavingInProgress(sectionId);
+            if (loadingInProgress && elapsedSaveTime < 10) {
+                return false;
+            }
+            dataSavingElement.addClass("tnth-hide");
+            window.startDataSavingTime = 0;
+            window.endDataSavingTime = 0;
+            clearInterval(window.dataSavingIntervalId);
+
+            var hasError = self.sectionHasError(sectionId);
+            if (hasError) {
+                self.stopContinue(sectionId);
+                self.handleRefreshElement(sectionId);
+                $("#iqRefresh").removeClass("tnth-hide");
+                return false;
+            }
+            if (self.allFieldsCompleted()) { //all sections finished
+                self.continueToFinish();
+                return true;
+            }
+            if (self.sectionCompleted(sectionId)) { //current section completed
+                self.continueToNext(sectionId);
+                return;
+            }
+            self.stopContinue(sectionId);
+        }, 150);
     };
 
     FieldsChecker.prototype.updateTerms = function(data) {
@@ -770,7 +826,7 @@
                                 theTerms["organization_id"] = topOrg;
                             }
                         }
-                        tnthAjax.postTerms(theTerms); // Post terms agreement via API
+                        tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
                     });
                 }
                 // Update UI
@@ -801,15 +857,7 @@
                         }
                     });
                 }
-            }
-
-            if (__self.sectionCompleted("topTerms")) {
-                $("#aboutForm").fadeIn();
-            }
-            if (__self.allFieldsCompleted()) {
-                __self.continueToFinish();
-            } else {
-                __self.continueToNext("topTerms");
+                __self.handlePostEvent(__self.getSectionContainerId($(this)));
             }
         };
         $("#topTerms label.terms-label").each(function() { //account for the fact that some terms items are hidden as child elements to a label
@@ -839,11 +887,8 @@
         var self = this;
         fields.forEach(function(item) {
             $(item).on(self.getFieldEventType(item), function() {
-                self.handlePostEvent("demographicsContainer");
-            });
-            $(item).on("blur", function() {
                 if ($(this).val() !== "") {
-                    self.postDemoData();
+                    self.postDemoData($(this));
                 }
             });
         });
@@ -855,14 +900,12 @@
             $(item).on(self.getFieldEventType(item), function() {
                 var d = $("#date"), m = $("#month"), y = $("#year");
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
-                if (isValid) {
-                    $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                    $("#errorbirthday").text("").hide();
-                    self.postDemoData();
-                    self.handlePostEvent("demographicsContainer");
-                } else {
-                    self.stopContinue("demographicsContainer");
+                if (!isValid) {
+                    return false;
                 }
+                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                $("#errorbirthday").text("").hide();
+                self.postDemoData($(this));
             });
         });
     };
@@ -873,7 +916,8 @@
             $(item).on("click", function() {
                 var roles = [], theVal = $(this).val();
                 roles.push({name: theVal});
-                tnthAjax.putRoles(self.userId,{"roles": roles});
+                tnthAjax.putRoles(self.userId,{"roles": roles}, $("#rolesGroup"));
+                self.handlePostEvent(self.getSectionContainerId($(this)));
                 if (theVal === "patient") {
                     $("#clinicalContainer").attr("skipped", "false");
                     $("#orgsContainer").attr("skipped", "false");
@@ -891,7 +935,6 @@
                         $(".bd-optional").show();
                     }
                 }
-                self.handlePostEvent("demographicsContainer");
             });
         });
     };
@@ -928,7 +971,7 @@
                 } else {
                     thisItem.parents(".pat-q").nextAll().fadeOut();
                 }
-                self.handlePostEvent("clinicalContainer");
+                self.handlePostEvent(self.getSectionContainerId($(this)));
 
             });
         });
@@ -983,10 +1026,16 @@
                     } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
                         return true;
                     } else {
-                        self.continueToFinish();
+                        self.handlePostEvent(self.getSectionContainerId($(this)));
                     }
                 }
             });
+        });
+        $("#stateSelector").on("change", function() {
+            if (!$(this).val()) {
+                return;
+            }
+            self.scrollTo($("#clinics .state-selector-container.selector-show"));
         });
         /*** event for consent popups **/
         $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
@@ -995,7 +1044,7 @@
                     $("#userOrgs input[name='organization']").each(function() {
                         $(this).removeAttr("data-require-validate");
                     });
-                    self.continueToFinish();
+                    self.handlePostEvent(self.getSectionContainerId($(this)));
                 }
             });
         });
@@ -1011,7 +1060,7 @@
          * note: need to delay gathering incomplete fields to allow fields to be render
          */
         if ($("#aboutForm").length > 0 || $("#topTerms").length > 0) { /*global i18next, tnthAjax, OrgTool, tnthDates*/
-            var fc = new window.FieldsChecker({
+            var fc = window.fc = new window.FieldsChecker({
                 i18next: i18next,
                 tnthAjax: tnthAjax,
                 orgTool: new OrgTool(),
@@ -1020,11 +1069,12 @@
             fc.init(function() {
                 fc.startTime = new Date();
                 DELAY_LOADING = true; /*global DELAY_LOADING */
+                clearInterval(fc.intervalId);
                 fc.intervalId = setInterval(function() {
                     fc.endTime = new Date();
                     var elapsedTime = fc.endTime - fc.startTime;
                     elapsedTime /= 1000;
-                    if (fc.sectionsLoaded() || elapsedTime >= 3) {
+                    if (fc.sectionsLoaded() || elapsedTime >= 5) {
                         setTimeout(function() {
                             fc.initIncompleteFields();
                             fc.onIncompleteFieldsDidInit();
