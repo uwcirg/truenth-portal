@@ -783,7 +783,7 @@
                 if (toCall === "biopsy" && !$("#biopsyDate").val()) {
                     return true;
                 }
-                thisItem.parents(".pat-q").next().fadeIn();
+                thisItem.parents(".pat-q").next().fadeIn(150);
                 var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
                 var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
                 if (nextItem.length > 0) {
@@ -802,7 +802,7 @@
                     });
                 }
             } else {
-                thisItem.parents(".pat-q").nextAll().fadeOut();
+                thisItem.parents(".pat-q").nextAll().fadeOut(150);
             }
             self.handlePostEvent(self.getSectionContainerId($(this)));
         });
@@ -851,13 +851,12 @@
         $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
             if ($(this).prop("checked")) {
                 var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
-                if ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) { //do nothing
+                var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) || ($("#fillOrgs").attr("patient_view") && dm.length > 0);
+                if (requiringConsentViaModal) { //do nothing
                     return true;
-                } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
-                    return true;
-                } else {
-                    self.handlePostEvent(self.getSectionContainerId($(this)));
-                }
+                } 
+                self.handlePostEvent(self.getSectionContainerId($(this)));
+
             }
         });
         $("#stateSelector").on("change", function() {
