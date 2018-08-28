@@ -358,11 +358,19 @@ TravisCI allows Selenium tests to be run with any number of browser/OS
 combinations and `captures video from running
 tests <https://saucelabs.com/open_sauce/user/ivan-c>`__.
 
-UI tests can also be run locally (after installing ``xvfb``) by passing
-Tox the virtual environment that corresponds to the UI tests (``ui``):
+UI tests can also be run locally (after installing ``xvfb`` and geckodriver) by passing
+Tox the virtual environment that corresponds to the UI tests (``ui``).
+
+Setup:
+1. ```sudo apt-get install xvfb python-xvfbwrapper```
+2. Install geckodriver from `here <https://github.com/mozilla/geckodriver/releases>`__. For example:
+    a) ```wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz```
+    b) ```tar -xvzf geckodriver-v0.21.0-linux64.tar.gz```
+    c) ```rm geckodriver-v0.21.0-linux64.tar.gz```
+    d) ```chmod +x geckdriver```
+    e) ```sudo mv geckodriver /usr/local/bin/```
 
 .. code:: bash
-
     $ tox -e ui
 
 Dependency Management
