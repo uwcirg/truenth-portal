@@ -14,7 +14,7 @@
     {% if user and user.email %}
       <input type="hidden" name="email" id="email" value="{{user.email}}" />
     {% endif %}
-    {% call sectionContent(sectionId="demographicsContainer", title=_('Tell us a little about yourself.')) -%}
+    {% call sectionContent(sectionId="demographicsContainer", title=_("Tell us a little about yourself."), display=_("your information"), config="name,dob,role") -%}
       {{nameGroup()}}
       <br/><br/>
       {{dobGroup()}}
@@ -23,11 +23,11 @@
       <div class="get-demo-error error-message"></div>
       <div class="put-demo-error error-message"></div>
     {%- endcall %}
-    {% call sectionContent(sectionId="clinicalContainer", title=_('Now it is time to build your prostate cancer profile.')) -%}
+    {% call sectionContent(sectionId="clinicalContainer", title=_('Now it is time to build your prostate cancer profile.'), display=_("your clinical profile"), config="clinical,localized") -%}
       <p class="subtitle">{{_("The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.")}}</p>
       {{patientQGroup(user)}}
     {%- endcall %}
-    {% call sectionContent(sectionId="orgsContainer", title=_("Your clinic of care.")) -%}
+    {% call sectionContent(sectionId="orgsContainer", title=_("Your clinic of care."), display=_("your clinic"), config="org") -%}
       {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
         {{profileOrgsSelector(user, user, consent_agreements)}}
       {% else %}

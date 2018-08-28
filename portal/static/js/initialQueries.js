@@ -11,12 +11,10 @@
         this.userId = null;
         this.roleRequired = false;
         this.userRoles = [];
-        this.CONFIG_DEFAULT_CORE_DATA = null;
         this.CONFIG_REQUIRED_CORE_DATA = null;
         this.preselectClinic = "";
-        this.mainSections = {};
         this.defaultSections = {};
-        this.incompleteFields = [];
+        this.mainSections = {};
         this.dependencies = dependencies || {};
         this.orgTool = null;
 
@@ -32,7 +30,7 @@
             self.initConfig(function(data) {
                 self.preselectClinic = $("#preselectClinic").val();
                 self.initSections();
-                self.initSectionData(data);
+                self.initSectionData();
                 if (callback) {
                     callback(data);
                 }
@@ -64,140 +62,74 @@
         return this.orgTool;
     };
 
-    FieldsChecker.prototype.initSectionData = function(data) {
-        var self = this, sections = self.getSections();
-        for (var section in sections) {
-            if (self.inConfig(sections[section].config, data)) {
-                self.initData(section);
-            }
+    FieldsChecker.prototype.setSectionDataLoadedFlag = function(sectionId, flag) {
+        if (!sectionId || !this.mainSections.hasOwnProperty(sectionId)) {
+            return false;
         }
+        this.mainSections[sectionId].loaded = flag;
     };
 
-    FieldsChecker.prototype.initData = function(section) {
-        if (this.mainSections[section] && this.mainSections[section].initData) {
-            this.mainSections[section].initData();
+    FieldsChecker.prototype.sectionIsLoaded = function(sectionId) {
+        if (!sectionId || !this.mainSections.hasOwnProperty(sectionId)) {
+            return false;
+        }
+        return this.mainSections[sectionId].loaded;
+    };
+
+    FieldsChecker.prototype.initSectionData = function() {
+        var self = this, sections = self.getSections(), tnthAjax = this.__getDependency("tnthAjax");
+        var initDataObj = {
+            "topTerms": function() {
+                tnthAjax.getTerms(self.userId, "", "", function() {
+                    self.setSectionDataLoadedFlag("topTerms", true);
+                });
+            },
+            "demographicsContainer": function() {
+                tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
+                    self.setSectionDataLoadedFlag("demographicsContainer", true);
+                });
+            },
+            "clinicalContainer": function() {
+                tnthAjax.getTreatment(self.userId, {useWorker:true}, function() {
+                    tnthAjax.getClinical(self.userId, {async:false}, function() {
+                        self.setSectionDataLoadedFlag("clinicalContainer", true);
+                    });
+                });
+            },
+            "orgsContainer": function() {
+                tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
+                    self.setSectionDataLoadedFlag("orgsContainer", true);
+                });
+            }
+        };
+        for (var section in sections) {
+            if (!initDataObj.hasOwnProperty(section)) {
+                continue;
+            }
+            if (self.sectionCompleted(section)) {
+                continue;
+            }
+            initDataObj[section](); //will initialize data for the first/current incomplete section
+            break;
         }
     };
 
     FieldsChecker.prototype.getSections = function() {
-        var sections = this.defaultSections;
-        if (Object.keys(this.mainSections).length > 0) {
-            sections = this.mainSections;
-        }
-        return sections;
+        return this.mainSections;
     };
 
     FieldsChecker.prototype.initSections = function() {
+        this.mainSections = {};
         var self = this;
-        self.setSections();
-        if (!self.getConfig()) {
-            this.mainSections = this.defaultSections;
-        } else {
-            var defaultSections = this.defaultSections;
-            for (var section in defaultSections) {
-                if (self.inConfig(defaultSections[section].config)) {
-                    this.mainSections[section] = defaultSections[section];
-                }
+        $("#mainDiv .section-container").each(function() {
+            var sectionId = $(this).attr("id");
+            if (!sectionId) {
+                return true;
             }
-        }
-    };
-
-    FieldsChecker.prototype.setSections = function() {
-        var preselectClinic = this.preselectClinic, self = this, i18next = this.__getDependency("i18next");
-        var tnthAjax = this.__getDependency("tnthAjax");
-        this.defaultSections = { //main sections blueprint object, this will help keeping track of missing fields for each section
-            "topTerms": {
-                display: i18next.t("terms"),
-                config: "website_terms_of_use,subject_website_consent,privacy_policy",
-                subsections: {
-                    "termsCheckbox": {
-                        fields: ["#topTerms [data-type='terms'][data-required='true']"]
-                    }
-                },
-                initData: function() {
-                    tnthAjax.getTerms(self.userId, false, false, function(data) {
-                        self.updateTerms(data);
-                        $("#termsCheckbox").attr("loaded", "true");
-                    }, {
-                        "all": true
-                    });
-                    tnthAjax.getTermsUrl();
-                },
-                handleIncomplete: function() {
-                    $("#aboutForm").addClass("full-size");
-                    $("#topTerms").removeClass("hide-terms").show();
-                    if (!window.performance) {
-                        return false;
-                    }
-                    if (performance.navigation.type === 1) {
-                        //page has been reloaded;
-                        var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
-                        if (agreedCheckboxes.length > 1) {
-                            $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
-                        }
-                        if (agreedCheckboxes.length === 0) {
-                            $("#termsText").addClass("agreed");
-                        }
-                        $("#termsReminderModal").modal("show");
-                    }
-                    setTimeout(function() {disableHeaderFooterLinks();}, 1000);
-                }
-            },
-            "demographicsContainer": {
-                display: i18next.t("your information"),
-                config: "name,dob,role",
-                subsections: {
-                    "nameGroup": {fields: ["#firstname", "#lastname"]},
-                    "rolesGroup": {fields: ["input[name='user_type']"]},
-                    "bdGroup": {fields: ["#month", "#date", "#year"]}
-                },
-                initData: function() {
-                    tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
-                        $("#nameGroup").attr("loaded", "true");
-                        $("#rolesGroup").attr("loaded", "true");
-                        $("#bdGroup").attr("loaded", "true");
-                    });
-                    __convertToNumericField($("#date, #year"));
-                }
-            },
-            "clinicalContainer": {
-                display: i18next.t("your clinical profile"),
-                config: "clinical,localized",
-                subsections: {
-                    "patientQ": {
-                        fields: ["input[name='biopsy']", "#biopsyDate", "input[name='pca_diag']", "input[name='pca_localized']", "input[name='tx']"]
-                    }
-                },
-                initData: function() {
-                    tnthAjax.getTreatment(self.userId, {useWorker:true}, function() {
-                        tnthAjax.getClinical(self.userId, {useWorker:true}, function() {
-                            $("#patientQ").attr("loaded", "true");
-                        });
-                    });
-                }
-            },
-            "orgsContainer": {
-                display: i18next.t("your clinic"),
-                config: "org",
-                subsections: {
-                    "clinics": {
-                        fields: ["#userOrgs input[name='organization']"]
-                    }
-                },
-                handleIncomplete: function() {
-                    if (hasValue(preselectClinic)) {
-                        self.handlePreSelectedClinic();
-                        var __modal = self.getConsentModal();
-                        if (__modal) {
-                            __modal.modal("show");
-                        }
-                        $("#orgsContainer").fadeIn(500).addClass("open");
-                    } else {
-                        $("#orgsContainer").fadeIn(500).addClass("open");
-                    }
-                }
-            }
-        };
+            var sectionObj = self.mainSections[sectionId] = {};
+            sectionObj.config =  $(this).attr("data-config");
+            sectionObj.display = $(this).attr("data-display");
+        });
     };
 
     FieldsChecker.prototype.postDemoData = function(targetField) {
@@ -213,27 +145,6 @@
         this.handlePostEvent(this.getSectionContainerId(targetField));
     };
 
-    FieldsChecker.prototype.initEvent = function(field) {
-        if (field) {
-            var subSectionId = field.subsectionId,
-                self = this;
-            var fields = field.elements;
-            var events = {
-                "termsCheckbox": function(o) { self.termsCheckboxEvent(o); },
-                "nameGroup": function(o) { self.nameGroupEvent(o); },
-                "rolesGroup": function(o) { self.rolesGroupEvent(o); },
-                "bdGroup": function(o) { self.bdGroupEvent(o); },
-                "patientQ": function(o) { self.patientQEvent(o); },
-                "clinics": function(o) { self.clinicsEvent(o); }
-            };
-            $(fields).each(function() {
-                if (events[subSectionId]) {
-                    events[subSectionId]([$(this)]);
-                }
-            });
-        }
-    };
-
     FieldsChecker.prototype.setUserRoles = function() {
         var self = this, tnthAjax = self.__getDependency("tnthAjax");
         tnthAjax.getRoles(this.userId, function(data) {
@@ -241,6 +152,8 @@
                 self.userRoles = data.roles.map(function(item) {
                     return item.name;
                 });
+            } else {
+                tnthAjax.removeCachedRoles();
             }
             self.roleRequired = self.userRoles.indexOf("patient") !== -1 || self.userRoles.indexOf("staff") !== -1 || self.userRoles.indexOf("staff_admin") !== -1;
         }, {sync: true});
@@ -249,43 +162,23 @@
     FieldsChecker.prototype.initConfig = function(callback) {
         var self = this, tnthAjax = self.__getDependency("tnthAjax");
         tnthAjax.getStillNeededCoreData(self.userId, true, function(data) {
-            self.setUserRoles();
-            self.setConfig(self.roleRequired ? data : null, callback);
+            self.setConfig(data, callback);
         });
     };
 
     FieldsChecker.prototype.inConfig = function(configMatch, dataArray) {
         if (!hasValue(configMatch)) {
             return false;
-        } else {
-            if (!dataArray) {
-                dataArray = this.CONFIG_REQUIRED_CORE_DATA;
-            }
-            if (!dataArray || dataArray.length === 0) { return false; }
-            var found = false;
-            var ma = configMatch.split(",");
-            ma.forEach(function(item) {
-                if (found) { return true; } /* IMPORTANT, immediately return true. without checking this item, this is in the context of the loop, the sequence matters here, loop still continues*/
-                found = dataArray.indexOf(item) !== -1;
-            });
-            return found;
         }
-    };
-
-    FieldsChecker.prototype.getDefaultConfig = function() {
-        var self = this, tnthAjax = this.__getDependency("tnthAjax");
-        if (!this.CONFIG_DEFAULT_CORE_DATA) {
-            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", self.userId, {
-                sync: true
-            }, function(data) {
-                if (!data.error) {
-                    if (data.REQUIRED_CORE_DATA) {
-                        self.CONFIG_DEFAULT_CORE_DATA = data.REQUIRED_CORE_DATA;
-                    }
-                }
-            });
-        }
-        return this.CONFIG_DEFAULT_CORE_DATA;
+        dataArray = dataArray || this.CONFIG_REQUIRED_CORE_DATA;
+        if (!dataArray || dataArray.length === 0) { return false; }
+        var found = false;
+        var ma = configMatch.split(",");
+        ma.forEach(function(item) {
+            if (found) { return true; } /* IMPORTANT, immediately return true. without checking this item, this is in the context of the loop, the sequence matters here, loop still continues*/
+            found = dataArray.indexOf(item) !== -1;
+        });
+        return found;
     };
 
     FieldsChecker.prototype.getConfig = function() {
@@ -295,10 +188,8 @@
     FieldsChecker.prototype.setConfig = function(data, callback) {
         callback = callback || function() {};
         var tnthAjax = this.__getDependency("tnthAjax");
-        if (data) {
-            if (!data.error) {
-                this.CONFIG_REQUIRED_CORE_DATA = data;
-            }
+        if (data && !data.error) {
+            this.CONFIG_REQUIRED_CORE_DATA = data;
         }
         if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
             var self = this;
@@ -306,36 +197,16 @@
                 sync: true
             }, function(data) {
                 if (!data.error) {
-                    if (data.REQUIRED_CORE_DATA) {
-                        self.CONFIG_REQUIRED_CORE_DATA = data.REQUIRED_CORE_DATA;
-                    }
+                    self.CONFIG_REQUIRED_CORE_DATA = data.REQUIRED_CORE_DATA;
                 }
-                callback();
             });
-        } else {
-            callback();
         }
+        this.setUserRoles();
+        callback();
     };
 
     FieldsChecker.prototype.getTotalSections = function() {
-        /*** note counting all the default main sections to show progress for each**/
-        var configData = this.getDefaultConfig();
-        if (configData) {
-            return configData.length;
-        } else {
-            return Object.keys(this.defaultSections);
-        }
-    };
-
-    FieldsChecker.prototype.getCompleteSections = function() {
-        var ct = 0,
-            self = this;
-        for (var section in this.mainSections) {
-            if (self.sectionCompleted(section)) {
-                ct++;
-            }
-        }
-        return ct;
+        return Object.keys(this.mainSections).length;
     };
 
     FieldsChecker.prototype.constructProgressBar = function() {
@@ -345,142 +216,53 @@
         }
         var self = this;
         var totalSections = self.getTotalSections();
-
-        if (totalSections > 1) {
-            var availableSections = 0;
-            if (self.defaultSections) {
-                for (var section in self.defaultSections) {
-                    if (self.defaultSections.hasOwnProperty(section)) {
-                        var active = self.sectionCompleted(section);
-                        $("#progressbar").append("<li sectionId='" + section + "'  " + (active ? " class='active'" : "") + ">" + self.defaultSections[section].display + "</li>");
-                        availableSections++;
-                    }
-                }
-            }
-            if (availableSections > 0) {
-                var w = (1 / availableSections) * 100;
-                $("#progressbar li").each(function() {
-                    $(this).css("width", w + "%");
-                });
-                if (availableSections > 1) {
-                    $("#progressWrapper").show();
-                }
-            }
-        } else {
+        if (totalSections <= 1) {
             $("#progressWrapper").remove();
+            return;
+        }
+        var availableSections = 0;
+        for (var section in self.mainSections) {
+            var sectionConfigs = self.getSectionConfigs(section);
+            var active = (section === "topTerms" && !self.inConfig(sectionConfigs)) || (self.roleRequired && !self.inConfig(sectionConfigs));
+            $("#progressbar").append("<li sectionId='" + section + "'  " + (active ? " class='active'" : "") + ">" + self.mainSections[section].display + "</li>");
+            availableSections++;
+        }
+        if (availableSections === 0) {
+            return;
+        }
+        var w = (1 / availableSections) * 100;
+        $("#progressbar li").each(function() {
+            $(this).css("width", w + "%");
+        });
+        if (availableSections > 1) {
+            $("#progressWrapper").show();
         }
     };
 
     FieldsChecker.prototype.setProgressBar = function(sectionId) {
-        if (this.allFieldsCompleted()) {
-            $("#progressWrapper").hide();
+        if (!hasValue(sectionId)) {
+            return;
+        }
+        if (this.sectionCompleted(sectionId)) {
+            $("#progressbar li[sectionId='" + sectionId + "']").addClass("active");
         } else {
-            if (hasValue(sectionId)) {
-                if (this.sectionCompleted(sectionId)) {
-                    $("#progressbar li[sectionId='" + sectionId + "']").addClass("active");
-                } else {
-                    $("#progressbar li[sectionId='" + sectionId + "']").removeClass("active");
-                }
-            }
+            $("#progressbar li[sectionId='" + sectionId + "']").removeClass("active");
         }
     };
 
-    FieldsChecker.prototype.getIncompleteFields = function() {
-        return this.incompleteFields;
-    };
-
-    FieldsChecker.prototype.setIncompleteFields = function() {
-        var self = this;
-        if (self.mainSections) {
-            var ms = self.mainSections;
-            self.reset();
-            for (var section in ms) {
-                if (!self.sectionCompleted(section)) {
-                    for (var sectionId in ms[section].subsections) {
-                        var fields = ms[section].subsections[sectionId].fields;
-                        fields.forEach(function(field) {
-                            field = $(field);
-                            if (field.length > 0) {
-                                self.incompleteFields.push({
-                                    "sectionId": section,
-                                    "subsectionId": sectionId,
-                                    "section": $("#" + section),
-                                    "elements": field
-                                });
-                            }
-                        });
-                    }
-                }
-            }
+    FieldsChecker.prototype.getSectionConfigs = function(sectionId) {
+        if (!sectionId || !this.mainSections[sectionId]) {
+            return false;
         }
+        return this.mainSections[sectionId].config;
     };
 
-    FieldsChecker.prototype.reset = function() {
-        this.incompleteFields = [];
-    };
-
-    FieldsChecker.prototype.sectionCompleted = function(sectionId) {
-        var isComplete = true, isChecked = false;
-        if (this.mainSections && this.mainSections[sectionId]) {
-            //count skipped section as complete
-            if ($("#" + sectionId).attr("skipped") === "true") {
-                return true;
-            }
-            for (var id in (this.mainSections[sectionId]).subsections) {
-                var fields = (this.mainSections[sectionId]).subsections[id].fields;
-                if (!isComplete || !fields) {return isComplete; }
-                fields.forEach(function(field) {
-                    field = $(field);
-                    if (field.length === 0 || field.attr("skipped") === "true") { return true; }
-                    var type = field.attr("data-type") || field.attr("type");
-                    switch (String(type).toLowerCase()) {
-                    case "checkbox":
-                    case "radio":
-                        isChecked = false;
-                        field.each(function() {
-                            if ($(this).is(":checked")) {
-                                isChecked = true;
-                            }
-                            if (hasValue($(this).attr("data-require-validate"))) {
-                                isComplete = false;
-                            }
-                        });
-                        if (!(isChecked)) {
-                            isComplete = false;
-                        }
-                        break;
-                    case "select":
-                        isComplete = field.val() !== "";
-                        break;
-                    case "hidden":
-                        isComplete = (field.val() !== "");
-                        break;
-                    case "text":
-                        isComplete = (field.val() !== "") && (field.get(0).validity.valid);
-                        break;
-                    case "terms":
-                        var isAgreed = true;
-                        field.each(function() {
-                            if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") === "true")) {
-                                isAgreed = false;
-                            }
-                        });
-                        isComplete = isAgreed;
-                        break;
-                    }
-                    if (hasValue(field.attr("data-require-validate"))) {
-                        isComplete = false;
-                    }
-                });
-            }
+    FieldsChecker.prototype.sectionCompleted = function(sectionId, configArray) {
+        if (!sectionId || !this.mainSections[sectionId]) {
+            return false;
         }
-        return isComplete;
-    };
-
-    FieldsChecker.prototype.allFieldsCompleted = function() {
-        this.setIncompleteFields();
-        var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length === 0;
-        return completed;
+        var sectionConfigs = this.getSectionConfigs(sectionId);
+        return !this.inConfig(sectionConfigs, configArray || this.CONFIG_REQUIRED_CORE_DATA);
     };
 
     FieldsChecker.prototype.scrollTo = function(element) {
@@ -498,7 +280,7 @@
         if ($("div.reg-complete-container").hasClass("inactive")) {
             return false;
         }
-        this.setProgressBar();
+        $("#progressWrapper").hide();
         $("#iqRefresh").addClass("tnth-hide");
         $("#next").attr("disabled", true).removeClass("open");
         $("#buttonsContainer").addClass("continue");
@@ -513,14 +295,12 @@
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
         $("div.reg-complete-container").fadeOut();
-        $("#next").attr("disabled", true);
+        $("#next").attr("disabled", true).addClass("open");
         this.setProgressBar(sectionId);
     };
 
     FieldsChecker.prototype.continueToNext = function(sectionId) {
-        if (sectionId) {
-            this.setProgressBar(sectionId);
-        }
+        this.setProgressBar(sectionId);
         $("#aboutForm").removeClass("tnth-hide");
         $("#iqRefresh").addClass("tnth-hide");
         $("#buttonsContainer").removeClass("continue");
@@ -548,26 +328,66 @@
     };
 
     FieldsChecker.prototype.handleIncomplete = function(section) {
-        if (this.mainSections[section] && this.mainSections[section].handleIncomplete) {
-            this.mainSections[section].handleIncomplete();
+        var preselectClinic = this.preselectClinic, self = this, i18next = this.__getDependency("i18next");
+        var handleIncompleteFuncObj = {
+            "topTerms": function() {
+                $("#aboutForm").addClass("full-size");
+                $("#topTerms").removeClass("hide-terms").show();
+                if (!window.performance) {
+                    return false;
+                }
+                if (performance.navigation.type === 1) {
+                    //page has been reloaded;
+                    var agreedCheckboxes = $("#topTerms [data-required][data-agree='false']");
+                    if (agreedCheckboxes.length > 1) {
+                        $("#termsReminderCheckboxText").text(i18next.t("You must agree to the terms and conditions by checking the provided checkboxes."));
+                    }
+                    if (agreedCheckboxes.length === 0) {
+                        $("#termsText").addClass("agreed");
+                    }
+                    $("#termsReminderModal").modal("show");
+                }
+                setTimeout(function() {disableHeaderFooterLinks();}, 1000);
+            },
+            "orgsContainer": function() {
+                if (hasValue(preselectClinic)) {
+                    self.handlePreSelectedClinic();
+                    var __modal = self.getConsentModal();
+                    if (__modal) {
+                        __modal.modal("show");
+                    }
+                    $("#orgsContainer").fadeIn(500).addClass("open");
+                } else {
+                    $("#orgsContainer").fadeIn(500).addClass("open");
+                }
+            }
+        };
+        if (!this.mainSections[section]) {
+            return false;
+        }
+        if (handleIncompleteFuncObj.hasOwnProperty(section)) {
+            handleIncompleteFuncObj[section]();
         }
     };
 
-    FieldsChecker.prototype.sectionsLoaded = function() {
-        var self = this, isLoaded = true, subsectionId;
+    FieldsChecker.prototype.currentSectionLoaded = function() {
+        var self = this, isLoaded = true;
         //check all
         for (var section in self.mainSections) {
-            if (!self.mainSections.hasOwnProperty(section)) {
-                return false;
+            if (!self.mainSections.hasOwnProperty(section) || self.sectionCompleted(section)) {
+                continue;
             }
-            for (subsectionId in self.mainSections[section].subsections) {
-                if (isLoaded && !$("#" + subsectionId).attr("loaded")) {
-                    isLoaded = false;
-                }
+            if (!isLoaded) {
+                break;
+            }
+            if (!self.sectionCompleted(section)) {
+                isLoaded = self.sectionIsLoaded(section);
+                break;
             }
         }
         return isLoaded;
     };
+
     FieldsChecker.prototype.getFieldEventType = function(field) {
         var triggerEvent = $(field).attr("data-trigger-event");
         if (!hasValue(triggerEvent)) {
@@ -579,16 +399,32 @@
         return triggerEvent;
     };
 
-    FieldsChecker.prototype.initIncompleteFields = function() {
+    FieldsChecker.prototype.initFields = function() {
         var self = this;
-        self.setIncompleteFields();
-        var incompleteFields = self.getIncompleteFields();
-        incompleteFields.forEach(function(field) {
-            self.initEvent(field);
-        });
+        var events = {
+            "topTerms": function() {
+                self.termsCheckboxEvent();
+            },
+            "demographicsContainer": function() { 
+                self.nameGroupEvent();
+                self.bdGroupEvent();
+                self.rolesGroupEvent();
+
+            },
+            "clinicalContainer": function() { self.patientQEvent(); },
+            "orgsContainer": function() { self.clinicsEvent(); }
+        };
+        for (var sectionId in this.mainSections) {
+            if (self.sectionCompleted(sectionId)) {
+                continue;
+            }
+            if (events[sectionId]) {
+                events[sectionId]();
+            }
+        }
     };
 
-    FieldsChecker.prototype.onIncompleteFieldsDidInit = function() {
+    FieldsChecker.prototype.onFieldsDidInit = function() {
         var self = this;
         /****** prep work after initializing incomplete fields -set visuals e.g. top terms ************************/
         self.constructProgressBar();
@@ -626,9 +462,6 @@
         if ($("#topTerms").length === 0) {
             $("#aboutForm").fadeIn();
             self.getNext();
-            if ($("#aboutForm").length === 0 || self.allFieldsCompleted()) {
-                self.continueToFinish();
-            }
         } else {
             if (!self.sectionCompleted("topTerms")) {
                 self.handleIncomplete("topTerms");
@@ -636,9 +469,6 @@
                 $("#aboutForm").removeClass("full-size");
                 self.getNext();
                 $("#aboutForm").fadeIn();
-                if ($("#aboutForm").length === 0 || self.allFieldsCompleted()) {
-                    self.continueToFinish();
-                }
             }
         }
         setTimeout(function() {
@@ -689,21 +519,17 @@
             if (!hasError) { //short circuit the loop through elements
                 hasError = hasValue($(this).text());
             }
-           
+
         });
         return hasError;
-    }
+    };
 
     FieldsChecker.prototype.handlePostEvent = function(sectionId) {
         var self = this, elapsedSaveTime = 0;
         window.startDataSavingTime = new Date();
         window.endDataSavingTime = new Date();
         var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
-        if (this.sectionCompleted(sectionId)) {
-            dataSavingElement.removeClass("tnth-hide");
-            this.scrollTo(dataSavingElement);
-
-        }
+        dataSavingElement.removeClass("tnth-hide");
         clearInterval(window.dataSavingIntervalId);
         window.dataSavingIntervalId = setInterval(function() {
             window.endDataSavingTime = new Date();
@@ -725,15 +551,25 @@
                 $("#iqRefresh").removeClass("tnth-hide");
                 return false;
             }
-            if (self.allFieldsCompleted()) { //all sections finished
-                self.continueToFinish();
-                return true;
-            }
-            if (self.sectionCompleted(sectionId)) { //current section completed
-                self.continueToNext(sectionId);
-                return;
-            }
-            self.stopContinue(sectionId);
+            var tnthAjax = self.__getDependency("tnthAjax");
+            tnthAjax.getStillNeededCoreData(self.userId, false, function(data) {
+                setTimeout(function() {
+                    dataSavingElement.addClass("tnth-hide");
+                }, 50);
+                if (!data || data.error) {
+                    self.stopContinue(sectionId);
+                    return false;
+                }
+                if (!data.length) {//finished all sections
+                    self.continueToFinish();
+                    return true;
+                }
+                self.setConfig(data);
+                if (self.sectionCompleted(sectionId)) {
+                    self.continueToNext(sectionId);
+                }
+
+            });
         }, 150);
     };
 
@@ -786,7 +622,7 @@
         }
     };
 
-    FieldsChecker.prototype.termsCheckboxEvent = function(fields) {
+    FieldsChecker.prototype.termsCheckboxEvent = function() {
         var __self = this;
         var userId = __self.userId, tnthAjax = this.__getDependency("tnthAjax"), orgTool = this.getOrgTool();
         var termsEvent = function() {
@@ -871,11 +707,11 @@
                 }
             });
         });
-        fields.forEach(function(item) {
-            $(item).each(function() {
-                $(this).on(__self.getFieldEventType(item), termsEvent);
-            });
+
+        $("#topTerms [data-type='terms'][data-required='true']").each(function() {
+            $(this).on(__self.getFieldEventType($(this)), termsEvent);
         });
+
         $("#topTerms .required-link").each(function() {
             $(this).on("click", function(e) {
                 e.stopPropagation();
@@ -883,10 +719,10 @@
         });
     };
 
-    FieldsChecker.prototype.nameGroupEvent = function(fields) {
+    FieldsChecker.prototype.nameGroupEvent = function() {
         var self = this;
-        fields.forEach(function(item) {
-            $(item).on(self.getFieldEventType(item), function() {
+        $("#firstname, #lastname").each(function() {
+            $(this).on(self.getFieldEventType($(this)), function() {
                 if ($(this).val() !== "") {
                     self.postDemoData($(this));
                 }
@@ -894,10 +730,10 @@
         });
     };
 
-    FieldsChecker.prototype.bdGroupEvent = function(fields) {
+    FieldsChecker.prototype.bdGroupEvent = function() {
         var self = this, tnthDates = this.__getDependency("tnthDates");
-        fields.forEach(function(item) {
-            $(item).on(self.getFieldEventType(item), function() {
+        $("#month, #date, #year").each(function() {
+            $(this).on(self.getFieldEventType($(this)), function() {
                 var d = $("#date"), m = $("#month"), y = $("#year");
                 var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
                 if (!isValid) {
@@ -908,72 +744,68 @@
                 self.postDemoData($(this));
             });
         });
+        __convertToNumericField($("#date, #year"));
     };
 
-    FieldsChecker.prototype.rolesGroupEvent = function(fields) {
+    FieldsChecker.prototype.rolesGroupEvent = function() {
         var self = this, tnthAjax = this.__getDependency("tnthAjax");
-        fields.forEach(function(item) {
-            $(item).on("click", function() {
-                var roles = [], theVal = $(this).val();
-                roles.push({name: theVal});
-                tnthAjax.putRoles(self.userId,{"roles": roles}, $("#rolesGroup"));
-                self.handlePostEvent(self.getSectionContainerId($(this)));
-                if (theVal === "patient") {
-                    $("#clinicalContainer").attr("skipped", "false");
-                    $("#orgsContainer").attr("skipped", "false");
-                    $("#date").attr("required", "required").attr("skipped", "false");
-                    $("#month").attr("required", "required").attr("skipped", "false");
-                    $("#year").attr("required", "required").attr("skipped", "false");
-                    $(".bd-optional").hide();
-                } else {
-                    if (theVal === "partner") { // If partner, skip all questions
-                        $("#clinicalContainer").attr("skipped", "true");
-                        $("#orgsContainer").attr("skipped", "true");
-                        $("#date").removeAttr("required").attr("skipped", "true");
-                        $("#month").removeAttr("required").attr("skipped", "true");
-                        $("#year").removeAttr("required").attr("skipped", "true");
-                        $(".bd-optional").show();
-                    }
+        $("input[name='user_type']").on("click", function() {
+            var roles = [], theVal = $(this).val();
+            roles.push({name: theVal});
+            tnthAjax.putRoles(self.userId,{"roles": roles}, $("#rolesGroup"));
+            self.handlePostEvent(self.getSectionContainerId($(this)));
+            if (theVal === "patient") {
+                $("#clinicalContainer").attr("skipped", "false");
+                $("#orgsContainer").attr("skipped", "false");
+                $("#date").attr("required", "required").attr("skipped", "false");
+                $("#month").attr("required", "required").attr("skipped", "false");
+                $("#year").attr("required", "required").attr("skipped", "false");
+                $(".bd-optional").hide();
+            } else {
+                if (theVal === "partner") { // If partner, skip all questions
+                    $("#clinicalContainer").attr("skipped", "true");
+                    $("#orgsContainer").attr("skipped", "true");
+                    $("#date").removeAttr("required").attr("skipped", "true");
+                    $("#month").removeAttr("required").attr("skipped", "true");
+                    $("#year").removeAttr("required").attr("skipped", "true");
+                    $(".bd-optional").show();
                 }
-            });
+            }
         });
     };
 
-    FieldsChecker.prototype.patientQEvent = function(fields) {
+    FieldsChecker.prototype.patientQEvent = function() {
         var self = this;
-        fields.forEach(function(item) {
-            $(item).on("click", function() {
-                var thisItem = $(this);
-                var toCall = thisItem.attr("name") || thisItem.attr("data-name");
-                var toSend = (toCall === "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
-                if (toSend === "true" || toCall === "pca_localized") {
-                    if (toCall === "biopsy" && !$("#biopsyDate").val()) {
-                        return true;
+        $("#patientQ [data-topic] input[type='radio']").on("click", function() {
+            var thisItem = $(this);
+            var toCall = thisItem.attr("name") || thisItem.attr("data-name");
+            var toSend = (toCall === "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
+            if (toSend === "true" || toCall === "pca_localized") {
+                if (toCall === "biopsy" && !$("#biopsyDate").val()) {
+                    return true;
+                }
+                thisItem.parents(".pat-q").next().fadeIn();
+                var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
+                var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
+                if (nextItem.length > 0) {
+                    var checkedRadio = nextItem.find("input[type='radio']:checked");
+                    if (!(checkedRadio.length > 0)) {
+                        $("html, body").animate({scrollTop: nextItem.offset().top}, 1000);
                     }
-                    thisItem.parents(".pat-q").next().fadeIn();
-                    var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
-                    var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
-                    if (nextItem.length > 0) {
-                        var checkedRadio = nextItem.find("input[type='radio']:checked");
-                        if (!(checkedRadio.length > 0)) {
-                            $("html, body").animate({scrollTop: nextItem.offset().top}, 1000);
-                        }
-                        nextItem.find("input[type='radio']").each(function() {
+                    nextItem.find("input[type='radio']").each(function() {
+                        $(this).attr("skipped", "false");
+                    });
+                    thisItem.closest(".pat-q").nextAll().each(function() {
+                        var dataTopic = $(this).attr("data-topic");
+                        $(this).find("input[name='" + dataTopic + "']").each(function() {
                             $(this).attr("skipped", "false");
                         });
-                        thisItem.closest(".pat-q").nextAll().each(function() {
-                            var dataTopic = $(this).attr("data-topic");
-                            $(this).find("input[name='" + dataTopic + "']").each(function() {
-                                $(this).attr("skipped", "false");
-                            });
-                        });
-                    }
-                } else {
-                    thisItem.parents(".pat-q").nextAll().fadeOut();
+                    });
                 }
-                self.handlePostEvent(self.getSectionContainerId($(this)));
-
-            });
+            } else {
+                thisItem.parents(".pat-q").nextAll().fadeOut();
+            }
+            self.handlePostEvent(self.getSectionContainerId($(this)));
         });
     };
     FieldsChecker.prototype.getConsentModal = function(parentOrg) {
@@ -1015,21 +847,19 @@
         }
     };
 
-    FieldsChecker.prototype.clinicsEvent = function(fields) {
+    FieldsChecker.prototype.clinicsEvent = function() {
         var self = this;
-        fields.forEach(function(item) {
-            $(item).on("click", function() {
-                if ($(this).prop("checked")) {
-                    var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
-                    if ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) { //do nothing
-                        return true;
-                    } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
-                        return true;
-                    } else {
-                        self.handlePostEvent(self.getSectionContainerId($(this)));
-                    }
+        $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
+            if ($(this).prop("checked")) {
+                var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
+                if ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) { //do nothing
+                    return true;
+                } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0) { //do nothing
+                    return true;
+                } else {
+                    self.handlePostEvent(self.getSectionContainerId($(this)));
                 }
-            });
+            }
         });
         $("#stateSelector").on("change", function() {
             if (!$(this).val()) {
@@ -1074,10 +904,10 @@
                     fc.endTime = new Date();
                     var elapsedTime = fc.endTime - fc.startTime;
                     elapsedTime /= 1000;
-                    if (fc.sectionsLoaded() || elapsedTime >= 5) {
+                    if (fc.currentSectionLoaded() || elapsedTime >= 5) {
                         setTimeout(function() {
-                            fc.initIncompleteFields();
-                            fc.onIncompleteFieldsDidInit();
+                            fc.initFields();
+                            fc.onFieldsDidInit();
                             DELAY_LOADING = false;
                             showMain(); /* global showMain */
                             hideLoader(true); /* global hideLoader */
@@ -1091,4 +921,3 @@
         }
     });
 })();
-

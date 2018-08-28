@@ -6,10 +6,10 @@
     </div>
 {%- endmacro %}
 {% macro dataSavingIndicator() -%}
-    <div class="data-saving-indicator tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
+    <div class="data-saving-indicator text-muted tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
 {%- endmacro %}
-{% macro sectionContent(sectionId, title) -%}
-    <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true">
+{% macro sectionContent(sectionId="", title="", display="", config="") -%}
+    <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true" data-display="{{display}}" data-config="{{config}}">
       <div class="content">
           <div class="heading"><h3 class="tnth-headline">{{title}}</h3></div>
           <div class="content-body">
@@ -21,7 +21,7 @@
     </div>
 {%- endmacro %}
 {% macro tou(terms, user) -%}
-    <div id="topTerms" class="section-container hide-terms">
+    <div id="topTerms" class="section-container hide-terms" data-display="{{_('terms')}}" data-config="website_terms_of_use,subject_website_consent,privacy_policy">
         <br/>
         <div class="terms-of-use-intro">
           <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
