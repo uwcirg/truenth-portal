@@ -3,8 +3,6 @@ DEBUG = True
 SECRET_KEY = 'generate some random secret string'
 SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost/dbname'
 SERVER_NAME = '<the name and port number of the server (e.g.: 'myapp.dev:5000')>'
-LOCKOUT_PERIOD_MINUTES = 30
-FAILED_LOGIN_ATTEMPTS_BEFORE_LOCKOUT = 5
 
 # CONTACT_SENDTO_EMAIL = '<email address(es) that should receive contact form submissions>'
 # LOG_FOLDER = '/home/username/example/path'
