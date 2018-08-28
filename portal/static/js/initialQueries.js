@@ -761,15 +761,14 @@
                 $("#month").attr("required", "required").attr("skipped", "false");
                 $("#year").attr("required", "required").attr("skipped", "false");
                 $(".bd-optional").hide();
-            } else {
-                if (theVal === "partner") { // If partner, skip all questions
-                    $("#clinicalContainer").attr("skipped", "true");
-                    $("#orgsContainer").attr("skipped", "true");
-                    $("#date").removeAttr("required").attr("skipped", "true");
-                    $("#month").removeAttr("required").attr("skipped", "true");
-                    $("#year").removeAttr("required").attr("skipped", "true");
-                    $(".bd-optional").show();
-                }
+            } 
+            if (theVal === "partner") { // If partner, skip all questions
+                $("#clinicalContainer").attr("skipped", "true");
+                $("#orgsContainer").attr("skipped", "true");
+                $("#date").removeAttr("required").attr("skipped", "true");
+                $("#month").removeAttr("required").attr("skipped", "true");
+                $("#year").removeAttr("required").attr("skipped", "true");
+                $(".bd-optional").show();
             }
         });
     };
