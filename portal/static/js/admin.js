@@ -281,6 +281,7 @@
                         }, 10);
                     });
                 }
+                $("#adminTableToolbar .orgs-filter-warning").popover();
             },
             setShowDeletedUsersFlag: function () {
                 if (!$("#chkDeletedUsersFilter").length) {

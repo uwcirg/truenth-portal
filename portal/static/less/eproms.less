@@ -1332,24 +1332,41 @@ div.footer-wrapper.right-panel {
    display: none;
  }
 
+.filter-popover {
+  margin-top: -6px !important;
+}
+
 #adminTableToolbar {
   .orgs-filter-warning {
     display: inline-block;
-    margin: 2px 8px;
+    margin: 0 8px;
     letter-spacing: 0.1rem;
-    position: relative;
-    font-size: 1.25em;
+    font-size: 0.95em;
     opacity: 0.8;
-    top: 2px;
+    position: relative;
+    img {
+      width: 22px;
+    }
     &:hover {
-      color: @errorMessageColor;
       cursor: pointer;
     }
-
+    &:after {
+      content: "";
+      position: absolute;
+      top: 20%;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 100%;
+      display: block;
+      z-index: 1;
+    }
+    &:hover:after {
+      background: hsla(0, 0%, 0%, 0.2);
+    }
   }
   div.orglist-selector {
     display: inline-block;
-    width: 350px;
     max-width: 100%;
     legend {
       letter-spacing: 1px;
