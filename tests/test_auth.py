@@ -18,8 +18,6 @@ from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import (
-    LOCKOUT_PERIOD,
-    PERMITTED_FAILED_LOGIN_ATTEMPTS,
     RoleError,
     User,
     UserRelationship,
@@ -126,7 +124,8 @@ class TestAuth(TestCase):
         )
 
         # Use up all of the permitted login attempts
-        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS):
+        attempts = user.failed_login_attempts_before_lockout - 1
+        for failureIndex in range(0, attempts):
             response = self.local_login(user.email, 'invalidpassword')
             assert response.status_code is 200
 
@@ -151,7 +150,8 @@ class TestAuth(TestCase):
         )
 
         # Lock the user out
-        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+        attempts = user.failed_login_attempts_before_lockout
+        for failureIndex in range(0, attempts):
             user.add_password_verification_failure()
 
         # Verify the user is locked out
@@ -159,7 +159,7 @@ class TestAuth(TestCase):
 
         # Move time to the end of the lockout period
         user.last_password_verification_failure = \
-            datetime.datetime.utcnow() - LOCKOUT_PERIOD
+            datetime.datetime.utcnow() - user.lockout_period_timedelta
 
         # Verify we are no longer locked out
         assert not user.is_locked_out
@@ -175,7 +175,8 @@ class TestAuth(TestCase):
         )
 
         # Lock the user out
-        for failureIndex in range(0, PERMITTED_FAILED_LOGIN_ATTEMPTS + 1):
+        attempts = user.failed_login_attempts_before_lockout
+        for failureIndex in range(0, attempts):
             user.add_password_verification_failure()
 
         assert user.is_locked_out

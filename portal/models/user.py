@@ -229,10 +229,6 @@ def validate_email(email):
         raise BadRequest("requires a valid email address")
 
 
-LOCKOUT_PERIOD = timedelta(minutes=30)
-PERMITTED_FAILED_LOGIN_ATTEMPTS = (5 - 1)  # account for zero index
-
-
 class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
@@ -693,6 +689,21 @@ class User(db.Model, UserMixin):
         return locale_options
 
     @property
+    def lockout_period_minutes(self):
+        """The lockout period in minutes"""
+        return current_app.config['LOCKOUT_PERIOD_MINUTES']
+
+    @property
+    def lockout_period_timedelta(self):
+        """The lockout period as a timedelta"""
+        return timedelta(minutes=self.lockout_period_minutes)
+
+    @property
+    def failed_login_attempts_before_lockout(self):
+        """Number of failed login attempts before lockout"""
+        return current_app.config['FAILED_LOGIN_ATTEMPTS_BEFORE_LOCKOUT']
+
+    @property
     def is_locked_out(self):
         """tells if user is temporarily locked out
 
@@ -706,11 +717,11 @@ class User(db.Model, UserMixin):
         # If we're not in the lockout window reset everything
         time_since_last_failure = \
             datetime.utcnow() - self.last_password_verification_failure
-        if time_since_last_failure >= LOCKOUT_PERIOD:
+        if time_since_last_failure >= self.lockout_period_timedelta:
             self.reset_lockout()
 
         failures = self.password_verification_failures
-        return failures > PERMITTED_FAILED_LOGIN_ATTEMPTS
+        return failures >= self.failed_login_attempts_before_lockout
 
     def reset_lockout(self):
         """resets variables that track lockout
@@ -719,6 +730,12 @@ class User(db.Model, UserMixin):
         to lockout users when they fail too many times.
         This function resets those variables
         """
+        current_app.logger.debug(
+            'resetting lockout variables - ' +
+            'failures: {}, '.format(self.password_verification_failures) +
+            'last_failure: {}'.format(self.last_password_verification_failure)
+        )
+
         self.password_verification_failures = 0
         self.last_password_verification_failure = None
         db.session.commit()
