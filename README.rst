@@ -365,6 +365,7 @@ Setup
 ^^^^^
 - ``sudo apt-get install xvfb python-xvfbwrapper``
 - Install geckodriver from https://github.com/mozilla/geckodriver/releases.  For example
+
 .. code:: bash
 
     $ wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz
