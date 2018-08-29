@@ -28,7 +28,7 @@ def patients_root():
     """patients view function, intended for staff
 
     Present the logged in staff the list of patients matching
-    the staff's organizations (and any decendent organizations)
+    the staff's organizations (and any descendant organizations)
 
     """
     user = current_user()
