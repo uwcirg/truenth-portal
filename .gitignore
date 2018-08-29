@@ -18,6 +18,7 @@ pip-selfcheck.json
 log
 portal/test_uploads
 docker/portal.env
+geckodriver.log
 
 .coverage
 .idea
