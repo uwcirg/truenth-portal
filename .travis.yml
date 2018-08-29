@@ -96,6 +96,15 @@ install:
       ;
     fi
 
+  # Install webdriver plugin for ui tests
+  - if [ "$TOXENV" = "ui" ]; then
+      wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz ;
+      tar -xvzf geckodriver-v0.21.0-linux64.tar.gz ;
+      rm geckodriver-v0.21.0-linux64.tar.gz ;
+      chmod +x geckodriver ;
+      sudo mv geckodriver /usr/local/bin/ ;
+    fi
+
 script:
   - tox
 
