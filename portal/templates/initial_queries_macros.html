@@ -70,10 +70,9 @@
                 </label>
                 <label class="terms-label tnth-hide">
                   <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                  {% trans privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" %}
-                    <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
-                      <a href="{{terms_url}}" class="required-link">terms</a>.</span>
-                  {% endtrans %}
+                  {% trans privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" -%}
+                    <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and <a href="{{terms_url}}" class="required-link">terms</a>.</span>
+                  {%- endtrans %}
                   <input type="hidden"
                     data-agree="false"
                     data-type="terms"
