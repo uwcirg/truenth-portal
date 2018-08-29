@@ -272,6 +272,9 @@ class AssessmentStatus(object):
     @property
     def __organization(self):
         """Returns the top organization associated with users's QB or None"""
+        if not self.qb_data.qbd.questionnaire_bank:
+            return None
+
         rp_id = self.qb_data.qbd.questionnaire_bank.research_protocol_id
         for org in self.user.organizations:
             org_rp = org.research_protocol(self.as_of_date)
@@ -477,4 +480,4 @@ def overall_assessment_status(user_id):
     now = datetime.utcnow()
     a_s = AssessmentStatus(user, as_of_date=now)
     qbd = QuestionnaireBank.most_current_qb(user, as_of_date=now)
-    return (a_s.overall_status, qbd)
+    return a_s.overall_status, qbd
