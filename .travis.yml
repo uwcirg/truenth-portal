@@ -81,18 +81,6 @@ before_install:
 
   - pip install --upgrade pip setuptools
 
-  # Install  plugins for ui tests
-  - if [ "$TOXENV" = "ui" ]; then
-      apt-get install xvfb
-
-      # Install webdriver plugin for ui tests
-      wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz ;
-      tar -xvzf geckodriver-v0.21.0-linux64.tar.gz ;
-      rm geckodriver-v0.21.0-linux64.tar.gz ;
-      chmod +x geckodriver ;
-      sudo mv geckodriver /usr/local/bin/ ;
-    fi
-
 install:
   - pip install tox
   # Install test dependencies only
