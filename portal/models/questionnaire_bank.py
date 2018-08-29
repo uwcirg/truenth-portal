@@ -421,14 +421,23 @@ class QuestionnaireBank(db.Model):
         """
         indefinite_qb = QuestionnaireBank.qbs_for_user(
             user, classification='indefinite', as_of_date=as_of_date)
+        no_qb = QBD(None, None, None, None)
+
         if not indefinite_qb:
-            return QBD(None, None, None, None)
+            return no_qb
 
         if len(indefinite_qb) > 1:
             raise ValueError("only supporting single indefinite QB")
 
         as_of_date = as_of_date or datetime.utcnow()
         trigger_date = indefinite_qb[0].trigger_date(user)
+
+        # Without basic requirements, such as a consent, the trigger
+        # date can't be calculated.  Without a trigger, the user doesn't
+        # get an indefinite qb.
+        if not trigger_date:
+            return no_qb
+
         return indefinite_qb[0].calculated_start(
             trigger_date=trigger_date, as_of_date=as_of_date)
 
