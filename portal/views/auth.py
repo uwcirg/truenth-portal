@@ -681,7 +681,7 @@ def logout(prevent_redirect=False, reason=None):
 
 
 @auth.route('/oauth/token-status', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def token_status():
     """Return remaining valid time and other info for oauth token
@@ -735,7 +735,7 @@ def token_status():
               type: string
               description: Deprecated version of `scope` containing identical data.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     authorization = request.headers.get('Authorization')
@@ -754,7 +754,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('OPTIONS', 'GET', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
@@ -779,7 +779,7 @@ def oauth_errors():
               type: string
               description: Known details of error situation.
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_app.logger.warn(request.args.get('error'))
@@ -874,7 +874,7 @@ def access_token():
 
 
 @auth.route('/oauth/authorize', methods=('OPTIONS', 'GET', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):

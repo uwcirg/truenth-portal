@@ -70,7 +70,7 @@ def demographics(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     if patient_id:
@@ -84,7 +84,7 @@ def demographics(patient_id):
 @demographics_api.route(
     '/demographics/<int:patient_id>',
     methods=('OPTIONS', 'PUT'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient
@@ -151,7 +151,7 @@ def demographics_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)

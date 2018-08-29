@@ -102,7 +102,7 @@ def user_intervention_get(intervention_name, user_id):
         description:
           if either the intervention name or the user_id given can't be found
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     intervention = getattr(INTERVENTION, intervention_name)

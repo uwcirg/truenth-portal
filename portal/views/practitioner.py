@@ -68,7 +68,7 @@ def practitioner_search():
         description:
           if no practitioners found for given search parameters
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     query = Practitioner.query
@@ -161,7 +161,7 @@ def practitioner_get(id_or_code):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     system = request.args.get('system')

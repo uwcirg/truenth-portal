@@ -16,7 +16,8 @@ def crossdomain(
             'Authorization',
             'X-Requested-With',
             'X-CSRFToken',
-            'Content-Type'),
+            'Content-Type'
+        ),
         max_age=21600, automatic_options=True):
     """Decorator to add specified crossdomain headers to response
 

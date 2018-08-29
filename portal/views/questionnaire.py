@@ -29,7 +29,7 @@ def questionnaire_bank_list():
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     bundle = QuestionnaireBank.generate_bundle()
@@ -56,7 +56,7 @@ def questionnaire_list():
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     bundle = Questionnaire.generate_bundle()
@@ -98,7 +98,7 @@ def get_questionnaire(value):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     try:

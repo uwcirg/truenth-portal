@@ -34,7 +34,7 @@ def get_current_tou_url():
           Returns URL for current Terms Of Use, with respect to current
           system configuration in simple json {url:"http..."}
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     terms = VersionedResource(
@@ -95,7 +95,7 @@ def get_tou(user_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -166,7 +166,7 @@ def get_tou_by_type(user_id, tou_type):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -190,7 +190,7 @@ def get_tou_by_type(user_id, tou_type):
 
 
 @tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
     """Accept Terms Of Use on behalf of user
@@ -237,7 +237,7 @@ def post_user_accepted_tou(user_id):
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     authd_user = current_user()
@@ -251,7 +251,7 @@ def post_user_accepted_tou(user_id):
 
 
 @tou_api.route('/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*', headers=('Content-Type', 'Authorization'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def accept_tou(user_id=None):
     """Accept Terms Of Use info for authenticated user
@@ -290,7 +290,7 @@ def accept_tou(user_id=None):
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     if user_id:

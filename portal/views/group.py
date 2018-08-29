@@ -47,7 +47,7 @@ def current_groups():
       401:
         description: if missing valid OAuth token
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     results = [g.as_json() for g in Group.query.all()]
@@ -93,7 +93,7 @@ def group_by_name(group_name):
       404:
         description: if named group doesn't exist
     security:
-      - Authorization: []
+      - ServiceToken: []
 
     """
     g = Group.query.filter_by(name=group_name).first()
