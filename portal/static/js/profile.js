@@ -1217,6 +1217,10 @@
                         }
                         return parentName ? parentName : i18next.t("your clinic");
                     })();
+                    $(this).addClass("disabled").attr("disabled", true);
+                    $("#sendRegistrationEmailForm .loading-indicator").show();
+                    $("#profileEmailErrorMessage").html("");
+                    var btnRef = $(this);
                     $.ajax({
                         type: "GET",
                         url: $("#staffRegistrationEmailUrl").val(),
@@ -1250,6 +1254,8 @@
                                 $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
                             }
                         }
+                        $("#sendRegistrationEmailForm .loading-indicator").hide();
+                        btnRef.removeClass("disabled").attr("disabled", false);
                     });
                 });
             },

@@ -80,7 +80,8 @@
 @wellColor: rgba(203, 210, 217, 0.2);
 @wellBorderColor: #f1efef;
 @disabledColor: #b6c4d0;
-
+@dividerColor: #e0e0e0;
+@HRColor:#eee;
 @inputHeight: 2.4em;
 @disabledOpacity: 0.6;
 
@@ -354,7 +355,7 @@ a.btn {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 50em;
+    max-height: 120em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -493,6 +494,17 @@ select:not([multiple]) {
   transition: visibility 0.6s, opacity 0.7s ease-in;
 }
 #createProfileForm {
+  .tnth-headline {
+    padding-bottom: 8px;
+    border-bottom: 1px solid @HRColor;
+  }
+  label {
+    font-weight: 500;
+    letter-spacing: 0.02rem;
+  }
+  .optional-display-text {
+    font-weight: normal;
+  }
   .profile-item-edit-btn {
     display: none;
   }
@@ -501,10 +513,21 @@ select:not([multiple]) {
     max-width: 100%;
   }
   #profileSiteIDContainer {
-    margin-top: 1.6em;
+    margin-top: 1.5em;
   }
   #noEmailContainer {
     display: none;
+  }
+  #fillOrgs {
+    label {
+      font-weight: normal;
+    }
+  }
+  #rolesContainer {
+    margin: 0.5em 0 2.25em;
+  }
+  .save-button-container {
+    padding: 1.5em 0 0;
   }
 }
 #profileSiteId {
@@ -673,9 +696,6 @@ div.right-panel {
     margin-top: 20%;
     display: none;
     position: relative;
-    .save-info {
-      display: none;
-    }
   }
   .iq-container .tnth-headline:first-of-type {
     transform: translateY(-100%);
@@ -944,6 +964,20 @@ div.pull-right {
   min-height: 280px;
   transition: all 0.5s ease-in;
 
+  .check-role-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      left: 42%;
+      background: hsla(0, 0%, 100%, 0.35);
+      z-index: 10;
+      display: none;
+    }
+    input:hover {
+      cursor: pointer;
+    }
+  }
+
   div.card-view {
     display: flex;
   }
@@ -953,6 +987,17 @@ div.pull-right {
   }
   tr.loading {
     opacity: 0.4;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      z-index: 5;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      background: transparent;
+    }
   }
   TH {
     background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
@@ -1405,7 +1450,9 @@ div.pull-right {
   }
 }
 #patientList {
+  padding: 1em 0;
   #patientListOptions {
+    padding: 1em 0 0;
     border-bottom: 1px solid #ececec;
     margin-bottom: 2em;
   }
@@ -1429,6 +1476,9 @@ div.pull-right {
 }
 
 #staffList {
+  #staffListOptions {
+    border-bottom: 1px solid @HRColor;
+  }
   div.or {
     display: block;
     background-color: @orBackgroundColor;
@@ -2254,6 +2304,7 @@ div.noOrg-container {
   #bdGroup {
     margin-bottom: 0.1em;
     padding-bottom: 0;
+    padding-top: 0;
   .flex {
       flex-wrap: wrap;
     }
@@ -2266,7 +2317,7 @@ div.noOrg-container {
     margin-top: 5%;
   }
   #userOrgs {
-    margin-top: 2.2em;
+    margin-top: 0.55em;
   }
   #phone, #email, #altPhone  {
     width: 350px;
@@ -2283,10 +2334,10 @@ div.noOrg-container {
     top:-1px
   }
   #phoneGroup {
-    margin-top: 1.2em;
+    margin-top: 1.5em;
   }
   #altPhoneGroup {
-    margin-top: 1.4em;
+    margin-top: 1em;
   }
   #updateProfile {
     font-size: @smallBtnSize;
@@ -2302,17 +2353,27 @@ div.noOrg-container {
   padding: 2em;
   width: 100%;
   max-width: 100%;
-  border: solid 2px #F1F1F1;
-  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  border: 0;
+  background-image: linear-gradient(to top,#f7f7f7 0,#f5f5f5 100%);
+  background: hsla(0, 0%, 93%, 0.5);
+  box-shadow: 1px 2px 4px #d0cfcf;
 }
 #accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 104px;
 }
 #accountCreationContentContainer[data-account='staff'] {
   #userOrgs {
-   margin-top: 0;
+   margin-top: 0.25em;
+  }
+  #emailGroup {
+    margin-top: 0.55em;
+  }
+  #bdGroup {
+    margin-bottom: 0.25em;
+    margin-top: 1.25em;
+  }
+  #altPhoneGroup {
+    margin-top: 0;
   }
 }
 
@@ -2353,8 +2414,23 @@ div.noOrg-container {
 #userSessionsListContainer TH {
   background-color: @rowBackgroundColor;
 }
-#sendRegistrationEmailForm label {
-  font-weight: normal;
+#sendRegistrationEmailForm {
+  label {
+    font-weight: normal;
+  }
+  .buttons-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      top: 15%;
+      left: 5%;
+      display: none;
+      z-index: 5;
+    }
+  }
+  #profileEmailErrorMessage {
+    margin: 1em 0;
+  }
 }
 #userSessionReportDetailTable {
   margin-left: -1%;
@@ -3263,7 +3339,7 @@ div.timezone-warning.text-warning {
 
 
   .create-account-container {
-      padding: 3.5em 4em;
+      padding: 3em;
       overflow: auto;
   }
   #createProfileForm {
@@ -3464,7 +3540,7 @@ div.timezone-warning.text-warning {
   }
   #createProfileForm {
     #emailGroup {
-      margin-top: 1em;
+      margin-top: 0.5em;
     }
   }
 }

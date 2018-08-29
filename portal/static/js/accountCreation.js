@@ -84,6 +84,11 @@
             _accountArray["organizations"] = orgIDs;
             if (this.roles) {
                 _accountArray["roles"] =  this.roles;
+                $("#rolesContainer .input-role").each(function() {
+                    if ($(this).is(":checked")) {
+                        _accountArray["roles"] = _accountArray["roles"].concat([{"name": $(this).attr("data-role")}]);
+                    }
+                });
             }
             _accountArray["consents"] = this.getConsents();
 

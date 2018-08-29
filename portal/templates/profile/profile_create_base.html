@@ -10,6 +10,14 @@
     <div class="help-block with-errors get-orgs-error error-message"></div>
   </div>
 {%- endmacro %}
+{% macro addRoles() -%}
+    <div id="rolesContainer">
+        <label class="text-muted">{{_("Role")}}</label>
+        <!-- note can add addtional role(s) if needed -->
+        <div><input class="input-role" type="checkbox" name="chkRoles" data-role="staff_admin">  <span class="text-muted">{{_("Admin staff")}}</span></div>
+        <div class="divider"></div>
+    </div>
+{%- endmacro %}
 {% block main %}
     <br/>
     <form id="createProfileForm" class="form tnth-form to-validate" data-toggle="validator">
@@ -18,11 +26,10 @@
         <div class="row">
             <div class="col-md-11">
                 <div class="row">
-                    <div class="col-md-push-2 col-md-9 col-xs-12">
+                    <div class="col-md-push-3 col-md-8 col-xs-12">
                             <h4 class="tnth-headline left-indent-top">
                                 {% block title %}{{_("New Patient")}}{% endblock %}
                             </h4>
-                            <hr/>
                             <br/>
                         <div class="profile-item-container create-account-container">
                             {% block content %}{% endblock %}

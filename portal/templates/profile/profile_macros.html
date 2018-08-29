@@ -344,7 +344,10 @@
                 <h4 class="text-warning registration-label">{{_("not yet registered")}}</h4>
             {%- endif -%}
         </div>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
+        <div class="buttons-container">
+            <div class="loading-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
+        </div>
         <div id="profileEmailMessage" class="text-info"></div>
         <div id="profileEmailErrorMessage" class="text-danger"></div>
         {{emailReadyMessage()}}
@@ -443,7 +446,7 @@
 
 {% macro profilePhone(person) -%}
     <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="phone">
-        <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
+        <label for="phone">{{_("Cell")}} <span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>
         <input type="text" class="form-control" id="phone" name="phone" value="{{ person.phone if person and person.phone }}"  pattern="^[0-9]*$"  data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="errorphone" v-on:change="updateTelecomData" v-model.lazy="demo.data.cellPhone"/>
         <div class="help-block with-errors"></div>
         {{saveLoaderDiv("phoneGroup")}}
@@ -453,7 +456,7 @@
 
 {% macro profileAltPhone(person) -%}
     <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true" data-profile-section-id="altphone">
-        <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text">({{_("Optional")}})</span></label>
+        <label for="altPhone">{{_("Phone (Other)")}} <span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>
         <input type="text" class="form-control" id="altPhone" name="altPhone" value="{{ person.alt_phone if person and person.alt_phone }}" pattern="^[0-9]*$" data-error="{{_('Phone number must be in numbers.')}}" data-htmltags="true" data-error-field="erroraltPhone" v-on:change="updateTelecomData" v-model.lazy="demo.data.homePhone"/>
         <div class="help-block with-errors"></div>
         <div id="erroraltPhone" class="error-message"></div>
@@ -518,7 +521,7 @@
         <div id="clinics" data-profile-section-id="orgs" data-save-container-id="clinics">
             <div class="form-group profile-section standard" id="userOrgs">
                 {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
-                <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{_("Optional")}})</span></label>{% endif %}
+                <label>{{_("Clinics ")}}<span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>{% endif %}
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
                 <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT.value) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
@@ -1015,7 +1018,7 @@
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text optional-display-text">({{ _("Optional") }})</span></label>
         <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('studyid')" v-on:change="updateIdentifierData"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
@@ -1162,7 +1165,7 @@
                 <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
                 {{profileEditButton()}}
                 {% call titleSection(id="clinicalDataLoc") -%}
-                    {% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-diplay-text text-muted tnth-hide">{{_("(Optional)")}}</span>
+                    {% if person and person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}&nbsp;<span class="optional-display-text text-muted tnth-hide">{{_("(Optional)")}}</span>
                 {%- endcall %}
                 {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
                 {% call editSection() -%}
