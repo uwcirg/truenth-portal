@@ -920,7 +920,7 @@ def spec():
         },
         "schemes": ("http", "https"),
         "securityDefinitions": {
-            "Authorization": {
+            "ServiceToken": {
                 "type": "apiKey",
                 "name": "Authorization",
                 "in": "header"
