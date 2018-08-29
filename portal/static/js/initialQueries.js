@@ -145,8 +145,9 @@
         this.handlePostEvent(this.getSectionContainerId(targetField));
     };
 
-    FieldsChecker.prototype.setUserRoles = function() {
+    FieldsChecker.prototype.setUserRoles = function(callback) {
         var self = this, tnthAjax = self.__getDependency("tnthAjax");
+        callback = callback || function() {};
         tnthAjax.getRoles(this.userId, function(data) {
             if (data.roles) {
                 self.userRoles = data.roles.map(function(item) {
@@ -156,7 +157,8 @@
                 tnthAjax.removeCachedRoles();
             }
             self.roleRequired = self.userRoles.indexOf("patient") !== -1 || self.userRoles.indexOf("staff") !== -1 || self.userRoles.indexOf("staff_admin") !== -1;
-        }, {sync: true});
+            callback();
+        });
     };
 
     FieldsChecker.prototype.initConfig = function(callback) {
@@ -201,8 +203,7 @@
                 }
             });
         }
-        this.setUserRoles();
-        callback();
+        this.setUserRoles(callback);
     };
 
     FieldsChecker.prototype.getTotalSections = function() {
@@ -276,7 +277,8 @@
         }(), 800);
     };
 
-    FieldsChecker.prototype.continueToFinish = function() {
+    FieldsChecker.prototype.continueToFinish = function(sectionId) {
+        this.hideSectionSavingLoader(sectionId);
         if ($("div.reg-complete-container").hasClass("inactive")) {
             return false;
         }
@@ -292,6 +294,7 @@
     };
 
     FieldsChecker.prototype.stopContinue = function(sectionId) {
+        this.hideSectionSavingLoader(sectionId);
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
         $("div.reg-complete-container").fadeOut();
@@ -301,6 +304,7 @@
 
     FieldsChecker.prototype.continueToNext = function(sectionId) {
         this.setProgressBar(sectionId);
+        this.hideSectionSavingLoader(sectionId);
         $("#aboutForm").removeClass("tnth-hide");
         $("#iqRefresh").addClass("tnth-hide");
         $("#buttonsContainer").removeClass("continue");
@@ -356,7 +360,7 @@
                     if (__modal) {
                         __modal.modal("show");
                     }
-                } 
+                }
                 $("#orgsContainer").fadeIn(500).addClass("open");
             }
         };
@@ -403,7 +407,7 @@
             "topTerms": function() {
                 self.termsCheckboxEvent();
             },
-            "demographicsContainer": function() { 
+            "demographicsContainer": function() {
                 self.nameGroupEvent();
                 self.bdGroupEvent();
                 self.rolesGroupEvent();
@@ -522,12 +526,31 @@
         return hasError;
     };
 
+    FieldsChecker.prototype.showSectionSavingLoader = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        $("#"+sectionId).find(".data-saving-indicator").removeClass("tnth-hide");
+    };
+
+    FieldsChecker.prototype.hideSectionSavingLoader = function(sectionId) {
+        if (!sectionId) {
+            return false;
+        }
+        $("#"+sectionId).find(".data-saving-indicator").addClass("tnth-hide");
+    };
+
+    FieldsChecker.prototype.handleSectionError = function(sectionId) {
+        this.stopContinue(sectionId);
+        this.handleRefreshElement(sectionId);
+        $("#iqRefresh").removeClass("tnth-hide");
+    };
+
     FieldsChecker.prototype.handlePostEvent = function(sectionId) {
         var self = this, elapsedSaveTime = 0;
         window.startDataSavingTime = new Date();
         window.endDataSavingTime = new Date();
-        var dataSavingElement = $("#"+sectionId).find(".data-saving-indicator");
-        dataSavingElement.removeClass("tnth-hide");
+        this.showSectionSavingLoader(sectionId);
         clearInterval(window.dataSavingIntervalId);
         window.dataSavingIntervalId = setInterval(function() {
             window.endDataSavingTime = new Date();
@@ -537,36 +560,33 @@
             if (loadingInProgress && elapsedSaveTime < 10) {
                 return false;
             }
-            dataSavingElement.addClass("tnth-hide");
             window.startDataSavingTime = 0;
             window.endDataSavingTime = 0;
             clearInterval(window.dataSavingIntervalId);
 
             var hasError = self.sectionHasError(sectionId);
             if (hasError) {
-                self.stopContinue(sectionId);
-                self.handleRefreshElement(sectionId);
-                $("#iqRefresh").removeClass("tnth-hide");
+                self.handleSectionError(sectionId);
                 return false;
             }
             var tnthAjax = self.__getDependency("tnthAjax");
             tnthAjax.getStillNeededCoreData(self.userId, false, function(data) {
-                setTimeout(function() {
-                    dataSavingElement.addClass("tnth-hide");
-                }, 50);
                 if (!data || data.error) {
                     self.stopContinue(sectionId);
                     return false;
                 }
                 if (!data.length) {//finished all sections
-                    self.continueToFinish();
+                    self.continueToFinish(sectionId);
                     return true;
                 }
-                self.setConfig(data);
-                if (self.sectionCompleted(sectionId)) {
-                    self.continueToNext(sectionId);
-                }
-
+                self.setConfig(data, function(){
+                    setTimeout(function() {
+                        self.hideSectionSavingLoader(sectionId);
+                    }, 50);
+                    if (self.sectionCompleted(sectionId)) {
+                        self.continueToNext(sectionId);
+                    }
+                });
             });
         }, 150);
     };
@@ -827,7 +847,7 @@
                 var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) || ($("#fillOrgs").attr("patient_view") && dm.length > 0);
                 if (requiringConsentViaModal) { //do nothing
                     return true;
-                } 
+                }
                 self.handlePostEvent(self.getSectionContainerId($(this)));
 
             }
