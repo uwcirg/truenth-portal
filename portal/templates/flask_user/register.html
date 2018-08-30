@@ -42,7 +42,7 @@
             </div>
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
-                     <p class="profile-item-title title">{{ _("Register using:")}}</p>
+                     <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <div class="divider"></div>
                     <div>
                         <a href="{{ url_for('facebook.login', provider_name='facebook', next=request.args.get('next')) }}"
