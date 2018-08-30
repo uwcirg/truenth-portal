@@ -16,7 +16,7 @@
         {{profilePhone(False)}}
         {{profileAltPhone(False)}}
         {{addClinics()}}
-        {% if config.ALLOW_ASSIGNMENT_OF_STAFFADMIN_ROLE_BY_STAFFADMIN -%}
+        {% if config.ALLOW_STAFFADMIN_DELEGATION -%}
             {{addRoles()}}
         {%- endif %}
     </div>
