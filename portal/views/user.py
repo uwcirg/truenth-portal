@@ -97,7 +97,7 @@ def me():
         id=user.id, username=user.username, email=user.email)
 
 
-@user_api.route('/account', methods=('POST', ))
+@user_api.route('/account', methods=('OPTIONS', 'POST'))
 @crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -210,6 +210,9 @@ def account():
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     acting_user = current_user()
     if (acting_user.has_role(ROLE.ADMIN.value) or
@@ -282,7 +285,7 @@ def account():
     return jsonify(user_id=user.id)
 
 
-@user_api.route('/user/<int:user_id>', methods=['DELETE'])
+@user_api.route('/user/<int:user_id>', methods=['OPTIONS','DELETE'])
 @crossdomain(origin='*')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
@@ -326,6 +329,9 @@ def delete_user(user_id):
           permission to edit requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = get_user_or_abort(user_id)
@@ -337,7 +343,8 @@ def delete_user(user_id):
     return jsonify(message="deleted")
 
 
-@user_api.route('/user/<int:user_id>/reactivate', methods=['POST'])
+@user_api.route('/user/<int:user_id>/reactivate', methods=['OPTIONS','POST'])
+@crossdomain(origin='*')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def reactivate_user(user_id):
@@ -380,6 +387,9 @@ def reactivate_user(user_id):
           permission to edit requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = get_user_or_abort(user_id, allow_deleted=True)
@@ -393,7 +403,7 @@ def reactivate_user(user_id):
     return jsonify(message="reactivated")
 
 
-@user_api.route('/user/<int:user_id>/access_url')
+@user_api.route('/user/<int:user_id>/access_url', methods=('OPTIONS','GET'))
 @crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -441,6 +451,9 @@ def access_url(user_id):
           permission to view requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
@@ -1188,6 +1201,7 @@ def relationships(user_id):
 
 
 @user_api.route('/user/register-now', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def register_now():
     """Target for triggering registration of account
@@ -1221,6 +1235,9 @@ def register_now():
       400:
         description:
           if user is already registered or not eligible for some reason
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -1812,7 +1829,7 @@ def upload_user_document(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/password_reset', methods=('POST', ))
+@user_api.route('/user/<int:user_id>/password_reset', methods=('OPTIONS','POST'))
 @crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -1855,6 +1872,9 @@ def trigger_password_reset_email(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -1960,6 +1980,7 @@ def get_table_preferences(user_id, table_name):
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
     methods=('OPTIONS', 'PUT', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
     """Add a consent agreement for the user with named organization
@@ -2038,6 +2059,9 @@ def set_table_preferences(user_id, table_name):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to edit requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     if not user_id or not table_name:
@@ -2060,7 +2084,7 @@ def set_table_preferences(user_id, table_name):
     return jsonify(pref.as_json())
 
 
-@user_api.route('/user/<int:user_id>/invite', methods=('POST',))
+@user_api.route('/user/<int:user_id>/invite', methods=('OPTIONS','POST'))
 @crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.SERVICE.value])
@@ -2121,6 +2145,9 @@ def invite(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     user = get_user_or_abort(user_id)
     validate_email(user.email)
@@ -2144,7 +2171,7 @@ def invite(user_id):
     return jsonify(message=message)
 
 
-@user_api.route('/user/<int:user_id>/messages')
+@user_api.route('/user/<int:user_id>/messages', methods=('OPTIONS','POST'))
 @crossdomain(origin='*')
 @oauth.require_oauth()
 @roles_required(
@@ -2198,6 +2225,9 @@ def get_user_messages(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()

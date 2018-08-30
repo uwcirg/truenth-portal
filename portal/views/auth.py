@@ -787,6 +787,7 @@ def oauth_errors():
 
 
 @auth.route('/oauth/token', methods=('OPTIONS', 'GET', 'POST'))
+@crossdomain(origin='*')
 @csrf.exempt
 @oauth.token_handler
 def access_token():
@@ -865,6 +866,9 @@ def access_token():
             scope:
               type: string
               description: The authorized scope.
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     for field in request.form:
@@ -945,6 +949,9 @@ def authorize(*args, **kwargs):
           exchanged for such an access token. In the
           event of an error, redirection will target /oauth/errors
           of TrueNTH.
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     # Interventions may include additional text to display as a way

@@ -653,7 +653,8 @@ def assessment(patient_id, instrument_id):
     return jsonify(bundle)
 
 
-@assessment_engine_api.route('/patient/assessment')
+@assessment_engine_api.route('/patient/assessment', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @roles_required(
     [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
@@ -746,6 +747,9 @@ def get_assessments():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     # Rather than call current_user.check_role() for every patient
@@ -1458,7 +1462,8 @@ def present_needed():
     return redirect(url, code=302)
 
 
-@assessment_engine_api.route('/present-assessment')
+@assessment_engine_api.route('/present-assessment', methods=('OPTIONS','GET'))
+@crossdomain(origin='*')
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
@@ -1526,6 +1531,9 @@ def present_assessment(instruments=None):
             format: url
       401:
         description: if missing valid OAuth token or bad `next` parameter
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     # Todo: replace with proper models
@@ -1606,7 +1614,8 @@ def deprecated_present_assessment(instrument_id):
     return present_assessment(instruments=[instrument_id])
 
 
-@assessment_engine_api.route('/complete-assessment')
+@assessment_engine_api.route('/complete-assessment', methods=('OPTIONS','GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def complete_assessment():
     """Return to the last intervention that requested an assessment be presented
@@ -1631,6 +1640,9 @@ def complete_assessment():
             format: url
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
 

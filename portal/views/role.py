@@ -106,6 +106,7 @@ def roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def add_roles(user_id):
     """Add roles to user, returns simple JSON defining user roles
@@ -155,6 +156,9 @@ def add_roles(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given roles are already assigned to the user
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -174,6 +178,7 @@ def add_roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'DELETE'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def delete_roles(user_id):
     """Delete roles from user, returns simple JSON listing remaining roles
@@ -222,6 +227,9 @@ def delete_roles(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given roles are not currently assigned to the user
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -241,6 +249,7 @@ def delete_roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
@@ -285,6 +294,9 @@ def set_roles(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
