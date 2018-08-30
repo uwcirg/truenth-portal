@@ -596,13 +596,12 @@
                 ofields.each(function () {
                     $(this).on("click touchstart", function (e) {
                         e.stopPropagation();
-                        if ($(this).is(":checked")) {
-                            var childOrgs = self.orgTool.getHereBelowOrgs([$(this).val()]);
-                            if (childOrgs && childOrgs.length > 0) {
-                                childOrgs.forEach(function (org) {
-                                    $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
-                                });
-                            }
+                        var isChecked = $(this).is(":checked");
+                        var childOrgs = self.orgTool.getHereBelowOrgs([$(this).val()]);
+                        if (childOrgs && childOrgs.length) {
+                            childOrgs.forEach(function (org) {
+                                $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", isChecked);
+                            });
                         }
                         self.setOrgsSelector({
                             selectAll: false,
