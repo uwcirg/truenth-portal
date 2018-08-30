@@ -224,7 +224,9 @@ Should the need ever arise to purge the queue of jobs, run the following
 
 .. code:: bash
 
-    $ celery --app portal.celery_worker.celery purge
+    $ celery purge --app portal.celery_worker.celery
+
+Without running ``purge``, celery will resume any unfinished tasks when it restarts
 
 DATABASE
 --------
