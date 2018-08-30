@@ -598,7 +598,7 @@
                         e.stopPropagation();
                         var isChecked = $(this).is(":checked");
                         var childOrgs = self.orgTool.getHereBelowOrgs([$(this).val()]);
-                        if (childOrgs && childOrgs.length > 0) {
+                        if (childOrgs && childOrgs.length) {
                             childOrgs.forEach(function (org) {
                                 $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", isChecked);
                             });
