@@ -318,6 +318,41 @@
                         documentDataType: $(this).attr("data-document-type")
                     });
                 });
+                $("#adminTableContainer [name='chkRole']").each(function() {
+                    $(this).off("click").on("click", function(e) {
+                        e.stopPropagation();
+                        var userId = $(this).attr("data-user-id");
+                        if (!userId) {
+                            return false;
+                        }
+                        var role = $(this).attr("data-role"), checked = $(this).is(":checked"), tnthAjax = self.getDependency("tnthAjax");
+                        $("#loadingIndicator_"+userId).show();
+                        $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
+                        tnthAjax.getRoles(userId, function(data) {
+                            if (!data || data.error) {
+                                $("#loadingIndicator_"+userId).hide();
+                                $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
+                                alert(i18next.t("Error occurred retrieving roles for user"));
+                                return false;
+                            }
+                            var arrRoles = data.roles;
+                            arrRoles = $.grep(arrRoles, function(item) {
+                                return String(item.name).toLowerCase() !== String(role).toLowerCase();
+                            });
+                            if (checked) {
+                                arrRoles = arrRoles.concat([{name: role}]);
+                            }
+                            tnthAjax.putRoles(userId, {roles:arrRoles}, "", function(data) {
+                                $("#loadingIndicator_"+userId).hide();
+                                $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
+                                if (data.error) {
+                                    alert(i18next.t("Error occurred updating user roles"));
+                                    return false;
+                                }
+                            });
+                        });
+                    });
+                });
                 $("#adminTableContainer .btn-delete-user").each(function () {
                     $(this).popover({
                         container: "#adminTable",
