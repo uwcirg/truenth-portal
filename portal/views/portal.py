@@ -978,6 +978,13 @@ def spec():
     return jsonify(swag)
 
 
+@portal.route("/test-producer-consumer")
+def celery_pc():
+    celery = create_celery(current_app)
+    celery.send_task('tasks.produce_list')
+    return jsonify(message='launched')
+
+
 @portal.route("/celery-test")
 def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""
