@@ -659,9 +659,13 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             now=now, backdate=relativedelta(months=6, hours=-1))
         self.bless_with_basics(
             setdate=backdate, local_metastatic='metastatic')
+        mr3_qb = QuestionnaireBank.query.filter_by(
+            name='metastatic_recurring3').first()
+
         for instrument in metastatic_3:
             mock_qr(
-                instrument_id=instrument, status='in-progress', iteration=0)
+                instrument_id=instrument, status='in-progress',
+                qb=mr3_qb, iteration=0)
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
         assert a_s.overall_status == 'In Progress'
