@@ -402,9 +402,65 @@ a.btn {
   line-height: 33px;
   color: #494a45;
   position: relative;
-  padding: 0.6em 0 20px;
-  margin: 1.5em 0 25px;
+  margin: 1.5em 0 1em;
   font-weight: bold;
+}
+.login-form,
+.register-form {
+  overflow: hidden;
+  #mainHolder {
+    padding-top: 20%;
+  }
+  #homeFooter {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    border-top: 1px solid #eee;
+    left: 0;
+    right: 0;
+    padding: 0 2em 1em;
+  }
+  #homeFooter.footer-separate {
+    .footer-container {
+      margin-top: 16px;
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+  .footer-container {
+    margin-top: 16px;
+  }
+}
+.register-form {
+  #mainHolder {
+    padding-top: 2.5%;
+  }
+}
+.login-form {
+  #mainHolder {
+    padding-top: 20%;
+  }
+}
+@media (min-width: 992px) {
+  .login-form{
+    #mainHolder {
+      padding-top: 7.5%;
+    }
+  }
+}
+.register-form {
+  #regForm {
+    position: relative;
+    overflow: hidden;
+  }
+}
+.login-form {
+  #loginForm {
+    position: relative;
+    overflow: hidden;
+  }
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
@@ -594,7 +650,8 @@ select:not([multiple]) {
   }
 }
 #socialMediaRegistrationContainer,
-#socialMediaLoginContainer
+#socialMediaLoginContainer,
+.social-divider-container
  {
   display: none;
 }
@@ -642,6 +699,12 @@ select:not([multiple]) {
   }
   img {
     width: 40%;
+  }
+  .copyright {
+    line-height: 1.25;
+  }
+  .logo-container {
+    text-align: right;
   }
 }
 @media (min-width: 416px) {
@@ -3978,16 +4041,6 @@ div.timezone-warning.text-warning {
   html, body {
     width: 100%;
     height: 100%;
-  }
-  #mainHolder.vertical-center {
-    display: table;
-    height:100%;
-    margin: 0 auto;
-    #mainDiv {
-      display: table-cell;
-      text-align: center; /* horizontal */
-      vertical-align: middle; /* vertical */
-    }
   }
   #fullSizeBox {
     margin: 0 auto;

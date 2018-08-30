@@ -1,5 +1,5 @@
 {% extends 'flask_user/public_base.html' %}
-
+{% block mainclass -%}class="login-form"{%- endblock %}
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, render_submit_field %}
 <br/><br/><div class="divider"></div>
@@ -22,11 +22,13 @@
                     <span class="text-muted"><a href="{{ url_for('user.forgot_password') }}">{%trans%}Having trouble logging in?{%endtrans%}</a></span>
                 </div>
             {% endif %}
-            <br/>
-            <div class="divider"></div>
-            <div class="or">{{_("or")}}</div>
-            <div class="or-divider"></div>
-            <br/>
+            <div class="social-divider-container">
+                <br/>
+                <div class="divider"></div>
+                <div class="or">{{_("or")}}</div>
+                <div class="or-divider"></div>
+                <br/>
+            </div>
         </div>
         <div id="socialMediaLoginContainer">
             <div class="btn-social-container">
@@ -46,12 +48,11 @@
                     </a>
                 </div>
             </div>
+            <div class="divider"></div>
+            <br/><br/>
         </div>
-        <div class="divider"></div>
-        <br/><br/>
     </div>
 </div>
-<hr/>
 {% endblock %}
 {% block document_ready %}
 {{super()}}
