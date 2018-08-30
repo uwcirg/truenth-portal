@@ -671,6 +671,34 @@
     {
       "extension": [
         {
+          "timezone": "America/Chicago",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14610,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-10"
+        }
+      ],
+      "language": "en_US",
+      "name": "University of Wisconsin",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "timezone": "America/Los_Angeles",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1291,9 +1319,9 @@
       "id": 14700,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "147-00-PLACEHOLDER"
+          "value": "146-38"
         }
       ],
       "language": "en_US",
@@ -1449,9 +1477,9 @@
       "id": 14703,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "147-03-PLACEHOLDER"
+          "value": "146-47"
         }
       ],
       "language": "en_GB",
