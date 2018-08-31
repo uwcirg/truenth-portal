@@ -407,14 +407,12 @@ a.btn {
 }
 .login-form,
 .register-form {
-  overflow: hidden;
-  #mainHolder {
-    padding-top: 20%;
+  .btn-social-container {
+    position: relative;
+    min-height: 45vh;
   }
   #homeFooter {
     display: block;
-    position: fixed;
-    bottom: 0;
     width: 100%;
     max-width: 100%;
     border-top: 1px solid #eee;
@@ -434,32 +432,25 @@ a.btn {
   }
 }
 .register-form {
-  #mainHolder {
-    padding-top: 2.5%;
-  }
-}
-.login-form {
-  #mainHolder {
-    padding-top: 20%;
-  }
-}
-@media (min-width: 992px) {
-  .login-form{
-    #mainHolder {
-      padding-top: 7.5%;
-    }
-  }
-}
-.register-form {
   #regForm {
     position: relative;
     overflow: hidden;
+    padding: 2em 0;
   }
 }
 .login-form {
   #loginForm {
     position: relative;
     overflow: hidden;
+    padding-top: 10.5vh;
+    padding-bottom: 1em;
+  }
+}
+@media (min-width: 992px) {
+  .login-form {
+    #loginForm {
+      padding: 6vh 0 1em;
+    }
   }
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -707,7 +698,7 @@ select:not([multiple]) {
     text-align: right;
   }
 }
-@media (min-width: 416px) {
+@media (min-width: 699px) {
   #homeFooter {
     img {
       width: auto;
@@ -1796,13 +1787,12 @@ div.footer-wrapper.right-panel {
 #fullSizeBox {
   position: relative;
   text-align: left;
-  left:0;
-  top:0;
-  margin:0;
+  margin: auto;
   background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: 30%;
   overflow: hidden;
+  width: 100%;
   max-width: 100%;
   height:680px;
    -webkit-transition: height 0.8s ease-in;
@@ -1814,7 +1804,7 @@ div.footer-wrapper.right-panel {
   }
   &.box-min-500 {
     min-height: 500px;
-    max-height: 660px;
+    max-height: 80vh;
     margin: auto;
     overflow: hidden;
   }
@@ -2562,6 +2552,7 @@ input.clinic {
   .tnth-headline {
     padding-bottom: 8px;
     border-bottom: 1px solid @HRColor;
+    margin-bottom: 4px;
   }
   label {
     font-weight: 500;
@@ -3756,12 +3747,14 @@ div.timezone-warning.text-warning {
   }
 }
 
-@media (min-width: 768px) {
-  #fullSizeBox {
-    > img {
-      width: 100%;
-    }
+#fullSizeBox {
+  > img {
+    width: 100%;
+    margin: auto;
   }
+}
+
+@media (min-width: 768px) {
   #fullSizeContainer {
     padding: 24px 0;
   }
@@ -4043,7 +4036,7 @@ div.timezone-warning.text-warning {
     height: 100%;
   }
   #fullSizeBox {
-    margin: 0 auto;
+    margin: 1em auto;
     max-width: 1400px;
   }
   #homeFooter {
