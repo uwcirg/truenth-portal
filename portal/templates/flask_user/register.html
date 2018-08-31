@@ -1,5 +1,5 @@
 {% extends 'flask_user/public_base.html' %}
-{% block mainclass -%}class="register-form"{%- endblock %}
+{% block mainclass %}class="register-form"{% endblock %}
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate">
