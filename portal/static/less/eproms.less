@@ -407,14 +407,12 @@ a.btn {
 }
 .login-form,
 .register-form {
-  overflow: hidden;
-  #mainHolder {
-    padding-top: 20%;
+  .btn-social-container {
+    position: relative;
+    min-height: 45vh;
   }
   #homeFooter {
     display: block;
-    position: fixed;
-    bottom: 0;
     width: 100%;
     max-width: 100%;
     border-top: 1px solid #eee;
@@ -434,32 +432,25 @@ a.btn {
   }
 }
 .register-form {
-  #mainHolder {
-    padding-top: 2.5%;
-  }
-}
-.login-form {
-  #mainHolder {
-    padding-top: 9%;
-  }
-}
-@media (min-width: 992px) {
-  .login-form{
-    #mainHolder {
-      padding-top: 5.5%;
-    }
-  }
-}
-.register-form {
   #regForm {
     position: relative;
     overflow: hidden;
+    padding: 2em 0;
   }
 }
 .login-form {
   #loginForm {
     position: relative;
     overflow: hidden;
+    padding-top: 10.5vh;
+    padding-bottom: 1em;
+  }
+}
+@media (min-width: 992px) {
+  .login-form {
+    #loginForm {
+      padding: 6vh 0 1em;
+    }
   }
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -707,7 +698,7 @@ select:not([multiple]) {
     text-align: right;
   }
 }
-@media (min-width: 416px) {
+@media (min-width: 699px) {
   #homeFooter {
     img {
       width: auto;
