@@ -440,13 +440,13 @@ a.btn {
 }
 .login-form {
   #mainHolder {
-    padding-top: 20%;
+    padding-top: 10%;
   }
 }
 @media (min-width: 992px) {
   .login-form{
     #mainHolder {
-      padding-top: 7.5%;
+      padding-top: 5.5%;
     }
   }
 }
@@ -1796,13 +1796,12 @@ div.footer-wrapper.right-panel {
 #fullSizeBox {
   position: relative;
   text-align: left;
-  left:0;
-  top:0;
-  margin:0;
+  margin: auto;
   background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: 30%;
   overflow: hidden;
+  width: 100%;
   max-width: 100%;
   height:680px;
    -webkit-transition: height 0.8s ease-in;
@@ -1814,7 +1813,7 @@ div.footer-wrapper.right-panel {
   }
   &.box-min-500 {
     min-height: 500px;
-    max-height: 660px;
+    max-height: 80vh;
     margin: auto;
     overflow: hidden;
   }
@@ -2562,6 +2561,7 @@ input.clinic {
   .tnth-headline {
     padding-bottom: 8px;
     border-bottom: 1px solid @HRColor;
+    margin-bottom: 4px;
   }
   label {
     font-weight: 500;
@@ -3756,12 +3756,14 @@ div.timezone-warning.text-warning {
   }
 }
 
-@media (min-width: 768px) {
-  #fullSizeBox {
-    > img {
-      width: 100%;
-    }
+#fullSizeBox {
+  > img {
+    width: 100%;
+    margin: auto;
   }
+}
+
+@media (min-width: 768px) {
   #fullSizeContainer {
     padding: 24px 0;
   }
@@ -4043,7 +4045,7 @@ div.timezone-warning.text-warning {
     height: 100%;
   }
   #fullSizeBox {
-    margin: 0 auto;
+    margin: 1em auto;
     max-width: 1400px;
   }
   #homeFooter {
