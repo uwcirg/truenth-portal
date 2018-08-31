@@ -489,6 +489,13 @@
         }
       ],
       "id": 21400,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-37"
+        }
+      ],
       "language": "en_AU",
       "name": "Eastern Health",
       "partOf": {
@@ -511,6 +518,13 @@
         }
       ],
       "id": 21500,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-41"
+        }
+      ],
       "language": "en_AU",
       "name": "Westmead Hospital",
       "partOf": {
@@ -533,6 +547,13 @@
         }
       ],
       "id": 21600,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-40"
+        }
+      ],
       "language": "en_AU",
       "name": "Macquarie University Hospital",
       "partOf": {
@@ -1548,7 +1569,7 @@
         {
           "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "146-39"
+          "value": "TNG-PLACEHOLDER-SOUTHAMPTON"
         }
       ],
       "language": "en_GB",
