@@ -41,7 +41,7 @@ future==0.16.0
 fuzzywuzzy==0.17.0
 gunicorn==19.8.1
 idna==2.7                 # via requests
-imagesize==1.0.0          # via sphinx
+imagesize==1.1.0          # via sphinx
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==2.6.0
