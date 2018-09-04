@@ -410,21 +410,6 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     patient_fields = ("careProvider", "identifier")
 
     for questionnaire_response in questionnaire_responses:
-        subject = questionnaire_response.subject
-        encounter = questionnaire_response.encounter
-        encounter_fhir = encounter.as_fhir()
-        questionnaire_response.document["encounter"] = encounter_fhir
-
-        questionnaire_response.document["subject"] = {
-            k: v for k, v in subject.as_fhir().items() if k in patient_fields
-        }
-
-        if subject.organizations:
-            questionnaire_response.document["subject"]["careProvider"] = [
-                Reference.organization(org.id).as_fhir()
-                for org in subject.organizations
-            ]
-
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
         if patch_dstu2:
@@ -437,6 +422,21 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
                     _external=True,
                 ),
             }
+        else:
+            subject = questionnaire_response.subject
+            encounter = questionnaire_response.encounter
+            encounter_fhir = encounter.as_fhir()
+            questionnaire_response.document["encounter"] = encounter_fhir
+
+            questionnaire_response.document["subject"] = {
+                k: v for k, v in subject.as_fhir().items() if k in patient_fields
+            }
+
+            if subject.organizations:
+                questionnaire_response.document["subject"]["careProvider"] = [
+                    Reference.organization(org.id).as_fhir()
+                    for org in subject.organizations
+                ]
 
         annotated_questionnaire_responses.append(
             questionnaire_response.document)
