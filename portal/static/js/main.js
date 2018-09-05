@@ -1607,24 +1607,20 @@ var tnthAjax = {
         if (!configKey || $("#profile_" + configKey).length > 0) { return false; }
         $("body").append("<input type='hidden' id='profile_" + configKey + "' value='" + (value ? value : "") + "'/>");
     },
-    "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
+    "getConfigurationByKey": function(configVar, params, callback, setConfigInUI) {
         callback = callback || function() {};
         var self = this;
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-            return false;
-        }
         if (!configVar) {
             callback({"error": i18next.t("configuration variable name is required.")});
             return false;
         }
-        var sessionConfigKey = "config_" + configVar + "_" + userId;
+        var sessionConfigKey = "config_" + configVar;
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             if (setConfigInUI) { self.setConfigurationUI(configVar, data[configVar] + "");}
             callback(data);
         } else {
-            this.sendRequest("/api/settings/" + configVar, "GET", userId, (params || {}), function(data) {
+            this.sendRequest("/api/settings/" + configVar, "GET", null, (params || {}), function(data) {
                 if (data) {
                     callback(data);
                     if (data.hasOwnProperty(configVar)) {
