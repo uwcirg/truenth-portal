@@ -466,7 +466,7 @@ def invalidate_assessment_status_cache(user_id):
         overall_assessment_status, user_id)
 
 
-@dogpile_cache.region('hourly')
+@dogpile_cache.region('assessment_cache_region')
 def overall_assessment_status(user_id):
     """Cachable interface for expensive assessment status lookup
 
