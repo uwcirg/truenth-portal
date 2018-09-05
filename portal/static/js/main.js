@@ -874,6 +874,7 @@ var tnthAjax = {
                 });
             }
             if (arrConsent.length > 0) { //don't send request if suspended consent already existed
+                callback({"data": "success"});
                 return false;
             }
             self.sendRequest("/api/user/" + userId + "/consent/withdraw",

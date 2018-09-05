@@ -771,6 +771,37 @@ select:not([multiple]) {
   .study-id-view td {
     margin-top: 0.4em;
   }
+  #profileDeceasedSection {
+    hr {
+      border-bottom: 1px solid darken(@HRColor, 10%);
+      margin-bottom: 2.25em;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+#deceasedConsentPopover {
+  &:hover {
+    cursor: auto;
+  }
+}
+
+.deceased-popover-content {
+  margin-top: 0.5em;
+}
+
+.deceased-popover-buttons-container {
+  display: flex;
+  justify-content: center;
+  margin: 0.5em 0 0.25em;
+  button {
+    margin: 0.5em;
+  }    
+}
+#deceasedInfo {
+  margin: 0.5em 0;
 }
 
 #mainDiv.profile .copyright-container,

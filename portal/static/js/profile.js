@@ -770,8 +770,12 @@
                 }
                 location.replace("/login-as/" + this.subjectId);
             },
-            postDemoData: function(field, data) {
-                if (!this.subjectId) { return false; }
+            postDemoData: function(field, data, callback) {
+                callback = callback || function() {};
+                if (!this.subjectId) {
+                    callback({"error": i18next.t("Subject id is required")});
+                    return false;
+                }
                 var self = this;
                 Vue.nextTick(function () {
                     // DOM updated
@@ -779,6 +783,7 @@
                     data = data || {};
                     var valid = field.get(0).validity ? field.get(0).validity.valid : true;
                     if (!valid) {
+                        callback({"error": i18next.t("Invalid field value.")});
                         return false;
                     }
                     var o = field;
@@ -788,11 +793,13 @@
                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                     if (hasError) {
                         editButton.attr("disabled", false);
+                        callback({"error": i18next.t("Validation error.")});
                         return;
                     }
                     editButton.attr("disabled", true);
                     data.resourceType = data.resourceType || "Patient";
-                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function(data) {
+                        callback(data);
                         setTimeout(function() {
                             self.setDemoData({cache: false}, function() {
                                 var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
@@ -1289,16 +1296,72 @@
                 });
             },
             updateDeceasedSection: function(targetField) {
-                var data = {};
+                var data = {}, isChecked = $("#boolDeath").is(":checked");
+                var hasSuspendedConsent = $("#consentListTable .withdrawn-label").length;
+                var confirmationRequired = isChecked && !hasSuspendedConsent && this.settings.LOCALIZED_AFFILIATE_ORG && this.topLevelOrgs.indexOf(this.settings.LOCALIZED_AFFILIATE_ORG) !== -1;
+                $("#deceasedInfo").html("");
                 if ($("#deathDate").val()) {
                     data.deceasedDateTime = $("#deathDate").val();
                 }
-                if ($("#boolDeath").prop("checked")) {
-                    data.deceasedBoolean = true;
-                } else {
-                    data.deceasedBoolean = false;
+                data.deceasedBoolean = isChecked;
+                if (!confirmationRequired) {
+                    this.postDemoData(targetField, data);
+                    return;
                 }
-                this.postDemoData(targetField, data);
+                var self = this, subjectId = this.subjectId;
+                var setDisabledFields = function(disabledFlag) {
+                    $("#boolDeath, #deathDate, #deathDay, #deathYear, #deathMonth").attr("disabled", disabledFlag);
+                };
+                var hidePopover = function() {
+                    $("#deceasedConsentPopover").popover("hide");
+                };
+                var showPopover = function() {
+                    if (!$("#deceasedConsentPopover").attr("aria-describedby")) {
+                        $("#deceasedConsentPopover").popover("show");
+                    }
+                };
+                var clearFields = function() {
+                    if (!self.demo.data.deceasedDateTime) {
+                        $("#deathDate, #deathDay, #deathYear, #deathMonth").val("");
+                    }
+                    if (!(String(self.demo.data.deceasedBoolean).toLowerCase() === "true")) {
+                        $("#boolDeath").prop("checked", false);
+                    }
+                    hidePopover();
+                };
+                showPopover();
+                $("#btnDeceasedConsentYes").off("click").on("click", function(e) { //selecting yes in the confirmation popover
+                    e.stopPropagation();
+                    setDisabledFields(true);
+                    self.postDemoData(targetField, data, function(data) {
+                        if (!data || data.error) {
+                            setDisabledFields(false);
+                            return false;
+                        }
+                        var orgTool = self.getOrgTool(), selectedOrgElement = orgTool.getSelectedOrg();
+                        if (!selectedOrgElement.length) { //no need to continue if no affiliated org
+                            setDisabledFields(false);
+                            return;
+                        }
+                        self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), "", function(data) {
+                            setDisabledFields(false);
+                            if (data.error) {
+                                $("#deceasedInfo").html(i18next.t("Error occurred suspending consent for subject."));
+                                return;
+                            }
+                            hidePopover();
+                            self.reloadConsentList(subjectId);
+                        });
+                    });
+                });
+                $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
+                    e.stopPropagation();
+                    clearFields();
+                });
+                $("#profileDeceasedSection .profile-item-edit-btn").on("click", function(e) {
+                    e.stopPropagation();
+                    clearFields();
+                });
             },
             initDeceasedSection: function() {
                 var self = this;
