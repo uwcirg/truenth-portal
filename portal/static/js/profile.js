@@ -280,6 +280,9 @@
                 return this.userEmailReady;
             },
             setUserEmailReady: function(params) {
+                if (this.mode !== "profile") { //setting email ready status only applies to profile page
+                    return false;
+                }
                 var self = this;
                 this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
                     if (data.error) {
@@ -1686,7 +1689,7 @@
                 var self = this, orgTool = this.getOrgTool();
                 $("#userOrgs input[name='organization']").each(function() {
                     $(this).attr("data-save-container-id", "userOrgs");
-                    $(this).off("click").on("click", function() {
+                    $(this).on("click", function() {
                         var userId = self.subjectId, parentOrg = orgTool.getElementParentOrg(this);
                         var orgsElements = $("#userOrgs input[name='organization']").not("[id='noOrgs']");
                         if ($(this).prop("checked")) {
