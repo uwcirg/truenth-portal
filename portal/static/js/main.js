@@ -2080,20 +2080,35 @@ var Global = {
 
         setTimeout(function() {
             var userLocale = tnthDates.getUserLocale(), footerElements = $("#homeFooter .copyright");
-            var getContent = function(cc) {
+            var userId;
+            $.ajax({
+                type: "GET",
+                url: "/api/me",
+                async: false
+            }).done(function(data) {
+                if (data) { userId = data.id; }
+            });
+            var copyright_year = new Date().getFullYear();
+            tnthAjax.getConfigurationByKey("COPYRIGHT_YEAR", userId, {sync: true}, function(data) {
+                if (!data.error) {
+                    copyright_year = data.COPYRIGHT_YEAR;
+                }
+            });
+
+            var getContent = function(cc, copyright_year) {
                 var content = "";
                 switch (String(cc.toUpperCase())) {
                 case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).").replace("{year}", copyright_year);
                     break;
                 case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
                 case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
                 default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
+                    content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
 
                 }
                 return content;
