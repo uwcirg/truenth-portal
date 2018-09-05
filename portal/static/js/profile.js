@@ -280,6 +280,9 @@
                 return this.userEmailReady;
             },
             setUserEmailReady: function(params) {
+                if (this.mode !== "profile") { //setting email ready status only applies to profile page
+                    return false;
+                }
                 var self = this;
                 this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
                     if (data.error) {
@@ -1850,16 +1853,8 @@
                             } else {
                                 self.setDefaultConsent(userId, parentOrg);
                             }
-                        } else {
-                            var arrayDelOrgs = $("#userOrgs input[name='organization']").toArray().map(function(item) {return $(item).val();});
-                            if (cto) {
-                                arrayDelOrgs = OT.getTopLevelOrgs();
-                            }
-                            arrayDelOrgs.forEach(function(i) {
-                                (function(orgId) {
-                                    setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
-                                })(i);
-                            });
+                        } else { //remove all valid consent if no org is selected
+                            setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": "all"});}, 350);
                         }
                     } else {
                         if (cto) {
