@@ -9,6 +9,7 @@ import json
 import re
 import urllib
 import urllib.parse
+from werkzeug.exceptions import HTTPException
 
 from flask_webtest import SessionScope
 import pytest
@@ -1151,8 +1152,7 @@ class TestUser(TestCase):
             user, other = map(db.session.merge, (self.test_user, other))
             old_regtime = user.registered
             assert not user.is_registered()
-            success = user.promote_to_registered(other)
-            assert success
+            user.promote_to_registered(other)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
             assert user.is_registered()
@@ -1181,8 +1181,9 @@ class TestUser(TestCase):
             self.test_user.organizations.append(orgs[1])
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
-            success = user.promote_to_registered(other)
-            assert not success
+            with self.assertRaises(HTTPException) as http_error:
+                user.promote_to_registered(other)
+                assert http_error.exception.code == 400
 
     def test_password_reset(self):
         self.promote_user(role_name=ROLE.ADMIN.value)

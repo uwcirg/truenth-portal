@@ -1497,8 +1497,7 @@ class User(db.Model, UserMixin):
                 error_message = 'Attempted to promote temporary user {} \
                         to registered user {} with role {}' \
                         .format(self.id, registered_user.id, restricted_role)
-                current_app.logger.error(error_message)
-                return False
+                abort(400, error_message)
 
         before = self.as_fhir()
 
@@ -1534,7 +1533,6 @@ class User(db.Model, UserMixin):
             to registered user {}'
             .format(self.id, registered_user.id)
         )
-        return True
 
     def check_role(self, permission, other_id):
         """check user for adequate role
