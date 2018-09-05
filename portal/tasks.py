@@ -141,17 +141,32 @@ def test_args(*args, **kwargs):
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
-@celery.task(name="tasks.consume_list", ignore_result=True, soft_time_limit=4)
-def consume_list(id_list, priority):
+@celery.task(
+    name="tasks.test_consume_list", ignore_result=True, soft_time_limit=4)
+def test_consume_list(id_list, priority):
+    """Proof of concept / test code to eval producer/consumer pattern.
+
+    See also the produce_list() task, and the trigger view
+    at /test-producer-consumer
+
+    """
     try:
+        # sleep for a number of seconds, so the process looks to take
+        # a bit and evaluation of tasks and priorities can be observed.
         time.sleep(random.randint(1, 5))
         logger.info("priority: {} consuming {}".format(priority, id_list))
     except SoftTimeLimitExceeded:
         logger.info("timed out")
 
 
-@celery.task(name="tasks.produce_list")
-def produce_list():
+@celery.task(name="tasks.test_produce_list")
+def test_produce_list():
+    """Proof of concept / test code to eval producer/consumer pattern.
+
+    See also the consume_list() task, and the trigger view
+    at /test-producer-consumer
+
+    """
     j = 0
     step = 5
     numlists = 50
@@ -159,7 +174,7 @@ def produce_list():
         id_list = (range(j, i))
         priority = random.choice((0, 5, 9))
         logger.info("priority {}; producing {}".format(priority, id_list))
-        consume_list.apply_async(
+        test_consume_list.apply_async(
             priority=priority,
             kwargs={'id_list': id_list, 'priority': priority})
         j = i
@@ -216,7 +231,8 @@ def update_patient_loop(
 
     patients = valid_patients.all()
     j = 0
-    batchsize = 16
+    batchsize = current_app.config.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+
     while True:
         sublist = patients[j:j+batchsize]
         if not sublist:

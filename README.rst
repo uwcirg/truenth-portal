@@ -220,11 +220,12 @@ Alternatively, install an init script and configure. See
 `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
 
 Should the need ever arise to purge the queue of jobs, run the following
-**destructive** command
+**destructive** command.  All tasks should be idempotent by design, so doing
+this is suggested, especially if the server is struggling.
 
 .. code:: bash
 
-    $ celery purge --app portal.celery_worker.celery
+    $ celery purge --force --app portal.celery_worker.celery
 
 Without running ``purge``, celery will resume any unfinished tasks when it restarts
 

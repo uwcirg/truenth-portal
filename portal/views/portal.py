@@ -981,7 +981,7 @@ def spec():
 @portal.route("/test-producer-consumer")
 def celery_pc():
     celery = create_celery(current_app)
-    celery.send_task('tasks.produce_list')
+    celery.send_task('tasks.test_produce_list')
     return jsonify(message='launched')
 
 

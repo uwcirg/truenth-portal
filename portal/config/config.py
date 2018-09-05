@@ -121,6 +121,7 @@ class BaseConfig(object):
     # config values aren't typically objects...
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
+    UPDATE_PATIENT_TASK_BATCH_SIZE = 16
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
