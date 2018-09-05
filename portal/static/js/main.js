@@ -874,6 +874,7 @@ var tnthAjax = {
                 });
             }
             if (arrConsent.length > 0) { //don't send request if suspended consent already existed
+                callback({"data": "success"});
                 return false;
             }
             self.sendRequest("/api/user/" + userId + "/consent/withdraw",
@@ -881,7 +882,7 @@ var tnthAjax = {
             userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
             function(data) {
                 if (data.error) {
-                    callback({"error": i18next.t("Error occurred setting suspended consent status.")});
+                    callback({"data": i18next.t("Error occurred setting suspended consent status.")});
                     return false;
                 }
                 callback(data);
