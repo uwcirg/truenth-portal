@@ -680,6 +680,7 @@ var tnthAjax = {
                     }
                 });
                 if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
+                    $("#next").addClass("accept-on-next");
                     $("#next").on("click", function() {
                         acceptOnNextCheckboxes.forEach(function(ckBox) {
                             ckBox.trigger("click");

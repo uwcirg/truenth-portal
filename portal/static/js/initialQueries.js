@@ -473,6 +473,12 @@
                 $("#aboutForm").fadeIn();
             }
         }
+        if ($("#next").hasClass("accept-on-next")) { //related to MUSIC - Accept on Next - special case
+            setTimeout(function() {
+                $("#aboutForm").removeClass("tnth-hide");
+                $("#next").removeAttr("disabled").addClass("open");
+            }, 150);
+        }
         setTimeout(function() {
             $("#iqFooterWrapper").show();
         }, 500);
