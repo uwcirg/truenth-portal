@@ -85,7 +85,9 @@ class BaseConfig(object):
     CELERY_IMPORTS = ('portal.tasks',)
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
-    DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
+    DOGPILE_CACHE_REGIONS = [
+        ('assessment_cache_region', 60*60*2),
+        ('reporting_cache_region', 60*60*12)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
     LOG_CACHE_MISS = False
