@@ -1529,9 +1529,9 @@ class User(db.Model, UserMixin):
             user_id=self.id, subject_id=self.id,
             context='account'))
 
-        current_app.logger.info( \
+        current_app.logger.info(
             'Successfully promoted temporary user {} \
-            to registered user {}' \
+            to registered user {}'
             .format(self.id, registered_user.id)
         )
         return True
