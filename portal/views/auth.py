@@ -498,7 +498,7 @@ def next_after_login():
         logout(prevent_redirect=True, reason='reverting to invited account')
         success = invited_user.promote_to_registered(user)
         if not success:
-            abort(404, 'Unable to promote to registered user')
+            abort(400, 'Unable to promote to registered user')
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
         if preserve_next_across_sessions:
