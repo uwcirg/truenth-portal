@@ -195,7 +195,7 @@
         }
         if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
             var self = this;
-            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", this.userId, {
+            tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", {
                 sync: true
             }, function(data) {
                 if (!data.error) {
