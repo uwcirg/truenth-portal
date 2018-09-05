@@ -1686,7 +1686,7 @@
                 var self = this, orgTool = this.getOrgTool();
                 $("#userOrgs input[name='organization']").each(function() {
                     $(this).attr("data-save-container-id", "userOrgs");
-                    $(this).on("click", function() {
+                    $(this).off("click").on("click", function() {
                         var userId = self.subjectId, parentOrg = orgTool.getElementParentOrg(this);
                         var orgsElements = $("#userOrgs input[name='organization']").not("[id='noOrgs']");
                         if ($(this).prop("checked")) {
@@ -1850,16 +1850,8 @@
                             } else {
                                 self.setDefaultConsent(userId, parentOrg);
                             }
-                        } else {
-                            var arrayDelOrgs = $("#userOrgs input[name='organization']").toArray().map(function(item) {return $(item).val();});
-                            if (cto) {
-                                arrayDelOrgs = OT.getTopLevelOrgs();
-                            }
-                            arrayDelOrgs.forEach(function(i) {
-                                (function(orgId) {
-                                    setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
-                                })(i);
-                            });
+                        } else { //remove all valid consent if no org is selected
+                            setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": "all"});}, 350);
                         }
                     } else {
                         if (cto) {
