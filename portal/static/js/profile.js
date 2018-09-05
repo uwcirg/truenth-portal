@@ -1916,7 +1916,7 @@
                             } else {
                                 self.setDefaultConsent(userId, parentOrg);
                             }
-                        } else { //remove all valid consent if no org is select
+                        } else { //remove all valid consent if no org is selected
                             setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": "all"});}, 350);
                         }
                     } else {

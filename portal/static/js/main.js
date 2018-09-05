@@ -882,7 +882,7 @@ var tnthAjax = {
             userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
             function(data) {
                 if (data.error) {
-                    callback({"data": i18next.t("Error occurred setting suspended consent status.")});
+                    callback({"error": i18next.t("Error occurred setting suspended consent status.")});
                     return false;
                 }
                 callback(data);
