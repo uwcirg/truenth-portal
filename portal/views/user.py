@@ -1457,7 +1457,11 @@ def unique_email():
     validate_email(email)
     # find matching account by email regardless of case
     match = User.query.filter(func.lower(User.email) == email.lower())
-    assert (match.count() < 2)  # db unique constraint - can't happen, right?
+    if match.count() > 1:
+        current_app.logger.error(
+             'there are >1 emails that match {}'.format(email)
+        )
+        return jsonify(unique=False)
     if match.count() == 1:
         # If the user is the authenticated user or provided user_id,
         # it still counts as unique
