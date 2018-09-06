@@ -2251,7 +2251,7 @@
                 }
                 var self = this, still_needed = false, subjectId = this.subjectId;
                 this.modules.tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
-                    still_needed = data && !data.error && data.length > 0;
+                    still_needed = data && data.still_needed && data.still_needed.length;
                 }, method);
                 if (/\?/.test(assessment_url)) { //passing additional query params
                     assessment_url += "&entry_method=" + method;

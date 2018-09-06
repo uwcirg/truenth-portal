@@ -55,8 +55,6 @@
     var tnthAjax = window.portalModules.tnthAjax;
 
     $(document).ready(function() {
-        //get still needed
-        tnthAjax.getStillNeededCoreData(patientId, true, null, entryMethod);
         //populate existing checkbox(es)
         tnthAjax.getTerms(patientId, false, true, function(data) {
             updateTerms(data);
@@ -104,7 +102,7 @@
                         $(this).attr("data-agree", "true");
                     }
                 });
-               
+
             });
         });
         $(".button-container").each(function() {

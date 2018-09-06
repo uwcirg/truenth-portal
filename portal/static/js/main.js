@@ -655,43 +655,7 @@ var tnthAjax = {
                 callback({"error": i18next.t("unable to get needed core data")});
                 return false;
             }
-            var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
-            var fields = (data.still_needed).map(function(item) {
-                return item.field;
-            });
-            if ($("#topTerms").length > 0) {
-                var acceptOnNextCheckboxes = [];
-                (data.still_needed).forEach(function(item) {
-                    var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
-                    if (matchedTermsCheckbox.length > 0) {
-                        matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
-                        var parentNode = matchedTermsCheckbox.closest("label.terms-label");
-                        if (parentNode.length > 0) {
-                            parentNode.show().removeClass("tnth-hide");
-                            if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
-                                parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
-                                $("#termsText").addClass("agreed");
-                                $("#termsCheckbox_default").removeClass("tnth-hide");
-                                $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
-                                acceptOnNextCheckboxes.push(parentNode);
-                            }
-                        }
-                    }
-                });
-                if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
-                    $("#next").addClass("accept-on-next");
-                    $("#next").on("click", function() {
-                        acceptOnNextCheckboxes.forEach(function(ckBox) {
-                            ckBox.trigger("click");
-                        });
-                    });
-                }
-            }
-            if (fields.indexOf("localized") === -1) {
-                $("#patMeta").remove();
-            }
-            callback(fields);
+            callback(data);
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {

@@ -190,8 +190,15 @@
     FieldsChecker.prototype.setConfig = function(data, callback) {
         callback = callback || function() {};
         var tnthAjax = this.__getDependency("tnthAjax");
-        if (data && !data.error) {
-            this.CONFIG_REQUIRED_CORE_DATA = data;
+        if (data && data.still_needed) {
+            var fields = (data.still_needed).map(function(item) {
+                return item.field;
+            });
+            this.CONFIG_REQUIRED_CORE_DATA = fields;
+            if (fields.indexOf("localized") === -1) {
+                $("#patMeta").remove();
+            }
+            this.handleAcceptOnNext(data);
         }
         if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
             var self = this;
@@ -204,6 +211,47 @@
             });
         }
         this.setUserRoles(callback);
+    };
+
+    FieldsChecker.prototype.handleAcceptOnNext = function(data) {
+        if (!data || !data.still_needed) {
+            return false;
+        }
+        var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
+        var acceptOnNextCheckboxes = [];
+        (data.still_needed).forEach(function(item) {
+            var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
+            if (matchedTermsCheckbox.length > 0) {
+                matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
+                var parentNode = matchedTermsCheckbox.closest("label.terms-label");
+                if (parentNode.length === 0) {
+                    return;
+                }
+                parentNode.show().removeClass("tnth-hide");
+                if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
+                    parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    acceptOnNextCheckboxes.push(parentNode);
+                }
+            }
+        });
+        if (acceptOnNextCheckboxes.length === 0) {
+            return false;
+        }
+        //require for accept on next collection method
+        $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
+        $("#termsText").addClass("agreed");
+        $("#termsCheckbox_default").removeClass("tnth-hide");
+        $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
+        $("#next").addClass("accept-on-next").on("click", function() {
+            acceptOnNextCheckboxes.forEach(function(ckBox) {
+                ckBox.trigger("click");
+            });
+        });
+        //show next button for data collection method of accept on next - such as organizations like Music
+        setTimeout(function() {
+            $("#aboutForm").removeClass("tnth-hide");
+            $("#next").removeAttr("disabled").addClass("open");
+        }, 350);
     };
 
     FieldsChecker.prototype.getTotalSections = function() {
@@ -473,12 +521,6 @@
                 $("#aboutForm").fadeIn();
             }
         }
-        if ($("#next").hasClass("accept-on-next")) { //related to MUSIC - Accept on Next - special case
-            setTimeout(function() {
-                $("#aboutForm").removeClass("tnth-hide");
-                $("#next").removeAttr("disabled").addClass("open");
-            }, 150);
-        }
         setTimeout(function() {
             $("#iqFooterWrapper").show();
         }, 500);
@@ -581,7 +623,7 @@
                     self.stopContinue(sectionId);
                     return false;
                 }
-                if (!data.length) {//finished all sections
+                if (!data.still_needed || !data.still_needed.length) {//finished all sections
                     self.continueToFinish(sectionId);
                     return true;
                 }
