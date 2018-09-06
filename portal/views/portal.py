@@ -826,7 +826,6 @@ def settings():
 
 @portal.route('/api/settings', defaults={'config_key': None})
 @portal.route('/api/settings/<string:config_key>')
-@oauth.require_oauth()
 def config_settings(config_key):
     # return selective keys - not all can be be viewed by users, e.g.secret key
     config_prefix_whitelist = (
