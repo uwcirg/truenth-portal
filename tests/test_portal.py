@@ -248,6 +248,20 @@ class TestPortal(TestCase):
         response2 = self.client.get('/api/settings/bad_value')
         assert response2.status_code == 400
 
+    def test_configuration_secrets(self):
+        """Ensure config keys containing secrets are not exposed"""
+        blacklist = (
+            'SECRET',
+            'URI',
+            'SQL',
+        )
+        response = self.client.get('/api/settings')
+
+        assert response.status_code == 200
+        assert not any(
+            any(k in config_key for k in blacklist)
+            for config_key in response.json
+        )
 
 class TestPortalEproms(TestCase):
     """Portal views depending on eproms blueprint"""
