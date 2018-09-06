@@ -655,42 +655,7 @@ var tnthAjax = {
                 callback({"error": i18next.t("unable to get needed core data")});
                 return false;
             }
-            var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
-            var fields = (data.still_needed).map(function(item) {
-                return item.field;
-            });
-            if ($("#topTerms").length > 0) {
-                var acceptOnNextCheckboxes = [];
-                (data.still_needed).forEach(function(item) {
-                    var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
-                    if (matchedTermsCheckbox.length > 0) {
-                        matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
-                        var parentNode = matchedTermsCheckbox.closest("label.terms-label");
-                        if (parentNode.length > 0) {
-                            parentNode.show().removeClass("tnth-hide");
-                            if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
-                                parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
-                                $("#termsText").addClass("agreed");
-                                $("#termsCheckbox_default").removeClass("tnth-hide");
-                                $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
-                                acceptOnNextCheckboxes.push(parentNode);
-                            }
-                        }
-                    }
-                });
-                if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
-                    $("#next").on("click", function() {
-                        acceptOnNextCheckboxes.forEach(function(ckBox) {
-                            ckBox.trigger("click");
-                        });
-                    });
-                }
-            }
-            if (fields.indexOf("localized") === -1) {
-                $("#patMeta").remove();
-            }
-            callback(fields);
+            callback(data);
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
@@ -802,32 +767,30 @@ var tnthAjax = {
         }
         var consented = this.hasConsent(userId, params.org, status);
         var __url = "/api/user/" + userId + "/consent";
-        if (consented) {
-            callback({error: false});
-            return;
+        if (consented && !params.testPatient) {
+        	callback({"error": false});
+        	return;
         }
-        if (!consented || params.testPatient) {
-            var data = {};
-            data.user_id = userId;
-            data.organization_id = params.org;
-            data.agreement_url = params.agreementUrl;
-            data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
-            data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
-            data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
-            if (params.acceptance_date) {
-                data.acceptance_date = params.acceptance_date;
+        var data = {};
+        data.user_id = userId;
+        data.organization_id = params.org;
+        data.agreement_url = params.agreementUrl;
+        data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
+        data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
+        data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
+        if (params.acceptance_date) {
+            data.acceptance_date = params.acceptance_date;
+        }
+        this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
+            if (!data.error) {
+                $(".set-consent-error").html("");
+                callback(data);
+            } else {
+                var errorMessage = i18next.t("Server error occurred setting consent status.");
+                callback({"error": errorMessage});
+                $(".set-consent-error").html(errorMessage);
             }
-            this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
-                if (!data.error) {
-                    $(".set-consent-error").html("");
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred setting consent status.");
-                    callback({"error": errorMessage});
-                    $(".set-consent-error").html(errorMessage);
-                }
-            });
-        }
+        });
     },
     deleteConsent: function(userId, params) {
         if (!userId || !params) {
