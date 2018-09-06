@@ -2256,15 +2256,18 @@ var Global = {
                         addUserId = "&user_id=" + $el.attr("data-user-id");
                     }
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-                        tnthAjax.sendRequest("/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId, "GET", "", null, function(data) {
-                            if (!data.error) {
-                                if (data.unique) {
-                                    $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                    update($el);
-                                } else {
-                                    $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                                }
+                        var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
+                        tnthAjax.sendRequest(url, "GET", $el.attr("data-user-id"), {max_attempts:1}, function(data) {
+                            if (data.error) { //note a failed request will be logged
+                                $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
+                                return; //stop proceeding to update email
                             }
+                            if (data.unique) {
+                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                update($el);
+                                return;
+                            } 
+                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                         });
                     }
                     return emailReg.test(emailVal);
