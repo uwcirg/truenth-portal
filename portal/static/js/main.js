@@ -2080,16 +2080,8 @@ var Global = {
 
         setTimeout(function() {
             var userLocale = tnthDates.getUserLocale(), footerElements = $("#homeFooter .copyright");
-            var userId;
-            $.ajax({
-                type: "GET",
-                url: "/api/me",
-                async: false
-            }).done(function(data) {
-                if (data) { userId = data.id; }
-            });
             var copyright_year = new Date().getFullYear();
-            tnthAjax.getConfigurationByKey("COPYRIGHT_YEAR", userId, {sync: true}, function(data) {
+            tnthAjax.getConfigurationByKey("COPYRIGHT_YEAR", {sync: false}, function(data) {
                 if (!data.error) {
                     copyright_year = data.COPYRIGHT_YEAR;
                 }
