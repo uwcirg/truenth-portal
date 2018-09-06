@@ -2106,7 +2106,7 @@ var Global = {
                 return content;
 
             };
-            footerElements.html(getContent(userLocale));
+            footerElements.html(getContent(userLocale, copyright_year));
         }, 500);
     },
     "getNotification": function(callback) {
