@@ -1487,6 +1487,18 @@ class User(db.Model, UserMixin):
     def promote_to_registered(self, registered_user):
         """Promote a weakly authenticated account to a registered one"""
         assert self.id != registered_user.id
+
+        # Ensure the registered user is not a power user
+        # https://jira.movember.com/browse/TN-1408
+        restricted_roles = \
+            current_app.config['RESTRICTED_FROM_PROMOTION_ROLES']
+        for restricted_role in restricted_roles:
+            if registered_user.has_role(restricted_role):
+                error_message = 'Attempted to promote temporary user {} \
+                        to registered user {} with role {}' \
+                        .format(self.id, registered_user.id, restricted_role)
+                abort(400, error_message)
+
         before = self.as_fhir()
 
         # due to unique constraints, email is handled manually after
@@ -1515,6 +1527,12 @@ class User(db.Model, UserMixin):
             comment="registered invited user, {}".format(details.getvalue()),
             user_id=self.id, subject_id=self.id,
             context='account'))
+
+        current_app.logger.info(
+            'Successfully promoted temporary user {} \
+            to registered user {}'
+            .format(self.id, registered_user.id)
+        )
 
     def check_role(self, permission, other_id):
         """check user for adequate role

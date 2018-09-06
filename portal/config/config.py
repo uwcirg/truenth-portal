@@ -1,7 +1,8 @@
 """Configuration"""
 import os
-
 import redis
+
+from portal.models.role import ROLE
 
 SITE_CFG = 'site.cfg'
 
@@ -177,6 +178,16 @@ class BaseConfig(object):
 
     LOCKOUT_PERIOD_MINUTES = 30
     FAILED_LOGIN_ATTEMPTS_BEFORE_LOCKOUT = 5
+
+    RESTRICTED_FROM_PROMOTION_ROLES = [
+        ROLE.ADMIN.value,
+        ROLE.APPLICATION_DEVELOPER.value,
+        ROLE.CONTENT_MANAGER.value,
+        ROLE.INTERVENTION_STAFF.value,
+        ROLE.STAFF.value,
+        ROLE.STAFF_ADMIN.value,
+        ROLE.SERVICE.value,
+    ]
 
 
 class DefaultConfig(BaseConfig):

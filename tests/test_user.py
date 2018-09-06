@@ -9,6 +9,7 @@ import json
 import re
 import urllib
 import urllib.parse
+from werkzeug.exceptions import HTTPException
 
 from flask_webtest import SessionScope
 import pytest
@@ -1163,6 +1164,26 @@ class TestUser(TestCase):
             assert user.password == 'phoney'
             assert ({o.name for o in user.organizations}
                     == {o.name for o in orgs})
+
+    def test_promote_to_registered_fails_when_target_is_power_user(self):
+        with SessionScope(db):
+            self.test_user.password = None  # mock pre-registered user
+            self.test_user.birthdate = '02-05-1968'
+            self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY.value)
+            other = self.add_user('other@foo.com', first_name='newFirst',
+                                  last_name='Better')
+            other.password = 'phoney'
+            other.gender = 'male'
+            self.promote_user(user=other, role_name=ROLE.ADMIN.value)
+            self.shallow_org_tree()
+            orgs = Organization.query.limit(2)
+            self.test_user.organizations.append(orgs[0])
+            self.test_user.organizations.append(orgs[1])
+            db.session.commit()
+            user, other = map(db.session.merge, (self.test_user, other))
+            with self.assertRaises(HTTPException) as http_error:
+                user.promote_to_registered(other)
+                assert http_error.exception.code == 400
 
     def test_password_reset(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
