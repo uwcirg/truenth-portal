@@ -221,17 +221,18 @@
         var acceptOnNextCheckboxes = [];
         (data.still_needed).forEach(function(item) {
             var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
-            if (matchedTermsCheckbox.length > 0) {
-                matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
-                var parentNode = matchedTermsCheckbox.closest("label.terms-label");
-                if (parentNode.length === 0) {
-                    return;
-                }
-                parentNode.show().removeClass("tnth-hide");
-                if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
-                    parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                    acceptOnNextCheckboxes.push(parentNode);
-                }
+            if (matchedTermsCheckbox.length === 0) {
+                return;
+            }
+            matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
+            var parentNode = matchedTermsCheckbox.closest("label.terms-label");
+            if (parentNode.length === 0) {
+                return;
+            }
+            parentNode.show().removeClass("tnth-hide");
+            if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
+                parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                acceptOnNextCheckboxes.push(parentNode);
             }
         });
         if (acceptOnNextCheckboxes.length === 0) {
