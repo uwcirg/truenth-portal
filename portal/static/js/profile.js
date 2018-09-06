@@ -2861,6 +2861,7 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
+                clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");

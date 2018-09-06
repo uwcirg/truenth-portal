@@ -767,10 +767,6 @@ var tnthAjax = {
         }
         var consented = this.hasConsent(userId, params.org, status);
         var __url = "/api/user/" + userId + "/consent";
-        if (consented) {
-            callback({error: false});
-            return;
-        }
         if (!consented || params.testPatient) {
             var data = {};
             data.user_id = userId;
