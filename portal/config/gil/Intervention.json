@@ -123,7 +123,10 @@
       "resourceType": "Intervention"
     },
     {
+      "card_html": "<p>Remember to update your PSA level.</p>",
       "description": "PSA Tracker",
+      "display_rank": 45,
+      "link_label": "Track your PSA",
       "name": "psa_tracker",
       "public_access": false,
       "subscribed_events": 1,
