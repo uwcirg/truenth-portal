@@ -16,9 +16,7 @@
         {{profilePhone(False)}}
         {{profileAltPhone(False)}}
         {{addClinics()}}
-        {% if config.ALLOW_STAFFADMIN_DELEGATION -%}
-            {{addRoles()}}
-        {%- endif %}
+        {{addRoles()}}
     </div>
 {% endblock %}
 {% block back_button %}
