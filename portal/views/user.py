@@ -1014,7 +1014,8 @@ def set_user_groups(user_id):
 
     remove_if_not_requested = {group.id: group for group in user.groups}
     requested_groups = [r['name'] for r in request.json['groups']]
-    matching_groups = Group.query.filter(Group.name.in_(requested_groups)).all()
+    matching_groups = Group.query.filter(Group.name.in_(
+                                         requested_groups)).all()
     if len(matching_groups) != len(requested_groups):
         abort(400, "One or more groups requested not available")
     # Add any requested not already set on user
@@ -2200,7 +2201,7 @@ def get_current_user_qb(user_id):
     qbd_json = {}
 
     qbd_questionnaire_bank = qbd.questionnaire_bank
-                             if qbd.questionnaire_bank else None
+                            if qbd.questionnaire_bank else None
 
     expiry = None
 
