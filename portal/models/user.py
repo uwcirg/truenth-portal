@@ -1402,7 +1402,7 @@ class User(db.Model, UserMixin):
             telecom = Telecom.from_fhir(fhir['telecom'])
             if telecom.email:
                 if self._email and (
-                    (telecom.email != self._email) and
+                    (telecom.email.lower() != self._email.lower()) and
                     User.query.filter
                     (
                         func.lower(User.email) == telecom.email.lower()

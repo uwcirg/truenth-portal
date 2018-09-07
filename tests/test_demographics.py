@@ -242,12 +242,12 @@ class TestDemographics(TestCase):
 
     def test_demographics_duplicate_email_different_case(self):
         dup = 'bogus@match.com'
-        dupUpper = dup.upper()
+        dup_upper = dup.upper()
         self.test_user._email = NO_EMAIL_PREFIX
         self.add_user(username=dup)
         data = {
             "resourceType": "Patient",
-            "telecom": [{"system": 'email', 'value': dupUpper}]}
+            "telecom": [{"system": 'email', 'value': dup_upper}]}
 
         self.login()
         response = self.client.put(
