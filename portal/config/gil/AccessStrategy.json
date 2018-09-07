@@ -474,6 +474,60 @@
       "intervention_name": "exercise_diet",
       "name": "Allow Exercise & Diet if not in Community of Wellness or Sexual Recovery",
       "resourceType": "AccessStrategy"
+    },
+    {
+      "name": "PSA Tracker strategy",
+      "description": "Allow with localized PCa OR w/o positive PCa dx",
+      "resourceType": "AccessStrategy",
+      "intervention_name": "psa_tracker",
+      "id": 3001,
+      "function_details": {
+        "function": "combine_strategies",
+        "kwargs": [
+          {
+            "name": "combinator",
+            "value": "any"
+          },
+          {
+            "name": "strategy_1",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_1_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa localized diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              }
+            ]
+          },
+          {
+            "name": "strategy_2",
+            "value": "observation_check"
+          },
+          {
+            "name": "strategy_2_kwargs",
+            "value": [
+              {
+                "name": "display",
+                "value": "PCa diagnosis"
+              },
+              {
+                "name": "boolean_value",
+                "value": "true"
+              },
+              {
+                "name": "invert_logic",
+                "value": "true"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "id": "SitePersistence v0.2",
