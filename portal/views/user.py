@@ -2200,8 +2200,8 @@ def get_current_user_qb(user_id):
 
     qbd_json = {}
 
-    qbd_questionnaire_bank = qbd.questionnaire_bank
-                            if qbd.questionnaire_bank else None
+    qbd_questionnaire_bank = (qbd.questionnaire_bank
+                              if qbd.questionnaire_bank else None)
 
     expiry = None
 
