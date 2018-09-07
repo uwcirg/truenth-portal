@@ -1390,7 +1390,7 @@
       "id": 14652,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-52"
         }
@@ -1399,6 +1399,62 @@
       "name": "Juravinski Cancer Centre",
       "partOf": {
         "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14653,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-53"
+        }
+      ],
+      "language": "en_US",
+      "name": "Ottawa Hospital Cancer Centre",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14654,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-54"
+        }
+      ],
+      "language": "en_US",
+      "name": "Winship Cancer Institute Emory University",
+      "partOf": {
+        "reference": "api/organization/22000"
       },
       "resourceType": "Organization"
     },
