@@ -11,8 +11,9 @@
       <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
     </div>
     <br/>
+    {% set allowReactivate = user.has_role(ROLE.ADMIN.value) %}
     <div id="adminTableContainer" class="staff-view admin-table table-responsive medium-text" data-export-prefix="{{_('StaffList_')}}">
-        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <div id="adminTableToolbar" class="admin-toolbar">{{deletedUsersFilter()}}</div>
         <table id="adminTable"
                class="staff-view table table-striped table-hover table-condensed"
                data-toggle="table"
@@ -23,25 +24,24 @@
                data-page-size="25"
                data-page-list="[25,50,100,ALL]"
                data-toolbar="#adminTableToolbar"
-               data-show-toggle="true"
+               data-show-toggle="false"
                data-show-columns="true"
                data-unique-id="id"
                data-filter-control="true"
                data-show-export="true"
                data-export-data-type="all"
                data-id-field="id"
+               {% if allowReactivate %}data-allow-reactivate="true"{% endif %}
                >
             <thead>
             <tr>
                 <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
-                <th data-field="firstname" data-sortable="true" data-filter-control="input">{{ _("First Name") }}</th>
-                <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
+                <th data-field="firstname" data-sortable="true" class="firstname-data-field" data-filter-control="input">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true" class="lastname-data-field" data-filter-control="input">{{ _("Last Name") }}</th>
                 <th data-field="email" data-sortable="true" class="email-data-field" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="organization" data-sortable="true" class="org-data-field" data-filter-control="select">{{ _("Site(s)") }}</th>
-                {% if config.ALLOW_STAFFADMIN_DELEGATION -%}
-                  <th data-field="role" data-searchable="false" data-card-visible="false">{{_("Staff Admin")}}</th>
-                {%- endif %}
+                <th data-field="role" data-searchable="false" data-card-visible="false">{{_("Staff Admin")}}</th>
                 <th class="text-center" data-field="deactivate" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate Account") }}</th>
                 <th data-field="activationstatus" data-class="deleted-field" data-visible="false">{{_("activation status")}}</th>
             </tr>
@@ -61,15 +61,13 @@
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
-                  {% if config.ALLOW_STAFFADMIN_DELEGATION -%}
-                    <td class="text-center">
-                      <div class="check-role-container">
-                        <div id="loadingIndicator_{{user.id}}" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
-                        <input type="checkbox" name="chkRole" data-user-id="{{user.id}}" data-role="staff_admin" {%if user.has_role(ROLE.STAFF_ADMIN.value)%}checked="checked"{%endif%} />
-                      </div>
-                    </td>
-                  {%- endif %}
-                  {{deletedUserCell(user)}}
+                  <td class="text-center">
+                    <div class="check-role-container">
+                      <div id="loadingIndicator_{{user.id}}" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
+                      <input type="checkbox" name="chkRole" data-user-id="{{user.id}}" data-role="staff_admin" {%if user.has_role(ROLE.STAFF_ADMIN.value)%}checked="checked"{%endif%} />
+                    </div>
+                  </td>
+                  {{deletedUserCell(user, allowReactivate=allowReactivate)}}
                   <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
               </tr>
             {% endfor %}

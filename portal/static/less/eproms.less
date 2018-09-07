@@ -798,7 +798,7 @@ select:not([multiple]) {
   margin: 0.5em 0 0.25em;
   button {
     margin: 0.5em;
-  }    
+  }
 }
 #deceasedInfo {
   margin: 0.5em 0;
@@ -1566,6 +1566,17 @@ div.footer-wrapper.right-panel {
   }
 }
 
+#staffList {
+  .fixed-table-toolbar {
+    .bs-bars {
+      width: 72%
+    }
+    #adminTableToolbar {
+      float: right;
+    }
+  }
+}
+
 /* reporting dashboard styling */
 .nav-tabs.rd-nav>li.active>a,
 .nav-tabs.rd-nav>li.active>a:focus,
@@ -1639,14 +1650,49 @@ div.footer-wrapper.right-panel {
     word-wrap: break-word;
   }
 }
+#chkDeletedUsersFilter {
+  margin: 0 0 0 4px;
+  font-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.deletedUsersFilterContainer {
+  margin: 1em 0.25em;
+  display: inline-block;
+  padding: .5em 1em;
+  line-height: 1.4;
+  vertical-align: middle;
+  border: 1px dotted #eee;
+  .text {
+    color: @sectionTitleColor;
+    font-weight: normal;
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: middle;
+    letter-spacing: .1rem;
+  }
+}
 @media (min-width: 705px) {
   #patientList {
     .deletedUsersFilterContainer {
       margin: 0.5em 1.25em 0;
     }
   }
+  #staffList {
+    .deletedUsersFilterContainer {
+      margin: 0;
+    }
+  }
 }
 #staffList {
+  .firstname-data-field, .lastname-data-field {
+    max-width: 150px;
+    word-wrap: break-word;
+  }
+  .email-data-field {
+    max-width: 235px;
+    word-wrap: break-word;
+  }
   #staffListOptions {
     border-bottom: 1px solid #eee;
     padding-bottom: 4px;

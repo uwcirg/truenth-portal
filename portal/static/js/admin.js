@@ -1046,7 +1046,8 @@
                 if (!userId) {
                     return false;
                 }
-                $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip").find(".deleted-button-cell").html('<span class="text-display">{inactivetext}</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon"></i>'.replace("{userid}", userId).replace("{inactivetext}", i18next.t("Inactive"))).find("a.profile-link").remove();
+                var allowReactivate = $("#adminTable").attr("data-allow-reactivate");
+                $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip").find(".deleted-button-cell").html('<span class="text-display">{inactivetext}</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon {class}"></i>'.replace('{class}', allowReactivate?"":"tnth-hide").replace("{userid}", userId).replace("{inactivetext}", i18next.t("Inactive"))).find("a.profile-link").remove();
                 if (!this.showDeletedUsers) {
                     $("#" + this.ROW_ID_PREFIX + userId).hide();
                 }

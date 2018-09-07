@@ -20,7 +20,6 @@
         "TRUENTH_LINK_URL='https://us.movember.com/'\n",
         "MOVEMER_LINK_URL='https://us.movember.com/'\n",
         "STAFF_BULK_DATA_ACCESS=False\n",
-        "ALLOW_STAFFADMIN_DELEGATION = True\n",
         "BABEL_CONFIG_FILENAME = 'gil.babel.cfg'\n",
         "SMARTLING_PROJECT_ID='13f8e2dcf'\n",
         "\n",
