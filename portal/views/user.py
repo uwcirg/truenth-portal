@@ -2190,7 +2190,8 @@ def get_current_user_qb(user_id):
         user = get_user_or_abort(user_id)
 
     date = request.args.get('as_of_date')
-    date = datetime.strptime(date, '%Y-%m-%d') if date else datetime.utcnow()
+    # allow date and time info to be available
+    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 
