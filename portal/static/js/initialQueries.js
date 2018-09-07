@@ -141,8 +141,9 @@
         if (y && m && d) {
             demoArray.birthDate = y + "-" + m + "-" + d;
         }
-        tnthAjax.putDemo(this.userId, demoArray, targetField);
-        this.handlePostEvent(this.getSectionContainerId(targetField));
+        var sectionId = this.getSectionContainerId(targetField);
+        tnthAjax.putDemo(this.userId, demoArray, $("#"+sectionId));
+        this.handlePostEvent(sectionId);
     };
 
     FieldsChecker.prototype.setUserRoles = function(callback) {
@@ -252,7 +253,7 @@
         setTimeout(function() {
             $("#aboutForm").removeClass("tnth-hide");
             $("#next").removeAttr("disabled").addClass("open");
-        }, 350);
+        }, 1000);
     };
 
     FieldsChecker.prototype.getTotalSections = function() {
@@ -552,13 +553,7 @@
         if (!sectionId) {
             return false;
         }
-        var loadingInProgress = false;
-        $("#"+sectionId).find(".save-loader-wrapper").each(function() {
-            if (!loadingInProgress && $(this).hasClass("loading")) {
-                loadingInProgress = true;
-            }
-        });
-        return loadingInProgress;
+        return ($("#"+sectionId).find(".loading").length > 0);
     };
 
     FieldsChecker.prototype.sectionHasError = function(sectionId) {
@@ -606,11 +601,11 @@
             elapsedSaveTime = window.endDataSavingTime - window.startDataSavingTime;
             elapsedSaveTime  /= 1000;
             var loadingInProgress = self.isSavingInProgress(sectionId);
-            if (loadingInProgress && elapsedSaveTime < 10) {
+            if (elapsedSaveTime < 0.5 || (loadingInProgress && elapsedSaveTime < 10)) {
                 return false;
             }
             window.startDataSavingTime = 0;
-            window.endDataSavingTime = 0;
+            window.endDataSavingTime = 0 ;
             clearInterval(window.dataSavingIntervalId);
 
             var hasError = self.sectionHasError(sectionId);
@@ -892,8 +887,8 @@
         var self = this;
         $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
             if ($(this).prop("checked")) {
-                var parentOrg = $(this).attr("data-parent-id"), m = $("#" + parentOrg + "_consentModal"), dm = $("#" + parentOrg + "_defaultConsentModal");
-                var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0) || ($("#fillOrgs").attr("patient_view") && dm.length > 0);
+                var parentOrg = $(this).attr("data-parent-id"), m = $("#consentContainer .modal, #defaultConsentContainer .modal");
+                var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0);
                 if (requiringConsentViaModal) { //do nothing
                     return true;
                 }

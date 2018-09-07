@@ -578,7 +578,7 @@ var tnthAjax = {
             if (!targetField || targetField.length === 0) { return false; }
             var el = $("#" + (targetField.attr("data-save-container-id") || targetField.attr("id")) + "_load");
             el.css("opacity", 1);
-            el.closest(".save-loader-wrapper").addClass("loading");
+            el.addClass("loading");
         },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
@@ -589,7 +589,7 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
-                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
+                    loadingField.removeClass("loading");
                     errorField.text("").css("opacity", 0);
                     successField.text(i18next.t("success"));
                     loadingField.animate({"opacity": 0}, __timeout, function() {
@@ -612,7 +612,7 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
-                    loadingField.closest(".save-loader-wrapper").removeClass("loading");
+                    loadingField.removeClass("loading");
                     errorField.text(i18next.t("Unable to update. System/Server Error."));
                     successField.text("").css("opacity", 0);
                     loadingField.animate({"opacity": 0}, __timeout, function() {

@@ -1775,14 +1775,15 @@
                                 if (__modal && __modal.length > 0) {
                                     setTimeout(function() { __modal.modal("show"); }, 50);
                                 } else {
-                                    self.setDefaultConsent(userId, parentOrg);
-                                    setTimeout(function() { self.updateOrgs($("#clinics"), true);}, 500);
+                                    self.updateOrgs($("#clinics"), true);
+                                    setTimeout(function() { self.setDefaultConsent(userId, parentOrg);}, 500);
                                 }
                             }
                         } else {
-                            self.handleConsent($(this));
+                            self.updateOrgs($("#clinics"),true);
+                            var thisElement = $(this);
                             setTimeout(function() {
-                                self.updateOrgs($("#clinics"),true);
+                                self.handleConsent(thisElement);
                             }, 500);
                             self.reloadConsentList(userId);
                         }
@@ -2095,22 +2096,14 @@
                                         $("#biopsy_month").val(dArray[1]);
                                         $("#biopsy_day").val(dArray[2]);
                                         $("#biopsyDateContainer").show();
-                                        $("#biopsyDate").removeAttr("skipped");
                                     }
                                 } else {
                                     $("#biopsyDate").val("");
                                     $("#biopsyDateContainer").hide();
-                                    $("#biopsyDate").attr("skipped", "true");
                                 }
                             }
-                            if (clinicalItem === "pca_diag") {
-                                if ($("#pca_diag_no").is(":checked")) {
-                                    $("#tx_yes").attr("skipped", "true");
-                                    $("#tx_no").attr("skipped", "true");
-                                } else {
-                                    $("#tx_yes").removeAttr("skipped");
-                                    $("#tx_no").removeAttr("skipped");
-                                }
+                            if (String(clinicalValue) === "true" || truesyValue) {
+                                $radios.parents(".pat-q").next().fadeIn(150);
                             }
                         }
                     }
