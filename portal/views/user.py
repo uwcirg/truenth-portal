@@ -191,7 +191,8 @@ def account():
                   name:
                     type: string
                     description:
-                      Role name, always a lower case string with no white space.
+                      Role name, always a lower case string
+                      with no white space.
                   description:
                     type: string
                     description: Plain text describing the role.
@@ -974,8 +975,9 @@ def set_user_groups(user_id):
                   name:
                     type: string
                     description:
-                      The string defining the name of each group the user should
-                      belong to.  Must exist as an available group in the system.
+                      The string defining the name of each group
+                      the user should belong to.  Must exist as an
+                      available group in the system.
     responses:
       200:
         description:
@@ -2197,7 +2199,8 @@ def get_current_user_qb(user_id):
 
     qbd_json = {}
 
-    qbd_questionnaire_bank = qbd.questionnaire_bank if qbd.questionnaire_bank else None
+    qbd_questionnaire_bank = qbd.questionnaire_bank
+                             if qbd.questionnaire_bank else None
 
     expiry = None
 
