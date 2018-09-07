@@ -79,7 +79,7 @@ class TestUser(TestCase):
         response = self.client.get(request)
         assert response.status_code == 200
         results = response.json
-        results['unique'] is True
+        assert results['unique'] is True
 
         # should still be unique if it's the current user's email
         # test also the case insensitive match on user's email
@@ -107,6 +107,22 @@ class TestUser(TestCase):
         assert response.status_code == 200
         results = response.json
         assert results['unique'] is True
+
+    def test_unique_email_when_more_than_one_match_exists(self):
+        self.login()
+
+        # If there are more than two emails that match
+        # we should see false
+        # This scenario should not happen, but when it does
+        # we should fail gracefully
+        email = 'example@gmail.com'
+        firstMatch = self.add_user(username='foo', email=email)
+        secondMatch = self.add_user(username='bar', email=email.upper())
+        response = self.client.get('/api/unique_email',
+                query_string={'email': email})
+        assert response.status_code == 200
+        results = response.json
+        assert results['unique'] is False
 
     def test_ethnicities(self):
         """Apply a few ethnicities via FHIR
