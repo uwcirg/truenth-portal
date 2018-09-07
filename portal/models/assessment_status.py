@@ -223,8 +223,10 @@ class QuestionnaireBankDetails(object):
                 if valid_consent and valid_consent[1] == 'suspended':
                     return True
 
-        if not valid_consent_found:
-            current_app.logger.warn("No consent found for {}".format(self.user))
+        # no longer considered a concern, ignore this situation, well handled.
+        # if not valid_consent_found:
+        #    current_app.logger.warn("No consent found for {}".format(self.user))
+
         return False
 
 
