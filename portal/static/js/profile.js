@@ -2332,14 +2332,8 @@
                                 self.manualEntry.errorMessage = i18next.t("All date fields are required");
                                 return false;
                             }
-
-                            //check if date entered is today, if so use today's date/time
-                            if (td + tm + ty === (pad(d.val()) + pad(m.val()) + pad(y.val()))) {
-                                self.manualEntry.completionDate = todayObj.gmtDate;
-                            } else {
-                                var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
-                                self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj);
-                            }
+                            var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0); //noon UTC date
+                            self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj); //time zone based on user's
                             //all date/time should be in GMT date/time
                             var completionDate = new Date(self.manualEntry.completionDate);
                             var cConsentDate = new Date(self.manualEntry.consentDate);
@@ -2364,7 +2358,7 @@
                     });
                 });
                 $(document).delegate("#meSubmit", "click", function() {
-                    var method = String(self.manualEntry.method), completionDate = $("#qCompletionDate").val();
+                    var method = String(self.manualEntry.method), completionDate = self.modules.tnthDates.formatDateString(self.manualEntry.completionDate, "system"); //note completion date has both date and time info
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
                     if (method === "") { return false; }
                     if (method !== "paper") {
@@ -2372,8 +2366,10 @@
                         return false;
                     }
                     self.manualEntryModalVis(true);
-                    self.modules.tnthAjax.getCurrentQB(subjectId, self.modules.tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
+                    self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
                         if (data.error) {
+                            self.manualEntry.errorMessage = i18next.t("Server error occurred checking questionnaire window");
+                            self.manualEntryModalVis();
                             return false;
                         }
                         //check questionnaire time windows

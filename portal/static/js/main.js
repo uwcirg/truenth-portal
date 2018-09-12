@@ -1845,6 +1845,9 @@ var tnthDates = {
             case "yyyy-mm-dd hh:mm:ss":
                 nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
                 break;
+            case "system":
+                nd = year + "-" + month + "-" + day + "T" + hours + ":" + minutes + ":" + seconds + "Z";
+                break;
             case "d M y hh:mm:ss":
                 nd = this.displayDateString(month, day, year);
                 nd = nd + " " + hours + ":" + minutes + ":" + seconds;
