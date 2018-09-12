@@ -196,9 +196,6 @@
                 return item.field;
             });
             this.CONFIG_REQUIRED_CORE_DATA = fields;
-            if (fields.indexOf("localized") === -1) {
-                $("#patMeta").remove();
-            }
             this.handleAcceptOnNext(data);
         }
         if (!this.CONFIG_REQUIRED_CORE_DATA) { //get default required core data
