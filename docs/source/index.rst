@@ -26,3 +26,4 @@ Contents:
     code
     docker
     contributing
+    testing
