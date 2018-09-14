@@ -1909,7 +1909,7 @@ var tnthDates = {
         var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
         if ($("#userSessionLocale").val()) {
-            return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authenication, cannot set sessionStorage here as it will be incorrect
+            return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
         }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
