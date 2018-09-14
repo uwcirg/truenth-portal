@@ -1,7 +1,8 @@
 """Configuration"""
 import os
-
 import redis
+
+from portal.models.role import ROLE
 
 SITE_CFG = 'site.cfg'
 
@@ -85,7 +86,9 @@ class BaseConfig(object):
     CELERY_IMPORTS = ('portal.tasks',)
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
-    DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
+    DOGPILE_CACHE_REGIONS = [
+        ('assessment_cache_region', 60*60*2),
+        ('reporting_cache_region', 60*60*12)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
     LOG_CACHE_MISS = False
@@ -121,6 +124,7 @@ class BaseConfig(object):
     # config values aren't typically objects...
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
+    UPDATE_PATIENT_TASK_BATCH_SIZE = 16
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
@@ -131,6 +135,7 @@ class BaseConfig(object):
 
     STAFF_BULK_DATA_ACCESS = True
     PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
+    COPYRIGHT_YEAR = 2018  # TrueNTH copyright year
 
     FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_OAUTH_CLIENT_ID')
     FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_OAUTH_CLIENT_SECRET')
@@ -170,6 +175,19 @@ class BaseConfig(object):
         ('228748004', 'http://snomed.info/sct'),
         ('707266006', 'http://snomed.info/sct'),
         ('999999999', 'http://snomed.info/sct')]
+
+    LOCKOUT_PERIOD_MINUTES = 30
+    FAILED_LOGIN_ATTEMPTS_BEFORE_LOCKOUT = 5
+
+    RESTRICTED_FROM_PROMOTION_ROLES = [
+        ROLE.ADMIN.value,
+        ROLE.APPLICATION_DEVELOPER.value,
+        ROLE.CONTENT_MANAGER.value,
+        ROLE.INTERVENTION_STAFF.value,
+        ROLE.STAFF.value,
+        ROLE.STAFF_ADMIN.value,
+        ROLE.SERVICE.value,
+    ]
 
 
 class DefaultConfig(BaseConfig):

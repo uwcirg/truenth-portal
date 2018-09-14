@@ -84,6 +84,11 @@
             _accountArray["organizations"] = orgIDs;
             if (this.roles) {
                 _accountArray["roles"] =  this.roles;
+                $("#rolesContainer .input-role").each(function() {
+                    if ($(this).is(":checked")) {
+                        _accountArray["roles"] = _accountArray["roles"].concat([{"name": $(this).attr("data-role")}]);
+                    }
+                });
             }
             _accountArray["consents"] = this.getConsents();
 
@@ -393,9 +398,10 @@
         };
         this.getOrgs = function(callback, params) {
             var self = this;
-            self.attempts++;
             callback = callback || function() {};
+            $("#clinicsLoader").removeClass("tnth-hide");
             tnthAjax.getOrgs(self.userId, params, function(data) {
+                $("#clinicsLoader").addClass("tnth-hide");
                 if (!data) {
                     callback.call(self, {"error": i18next.t("no data returned")});
                     return false;

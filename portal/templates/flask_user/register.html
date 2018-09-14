@@ -1,5 +1,5 @@
 {% extends 'flask_user/public_base.html' %}
-
+{% block mainclass %}class="register-form"{% endblock %}
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate">
@@ -43,8 +43,8 @@
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
                      <p class="profile-item-title">{{ _("Register using:")}}</p>
-                    <!-- hiding this temporarily -->
-                    <div class="tnth-hide">
+                    <div class="divider"></div>
+                    <div>
                         <a href="{{ url_for('facebook.login', provider_name='facebook', next=request.args.get('next')) }}"
                            class="btn btn-social btn-facebook">
                             <i class="fa fa-facebook"></i>{{_("Log In With Facebook")}}

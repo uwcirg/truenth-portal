@@ -24,7 +24,7 @@ from .role import ROLE
 from .user import User
 
 
-@dogpile_cache.region('hourly')
+@dogpile_cache.region('reporting_cache_region')
 def get_reporting_stats():
     """Cachable interface for expensive reporting data queries
 
@@ -116,7 +116,7 @@ def calculate_days_overdue(user):
     return (datetime.utcnow() - overdue).days if overdue else 0
 
 
-@dogpile_cache.region('hourly')
+@dogpile_cache.region('reporting_cache_region')
 def overdue_stats_by_org():
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)

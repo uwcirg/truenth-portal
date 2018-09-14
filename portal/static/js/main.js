@@ -527,11 +527,11 @@ var tnthAjax = {
         $.ajax(params).done(function(data) {
             params.attempts = 0;
             if (data) {
-                callback(data);
                 fieldHelper.showUpdate(targetField);
+                callback(data);
             } else {
-                callback({"error": true, "data": "no data returned"});
                 fieldHelper.showError(targetField);
+                callback({"error": true, "data": "no data returned"});
             }
         }).fail(function(xhr) {
             if (params.attempts < params.max_attempts) {
@@ -542,8 +542,8 @@ var tnthAjax = {
                 })(self, url, method, userId, params, callback);
             } else {
                 params.attempts = 0;
-                callback({"error": true, "data": xhr});
                 fieldHelper.showError(targetField);
+                callback({"error": true, "data": xhr});
                 self.sendError(xhr, url, userId);
             }
         });
@@ -576,7 +576,9 @@ var tnthAjax = {
         delayDuration: 300,
         showLoader: function(targetField) {
             if (!targetField || targetField.length === 0) { return false; }
-            $("#" + (targetField.attr("data-save-container-id")) + "_load").css("opacity", 1);
+            var el = $("#" + (targetField.attr("data-save-container-id") || targetField.attr("id")) + "_load");
+            el.css("opacity", 1);
+            el.addClass("loading");
         },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
@@ -587,11 +589,14 @@ var tnthAjax = {
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.removeClass("loading");
                     errorField.text("").css("opacity", 0);
                     successField.text(i18next.t("success"));
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
-                            setTimeout(function() { successField.animate({"opacity": 0}, __timeout * 2);}, __timeout * 2);
+                            setTimeout(function() {
+                                successField.animate({"opacity": 0}, __timeout * 2);
+                            }, __timeout * 2);
                         });
                     });
                 })(targetField);
@@ -603,10 +608,11 @@ var tnthAjax = {
             if (!targetField || targetField.length === 0) { return false; }
             setTimeout(function() {
                 (function(targetField) {
-                    var containerId = targetField.attr("data-save-container-id");
+                    var containerId = targetField.attr("data-save-container-id") || targetField.attr("id");
                     var errorField = $("#" + containerId + "_error");
                     var successField = $("#" + containerId + "_success");
                     var loadingField = $("#" + containerId + "_load");
+                    loadingField.removeClass("loading");
                     errorField.text(i18next.t("Unable to update. System/Server Error."));
                     successField.text("").css("opacity", 0);
                     loadingField.animate({"opacity": 0}, __timeout, function() {
@@ -649,42 +655,7 @@ var tnthAjax = {
                 callback({"error": i18next.t("unable to get needed core data")});
                 return false;
             }
-            var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
-            var fields = (data.still_needed).map(function(item) {
-                return item.field;
-            });
-            if ($("#topTerms").length > 0) {
-                var acceptOnNextCheckboxes = [];
-                (data.still_needed).forEach(function(item) {
-                    var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
-                    if (matchedTermsCheckbox.length > 0) {
-                        matchedTermsCheckbox.attr({"data-required": "true","data-collection-method": item.collection_method});
-                        var parentNode = matchedTermsCheckbox.closest("label.terms-label");
-                        if (parentNode.length > 0) {
-                            parentNode.show().removeClass("tnth-hide");
-                            if (String(item.collection_method).toUpperCase() === ACCEPT_ON_NEXT) {
-                                parentNode.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
-                                $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
-                                $("#termsText").addClass("agreed");
-                                $("#termsCheckbox_default").removeClass("tnth-hide");
-                                $("#aboutForm .reg-complete-container").addClass("inactive"); //hiding thank you and continue button for accept on next collection method
-                                acceptOnNextCheckboxes.push(parentNode);
-                            }
-                        }
-                    }
-                });
-                if (acceptOnNextCheckboxes.length > 0) { //require for accept on next collection method
-                    $("#next").on("click", function() {
-                        acceptOnNextCheckboxes.forEach(function(ckBox) {
-                            ckBox.trigger("click");
-                        });
-                    });
-                }
-            }
-            if (fields.indexOf("localized") === -1) {
-                $("#patMeta").remove();
-            }
-            callback(fields);
+            callback(data);
         });
     },
     "getRequiredCoreData": function(userId, sync, callback) {
@@ -796,28 +767,30 @@ var tnthAjax = {
         }
         var consented = this.hasConsent(userId, params.org, status);
         var __url = "/api/user/" + userId + "/consent";
-        if (!consented || params.testPatient) {
-            var data = {};
-            data.user_id = userId;
-            data.organization_id = params.org;
-            data.agreement_url = params.agreementUrl;
-            data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
-            data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
-            data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
-            if (params.acceptance_date) {
-                data.acceptance_date = params.acceptance_date;
-            }
-            this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
-                if (!data.error) {
-                    $(".set-consent-error").html("");
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred setting consent status.");
-                    callback({"error": errorMessage});
-                    $(".set-consent-error").html(errorMessage);
-                }
-            });
+        if (consented && !params.testPatient) {
+        	callback({"error": false});
+        	return;
         }
+        var data = {};
+        data.user_id = userId;
+        data.organization_id = params.org;
+        data.agreement_url = params.agreementUrl;
+        data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
+        data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
+        data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
+        if (params.acceptance_date) {
+            data.acceptance_date = params.acceptance_date;
+        }
+        this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
+            if (!data.error) {
+                $(".set-consent-error").html("");
+                callback(data);
+            } else {
+                var errorMessage = i18next.t("Server error occurred setting consent status.");
+                callback({"error": errorMessage});
+                $(".set-consent-error").html(errorMessage);
+            }
+        });
     },
     deleteConsent: function(userId, params) {
         if (!userId || !params) {
@@ -864,6 +837,7 @@ var tnthAjax = {
                 });
             }
             if (arrConsent.length > 0) { //don't send request if suspended consent already existed
+                callback({"data": "success"});
                 return false;
             }
             self.sendRequest("/api/user/" + userId + "/consent/withdraw",
@@ -1102,22 +1076,23 @@ var tnthAjax = {
     "removeCachedRoles": function(userId) {
         sessionStorage.removeItem("userRole_"+userId);
     },
-    "putRoles": function(userId, toSend, targetField) {
+    "putRoles": function(userId, toSend, targetField, callback) {
+        callback = callback || function() {};
         if (!userId) {
+            callback({error: i18next.t("User Id is required.")});
             return false;
         }
         this.removeCachedRoles(userId);
         this.sendRequest("/api/user/" + userId + "/roles", "PUT", userId, {data: JSON.stringify(toSend),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".put-roles-error").html("");
-                    if (sessionStorage.getItem("userRole_" + userId)) {
-                        sessionStorage.setItem("userRole_" + userId, "");
-                    }
-                } else {
-                    $(".put-roles-error").html(i18next.t("Server error occurred setting user role information."));
-                }
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred setting user role information.");
+                $(".put-roles-error").html(errorMessage);
+                callback({error: errorMessage});
+                return;
             }
+            $(".put-roles-error").html("");
+            sessionStorage.setItem("userRole_" + userId, "");
+            callback(data);
         });
     },
     "deleteRoles": function(userId, toSend) {
@@ -1203,13 +1178,13 @@ var tnthAjax = {
         }
         callback = callback || function() {};
         this.sendRequest(url, method, userId, {data: JSON.stringify(obsArray),targetField: targetField}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-clinical-error").html("");
-                } else {
-                    $(".post-clinical-error").html(i18next.t("Server error occurred updating clinical data."));
-                }
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred updating clinical data.");
+                $(".post-clinical-error").html(errorMessage).show();
+                callback({error: errorMessage});
+                return;
             }
+            $(".post-clinical-error").html("").hide();
             callback(data);
         });
     },
@@ -1294,26 +1269,29 @@ var tnthAjax = {
             }
         });
     },
-    "postTermsByUser": function(userId, toSend) {
+    "postTermsByUser": function(userId, toSend, callback) {
+        callback = callback || function() {};
         this.sendRequest("/api/user/" + userId + "/tou/accepted", "POST", userId, {data: JSON.stringify(toSend)}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-tou-error").html("");
-                } else {
-                    $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
-                }
+            if (!data || data.error) {
+                $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
+                callback(data);
+                return
             }
+            $(".post-tou-error").html("");
+            callback(data);
         });
     },
-    "postTerms": function(toSend) {
-        this.sendRequest("/api/tou/accepted", "POST", null, {data: JSON.stringify(toSend)}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".post-tou-error").html("");
-                } else {
-                    $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
-                }
+    "postTerms": function(toSend, targetField, callback) {
+        callback = callback || function() {};
+        this.sendRequest("/api/tou/accepted", "POST", null, {data: JSON.stringify(toSend), targetField: targetField}, function(data) {
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred saving terms of use information.");
+                $(".post-tou-error").html(errorMessage);
+                callback({error: errorMessage});
+                return;
             }
+            $(".post-tou-error").html("");
+            callback(data);
         });
     },
     "accessUrl": function(userId, sync, callback) {
@@ -1592,24 +1570,20 @@ var tnthAjax = {
         if (!configKey || $("#profile_" + configKey).length > 0) { return false; }
         $("body").append("<input type='hidden' id='profile_" + configKey + "' value='" + (value ? value : "") + "'/>");
     },
-    "getConfigurationByKey": function(configVar, userId, params, callback, setConfigInUI) {
+    "getConfigurationByKey": function(configVar, params, callback, setConfigInUI) {
         callback = callback || function() {};
         var self = this;
-        if (!userId) {
-            callback({"error": i18next.t("User id is required.")});
-            return false;
-        }
         if (!configVar) {
             callback({"error": i18next.t("configuration variable name is required.")});
             return false;
         }
-        var sessionConfigKey = "config_" + configVar + "_" + userId;
+        var sessionConfigKey = "config_" + configVar;
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             if (setConfigInUI) { self.setConfigurationUI(configVar, data[configVar] + "");}
             callback(data);
         } else {
-            this.sendRequest("/api/settings/" + configVar, "GET", userId, (params || {}), function(data) {
+            this.sendRequest("/api/settings/" + configVar, "GET", null, (params || {}), function(data) {
                 if (data) {
                     callback(data);
                     if (data.hasOwnProperty(configVar)) {
@@ -1871,6 +1845,9 @@ var tnthDates = {
             case "yyyy-mm-dd hh:mm:ss":
                 nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
                 break;
+            case "system":
+                nd = year + "-" + month + "-" + day + "T" + hours + ":" + minutes + ":" + seconds + "Z";
+                break;
             case "d M y hh:mm:ss":
                 nd = this.displayDateString(month, day, year);
                 nd = nd + " " + hours + ":" + minutes + ":" + seconds;
@@ -1931,8 +1908,8 @@ var tnthDates = {
         var sessionKey = this.localeSessionKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
-        if (sessionLocale) {
-            return sessionLocale;
+        if ($("#userSessionLocale").val()) {
+            return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
         }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
@@ -2106,26 +2083,47 @@ var Global = {
 
         setTimeout(function() {
             var userLocale = tnthDates.getUserLocale(), footerElements = $("#homeFooter .copyright");
-            var getContent = function(cc) {
+            var copyright_year = new Date().getFullYear();
+            tnthAjax.getConfigurationByKey("COPYRIGHT_YEAR", {sync: false}, function(data) {
+                if (!data.error) {
+                    copyright_year = data.COPYRIGHT_YEAR;
+                }
+                var getContent = function(country_code, copyright_year) {
+                //need to set this on callback as the call is asynchronous - otherwise the copyright value can be set before config value is returned
                 var content = "";
-                switch (String(cc.toUpperCase())) {
-                case "EN_US":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).");
+                switch (String(country_code.toUpperCase())) {
+                case "US":
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).").replace("{year}", copyright_year);
                     break;
-                case "EN_AU":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).");
+                case "AU":
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
-                case "EN_NZ":
-                    content = i18next.t("&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).");
+                case "NZ":
+                    content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
+                case "CA":
                 default:
-                    content = i18next.t("&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.");
-
+                    content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
                 }
                 return content;
+                };
+                // todo: properly decouple country/locale
+                country_code = userLocale.split("_")[1];
 
-            };
-            footerElements.html(getContent(userLocale));
+                // shortcut - infer country from locale if locale isn't default (en_us)
+                if (userLocale.toUpperCase() != 'EN_US'){
+                    footerElements.html(getContent(country_code, copyright_year));
+                } else {
+                    $.getJSON("//geoip.cirg.washington.edu/json/", function(data) {
+                        //country code Australia AU New Zealand NZ USA US
+                        if (data && data.country_code) {
+                            footerElements.html(getContent(data.country_code, copyright_year));
+                        } else {
+                            footerElements.html(getContent(country_code, copyright_year));
+                        }
+                    });
+                }
+            });
         }, 500);
     },
     "getNotification": function(callback) {
@@ -2275,15 +2273,18 @@ var Global = {
                         addUserId = "&user_id=" + $el.attr("data-user-id");
                     }
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-                        tnthAjax.sendRequest("/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId, "GET", "", null, function(data) {
-                            if (!data.error) {
-                                if (data.unique) {
-                                    $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                    update($el);
-                                } else {
-                                    $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                                }
+                        var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
+                        tnthAjax.sendRequest(url, "GET", $el.attr("data-user-id"), {max_attempts:1}, function(data) {
+                            if (data.error) { //note a failed request will be logged
+                                $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
+                                return; //stop proceeding to update email
                             }
+                            if (data.unique) {
+                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                                update($el);
+                                return;
+                            }
+                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                         });
                     }
                     return emailReg.test(emailVal);

@@ -1078,12 +1078,17 @@
           "value": "dukeuro"
         },
         {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "dukemain"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "Duke Urology"
+          "value": "Duke Cancer Center Main Campus"
         }
       ],
-      "name": "Duke Urology",
+      "name": "Duke Cancer Center Main Campus",
       "partOf": {
         "display": "Duke University",
         "reference": "api/organization/1302"
@@ -1104,12 +1109,17 @@
           "value": "dcc"
         },
         {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "dukeral"
+        },
+        {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "The Duke Cancer Center"
+          "value": "Duke Cancer Center Raleigh"
         }
       ],
-      "name": "Duke Cancer Center",
+      "name": "Duke Cancer Center Raleigh",
       "partOf": {
         "display": "Duke University",
         "reference": "api/organization/1302"
@@ -1127,12 +1137,17 @@
         {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "The Duke Cancer Center"
+          "value": "Duke Cancer Center North Durham"
         },
         {
           "system": "http://us.truenth.org/identity-codes/shortcut-alias",
           "use": "usual",
           "value": "dccnd"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+          "use": "usual",
+          "value": "dukedur"
         }
       ],
       "name": "Duke Cancer Center North Durham",

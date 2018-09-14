@@ -826,7 +826,6 @@ def settings():
 
 @portal.route('/api/settings', defaults={'config_key': None})
 @portal.route('/api/settings/<string:config_key>')
-@oauth.require_oauth()
 def config_settings(config_key):
     # return selective keys - not all can be be viewed by users, e.g.secret key
     config_prefix_whitelist = (
@@ -839,7 +838,8 @@ def config_settings(config_key):
         'SHOW_PROFILE_MACROS',
         'MEDIDATA_RAVE_FIELDS',
         'MEDIDATA_RAVE_ORG',
-        'LOCALIZED_AFFILIATE_ORG'
+        'LOCALIZED_AFFILIATE_ORG',
+        'COPYRIGHT',
     )
     if config_key:
         key = config_key.upper()
@@ -976,6 +976,13 @@ def spec():
                     operation_id, method)
 
     return jsonify(swag)
+
+
+@portal.route("/test-producer-consumer")
+def celery_pc():
+    celery = create_celery(current_app)
+    celery.send_task('tasks.test_produce_list')
+    return jsonify(message='launched')
 
 
 @portal.route("/celery-test")

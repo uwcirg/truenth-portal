@@ -220,11 +220,14 @@ Alternatively, install an init script and configure. See
 `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
 
 Should the need ever arise to purge the queue of jobs, run the following
-**destructive** command
+**destructive** command.  All tasks should be idempotent by design, so doing
+this is suggested, especially if the server is struggling.
 
 .. code:: bash
 
-    $ celery --app portal.celery_worker.celery purge
+    $ celery purge --force --app portal.celery_worker.celery
+
+Without running ``purge``, celery will resume any unfinished tasks when it restarts
 
 DATABASE
 --------
@@ -358,9 +361,24 @@ TravisCI allows Selenium tests to be run with any number of browser/OS
 combinations and `captures video from running
 tests <https://saucelabs.com/open_sauce/user/ivan-c>`__.
 
-UI tests can also be run locally (after installing ``xvfb``) by passing
-Tox the virtual environment that corresponds to the UI tests (``ui``):
+UI tests can also be run locally (after installing ``xvfb`` and geckodriver) by passing
+Tox the virtual environment that corresponds to the UI tests (``ui``).
 
+Setup
+^^^^^
+- ``sudo apt-get install xvfb``
+- Install geckodriver from https://github.com/mozilla/geckodriver/releases.  For example
+
+.. code:: bash
+
+    $ wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux64.tar.gz
+    $ tar -xvzf geckodriver-v0.21.0-linux64.tar.gz
+    $ rm geckodriver-v0.21.0-linux64.tar.gz
+    $ chmod +x geckdriver
+    $ sudo mv geckodriver /usr/local/bin/
+
+Run Tests
+^^^^^^^^^
 .. code:: bash
 
     $ tox -e ui

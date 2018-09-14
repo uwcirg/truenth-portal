@@ -402,9 +402,56 @@ a.btn {
   line-height: 33px;
   color: #494a45;
   position: relative;
-  padding: 0.6em 0 20px;
-  margin: 1.5em 0 25px;
+  margin: 1.5em 0 1em;
   font-weight: bold;
+}
+.login-form,
+.register-form {
+  .btn-social-container {
+    position: relative;
+    min-height: 45vh;
+  }
+  #homeFooter {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-top: 1px solid #eee;
+    left: 0;
+    right: 0;
+    padding: 0 2em 1em;
+  }
+  #homeFooter.footer-separate {
+    .footer-container {
+      margin-top: 16px;
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+  .footer-container {
+    margin-top: 16px;
+  }
+}
+.register-form {
+  #regForm {
+    position: relative;
+    overflow: hidden;
+    padding: 2em 0;
+  }
+}
+.login-form {
+  #loginForm {
+    position: relative;
+    overflow: hidden;
+    padding-top: 10.5vh;
+    padding-bottom: 1em;
+  }
+}
+@media (min-width: 992px) {
+  .login-form {
+    #loginForm {
+      padding: 6vh 0 1em;
+    }
+  }
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
@@ -594,7 +641,8 @@ select:not([multiple]) {
   }
 }
 #socialMediaRegistrationContainer,
-#socialMediaLoginContainer
+#socialMediaLoginContainer,
+.social-divider-container
  {
   display: none;
 }
@@ -643,8 +691,14 @@ select:not([multiple]) {
   img {
     width: 40%;
   }
+  .copyright {
+    line-height: 1.25;
+  }
+  .logo-container {
+    text-align: right;
+  }
 }
-@media (min-width: 416px) {
+@media (min-width: 699px) {
   #homeFooter {
     img {
       width: auto;
@@ -717,6 +771,37 @@ select:not([multiple]) {
   .study-id-view td {
     margin-top: 0.4em;
   }
+  #profileDeceasedSection {
+    hr {
+      border-bottom: 1px solid darken(@HRColor, 10%);
+      margin-bottom: 2.25em;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+#deceasedConsentPopover {
+  &:hover {
+    cursor: auto;
+  }
+}
+
+.deceased-popover-content {
+  margin-top: 0.5em;
+}
+
+.deceased-popover-buttons-container {
+  display: flex;
+  justify-content: center;
+  margin: 0.5em 0 0.25em;
+  button {
+    margin: 0.5em;
+  }
+}
+#deceasedInfo {
+  margin: 0.5em 0;
 }
 
 #mainDiv.profile .copyright-container,
@@ -861,7 +946,26 @@ div.footer-wrapper.right-panel {
 .terms-of-use-intro {
   display: none;
 }
+.data-saving-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 2.25em;
+  margin: 1.5em 0 0.5em;
+  padding: .5em 0;
+  z-index: 5;
+  .indicator-icon {
+    margin-right: 8px;
+  }
+}
 #topTerms {
+  position: relative;
+  .well {
+    position: relative;
+  }
+  .save-info {
+    top: 4px;
+    left: 12px;
+  }
   .well {
     margin-top: 1em;
   }
@@ -884,6 +988,7 @@ div.footer-wrapper.right-panel {
     }
   }
 }
+
 .terms-tick-box {
   float: left;
   width: 2%;
@@ -907,11 +1012,15 @@ div.footer-wrapper.right-panel {
   .terms-tick-box-text {
     width: 95%;
   }
+  .data-saving-indicator {
+    position: relative;
+  }
 }
 #termsCheckbox {
   width: 1000px;
   max-width: 100%;
   margin-top: 2em;
+  position: relative;
   .display-view {
     font-weight: normal;
     display: none;
@@ -1084,6 +1193,20 @@ div.footer-wrapper.right-panel {
     font-size: @subheadSize;
   }
 }
+#topTerms, #aboutForm {
+  .save-loader-wrapper {
+    display: none;
+  }
+}
+#iqRefresh {
+  .refresh-icon {
+    margin-right: 8px;
+  }
+  &:hover {
+    cursor: pointer;
+    color: darken(@errorMessageColor, 5%);
+  }
+}
 #iqErrorMessage {
   position: relative;
   top: 4em;
@@ -1204,6 +1327,19 @@ div.footer-wrapper.right-panel {
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+  .check-role-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      left: 42%;
+      background: hsla(0, 0%, 100%, 0.35);
+      z-index: 10;
+      display: none;
+    }
+    input:hover {
+      cursor: pointer;
+    }
+  }
   .organization-field {
     min-width: 150px;
   }
@@ -1215,6 +1351,17 @@ div.footer-wrapper.right-panel {
   }
   tr.loading {
     opacity: 0.4;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      z-index: 5;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      background: transparent;
+    }
   }
   tr[data-uniqueid]:hover {
    background-color: #ececea;
@@ -1294,24 +1441,38 @@ div.footer-wrapper.right-panel {
    display: none;
  }
 
+.filter-popover {
+  margin-top: -6px !important;
+}
+
 #adminTableToolbar {
   .orgs-filter-warning {
     display: inline-block;
-    margin: 2px 8px;
+    margin: 0 8px;
     letter-spacing: 0.1rem;
-    position: relative;
-    font-size: 1.25em;
+    font-size: 0.95em;
     opacity: 0.8;
-    top: 2px;
-    &:hover {
-      color: @errorMessageColor;
-      cursor: pointer;
+    position: relative;
+    img {
+      width: 22px;
     }
-
+    &:after {
+      content: "";
+      position: absolute;
+      top: 20%;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 100%;
+      display: block;
+      z-index: 1;
+    }
+    &:hover:after {
+      background: hsla(0, 0%, 0%, 0.2);
+    }
   }
   div.orglist-selector {
     display: inline-block;
-    width: 350px;
     max-width: 100%;
     legend {
       letter-spacing: 1px;
@@ -1405,6 +1566,17 @@ div.footer-wrapper.right-panel {
   }
 }
 
+#staffList {
+  .fixed-table-toolbar {
+    .bs-bars {
+      width: 72%
+    }
+    #adminTableToolbar {
+      float: right;
+    }
+  }
+}
+
 /* reporting dashboard styling */
 .nav-tabs.rd-nav>li.active>a,
 .nav-tabs.rd-nav>li.active>a:focus,
@@ -1478,14 +1650,53 @@ div.footer-wrapper.right-panel {
     word-wrap: break-word;
   }
 }
+#chkDeletedUsersFilter {
+  margin: 0 0 0 4px;
+  font-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.deletedUsersFilterContainer {
+  margin: 1em 0.25em;
+  display: inline-block;
+  padding: .5em 1em;
+  line-height: 1.4;
+  vertical-align: middle;
+  border: 1px dotted #eee;
+  .text {
+    color: @sectionTitleColor;
+    font-weight: normal;
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: middle;
+    letter-spacing: .1rem;
+  }
+}
 @media (min-width: 705px) {
   #patientList {
     .deletedUsersFilterContainer {
       margin: 0.5em 1.25em 0;
     }
   }
+  #staffList {
+    .deletedUsersFilterContainer {
+      margin: 0;
+    }
+  }
 }
 #staffList {
+  .firstname-data-field, .lastname-data-field {
+    max-width: 150px;
+    word-wrap: break-word;
+  }
+  .email-data-field {
+    max-width: 235px;
+    word-wrap: break-word;
+  }
+  #staffListOptions {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+  }
   div.or {
     display: inline-block;
     background-color: @orBackgroundColor;
@@ -1650,13 +1861,12 @@ div.footer-wrapper.right-panel {
 #fullSizeBox {
   position: relative;
   text-align: left;
-  left:0;
-  top:0;
-  margin:0;
+  margin: auto;
   background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: 30%;
   overflow: hidden;
+  width: 100%;
   max-width: 100%;
   height:680px;
    -webkit-transition: height 0.8s ease-in;
@@ -1668,7 +1878,7 @@ div.footer-wrapper.right-panel {
   }
   &.box-min-500 {
     min-height: 500px;
-    max-height: 660px;
+    max-height: 80vh;
     margin: auto;
     overflow: hidden;
   }
@@ -2074,7 +2284,7 @@ body.portal .copyright-container  {
  }
 
 #profileProceduresWrapper.profile-item-container {
-    border: 1px solid #dcdcdc;
+    border: 1px solid @HRColor;
 }
 
 #profileProceduresWrapper[data-top-org-name='IRONMAN'] {
@@ -2085,6 +2295,12 @@ body.portal .copyright-container  {
     .profile-item-edit-btn {
       display: none;
     }
+  }
+  #procDay {
+    width: 100px;
+  }
+  #procYear {
+    width: 155px;
   }
 }
 
@@ -2407,6 +2623,23 @@ input.clinic {
   right: 5px !important;
 }
 #createProfileForm  {
+  .tnth-headline {
+    padding-bottom: 8px;
+    border-bottom: 1px solid @HRColor;
+    margin-bottom: 4px;
+  }
+  label {
+    font-weight: 500;
+    letter-spacing: 0.02rem;
+  }
+  .optional-display-text {
+    font-weight: normal;
+  }
+  #fillOrgs {
+    label {
+      font-weight: normal;
+    }
+  }
   .profile-item-edit-btn {
     display: none;
   }
@@ -2417,7 +2650,9 @@ input.clinic {
     padding-bottom: 0;
   }
   #bdGroup {
-    margin-bottom: 0.1em;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 0.1em;
     padding-bottom: 0;
     .flex {
       flex-wrap: wrap;
@@ -2427,14 +2662,14 @@ input.clinic {
     margin-top: 1em;
   }
   #phoneGroup {
-    margin-top: 1.2em;
+    margin-top: 1.25em;
   }
   #altPhoneGroup {
-    margin-top: 1.2em;
+    margin-top: 1.25em;
 
   }
   #studyIdContainer {
-   margin-top: 1.6em;
+   margin-top: 1.5em;
   }
   .study-id-label {
     margin-top: 0.5em;
@@ -2471,10 +2706,19 @@ input.clinic {
   }
 
   #profileProceduresWrapper {
-    padding: 0.5em 1em;
+    padding: 1em 1.5em;
     background: none;
     margin-top: 1em;
     margin-bottom: 2em;
+    .profile-item-title {
+      font-weight: 500;
+    }
+    .optional-display-text {
+      font-weight: normal;
+    }
+    label {
+      font-weight: normal;
+    }
   }
   .profile-item-title {
     color: #777777;
@@ -2490,7 +2734,12 @@ input.clinic {
       padding: 0.3em 0.5em;
     }
   }
-
+  #rolesContainer {
+    margin: 0.5em 0 2.25em;
+  }
+  .save-button-container {
+    padding: 1.5em 0 0;
+  }
   #tnthproc-submit {
     height: auto;
   }
@@ -2500,8 +2749,9 @@ input.clinic {
   padding: 2em;
   width: 100%;
   max-width: 100%;
-  border: solid 2px @wellColor;
-  background-color: @wellColor;
+  border: 0;
+  background: @wellColor;
+  box-shadow: 1px 2px 4px darken(@wellColor, 3%);
   overflow: hidden;
 }
 #accountCreationContentContainer {
@@ -2510,8 +2760,20 @@ input.clinic {
 #accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 114px;
 }
-#accountCreationContentContainer[data-account='staff'] #userOrgs {
-  margin-top: -1.5em;
+#accountCreationContentContainer[data-account='staff'] {
+  #bdGroup {
+    margin-top: 1em;
+    margin-bottom: 0.25em;
+  }
+  #emalGroup {
+    margin-top: 0.35em;
+  }
+  #altPhoneGroup {
+    margin-top: 0.75em;
+  }
+  #phoneGroup {
+    margin-top: 1.35em;
+  }
 }
 #emailInfoText {
   display: none;
@@ -2543,8 +2805,23 @@ input.clinic {
   max-width: 100%;
   word-wrap: break-word;
 }
-#sendRegistrationEmailForm label {
-  font-weight: normal;
+#sendRegistrationEmailForm {
+  label {
+    font-weight: normal;
+  }
+  .buttons-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      top: 15%;
+      left: 5%;
+      display: none;
+      z-index: 5;
+    }
+  }
+  #profileEmailErrorMessage {
+    margin: 1em 0;
+  }
 }
 
 #profileStudyIDContainer {
@@ -3072,7 +3349,7 @@ div.biopsy-option:last-of-type{
   display: none;
 }
 #consentDateEditContainer {
-  margin-top: 2.6em;
+  margin-top: 2.25em;
   margin-bottom: 2em;
   label:first-of-type {
     margin-bottom: -0.1em;
@@ -3315,7 +3592,7 @@ div.timezone-warning.text-warning {
 @media (min-width: 580px) {
   #createProfileForm  {
     #emailGroup {
-      margin-top: 0;
+      margin-top: 0.25em;
     }
     #phone, #email, #profileStudyIDContainer input, #altPhone{
         width: 350px;
@@ -3529,7 +3806,7 @@ div.timezone-warning.text-warning {
     font-size:@orgSize;
   }
   .create-account-container {
-      padding: 3.5em 4em;
+      padding: 3em;
       overflow: auto;
   }
   #createProfileForm {
@@ -3544,12 +3821,14 @@ div.timezone-warning.text-warning {
   }
 }
 
-@media (min-width: 768px) {
-  #fullSizeBox {
-    > img {
-      width: 100%;
-    }
+#fullSizeBox {
+  > img {
+    width: 100%;
+    margin: auto;
   }
+}
+
+@media (min-width: 768px) {
   #fullSizeContainer {
     padding: 24px 0;
   }
@@ -3830,18 +4109,8 @@ div.timezone-warning.text-warning {
     width: 100%;
     height: 100%;
   }
-  #mainHolder.vertical-center {
-    display: table;
-    height:100%;
-    margin: 0 auto;
-    #mainDiv {
-      display: table-cell;
-      text-align: center; /* horizontal */
-      vertical-align: middle; /* vertical */
-    }
-  }
   #fullSizeBox {
-    margin: 0 auto;
+    margin: 1em auto;
     max-width: 1400px;
   }
   #homeFooter {

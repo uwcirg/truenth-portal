@@ -280,6 +280,9 @@
                 return this.userEmailReady;
             },
             setUserEmailReady: function(params) {
+                if (this.mode !== "profile") { //setting email ready status only applies to profile page
+                    return false;
+                }
                 var self = this;
                 this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
                     if (data.error) {
@@ -767,8 +770,12 @@
                 }
                 location.replace("/login-as/" + this.subjectId);
             },
-            postDemoData: function(field, data) {
-                if (!this.subjectId) { return false; }
+            postDemoData: function(field, data, callback) {
+                callback = callback || function() {};
+                if (!this.subjectId) {
+                    callback({"error": i18next.t("Subject id is required")});
+                    return false;
+                }
                 var self = this;
                 Vue.nextTick(function () {
                     // DOM updated
@@ -776,6 +783,7 @@
                     data = data || {};
                     var valid = field.get(0).validity ? field.get(0).validity.valid : true;
                     if (!valid) {
+                        callback({"error": i18next.t("Invalid field value.")});
                         return false;
                     }
                     var o = field;
@@ -785,11 +793,13 @@
                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                     if (hasError) {
                         editButton.attr("disabled", false);
+                        callback({"error": i18next.t("Validation error.")});
                         return;
                     }
                     editButton.attr("disabled", true);
                     data.resourceType = data.resourceType || "Patient";
-                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function() {
+                    self.modules.tnthAjax.putDemo(self.subjectId, data, field, false, function(data) {
+                        callback(data);
                         setTimeout(function() {
                             self.setDemoData({cache: false}, function() {
                                 var formGroup = parentContainer.find(".form-group").not(".data-update-on-validated");
@@ -1217,6 +1227,10 @@
                         }
                         return parentName ? parentName : i18next.t("your clinic");
                     })();
+                    $(this).addClass("disabled").attr("disabled", true);
+                    $("#sendRegistrationEmailForm .loading-indicator").show();
+                    $("#profileEmailErrorMessage").html("");
+                    var btnRef = $(this);
                     $.ajax({
                         type: "GET",
                         url: $("#staffRegistrationEmailUrl").val(),
@@ -1250,6 +1264,8 @@
                                 $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
                             }
                         }
+                        $("#sendRegistrationEmailForm .loading-indicator").hide();
+                        btnRef.removeClass("disabled").attr("disabled", false);
                     });
                 });
             },
@@ -1280,16 +1296,72 @@
                 });
             },
             updateDeceasedSection: function(targetField) {
-                var data = {};
+                var data = {}, isChecked = $("#boolDeath").is(":checked");
+                var hasSuspendedConsent = $("#consentListTable .withdrawn-label").length;
+                var confirmationRequired = isChecked && !hasSuspendedConsent && this.settings.LOCALIZED_AFFILIATE_ORG && this.topLevelOrgs.indexOf(this.settings.LOCALIZED_AFFILIATE_ORG) !== -1;
+                $("#deceasedInfo").html("");
                 if ($("#deathDate").val()) {
                     data.deceasedDateTime = $("#deathDate").val();
                 }
-                if ($("#boolDeath").prop("checked")) {
-                    data.deceasedBoolean = true;
-                } else {
-                    data.deceasedBoolean = false;
+                data.deceasedBoolean = isChecked;
+                if (!confirmationRequired) {
+                    this.postDemoData(targetField, data);
+                    return;
                 }
-                this.postDemoData(targetField, data);
+                var self = this, subjectId = this.subjectId;
+                var setDisabledFields = function(disabledFlag) {
+                    $("#boolDeath, #deathDate, #deathDay, #deathYear, #deathMonth").attr("disabled", disabledFlag);
+                };
+                var hidePopover = function() {
+                    $("#deceasedConsentPopover").popover("hide");
+                };
+                var showPopover = function() {
+                    if (!$("#deceasedConsentPopover").attr("aria-describedby")) {
+                        $("#deceasedConsentPopover").popover("show");
+                    }
+                };
+                var clearFields = function() {
+                    if (!self.demo.data.deceasedDateTime) {
+                        $("#deathDate, #deathDay, #deathYear, #deathMonth").val("");
+                    }
+                    if (!(String(self.demo.data.deceasedBoolean).toLowerCase() === "true")) {
+                        $("#boolDeath").prop("checked", false);
+                    }
+                    hidePopover();
+                };
+                showPopover();
+                $("#btnDeceasedConsentYes").off("click").on("click", function(e) { //selecting yes in the confirmation popover
+                    e.stopPropagation();
+                    setDisabledFields(true);
+                    self.postDemoData(targetField, data, function(data) {
+                        if (!data || data.error) {
+                            setDisabledFields(false);
+                            return false;
+                        }
+                        var orgTool = self.getOrgTool(), selectedOrgElement = orgTool.getSelectedOrg();
+                        if (!selectedOrgElement.length) { //no need to continue if no affiliated org
+                            setDisabledFields(false);
+                            return;
+                        }
+                        self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), "", function(data) {
+                            setDisabledFields(false);
+                            if (data.error) {
+                                $("#deceasedInfo").html(i18next.t("Error occurred suspending consent for subject."));
+                                return;
+                            }
+                            hidePopover();
+                            self.reloadConsentList(subjectId);
+                        });
+                    });
+                });
+                $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
+                    e.stopPropagation();
+                    clearFields();
+                });
+                $("#profileDeceasedSection .profile-item-edit-btn").on("click", function(e) {
+                    e.stopPropagation();
+                    clearFields();
+                });
             },
             initDeceasedSection: function() {
                 var self = this;
@@ -1703,14 +1775,15 @@
                                 if (__modal && __modal.length > 0) {
                                     setTimeout(function() { __modal.modal("show"); }, 50);
                                 } else {
-                                    self.setDefaultConsent(userId, parentOrg);
-                                    setTimeout(function() { self.updateOrgs($("#clinics"), true);}, 500);
+                                    self.updateOrgs($("#clinics"), true);
+                                    setTimeout(function() { self.setDefaultConsent(userId, parentOrg);}, 500);
                                 }
                             }
                         } else {
-                            self.handleConsent($(this));
+                            self.updateOrgs($("#clinics"),true);
+                            var thisElement = $(this);
                             setTimeout(function() {
-                                self.updateOrgs($("#clinics"),true);
+                                self.handleConsent(thisElement);
                             }, 500);
                             self.reloadConsentList(userId);
                         }
@@ -1844,16 +1917,8 @@
                             } else {
                                 self.setDefaultConsent(userId, parentOrg);
                             }
-                        } else {
-                            var arrayDelOrgs = $("#userOrgs input[name='organization']").toArray().map(function(item) {return $(item).val();});
-                            if (cto) {
-                                arrayDelOrgs = OT.getTopLevelOrgs();
-                            }
-                            arrayDelOrgs.forEach(function(i) {
-                                (function(orgId) {
-                                    setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
-                                })(i);
-                            });
+                        } else { //remove all valid consent if no org is selected
+                            setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": "all"});}, 350);
                         }
                     } else {
                         if (cto) {
@@ -2031,22 +2096,14 @@
                                         $("#biopsy_month").val(dArray[1]);
                                         $("#biopsy_day").val(dArray[2]);
                                         $("#biopsyDateContainer").show();
-                                        $("#biopsyDate").removeAttr("skipped");
                                     }
                                 } else {
                                     $("#biopsyDate").val("");
                                     $("#biopsyDateContainer").hide();
-                                    $("#biopsyDate").attr("skipped", "true");
                                 }
                             }
-                            if (clinicalItem === "pca_diag") {
-                                if ($("#pca_diag_no").is(":checked")) {
-                                    $("#tx_yes").attr("skipped", "true");
-                                    $("#tx_no").attr("skipped", "true");
-                                } else {
-                                    $("#tx_yes").removeAttr("skipped");
-                                    $("#tx_no").removeAttr("skipped");
-                                }
+                            if (String(clinicalValue) === "true" || truesyValue) {
+                                $radios.parents(".pat-q").next().fadeIn(150);
                             }
                         }
                     }
@@ -2095,7 +2152,7 @@
                         self.onBeforeInitClinicalQuestionsSection();
                         $("#patientQ [name='biopsy']").on("click", function() {
                             var toSend = String($(this).val()), biopsyDate = $("#biopsyDate").val(), thisItem = $(this), userId = self.subjectId;
-                            var toCall = thisItem.attr("name") || thisItem.attr("data-name"), targetField = $("#patientQContainer");
+                            var toCall = thisItem.attr("name") || thisItem.attr("data-name"), targetField = $("#patientQ");
                             var arrQ = ["pca_diag", "pca_localized", "tx"];
                             if (toSend === "true") {
                                 $("#biopsyDateContainer").show();
@@ -2122,8 +2179,8 @@
                                 });
                                 setTimeout(function() {
                                     self.modules.tnthAjax.postClinical(userId, toCall, "false", thisItem.attr("data-status"), targetField);
-                                    self.modules.tnthAjax.postClinical(userId, "pca_diag", "false");
-                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                    self.modules.tnthAjax.postClinical(userId, "pca_diag", "false", "", targetField);
+                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
                                     self.modules.tnthAjax.deleteTreatment(userId);
                                 }, 50);
 
@@ -2143,20 +2200,20 @@
                         });
 
                         $("#patientQ input[name='tx']").on("click", function() {
-                            self.modules.tnthAjax.postTreatment(self.subjectId, (String($(this).val()) === "true"), "", $("#patientQContainer"));
+                            self.modules.tnthAjax.postTreatment(self.subjectId, (String($(this).val()) === "true"), "", $("#patientQ"));
                         });
 
                         $("#patientQ input[name='pca_localized']").on("click", function() {
                             var o = $(this);
                             setTimeout(function() {
-                                self.modules.tnthAjax.postClinical(self.subjectId, o.attr("name"), o.val(), o.attr("data-status"), $("#patientQContainer"));
+                                self.modules.tnthAjax.postClinical(self.subjectId, o.attr("name"), o.val(), o.attr("data-status"), $("#patientQ"));
                             }, 50);
                         });
 
                         $("#patientQ input[name='pca_diag']").on("click", function() {
-                            var toSend = String($(this).val()), userId = self.subjectId, o = $(this);
+                            var toSend = String($(this).val()), userId = self.subjectId, o = $(this), targetField = $("#patientQ");
                             setTimeout(function() {
-                                self.modules.tnthAjax.postClinical(userId, o.attr("name"), toSend, o.attr("data-status"), $("#patientQContainer"));
+                                self.modules.tnthAjax.postClinical(userId, o.attr("name"), toSend, o.attr("data-status"), targetField);
                             }, 50);
                             if (toSend !== "true") {
                                 ["pca_localized", "tx"].forEach(function(fieldName) {
@@ -2165,7 +2222,7 @@
                                     field.attr("skipped", "true");
                                 });
                                 setTimeout(function() {
-                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false");
+                                    self.modules.tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
                                     self.modules.tnthAjax.deleteTreatment(userId);
                                 }, 50);
                             }
@@ -2187,7 +2244,7 @@
                 }
                 var self = this, still_needed = false, subjectId = this.subjectId;
                 this.modules.tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
-                    still_needed = data && !data.error && data.length > 0;
+                    still_needed = data && data.still_needed && data.still_needed.length;
                 }, method);
                 if (/\?/.test(assessment_url)) { //passing additional query params
                     assessment_url += "&entry_method=" + method;
@@ -2275,14 +2332,8 @@
                                 self.manualEntry.errorMessage = i18next.t("All date fields are required");
                                 return false;
                             }
-
-                            //check if date entered is today, if so use today's date/time
-                            if (td + tm + ty === (pad(d.val()) + pad(m.val()) + pad(y.val()))) {
-                                self.manualEntry.completionDate = todayObj.gmtDate;
-                            } else {
-                                var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
-                                self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj);
-                            }
+                            var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0); //noon UTC date
+                            self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj); //time zone based on user's
                             //all date/time should be in GMT date/time
                             var completionDate = new Date(self.manualEntry.completionDate);
                             var cConsentDate = new Date(self.manualEntry.consentDate);
@@ -2307,7 +2358,7 @@
                     });
                 });
                 $(document).delegate("#meSubmit", "click", function() {
-                    var method = String(self.manualEntry.method), completionDate = $("#qCompletionDate").val();
+                    var method = String(self.manualEntry.method), completionDate = self.modules.tnthDates.formatDateString(self.manualEntry.completionDate, "system"); //note completion date has both date and time info
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
                     if (method === "") { return false; }
                     if (method !== "paper") {
@@ -2315,8 +2366,10 @@
                         return false;
                     }
                     self.manualEntryModalVis(true);
-                    self.modules.tnthAjax.getCurrentQB(subjectId, self.modules.tnthDates.formatDateString(completionDate, "iso-short"), null, function(data) {
+                    self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
                         if (data.error) {
+                            self.manualEntry.errorMessage = i18next.t("Server error occurred checking questionnaire window");
+                            self.manualEntryModalVis();
                             return false;
                         }
                         //check questionnaire time windows
@@ -2797,6 +2850,7 @@
                         existingOrgs[item.organization_id] = true;
                     }
                 });
+                clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
                         $("#consentListTable .button--LR[show='true']").addClass("show");

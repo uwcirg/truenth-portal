@@ -10,8 +10,11 @@ NB: a celery worker must be started for these to ever return.  See
 from datetime import datetime
 from functools import wraps
 import json
+import random
+import time
 from traceback import format_exc
 
+from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
 from flask import current_app
 from requests import Request, Session
@@ -138,6 +141,46 @@ def test_args(*args, **kwargs):
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
+@celery.task(
+    name="tasks.test_consume_list", ignore_result=True, soft_time_limit=4)
+def test_consume_list(id_list, priority):
+    """Proof of concept / test code to eval producer/consumer pattern.
+
+    See also the produce_list() task, and the trigger view
+    at /test-producer-consumer
+
+    """
+    try:
+        # sleep for a number of seconds, so the process looks to take
+        # a bit and evaluation of tasks and priorities can be observed.
+        time.sleep(random.randint(1, 5))
+        logger.info("priority: {} consuming {}".format(priority, id_list))
+    except SoftTimeLimitExceeded:
+        logger.info("timed out")
+
+
+@celery.task(name="tasks.test_produce_list")
+def test_produce_list():
+    """Proof of concept / test code to eval producer/consumer pattern.
+
+    See also the consume_list() task, and the trigger view
+    at /test-producer-consumer
+
+    """
+    j = 0
+    step = 5
+    numlists = 50
+    for i in range(step, (step*numlists)+1, step):
+        id_list = (range(j, i))
+        priority = random.choice((0, 5, 9))
+        logger.info("priority {}; producing {}".format(priority, id_list))
+        test_consume_list.apply_async(
+            priority=priority,
+            kwargs={'id_list': id_list, 'priority': priority})
+        j = i
+    logger.info("producer done")
+
+
 @celery.task
 @scheduled_task
 def cache_reporting_stats(**kwargs):
@@ -162,17 +205,19 @@ def cache_assessment_status(**kwargs):
     stale cache.  Expected to be called as a scheduled job.
 
     """
-    update_patient_loop(update_cache=True, queue_messages=False)
+    update_patient_loop(update_cache=True, queue_messages=False, as_task=True)
 
 
 @celery.task
 @scheduled_task
 def prepare_communications(**kwargs):
     """Move any ready communications into prepared state """
-    update_patient_loop(update_cache=False, queue_messages=True)
+    update_patient_loop(
+        update_cache=False, queue_messages=True, as_task=True)
 
 
-def update_patient_loop(update_cache=True, queue_messages=True):
+def update_patient_loop(
+        update_cache=True, queue_messages=True, as_task=False):
     """Function to loop over valid patients and update as per settings
 
     Typically called as a scheduled_job - also directly from tests
@@ -182,41 +227,82 @@ def update_patient_loop(update_cache=True, queue_messages=True):
     valid_patients = User.query.join(UserRoles).filter(and_(
         User.id == UserRoles.user_id,
         User.deleted_id.is_(None),
-        UserRoles.role_id == patient_role_id))
+        UserRoles.role_id == patient_role_id)).with_entities(User.id)
 
+    patients = valid_patients.all()
+    j = 0
+    batchsize = current_app.config.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+
+    while True:
+        sublist = patients[j:j+batchsize]
+        if not sublist:
+            break
+        logger.debug("Sending sublist {} to update_patients".format(sublist))
+        j += batchsize
+        kwargs = {
+            'patient_list': sublist, 'update_cache': update_cache,
+            'queue_messages': queue_messages}
+        if as_task:
+            update_patients_task.apply_async(priority=9, kwargs=kwargs)
+        else:
+            update_patients(**kwargs)
+
+
+@celery.task(name="tasks.update_patients_task", soft_time_limit=60)
+def update_patients_task(patient_list, update_cache, queue_messages):
+    """Task form - wraps call to testable function `update_patients` """
+    update_patients(patient_list, update_cache, queue_messages)
+
+
+def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
-    for user in valid_patients:
+    for user_id in patient_list:
         if update_cache:
-            dogpile_cache.invalidate(overall_assessment_status, user.id)
-            dogpile_cache.refresh(overall_assessment_status, user.id)
+            dogpile_cache.invalidate(overall_assessment_status, user_id)
+            dogpile_cache.refresh(overall_assessment_status, user_id)
         if queue_messages:
+            user = User.query.get(user_id)
             qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,
                     iteration_count=qbd.iteration)
-    db.session.commit()
+        db.session.commit()
 
 
 @celery.task
 @scheduled_task
 def send_queued_communications(**kwargs):
-    "Look for communication objects ready to send"
-    send_messages()
+    """Look for communication objects ready to send"""
+    send_messages(as_task=True)
 
 
-def send_messages():
+def send_messages(as_task=False):
     """Function to send all queued messages
 
     Typically called as a scheduled_job - also directly from tests
     """
-    ready = Communication.query.filter(Communication.status == 'preparation')
-    for communication in ready:
-        current_app.logger.debug("Collate ready communication {}".format(
-            communication))
-        communication.generate_and_send()
-        db.session.commit()
+    ready = Communication.query.filter(
+        Communication.status == 'preparation').with_entities(Communication.id)
+
+    for communication_id in ready:
+        if as_task:
+            send_communication_task.apply_async(
+                priority=9, kwargs={'communication_id': communication_id})
+        else:
+            send_communication(communication_id)
+
+
+@celery.task(name="tasks.send_communication_task")
+def send_communication_task(communication_id):
+    send_communication(communication_id)
+
+
+def send_communication(communication_id):
+    communication = Communication.query.get(communication_id)
+    communication.generate_and_send()
+    db.session.commit()
 
 
 def send_user_messages(user, force_update=False):
@@ -248,8 +334,6 @@ def send_user_messages(user, force_update=False):
     ready = Communication.query.join(User).filter(
         Communication.status == 'preparation').filter(User == user)
     for communication in ready:
-        current_app.logger.debug("Collate ready communication {}".format(
-            communication))
         communication.generate_and_send()
         db.session.commit()
         count += 1

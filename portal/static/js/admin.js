@@ -281,6 +281,7 @@
                         }, 10);
                     });
                 }
+                $("#adminTableToolbar .orgs-filter-warning").popover();
             },
             setShowDeletedUsersFlag: function () {
                 if (!$("#chkDeletedUsersFilter").length) {
@@ -315,6 +316,41 @@
                     }
                     self.getReportModal($(this).attr("data-patient-id"), {
                         documentDataType: $(this).attr("data-document-type")
+                    });
+                });
+                $("#adminTableContainer [name='chkRole']").each(function() {
+                    $(this).off("click").on("click", function(e) {
+                        e.stopPropagation();
+                        var userId = $(this).attr("data-user-id");
+                        if (!userId) {
+                            return false;
+                        }
+                        var role = $(this).attr("data-role"), checked = $(this).is(":checked"), tnthAjax = self.getDependency("tnthAjax");
+                        $("#loadingIndicator_"+userId).show();
+                        $("#" + self.ROW_ID_PREFIX + userId).addClass("loading");
+                        tnthAjax.getRoles(userId, function(data) {
+                            if (!data || data.error) {
+                                $("#loadingIndicator_"+userId).hide();
+                                $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
+                                alert(i18next.t("Error occurred retrieving roles for user"));
+                                return false;
+                            }
+                            var arrRoles = data.roles;
+                            arrRoles = $.grep(arrRoles, function(item) {
+                                return String(item.name).toLowerCase() !== String(role).toLowerCase();
+                            });
+                            if (checked) {
+                                arrRoles = arrRoles.concat([{name: role}]);
+                            }
+                            tnthAjax.putRoles(userId, {roles:arrRoles}, "", function(data) {
+                                $("#loadingIndicator_"+userId).hide();
+                                $("#" + self.ROW_ID_PREFIX + userId).removeClass("loading");
+                                if (data.error) {
+                                    alert(i18next.t("Error occurred updating user roles"));
+                                    return false;
+                                }
+                            });
+                        });
                     });
                 });
                 $("#adminTableContainer .btn-delete-user").each(function () {
@@ -560,13 +596,12 @@
                 ofields.each(function () {
                     $(this).on("click touchstart", function (e) {
                         e.stopPropagation();
-                        if ($(this).is(":checked")) {
-                            var childOrgs = self.orgTool.getHereBelowOrgs([$(this).val()]);
-                            if (childOrgs && childOrgs.length > 0) {
-                                childOrgs.forEach(function (org) {
-                                    $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", true);
-                                });
-                            }
+                        var isChecked = $(this).is(":checked");
+                        var childOrgs = self.orgTool.getHereBelowOrgs([$(this).val()]);
+                        if (childOrgs && childOrgs.length) {
+                            childOrgs.forEach(function (org) {
+                                $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", isChecked);
+                            });
                         }
                         self.setOrgsSelector({
                             selectAll: false,
@@ -1011,7 +1046,8 @@
                 if (!userId) {
                     return false;
                 }
-                $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip").find(".deleted-button-cell").html('<span class="text-display">{inactivetext}</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon"></i>'.replace("{userid}", userId).replace("{inactivetext}", i18next.t("Inactive"))).find("a.profile-link").remove();
+                var allowReactivate = $("#adminTable").attr("data-allow-reactivate");
+                $("#" + this.ROW_ID_PREFIX + userId).addClass("deleted-user-row").addClass("rowlink-skip").find(".deleted-button-cell").html('<span class="text-display">{inactivetext}</span><i data-user-id="{userid}" aria-hidden="true" title="Reactivate account" class="fa fa-undo reactivate-icon {class}"></i>'.replace('{class}', allowReactivate?"":"tnth-hide").replace("{userid}", userId).replace("{inactivetext}", i18next.t("Inactive"))).find("a.profile-link").remove();
                 if (!this.showDeletedUsers) {
                     $("#" + this.ROW_ID_PREFIX + userId).hide();
                 }

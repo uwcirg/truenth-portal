@@ -191,7 +191,8 @@ def account():
                   name:
                     type: string
                     description:
-                      Role name, always a lower case string with no white space.
+                      Role name, always a lower case string
+                      with no white space.
                   description:
                     type: string
                     description: Plain text describing the role.
@@ -974,8 +975,9 @@ def set_user_groups(user_id):
                   name:
                     type: string
                     description:
-                      The string defining the name of each group the user should
-                      belong to.  Must exist as an available group in the system.
+                      The string defining the name of each group
+                      the user should belong to.  Must exist as an
+                      available group in the system.
     responses:
       200:
         description:
@@ -1012,7 +1014,8 @@ def set_user_groups(user_id):
 
     remove_if_not_requested = {group.id: group for group in user.groups}
     requested_groups = [r['name'] for r in request.json['groups']]
-    matching_groups = Group.query.filter(Group.name.in_(requested_groups)).all()
+    matching_groups = Group.query.filter(Group.name.in_(
+                                         requested_groups)).all()
     if len(matching_groups) != len(requested_groups):
         abort(400, "One or more groups requested not available")
     # Add any requested not already set on user
@@ -1457,7 +1460,11 @@ def unique_email():
     validate_email(email)
     # find matching account by email regardless of case
     match = User.query.filter(func.lower(User.email) == email.lower())
-    assert (match.count() < 2)  # db unique constraint - can't happen, right?
+    if match.count() > 1:
+        current_app.logger.error(
+             'there are >1 emails that match {}'.format(email)
+        )
+        return jsonify(unique=False)
     if match.count() == 1:
         # If the user is the authenticated user or provided user_id,
         # it still counts as unique
@@ -2190,13 +2197,15 @@ def get_current_user_qb(user_id):
         user = get_user_or_abort(user_id)
 
     date = request.args.get('as_of_date')
-    date = datetime.strptime(date, '%Y-%m-%d') if date else datetime.utcnow()
+    # allow date and time info to be available
+    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 
     qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
 
     qbd_json = {}
 
-    qbd_questionnaire_bank = qbd.questionnaire_bank if qbd.questionnaire_bank else None
+    qbd_questionnaire_bank = (qbd.questionnaire_bank
+                              if qbd.questionnaire_bank else None)
 
     expiry = None
 

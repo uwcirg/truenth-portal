@@ -70,7 +70,7 @@ echo "Starting containers..."
 restarted_containers="$(docker-compose up -d web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
 
 # Set celery CPU limit after start
-if echo "$restarted_containers" | grep --quiet 'Creating.*celeryworker'; then
+if echo "$restarted_containers" | grep --ignore-case --quiet 'creating.*celeryworker'; then
     echo "Applying CPU limit to celery worker..."
     docker container update --cpus .3 "$(docker-compose ps --quiet celeryworker)"
 fi

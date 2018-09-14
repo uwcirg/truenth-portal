@@ -11,7 +11,7 @@ beautifulsoup4==4.6.3     # via webtest
 billiard==3.5.0.4         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
-certifi==2018.8.13        # via requests
+certifi==2018.8.24        # via requests
 cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
 click==6.7                # via flask
@@ -41,7 +41,7 @@ future==0.16.0
 fuzzywuzzy==0.17.0
 gunicorn==19.8.1
 idna==2.7                 # via requests
-imagesize==1.0.0          # via sphinx
+imagesize==1.1.0          # via sphinx
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==2.6.0
@@ -56,7 +56,7 @@ passlib==1.7.1            # via flask-user
 pluggy==0.7.1             # via tox
 polib==1.1.0
 psycopg2==2.7.5
-py==1.5.4                 # via tox
+py==1.6.0                 # via tox
 pycparser==2.18           # via cffi
 pycryptodome==3.6.6       # via flask-user
 pygments==2.2.0           # via sphinx
@@ -76,12 +76,12 @@ selenium==3.14.0
 six==1.11.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.1
-sphinx==1.7.7
+sphinx==1.7.9
 sphinxcontrib-websupport==1.1.0  # via sphinx
 sqlalchemy==1.2.11         # via alembic, flask-sqlalchemy
-swagger-spec-validator==2.3.1
+swagger-spec-validator==2.4.0
 tox==3.2.1
-typing==3.6.4             # via sphinx
+typing==3.6.6             # via sphinx
 urllib3==1.23             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4               # via amqp
@@ -91,7 +91,6 @@ webob==1.8.2              # via webtest
 webtest==2.0.30           # via flask-webtest
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
-xvfbwrapper==0.2.9
 -e .
 
 ###

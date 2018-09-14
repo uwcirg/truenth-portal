@@ -79,8 +79,9 @@
 @labelColor: #777;
 @wellColor: rgba(203, 210, 217, 0.2);
 @wellBorderColor: #f1efef;
-@disabledColor: #bfc3c3;
-
+@disabledColor: #b6c4d0;
+@dividerColor: #e0e0e0;
+@HRColor:#eee;
 @inputHeight: 2.4em;
 @disabledOpacity: 0.6;
 
@@ -135,6 +136,7 @@ body {
     min-height: 8px;
   }
 }
+
 .form-control,
 input,
 select,
@@ -307,6 +309,32 @@ a.btn {
     text-align: left;
 }
 
+.login-form,
+.register-form {
+  min-height: 70vh;
+  #homeFooter {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-top: 1px solid #eee;
+    padding: 0 1.5em 1em;
+  }
+  #homeFooter.footer-separate {
+    .footer-container {
+      margin-top: 16px;
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+  .footer-container {
+    margin-top: 16px;
+  }
+}
+.login-form {
+  #mainHolder {
+    margin-top: 0.5%;
+  }
+}
 /* Accordion styles */
 .tabs-container {
   .tab {
@@ -353,7 +381,7 @@ a.btn {
   /* :checked */
   label.tab-label.active ~ .tab-content,
   input.tab-input:checked ~ .tab-content {
-    max-height: 50em;
+    max-height: 120em;
     margin: 1em auto;
     padding: 0.5em;
     border: 1px solid #e4dfdf;
@@ -492,6 +520,18 @@ select:not([multiple]) {
   transition: visibility 0.6s, opacity 0.7s ease-in;
 }
 #createProfileForm {
+  .tnth-headline {
+    padding-bottom: 8px;
+    border-bottom: 1px solid @HRColor;
+    margin-bottom: 4px;
+  }
+  label {
+    font-weight: 500;
+    letter-spacing: 0.02rem;
+  }
+  .optional-display-text {
+    font-weight: normal;
+  }
   .profile-item-edit-btn {
     display: none;
   }
@@ -500,10 +540,21 @@ select:not([multiple]) {
     max-width: 100%;
   }
   #profileSiteIDContainer {
-    margin-top: 1.6em;
+    margin-top: 1.5em;
   }
   #noEmailContainer {
     display: none;
+  }
+  #fillOrgs {
+    label {
+      font-weight: normal;
+    }
+  }
+  #rolesContainer {
+    margin: 0.5em 0 2.25em;
+  }
+  .save-button-container {
+    padding: 1.5em 0 0;
   }
 }
 #profileSiteId {
@@ -581,6 +632,11 @@ div.right-panel {
 }
 #termsText.agreed {
   display: block;
+}
+#topTerms {
+  .well {
+    position: relative;
+  }
 }
 #topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
@@ -666,6 +722,7 @@ div.right-panel {
     min-height: 30vh;
     margin-top: 20%;
     display: none;
+    position: relative;
   }
   .iq-container .tnth-headline:first-of-type {
     transform: translateY(-100%);
@@ -726,9 +783,11 @@ div.right-panel {
   .bd-optional {
     display: none;
   }
+  #patientQ .save-info {
+    display: none;
+  }
   #next,  #updateProfile {
     opacity: 0;
-    transition: opacity 200ms ease-in;
     position: absolute;
     left: 0;
     top: 0;
@@ -736,6 +795,7 @@ div.right-panel {
     text-transform: uppercase;
     padding: 1em;
     font-size: @smallBtnSize;
+    transition: opacity 350ms ease;
   }
   #next {
     width: 110px;
@@ -773,6 +833,28 @@ div.right-panel {
   }
   .iq-container .noOrg-container {
     margin-left: 0.8em;
+  }
+}
+.iq-container {
+  #bdGroup {
+    .with-errors {
+      margin-top: 1em;
+      padding-left: 1em;
+    }
+    .custom-error {
+      margin-top: 1em;
+      padding-left: 1em;
+      color: @errorMessageColor;
+    }
+  }
+}
+#iqRefresh {
+  .refresh-icon {
+    margin-right: 8px;
+  }
+  &:hover {
+    cursor: pointer;
+    color: darken(@errorMessageColor, 5%);
   }
 }
 #iqFooterWrapper.footerWrapper {
@@ -841,6 +923,18 @@ div.right-panel {
   }
 }
 
+#topTerms .data-saving-indicator,
+.iq-container .data-saving-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 2.25em;
+  margin: 1em 0 0.5em;
+  padding: .5em 0;
+  z-index: 5;
+  .indicator-icon {
+    margin-right: 8px;
+  }
+}
 .orglist-download-container {
   display: inline-block;
   div {
@@ -900,6 +994,20 @@ div.pull-right {
   min-height: 280px;
   transition: all 0.5s ease-in;
 
+  .check-role-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      left: 42%;
+      background: hsla(0, 0%, 100%, 0.35);
+      z-index: 10;
+      display: none;
+    }
+    input:hover {
+      cursor: pointer;
+    }
+  }
+
   div.card-view {
     display: flex;
   }
@@ -909,6 +1017,17 @@ div.pull-right {
   }
   tr.loading {
     opacity: 0.4;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      z-index: 5;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      background: transparent;
+    }
   }
   TH {
     background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
@@ -1045,24 +1164,43 @@ div.pull-right {
   .deletedUsersFilterContainer {
     margin: 0 1em;
   }
+  #staffList {
+    .deletedUsersFilterContainer {
+      margin: 0;
+    }
+  }
+}
+.filter-popover {
+  margin-top: -6px !important;
 }
 #adminTableToolbar {
   .orgs-filter-warning {
     display: inline-block;
-    margin: 4px 8px;
+    margin: 0 8px;
     letter-spacing: 0.1rem;
-    position: relative;
-    font-size: 1.25em;
+    font-size: 0.95em;
     opacity: 0.8;
-    top: 2px;
-    &:hover .alert-icon {
-      cursor: pointer;
-      color: @errorMessageColor;
+    position: relative;
+    img {
+      width: 22px;
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      top: 20%;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 100%;
+      display: block;
+      z-index: 1;
+    }
+    &:hover:after {
+      background: hsla(0, 0%, 0%, 0.2);
     }
   }
   div.orglist-selector {
     display: inline-block;
-    width: 350px;
     max-width: 100%;
     .indent {
       padding: 0 0.4em;
@@ -1136,6 +1274,16 @@ div.pull-right {
   }
 }
 
+#staffList {
+  .fixed-table-toolbar {
+    .bs-bars {
+      width: 72%
+    }
+    #adminTableToolbar {
+      float: right;
+    }
+  }
+}
 /* reporting dashboard styling */
 .nav-tabs.rd-nav>li.active>a,
 .nav-tabs.rd-nav>li.active>a:focus,
@@ -1344,7 +1492,9 @@ div.pull-right {
   }
 }
 #patientList {
+  padding: 1em 0;
   #patientListOptions {
+    padding: 1em 0 0;
     border-bottom: 1px solid #ececec;
     margin-bottom: 2em;
   }
@@ -1368,6 +1518,9 @@ div.pull-right {
 }
 
 #staffList {
+  #staffListOptions {
+    border-bottom: 1px solid @HRColor;
+  }
   div.or {
     display: block;
     background-color: @orBackgroundColor;
@@ -2193,6 +2346,7 @@ div.noOrg-container {
   #bdGroup {
     margin-bottom: 0.1em;
     padding-bottom: 0;
+    padding-top: 0;
   .flex {
       flex-wrap: wrap;
     }
@@ -2205,7 +2359,7 @@ div.noOrg-container {
     margin-top: 5%;
   }
   #userOrgs {
-    margin-top: 2.2em;
+    margin-top: 0.55em;
   }
   #phone, #email, #altPhone  {
     width: 350px;
@@ -2222,10 +2376,10 @@ div.noOrg-container {
     top:-1px
   }
   #phoneGroup {
-    margin-top: 1.2em;
+    margin-top: 1.5em;
   }
   #altPhoneGroup {
-    margin-top: 1.4em;
+    margin-top: 1em;
   }
   #updateProfile {
     font-size: @smallBtnSize;
@@ -2241,17 +2395,27 @@ div.noOrg-container {
   padding: 2em;
   width: 100%;
   max-width: 100%;
-  border: solid 2px #F1F1F1;
-  background-image: -moz-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  background-image: -webkit-linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
+  border: 0;
+  background-image: linear-gradient(to top,#f7f7f7 0,#f5f5f5 100%);
+  background: hsla(0, 0%, 93%, 0.5);
+  box-shadow: 1px 2px 4px #d0cfcf;
 }
 #accountCreationContentContainer[data-account='patient'] #bdGroup {
   min-height: 104px;
 }
 #accountCreationContentContainer[data-account='staff'] {
   #userOrgs {
-   margin-top: 0;
+   margin-top: 0.25em;
+  }
+  #emailGroup {
+    margin-top: 0.55em;
+  }
+  #bdGroup {
+    margin-bottom: 0.25em;
+    margin-top: 1.25em;
+  }
+  #altPhoneGroup {
+    margin-top: 0;
   }
 }
 
@@ -2292,8 +2456,23 @@ div.noOrg-container {
 #userSessionsListContainer TH {
   background-color: @rowBackgroundColor;
 }
-#sendRegistrationEmailForm label {
-  font-weight: normal;
+#sendRegistrationEmailForm {
+  label {
+    font-weight: normal;
+  }
+  .buttons-container {
+    position: relative;
+    .loading-indicator {
+      position: absolute;
+      top: 15%;
+      left: 5%;
+      display: none;
+      z-index: 5;
+    }
+  }
+  #profileEmailErrorMessage {
+    margin: 1em 0;
+  }
 }
 #userSessionReportDetailTable {
   margin-left: -1%;
@@ -3202,7 +3381,7 @@ div.timezone-warning.text-warning {
 
 
   .create-account-container {
-      padding: 3.5em 4em;
+      padding: 3em;
       overflow: auto;
   }
   #createProfileForm {
@@ -3318,12 +3497,16 @@ div.timezone-warning.text-warning {
     }
   }
   #topTerms {
+    position: relative;
     .terms-tick-box-text {
       margin-left: 0;
       width: 96.5%;
     }
     .terms-checkbox-container {
       margin-left: 1em;
+    }
+    .save-info {
+      left: 1em;
     }
   }
   #termsText {
@@ -3372,6 +3555,11 @@ div.timezone-warning.text-warning {
   }
   #aboutForm.full-size {
     max-width: 100%;
+    margin: 2em 0;
+    padding: 1em 0;
+    #next {
+      margin-left: 0;
+    }
   }
   #aboutForm .iq-container {
     margin-top: 5%;
@@ -3394,8 +3582,13 @@ div.timezone-warning.text-warning {
   }
   #createProfileForm {
     #emailGroup {
-      margin-top: 1em;
+      margin-top: 0.5em;
     }
+  }
+}
+#topTerms, #aboutForm {
+  .save-loader-wrapper {
+    display: none;
   }
 }
 @media (min-width: 1200px) {
@@ -3481,16 +3674,6 @@ div.timezone-warning.text-warning {
     width: 100%;
     height: 100%;
   }
-  #mainHolder.vertical-center {
-    display: table;
-    height:100%;
-    margin: 0 auto;
-    #mainDiv {
-      display: table-cell;
-      text-align: center; /* horizontal */
-      vertical-align: middle; /* vertical */
-    }
-  }
   #fullSizeBox {
     margin: 0 auto;
     max-width: 1400px;
@@ -3556,8 +3739,8 @@ div.timezone-warning.text-warning {
   line-height: 33px;
   color: @sectionTitleColor;
   position: relative;
-  padding: 0.6em 0 20px;
-  margin: 1.5em 0 25px;
+  padding: .6em 0 0.5em;
+  margin: 1.5em 0 8px;
   font-weight: bold;
 }
 

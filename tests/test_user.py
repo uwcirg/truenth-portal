@@ -9,6 +9,7 @@ import json
 import re
 import urllib
 import urllib.parse
+from werkzeug.exceptions import HTTPException
 
 from flask_webtest import SessionScope
 import pytest
@@ -78,7 +79,7 @@ class TestUser(TestCase):
         response = self.client.get(request)
         assert response.status_code == 200
         results = response.json
-        results['unique'] is True
+        assert results['unique'] is True
 
         # should still be unique if it's the current user's email
         # test also the case insensitive match on user's email
@@ -106,6 +107,22 @@ class TestUser(TestCase):
         assert response.status_code == 200
         results = response.json
         assert results['unique'] is True
+
+    def test_unique_email_when_more_than_one_match_exists(self):
+        self.login()
+
+        # If there are more than two emails that match
+        # we should see false
+        # This scenario should not happen, but when it does
+        # we should fail gracefully
+        email = 'example@gmail.com'
+        firstMatch = self.add_user(username='foo', email=email)
+        secondMatch = self.add_user(username='bar', email=email.upper())
+        response = self.client.get('/api/unique_email',
+                query_string={'email': email})
+        assert response.status_code == 200
+        results = response.json
+        assert results['unique'] is False
 
     def test_ethnicities(self):
         """Apply a few ethnicities via FHIR
@@ -1163,6 +1180,26 @@ class TestUser(TestCase):
             assert user.password == 'phoney'
             assert ({o.name for o in user.organizations}
                     == {o.name for o in orgs})
+
+    def test_promote_to_registered_fails_when_target_is_power_user(self):
+        with SessionScope(db):
+            self.test_user.password = None  # mock pre-registered user
+            self.test_user.birthdate = '02-05-1968'
+            self.promote_user(self.test_user, role_name=ROLE.WRITE_ONLY.value)
+            other = self.add_user('other@foo.com', first_name='newFirst',
+                                  last_name='Better')
+            other.password = 'phoney'
+            other.gender = 'male'
+            self.promote_user(user=other, role_name=ROLE.ADMIN.value)
+            self.shallow_org_tree()
+            orgs = Organization.query.limit(2)
+            self.test_user.organizations.append(orgs[0])
+            self.test_user.organizations.append(orgs[1])
+            db.session.commit()
+            user, other = map(db.session.merge, (self.test_user, other))
+            with self.assertRaises(HTTPException) as http_error:
+                user.promote_to_registered(other)
+                assert http_error.exception.code == 400
 
     def test_password_reset(self):
         self.promote_user(role_name=ROLE.ADMIN.value)

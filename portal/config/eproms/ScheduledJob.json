@@ -20,7 +20,7 @@
       "kwargs": null,
       "name": "Prepare ready communications",
       "resourceType": "ScheduledJob",
-      "schedule": "5,25,45 * * * *",
+      "schedule": "35 */2 * * *",
       "task": "prepare_communications"
     },
     {
@@ -30,7 +30,7 @@
       "kwargs": null,
       "name": "Send ready communications",
       "resourceType": "ScheduledJob",
-      "schedule": "15,35,55 * * * *",
+      "schedule": "55 */2 * * *",
       "task": "send_queued_communications"
     },
     {
@@ -53,7 +53,7 @@
       "kwargs": null,
       "name": "Update assessment status cache",
       "resourceType": "ScheduledJob",
-      "schedule": "3 * * * *",
+      "schedule": "5 */2 * * *",
       "task": "cache_assessment_status"
     },
     {
@@ -63,7 +63,8 @@
       "kwargs": null,
       "name": "Update reporting stats cache",
       "resourceType": "ScheduledJob",
-      "schedule": "57 * * * *",
+      "comment": "UTC times, desire 9 am & pm PTC",
+      "schedule": "0 4,16 * * *",
       "task": "cache_reporting_stats"
     },
     {

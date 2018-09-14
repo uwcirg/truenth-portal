@@ -1,5 +1,27 @@
+{% macro saveLoaderDiv(container_id="") -%}
+    <div class="load-container save-loader-wrapper">
+      <i id="{{container_id}}_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" aria-hidden="true"></i>
+      <i id="{{container_id}}_success" class="fa fa-check success-icon save-info" aria-hidden="true">{{_("Data Saved")}}</i>
+      <i id="{{container_id}}_error" class="fa fa-times error-icon save-info" aria-hidden="true">'{{_("Unable to Save Data. System error.")}}</i>
+    </div>
+{%- endmacro %}
+{% macro dataSavingIndicator() -%}
+    <div class="data-saving-indicator text-muted tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
+{%- endmacro %}
+{% macro sectionContent(sectionId="", title="", display="", config="") -%}
+    <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true" data-display="{{display}}" data-config="{{config}}">
+      <div class="content">
+          <div class="heading"><h3 class="tnth-headline">{{title}}</h3></div>
+          <div class="content-body">
+              {{ caller() }}
+          </div>
+      </div>
+      {{saveLoaderDiv(sectionId)}}
+      {{dataSavingIndicator()}}
+    </div>
+{%- endmacro %}
 {% macro tou(terms, user) -%}
-    <div id="topTerms" class="hide-terms">
+    <div id="topTerms" class="section-container hide-terms" data-display="{{_('terms')}}" data-config="website_terms_of_use,subject_website_consent,privacy_policy">
         <br/>
         <div class="terms-of-use-intro">
           <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
@@ -48,10 +70,9 @@
                 </label>
                 <label class="terms-label tnth-hide">
                   <i class="fa fa-square-o fa-lg terms-tick-box"></i>
-                  {% trans privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" %}
-                    <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and
-                      <a href="{{terms_url}}" class="required-link">terms</a>.</span>
-                  {% endtrans %}
+                  {% trans privacy_url="/privacy?disableLinks=true", terms_url="terms?disableLinks=true" -%}
+                    <span class="terms-tick-box-text">&nbsp;By checking this box, I confirm that I have read and accept the website <a href="{{privacy_url}}" class="required-link">privacy policy</a> and <a href="{{terms_url}}" class="required-link">terms</a>.</span>
+                  {%- endtrans %}
                   <input type="hidden"
                     data-agree="false"
                     data-type="terms"
@@ -66,8 +87,10 @@
                       data-url="{{tou_url}}"/>
                 </label>
               </div>
+              {{saveLoaderDiv("topTerms")}}
             </div>
             <br/>
+            {{dataSavingIndicator()}}
         </div>
         <div class="get-tou-error error-message"></div>
         <div class="post-tou-error error-message"></div>
@@ -99,7 +122,9 @@
     <hr/>
     <br/>
     <div>
-        <div id="termsText" class="well">{{ terms['asset']|safe if terms}}</div>
+        <div id="termsText" class="well">
+          {{ terms['asset']|safe if terms}}
+        </div>
     </div>
     <div id="termsCheckbox">
       <label class="custom-tou terms-label">
@@ -109,6 +134,7 @@
             </div>
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
+      {{dataSavingIndicator()}}
     </div>
     <div class="get-tou-error error-message"></div>
     <div class="post-tou-error error-message"></div>
@@ -180,6 +206,7 @@
           </div>
           <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
+        {{dataSavingIndicator()}}
       </div>
       <div class="get-tou-error error-message hidden-print"></div>
       <div class="post-tou-error error-message hidden-print"></div>
@@ -202,7 +229,6 @@
         </div>
     </div>
   {%- endmacro %}
-
   {% macro rolesGroup() -%}
       <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist">
           <div class="radio">
@@ -216,6 +242,7 @@
             </label>
           </div>
       </div>
+      {{saveLoaderDiv("rolesGroup")}}
       <div class="get-roles-error error-message"></div>
       <div class="put-roles-error error-message"></div>
   {%- endmacro %}
@@ -249,8 +276,8 @@
                 <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" aria-label="Birth year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-trigger-event="change" data-error="{{_('The birth year is required and must be in valid format')}}" v-model="demo.data.birthYear" lazy required />
               </div>
             </div>
-            <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>
-            <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
+            <div class="help-block with-errors"></div>
+            <span id="errorbirthday" class="help-block tnth-hide custom-error"></span>
         </div>
       </div>
   {%- endmacro %}
@@ -368,6 +395,7 @@
             </div>
           </div>
         </div>
+        {{saveLoaderDiv("patientQ")}}
         <br/>
         <div class="get-clinical-error error-message"></div>
         <div class="put-clinical-error error-message"></div>
@@ -375,7 +403,7 @@
       </div>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
-    <div id="clinics">
+    <div id="clinics" data-profile-section-id="orgs">
       <p class="subtitle">{{ _("What is your main clinic for prostate cancer care?") }}</p>
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
@@ -384,6 +412,7 @@
         </div>
       </div>
       {{consent_fields(consent_agreements)}}
+      {{saveLoaderDiv("clinics")}}
       <div class="get-orgs-error error-message"></div>
     </div>
   {%- endmacro %}

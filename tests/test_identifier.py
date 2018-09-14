@@ -39,3 +39,9 @@ class TestIdentifier(TestCase):
         assert len(response.json['identifier']) == expected
         user = User.query.get(TEST_USER_ID)
         assert len(user.identifiers) == expected
+
+    def test_unicode_value(self):
+        ex = Identifier(system='http://nonsense.com', value='ascii')
+        unicode_string = '__invite__justin.emcee\xb1jm050417C@gmail.com'
+        ex.value = unicode_string
+        assert ex.value == unicode_string
