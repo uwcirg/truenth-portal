@@ -1908,8 +1908,8 @@ var tnthDates = {
         var sessionKey = this.localeSessionKey;
         var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
-        if (sessionLocale) {
-            return sessionLocale;
+        if ($("#userSessionLocale").val()) {
+            return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authenication, cannot set sessionStorage here as it will be incorrect
         }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
@@ -2088,9 +2088,7 @@ var Global = {
                 if (!data.error) {
                     copyright_year = data.COPYRIGHT_YEAR;
                 }
-            });
-
-            var getContent = function(cc, copyright_year) {
+                var getContent = function(cc, copyright_year) { //need to set this on callback as the call is asynchronous - otherwise the copyright value can be set before config value is returned
                 var content = "";
                 switch (String(cc.toUpperCase())) {
                 case "EN_US":
@@ -2104,12 +2102,11 @@ var Global = {
                     break;
                 default:
                     content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
-
                 }
                 return content;
-
-            };
-            footerElements.html(getContent(userLocale, copyright_year));
+                };
+                footerElements.html(getContent(userLocale, copyright_year));
+            });
         }, 500);
     },
     "getNotification": function(callback) {
@@ -2269,7 +2266,7 @@ var Global = {
                                 $("#erroremail").html("").parents(".form-group").removeClass("has-error");
                                 update($el);
                                 return;
-                            } 
+                            }
                             $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                         });
                     }
