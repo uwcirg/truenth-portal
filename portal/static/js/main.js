@@ -2088,16 +2088,17 @@ var Global = {
                 if (!data.error) {
                     copyright_year = data.COPYRIGHT_YEAR;
                 }
-                var getContent = function(cc, copyright_year) { //need to set this on callback as the call is asynchronous - otherwise the copyright value can be set before config value is returned
+                var getContent = function(country_code, copyright_year) {
+                //need to set this on callback as the call is asynchronous - otherwise the copyright value can be set before config value is returned
                 var content = "";
-                switch (String(cc.toUpperCase())) {
-                case "EN_US":
+                switch (String(country_code.toUpperCase())) {
+                case "US":
                     content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).").replace("{year}", copyright_year);
                     break;
-                case "EN_AU":
+                case "AU":
                     content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
-                case "EN_NZ":
+                case "NZ":
                     content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
                 default:
@@ -2105,7 +2106,22 @@ var Global = {
                 }
                 return content;
                 };
-                footerElements.html(getContent(userLocale, copyright_year));
+                // todo: properly decouple country/locale
+                country_code = userLocale.split("_")[1];
+
+                // shortcut - infer country from locale if locale isn't default (en_us)
+                if (userLocale.toUpperCase() != 'EN_US'){
+                    footerElements.html(getContent(country_code, copyright_year));
+                } else {
+                    $.getJSON("//geoip.cirg.washington.edu/json/", function(data) {
+                        //country code Australia AU New Zealand NZ USA US
+                        if (data && data.country_code) {
+                            footerElements.html(getContent(data.country_code, copyright_year));
+                        } else {
+                            footerElements.html(getContent(country_code, copyright_year));
+                        }
+                    });
+                }
             });
         }, 500);
     },
