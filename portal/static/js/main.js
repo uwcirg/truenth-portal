@@ -2101,6 +2101,7 @@ var Global = {
                 case "NZ":
                     content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).").replace("{year}", copyright_year);
                     break;
+                case "CA":
                 default:
                     content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
                 }
