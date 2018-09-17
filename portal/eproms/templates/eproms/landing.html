@@ -1,26 +1,70 @@
 {% extends "eproms/base.html" %}
-{% block main %}
-<style>
-    #tnthNavWrapper {
-        display: none;
-    }
-    #mainDiv {
-        background: none;
-    }
-    .watermark {
-        display: none;
-    }
-    #timeOutMessageContainer {
-        margin: 1em auto;
-        padding: 0.5em 1em;
-        font-weight: bold;
-        background-color: #ddd;
-        color:#a94442;
-        border-radius: 4px;
-        width: 400px;
-        max-width: 100%
-    }
-</style>
+{% block main_class %}class="landing"{% endblock %}
+{%- block body -%}
+{%- from "flask_user/_macros.html" import linksHTML -%}
+{% if config.SYSTEM_TYPE.upper() != "PRODUCTION" %}
+<div class='watermark-nowrapper'>TRUE<sup>NTH</sup> - <span>{{_("%(env)s version - Not for study or clinical use", env=config.SYSTEM_TYPE.upper())}}</span></div>
+{% endif %}
+<div id="loadingIndicator" class="loading-indicator">Loading...</div>
+<main id="mainHolder" class="main">
+    <header>
+        <div class="logo-container">
+            <a href="/"><img src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="{{_('TrueNTH Logo')}}" /></a>
+        </div>
+    </header>
+    <section class="message-section">
+        {% if config.MAINTENANCE_MESSAGE -%}
+            <div class="sys-maintenance">
+                <img src="{{ url_for('static', filename='img/logo_wordmark_topnav.png') }}" alt="{{_('TrueNTH Logo')}}" width="100px" />
+                <div class="message-container">
+                    <p class="title">{{_("Please note")}}</p>
+                    <p class="message">{{config.MAINTENANCE_MESSAGE | safe}}</p>
+                </div>
+            </div>
+        {%- endif %}
+    </section>
+    <section class="image"></section>
+    <section class="login">
+        <form action="{{url_for('user.login')}}" method="POST" class="form tnth-form to-validate" role="form" data-toggle="validator">
+            <div class="headline">{{ app_text('landing title') }}</div>
+            <div class="inputs-container">
+                <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="fields-container">
+                    <div class="input-field-container">
+                        <div class="email-container">
+                            <label class="input-label">{{_("log in")}}</label>
+                            <input class="field" id="email" name="email" autocomplete="off" readonly type="text" placeholder="{{_('Email Address')}}" required>
+                        </div>
+                    </div>
+                    <div class="input-field-container">
+                        <input class="field" id="password" autocomplete="false" name="password" type="password" placeholder="{{_('Password')}}" required>
+                    </div>
+                    <div class="submit-field-container">
+                        <input id="btnLogin" class="btn btn-tnth-primary" type="submit" value="Log In" disabled="disabled" class="disabled">
+                        <a href="{{url_for('user.forgot_password')}}" class="link"><span class="muted">{{_("Having trouble logging in?")}}</span></a>
+                    </div>
+                    {% if timed_out %}
+                        <div id="timeOutMessageContainer">
+                            {{_("You have been logged out due to inactivity. Please log in again to continue.")}}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+        <div class="footer">{{linksHTML()}}</div>
+    </section>
+</main>
+<footer>
+    <picture>
+        <!--
+        <source media="(min-width: 992px)" srcset="{{url_for('static', filename='img/Movember-Footer-Logo.png')}}">
+        <source srcset="{{url_for('static', filename='img/movember_logo.jpg') }}">
+        -->
+        <img class="logo-footer desktop" src="{{url_for('static', filename='img/Movember-Footer-Logo.png')}}" alt="{{_('TrueNTH Footer Logo')}}"/>
+        <img class="logo-footer mobile" src="{{url_for('static', filename='img/movember_logo.jpg') }}" alt="{{_('TrueNTH Footer Logo')}}"/>
+    </picture>
+</footer>
+<!--
 <div id="fullSizeBox" class="box-min-500">
     <img  src="{{ url_for('.static', filename='img/spacer.jpg') }}" class="tnth-image img-responsive hidden-xs" style="visibility:hidden" alt="spacer image"/>
     <div id="fullSizeContainer">
@@ -52,18 +96,10 @@
             </div>
         </div>
     </div>
-
 </div>
+-->
+{% endblock %}
+{% block footer %}<!--empty-->{% endblock %}
+{% block additional_scripts %}<script src="{{ url_for('.static', filename='js/landing.js') }}"></script>{% endblock %}
 
-{% endblock %}
-{% block document_ready %}
-    $("document").ready(function() {
-        $("#fullSizeBox").closest("div.col-lg-12").css("padding", "0");
-        if (typeof sessionStorage != "undefined") sessionStorage.clear();
-    });
-    (function() {
-        var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
-        if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark-nowrapper").length == 0)) $("<div class='watermark-nowrapper'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
-    }) ();
-{% endblock %}
 

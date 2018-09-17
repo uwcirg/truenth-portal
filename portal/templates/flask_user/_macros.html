@@ -106,7 +106,7 @@
 </div>
 {%- endmacro %}
 {% macro linksHTML(user)-%}
-    <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a>{%- if user -%}&nbsp;| <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a>{%- endif -%}{% if user or config.SHOW_PUBLIC_TERMS %}&nbsp;| <a href="{{PORTAL}}/terms">{{ _("Terms") }}</a></small></p>{%- endif -%}
+    <p><small class="links"><a href="{{PORTAL}}/about">{{_("About")}}</a> | <a href="{{PORTAL}}/contact">{{_("Contact")}}</a>{%- if user -%}&nbsp;| <a href="{{PORTAL}}/privacy">{{_("Privacy")}}</a>{%- endif -%}{% if user or config.SHOW_PUBLIC_TERMS %}&nbsp;| <a href="{{PORTAL}}/terms">{{_("Terms")}}</a></small></p>{%- endif -%}
     <p><small class="copyright text-muted">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</small></p>
 {%- endmacro %}
 {% macro logo(white_theme=False) -%}
