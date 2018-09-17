@@ -124,6 +124,22 @@ class TestUser(TestCase):
         results = response.json
         assert results['unique'] is False
 
+    def test_unique_email_with_dashes_replaced_by_underscores(self):
+        self.login()
+
+        # Emails with dashes are found when searching for
+        # the same email replaced with underscores
+        # These are diferent emails so no results should be found
+        # https://jira.movember.com/browse/TN-1472?filter=-1
+        email = 'example-@gmail.com'
+        email_with_underscore = email.replace('-', '_')
+        self.add_user(username='foo', email=email)
+        response = self.client.get('/api/unique_email',
+                query_string={'email': email_with_underscore})
+        assert response.status_code == 200
+        results = response.json
+        assert results['unique'] is True
+
     def test_ethnicities(self):
         """Apply a few ethnicities via FHIR
 
