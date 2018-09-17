@@ -134,8 +134,11 @@ class TestUser(TestCase):
         email = 'example-@gmail.com'
         email_with_underscore = email.replace('-', '_')
         self.add_user(username='foo', email=email)
-        response = self.client.get('/api/unique_email',
-                query_string={'email': email_with_underscore})
+        response = self.client.get
+        (
+            '/api/unique_email',
+            query_string={'email': email_with_underscore}
+        )
         assert response.status_code == 200
         results = response.json
         assert results['unique'] is True
