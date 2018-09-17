@@ -9,14 +9,15 @@ $("document").ready(function() {
         sessionStorage.clear();
     }
     $("#email").on("focus", function() {
-    	$(this).removeAttr("readonly");
+        $(this).removeAttr("readonly");
     });
 
     $("#email, #password").on("change", function() {
-    	if ($(this).val()) {
-    		$("#btnLogin").attr("disabled", false).removeClass("disabled");
-    		return;
-    	}
-    	$("#btnLogin").attr("disabled", true).addClass("disabled");
+        if ($(this).val()) {
+            $("#btnLogin").attr("disabled", false).removeClass("disabled");
+            return;
+        }
+        $("#btnLogin").attr("disabled", true).addClass("disabled");
     });
 });
+
