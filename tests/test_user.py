@@ -118,8 +118,11 @@ class TestUser(TestCase):
         email = 'example@gmail.com'
         firstMatch = self.add_user(username='foo', email=email)
         secondMatch = self.add_user(username='bar', email=email.upper())
-        response = self.client.get('/api/unique_email',
-                query_string={'email': email})
+        response = self.client.get
+        (
+            '/api/unique_email',
+            query_string={'email': email}
+        )
         assert response.status_code == 200
         results = response.json
         assert results['unique'] is False
