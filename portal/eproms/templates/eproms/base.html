@@ -29,75 +29,77 @@
 {%- if wide_container and wide_container=="true" -%}
     {%- set wideContainer = true -%}
 {%- endif -%}
-<body>
-    <div id="loadingIndicator" class="loading-indicator">Loading...</div>
-    {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
-    <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
-        <div id="mainNavLoadingError"></div>
-    </div>
-    <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
-      <div id="mainDiv">
-          <div class="container{% if splashView %}-fluid{% endif %}">
-            <div class="row">
-                <div class="col-xs-12 {% if not wideContainer %}col-lg-12{% endif %}">
-                    <!--[if lt IE 10]>
-                      <div class="error-message text-center" style="background: #FFF; padding: 10px;"><h2>{{_("You are using an outdated browser. Please upgrade your browser to improve your experience.")}}</h2></div>
-                    <!--<![endif]-->
-                    {% block main -%}
-                    {%- endblock %}
+<body {% block main_class -%}{%- endblock %}>
+    {%- block body -%}
+        <div id="loadingIndicator" class="loading-indicator">{{_("Loading...")}}</div>
+        {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
+        <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
+            <div id="mainNavLoadingError"></div>
+        </div>
+        <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
+          <div id="mainDiv">
+              <div class="container{% if splashView %}-fluid{% endif %}">
+                <div class="row">
+                    <div class="col-xs-12 {% if not wideContainer %}col-lg-12{% endif %}">
+                        <!--[if lt IE 10]>
+                          <div class="error-message text-center" style="background: #FFF; padding: 10px;"><h2>{{_("You are using an outdated browser. Please upgrade your browser to improve your experience.")}}</h2></div>
+                        <!--<![endif]-->
+                        {% block main -%}
+                        {%- endblock %}
+                    </div>
                 </div>
-            </div>
-          </div>
-        {% block footer -%}
-            {%- from "flask_user/_macros.html" import footer -%}
-            {%- if splashView -%}
-                {{ footer(splash_style=true) }}
-            {%- else -%}
-                {{ footer() }}
-            {%- endif -%}
-        {%- endblock -%}
-      </div> {# <!-- <div id="mainDiv"> --> #}
-    </div> {# <!-- <div id="mainHolder"> --> #}
+              </div>
+            {% block footer -%}
+                {%- from "flask_user/_macros.html" import footer -%}
+                {%- if splashView -%}
+                    {{ footer(splash_style=true) }}
+                {%- else -%}
+                    {{ footer() }}
+                {%- endif -%}
+            {%- endblock -%}
+          </div> {# <!-- <div id="mainDiv"> --> #}
+        </div> {# <!-- <div id="mainHolder"> --> #}
 
-    {# One-time system messages called Flash messages #}
-    {% block flash_messages %}
-        {%- with messages = get_flashed_messages(with_categories=true) -%}
-            {% if messages %}
-                {# Hack to prevent modal if it's only successful login #}
-                {% set showMessages = true %}
-                {% if messages|first|last == "You have signed in successfully." %}
-                    {% set showMessages = false %}
-                {% endif %}
-                {% if showMessages %}
-                    {# Modal dialog for alerts #}
-                    <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}"><span aria-hidden="true">&times;</span></button>
-                            <h2 class="modal-title">{{ _("TrueNTH") }}</h2>
-                          </div>
-                          <div class="modal-body">
-                            {% for category, message in messages -%}
-                                {% if category=='error' %}
-                                    {% set category='danger' %}
-                                {% endif %}
-                                <p class="text-{{category}}">{{ message|safe }}</p>
-                            {%- endfor %}
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Close") }}</button>
+        {# One-time system messages called Flash messages #}
+        {% block flash_messages %}
+            {%- with messages = get_flashed_messages(with_categories=true) -%}
+                {% if messages %}
+                    {# Hack to prevent modal if it's only successful login #}
+                    {% set showMessages = true %}
+                    {% if messages|first|last == "You have signed in successfully." %}
+                        {% set showMessages = false %}
+                    {% endif %}
+                    {% if showMessages %}
+                        {# Modal dialog for alerts #}
+                        <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}"><span aria-hidden="true">&times;</span></button>
+                                <h2 class="modal-title">{{ _("TrueNTH") }}</h2>
+                              </div>
+                              <div class="modal-body">
+                                {% for category, message in messages -%}
+                                    {% if category=='error' %}
+                                        {% set category='danger' %}
+                                    {% endif %}
+                                    <p class="text-{{category}}">{{ message|safe }}</p>
+                                {%- endfor %}
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Close") }}</button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    {# Modal dialog opens on page load because we went to display alert(s) #}
+                        {# Modal dialog opens on page load because we went to display alert(s) #}
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        {%- endwith %}
-    {% endblock %}
-    <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
-    <input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
+            {%- endwith %}
+        {% endblock %}
+    {%- endblock -%}
+<input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
+<input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
