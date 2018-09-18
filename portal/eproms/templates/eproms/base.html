@@ -31,7 +31,7 @@
 {%- endif -%}
 <body {% block main_class -%}{%- endblock %}>
     {%- block body -%}
-        <div id="loadingIndicator" class="loading-indicator">Loading...</div>
+        <div id="loadingIndicator" class="loading-indicator">{{_("Loading...")}}</div>
         {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
         <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
             <div id="mainNavLoadingError"></div>
