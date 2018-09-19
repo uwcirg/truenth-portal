@@ -8,10 +8,9 @@ $("document").ready(function() {
     if (typeof sessionStorage !== "undefined") {
         sessionStorage.clear();
     }
-    $("#email").on("focus", function() {
+    $("#email").on("focus touchstart", function() {
         $(this).removeAttr("readonly");
     });
-
     $("#email, #password").on("change", function() {
         if ($(this).val()) {
             $("#btnLogin").attr("disabled", false).removeClass("disabled");

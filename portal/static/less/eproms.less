@@ -46,6 +46,8 @@
 @mobileSmallSize:      0.7777em;
 @formSize:        16px;
 
+@jumboInputHeight: 48px;
+
 /**
  * = Colors =
  **/
@@ -432,7 +434,7 @@ body.landing {
       width: 100%;
       font-weight: 500;
       text-align: center;
-      letter-spacing: 0.02rem;
+      letter-spacing: 0.1rem;
       margin: 0.55em auto 0.25em;
       color: @headlineColor;
       padding: 0.5em 0.75em;
@@ -531,13 +533,13 @@ body.landing {
     display: none;
   }
   #timeOutMessageContainer {
-    margin: 1em auto;
-    padding: 0.5em 1em;
-    font-weight: bold;
+    margin: 0.5em auto 1.5em;
+    padding: 0 1em;
+    font-weight: 600;
     color:#a94442;
-    width: 95%;
     max-width: 100%;
     text-align: center;
+    letter-spacing: 0.01rem;
   }
 }
 @media (min-width: 520px) {
@@ -568,14 +570,6 @@ body.landing {
     }
   }
 }
-/*
-@media (min-width: 735px) {
-  body.landing {
-    .login {
-      width: 55vw;
-    }
-  }
-}*/
 @media (min-width: 992px) {
   body.landing {
     img.mobile {
@@ -631,8 +625,12 @@ body.landing {
       .inputs-container {
         .input-field-container,
         .submit-field-container {
-          input {
+          input,
+          .input-label {
             width: 375px;
+          }
+          .input-label {
+            margin: auto;
           }
         }
       }
@@ -653,6 +651,10 @@ body.landing {
         right: auto;
       }
     }
+    #timeOutMessageContainer {
+      width: 82.5%;
+      text-align: left;
+    }
   }
 }
 @media (min-width: 1200px) {
@@ -665,11 +667,23 @@ body.landing {
 @media (min-width: 1650px) {
   body.landing {
     .login {
+      .inputs-container {
+        .input-label {
+          margin-left: 5em;
+        }
+      }
       .footer {
         left: 3.5em;
         right: 3.5em
       }
     }
+  }
+}
+#forgetPasswordForm {
+  min-height: 35vh;
+  #email {
+    height: @jumboInputHeight;
+    width: 325px;
   }
 }
 #socialMediaRegistrationContainer .btn-social,
@@ -695,10 +709,9 @@ body.landing {
 }
 #regForm input,
 #loginForm input {
-  background: #f1f0ef;
-  height: 44px;
+  background: @wellColor;
+  height: @jumboInputHeight;
   padding: 5px;
-  border: 1px solid #f1f0ef;
   border-radius: 0;
   width: 350px;
   max-width: 100%;
@@ -743,6 +756,9 @@ body.landing {
   .btn-social-container {
     position: relative;
     min-height: 45vh;
+    a {
+      text-decoration: underline;
+    }
   }
   #homeFooter {
     display: block;
@@ -775,14 +791,13 @@ body.landing {
   #loginForm {
     position: relative;
     overflow: hidden;
-    padding-top: 10.5vh;
-    padding-bottom: 1em;
+    padding: 10vh 0;
   }
 }
 @media (min-width: 992px) {
   .login-form {
     #loginForm {
-      padding: 6vh 0 1em;
+      padding: 7vh 0;
     }
   }
 }
