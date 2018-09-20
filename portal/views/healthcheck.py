@@ -1,6 +1,5 @@
-from celery.task.control import inspect
+from datetime import datetime, timedelta
 from flask import current_app
-import json
 import redis
 from redis import ConnectionError
 from sqlalchemy import text
@@ -15,8 +14,18 @@ def celery_available():
         current_app.logger.error('Unable to connect to celery. Error {}'.format(e))
         return False, 'Celery is not available'
 
-def celery_beat_queuing_jobs():
-    return True, 'Celery beat is queuing jobs'
+def celery_beat_available():
+    return True, 'Celery beat is available'
+    threshold = timedelta(
+        seconds=current_app.config['CELERY_BEAT_HEALTH_CHECK_INTERVAL_SECONDS']
+    )
+    # last_celery_beat_health_check = ???
+    time_since_last_beat = \
+        datetime.now() - last_celery_beat_health_check
+
+    if time_since_last_beat > threshold:
+        return False, "Celery beat is not running jobs"
+    return True, 'Celery beat is available'
 
 def postgresql_available():
     try:
@@ -37,7 +46,8 @@ def redis_available():
 
 HEALTH_CHECKS = [
     celery_available,
-    celery_beat_queuing_jobs,
+    celery_beat_available,
     postgresql_available,
     redis_available,
 ]
+

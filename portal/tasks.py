@@ -375,3 +375,9 @@ def token_watchdog(**kwargs):
     if error_emails:
         return '\nUnable to reach recipient(s): {}'.format(
             ', '.join(error_emails))
+
+@celery.task
+def celery_beat_health_check():
+    """Checking this task allows us to monitor celery beat"""
+    logger.debug('Celery beat check')
+    pass
