@@ -33,14 +33,14 @@
                     <div class="input-field-container">
                         <div class="email-container">
                             <label class="input-label">{{_("log in")}}</label>
-                            <input class="field" id="email" name="email" autocomplete="off" readonly type="text" placeholder="{{_('Email Address')}}" required>
+                            <input class="field" id="email" name="email" type="text" placeholder="{{_('Email Address')}}" required>
                         </div>
                     </div>
                     <div class="input-field-container">
                         <input class="field" id="password" autocomplete="false" name="password" type="password" placeholder="{{_('Password')}}" required>
                     </div>
                     <div class="submit-field-container">
-                        <input id="btnLogin" class="btn btn-tnth-primary" type="submit" value="Log In" disabled="disabled" class="disabled">
+                        <input id="btnLogin" class="btn btn-tnth-primary" type="submit" value="Log In">
                         <a href="{{url_for('user.forgot_password')}}" class="link"><span class="muted">{{_("Having trouble logging in?")}}</span></a>
                     </div>
                     {% if timed_out %}
