@@ -20,7 +20,7 @@ def celery_beat_queuing_jobs():
 
 def postgresql_available():
     try:
-        db.session.query('1').from_statement(text('SELECT 1 as is_alive')).all()
+        db.engine.execute(text('SELECT 1'))
         return True, 'PostgreSQL is available'
     except Exception as e:
         current_app.logger.error('sql alchemy not connected to postgreSQL. Error: {}'.format(e))
