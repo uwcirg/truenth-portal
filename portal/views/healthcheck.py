@@ -3,15 +3,20 @@ from flask import current_app
 import redis
 from redis import ConnectionError
 from sqlalchemy import text
+from subprocess import call
 
 from ..database import db
 
 def celery_available():
-    try:
-        #inspect().ping()
+    code = call([
+        'celery',
+        '-A', 'portal.celery_worker.celery',
+        'inspect', 'ping'
+    ])
+    if code == 0:
         return True, 'Celery is available.'
-    except IOError as e:
-        current_app.logger.error('Unable to connect to celery. Error {}'.format(e))
+    else:
+        current_app.logger.error('Unable to connect to celery.')
         return False, 'Celery is not available'
 
 def celery_beat_available():
