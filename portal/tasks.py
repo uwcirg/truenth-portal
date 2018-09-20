@@ -17,6 +17,7 @@ from traceback import format_exc
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
 from flask import current_app
+import requests
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
@@ -379,5 +380,5 @@ def token_watchdog(**kwargs):
 @celery.task
 def celery_beat_health_check():
     """Checking this task allows us to monitor celery beat"""
-    logger.debug('Celery beat check')
-    pass
+    return requests.get('http://localhost:5000/celery_beat_ping').text
+

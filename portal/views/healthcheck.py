@@ -1,11 +1,31 @@
 from datetime import datetime, timedelta
-from flask import current_app
+from flask import Blueprint, current_app
 import redis
 from redis import ConnectionError
 from sqlalchemy import text
 from subprocess import call
 
 from ..database import db
+
+
+healthcheck_blueprint = Blueprint('healthcheck', __name__)
+last_celery_beat_health_check = datetime.now()
+
+@healthcheck_blueprint.route('/celery_beat_ping')
+def celery_beat_ping():
+    """Periodically called by a celery beat task
+    
+    Updates the last time we recieved a call to this API.
+    This allows us to monitor whether celery beat tasks are running
+    """
+    global last_celery_beat_health_check
+    last_celery_beat_health_check = datetime.now()
+    return 'PONG'
+
+
+##############################
+# Healthcheck functions below
+##############################
 
 def celery_available():
     code = call([
@@ -20,17 +40,17 @@ def celery_available():
         return False, 'Celery is not available'
 
 def celery_beat_available():
-    return True, 'Celery beat is available'
-    threshold = timedelta(
-        seconds=current_app.config['CELERY_BEAT_HEALTH_CHECK_INTERVAL_SECONDS']
-    )
-    # last_celery_beat_health_check = ???
-    time_since_last_beat = \
-        datetime.now() - last_celery_beat_health_check
+    if last_celery_beat_health_check:
+        threshold = timedelta(
+            seconds=current_app.config['CELERY_BEAT_HEALTH_CHECK_INTERVAL_SECONDS'] * 2
+        )
+        time_since_last_beat = \
+            datetime.now() - last_celery_beat_health_check
 
-    if time_since_last_beat > threshold:
-        return False, "Celery beat is not running jobs"
-    return True, 'Celery beat is available'
+        if time_since_last_beat <= threshold:
+            return True, 'Celery beat is available. Last check: {}'.format(last_celery_beat_health_check)
+    
+    return False, "Celery beat is not running jobs. Last check: {}".format(last_celery_beat_health_check)
 
 def postgresql_available():
     try:
@@ -55,4 +75,3 @@ HEALTH_CHECKS = [
     postgresql_available,
     redis_available,
 ]
-

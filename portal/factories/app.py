@@ -52,7 +52,7 @@ from ..views.extend_flask_user import (
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
-from ..views.healthcheck import HEALTH_CHECKS
+from ..views.healthcheck import healthcheck_blueprint, HEALTH_CHECKS
 from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
@@ -85,6 +85,7 @@ DEFAULT_BLUEPRINTS = (
     filters_blueprint,
     google_blueprint,
     group_api,
+    healthcheck_blueprint,
     identifier_api,
     intervention_api,
     notification_api,
