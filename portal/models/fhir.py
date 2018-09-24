@@ -389,6 +389,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         to list of patients the current_user has permission to see
 
     """
+    from .questionnaire_bank import QuestionnaireBank, visit_name
+
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = OrgTree().visible_patients(current_user)
 
@@ -424,6 +426,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
                 Reference.organization(org.id).as_fhir()
                 for org in subject.organizations
             ]
+
+        # To lookup the time point, obtain the qbd holding both the qb
+        # and iteration to which the document applies
+
+        qbd = QuestionnaireBank.most_current_qb(
+            subject, as_of_date=encounter.start_time)
+        questionnaire_response.document["timepoint"] = visit_name(qbd)
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
@@ -595,6 +604,7 @@ def generate_qnr_csv(qnr_bundle):
         'author_role',
         'entry_method',
         'authored',
+        'timepoint',
         'instrument',
         'question_code',
         'answer_code',
@@ -619,6 +629,7 @@ def generate_qnr_csv(qnr_bundle):
                 system=TRUENTH_EXTERNAL_STUDY_SYSTEM
             ),
             'authored': qnr['authored'],
+            'timepoint': qnr['timepoint'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
         row_data.update({
