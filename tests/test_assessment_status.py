@@ -60,8 +60,11 @@ def mock_qr(
         db.session.add(enc)
         db.session.commit()
     enc = db.session.merge(enc)
-    qb = qb or QuestionnaireBank.most_current_qb(get_user(TEST_USER_ID),
-                                                 timestamp).questionnaire_bank
+    if not qb:
+        qbd = QuestionnaireBank.most_current_qb(
+            get_user(TEST_USER_ID), timestamp)
+        qb, iteration = qbd.questionnaire_bank, qbd.iteration
+
     qr = QuestionnaireResponse(
         subject_id=TEST_USER_ID,
         status=status,
