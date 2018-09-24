@@ -331,7 +331,8 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         self.promote_user(role_name=ROLE.PATIENT.value)
         instrument_id = 'eortc'
         for months_back in range(0, 10, 3):
-            backdate, _ = associative_backdate(now=now, backdate=relativedelta(months=months_back))
+            backdate, _ = associative_backdate(
+                now=now, backdate=relativedelta(months=months_back))
             mock_qr(instrument_id=instrument_id, timestamp=backdate)
 
         # add staff user w/ same org association for bundle creation
@@ -341,7 +342,8 @@ class TestAggregateResponses(TestQuestionnaireSetup):
                 Organization.name == 'metastatic').one())
         self.promote_user(staff, role_name=ROLE.STAFF.value)
         staff = db.session.merge(staff)
-        bundle = aggregate_responses(instrument_ids=[instrument_id,], current_user=staff)
+        bundle = aggregate_responses(
+            instrument_ids=[instrument_id], current_user=staff)
         expected = {'Baseline', 'Month 3', 'Month 6', 'Month 9'}
         found = [i['timepoint'] for i in bundle['entry']]
         assert set(found) == expected
