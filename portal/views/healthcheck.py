@@ -15,13 +15,29 @@ last_celery_beat_ping = None
 @healthcheck_blueprint.route('/celery_beat_ping')
 def celery_beat_ping():
     """Periodically called by a celery beat task
-    
+
     Updates the last time we recieved a call to this API.
     This allows us to monitor whether celery beat tasks are running
     """
     global last_celery_beat_ping
     last_celery_beat_ping = datetime.now()
     return 'PONG'
+
+def celery_beat_threshold():
+    # The interval celery beat pings the celery_beat_ping API
+    ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL_SECONDS']
+
+    # The number of times we can miss a ping before we fail
+    missed_beats_before_fail = \
+            current_app.config['CELERY_BEAT_MISSED_PINGS_BEFORE_FAIL']
+
+    # The maximum amount of time we can go
+    # without a ping and still succeed
+    threshold = timedelta(
+        seconds=(ping_interval * missed_beats_before_fail)
+    )
+
+    return threshold
 
 
 ##############################
@@ -48,24 +64,12 @@ def celery_available():
 
 def celery_beat_available():
     if last_celery_beat_ping:
-        # The interval celery beat pings the celery_beat_ping API
-        ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL_SECONDS']
-
-        # The number of times we can miss a ping before we fail
-        missed_beats_before_fail = \
-            current_app.config['CELERY_BEAT_MISSED_PINGS_BEFORE_FAIL']
-
-        # The maximum amount of time we can go
-        # without a ping and still succeed
-        threshold = timedelta(
-            seconds=(ping_interval * missed_beats_before_fail)
-        )
         time_since_last_beat = \
             datetime.now() - last_celery_beat_ping
 
-        if time_since_last_beat <= threshold:
+        if time_since_last_beat <= celery_beat_threshold():
             return True, 'Celery beat is available. Last check: {}'.format(last_celery_beat_ping)
-    
+
     return False, "Celery beat is not running jobs. Last check: {}".format(last_celery_beat_ping)
 
 def postgresql_available():
