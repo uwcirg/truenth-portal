@@ -7,7 +7,7 @@ services:
     environment:
       # Number of worker processes for handling requests
       # http://docs.gunicorn.org/en/stable/settings.html#workers
-      WEB_CONCURRENCY: 8
+      WEB_CONCURRENCY: 4
 
   celeryworker:
     restart: unless-stopped
