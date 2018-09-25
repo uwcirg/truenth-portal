@@ -330,7 +330,7 @@
                 }
             },
             setDisableFields: function(params) {
-                if (!this.currentUserId || this.isAdmin() || !this.isPatient()) {
+                if (!this.currentUserId || this.isAdmin() || !this.isSubjectPatient()) {
                     return false;
                 }
                 var self = this;
@@ -494,7 +494,7 @@
             isAdmin: function() {
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
-            isPatient: function() {
+            isSubjectPatient: function() {
                 if (this.mode === "createPatientAccount" || $("#profileMainContent").hasClass("patient-view")) {
                     return true;
                 }
@@ -2033,7 +2033,7 @@
                 });
             },
             handlePcaLocalized: function() {
-                if (!this.subjectId || !this.isPatient()) {
+                if (!this.subjectId || !this.isSubjectPatient()) {
                     return false;
                 }
                 var parentOrg = this.orgTool.getSelectedOrgTopLevelParentOrg();
@@ -2499,7 +2499,7 @@
             },
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
-                return this.isConsentStatusEditable(item) && this.isPatient() && this.isStaff();
+                return this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff();
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
