@@ -23,7 +23,7 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .lazy import lazyprop
 from .locale import LocaleConstants
-from .organization import OrgTree
+from .organization import Organization, OrgTree
 from .performer import Performer
 from .reference import Reference
 
@@ -410,7 +410,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             or_(*instrument_filters))
 
     patient_fields = ("careProvider", "identifier")
-
+    system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
@@ -422,10 +422,16 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         }
 
         if subject.organizations:
-            questionnaire_response.document["subject"]["careProvider"] = [
-                Reference.organization(org.id).as_fhir()
-                for org in subject.organizations
-            ]
+            providers = []
+            for org in subject.organizations:
+                org_ref = Reference.organization(org.id).as_fhir()
+                identifiers = [i.as_fhir() for i in org.identifiers if
+                               i.system in system_filter]
+                if identifiers:
+                    org_ref['identifier'] = identifiers
+                providers.append(org_ref)
+            questionnaire_response.document[
+                "subject"]["careProvider"] = providers
 
         # To lookup the time point, obtain the qbd holding both the qb
         # and iteration to which the document applies
@@ -530,11 +536,17 @@ def generate_qnr_csv(qnr_bundle):
         return None
 
     def get_site(qnr_data):
-        """Return name of first organization, else None"""
+        """Return (external id, name) of first organization, else Nones"""
         try:
-            return qnr_data['subject']['careProvider'][0]['display']
+            provider = qnr_data['subject']['careProvider'][0]
+            org_name = provider['display']
+            if 'identifier' in provider:
+                id_value = provider['identifier'][0]['value']
+            else:
+                id_value = None
+            return id_value, org_name
         except (KeyError, IndexError):
-            return None
+            return None, None
 
     def consolidate_answer_pairs(answers):
         """
@@ -598,6 +610,7 @@ def generate_qnr_csv(qnr_bundle):
         'identifier',
         'status',
         'study_id',
+        'site_id',
         'site_name',
         'truenth_subject_id',
         'author_id',
@@ -614,6 +627,7 @@ def generate_qnr_csv(qnr_bundle):
 
     yield ','.join('"' + column + '"' for column in columns) + '\n'
     for qnr in qnr_bundle['entry']:
+        site_id, site_name = get_site(qnr)
         row_data = {
             'identifier': qnr['identifier']['value'],
             'status': qnr['status'],
@@ -622,7 +636,8 @@ def generate_qnr_csv(qnr_bundle):
                 use='official'
             ),
             'author_id': qnr['author']['reference'].split('/')[-1],
-            'site_name': get_site(qnr),
+            'site_id': site_id,
+            'site_name': site_name,
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
