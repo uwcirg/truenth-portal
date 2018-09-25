@@ -483,10 +483,10 @@
             },
             isConsentEditable: function() {
                 var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
-                var isPatient = this.currentUserRoles.indexOf("patient") !== -1;
+                var isCurrentUserPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
-                return !this.isDisableField("consent_status") && ((isStaff && isEditableByStaff) || (isPatient && isEditableByPatient));
+                return !this.isDisableField("consent_status") && ((isStaff && isEditableByStaff) || (isCurrentUserPatient && isEditableByPatient));
             },
             isTestEnvironment: function() {
                 return String(this.settings.SYSTEM_TYPE).toLowerCase() !== "production";
