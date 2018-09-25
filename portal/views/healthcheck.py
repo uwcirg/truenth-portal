@@ -48,8 +48,17 @@ def celery_available():
 
 def celery_beat_available():
     if last_celery_beat_ping:
+        # The interval celery beat pings the celery_beat_ping API
+        ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL_SECONDS']
+
+        # The number of times we can miss a ping before we fail
+        missed_beats_before_fail = \
+            current_app.config['CELERY_BEAT_MISSED_PINGS_BEFORE_FAIL']
+
+        # The maximum amount of time we can go
+        # without a ping and still succeed
         threshold = timedelta(
-            seconds=current_app.config['CELERY_BEAT_HEALTH_CHECK_INTERVAL_SECONDS'] * 2
+            seconds=(ping_interval * missed_beats_before_fail)
         )
         time_since_last_beat = \
             datetime.now() - last_celery_beat_ping

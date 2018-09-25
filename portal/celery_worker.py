@@ -53,7 +53,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # add the healthcheck task
     logger.info("Scheduling celery beat health check")
     sender.add_periodic_task(
-        app.config['CELERY_BEAT_HEALTH_CHECK_INTERVAL_SECONDS'],
+        app.config['CELERY_BEAT_PING_INTERVAL_SECONDS'],
         tasks.celery_beat_health_check.s(),
         name='celery beat health check'
     )
