@@ -425,11 +425,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             providers = []
             for org in subject.organizations:
                 org_ref = Reference.organization(org.id).as_fhir()
-                identifiers = [i.as_fhir() for i in org.identifiers if i.system in system_filter]
+                identifiers = [i.as_fhir() for i in org.identifiers if
+                               i.system in system_filter]
                 if identifiers:
                     org_ref['identifier'] = identifiers
                 providers.append(org_ref)
-            questionnaire_response.document["subject"]["careProvider"] = providers
+            questionnaire_response.document[
+                "subject"]["careProvider"] = providers
 
         # To lookup the time point, obtain the qbd holding both the qb
         # and iteration to which the document applies

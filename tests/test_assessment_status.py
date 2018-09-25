@@ -355,9 +355,12 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         unwanted_system = 'http://other.org/'
         self.app.config['REPORTING_IDENTIFIER_SYSTEMS'] = [wanted_system]
         id_value = '146-11'
-        org = Organization.query.filter(Organization.name == 'metastatic').one()
-        id1 = Identifier(system=wanted_system, use='secondary', value=id_value)
-        id2 = Identifier(system=unwanted_system, use='secondary', value=id_value)
+        org = Organization.query.filter(
+            Organization.name == 'metastatic').one()
+        id1 = Identifier(
+            system=wanted_system, use='secondary', value=id_value)
+        id2 = Identifier(
+            system=unwanted_system, use='secondary', value=id_value)
         org.identifiers.append(id1)
         org.identifiers.append(id2)
 
@@ -382,14 +385,15 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         bundle = aggregate_responses(
             instrument_ids=[instrument_id], current_user=staff)
         id1 = db.session.merge(id1)
-        assert len(bundle['entry']) == 1
-        assert len(
-            bundle['entry'][0]['subject']['careProvider']) == 1
-        assert len(
-            bundle['entry'][0]['subject']['careProvider'][0]['identifier']) == 1
-        assert (
-            bundle['entry'][0]['subject']['careProvider'][0]['identifier'][0] ==
-            id1.as_fhir())
+        assert 1 == len(bundle['entry'])
+        assert (1 ==
+                len(bundle['entry'][0]['subject']['careProvider']))
+        assert (1 ==
+                len(bundle['entry'][0]['subject']['careProvider'][0]
+                    ['identifier']))
+        assert (id1.as_fhir() ==
+                bundle['entry'][0]['subject']['careProvider'][0]
+                ['identifier'][0])
 
 
 class TestAssessmentStatus(TestQuestionnaireSetup):
