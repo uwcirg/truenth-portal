@@ -52,7 +52,7 @@ from ..views.extend_flask_user import (
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
-from ..views.healthcheck import healthcheck_blueprint, HEALTH_CHECKS
+from ..views.healthcheck import HEALTH_CHECKS, healthcheck_blueprint
 from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
@@ -343,8 +343,15 @@ def configure_cache(app):
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),
     )
 
+
 def configure_healthcheck(app):
-    """Configure the API used to check the health of the service"""
+    """Configure the API used to check the health of our dependencies"""
+    # Adds the /healthcheck API that returns
+    # the health of the service's dependencies based
+    # on the results of the below checks
     health = HealthCheck(app, '/healthcheck')
+
+    # Functions that are called whose return values
+    # determine the health of the service's dependencies
     for check in HEALTH_CHECKS:
         health.add_check(check)
