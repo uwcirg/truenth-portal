@@ -2511,10 +2511,10 @@
                     "_class": "indent"
                 }, {
                     content: (function(item) {
-                        var viewLinkHTML = "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                        var viewLinkHTML = "<span class='agreement'>&nbsp;&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
                         var s = viewLinkHTML + self.getLREditIconHTML(item);
                         if (self.isDefaultConsent(item)) {
-                            s = i18next.t("Sharing information with clinics ") + viewLinkHTML;
+                            s = i18next.t("Sharing information with clinics") + viewLinkHTML;
                         }
                         return s;
                     })(item)
