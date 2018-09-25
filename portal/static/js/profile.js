@@ -486,7 +486,7 @@
                 var isPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
-                return this.isAdmin() || (isStaff && isEditableByStaff) || (isPatient && isEditableByPatient);
+                return !this.isDisableField("consent_status") && (this.isAdmin() || (isStaff && isEditableByStaff) || (isPatient && isEditableByPatient));
             },
             isTestEnvironment: function() {
                 return String(this.settings.SYSTEM_TYPE).toLowerCase() !== "production";
@@ -2471,32 +2471,55 @@
                 });
                 return content;
             },
+            getConsentEditDisplayIconHTML: function(item, targetElementId) {
+                if (!item) {
+                    return "";
+                }
+                return "&nbsp;&nbsp;<a data-toggle='modal' data-target='#{targetElementId}' data-orgId='{orgId}' data-agreementUrl='{agreementUrl}' data-userId='{userId}' data-status='{consentStatus}' data-signed-date='{signedDate}'><span class='glyphicon glyphicon-pencil edit-icon' aria-hidden='true'></span></a>"
+                    .replace("{targetElementId}", targetElementId||"")
+                    .replace("{orgId}", item.organization_id)
+                    .replace("{agreementUrl}", item.agreement_url)
+                    .replace("{userId}", this.subjectId)
+                    .replace("{consentStatus}", this.getConsentStatusHTMLObj(item).statusText)
+                    .replace("{signedDate}", this.modules.tnthDates.formatDateString(item.acceptance_date, "d M y hh:mm:ss"));
+            },
+            getLREditIconHTML: function(item) {
+                var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
+                var editorUrlEl = $("#" + LROrgId + "_editor_url");
+                if (!editorUrlEl.val()) {
+                    return "";
+                }
+                return "<div class='button--LR' data-show='{showData}'><a href='{url}' target='_blank'>{displayText}</a></div>"
+                    .replace("{showData}", (String(editorUrlEl.attr("data-show")) === "true"))
+                    .replace("{url}", editorUrlEl.val())
+                    .replace("{displayText}", i18next.t("Edit in Liferay"));
+            },
+            isConsentStatusEditable: function(item) {
+               return this.isConsentEditable() && String(this.getConsentStatus(item)) === "active";
+            },
+            isConsentDateEditable: function(item) {
+                //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
+                return this.isConsentStatusEditable(item) && this.isPatient() && this.isStaff();
+            },
             getConsentRow: function(item) {
                 if (!item) {return false;}
-                var self = this, consentStatus = self.getConsentStatus(item), sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var isDisabled = this.isDisableField("consent_status");
-                var LROrgId = item.organization_id;
-                var topOrgID = (self.getOrgTool()).getTopLevelParentOrg(LROrgId);
-                if (topOrgID && (String(topOrgID) !== String(LROrgId))) {
-                    LROrgId = topOrgID;
-                }
-                var editorUrlEl = $("#" + LROrgId + "_editor_url"), cflag = this.getConsentStatusHTMLObj(item).statusText;
+                var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
                 var contentArray = [{
                     content: self.getConsentOrgDisplayName(item)
                 }, {
-                    content: sDisplay + (!isDisabled && self.isConsentEditable() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#profileConsentListModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : ""),
+                    content: sDisplay + (self.isConsentStatusEditable(item) ? self.getConsentEditDisplayIconHTML(item, "profileConsentListModal") : ""),
                     "_class": "indent"
                 }, {
                     content: (function(item) {
-                        var s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                                ((editorUrlEl.length > 0 && editorUrlEl.val()) ? ("<div class='button--LR' " + (String(editorUrlEl.attr("data-show")) === "true" ? "data-show='true'" : "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>" + i18next.t("Edit in Liferay") + "</a></div>") : "");
+                        var viewLinkHTML = "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                        var s = viewLinkHTML + self.getLREditIconHTML(item);
                         if (self.isDefaultConsent(item)) {
-                            s = i18next.t("Sharing information with clinics ") + "<span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>" + i18next.t("View") + "</em></a></span>";
+                            s = i18next.t("Sharing information with clinics ") + viewLinkHTML;
                         }
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentEditable() && self.isTestEnvironment() && String(consentStatus) === "active" ? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDateModal" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + self.subjectId + '" data-status="' + cflag + '" data-signed-date="' + self.modules.tnthDates.formatDateString(item.acceptance_date, "d M y hh:mm:ss") + '"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' : "")
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2769,11 +2792,12 @@
                             $("#consentDateModalError").text(i18next.t("Error processing data.  Make sure the date is in the correct format."));
                             setTimeout(function() {
                                 $("#consentDateContainer").show();
+                                $("#consentDateModal button[data-dismiss]").attr("disabled", false);
                                 $("#consentDateLoader").hide();
                             }, 450);
-                            $("#consentDateModal button[data-dismiss]").attr("disabled", false);
                             return false;
                         }
+                        $("#consentDateModal button[data-dismiss]").attr("disabled", false);
                         $("#consentDateModal").removeClass("fade").modal("hide");
                         __self.reloadConsentList(ct.attr("data-userId"));
                     }), 100);
@@ -2862,8 +2886,6 @@
                         }
                         if (self.isConsentEditable()) {
                             self.initConsentItemEvent();
-                        }
-                        if (self.isConsentEditable() && self.isTestEnvironment()) {
                             self.initConsentDateEvents();
                         }
                         $("#consentListTable").animate({opacity: 1}, 1500);
