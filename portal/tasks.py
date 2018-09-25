@@ -377,10 +377,10 @@ def token_watchdog(**kwargs):
         return '\nUnable to reach recipient(s): {}'.format(
             ', '.join(error_emails))
 
+
 @celery.task
 def celery_beat_health_check():
     """Pings the celery beat helath check API for monitoring"""
     return requests.get(
         url_for('healthcheck.celery_beat_ping', _external=True)
     ).text
-
