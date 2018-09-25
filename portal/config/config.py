@@ -106,6 +106,7 @@ class BaseConfig(object):
     PRE_REGISTERED_ROLES = [
         'access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
+    REPORTING_IDENTIFIER_SYSTEMS = []
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_PUBLIC_TERMS = True
