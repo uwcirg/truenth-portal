@@ -59,7 +59,7 @@ pluggy==0.7.1             # via tox
 polib==1.1.0
 psycopg2==2.7.5
 py==1.6.0                 # via tox
-pycparser==2.18           # via cffi
+pycparser==2.19           # via cffi
 pycryptodome==3.6.6       # via flask-user
 pygments==2.2.0           # via sphinx
 pyparsing==2.2.1          # via packaging
@@ -74,15 +74,15 @@ regex==2018.08.17
 requests-cache==0.4.13
 requests-oauthlib==1.0.0  # via flask-oauthlib
 requests==2.19.1          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
-selenium==3.14.0
+selenium==3.14.1
 six==1.11.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.1
-sphinx==1.8.0
+sphinx==1.8.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
-sqlalchemy==1.2.11         # via alembic, flask-sqlalchemy
+sqlalchemy==1.2.12         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.0
-tox==3.2.1
+tox==3.4.0
 typing==3.6.6             # via sphinx
 urllib3==1.23             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
