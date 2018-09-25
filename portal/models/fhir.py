@@ -291,8 +291,8 @@ class UserObservation(db.Model):
         'users.id', ondelete='CASCADE'), nullable=False)
     observation_id = db.Column(
         db.ForeignKey('observations.id'), nullable=False)
-    encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
+    encounter_id = db.Column(db.ForeignKey(
+        'encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     audit = db.relationship('Audit', cascade="save-update, delete")
@@ -389,6 +389,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         to list of patients the current_user has permission to see
 
     """
+    from .questionnaire_bank import QuestionnaireBank, visit_name
+
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = OrgTree().visible_patients(current_user)
 
@@ -424,6 +426,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
                 Reference.organization(org.id).as_fhir()
                 for org in subject.organizations
             ]
+
+        # To lookup the time point, obtain the qbd holding both the qb
+        # and iteration to which the document applies
+
+        qbd = QuestionnaireBank.most_current_qb(
+            subject, as_of_date=encounter.start_time)
+        questionnaire_response.document["timepoint"] = visit_name(qbd)
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
@@ -502,7 +511,7 @@ def generate_qnr_csv(qnr_bundle):
             return ' '.join(self.fed)
 
     def strip_tags(html):
-        """Strip HTML tags from strings. Inserts replacement whitespace if necessary."""
+        """Strip HTML tags from strings. Inserts whitespace if necessary."""
 
         s = HTMLStripper()
         s.feed(html)
@@ -595,6 +604,7 @@ def generate_qnr_csv(qnr_bundle):
         'author_role',
         'entry_method',
         'authored',
+        'timepoint',
         'instrument',
         'question_code',
         'answer_code',
@@ -619,6 +629,7 @@ def generate_qnr_csv(qnr_bundle):
                 system=TRUENTH_EXTERNAL_STUDY_SYSTEM
             ),
             'authored': qnr['authored'],
+            'timepoint': qnr['timepoint'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
         row_data.update({
@@ -646,7 +657,7 @@ def generate_qnr_csv(qnr_bundle):
                             'answer_code': answer['valueCoding']['code'],
 
                             # Add supplementary text added earlier
-                            # Todo: lookup option text from stored Questionnaire
+                            # Todo: lookup option text in stored Questionnaire
                             'option_text': strip_tags(
                                 answer['valueCoding'].get('text', None)),
                             'other_text': None,
@@ -716,11 +727,11 @@ def add_static_concepts(only_quick=False):
             db.session.add(concept)
 
     for clinical_concepts in CC:
-        if not clinical_concepts in db.session():
+        if clinical_concepts not in db.session():
             db.session.add(clinical_concepts)
 
     for encounter_type in EC:
-        if not encounter_type in db.session():
+        if encounter_type not in db.session():
             db.session.add(encounter_type)
 
     for concept in LocaleConstants():
