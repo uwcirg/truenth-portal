@@ -29,6 +29,10 @@ services:
       - redis
       - celeryworker
       - celerybeat
+    volumes:
+      - source: tmp
+        target: /tmp
+        type: volume
 
   celeryworker:
     <<: *service_base
@@ -73,3 +77,4 @@ services:
 
 volumes:
     postgres-data: {}
+    tmp: {}
