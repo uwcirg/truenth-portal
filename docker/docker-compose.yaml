@@ -30,8 +30,8 @@ services:
       - celeryworker
       - celerybeat
     volumes:
-      - source: tmp
-        target: /tmp
+      - source: persistence-data
+        target: /var/lib/persistence/data
         type: volume
 
   celeryworker:
@@ -76,5 +76,5 @@ services:
         type: volume
 
 volumes:
+    persistence-data: {}
     postgres-data: {}
-    tmp: {}
