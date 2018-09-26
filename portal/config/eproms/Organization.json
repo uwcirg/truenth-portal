@@ -1561,8 +1561,32 @@
     {
       "extension": [
         {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
           "timezone": "Europe/Zurich",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-09-26T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14703,
@@ -1573,7 +1597,7 @@
           "value": "146-47"
         }
       ],
-      "language": "en_GB",
+      "language": "de_CH",
       "name": "Kantonsspitals Chur",
       "partOf": {
         "reference": "api/organization/25000"
@@ -1583,8 +1607,32 @@
     {
       "extension": [
         {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
           "timezone": "Europe/Zurich",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-09-26T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14639,
@@ -1595,7 +1643,7 @@
           "value": "146-39"
         }
       ],
-      "language": "en_GB",
+      "language": "de_CH",
       "name": "Kantonsspitals St. Gallen",
       "partOf": {
         "reference": "api/organization/25000"
