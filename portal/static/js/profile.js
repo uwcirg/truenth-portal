@@ -2481,7 +2481,7 @@
                     .replace("{agreementUrl}", item.agreement_url)
                     .replace("{userId}", this.subjectId)
                     .replace("{consentStatus}", this.getConsentStatusHTMLObj(item).statusText)
-                    .replace("{signedDate}", this.modules.tnthDates.formatDateString(item.acceptance_date, "d M y hh:mm:ss"));
+                    .replace("{signedDate}", this.modules.tnthDates.formatDateString(item.acceptance_date, "system")); //this will submit date in default system format: 2018-09-26T15:10:19:23Z
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2721,7 +2721,7 @@
                     $(this).addClass("active");
                     var relatedTarget = $(e.relatedTarget), orgId = relatedTarget.attr("data-orgId");
                     var agreementUrl = relatedTarget.attr("data-agreementUrl"), userId = relatedTarget.attr("data-userId"), status = relatedTarget.attr("data-status");
-                    $(this).find(".data-current-consent-date").text(relatedTarget.attr("data-signed-date"));
+                    $(this).find(".data-current-consent-date").text(__self.modules.tnthDates.formatDateString(relatedTarget.attr("data-signed-date"), "d M y hh:mm:ss")); //display user friendly date
                     $(this).find("input.form-control").each(function() {
                         $(this).attr({
                             "data-agreementUrl": agreementUrl,
