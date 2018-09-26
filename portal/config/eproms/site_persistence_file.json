@@ -23,6 +23,8 @@
         "CUSTOM_PATIENT_DETAIL = True\n",
         "LOCALIZED_AFFILIATE_ORG = 'TrueNTH Global Registry'\n",
         "ORGS_W_CUSTOM_INVITES = ['TrueNTH Global Registry', 'IRONMAN']\n",
+        "MEDIDATA_RAVE_FIELDS = ['deceased', 'study_id', 'consent_status', 'dob', 'org']\n",
+        "MEDIDATA_RAVE_ORG = 'IRONMAN'\n",
         "SHOW_WELCOME = False\n",
         "HIDE_TRUENTH_ID_FIELD = True\n",
         "TRUENTH_LINK_URL = False\n",
