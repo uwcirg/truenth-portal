@@ -29,6 +29,10 @@ services:
       - redis
       - celeryworker
       - celerybeat
+    volumes:
+      - source: persistence-data
+        target: /var/lib/persistence/data
+        type: volume
 
   celeryworker:
     <<: *service_base
@@ -72,4 +76,5 @@ services:
         type: volume
 
 volumes:
+    persistence-data: {}
     postgres-data: {}
