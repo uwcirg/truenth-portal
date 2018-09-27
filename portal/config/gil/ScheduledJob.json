@@ -32,6 +32,13 @@
     },
     {
       "active": true,
+      "name": "Celery Beat Health Check",
+      "resourceType": "ScheduledJob",
+      "schedule": "5 * * * *",
+      "task": "celery_beat_health_check"
+    },
+    {
+      "active": true,
       "name": "Service Token Watchdog",
       "resourceType": "ScheduledJob",
       "schedule": "30 2 * * *",

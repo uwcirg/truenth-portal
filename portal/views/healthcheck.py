@@ -22,26 +22,10 @@ def celery_beat_ping():
     rs = redis.from_url(current_app.config['REDIS_URL'])
     rs.setex(
         'celery_beat_available',
-        get_celery_beat_ping_expiration_time(),
+        current_app.config['CELERY_BEAT_AVAILABLE_EXPIRATION_TIME'],
         str(datetime.now()),
     )
     return 'PONG'
-
-
-def get_celery_beat_ping_expiration_time():
-    """The max time we can go without a ping in seconds"""
-    # The interval celery beat pings the /celery_beat_ping API
-    ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL']
-
-    # The number of times we can miss a ping before we fail
-    missed_beats_before_fail = \
-        current_app.config['CELERY_BEAT_MISSED_PINGS_BEFORE_FAIL']
-
-    # The maximum amount of time we can go
-    # without a ping and still succeed
-    threshold = ping_interval * missed_beats_before_fail
-
-    return threshold
 
 
 ##############################
