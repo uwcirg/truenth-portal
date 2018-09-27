@@ -51,7 +51,12 @@ ENV \
     PORT="${PORT:-8008}" \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PATH="${PROJECT_DIR}/bin:${PATH}" \
-    PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}"
+    PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}" \
+    PERSISTENCE_EXCLUSIONS_DIR="${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}"
+
+RUN \
+    mkdir --parents "${PERSISTENCE_EXCLUSIONS_DIR}" && \
+    chown "$RUN_USER:$RUN_USER" "${PERSISTENCE_EXCLUSIONS_DIR}"
 
 EXPOSE "${PORT}"
 
