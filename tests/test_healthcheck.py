@@ -15,22 +15,26 @@ from portal.views.healthcheck import (
 class TestHealthcheck(TestCase):
     """Health check module and view tests"""
 
-    @patch('portal.views.healthcheck.requests.get')
-    def test_celery_available_succeeds_when_celery_test_succeeds(
+    @patch('portal.views.healthcheck.create_celery')
+    def test_celery_available_succeeds_when_celery_ping_success(
         self,
-        requests_mock
+        create_celery_mock
     ):
-        requests_mock.return_value.ok = True
+        create_celery_mock.return_value \
+            .control.inspect.return_value \
+            .ping.return_value = True
+
         results = celery_available()
         assert results[0] is True
 
-    @patch('portal.views.healthcheck.requests.get')
-    def test_celery_available_fails_when_celery_test_fails(
+    @patch('portal.views.healthcheck.create_celery')
+    def test_celery_available_fails_when_celery_ping_fails(
         self,
-        requests_mock
+        create_celery_mock
     ):
-        requests_mock.return_value.ok = False
-        requests_mock.return_value.status_code = 500
+        create_celery_mock.return_value \
+            .control.inspect.return_value \
+            .ping.return_value = None
 
         results = celery_available()
         assert results[0] is False

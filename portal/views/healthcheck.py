@@ -5,6 +5,7 @@ import redis
 import requests
 from sqlalchemy import text
 
+from ..factories.celery import create_celery
 from ..database import db
 
 
@@ -49,18 +50,11 @@ def get_celery_beat_ping_expiration_time():
 
 def celery_available():
     """Determines whether celery is available"""
-    celery_info_args = {
-        'redirect-to-result': True
-    }
-    url = url_for('portal.celery_info', **celery_info_args)
-    response = requests.get(url)
-    if response.ok:
+    celery = create_celery(current_app)
+    result = celery.control.inspect().ping()
+    if result:
         return True, 'Celery is available.'
     else:
-        current_app.logger.error(
-            'Unable to connect to celery. '
-            '/celery-test status code {}'.format(response.status_code)
-        )
         return False, 'Celery is not available'
 
 
