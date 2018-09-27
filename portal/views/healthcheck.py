@@ -1,8 +1,6 @@
-from datetime import datetime, timedelta
-from flask import Blueprint, current_app, url_for
-import os
+from datetime import datetime
+from flask import Blueprint, current_app
 import redis
-import requests
 from sqlalchemy import text
 
 from ..factories.celery import create_celery
