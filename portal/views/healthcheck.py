@@ -19,8 +19,8 @@ def celery_beat_ping():
     """
     rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
     rs.setex(
-        'celery_beat_available',
-        current_app.config['CELERY_BEAT_AVAILABLE_EXPIRATION_TIME'],
+        'last_celery_beat_ping',
+        current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
         str(datetime.now()),
     )
     return 'PONG'
@@ -51,7 +51,7 @@ def celery_beat_available():
     # we have not received a ping from celery beat
     # within the allowed window and we must assume
     # celery beat is not available
-    last_celery_beat_ping = rs.get('celery_beat_available')
+    last_celery_beat_ping = rs.get('last_celery_beat_ping')
     if last_celery_beat_ping:
         return (
             True,
