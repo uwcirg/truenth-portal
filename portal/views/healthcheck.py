@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, url_for
 import os
 import redis
 import requests
@@ -18,9 +18,10 @@ def celery_beat_ping():
     Updates the last time we recieved a call to this API.
     This allows us to monitor whether celery beat tasks are running
     """
-    redis.from_url(app.config['REDIS_URL']).setex(
+    rs = redis.from_url(current_app.config['REDIS_URL'])
+    rs.setex(
         'celery_beat_available',
-        get_celery_beat_ping_expiration_time(), 
+        get_celery_beat_ping_expiration_time(),
         str(datetime.now()),
     )
     return 'PONG'
@@ -48,7 +49,10 @@ def get_celery_beat_ping_expiration_time():
 
 def celery_available():
     """Determines whether celery is available"""
-    url = url_for('celery_test', redirect-to-result=True)
+    celery_info_args = {
+        'redirect-to-result': True
+    }
+    url = url_for('portal.celery_info', **celery_info_args)
     response = requests.get(url)
     if response.ok:
         return True, 'Celery is available.'
@@ -62,7 +66,7 @@ def celery_available():
 
 def celery_beat_available():
     """Determines whether celery beat is available"""
-    rs = redis.from_url(app.config['REDIS_URL'])
+    rs = redis.from_url(current_app.config['REDIS_URL'])
 
     # When celery beat is running it pings
     # our service periodically which sets
@@ -107,7 +111,7 @@ def redis_available():
     try:
         rs.ping()
         return True, 'Redis is available'
-    except redis.ConnectionError as e:
+    except Exception as e:
         current_app.logger.error(
             'Unable to connect to redis. Error {}'.format(e)
         )

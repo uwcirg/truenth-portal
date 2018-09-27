@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import url_for
 from mock import Mock, patch
-from redis
+import redis
 from tests import TestCase
 
 from portal.views.healthcheck import (
@@ -30,34 +30,29 @@ class TestHealthcheck(TestCase):
         requests_mock
     ):
         requests_mock.return_value.ok = False
-        requests.mock.return_value.status_code = 500
+        requests_mock.return_value.status_code = 500
 
         results = celery_available()
         assert results[0] is False
 
-    def test_celery_beat_available_fails_when_not_pinged(self):
+    @patch('portal.views.healthcheck.redis')
+    def test_celery_beat_available_fails_when_redis_var_none(
+        self,
+        redis_mock
+    ):
+        redis_mock.from_url.return_value.get.return_value = None
         results = celery_beat_available()
         assert results[0] is False
 
-    def test_celery_beat_available_succeeds_when_pinged(self):
-        response = self.client.get(url_for('healthcheck.celery_beat_ping'))
-        assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'PONG'
-
+    @patch('portal.views.healthcheck.redis')
+    def test_celery_beat_available_succeeds_when_redis_var_set(
+        self,
+        redis_mock
+    ):
+        redis_mock.from_url.return_value.get.return_value = \
+            str(datetime.now())
         results = celery_beat_available()
         assert results[0] is True
-
-    def test_celery_beat_available_fails_when_ping_expires(self):
-        response = self.client.get(url_for('healthcheck.celery_beat_ping'))
-        assert response.status_code == 200
-        assert response.get_data(as_text=True) == 'PONG'
-
-        # expire the last ping
-        rs = redis.from_url(app.config['REDIS_URL'])
-        rs.delete('celery_beat_available')
-
-        response = celery_beat_available()
-        assert response[0] is False
 
     @patch('portal.views.healthcheck.db')
     def test_postgresql_available_succeeds_when_query_successful(
@@ -93,10 +88,7 @@ class TestHealthcheck(TestCase):
         self,
         redis_mock
     ):
-        redis_connection_mock = Mock()
-        redis_connection_mock.ping = Mock(
-            side_effect=redis.ConnectionError()
-        )
-        redis_mock.from_url.return_value = redis_connection_mock
+        redis_mock.from_url.return_value.ping.side_effect = \
+            redis.ConnectionError()
         results = redis_available()
         assert results[0] is False
