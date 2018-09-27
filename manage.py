@@ -141,6 +141,9 @@ def export_site(directory, staging_exclusion):
     other static data.
 
     """
+    if staging_exclusion and not directory:
+        directory = app.config.get("PERSISTENCE_EXCLUSIONS_DIR")
+
     SitePersistence(target_dir=directory).export(
         staging_exclusion=staging_exclusion)
 

@@ -100,6 +100,7 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
+    PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
