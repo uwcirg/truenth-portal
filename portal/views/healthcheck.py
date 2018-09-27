@@ -19,7 +19,7 @@ def celery_beat_ping():
     Updates the last time we recieved a call to this API.
     This allows us to monitor whether celery beat tasks are running
     """
-    rs = redis.from_url(current_app.config['REDIS_URL'])
+    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
     rs.setex(
         'celery_beat_available',
         current_app.config['CELERY_BEAT_AVAILABLE_EXPIRATION_TIME'],

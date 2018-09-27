@@ -379,7 +379,7 @@ def token_watchdog(**kwargs):
 
 
 @celery.task
-def celery_beat_health_check():
+def celery_beat_health_check(**kwargs):
     """Pings the celery beat health check API for monitoring"""
     return requests.get(
         url_for('healthcheck.celery_beat_ping', _external=True)
