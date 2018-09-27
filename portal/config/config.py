@@ -84,7 +84,7 @@ class BaseConfig(object):
     FLUSH_CACHE_ON_SYNC = True
 
     CELERY_IMPORTS = ('portal.tasks',)
-    CELERY_BEAT_AVAILABLE_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
+    LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [
