@@ -2,15 +2,13 @@ from datetime import datetime, timedelta
 from flask import Blueprint, current_app
 import os
 import redis
-from redis import ConnectionError
+import requests
 from sqlalchemy import text
-import subprocess
 
 from ..database import db
 
 
 healthcheck_blueprint = Blueprint('healthcheck', __name__)
-last_celery_beat_ping = None
 
 
 @healthcheck_blueprint.route('/celery_beat_ping')
@@ -20,15 +18,18 @@ def celery_beat_ping():
     Updates the last time we recieved a call to this API.
     This allows us to monitor whether celery beat tasks are running
     """
-    global last_celery_beat_ping
-    last_celery_beat_ping = datetime.now()
+    redis.from_url(app.config['REDIS_URL']).setex(
+        'celery_beat_available',
+        get_celery_beat_ping_expiration_time(), 
+        str(datetime.now()),
+    )
     return 'PONG'
 
 
-def get_celery_beat_threshold():
-    """A timedelta representing max time we can go without a ping"""
+def get_celery_beat_ping_expiration_time():
+    """The max time we can go without a ping in seconds"""
     # The interval celery beat pings the /celery_beat_ping API
-    ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL_SECONDS']
+    ping_interval = current_app.config['CELERY_BEAT_PING_INTERVAL']
 
     # The number of times we can miss a ping before we fail
     missed_beats_before_fail = \
@@ -36,9 +37,7 @@ def get_celery_beat_threshold():
 
     # The maximum amount of time we can go
     # without a ping and still succeed
-    threshold = timedelta(
-        seconds=(ping_interval * missed_beats_before_fail)
-    )
+    threshold = ping_interval * missed_beats_before_fail
 
     return threshold
 
@@ -49,52 +48,39 @@ def get_celery_beat_threshold():
 
 def celery_available():
     """Determines whether celery is available"""
-    # Ping celery. If we get a response
-    # then celery is available. Otherwise
-    # it is not available
-    FNULL = open(os.devnull, 'w')
-    code = subprocess.call([
-            'celery',
-            '-A', 'portal.celery_worker.celery',
-            'inspect', 'ping'
-        ],
-        stdout=FNULL,  # Don't output to console
-        stderr=subprocess.STDOUT
-    )
-
-    if code == 0:
+    url = url_for('celery_test', redirect-to-result=True)
+    response = requests.get(url)
+    if response.ok:
         return True, 'Celery is available.'
     else:
         current_app.logger.error(
-            'Unable to connect to celery. Exit code {}'.format(code)
+            'Unable to connect to celery. '
+            '/celery-test status code {}'.format(response.status_code)
         )
         return False, 'Celery is not available'
 
 
 def celery_beat_available():
     """Determines whether celery beat is available"""
-    # If the celery beat task has pinged our
-    # service within the allotted amount of time
-    # then we assume celery beat is running. Otherwise
-    # we assume it is not running
+    rs = redis.from_url(app.config['REDIS_URL'])
+
+    # When celery beat is running it pings
+    # our service periodically which sets
+    # 'celery_beat_available' in redis. If
+    # that variable expires it means
+    # we have not received a ping from celery beat
+    # within the allowed window and we must assume
+    # celery beat is not available
+    last_celery_beat_ping = rs.get('celery_beat_available')
     if last_celery_beat_ping:
-        time_since_last_beat = \
-            datetime.now() - last_celery_beat_ping
-
-        if time_since_last_beat <= get_celery_beat_threshold():
-            return (
-                True,
-                'Celery beat is available. Last check: {}'.format(
-                    last_celery_beat_ping
-                )
+        return (
+            True,
+            'Celery beat is available. Last check: {}'.format(
+                last_celery_beat_ping
             )
-
-    return (
-        False,
-        'Celery beat is not running jobs. Last check: {}'.format(
-            last_celery_beat_ping
         )
-    )
+
+    return False, 'Celery beat is not running jobs'
 
 
 def postgresql_available():
@@ -121,7 +107,7 @@ def redis_available():
     try:
         rs.ping()
         return True, 'Redis is available'
-    except ConnectionError as e:
+    except redis.ConnectionError as e:
         current_app.logger.error(
             'Unable to connect to redis. Error {}'.format(e)
         )
