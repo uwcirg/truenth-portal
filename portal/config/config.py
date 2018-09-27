@@ -107,6 +107,7 @@ class BaseConfig(object):
     PRE_REGISTERED_ROLES = [
         'access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
+    REPORTING_IDENTIFIER_SYSTEMS = []
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_PUBLIC_TERMS = True
@@ -139,7 +140,8 @@ class BaseConfig(object):
     COPYRIGHT_YEAR = 2018  # TrueNTH copyright year
 
     FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_OAUTH_CLIENT_ID')
-    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_OAUTH_CLIENT_SECRET')
+    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get(
+        'FACEBOOK_OAUTH_CLIENT_SECRET')
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 

@@ -87,6 +87,7 @@
 @notificationLinkHoverBgColor: #CC112D;
 @alertColor: hsla(1, 44%, 46%, 0.9);
 @HRColor: #eeeeee;
+@landingInputBorderColor: #AFB8C2;
 
 
 /**
@@ -192,6 +193,7 @@ body {
   }
   .message-container {
     text-align: center;
+    margin: 0.45em 0.25em 0.15em
   }
   .message {
     line-height: 26px;
@@ -479,7 +481,7 @@ body.landing {
         input {
           width: 325px;
           max-width: 100%;
-          border: 1px solid #AFB8C2;
+          border: 1px solid @landingInputBorderColor;
         }
         input.field {
           -webkit-appearance: none;
@@ -717,6 +719,8 @@ body.landing {
   max-width: 100%;
   margin: auto;
   display: block;
+  border: 1px solid @landingInputBorderColor;
+  box-shadow: none;
 }
 
 #regForm input[type="submit"],
@@ -3726,6 +3730,10 @@ div.biopsy-option:last-of-type{
   }
   a:hover {
     color: @linkHover;
+  }
+  .edit-icon {
+    cursor:pointer;
+    color: #000;
   }
   .consentlist-header {
     background-color: @rowBackgroundColor;
