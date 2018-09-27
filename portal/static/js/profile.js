@@ -2499,7 +2499,7 @@
             },
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
-                return this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff();
+                return this.isTestEnvironment() || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
