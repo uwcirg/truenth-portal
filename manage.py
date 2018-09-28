@@ -163,6 +163,9 @@ def import_site_exclusions(directory):
       files
 
     """
+    if not directory:
+        directory = app.config.get("PERSISTENCE_EXCLUSIONS_DIR")
+
     SitePersistence(target_dir=directory).import_(
         staging_exclusion=True, keep_unmentioned=True)
 
