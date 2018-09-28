@@ -51,7 +51,10 @@ class TestPathFlaskUser(TestCase):
         assert user is None
 
     def test_user_manager_find_user_case_insensitive(self):
-        added_user = self.add_user(username='foo', email='CrAzYcAsInG@example.com')
+        added_user = self.add_user(
+            username='foo',
+            email='CrAzYcAsInG@example.com'
+        )
         user_manager = current_app.user_manager
         user = user_manager.find_user_by_email('crazycasing@example.com')[0]
         assert user is not None
