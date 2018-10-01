@@ -24,12 +24,20 @@ patient_api = Blueprint('patient_api', __name__)
 @patient_api.route('/api/patient/')
 @oauth.require_oauth()
 def patient_search():
-    """Looks up patient from given parameters, returns FHIR Patient if found
+    """Looks up patient from given parameters, returns FHIR Patient bundle
 
-    Takes key=value pairs to look up.  At this time, only email is supported.
+    Takes key=value pairs to look up.  Email, identifier searches supported.
 
     Example search:
         /api/patient?email=username@server.com
+
+    Deleted users will NOT be returned.  A 403 will be generated if the
+    search parameters result in only a deleted user.
+
+    This API does NOT return a patient bundle, but rather only a single FHIR
+    Patient on success.  If the search criteria is ambiguous, resulting in multiple
+    (non-deleted) patients, a 400 is raised, as only a bundle would adequately
+    house the results.
 
     Returns a FHIR patient resource (http://www.hl7.org/fhir/patient.html)
     formatted in JSON if a match is found, 404 otherwise.

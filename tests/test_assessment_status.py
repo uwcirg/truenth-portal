@@ -16,10 +16,10 @@ from portal.models.assessment_status import (
     invalidate_assessment_status_cache,
 )
 from portal.models.audit import Audit
+from portal.models.clinical_constants import CC
 from portal.models.encounter import Encounter
-from portal.models.fhir import (
+from portal.models.questionnaire_response import (
     aggregate_responses,
-    CC,
     QuestionnaireResponse,
     qnr_document_id,
 )

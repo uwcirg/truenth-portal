@@ -40,21 +40,17 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
-from .fhir import (
-    Observation,
-    UserObservation,
-    ValueQuantity,
-    v_or_first,
-    v_or_n,
-)
+from .fhir import v_or_first, v_or_n
 from .identifier import Identifier
 from .intervention import UserIntervention
+from .observation import Observation, UserObservation
 from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
+from .value_quantity import ValueQuantity
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
@@ -1944,3 +1940,36 @@ class UserRelationship(db.Model):
         for attr in ('user_id', 'other_user_id', 'relationship_id'):
             setattr(self, attr, data.get(attr))
         return self
+
+
+class UserIndigenous(db.Model):
+    __tablename__ = 'user_indigenous'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_indigenous_user_coding'),)
+
+
+class UserEthnicity(db.Model):
+    __tablename__ = 'user_ethnicities'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_ethnicity_user_coding'),)
+
+
+class UserRace(db.Model):
+    __tablename__ = 'user_races'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_race_user_coding'),)

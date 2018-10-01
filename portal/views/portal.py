@@ -59,7 +59,6 @@ from ..models.assessment_status import (
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
-from ..models.fhir import QuestionnaireResponse
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.login import login_user
@@ -71,6 +70,7 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
+from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference

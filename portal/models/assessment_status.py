@@ -6,13 +6,13 @@ from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
 from ..trace import trace
-from .fhir import (
-    CC,
+from .clinical_constants import CC
+from .organization import OrgTree
+from .questionnaire_bank import QuestionnaireBank
+from .questionnaire_response import (
     QuestionnaireResponse,
     qnr_document_id,
 )
-from .organization import OrgTree
-from .questionnaire_bank import QuestionnaireBank
 from .user import User
 from .user_consent import UserConsent
 

@@ -22,11 +22,10 @@ from portal.database import db
 from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.client import Client
+from portal.models.clinical_constants import add_static_concepts, CC
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import CC
-from portal.models.fhir import add_static_concepts
 from portal.models.identifier import Identifier
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.organization import Organization, add_static_organization

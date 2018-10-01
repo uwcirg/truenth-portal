@@ -9,7 +9,7 @@ from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
-from portal.models.fhir import CC
+from portal.models.clinical_constants import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.organization import (

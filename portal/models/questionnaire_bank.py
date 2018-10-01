@@ -10,11 +10,12 @@ from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..trace import trace
-from .fhir import CC, QuestionnaireResponse
+from .clinical_constants import CC
 from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
+from .questionnaire_response import QuestionnaireResponse
 from .recur import Recur
 from .reference import Reference
 

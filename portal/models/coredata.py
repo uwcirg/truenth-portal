@@ -15,7 +15,7 @@ from flask import current_app
 from future.utils import with_metaclass
 
 from .audit import Audit
-from .fhir import CC
+from .clinical_constants import CC
 from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
 from .role import ROLE

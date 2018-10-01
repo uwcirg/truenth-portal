@@ -5,7 +5,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.fhir import CC, Observation, ValueQuantity
+from ..models.clinical_constants import CC
+from ..models.observation import Observation
+from ..models.value_quantity import ValueQuantity
 from ..models.user import current_user, get_user_or_abort
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')

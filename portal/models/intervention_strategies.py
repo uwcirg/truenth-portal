@@ -28,9 +28,9 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from ..database import db
 from ..date_tools import localize_datetime
 from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
+from .clinical_constants import CC
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from .fhir import CC
 from .identifier import Identifier
 from .intervention import INTERVENTION, Intervention, UserIntervention
 from .organization import Organization, OrganizationIdentifier, OrgTree

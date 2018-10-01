@@ -15,10 +15,11 @@ from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import Observation, UserObservation, ValueQuantity
+from portal.models.observation import Observation, UserObservation
 from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.user import User
+from portal.models.value_quantity import ValueQuantity
 from tests import TEST_USER_ID, TestCase
 
 

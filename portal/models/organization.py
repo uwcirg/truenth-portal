@@ -27,6 +27,7 @@ from .app_text import (
 from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .extension import CCExtension, TimezoneExtension
+from .fhir import bundle_results
 from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
@@ -388,19 +389,11 @@ class Organization(db.Model):
 
         orgs = [o.as_fhir(include_empties=include_empties) for o in query]
 
-        bundle = {
-            'resourceType': 'Bundle',
-            'updated': FHIR_datetime.now(),
-            'total': len(orgs),
-            'type': 'searchset',
-            'link': {
-                'rel': 'self',
-                'href': url_for(
-                    'org_api.organization_search', _external=True),
-            },
-            'entry': orgs,
-        }
-        return bundle
+        search_link = {
+            'rel': 'self',
+            'href': url_for(
+                'org_api.organization_search', _external=True)}
+        return bundle_results(elements=orgs, links=[search_link])
 
     @staticmethod
     def consent_agreements(locale_code):

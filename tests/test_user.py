@@ -21,14 +21,8 @@ from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import (
-    Observation,
-    UserEthnicity,
-    UserIndigenous,
-    UserObservation,
-    ValueQuantity,
-)
 from portal.models.message import EmailMessage
+from portal.models.observation import Observation
 from portal.models.organization import Organization, OrganizationLocale
 from portal.models.performer import Performer
 from portal.models.reference import Reference
@@ -37,14 +31,18 @@ from portal.models.role import ROLE, STATIC_ROLES
 from portal.models.user import (
     TimezoneExtension,
     User,
+    UserEthnicity,
     UserEthnicityExtension,
+    UserIndigenous,
     UserIndigenousStatusExtension,
+    UserObservation,
     UserRelationship,
     get_user_or_abort,
     permanently_delete_user,
     user_extension_map,
 )
 from portal.models.user_consent import STAFF_EDITABLE_MASK, UserConsent
+from portal.models.value_quantity import ValueQuantity
 from portal.system_uri import (
     TRUENTH_EXTENSTION_NHHD_291036,
     TRUENTH_USERNAME,
