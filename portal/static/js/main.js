@@ -552,7 +552,11 @@ var tnthAjax = {
         if (!xhr) { return false; }
         var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
         if (params) {
-            errorMessage += " [data sent]: " + JSON.stringify(params);
+            try {
+                errorMessage += " [data sent]: " + JSON.stringify(params); //error can happen if for some reason the params are malformed
+            } catch(e) {
+                errorMessage += " Error occurred transforming sent data: " + e.message;
+            }
         }
         tnthAjax.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
