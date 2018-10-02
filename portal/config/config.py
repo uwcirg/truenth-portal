@@ -146,7 +146,7 @@ class BaseConfig(object):
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
-    FILE_UPLOAD_DIR = 'uploads'
+    FILE_UPLOAD_DIR = os.environ.get('FILE_UPLOAD_DIR', 'uploads')
 
     LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://stg-lr7.us.truenth.org')
     LR_GROUP = os.environ.get('LR_GROUP', 20145)

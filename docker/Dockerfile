@@ -33,13 +33,20 @@ RUN \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
-    RUN_USER="${RUN_USER:-www-data}" \
+    BASH_ENV="/etc/profile.d/remap_envvars.sh" \
+    FILE_UPLOAD_DIR="${FILE_UPLOAD_DIR:-/var/lib/portal/uploads}" \
+    PERSISTENCE_EXCLUSIONS_DIR="${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}" \
     PROJECT_DIR="/opt/venvs/portal" \
-    BASH_ENV="/etc/profile.d/remap_envvars.sh"
+    RUN_USER="${RUN_USER:-www-data}"
 
 RUN \
-    mkdir --parents "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" "${PROJECT_DIR}/var/portal-instance/" && \
+    mkdir --parents \
+        "${FILE_UPLOAD_DIR}" \
+        "${PERSISTENCE_EXCLUSIONS_DIR}" \
+        "${PROJECT_DIR}/var/portal-instance/" && \
+    chown "$RUN_USER:$RUN_USER" \
+        "${PERSISTENCE_EXCLUSIONS_DIR}" \
+        "${PROJECT_DIR}/var/portal-instance/" && \
     echo 'eval $("${PROJECT_DIR}/bin/remap_envvars.py")' > /etc/profile.d/remap_envvars.sh
 
 
@@ -52,13 +59,8 @@ ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PATH="${PROJECT_DIR}/bin:${PATH}" \
     PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}" \
-    PERSISTENCE_EXCLUSIONS_DIR="${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}"
 
-RUN \
-    mkdir --parents "${PERSISTENCE_EXCLUSIONS_DIR}" && \
-    chown "$RUN_USER:$RUN_USER" "${PERSISTENCE_EXCLUSIONS_DIR}"
-
-EXPOSE "${PORT}"
+EXPOSE="${PORT}"
 
 CMD \
     env && \
