@@ -1190,7 +1190,7 @@ class TestEpromsStrategies(TestCase):
 
         from portal.config.model_persistence import ModelPersistence
         from portal.config.site_persistence import models
-        from portal.models.fhir import Coding
+        from portal.models.coding import Coding
         from portal.models.research_protocol import ResearchProtocol
 
         eproms_config_dir = os.path.join(
