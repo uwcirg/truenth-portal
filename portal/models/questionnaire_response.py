@@ -180,8 +180,8 @@ def generate_qnr_csv(qnr_bundle):
             self.convert_charrefs = True
             self.fed = []
 
-        def handle_data(self, d):
-            self.fed.append(d)
+        def handle_data(self, data):
+            self.fed.append(data)
 
         def get_data(self):
             return ' '.join(self.fed)
