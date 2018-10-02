@@ -2,14 +2,7 @@
 from enum import Enum
 
 from flask import abort, current_app
-import requests
-
-from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import NHHD_291036, TRUENTH_VALUESET
-from ..views.fhir import valueset_nhhd_291036
-from .coding import Coding
-from .locale import LocaleConstants
 
 BundleType = Enum(
     'BundleType',
