@@ -728,7 +728,7 @@
                             var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
                             theTerms["organization_id"] = topOrg || userOrgId;
                         }
-                        if (!theTerms["organization_id"] || !theTerms["agreement_url"]) {
+                        if (!theTerms["organization_id"] || !theTerms["agreement_url"]) { //this will display error to user if information is missing
                             $("#topTerms .post-tou-error").html(i18next.t("Missing information for organization and consent agreement.  Unable to complete request."));
                             return;
                         }
