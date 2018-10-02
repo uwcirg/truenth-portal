@@ -103,7 +103,7 @@ PostgreSQL Access
 -----------------
 To interact with the running database container, started via the ``docker-compose`` instructions above, use ``docker exec`` as follows below::
 
-    docker-compose exec db psql --username postgres
+    docker-compose exec db psql --username postgres --dbname portaldb
 
 Account Bootstrapping
 ---------------------
