@@ -34,12 +34,14 @@ RUN \
 
 ENV \
     BASH_ENV="/etc/profile.d/remap_envvars.sh" \
+    FILE_UPLOAD_DIR="${PERSISTENCE_EXCLUSIONS_DIR:-/var/lib/portal/uploads}" \
     PERSISTENCE_EXCLUSIONS_DIR="${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}" \
     PROJECT_DIR="/opt/venvs/portal" \
     RUN_USER="${RUN_USER:-www-data}"
 
 RUN \
     mkdir --parents \
+        "${FILE_UPLOAD_DIR}" \
         "${PERSISTENCE_EXCLUSIONS_DIR}" \
         "${PROJECT_DIR}/var/portal-instance/" && \
     chown "$RUN_USER:$RUN_USER" \
