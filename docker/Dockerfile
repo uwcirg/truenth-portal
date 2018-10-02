@@ -60,7 +60,7 @@ ENV \
     PATH="${PROJECT_DIR}/bin:${PATH}" \
     PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}" \
 
-EXPOSE "${PORT}"
+EXPOSE="${PORT}"
 
 CMD \
     env && \
