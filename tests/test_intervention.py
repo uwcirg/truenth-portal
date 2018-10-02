@@ -606,8 +606,9 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
 
-        assert ("The assessment is no longer available"
-            in ae.display_for_user(user).card_html)
+        assert (
+            "The assessment is no longer available" in
+            ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
