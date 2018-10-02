@@ -86,7 +86,6 @@ def fetch_HL7_V3_Namespace(valueSet):
     src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
         valueSet=valueSet)
     response = requests.get(src_url)
-    load = response.text
     return parse_concepts(response.json()['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
