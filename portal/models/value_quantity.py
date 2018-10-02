@@ -1,3 +1,5 @@
+from past.builtins import basestring
+
 from ..database import db
 
 
