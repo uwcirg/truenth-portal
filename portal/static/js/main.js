@@ -508,7 +508,7 @@ var tnthAjax = {
                     fieldHelper.showError(targetField);
                 } else if (data.error) {
                     callback({"error": true, "data": data});
-                    self.sendError(data, url, userId);
+                    self.sendError(data, url, userId, params);
                     fieldHelper.showError(targetField);
                 } else {
                     callback(data);
@@ -544,13 +544,16 @@ var tnthAjax = {
                 params.attempts = 0;
                 fieldHelper.showError(targetField);
                 callback({"error": true, "data": xhr});
-                self.sendError(xhr, url, userId);
+                self.sendError(xhr, url, userId, params);
             }
         });
     },
-    "sendError": function(xhr, url, userId) {
+    "sendError": function(xhr, url, userId, params) {
         if (!xhr) { return false; }
         var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
+        if (params) {
+            errorMessage += " [data sent]: " + JSON.stringify(params);
+        }
         tnthAjax.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
     "reportError": function(userId, page_url, message, sync) {
