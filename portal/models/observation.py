@@ -15,7 +15,8 @@ class Observation(db.Model):
         db.ForeignKey('codeable_concepts.id'), nullable=False)
     value_quantity_id = db.Column(
         db.ForeignKey('value_quantities.id'), nullable=False)
-    codeable_concept = db.relationship('CodeableConcept', cascade="save-update")
+    codeable_concept = db.relationship(
+        'CodeableConcept', cascade="save-update")
     value_quantity = db.relationship('ValueQuantity')
     performers = db.relationship(
         'Performer', lazy='dynamic', cascade="save-update",

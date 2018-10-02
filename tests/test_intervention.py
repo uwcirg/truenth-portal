@@ -11,7 +11,7 @@ import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC
+from portal.models.clinical_constants import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
 from portal.models.intervention import (

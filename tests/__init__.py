@@ -25,6 +25,7 @@ from portal.models.client import Client
 from portal.models.clinical_constants import add_static_concepts, CC
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
+from portal.models.communication_request import CommunicationRequest
 from portal.models.encounter import Encounter
 from portal.models.identifier import Identifier
 from portal.models.intervention import add_static_interventions, INTERVENTION
@@ -61,9 +62,7 @@ OAUTH_INFO_PROVIDER_LOGIN = {
     'token': '{ "property": "value" }',
 }
 
-# import hidden relation classes needed to create database
-from portal.models.communication_request import CommunicationRequest
-
+# cheap reference to hidden relation classes needed to create database
 CommunicationRequest
 
 
@@ -260,7 +259,7 @@ class TestCase(Base):
         """
         if not sponsor:
             sponsor = self.test_user
-        if not sponsor in db.session:
+        if sponsor not in db.session:
             sponsor = db.session.merge(sponsor)
         service_user = sponsor.add_service_account()
         with SessionScope(db):

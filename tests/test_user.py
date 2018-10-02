@@ -173,7 +173,8 @@ class TestUser(TestCase):
         fhir_data = kls.as_fhir()
 
         assert len(fhir_data['valueCodeableConcept']['coding']) == 2
-        codes = [c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
+        codes = [
+            c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
         assert '2135-2' in codes
         assert '2142-8' in codes
 
@@ -219,7 +220,8 @@ class TestUser(TestCase):
         fhir_data = kls.as_fhir()
 
         assert len(fhir_data['valueCodeableConcept']['coding']) == 2
-        codes = [c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
+        codes = [
+            c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
         assert '1' in codes
         assert '4' in codes
 
@@ -373,7 +375,6 @@ class TestUser(TestCase):
         # Second POST should fail
         response = self.client.post('/api/user/{}/reactivate'.format(user_id))
         assert response.status_code == 400
-
 
     def test_user_timezone(self):
         assert self.test_user.timezone == 'UTC'

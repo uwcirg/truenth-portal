@@ -360,5 +360,3 @@ def generate_qnr_csv(qnr_bundle):
                     row.append('"' + column + '"')
 
                 yield ','.join(row) + '\n'
-
-

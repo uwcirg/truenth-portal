@@ -1,7 +1,7 @@
 """User model """
 from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
@@ -485,20 +485,21 @@ class User(db.Model, UserMixin):
         assert (self._email and len(self._email))
 
     def email_ready(self):
-        """Returns (True, None) IFF user has valid email and necessary criteria
+        """Returns (True, None) IFF user has valid email & necessary criteria
 
-        As user's frequently forget their passwords or start in a state without
-        a valid email address, the system should NOT email invites or reminders
-        unless adequate data is on file for the user to perform a reset password
-        loop.
+        As user's frequently forget their passwords or start in a state
+        without a valid email address, the system should NOT email invites
+        or reminders unless adequate data is on file for the user to perform
+        a reset password loop.
 
         NB exceptions exist for systems with the NO_CHALLENGE_WO_DATA
-        configuration set, as those systems allow for change of password without
-        the verification step, if the user doesn't have a required field set.
+        configuration set, as those systems allow for change of password
+        without the verification step, if the user doesn't have a required
+        field set.
 
-        :returns: (Success, Failure message), such as (True, None) if the user
-            account is "email_ready" or (False, _"invalid email") if the reason
-            for failure is a lack of valid email address.
+        :returns: (Success, Failure message), such as (True, None) if the
+            user account is "email_ready" or (False, _"invalid email") if
+            the reason for failure is a lack of valid email address.
 
         """
         try:
@@ -518,8 +519,9 @@ class User(db.Model, UserMixin):
             return False, _("invalid email address")
 
         else:
-            # Otherwise, require all challenge fields are defined, so an emailed
-            # user could finish a process such as reset password, if needed.
+            # Otherwise, require all challenge fields are defined,
+            # so an emailed user could finish a process such as reset
+            # password, if needed.
             if all((self.birthdate, self.first_name, self.last_name)):
                 return True, None
             else:
@@ -678,9 +680,11 @@ class User(db.Model, UserMixin):
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
                     locale_options[locale.code] = locale.display
-                if org.default_locale and org.default_locale not in locale_options:
-                    locale_options[org.default_locale] = locale_name_from_code(
-                        org.default_locale)
+                if (
+                        org.default_locale and
+                        org.default_locale not in locale_options):
+                    locale_options[org.default_locale] = (
+                        locale_name_from_code(org.default_locale))
 
         return locale_options
 
@@ -1728,7 +1732,8 @@ class User(db.Model, UserMixin):
         # sneak in with the same address while deleted.  The accessor returns
         # the unmasked value.
         unmasked = self.email
-        if User.query.filter(func.lower(User.email) == unmasked.lower()).count() > 0:
+        if User.query.filter(
+                func.lower(User.email) == unmasked.lower()).count() > 0:
             raise ValueError(
                 "A new account with same email {} in conflict. "
                 "Can't reactivate".format(unmasked))
@@ -1917,8 +1922,9 @@ class UserRelationship(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return ("{0.relationship} between {0.user_id} and {0.other_user_id}"
-            .format(self))
+        return (
+            "{0.relationship} between {0.user_id} and "
+            "{0.other_user_id}".format(self))
 
     def as_json(self):
         """serialize the relationship - used to preserve service users"""

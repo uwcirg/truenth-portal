@@ -96,9 +96,9 @@ class Organization(db.Model):
     @use_specific_codings.setter
     def use_specific_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | USE_SPECIFIC_CODINGS_MASK
+            self.coding_options |= USE_SPECIFIC_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~USE_SPECIFIC_CODINGS_MASK
+            self.coding_options &= ~USE_SPECIFIC_CODINGS_MASK
 
     @hybrid_property
     def race_codings(self):
@@ -113,9 +113,9 @@ class Organization(db.Model):
     @race_codings.setter
     def race_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | RACE_CODINGS_MASK
+            self.coding_options |= RACE_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~RACE_CODINGS_MASK
+            self.coding_options &= ~RACE_CODINGS_MASK
 
     @hybrid_property
     def ethnicity_codings(self):
@@ -130,9 +130,9 @@ class Organization(db.Model):
     @ethnicity_codings.setter
     def ethnicity_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | ETHNICITY_CODINGS_MASK
+            self.coding_options |= ETHNICITY_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~ETHNICITY_CODINGS_MASK
+            self.coding_options &= ~ETHNICITY_CODINGS_MASK
 
     @hybrid_property
     def indigenous_codings(self):
@@ -147,9 +147,9 @@ class Organization(db.Model):
     @indigenous_codings.setter
     def indigenous_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | INDIGENOUS_CODINGS_MASK
+            self.coding_options |= INDIGENOUS_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
+            self.coding_options &= ~INDIGENOUS_CODINGS_MASK
 
     @property
     def phone(self):
@@ -377,8 +377,8 @@ class Organization(db.Model):
     def generate_bundle(cls, limit_to_ids=None, include_empties=True):
         """Generate a FHIR bundle of existing orgs ordered by ID
 
-        :param limit_to_ids: if defined, only return the matching set, otherwise
-          all organizations found
+        :param limit_to_ids: if defined, only return the matching set,
+          otherwise all organizations found
         :param include_empties: set to include empty attributes
         :return:
 
@@ -536,8 +536,9 @@ class ResearchProtocolExtension(CCExtension):
             else:
                 remove_if_not_requested.remove(existing)
 
-                # Unfortunately, the association proxy requires we now query for the
-                # intermediary (link) table to check/set the value of `retired_as_of`
+                # Unfortunately, the association proxy requires
+                # we now query for the intermediary (link) table to
+                # check/set the value of `retired_as_of`
 
                 o_rp = OrganizationResearchProtocol.query.filter(
                     OrganizationResearchProtocol.organization_id ==
@@ -836,7 +837,7 @@ class OrgTree(object):
             given organization_id, or a child of it.
 
         """
-        ## work through list - shortcircuit out if a qualified node is found
+        # work through list - short circuit out if a qualified node is found
         for other_organization_id in other_organizations:
             if organization_id == other_organization_id:
                 return True

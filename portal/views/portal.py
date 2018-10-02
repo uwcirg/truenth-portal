@@ -243,7 +243,8 @@ def specific_clinic_landing(clinic_alias):
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
 
-    # Top-level orgs with child orgs won't work, as the UI only lists the clinic level
+    # Top-level orgs with child orgs won't work, as the UI only lists
+    # the clinic level
     org = Organization.query.get(results.organization_id)
     if org.partOf_id is None:
         orgs = OrgTree().here_and_below_id(results.organization_id)
@@ -369,9 +370,9 @@ def access_via_token(token, next_step=None):
             # Still here implies a WRITE_ONLY user in process of registration.
             # Preserve the invited user id, should we need to
             # merge associated details after user proves themselves and logs in
-            auditable_event("invited user entered using token, pending "
-                            "registration", user_id=user.id, subject_id=user.id,
-                            context='account')
+            auditable_event(
+                "invited user entered using token, pending registration",
+                user_id=user.id, subject_id=user.id, context='account')
             session['challenge.next_url'] = url_for(
                 'user.register', email=user.email)
             session['challenge.merging_accounts'] = True
@@ -499,11 +500,12 @@ def initial_queries():
         current_app.logger.debug("POST initial_queries -> next_after_login")
         return next_after_login()
     elif len(Coredata().still_needed(user)) == 0:
-        # also handle the situations that resulted from: 1. user refreshing the browser or
-        # 2. exiting browser and resuming session thereafter
-        # In both cases, the request method is GET,
-        # hence a redirect back to initial-queries page won't ever reach the above check
-        # specifically for next_after_login based on the request method of POST
+        # also handle the situations that resulted from:
+        #  1. user refreshing the browser or
+        #  2. exiting browser and resuming session thereafter
+        # In both cases, the request method is GET, hence a redirect back to
+        # initial-queries page won't ever reach the above check specifically
+        # for next_after_login based on the request method of POST
         current_app.logger.debug("GET initial_queries -> next_after_login")
         return next_after_login()
 
@@ -959,7 +961,8 @@ def spec():
                 if parameter['in'] == 'path' and (
                         "{%s}" % parameter['name']) not in path:
                     # Prevent duplicate operationIds by adding suffix
-                    # Assume "simple" version of API route if path parameter included but not in path
+                    # Assume "simple" version of API route if path parameter
+                    # included but not in path
                     swag['paths'][path][method][
                         'operationId'] = "{}-simple".format(operation_id)
                     continue
@@ -970,7 +973,8 @@ def spec():
             if parameters:
                 swag['paths'][path][method]['parameters'] = parameters
 
-            # Add method as suffix to prevent duplicate operationIds on synonymous routes
+            # Add method as suffix to prevent duplicate operationIds on
+            # synonymous routes
             if method == 'put' or method == 'post':
                 swag['paths'][path][method]['operationId'] = "{}-{}".format(
                     operation_id, method)
@@ -1134,7 +1138,8 @@ def stock_consent(org_name):
 
 
 def get_asset(uuid):
-    url = "{}/c/portal/truenth/asset/detailed".format(current_app.config["LR_ORIGIN"])
+    url = "{}/c/portal/truenth/asset/detailed".format(
+        current_app.config["LR_ORIGIN"])
     return requests.get(url, params={'uuid': uuid}).json()['asset']
 
 
@@ -1143,7 +1148,8 @@ def get_any_tag_data(*anyTags):
         query LR based on any tags
         this is an OR condition
         will match any tag specified
-        :param anyTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+        :param anyTag: a variable number of tags to be queried,
+         e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
     liferay_qs_params = {
@@ -1152,7 +1158,8 @@ def get_any_tag_data(*anyTags):
         'sortType': 'DESC'
     }
 
-    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    url = "{}/c/portal/truenth/asset/query".format(
+        current_app.config["LR_ORIGIN"])
     return requests.get(url, params=liferay_qs_params).json()
 
 
@@ -1161,7 +1168,8 @@ def get_all_tag_data(*allTags):
         query LR based on all required tags
         this is an AND condition
         all required tags must be present
-        :param allTag: a variable number of tags to be queried, e.g., 'tag1', 'tag2'
+        :param allTag: a variable number of tags to be queried,
+         e.g., 'tag1', 'tag2'
     """
     # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
     liferay_qs_params = {
@@ -1170,5 +1178,6 @@ def get_all_tag_data(*allTags):
         'sortType': 'DESC'
     }
 
-    url = "{}/c/portal/truenth/asset/query".format(current_app.config["LR_ORIGIN"])
+    url = "{}/c/portal/truenth/asset/query".format(
+        current_app.config["LR_ORIGIN"])
     return requests.get(url, params=liferay_qs_params).json()

@@ -35,9 +35,9 @@ def patient_search():
     search parameters result in only a deleted user.
 
     This API does NOT return a patient bundle, but rather only a single FHIR
-    Patient on success.  If the search criteria is ambiguous, resulting in multiple
-    (non-deleted) patients, a 400 is raised, as only a bundle would adequately
-    house the results.
+    Patient on success.  If the search criteria is ambiguous, resulting in
+    multiple (non-deleted) patients, a 400 is raised, as only a bundle would
+    adequately house the results.
 
     Returns a FHIR patient resource (http://www.hl7.org/fhir/patient.html)
     formatted in JSON if a match is found, 404 otherwise.
@@ -163,8 +163,8 @@ def post_patient_deceased(patient_id):
           resource](http://www.hl7.org/fhir/patient.html) in JSON.
       400:
         description:
-          if given parameters don't function, such as a false deceasedBoolean AND
-          a deceasedDateTime value.
+          if given parameters don't function, such as a false
+          deceasedBoolean AND a deceasedDateTime value.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -186,14 +186,16 @@ def post_patient_deceased(patient_id):
     return jsonify(patient.as_fhir(include_empties=False))
 
 
-@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
-@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
+@patient_api.route(
+    '/api/patient/<int:patient_id>/birthdate', methods=('POST',))
+@patient_api.route(
+    '/api/patient/<int:patient_id>/birthDate', methods=('POST',))
 @oauth.require_oauth()
 def post_patient_dob(patient_id):
     """POST date of birth for a patient
 
-    This convenience API wraps the ability to set a patient's birthDate - generally
-    the /api/demographics API should be preferred.
+    This convenience API wraps the ability to set a patient's birthDate.
+    Generally the /api/demographics API should be preferred.
 
     ---
     tags:

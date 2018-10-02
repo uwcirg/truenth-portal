@@ -67,5 +67,3 @@ def v_or_first(value, field_name):
             abort(400, msg)
         return value[0]
     return value
-
-

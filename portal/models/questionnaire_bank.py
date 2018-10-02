@@ -299,8 +299,8 @@ class QuestionnaireBank(db.Model):
             # At this time, doesn't apply to metastatic patients.
             if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
 
-                # Complicated rules (including strategies and UserIntervention rows)
-                # define a user's access to an intervention.  Rely on the
+                # Complicated rules (including strategies and UserIntervention
+                # rows) define a user's access to an intervention. Rely on the
                 # same check used to display the intervention cards, and only
                 # check if intervention is associated with QBs.
                 intervention_qbs = QuestionnaireBank.query.filter(
@@ -323,7 +323,8 @@ class QuestionnaireBank(db.Model):
         # collate submitted QBs, QBs by org and QBs by intervention
         in_progress = submitted_qbs(user=user, classification=classification)
         by_org = qbs_by_org(user=user, classification=classification)
-        by_intervention = qbs_by_intervention(user=user, classification=classification)
+        by_intervention = qbs_by_intervention(
+            user=user, classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
             # Need one QB for baseline, indef - prefer in_progress
