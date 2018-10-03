@@ -486,6 +486,7 @@ class TestQuestionnaireBank(TestCase):
         resp = self.client.get('/api/questionnaire')
         assert resp.status_code == 200
         assert len(resp.json['entry']) == 3
+        assert all(('resource' in entry for entry in resp.json['entry']))
 
         resp = self.client.get('/api/questionnaire/{}?system={}'.format(
             'epic26', TRUENTH_QUESTIONNAIRE_CODE_SYSTEM))
@@ -512,7 +513,7 @@ class TestQuestionnaireBank(TestCase):
 
         resp = self.client.get('/api/questionnaire_bank')
         assert resp.status_code == 200
-        assert len(resp.json['entry'][0]['questionnaires']) == 3
+        assert len(resp.json['entry'][0]['resource']['questionnaires']) == 3
 
     def test_visit_baseline(self):
         crv = self.setup_qbs()

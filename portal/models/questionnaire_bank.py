@@ -11,6 +11,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..trace import trace
 from .clinical_constants import CC
+from .fhir import bundle_results
 from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
@@ -210,22 +211,11 @@ class QuestionnaireBank(db.Model):
         if limit_to_ids:
             query = query.filter(QuestionnaireBank.id.in_(limit_to_ids))
 
-        objs = [q.as_json() for q in query]
-
-        bundle = {
-            'resourceType': 'Bundle',
-            'updated': FHIR_datetime.now(),
-            'total': len(objs),
-            'type': 'searchset',
-            'link': {
-                'rel': 'self',
-                'href': url_for(
-                    'questionnaire_api.questionnaire_bank_list',
-                    _external=True),
-            },
-            'entry': objs,
-        }
-        return bundle
+        objs = [{'resource': q.as_json()} for q in query]
+        link = {
+            'rel': 'self', 'href': url_for(
+                'questionnaire_api.questionnaire_bank_list', _external=True)}
+        return bundle_results(elements=objs, links=[link])
 
     @staticmethod
     def qbs_for_user(user, classification, as_of_date):
