@@ -305,10 +305,12 @@
                 </select>
             </div>
         </div>
-        <div v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" v-show="!patientEmailForm.loading" disabled>{{ _("Send email") }}</button>
-        <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
-        <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" disabled>{{ _("Send email") }}</button>
+        <div id="profile{{prefix}}EmailBtnMsgWrapper" class="profilePatientEmail__btn-msg-wrapper tnth-hide">
+            <div id="profile{{prefix}}EmailLoadingIndicator" v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
+            <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
+        </div>
         {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
