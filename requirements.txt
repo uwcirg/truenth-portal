@@ -2,7 +2,7 @@
 # See https://github.com/spotify/dh-virtualenv/issues/150
 --no-binary billiard,cffi,psycopg2
 
-alabaster==0.7.11         # via sphinx
+alabaster==0.7.12         # via sphinx
 alembic==1.0.0            # via flask-migrate
 amqp==2.3.2               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
