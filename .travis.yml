@@ -124,7 +124,7 @@ deploy:
         - -v ARTIFACTORY_API_KEY
         - -v ARTIFACTORY_DEB_REPO
         # Only deploy from develop, master and release branches
-        - "$GIT_BRANCH" =~ ^(develop$|master$|release/)
+        - $GIT_BRANCH =~ ^(develop$|master$|release/)
     script:
       - curl
           --verbose
@@ -140,7 +140,7 @@ deploy:
         - $TOXENV = build-artifacts
         - -v ARTIFACTORY_API_KEY
         # Only deploy from develop, master and release branches
-        - "$GIT_BRANCH" =~ ^(develop$|master$|release/)
+        - $GIT_BRANCH =~ ^(develop$|master$|release/)
     script:
       - ./bin/docker-push.sh
 
