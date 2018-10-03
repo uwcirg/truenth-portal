@@ -81,6 +81,13 @@
         var self = this, sections = self.getSections(), tnthAjax = this.__getDependency("tnthAjax");
         var initDataObj = {
             "topTerms": function() {
+                tnthAjax.getTermsUrl(false, function(data) {
+                    if (!data || !data.url) {
+                        return false;
+                    }
+                    $("#termsURL").attr("data-url", data.url); //default terms of use url
+                    $("#termsCheckbox_default .terms-url").attr("href", data.url);
+                });
                 tnthAjax.getTerms(self.userId, "", "", function() {
                     self.setSectionDataLoadedFlag("topTerms", true);
                 });

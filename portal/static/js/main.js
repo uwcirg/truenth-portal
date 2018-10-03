@@ -1202,8 +1202,6 @@ var tnthAjax = {
                 if (!data.error) {
                     $(".get-tou-error").html("");
                     if (data.url) {
-                        $("#termsURL").attr("data-url", data.url);
-                        $("#termsCheckbox_default .terms-url").attr("href", data.url);
                         callback({"url": data.url});
                     } else {
                         callback({"error": i18next.t("no url returned")});
