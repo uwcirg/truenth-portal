@@ -45,6 +45,7 @@ RUN \
         "${PERSISTENCE_EXCLUSIONS_DIR}" \
         "${PROJECT_DIR}/var/portal-instance/" && \
     chown "$RUN_USER:$RUN_USER" \
+        "${FILE_UPLOAD_DIR}" \
         "${PERSISTENCE_EXCLUSIONS_DIR}" \
         "${PROJECT_DIR}/var/portal-instance/" && \
     echo 'eval $("${PROJECT_DIR}/bin/remap_envvars.py")' > /etc/profile.d/remap_envvars.sh
