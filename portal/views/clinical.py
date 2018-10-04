@@ -301,6 +301,12 @@ def clinical(patient_id):
     Returns a patient's clinical data (eg TNM, Gleason score) as a FHIR
     bundle of observations (http://www.hl7.org/fhir/observation.html)
     in JSON.
+
+    NB - currently out of FHIR DSTU2 spec by default.  Include query string
+    parameter ``patch_dstu2=True`` to properly nest each practitioner under
+    a ``resource`` attribute.  Please consider using, as this will become
+    default behavior in the future.
+
     ---
     tags:
       - Clinical
@@ -314,6 +320,12 @@ def clinical(patient_id):
         required: true
         type: integer
         format: int64
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
     responses:
       200:
         description:
@@ -328,7 +340,9 @@ def clinical(patient_id):
     """
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    return jsonify(patient.clinical_history(requestURL=request.url))
+    patch_dstu2 = request.args.get('patch_dstu2', False)
+    return jsonify(patient.clinical_history(
+        requestURL=request.url, patch_dstu2=patch_dstu2))
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical',

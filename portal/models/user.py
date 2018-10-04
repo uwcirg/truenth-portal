@@ -40,7 +40,7 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
-from .fhir import v_or_first, v_or_n
+from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .observation import Observation, UserObservation
@@ -961,11 +961,17 @@ class User(db.Model, UserMixin):
         invalidate_assessment_status_cache(self.id)
         return observation
 
-    def clinical_history(self, requestURL=None):
+    def clinical_history(self, requestURL=None, patch_dstu2=False):
+        links = [{"rel": "self", "href": requestURL}]
+        if patch_dstu2:
+            elements = [
+                {'resource': ob.as_fhir()} for ob in self.observations]
+            return bundle_results(elements=elements, links=links)
+
         now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Clinical History",
-                "link": [{"rel": "self", "href": requestURL}, ],
+                "link": links,
                 "updated": as_fhir(now),
                 "entry": []}
 

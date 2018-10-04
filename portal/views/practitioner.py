@@ -39,7 +39,8 @@ def practitioner_search():
 
     NB - currently out of FHIR DSTU2 spec by default.  Include query string
     parameter ``patch_dstu2=True`` to properly nest each practitioner under
-    a ``resource`` attribute.
+    a ``resource`` attribute.  Please consider using, as this will become
+    default behavior in the future.
 
     ---
     operationId: practitioner_search
