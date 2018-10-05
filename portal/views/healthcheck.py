@@ -19,9 +19,9 @@ def celery_beat_ping():
     """
     rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
     rs.setex(
-        'last_celery_beat_ping',
-        current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
-        str(datetime.now()),
+        name='last_celery_beat_ping',
+        time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
+        value=str(datetime.now())
     )
     return 'PONG'
 
