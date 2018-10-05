@@ -75,7 +75,7 @@ requests==2.19.1          # via flask-recaptcha, requests-cache, requests-oauthl
 selenium==3.14.1
 six==1.11.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
-sphinx-rtd-theme==0.4.1
+sphinx-rtd-theme==0.4.2
 sphinx==1.8.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
 sqlalchemy==1.2.12         # via alembic, flask-sqlalchemy
