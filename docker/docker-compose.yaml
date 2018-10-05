@@ -29,6 +29,13 @@ services:
       - redis
       - celeryworker
       - celerybeat
+    volumes:
+      - source: user-documents
+        target: ${FILE_UPLOAD_DIR:-/var/lib/portal/uploads}
+        type: volume
+      - source: tmp-persistence-data
+        target: ${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}
+        type: volume
 
   celeryworker:
     <<: *service_base
@@ -73,3 +80,5 @@ services:
 
 volumes:
     postgres-data: {}
+    user-documents: {}
+    tmp-persistence-data: {}

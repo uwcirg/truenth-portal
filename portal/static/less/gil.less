@@ -6535,7 +6535,7 @@ a:hover {
 }
 
 .header.no-banner {
-    padding-top: 0
+    padding-top: 2em;
 }
 
 @media (max-width:899px) {
@@ -8974,7 +8974,10 @@ a.home--modal-link {
 }
 
 #consentContainer {
-    visibility: invisible
+    visibility: hidden;
+    position: fixed;
+    bottom: 0;
+    z-index: -1;
 }
 
 .box-modal div.or {

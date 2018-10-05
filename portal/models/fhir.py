@@ -23,7 +23,7 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .lazy import lazyprop
 from .locale import LocaleConstants
-from .organization import OrgTree
+from .organization import Organization, OrgTree
 from .performer import Performer
 from .reference import Reference
 
@@ -291,8 +291,8 @@ class UserObservation(db.Model):
         'users.id', ondelete='CASCADE'), nullable=False)
     observation_id = db.Column(
         db.ForeignKey('observations.id'), nullable=False)
-    encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
+    encounter_id = db.Column(db.ForeignKey(
+        'encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     audit = db.relationship('Audit', cascade="save-update, delete")
@@ -389,6 +389,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         to list of patients the current_user has permission to see
 
     """
+    from .questionnaire_bank import QuestionnaireBank, visit_name
+
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = OrgTree().visible_patients(current_user)
 
@@ -408,7 +410,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             or_(*instrument_filters))
 
     patient_fields = ("careProvider", "identifier")
-
+    system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
@@ -420,10 +422,23 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         }
 
         if subject.organizations:
-            questionnaire_response.document["subject"]["careProvider"] = [
-                Reference.organization(org.id).as_fhir()
-                for org in subject.organizations
-            ]
+            providers = []
+            for org in subject.organizations:
+                org_ref = Reference.organization(org.id).as_fhir()
+                identifiers = [i.as_fhir() for i in org.identifiers if
+                               i.system in system_filter]
+                if identifiers:
+                    org_ref['identifier'] = identifiers
+                providers.append(org_ref)
+            questionnaire_response.document[
+                "subject"]["careProvider"] = providers
+
+        # To lookup the time point, obtain the qbd holding both the qb
+        # and iteration to which the document applies
+
+        qbd = QuestionnaireBank.most_current_qb(
+            subject, as_of_date=encounter.start_time)
+        questionnaire_response.document["timepoint"] = visit_name(qbd)
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
@@ -502,7 +517,7 @@ def generate_qnr_csv(qnr_bundle):
             return ' '.join(self.fed)
 
     def strip_tags(html):
-        """Strip HTML tags from strings. Inserts replacement whitespace if necessary."""
+        """Strip HTML tags from strings. Inserts whitespace if necessary."""
 
         s = HTMLStripper()
         s.feed(html)
@@ -521,11 +536,17 @@ def generate_qnr_csv(qnr_bundle):
         return None
 
     def get_site(qnr_data):
-        """Return name of first organization, else None"""
+        """Return (external id, name) of first organization, else Nones"""
         try:
-            return qnr_data['subject']['careProvider'][0]['display']
+            provider = qnr_data['subject']['careProvider'][0]
+            org_name = provider['display']
+            if 'identifier' in provider:
+                id_value = provider['identifier'][0]['value']
+            else:
+                id_value = None
+            return id_value, org_name
         except (KeyError, IndexError):
-            return None
+            return None, None
 
     def consolidate_answer_pairs(answers):
         """
@@ -589,12 +610,14 @@ def generate_qnr_csv(qnr_bundle):
         'identifier',
         'status',
         'study_id',
+        'site_id',
         'site_name',
         'truenth_subject_id',
         'author_id',
         'author_role',
         'entry_method',
         'authored',
+        'timepoint',
         'instrument',
         'question_code',
         'answer_code',
@@ -604,6 +627,7 @@ def generate_qnr_csv(qnr_bundle):
 
     yield ','.join('"' + column + '"' for column in columns) + '\n'
     for qnr in qnr_bundle['entry']:
+        site_id, site_name = get_site(qnr)
         row_data = {
             'identifier': qnr['identifier']['value'],
             'status': qnr['status'],
@@ -612,13 +636,15 @@ def generate_qnr_csv(qnr_bundle):
                 use='official'
             ),
             'author_id': qnr['author']['reference'].split('/')[-1],
-            'site_name': get_site(qnr),
+            'site_id': site_id,
+            'site_name': site_name,
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
                 system=TRUENTH_EXTERNAL_STUDY_SYSTEM
             ),
             'authored': qnr['authored'],
+            'timepoint': qnr['timepoint'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
         row_data.update({
@@ -646,7 +672,7 @@ def generate_qnr_csv(qnr_bundle):
                             'answer_code': answer['valueCoding']['code'],
 
                             # Add supplementary text added earlier
-                            # Todo: lookup option text from stored Questionnaire
+                            # Todo: lookup option text in stored Questionnaire
                             'option_text': strip_tags(
                                 answer['valueCoding'].get('text', None)),
                             'other_text': None,
@@ -716,11 +742,11 @@ def add_static_concepts(only_quick=False):
             db.session.add(concept)
 
     for clinical_concepts in CC:
-        if not clinical_concepts in db.session():
+        if clinical_concepts not in db.session():
             db.session.add(clinical_concepts)
 
     for encounter_type in EC:
-        if not encounter_type in db.session():
+        if encounter_type not in db.session():
             db.session.add(encounter_type)
 
     for concept in LocaleConstants():

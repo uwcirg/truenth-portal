@@ -4,6 +4,10 @@ version: "3.2"
 services:
   web:
     restart: unless-stopped
+    environment:
+      # Number of worker processes for handling requests
+      # http://docs.gunicorn.org/en/stable/settings.html#workers
+      WEB_CONCURRENCY: 4
 
   celeryworker:
     restart: unless-stopped

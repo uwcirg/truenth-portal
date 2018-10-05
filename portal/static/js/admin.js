@@ -302,7 +302,7 @@
                 }
             },
             handleAffiliatedUIVis: function () {
-                $("#adminTableContainer input[data-field='id']:checkbox, #adminTableContainer input[data-field='deactivate']:checkbox, #adminTableContainer input[data-field='deleted']:checkbox").closest("label").hide(); //hide checkbox for hidden id field and deactivate account field from side menu
+                $("#adminTableContainer input[data-field='id']:checkbox, #adminTableContainer input[data-field='deactivate']:checkbox, #adminTableContainer input[data-field='activationstatus']:checkbox").closest("label").hide(); //hide checkbox for hidden id field and deactivate account field from side menu
                 $("#patientReportModal").modal({
                     "show": false
                 });

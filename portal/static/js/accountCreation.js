@@ -424,6 +424,12 @@
             }
             OT.populateOrgsList(data.entry);
             OT.populateUI();
+
+            if (!$("#userOrgs input[name='organization']").length) { 
+                //UI orgs aren't populated for some reason and no indication of error from returned data from ajax call, e.g. related to cached session data
+                $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
+                return false;
+            }
             var isPatient = $.grep(this.roles, function(role) {
                 return role.name === "patient";
             });

@@ -17,7 +17,13 @@ from portal.models.assessment_status import (
 )
 from portal.models.audit import Audit
 from portal.models.encounter import Encounter
-from portal.models.fhir import CC, QuestionnaireResponse, qnr_document_id
+from portal.models.fhir import (
+    aggregate_responses,
+    CC,
+    QuestionnaireResponse,
+    qnr_document_id,
+)
+from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
@@ -60,8 +66,11 @@ def mock_qr(
         db.session.add(enc)
         db.session.commit()
     enc = db.session.merge(enc)
-    qb = qb or QuestionnaireBank.most_current_qb(get_user(TEST_USER_ID),
-                                                 timestamp).questionnaire_bank
+    if not qb:
+        qbd = QuestionnaireBank.most_current_qb(
+            get_user(TEST_USER_ID), timestamp)
+        qb, iteration = qbd.questionnaire_bank, qbd.iteration
+
     qr = QuestionnaireResponse(
         subject_id=TEST_USER_ID,
         status=status,
@@ -308,6 +317,83 @@ class TestQuestionnaireSetup(TestCase):
     def setUp(self):
         super(TestQuestionnaireSetup, self).setUp()
         mock_questionnairebanks(self.eproms_or_tnth)
+
+
+class TestAggregateResponses(TestQuestionnaireSetup):
+
+    def test_aggregate_response_timepoints(self):
+        # generate a few mock qr's from various qb iterations, confirm
+        # time points.
+
+        nineback, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=9, hours=1))
+        self.bless_with_basics(
+            setdate=nineback, local_metastatic='metastatic')
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        instrument_id = 'eortc'
+        for months_back in range(0, 10, 3):
+            backdate, _ = associative_backdate(
+                now=now, backdate=relativedelta(months=months_back))
+            mock_qr(instrument_id=instrument_id, timestamp=backdate)
+
+        # add staff user w/ same org association for bundle creation
+
+        staff = self.add_user(username='staff')
+        staff.organizations.append(Organization.query.filter(
+                Organization.name == 'metastatic').one())
+        self.promote_user(staff, role_name=ROLE.STAFF.value)
+        staff = db.session.merge(staff)
+        bundle = aggregate_responses(
+            instrument_ids=[instrument_id], current_user=staff)
+        expected = {'Baseline', 'Month 3', 'Month 6', 'Month 9'}
+        found = [i['timepoint'] for i in bundle['entry']]
+        assert set(found) == expected
+
+    def test_site_ids(self):
+        # bless org w/ expected identifier type
+        wanted_system = 'http://pcctc.org/'
+        unwanted_system = 'http://other.org/'
+        self.app.config['REPORTING_IDENTIFIER_SYSTEMS'] = [wanted_system]
+        id_value = '146-11'
+        org = Organization.query.filter(
+            Organization.name == 'metastatic').one()
+        id1 = Identifier(
+            system=wanted_system, use='secondary', value=id_value)
+        id2 = Identifier(
+            system=unwanted_system, use='secondary', value=id_value)
+        org.identifiers.append(id1)
+        org.identifiers.append(id2)
+
+        with SessionScope(db):
+            db.session.commit()
+
+        nineback, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=9, hours=1))
+        self.bless_with_basics(
+            setdate=nineback, local_metastatic='metastatic')
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        instrument_id = 'eortc'
+        mock_qr(instrument_id=instrument_id)
+
+        # add staff user w/ same org association for bundle creation
+
+        staff = self.add_user(username='staff')
+        staff.organizations.append(Organization.query.filter(
+                Organization.name == 'metastatic').one())
+        self.promote_user(staff, role_name=ROLE.STAFF.value)
+        staff = db.session.merge(staff)
+        bundle = aggregate_responses(
+            instrument_ids=[instrument_id], current_user=staff)
+        id1 = db.session.merge(id1)
+        assert 1 == len(bundle['entry'])
+        assert (1 ==
+                len(bundle['entry'][0]['subject']['careProvider']))
+        assert (1 ==
+                len(bundle['entry'][0]['subject']['careProvider'][0]
+                    ['identifier']))
+        assert (id1.as_fhir() ==
+                bundle['entry'][0]['subject']['careProvider'][0]
+                ['identifier'][0])
 
 
 class TestAssessmentStatus(TestQuestionnaireSetup):

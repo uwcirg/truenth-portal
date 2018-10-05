@@ -183,7 +183,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_recurring_3mo_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -219,7 +219,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_v3_recurring_3mo_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -255,7 +255,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_recurring_6mo_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -303,7 +303,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_v3_recurring_6mo_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -351,7 +351,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_recurring_annual_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -408,7 +408,7 @@
       "due": "{\"days\": 14}",
       "expired": "{\"days\": 29}",
       "name": "IRONMAN_v3_recurring_annual_pattern",
-      "overdue": "{\"days\": 21}",
+      "overdue": "{\"days\": 15}",
       "questionnaires": [
         {
           "questionnaire": {

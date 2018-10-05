@@ -1,5 +1,6 @@
 """Unit test module for patch_flask_user"""
 from __future__ import unicode_literals  # isort:skip
+from flask import current_app
 
 from portal.views.patch_flask_user import patch_make_safe_url
 from tests import TestCase
@@ -37,3 +38,24 @@ class TestPathFlaskUser(TestCase):
         safe_url = patch_make_safe_url(url)
         index = url.find('/search')
         assert url[index:] == safe_url
+
+    def test_user_manager_find_user_wildcards_not_respected(self):
+        # At the time of writing this test flask-user looked up
+        # users using the LIKE clause which treats certain characters
+        # as special character, such as '_' which is treated as a wild card.
+        # This test will help us ensure that we avoid special characters
+        # when looking up users
+        self.add_user(username='foo', email='someUsername@example.com')
+        user_manager = current_app.user_manager
+        user = user_manager.find_user_by_email('some_sername@example.com')[0]
+        assert user is None
+
+    def test_user_manager_find_user_case_insensitive(self):
+        added_user = self.add_user(
+            username='foo',
+            email='CrAzYcAsInG@example.com'
+        )
+        user_manager = current_app.user_manager
+        user = user_manager.find_user_by_email('crazycasing@example.com')[0]
+        assert user is not None
+        assert user.id == added_user.id

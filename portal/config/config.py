@@ -100,12 +100,14 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
+    PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
     PRE_REGISTERED_ROLES = [
         'access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
+    REPORTING_IDENTIFIER_SYSTEMS = []
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_PUBLIC_TERMS = True
@@ -138,12 +140,13 @@ class BaseConfig(object):
     COPYRIGHT_YEAR = 2018  # TrueNTH copyright year
 
     FACEBOOK_OAUTH_CLIENT_ID = os.environ.get('FACEBOOK_OAUTH_CLIENT_ID')
-    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get('FACEBOOK_OAUTH_CLIENT_SECRET')
+    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get(
+        'FACEBOOK_OAUTH_CLIENT_SECRET')
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
-    FILE_UPLOAD_DIR = 'uploads'
+    FILE_UPLOAD_DIR = os.environ.get('FILE_UPLOAD_DIR', 'uploads')
 
     LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://stg-lr7.us.truenth.org')
     LR_GROUP = os.environ.get('LR_GROUP', 20145)

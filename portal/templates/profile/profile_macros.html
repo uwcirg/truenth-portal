@@ -305,10 +305,12 @@
                 </select>
             </div>
         </div>
-        <div v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" v-show="!patientEmailForm.loading" disabled>{{ _("Send email") }}</button>
-        <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
-        <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
+        <button id="btnProfileSend{{prefix}}Email" class="btn-send-email btn btn-tnth-primary" type="button" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()" disabled>{{ _("Send email") }}</button>
+        <div id="profile{{prefix}}EmailBtnMsgWrapper" class="profilePatientEmail__btn-msg-wrapper tnth-hide">
+            <div id="profile{{prefix}}EmailLoadingIndicator" v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
+            <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
+        </div>
         {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
@@ -1021,7 +1023,7 @@
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text optional-display-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('studyid')" v-on:change="updateIdentifierData"/>
+        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('study_id')" v-on:change="updateIdentifierData"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
         {{saveLoaderDiv("profileStudyIDContainer")}}

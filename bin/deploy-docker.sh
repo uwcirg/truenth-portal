@@ -48,8 +48,8 @@ set -o allexport # export all new env vars by default
 cd "${GIT_WORK_TREE}/docker"
 
 if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
-    web_image_id="$(docker-compose images -q web)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}"
+    web_image_hash="$(docker-compose images -q web | cut -c1-7)"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${COMPOSE_PROJECT_NAME}"
 
     echo "Backing up current database..."
     docker-compose exec --user postgres db bash -c '\
