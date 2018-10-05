@@ -1115,6 +1115,12 @@
                     self.messages.userInviteEmailErrorMessage = "";
                     self.messages.userInviteEmailInfoMessage = "";
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+                    $(".profilePatientEmail__btn-msg-wrapper").addClass("tnth-hide");
+                    if ($(this).val() === "") {
+                        $("#profile"+emailType+"EmailBtnMsgWrapper").addClass("tnth-hide");
+                    } else {
+                        $("#profile"+emailType+"EmailBtnMsgWrapper").removeClass("tnth-hide");
+                    }
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
                         var message = i18next.t("{emailType} email will be sent to {email}");
@@ -1148,7 +1154,7 @@
                     }
                     var resetBtn = function(disabled, showLoading) {
                         disabled = disabled || false;
-                        btnSelf.attr("disabled", disabled);
+                        btnSelf.attr("disabled", disabled).show();
                         self.patientEmailForm.loading = showLoading;
                         if (!disabled) {
                             btnSelf.removeClass("disabled");
@@ -1157,6 +1163,7 @@
                         }
                     };
                     resetBtn(true, true);
+                    btnSelf.hide();
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,

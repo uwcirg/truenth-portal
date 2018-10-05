@@ -726,9 +726,11 @@
                         }
                         if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                             var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
-                            if (hasValue(topOrg)) {
-                                theTerms["organization_id"] = topOrg;
-                            }
+                            theTerms["organization_id"] = topOrg || userOrgId;
+                        }
+                        if (!theTerms["agreement_url"]) { //this will display error to user if information is missing - can't check for org id as user might not belong to an org just yet
+                            $("#topTerms .post-tou-error").html(i18next.t("Missing information for consent agreement.  Unable to complete request."));
+                            return;
                         }
                         tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
                     });
