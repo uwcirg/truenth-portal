@@ -11,11 +11,14 @@ from ..models.app_text import InitialConsent_ATMA, VersionedResource, app_text
 from ..models.audit import Audit
 from ..models.tou import ToU, tou_types
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 
-@tou_api.route('/tou')
+@tou_api.route('/tou', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
+@oauth.require_oauth()
 def get_current_tou_url():
     """Return current ToU URL
 
@@ -30,6 +33,8 @@ def get_current_tou_url():
         description:
           Returns URL for current Terms Of Use, with respect to current
           system configuration in simple json {url:"http..."}
+    security:
+      - ServiceToken: []
 
     """
     terms = VersionedResource(
@@ -37,7 +42,8 @@ def get_current_tou_url():
     return jsonify(url=terms.url)
 
 
-@tou_api.route('/user/<int:user_id>/tou')
+@tou_api.route('/user/<int:user_id>/tou', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_tou(user_id):
     """Access all Terms Of Use info for given user
@@ -88,6 +94,8 @@ def get_tou(user_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -99,7 +107,10 @@ def get_tou(user_id):
     return jsonify(tous=[d.as_json() for d in tous])
 
 
-@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
+@tou_api.route(
+    '/user/<int:user_id>/tou/<string:tou_type>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_tou_by_type(user_id, tou_type):
     """Access Terms Of Use info for given user & ToU type
@@ -154,6 +165,8 @@ def get_tou_by_type(user_id, tou_type):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -176,7 +189,8 @@ def get_tou_by_type(user_id, tou_type):
     return jsonify(accepted=False)
 
 
-@tou_api.route('/user/<user_id>/tou/accepted', methods=('POST',))
+@tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
     """Accept Terms Of Use on behalf of user
@@ -222,6 +236,8 @@ def post_user_accepted_tou(user_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
+    security:
+      - ServiceToken: []
 
     """
     authd_user = current_user()
@@ -234,7 +250,8 @@ def post_user_accepted_tou(user_id):
     return accept_tou(user_id)
 
 
-@tou_api.route('/tou/accepted', methods=('POST',))
+@tou_api.route('/tou/accepted', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def accept_tou(user_id=None):
     """Accept Terms Of Use info for authenticated user
@@ -272,6 +289,8 @@ def accept_tou(user_id=None):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested user
+    security:
+      - ServiceToken: []
 
     """
     if user_id:

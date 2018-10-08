@@ -31,7 +31,8 @@ def ping():
     return 'OK'
 
 
-@truenth_api.route('/auditlog', methods=('POST',))
+@truenth_api.route('/auditlog', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def auditlog_addevent():
     """Add event to audit log
@@ -71,6 +72,8 @@ def auditlog_addevent():
               description: Result, typically "ok"
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     message = request.form.get('message')
@@ -82,7 +85,7 @@ def auditlog_addevent():
 
 
 @truenth_api.route('/portal-wrapper-html/', methods=('GET', 'OPTIONS'))
-@crossdomain()
+@crossdomain(origin='*')
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
@@ -196,7 +199,7 @@ def portal_wrapper_html():
 
 
 @truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
-@crossdomain()
+@crossdomain(origin='*')
 def portal_footer_html():
     """Returns portal footer for insertion at bottom of interventions
 
@@ -216,6 +219,8 @@ def portal_footer_html():
         description:
           html for direct insertion near the bottom of the intervention's
           page.
+    security:
+      - ServiceToken: []
 
     """
     # Unlike all other oauth protected resources, we manually check

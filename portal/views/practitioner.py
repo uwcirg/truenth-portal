@@ -15,11 +15,13 @@ from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
 from ..type_tools import check_int
+from .crossdomain import crossdomain
 
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 
 
-@practitioner_api.route('/practitioner')
+@practitioner_api.route('/practitioner', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def practitioner_search():
     """Obtain a bundle (list) of all matching practitioners
@@ -65,6 +67,8 @@ def practitioner_search():
       404:
         description:
           if no practitioners found for given search parameters
+    security:
+      - ServiceToken: []
 
     """
     query = Practitioner.query
@@ -118,7 +122,10 @@ def practitioner_search():
     return jsonify(bundle)
 
 
-@practitioner_api.route('/practitioner/<string:id_or_code>')
+@practitioner_api.route(
+    '/practitioner/<string:id_or_code>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def practitioner_get(id_or_code):
     """Access to the requested practitioner as a FHIR resource
@@ -153,6 +160,8 @@ def practitioner_get(id_or_code):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     system = request.args.get('system')

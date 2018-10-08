@@ -5,11 +5,13 @@ from ..database import db
 from ..extensions import oauth
 from ..models.role import Role
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 role_api = Blueprint('role_api', __name__)
 
 
-@role_api.route('/api/roles')
+@role_api.route('/api/roles', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def system_roles():
     """Returns simple JSON defining all system roles
@@ -53,12 +55,15 @@ def system_roles():
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view roles
+    security:
+      - ServiceToken: []
 
     """
     return jsonify(roles=[r.as_json() for r in Role.query.all()])
 
 
-@role_api.route('/api/user/<int:user_id>/roles')
+@role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def roles(user_id):
     """Returns simple JSON defining user roles
@@ -88,6 +93,8 @@ def roles(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -98,7 +105,7 @@ def roles(user_id):
     return jsonify(roles=[r.as_json() for r in user.roles])
 
 
-@role_api.route('/api/user/<int:user_id>/roles', methods=('POST',))
+@role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'POST'))
 @oauth.require_oauth()
 def add_roles(user_id):
     """Add roles to user, returns simple JSON defining user roles
@@ -166,7 +173,7 @@ def add_roles(user_id):
     return jsonify(roles=[r.as_json() for r in user.roles])
 
 
-@role_api.route('/api/user/<int:user_id>/roles', methods=('DELETE',))
+@role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'DELETE'))
 @oauth.require_oauth()
 def delete_roles(user_id):
     """Delete roles from user, returns simple JSON listing remaining roles
@@ -233,7 +240,7 @@ def delete_roles(user_id):
     return jsonify(roles=[r.as_json() for r in user.roles])
 
 
-@role_api.route('/api/user/<int:user_id>/roles', methods=('PUT',))
+@role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'PUT'))
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles

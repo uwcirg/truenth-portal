@@ -6,11 +6,15 @@ from ..extensions import oauth
 from ..models.notification import UserNotification
 from ..models.user import current_user, get_user, get_user_or_abort
 from ..type_tools import check_int
+from .crossdomain import crossdomain
 
 notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 
 
-@notification_api.route('/user/<int:user_id>/notification')
+@notification_api.route(
+    '/user/<int:user_id>/notification',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_user_notification(user_id):
     """Retrieve Notifications for the given User
@@ -70,6 +74,8 @@ def get_user_notification(user_id):
           permission to edit requested user_id
       404:
         description: if user_id don't exist
+    security:
+      - ServiceToken: []
 
     """
     check_int(user_id)
@@ -85,7 +91,8 @@ def get_user_notification(user_id):
 
 @notification_api.route(
     '/user/<int:user_id>/notification/<int:notification_id>',
-    methods=('DELETE',))
+    methods=('OPTIONS', 'DELETE'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def delete_user_notification(user_id, notification_id):
     """Remove the corresponding UserNotification for given User & Notification
@@ -128,6 +135,8 @@ def delete_user_notification(user_id, notification_id):
           permission to edit requested user_id
       404:
         description: if user_id or notification_id don't exist
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.debug(

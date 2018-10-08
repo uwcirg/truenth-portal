@@ -919,6 +919,13 @@ def spec():
             },
         },
         "schemes": ("http", "https"),
+        "securityDefinitions": {
+            "ServiceToken": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            }
+        },
     })
 
     # Todo: figure out why description isn't always set

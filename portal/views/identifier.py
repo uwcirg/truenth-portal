@@ -7,11 +7,15 @@ from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
+from .crossdomain import crossdomain
 
 identifier_api = Blueprint('identifier_api', __name__)
 
 
-@identifier_api.route('/api/user/<int:user_id>/identifier')
+@identifier_api.route(
+    '/api/user/<int:user_id>/identifier',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def identifiers(user_id):
     """Returns list of user's current identifiers
@@ -60,6 +64,8 @@ def identifiers(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given identifiers are already assigned to the user
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='view', other_id=user_id)
@@ -69,7 +75,10 @@ def identifiers(user_id):
     return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
 
 
-@identifier_api.route('/api/user/<int:user_id>/identifier', methods=('POST',))
+@identifier_api.route(
+    '/api/user/<int:user_id>/identifier',
+    methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def add_identifier(user_id):
     """Add additional identifier(s) to a user
@@ -112,6 +121,8 @@ def add_identifier(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given identifiers are already assigned to the user
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
