@@ -8,11 +8,13 @@ from ..extensions import oauth
 from ..models.group import Group
 from ..models.role import ROLE
 from ..models.user import current_user
+from .crossdomain import crossdomain
 
 group_api = Blueprint('group_api', __name__, url_prefix='/api/group')
 
 
-@group_api.route('/')
+@group_api.route('/', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def current_groups():
     """Returns simple JSON defining all current groups
@@ -44,13 +46,16 @@ def current_groups():
               description: Plain text describing the group.
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     results = [g.as_json() for g in Group.query.all()]
     return jsonify(groups=results)
 
 
-@group_api.route('/<string:group_name>')
+@group_api.route('/<string:group_name>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def group_by_name(group_name):
     """Returns simple JSON for the requested group
@@ -87,6 +92,8 @@ def group_by_name(group_name):
         description: if missing valid OAuth token
       404:
         description: if named group doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     g = Group.query.filter_by(name=group_name).first()
@@ -95,7 +102,8 @@ def group_by_name(group_name):
     return jsonify(group=g.as_json())
 
 
-@group_api.route('/', methods=('POST',))
+@group_api.route('/', methods=('OPTIONS','POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def add_group():
@@ -143,6 +151,9 @@ def add_group():
           if input isn't valid or if matching group name already exists
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     if not (request.json and 'name' in request.json and 'description' in
@@ -165,7 +176,8 @@ def add_group():
     return jsonify(message="ok")
 
 
-@group_api.route('/<string:group_name>', methods=('PUT',))
+@group_api.route('/<string:group_name>', methods=('OPTIONS','PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def edit_group(group_name):
@@ -220,7 +232,9 @@ def edit_group(group_name):
         description: if missing valid OAuth token
       404:
         description: if group by group_name can't be found
-
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     g = Group.query.filter_by(name=group_name).first()
     if not g:

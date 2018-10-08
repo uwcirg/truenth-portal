@@ -48,11 +48,13 @@ from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
 from ..type_tools import check_int
 from .auth import logout
+from .crossdomain import crossdomain
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
 
-@user_api.route('/me')
+@user_api.route('/me', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def me():
     """Access basics for current user
@@ -86,6 +88,8 @@ def me():
               description: User's preferred email address, same as username
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -93,7 +97,8 @@ def me():
         id=user.id, username=user.username, email=user.email)
 
 
-@user_api.route('/account', methods=('POST',))
+@user_api.route('/account', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
@@ -206,6 +211,9 @@ def account():
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     acting_user = current_user()
     if (acting_user.has_role(ROLE.ADMIN.value) or
@@ -278,7 +286,8 @@ def account():
     return jsonify(user_id=user.id)
 
 
-@user_api.route('/user/<int:user_id>', methods=['DELETE'])
+@user_api.route('/user/<int:user_id>', methods=['OPTIONS','DELETE'])
+@crossdomain(origin='*')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def delete_user(user_id):
@@ -321,6 +330,9 @@ def delete_user(user_id):
           permission to edit requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = get_user_or_abort(user_id)
@@ -332,7 +344,8 @@ def delete_user(user_id):
     return jsonify(message="deleted")
 
 
-@user_api.route('/user/<int:user_id>/reactivate', methods=['POST'])
+@user_api.route('/user/<int:user_id>/reactivate', methods=['OPTIONS','POST'])
+@crossdomain(origin='*')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def reactivate_user(user_id):
@@ -375,6 +388,9 @@ def reactivate_user(user_id):
           permission to edit requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = get_user_or_abort(user_id, allow_deleted=True)
@@ -388,7 +404,8 @@ def reactivate_user(user_id):
     return jsonify(message="reactivated")
 
 
-@user_api.route('/user/<int:user_id>/access_url')
+@user_api.route('/user/<int:user_id>/access_url', methods=('OPTIONS','GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
@@ -435,6 +452,9 @@ def access_url(user_id):
           permission to view requested user_id
       404:
         description: if the user isn't found
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
@@ -464,7 +484,8 @@ def access_url(user_id):
     return jsonify(access_url=url)
 
 
-@user_api.route('/user/<int:user_id>/consent')
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_consents(user_id):
     """Returns simple JSON listing user's valid consent agreements
@@ -558,6 +579,8 @@ def user_consents(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -569,7 +592,8 @@ def user_consents(user_id):
                                        user.all_consents])
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('POST',))
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_user_consents(user_id):
     """Add a consent agreement for the user with named organization
@@ -658,6 +682,8 @@ def set_user_consents(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.debug('post user consent called w/: {}'.format(
@@ -690,7 +716,8 @@ def set_user_consents(user_id):
 
 
 @user_api.route('/user/<int:user_id>/consent/withdraw',
-                methods=('POST', 'PUT'))
+                methods=('OPTIONS', 'POST', 'PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def withdraw_user_consent(user_id):
     """Withdraw existing consent agreement for the user with named organization
@@ -749,6 +776,8 @@ def withdraw_user_consent(user_id):
         description:
           if user_id doesn't exist, or it no consent found
           for given user org combination
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.debug('withdraw user consent called w/: '
@@ -796,7 +825,8 @@ def withdraw_user_consent(user_id):
     return jsonify(uc.as_json())
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
+@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'DELETE'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def delete_user_consents(user_id):
     """Delete a consent agreement between the user and the named organization
@@ -850,6 +880,8 @@ def delete_user_consents(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.debug('delete user consent called w/: {}'.format(
@@ -882,7 +914,8 @@ def delete_user_consents(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/groups')
+@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_groups(user_id):
     """Returns simple JSON defining user's groups
@@ -923,6 +956,8 @@ def user_groups(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -933,7 +968,8 @@ def user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/user/<int:user_id>/groups', methods=('PUT',))
+@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_user_groups(user_id):
     """Set groups for user, returns simple JSON defining user groups
@@ -1003,6 +1039,8 @@ def set_user_groups(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1042,7 +1080,8 @@ def set_user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/relationships')
+@user_api.route('/relationships', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def system_relationships():
     """Returns simple JSON defining all system relationships
@@ -1075,6 +1114,8 @@ def system_relationships():
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view system relationships
+    security:
+      - ServiceToken: []
 
     """
     results = [{'name': r.name, 'description': r.description}
@@ -1082,7 +1123,10 @@ def system_relationships():
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/<int:user_id>/relationships')
+@user_api.route(
+    '/user/<int:user_id>/relationships',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def relationships(user_id):
     """Returns simple JSON defining user relationships
@@ -1137,6 +1181,8 @@ def relationships(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1157,7 +1203,8 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/register-now')
+@user_api.route('/user/register-now', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def register_now():
     """Target for triggering registration of account
@@ -1191,6 +1238,9 @@ def register_now():
       400:
         description:
           if user is already registered or not eligible for some reason
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -1215,7 +1265,10 @@ def register_now():
     return redirect(url_for('user.register', email=user.email))
 
 
-@user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
+@user_api.route(
+    '/user/<int:user_id>/relationships',
+    methods=('OPTIONS', 'PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_relationships(user_id):
     """Set relationships for user, returns JSON defining user relationships
@@ -1295,6 +1348,8 @@ def set_relationships(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1354,7 +1409,8 @@ def set_relationships(user_id):
     return relationships(user.id)
 
 
-@user_api.route('/user/<int:user_id>/email_ready')
+@user_api.route('/user/<int:user_id>/email_ready', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def email_ready(user_id):
     """See if given user is 'email ready'
@@ -1397,6 +1453,8 @@ def email_ready(user_id):
                 to receive email
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     user = get_user_or_abort(user_id)
@@ -1408,7 +1466,8 @@ def email_ready(user_id):
         return jsonify(ready=ready, reason=reason)
 
 
-@user_api.route('/unique_email')
+@user_api.route('/unique_email', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 def unique_email():
     """Confirm a given email is unique
 
@@ -1454,6 +1513,8 @@ def unique_email():
         description: if email param is poorly defined
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     email = request.args.get('email')
@@ -1488,7 +1549,10 @@ def unique_email():
     return jsonify(unique=True)
 
 
-@user_api.route('/user/<int:user_id>/user_documents')
+@user_api.route(
+    '/user/<int:user_id>/user_documents',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_documents(user_id):
     """Returns simple JSON defining user documents
@@ -1563,6 +1627,8 @@ def user_documents(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1580,7 +1646,10 @@ def user_documents(user_id):
                                    results])
 
 
-@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>')
+@user_api.route(
+    '/user/<int:user_id>/user_documents/<int:doc_id>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def download_user_document(user_id, doc_id):
     """Download a user document belonging to a user
@@ -1619,6 +1688,8 @@ def download_user_document(user_id, doc_id):
           permission to edit requested user_id
       404:
         description: if user_id or doc_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1648,7 +1719,10 @@ def download_user_document(user_id, doc_id):
     return response
 
 
-@user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
+@user_api.route(
+    '/user/<int:user_id>/patient_report',
+    methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def upload_user_document(user_id):
     """Add a Patient Report for the user
@@ -1696,6 +1770,8 @@ def upload_user_document(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     user = current_user()
@@ -1760,7 +1836,8 @@ def upload_user_document(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
+@user_api.route('/user/<int:user_id>/password_reset', methods=('OPTIONS','POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
@@ -1802,6 +1879,9 @@ def trigger_password_reset_email(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -1821,7 +1901,10 @@ def trigger_password_reset_email(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>')
+@user_api.route(
+    '/user/<int:user_id>/table_preferences/<string:table_name>',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_table_preferences(user_id, table_name):
     """Returns simple JSON defining user table preferences
@@ -1880,6 +1963,8 @@ def get_table_preferences(user_id, table_name):
       404:
         description:
           if no TablePreference found for given user_id and table_name
+    security:
+      - ServiceToken: []
 
     """
     if not user_id or not table_name:
@@ -1901,7 +1986,8 @@ def get_table_preferences(user_id, table_name):
 
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
-    methods=('PUT', 'POST'))
+    methods=('OPTIONS', 'PUT', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
     """Add a consent agreement for the user with named organization
@@ -1980,6 +2066,9 @@ def set_table_preferences(user_id, table_name):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to edit requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     if not user_id or not table_name:
@@ -2002,7 +2091,8 @@ def set_table_preferences(user_id, table_name):
     return jsonify(pref.as_json())
 
 
-@user_api.route('/user/<int:user_id>/invite', methods=('POST',))
+@user_api.route('/user/<int:user_id>/invite', methods=('OPTIONS','POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.SERVICE.value])
 def invite(user_id):
@@ -2062,6 +2152,9 @@ def invite(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     user = get_user_or_abort(user_id)
     validate_email(user.email)
@@ -2085,7 +2178,8 @@ def invite(user_id):
     return jsonify(message=message)
 
 
-@user_api.route('/user/<int:user_id>/messages')
+@user_api.route('/user/<int:user_id>/messages', methods=('OPTIONS','POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
@@ -2138,6 +2232,10 @@ def get_user_messages(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
+
     """
     user = current_user()
     if user.id != user_id:
@@ -2154,7 +2252,10 @@ def get_user_messages(user_id):
     return jsonify(messages=[m.as_json() for m in messages])
 
 
-@user_api.route('/user/<int:user_id>/questionnaire_bank')
+@user_api.route(
+    '/user/<int:user_id>/questionnaire_bank',
+    methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def get_current_user_qb(user_id):
     """Returns JSON defining user's current QuestionnaireBank
@@ -2190,6 +2291,9 @@ def get_current_user_qb(user_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+
     """
     user = current_user()
     if user.id != user_id:

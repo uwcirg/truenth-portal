@@ -22,11 +22,13 @@ from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..system_uri import IETF_LANGUAGE_TAG, PRACTICE_REGION
+from .crossdomain import crossdomain
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
 
-@org_api.route('/organization')
+@org_api.route('/organization', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
@@ -83,6 +85,8 @@ def organization_search():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     filter = None
@@ -154,7 +158,8 @@ def organization_search():
     return jsonify(bundle)
 
 
-@org_api.route('/organization/<string:id_or_code>')
+@org_api.route('/organization/<string:id_or_code>', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def organization_get(id_or_code):
     """Access to the requested organization as a FHIR resource
@@ -189,6 +194,9 @@ def organization_get(id_or_code):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     system = request.args.get('system')
@@ -218,7 +226,10 @@ def organization_get(id_or_code):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
+@org_api.route(
+    '/organization/<int:organization_id>',
+    methods=('OPTIONS','DELETE'))
+@crossdomain(origin='*')
 @roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def organization_delete(organization_id):
@@ -248,6 +259,9 @@ def organization_delete(organization_id):
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     org = Organization.query.get_or_404(organization_id)
@@ -265,7 +279,8 @@ def organization_delete(organization_id):
     return jsonify(message='deleted organization {}'.format(org))
 
 
-@org_api.route('/organization', methods=('POST',))
+@org_api.route('/organization', methods=('OPTIONS','POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_post():
@@ -319,6 +334,9 @@ def organization_post():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -337,7 +355,8 @@ def organization_post():
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<int:organization_id>', methods=('PUT',))
+@org_api.route('/organization/<int:organization_id>', methods=('OPTIONS','PUT'))
+@crossdomain(origin='*')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_put(organization_id):
@@ -391,6 +410,9 @@ def organization_put(organization_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -413,7 +435,8 @@ def organization_put(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/user/<int:user_id>/organization')
+@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def user_organizations(user_id):
     """Obtain list of organization references currently associated with user
@@ -454,6 +477,8 @@ def user_organizations(user_id):
           permission to edit requested user_id
       404:
         description: if user_id doesn't exist
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='view', other_id=user_id)
@@ -466,7 +491,8 @@ def user_organizations(user_id):
         for org in user.organizations])
 
 
-@org_api.route('/user/<int:user_id>/organization', methods=('POST',))
+@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'POST'))
+@crossdomain(origin='*')
 @oauth.require_oauth()
 def add_user_organizations(user_id):
     """Associate organization with user via reference
@@ -526,6 +552,9 @@ def add_user_organizations(user_id):
         description: if user_id doesn't exist
       409:
         description: if any of the given identifiers are already assigned to the user
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)

@@ -40,6 +40,7 @@ from ..models.client import Client, validate_origin
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import current_user
+from .crossdomain import crossdomain
 
 client_api = Blueprint('client', __name__)
 
@@ -129,7 +130,8 @@ class ClientEditForm(FlaskForm):
                     "URL host must match a provided Application Origin URL")
 
 
-@client_api.route('/client', methods=('GET', 'POST'))
+@client_api.route('/client', methods=('OPTIONS','GET', 'POST'))
+@crossdomain(origin='*')
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_reg():
@@ -184,6 +186,9 @@ def client_reg():
                 Application's site Origin(s) or URL(s).
                 Required to include the origin of OAuth callbacks
                 and site origins making in-browser requests via CORS
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
@@ -214,7 +219,8 @@ def client_reg():
     return redirect(url_for('.client_edit', client_id=client.client_id))
 
 
-@client_api.route('/client/<client_id>', methods=('GET', 'POST'))
+@client_api.route('/client/<client_id>', methods=('OPTIONS','GET', 'POST'))
+@crossdomain(origin='*')
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_edit(client_id):
@@ -279,7 +285,9 @@ def client_edit(client_id):
                 the client_secret.  See numerous resources
                 published for decoding Facebook signed_request, as
                 the format is identical.
-
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
     """
     client = Client.query.get(client_id)
     if not client:
@@ -377,7 +385,8 @@ def client_edit(client_id):
     return redirect(redirect_target)
 
 
-@client_api.route('/clients')
+@client_api.route('/clients', methods=('OPTIONS', 'GET'))
+@crossdomain(origin='*')
 @roles_required([ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value])
 @oauth.require_oauth()
 def clients_list():
@@ -411,6 +420,9 @@ def clients_list():
                 Application's site Origin or URL.
                 Required to include the origin of OAuth callbacks
                 and site origins making in-browser requests via CORS
+    security:
+      - ServiceToken: []
+      - User_Authentication: []
 
     """
     user = current_user()
