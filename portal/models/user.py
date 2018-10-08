@@ -983,16 +983,9 @@ class User(db.Model, UserMixin):
         return fhir
 
     def procedure_history(self, requestURL=None):
-        now = datetime.utcnow()
-        fhir = {"resourceType": "Bundle",
-                "title": "Procedure History",
-                "link": [{"rel": "self", "href": requestURL}, ],
-                "updated": as_fhir(now),
-                "entry": []}
-
-        for proc in self.procedures:
-            fhir['entry'].append({"resource": proc.as_fhir()})
-        return fhir
+        link = {"rel": "self", "href": requestURL}
+        procs = [{"resource": proc.as_fhir()} for proc in self.procedures]
+        return bundle_results(elements=procs, links=[link])
 
     @property
     def rolelist(self):
