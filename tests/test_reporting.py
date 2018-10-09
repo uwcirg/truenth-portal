@@ -197,8 +197,12 @@ class TestReporting(TestCase):
         assert '<th>1-5 Days</th>' in table1
         assert '<th>6-10 Days</th>' in table1
         assert '<td>{}</td>'.format(org.name) in table1
-        org_row = (r'<td>{}<\/td>\s*<td>1<\/td>\s*'
-                   '<td>2<\/td>\s*<td>3<\/td>'.format(org.name))
+        org_row = r'\s*'.join((
+            '<td>{}<\/td>',
+            '<td>1<\/td>',
+            '<td>2<\/td>',
+            '<td>3<\/td>',
+        )).format(org.name)
         assert search(org_row, table1)
         # confirm alphabetical order
         org_order = r'{}[^O]*{}[^O]*{}'.format(org3.name, org2.name, org.name)
