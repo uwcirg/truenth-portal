@@ -1144,12 +1144,13 @@ def get_asset(uuid):
 
 
 def get_any_tag_data(*anyTags):
-    """
-        query LR based on any tags
-        this is an OR condition
-        will match any tag specified
-        :param anyTag: a variable number of tags to be queried,
+    """ query LR based on any tags
+
+    this is an OR condition; will match any tag specified
+
+    :param anyTag: a variable number of tags to be queried,
          e.g., 'tag1', 'tag2'
+
     """
     # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
     liferay_qs_params = {
@@ -1164,12 +1165,13 @@ def get_any_tag_data(*anyTags):
 
 
 def get_all_tag_data(*allTags):
-    """
-        query LR based on all required tags
-        this is an AND condition
-        all required tags must be present
-        :param allTag: a variable number of tags to be queried,
-         e.g., 'tag1', 'tag2'
+    """ query LR based on all required tags
+
+    this is an AND condition; all required tags must be present
+
+    :param allTags: variable number of tags to be queried,
+        e.g., 'tag1', 'tag2'
+
     """
     # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
     liferay_qs_params = {
