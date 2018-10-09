@@ -2,11 +2,9 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.fhir import QuestionnaireResponse
 from portal.models.intervention import Intervention
 from portal.models.intervention_strategies import observation_check
 from portal.models.organization import OrgTree
-from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 
 """empty message
