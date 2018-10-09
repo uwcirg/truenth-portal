@@ -336,8 +336,8 @@ def deauthorized():
     def base64_url_decode(s):
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
-        s += "="*padding_factor
-        return base64.b64decode(str(s).translate(
+        s += "=" * padding_factor
+        return base64.b64decode(unicode(s).translate(
             dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
