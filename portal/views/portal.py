@@ -923,14 +923,14 @@ def spec():
             "ServiceToken": {
                 "type": "apiKey",
                 "name": "Authorization",
-                "in": "header"
+                "in": "header",
             },
             "User_Authentication": {
                 "type": "oauth2",
-                "authorizationUrl": "http://127.0.0.1:5000/oauth/authorize",
-                "tokenUrl": "http://127.0.0.1:5000/oauth/token",
+                "authorizationUrl": url_for('auth.authorize', _external=True),
+                "tokenUrl": url_for('auth.access_token', _external=True),
                 "flow": "accessCode",
-                "scopes": {}
+                "scopes": {},
             }
         },
     })
