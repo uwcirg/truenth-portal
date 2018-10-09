@@ -158,7 +158,7 @@ def add_roles(user_id):
         description: if any of the given roles are already assigned to the user
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()
@@ -229,7 +229,7 @@ def delete_roles(user_id):
         description: if any of the given roles are not currently assigned to the user
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()
@@ -296,7 +296,7 @@ def set_roles(user_id):
         description: if user_id doesn't exist
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()

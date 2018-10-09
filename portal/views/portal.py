@@ -925,7 +925,7 @@ def spec():
                 "name": "Authorization",
                 "in": "header",
             },
-            "User_Authentication": {
+            "OAuth2AuthzFlow": {
                 "type": "oauth2",
                 "authorizationUrl": url_for('auth.authorize', _external=True),
                 "tokenUrl": url_for('auth.access_token', _external=True),

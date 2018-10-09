@@ -196,7 +196,7 @@ def organization_get(id_or_code):
           to view requested patient
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     system = request.args.get('system')
@@ -261,7 +261,7 @@ def organization_delete(organization_id):
           permission to view requested user_id
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     org = Organization.query.get_or_404(organization_id)
@@ -336,7 +336,7 @@ def organization_post():
           to view requested patient
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -412,7 +412,7 @@ def organization_put(organization_id):
           to view requested patient
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -554,7 +554,7 @@ def add_user_organizations(user_id):
         description: if any of the given identifiers are already assigned to the user
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)

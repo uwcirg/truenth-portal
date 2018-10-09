@@ -226,7 +226,7 @@ def practitioner_post():
           another Practitioner
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -306,7 +306,7 @@ def practitioner_put(id_or_code):
           another Practitioner
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or

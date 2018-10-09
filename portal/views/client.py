@@ -188,7 +188,7 @@ def client_reg():
                 and site origins making in-browser requests via CORS
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()
@@ -287,7 +287,7 @@ def client_edit(client_id):
                 the format is identical.
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
     """
     client = Client.query.get(client_id)
     if not client:
@@ -422,7 +422,7 @@ def clients_list():
                 and site origins making in-browser requests via CORS
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()

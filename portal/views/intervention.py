@@ -234,7 +234,7 @@ def user_intervention_set(intervention_name):
           the token isn't sponsored by the named intervention owner.
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     try:
@@ -421,7 +421,7 @@ def intervention_communicate(intervention_name):
         description: if the named intervention doesn't exist
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     intervention = getattr(INTERVENTION, intervention_name)

@@ -870,7 +870,7 @@ def access_token():
               description: The authorized scope.
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     for field in request.form:
@@ -953,7 +953,7 @@ def authorize(*args, **kwargs):
           of TrueNTH.
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     # Interventions may include additional text to display as a way

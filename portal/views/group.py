@@ -153,7 +153,7 @@ def add_group():
         description: if missing valid OAuth token
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if not (request.json and 'name' in request.json and 'description' in
@@ -234,7 +234,7 @@ def edit_group(group_name):
         description: if group by group_name can't be found
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
     """
     g = Group.query.filter_by(name=group_name).first()
     if not g:

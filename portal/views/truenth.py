@@ -134,7 +134,7 @@ def portal_wrapper_html():
           registered as a client app or intervention
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     # Unlike all other oauth protected resources, we manually check

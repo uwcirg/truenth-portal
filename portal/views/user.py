@@ -213,7 +213,7 @@ def account():
           permission to view requested user_id
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
     """
     acting_user = current_user()
     if (acting_user.has_role(ROLE.ADMIN.value) or
@@ -332,7 +332,7 @@ def delete_user(user_id):
         description: if the user isn't found
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = get_user_or_abort(user_id)
@@ -390,7 +390,7 @@ def reactivate_user(user_id):
         description: if the user isn't found
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = get_user_or_abort(user_id, allow_deleted=True)
@@ -454,7 +454,7 @@ def access_url(user_id):
         description: if the user isn't found
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     current_user().check_role(permission='edit', other_id=user_id)
@@ -1240,7 +1240,7 @@ def register_now():
           if user is already registered or not eligible for some reason
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()
@@ -1881,7 +1881,7 @@ def trigger_password_reset_email(user_id):
         description: if user_id doesn't exist
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()
@@ -2068,7 +2068,7 @@ def set_table_preferences(user_id, table_name):
           permission to edit requested user_id
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     if not user_id or not table_name:
@@ -2154,7 +2154,7 @@ def invite(user_id):
           permission to view requested user_id
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
     """
     user = get_user_or_abort(user_id)
     validate_email(user.email)
@@ -2234,7 +2234,7 @@ def get_user_messages(user_id):
           permission to view requested user_id
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = current_user()

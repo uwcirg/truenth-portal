@@ -749,7 +749,7 @@ def get_assessments():
           to view requested patient
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     # Rather than call current_user.check_role() for every patient
@@ -1539,7 +1539,7 @@ def present_assessment(instruments=None):
         description: if missing valid OAuth token or bad `next` parameter
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     # Todo: replace with proper models
@@ -1639,7 +1639,7 @@ def complete_assessment():
         description: if missing valid OAuth token
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
 

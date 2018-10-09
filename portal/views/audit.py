@@ -74,7 +74,7 @@ def get_audit(user_id):
           to view requested patient
     security:
       - ServiceToken: []
-      - User_Authentication: []
+      - OAuth2AuthzFlow: []
 
     """
     user = get_user_or_abort(user_id)
