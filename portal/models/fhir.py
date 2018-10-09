@@ -24,7 +24,7 @@ def bundle_results(elements, bundle_type=BundleType.searchset, links=None):
         'resourceType': 'Bundle',
         'updated': FHIR_datetime.now(),
         'total': len(elements),
-        'type': bundle_type.value,
+        'type': bundle_type.name,
         'entry': elements,
     }
     if links:
