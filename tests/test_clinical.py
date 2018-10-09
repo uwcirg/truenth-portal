@@ -87,11 +87,10 @@ class TestClinical(TestCase):
         assert ('Gleason score' ==
                 clinical_data['entry'][0]['resource']['code']['coding'][0][
                    'display'])
-        assert ('2' ==
-                clinical_data['entry'][0]['resource']['valueQuantity']['value'])
+        assert ('2' == clinical_data['entry'][0][
+            'resource']['valueQuantity']['value'])
         assert (json.dumps(Reference.patient(TEST_USER_ID).as_fhir())
                 == clinical_data['entry'][0]['resource']['performer'][0])
-
 
     def test_clinicalPOST(self):
         data = {

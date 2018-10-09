@@ -135,7 +135,8 @@ class TestPatient(TestCase):
 
         # Mark second user as deleted - should therefore be excluded
         second = db.session.merge(second)
-        second.deleted = Audit(user_id=second_id, subject_id=second_id, comment='deleted')
+        second.deleted = Audit(
+            user_id=second_id, subject_id=second_id, comment='deleted')
         with SessionScope(db):
             db.session.commit()
 
