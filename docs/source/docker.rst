@@ -110,7 +110,7 @@ Account Bootstrapping
 To bootstrap an admin account after a fresh install, run the below ``flask`` CLI command::
 
     docker-compose exec web \
-        flask add_user \
+        flask add-user \
             --email 'admin_email@example.com' \
             --password 'exampleP@$$W0RD' \
             --role admin

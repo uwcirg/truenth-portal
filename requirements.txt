@@ -14,7 +14,7 @@ celery==4.2.1
 certifi==2018.8.24        # via requests
 cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
-click==6.7                # via flask
+click==7.0                # via flask
 coverage==4.5.1
 decorator==4.3.0          # via validators
 docutils==0.14            # via sphinx
