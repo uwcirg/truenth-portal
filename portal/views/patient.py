@@ -59,9 +59,7 @@ def patient_search():
         description:
             Search parameters, such as `email` or `identifier`.  For
             identifier, URL-encode the `system` and `value` using '|' (pipe)
-            delimiter.
-            An example looking up a patient by a fake identifier:
-                `api/patient/?identifier=http://fake.org/id|12a7`
+            delimiter, i.e. `api/patient/?identifier=http://fake.org/id|12a7`
         required: true
         type: string
     responses:
