@@ -8,6 +8,7 @@
 *.swp
 application.cfg
 site.cfg
+celerybeat.pid
 celerybeat-schedule
 env
 lib

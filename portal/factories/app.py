@@ -8,6 +8,7 @@ import os
 import sys
 
 from flask import Flask
+from healthcheck import HealthCheck
 from pkg_resources import get_distribution
 import redis
 import requests_cache
@@ -51,6 +52,7 @@ from ..views.extend_flask_user import (
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
+from ..views.healthcheck import HEALTH_CHECKS, healthcheck_blueprint
 from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
@@ -83,6 +85,7 @@ DEFAULT_BLUEPRINTS = (
     filters_blueprint,
     google_blueprint,
     group_api,
+    healthcheck_blueprint,
     identifier_api,
     intervention_api,
     notification_api,
@@ -123,6 +126,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_metadata(app)
     configure_coredata(app)
     configure_cache(app)
+    configure_healthcheck(app)
     return app
 
 
@@ -338,3 +342,16 @@ def configure_cache(app):
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),
     )
+
+
+def configure_healthcheck(app):
+    """Configure the API used to check the health of our dependencies"""
+    # Adds the /healthcheck API that returns
+    # the health of the service's dependencies based
+    # on the results of the below checks
+    health = HealthCheck(app, '/healthcheck')
+
+    # Functions that are called whose return values
+    # determine the health of the service's dependencies
+    for check in HEALTH_CHECKS:
+        health.add_check(check)

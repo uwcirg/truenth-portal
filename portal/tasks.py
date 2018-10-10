@@ -16,7 +16,8 @@ from traceback import format_exc
 
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
-from flask import current_app
+from flask import current_app, url_for
+import requests
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
@@ -375,3 +376,11 @@ def token_watchdog(**kwargs):
     if error_emails:
         return '\nUnable to reach recipient(s): {}'.format(
             ', '.join(error_emails))
+
+
+@celery.task
+def celery_beat_health_check(**kwargs):
+    """Pings the celery beat health check API for monitoring"""
+    return requests.get(
+        url_for('healthcheck.celery_beat_ping', _external=True)
+    ).text
