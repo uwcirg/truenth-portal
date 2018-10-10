@@ -6,13 +6,13 @@ from flask import current_app
 
 from ..dogpile_cache import dogpile_cache
 from ..trace import trace
-from .fhir import (
-    CC,
+from .clinical_constants import CC
+from .organization import OrgTree
+from .questionnaire_bank import QuestionnaireBank
+from .questionnaire_response import (
     QuestionnaireResponse,
     qnr_document_id,
 )
-from .organization import OrgTree
-from .questionnaire_bank import QuestionnaireBank
 from .user import User
 from .user_consent import UserConsent
 
@@ -33,7 +33,8 @@ def recent_qnr_status(user, questionnaire_name, qbd):
         QuestionnaireResponse.document[
             ('questionnaire', 'reference')
         ].astext.endswith(questionnaire_name),
-        QuestionnaireResponse.questionnaire_bank_id == qbd.questionnaire_bank.id
+        QuestionnaireResponse.questionnaire_bank_id ==
+        qbd.questionnaire_bank.id
     ).order_by(
         QuestionnaireResponse.status,
         QuestionnaireResponse.authored.desc()).with_entities(
@@ -225,7 +226,8 @@ class QuestionnaireBankDetails(object):
 
         # no longer considered a concern, ignore this situation, well handled.
         # if not valid_consent_found:
-        #    current_app.logger.warn("No consent found for {}".format(self.user))
+        #    current_app.logger.warn(
+        #        "No consent found for {}".format(self.user))
 
         return False
 
@@ -461,7 +463,7 @@ def invalidate_assessment_status_cache(user_id):
     """Invalidate the assessment status cache values for this user"""
     try:
         int(user_id)
-    except:
+    except (TypeError, ValueError):
         raise ValueError(
             "overall_assessment_status cached on user_id; int cast failed")
     dogpile_cache.invalidate(

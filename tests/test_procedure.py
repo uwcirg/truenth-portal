@@ -208,8 +208,5 @@ class TestProcedure(TestCase):
         for code, display, system in not_started_codes:
             self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            assert (
-                known_treatment_not_started(self.test_user),
-                "treatment '{}' didn't show as not started".format(
-                    (system, code)))
+            assert known_treatment_not_started(self.test_user)
             self.test_user.procedures.delete()  # reset for next iteration

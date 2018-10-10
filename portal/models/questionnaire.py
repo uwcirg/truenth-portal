@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+from .fhir import bundle_results
 from .identifier import Identifier
 
 status_types = ('draft', 'published', 'retired')
@@ -128,21 +129,11 @@ class Questionnaire(db.Model):
         if limit_to_ids:
             query = query.filter(Questionnaire.id.in_(limit_to_ids))
 
-        objs = [q.as_fhir() for q in query]
-
-        bundle = {
-            'resourceType': 'Bundle',
-            'updated': FHIR_datetime.now(),
-            'total': len(objs),
-            'type': 'searchset',
-            'link': {
-                'rel': 'self',
-                'href': url_for('questionnaire_api.questionnaire_list',
-                                _external=True),
-            },
-            'entry': objs,
-        }
-        return bundle
+        objs = [{'resource': q.as_fhir()} for q in query]
+        link = {
+            'rel': 'self', 'href': url_for(
+                'questionnaire_api.questionnaire_list', _external=True)}
+        return bundle_results(elements=objs, links=[link])
 
 
 class QuestionnaireIdentifier(db.Model):

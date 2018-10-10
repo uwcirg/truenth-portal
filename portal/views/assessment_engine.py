@@ -30,15 +30,16 @@ from ..models.assessment_status import (
     overall_assessment_status,
 )
 from ..models.client import validate_origin
-from ..models.fhir import (
-    EC,
+from ..models.encounter import EC
+from ..models.fhir import bundle_results
+from ..models.intervention import INTERVENTION
+from ..models.questionnaire import Questionnaire
+from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.questionnaire_response import (
     QuestionnaireResponse,
     aggregate_responses,
     generate_qnr_csv,
 )
-from ..models.intervention import INTERVENTION
-from ..models.questionnaire import Questionnaire
-from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from ..trace import dump_trace, establish_trace
@@ -638,19 +639,8 @@ def assessment(patient_id, instrument_id):
 
         documents.append(qnr.document)
 
-    bundle = {
-        'resourceType': 'Bundle',
-        'updated': FHIR_datetime.now(),
-        'total': len(documents),
-        'type': 'searchset',
-        'link': {
-            'rel': 'self',
-            'href': request.url,
-        },
-        'entry': documents,
-    }
-
-    return jsonify(bundle)
+    link = {'rel': 'self', 'href': request.url}
+    return jsonify(bundle_results(elements=documents, links=[link]))
 
 
 @assessment_engine_api.route('/patient/assessment', methods=('OPTIONS', 'GET'))

@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
 from portal.models.encounter import initiate_encounter
-from portal.models.fhir import CC
+from portal.models.clinical_constants import CC
 from portal.models.organization import (
     Organization,
     OrgTree,

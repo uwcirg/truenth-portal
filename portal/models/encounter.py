@@ -8,6 +8,10 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
+from ..system_uri import TRUENTH_ENCOUNTER_CODE_SYSTEM
+from .codeable_concept import CodeableConcept
+from .coding import Coding
+from .lazy import lazyprop
 from .reference import Reference
 from .role import ROLE
 
@@ -101,6 +105,54 @@ class Encounter(db.Model):
                 period['end'], error_subject='period.end')
         p.auth_method = data['auth_method']
         return p
+
+
+class EncounterConstants(object):
+    """ TrueNTH Encounter type Codes
+    See http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.type
+    """
+
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
+    @lazyprop
+    def PAPER(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='paper',
+            display='Information collected on paper',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def PHONE(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='phone',
+            display='Information collected over telephone system',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def INTERVIEW_ASSISTED(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='interview_assisted',
+            display='Information collected in-person',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding, ]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+
+EC = EncounterConstants()
 
 
 def initiate_encounter(user, auth_method):

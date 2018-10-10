@@ -18,7 +18,7 @@ from portal.audit import auditable_event
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
-from portal.models.fhir import add_static_concepts
+from portal.models.clinical_constants import add_static_concepts
 from portal.models.i18n import smartling_download, smartling_upload
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
