@@ -2153,7 +2153,7 @@
                 var self = this;
                 self.modules.tnthAjax.getTreatment(self.subjectId, {useWorker:true}, function(data) {
                     self.updateTreatment(data);
-                    self.modules.tnthAjax.getClinical(self.subjectId,{data:{patch_dstu2: true}}, function(data) {
+                    self.modules.tnthAjax.getClinical(self.subjectId,{useWorker:true, data:{patch_dstu2: true}}, function(data) {
                         self.updateClinicalSection(data.entry);
                         $("#patientQ").attr("loaded", "true");
                         self.onBeforeInitClinicalQuestionsSection();

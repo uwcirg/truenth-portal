@@ -41,6 +41,11 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
         } // end for
     }
     params = params || {};
+    if (params.data && params.type === "GET") { //for request with method of 'GET' data need to be serialized format otherwise it is not sent with the request, more info: https://plainjs.com/javascript/ajax/send-ajax-get-and-post-requests-47/
+        url += "?" + (typeof params.data === "string" ? data : Object.keys(params.data).map( //no access to JQuery so do this in pure JS
+            function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(params.data[k]) }
+        ).join('&'));
+    }
     xhr.open("GET", url, true);
     if (!params.cache) {
         xhr.setRequestHeader("cache-control", "no-cache");
