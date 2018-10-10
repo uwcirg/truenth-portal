@@ -2,7 +2,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.fhir import QuestionnaireResponse
+from portal.models.questionnaire_response import QuestionnaireResponse
 
 """Reindex irondemog_v3 questions
 

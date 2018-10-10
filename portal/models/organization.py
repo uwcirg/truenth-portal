@@ -27,6 +27,7 @@ from .app_text import (
 from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .extension import CCExtension, TimezoneExtension
+from .fhir import bundle_results
 from .identifier import Identifier
 from .reference import Reference
 from .research_protocol import ResearchProtocol
@@ -95,9 +96,9 @@ class Organization(db.Model):
     @use_specific_codings.setter
     def use_specific_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | USE_SPECIFIC_CODINGS_MASK
+            self.coding_options |= USE_SPECIFIC_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~USE_SPECIFIC_CODINGS_MASK
+            self.coding_options &= ~USE_SPECIFIC_CODINGS_MASK
 
     @hybrid_property
     def race_codings(self):
@@ -112,9 +113,9 @@ class Organization(db.Model):
     @race_codings.setter
     def race_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | RACE_CODINGS_MASK
+            self.coding_options |= RACE_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~RACE_CODINGS_MASK
+            self.coding_options &= ~RACE_CODINGS_MASK
 
     @hybrid_property
     def ethnicity_codings(self):
@@ -129,9 +130,9 @@ class Organization(db.Model):
     @ethnicity_codings.setter
     def ethnicity_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | ETHNICITY_CODINGS_MASK
+            self.coding_options |= ETHNICITY_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~ETHNICITY_CODINGS_MASK
+            self.coding_options &= ~ETHNICITY_CODINGS_MASK
 
     @hybrid_property
     def indigenous_codings(self):
@@ -146,9 +147,9 @@ class Organization(db.Model):
     @indigenous_codings.setter
     def indigenous_codings(self, value):
         if value:
-            self.coding_options = self.coding_options | INDIGENOUS_CODINGS_MASK
+            self.coding_options |= INDIGENOUS_CODINGS_MASK
         else:
-            self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
+            self.coding_options &= ~INDIGENOUS_CODINGS_MASK
 
     @property
     def phone(self):
@@ -376,8 +377,8 @@ class Organization(db.Model):
     def generate_bundle(cls, limit_to_ids=None, include_empties=True):
         """Generate a FHIR bundle of existing orgs ordered by ID
 
-        :param limit_to_ids: if defined, only return the matching set, otherwise
-          all organizations found
+        :param limit_to_ids: if defined, only return the matching set,
+          otherwise all organizations found
         :param include_empties: set to include empty attributes
         :return:
 
@@ -388,19 +389,11 @@ class Organization(db.Model):
 
         orgs = [o.as_fhir(include_empties=include_empties) for o in query]
 
-        bundle = {
-            'resourceType': 'Bundle',
-            'updated': FHIR_datetime.now(),
-            'total': len(orgs),
-            'type': 'searchset',
-            'link': {
-                'rel': 'self',
-                'href': url_for(
-                    'org_api.organization_search', _external=True),
-            },
-            'entry': orgs,
-        }
-        return bundle
+        search_link = {
+            'rel': 'self',
+            'href': url_for(
+                'org_api.organization_search', _external=True)}
+        return bundle_results(elements=orgs, links=[search_link])
 
     @staticmethod
     def consent_agreements(locale_code):
@@ -543,8 +536,9 @@ class ResearchProtocolExtension(CCExtension):
             else:
                 remove_if_not_requested.remove(existing)
 
-                # Unfortunately, the association proxy requires we now query for the
-                # intermediary (link) table to check/set the value of `retired_as_of`
+                # Unfortunately, the association proxy requires
+                # we now query for the intermediary (link) table to
+                # check/set the value of `retired_as_of`
 
                 o_rp = OrganizationResearchProtocol.query.filter(
                     OrganizationResearchProtocol.organization_id ==
@@ -843,7 +837,7 @@ class OrgTree(object):
             given organization_id, or a child of it.
 
         """
-        ## work through list - shortcircuit out if a qualified node is found
+        # work through list - short circuit out if a qualified node is found
         for other_organization_id in other_organizations:
             if organization_id == other_organization_id:
                 return True

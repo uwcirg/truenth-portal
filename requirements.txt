@@ -14,7 +14,7 @@ celery==4.2.1
 certifi==2018.8.24        # via requests
 cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
-click==6.7                # via flask
+click==7.0                # via flask
 coverage==4.5.1
 decorator==4.3.0          # via validators
 docutils==0.14            # via sphinx
@@ -39,7 +39,7 @@ flask==1.0.2
 functools32==3.2.3.post2;python_version < '3'
 future==0.16.0
 fuzzywuzzy==0.17.0
-gunicorn==19.8.1
+gunicorn==19.9.0
 idna==2.7                 # via requests
 imagesize==1.1.0          # via sphinx
 itsdangerous==0.24        # via flask
@@ -80,7 +80,7 @@ sphinx==1.8.1
 sphinxcontrib-websupport==1.1.0  # via sphinx
 sqlalchemy==1.2.12         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.1
-tox==3.4.0
+tox==3.5.2
 typing==3.6.6             # via sphinx
 urllib3==1.23             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again

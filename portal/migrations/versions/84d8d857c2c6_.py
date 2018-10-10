@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from portal.dict_tools import dict_match
-from portal.models.fhir import QuestionnaireResponse
+from portal.models.questionnaire_response import QuestionnaireResponse
 
 """empty message
 
