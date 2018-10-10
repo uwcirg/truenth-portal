@@ -11,7 +11,7 @@ import pytest
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC
+from portal.models.clinical_constants import CC
 from portal.models.group import Group
 from portal.models.identifier import Identifier
 from portal.models.intervention import (
@@ -606,8 +606,9 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
 
-        assert ("The assessment is no longer available"
-            in ae.display_for_user(user).card_html)
+        assert (
+            "The assessment is no longer available" in
+            ae.display_for_user(user).card_html)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
@@ -1189,7 +1190,7 @@ class TestEpromsStrategies(TestCase):
 
         from portal.config.model_persistence import ModelPersistence
         from portal.config.site_persistence import models
-        from portal.models.fhir import Coding
+        from portal.models.coding import Coding
         from portal.models.research_protocol import ResearchProtocol
 
         eproms_config_dir = os.path.join(

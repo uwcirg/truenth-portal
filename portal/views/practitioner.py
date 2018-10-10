@@ -7,8 +7,8 @@ from sqlalchemy import and_
 
 from ..audit import auditable_event
 from ..database import db
-from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.practitioner import Practitioner, PractitionerIdentifier
 from ..models.reference import MissingReference
@@ -37,6 +37,11 @@ def practitioner_search():
     If search terms are provided but no matching practitioners are found,
     a 404 is returned.
 
+    NB - currently out of FHIR DSTU2 spec by default.  Include query string
+    parameter ``patch_dstu2=True`` to properly nest each practitioner under
+    a ``resource`` attribute.  Please consider using, as this will become
+    default behavior in the future.
+
     ---
     operationId: practitioner_search
     tags:
@@ -48,6 +53,12 @@ def practitioner_search():
             Search parameters (`first_name`, `last_name`)
         required: false
         type: string
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
     produces:
       - application/json
     responses:
@@ -68,7 +79,7 @@ def practitioner_search():
 
     """
     query = Practitioner.query
-    system, value = None, None
+    system, value, nest_resource = None, None, None
     for k, v in request.args.items():
         if (k == 'system') and v:
             system = v
@@ -78,6 +89,8 @@ def practitioner_search():
             if v:
                 d = {k: v}
                 query = query.filter_by(**d)
+        elif k == 'patch_dstu2':
+            nest_resource = v
         else:
             abort(
                 400,
@@ -100,22 +113,15 @@ def practitioner_search():
             PractitionerIdentifier.identifier_id == ident.id,
             PractitionerIdentifier.practitioner_id == Practitioner.id))
 
-    practs = [p.as_fhir() for p in query]
+    if nest_resource:
+        practitioners = [{'resource': p.as_fhir()} for p in query]
+    else:
+        practitioners = [p.as_fhir() for p in query]
 
-    bundle = {
-        'resourceType': 'Bundle',
-        'updated': FHIR_datetime.now(),
-        'total': len(practs),
-        'type': 'searchset',
-        'link': {
-            'rel': 'self',
-            'href': url_for(
-                'practitioner_api.practitioner_search', _external=True),
-        },
-        'entry': practs
-    }
-
-    return jsonify(bundle)
+    link = {
+        'rel': 'self', 'href': url_for(
+            'practitioner_api.practitioner_search', _external=True)}
+    return jsonify(bundle_results(elements=practitioners, links=[link]))
 
 
 @practitioner_api.route('/practitioner/<string:id_or_code>')

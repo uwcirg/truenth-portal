@@ -1,7 +1,7 @@
 """User model """
 from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library # isort:skip
+from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
@@ -40,21 +40,17 @@ from .codeable_concept import CodeableConcept
 from .coding import Coding
 from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
-from .fhir import (
-    Observation,
-    UserObservation,
-    ValueQuantity,
-    v_or_first,
-    v_or_n,
-)
+from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier
 from .intervention import UserIntervention
+from .observation import Observation, UserObservation
 from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
+from .value_quantity import ValueQuantity
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
@@ -489,20 +485,21 @@ class User(db.Model, UserMixin):
         assert (self._email and len(self._email))
 
     def email_ready(self):
-        """Returns (True, None) IFF user has valid email and necessary criteria
+        """Returns (True, None) IFF user has valid email & necessary criteria
 
-        As user's frequently forget their passwords or start in a state without
-        a valid email address, the system should NOT email invites or reminders
-        unless adequate data is on file for the user to perform a reset password
-        loop.
+        As user's frequently forget their passwords or start in a state
+        without a valid email address, the system should NOT email invites
+        or reminders unless adequate data is on file for the user to perform
+        a reset password loop.
 
         NB exceptions exist for systems with the NO_CHALLENGE_WO_DATA
-        configuration set, as those systems allow for change of password without
-        the verification step, if the user doesn't have a required field set.
+        configuration set, as those systems allow for change of password
+        without the verification step, if the user doesn't have a required
+        field set.
 
-        :returns: (Success, Failure message), such as (True, None) if the user
-            account is "email_ready" or (False, _"invalid email") if the reason
-            for failure is a lack of valid email address.
+        :returns: (Success, Failure message), such as (True, None) if the
+            user account is "email_ready" or (False, _"invalid email") if
+            the reason for failure is a lack of valid email address.
 
         """
         try:
@@ -522,8 +519,9 @@ class User(db.Model, UserMixin):
             return False, _("invalid email address")
 
         else:
-            # Otherwise, require all challenge fields are defined, so an emailed
-            # user could finish a process such as reset password, if needed.
+            # Otherwise, require all challenge fields are defined,
+            # so an emailed user could finish a process such as reset
+            # password, if needed.
             if all((self.birthdate, self.first_name, self.last_name)):
                 return True, None
             else:
@@ -682,9 +680,11 @@ class User(db.Model, UserMixin):
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
                     locale_options[locale.code] = locale.display
-                if org.default_locale and org.default_locale not in locale_options:
-                    locale_options[org.default_locale] = locale_name_from_code(
-                        org.default_locale)
+                if (
+                        org.default_locale and
+                        org.default_locale not in locale_options):
+                    locale_options[org.default_locale] = (
+                        locale_name_from_code(org.default_locale))
 
         return locale_options
 
@@ -961,11 +961,17 @@ class User(db.Model, UserMixin):
         invalidate_assessment_status_cache(self.id)
         return observation
 
-    def clinical_history(self, requestURL=None):
+    def clinical_history(self, requestURL=None, patch_dstu2=False):
+        links = [{"rel": "self", "href": requestURL}]
+        if patch_dstu2:
+            elements = [
+                {'resource': ob.as_fhir()} for ob in self.observations]
+            return bundle_results(elements=elements, links=links)
+
         now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Clinical History",
-                "link": [{"rel": "self", "href": requestURL}, ],
+                "link": links,
                 "updated": as_fhir(now),
                 "entry": []}
 
@@ -977,16 +983,9 @@ class User(db.Model, UserMixin):
         return fhir
 
     def procedure_history(self, requestURL=None):
-        now = datetime.utcnow()
-        fhir = {"resourceType": "Bundle",
-                "title": "Procedure History",
-                "link": [{"rel": "self", "href": requestURL}, ],
-                "updated": as_fhir(now),
-                "entry": []}
-
-        for proc in self.procedures:
-            fhir['entry'].append({"resource": proc.as_fhir()})
-        return fhir
+        link = {"rel": "self", "href": requestURL}
+        procs = [{"resource": proc.as_fhir()} for proc in self.procedures]
+        return bundle_results(elements=procs, links=[link])
 
     @property
     def rolelist(self):
@@ -1732,7 +1731,8 @@ class User(db.Model, UserMixin):
         # sneak in with the same address while deleted.  The accessor returns
         # the unmasked value.
         unmasked = self.email
-        if User.query.filter(func.lower(User.email) == unmasked.lower()).count() > 0:
+        if User.query.filter(
+                func.lower(User.email) == unmasked.lower()).count() > 0:
             raise ValueError(
                 "A new account with same email {} in conflict. "
                 "Can't reactivate".format(unmasked))
@@ -1921,8 +1921,9 @@ class UserRelationship(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return ("{0.relationship} between {0.user_id} and {0.other_user_id}"
-            .format(self))
+        return (
+            "{0.relationship} between {0.user_id} and "
+            "{0.other_user_id}".format(self))
 
     def as_json(self):
         """serialize the relationship - used to preserve service users"""
@@ -1944,3 +1945,36 @@ class UserRelationship(db.Model):
         for attr in ('user_id', 'other_user_id', 'relationship_id'):
             setattr(self, attr, data.get(attr))
         return self
+
+
+class UserIndigenous(db.Model):
+    __tablename__ = 'user_indigenous'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_indigenous_user_coding'),)
+
+
+class UserEthnicity(db.Model):
+    __tablename__ = 'user_ethnicities'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_ethnicity_user_coding'),)
+
+
+class UserRace(db.Model):
+    __tablename__ = 'user_races'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'coding_id', name='_race_user_coding'),)

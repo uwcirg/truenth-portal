@@ -5,7 +5,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.fhir import CC, Observation, ValueQuantity
+from ..models.clinical_constants import CC
+from ..models.observation import Observation
+from ..models.value_quantity import ValueQuantity
 from ..models.user import current_user, get_user_or_abort
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')
@@ -299,6 +301,12 @@ def clinical(patient_id):
     Returns a patient's clinical data (eg TNM, Gleason score) as a FHIR
     bundle of observations (http://www.hl7.org/fhir/observation.html)
     in JSON.
+
+    NB - currently out of FHIR DSTU2 spec by default.  Include query string
+    parameter ``patch_dstu2=True`` to properly nest each practitioner under
+    a ``resource`` attribute.  Please consider using, as this will become
+    default behavior in the future.
+
     ---
     tags:
       - Clinical
@@ -312,6 +320,12 @@ def clinical(patient_id):
         required: true
         type: integer
         format: int64
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
     responses:
       200:
         description:
@@ -326,7 +340,9 @@ def clinical(patient_id):
     """
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    return jsonify(patient.clinical_history(requestURL=request.url))
+    patch_dstu2 = request.args.get('patch_dstu2', False)
+    return jsonify(patient.clinical_history(
+        requestURL=request.url, patch_dstu2=patch_dstu2))
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical',
