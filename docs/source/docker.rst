@@ -103,14 +103,14 @@ PostgreSQL Access
 -----------------
 To interact with the running database container, started via the ``docker-compose`` instructions above, use ``docker exec`` as follows below::
 
-    docker-compose exec db psql --username postgres
+    docker-compose exec db psql --username postgres --dbname portaldb
 
 Account Bootstrapping
 ---------------------
 To bootstrap an admin account after a fresh install, run the below ``flask`` CLI command::
 
     docker-compose exec web \
-        flask add_user \
+        flask add-user \
             --email 'admin_email@example.com' \
             --password 'exampleP@$$W0RD' \
             --role admin

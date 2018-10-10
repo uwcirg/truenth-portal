@@ -1115,6 +1115,12 @@
                     self.messages.userInviteEmailErrorMessage = "";
                     self.messages.userInviteEmailInfoMessage = "";
                     var emailType = $(this).closest(".profile-email-container").attr("data-email-type");
+                    $(".profilePatientEmail__btn-msg-wrapper").addClass("tnth-hide");
+                    if ($(this).val() === "") {
+                        $("#profile"+emailType+"EmailBtnMsgWrapper").addClass("tnth-hide");
+                    } else {
+                        $("#profile"+emailType+"EmailBtnMsgWrapper").removeClass("tnth-hide");
+                    }
                     var btnEmail = $("#btnProfileSend" + emailType + "Email");
                     if (String(this.value) !== "" && $("#email").val() !== "" && $("#erroremail").text() === "") {
                         var message = i18next.t("{emailType} email will be sent to {email}");
@@ -1148,7 +1154,7 @@
                     }
                     var resetBtn = function(disabled, showLoading) {
                         disabled = disabled || false;
-                        btnSelf.attr("disabled", disabled);
+                        btnSelf.attr("disabled", disabled).show();
                         self.patientEmailForm.loading = showLoading;
                         if (!disabled) {
                             btnSelf.removeClass("disabled");
@@ -1157,6 +1163,7 @@
                         }
                     };
                     resetBtn(true, true);
+                    btnSelf.hide();
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,
@@ -2054,16 +2061,16 @@
                 if (!data) { return false; }
                 var self = this;
                 var sortedArray = data.sort(function(a, b) {
-                    return b.content.id - a.content.id;
+                    return b.resource.id - a.resource.id;
                 });
                 for (var i = 0; i < sortedArray.length; i++) {
                     var val = sortedArray[i];
-                    var clinicalItem = String(val.content.code.coding[0].display);
-                    var clinicalValue = val.content.valueQuantity.value;
-                    var clinicalUnit = val.content.valueQuantity.units;
+                    var clinicalItem = String(val.resource.code.coding[0].display);
+                    var clinicalValue = val.resource.valueQuantity.value;
+                    var clinicalUnit = val.resource.valueQuantity.units;
                     var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
                     var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
-                    var status = val.content.status;
+                    var status = val.resource.status;
                     if (clinicalItem === "PCa diagnosis") {
                         clinicalItem = "pca_diag";
                     } else if (clinicalItem === "PCa localized diagnosis") {
@@ -2088,8 +2095,8 @@
                             }
                             if (clinicalItem === "biopsy") {
                                 if (String(clinicalValue) === "true" || truesyValue) {
-                                    if (val.content.issued) {
-                                        var dString = self.modules.tnthDates.formatDateString(val.content.issued, "iso-short");
+                                    if (val.resource.issued) {
+                                        var dString = self.modules.tnthDates.formatDateString(val.resource.issued, "iso-short");
                                         var dArray = dString.split("-");
                                         $("#biopsyDate").val(dString);
                                         $("#biopsy_year").val(dArray[0]);
@@ -2146,7 +2153,7 @@
                 var self = this;
                 self.modules.tnthAjax.getTreatment(self.subjectId, {useWorker:true}, function(data) {
                     self.updateTreatment(data);
-                    self.modules.tnthAjax.getClinical(self.subjectId, {useWorker:true}, function(data) {
+                    self.modules.tnthAjax.getClinical(self.subjectId,{data:{patch_dstu2: true}}, function(data) {
                         self.updateClinicalSection(data.entry);
                         $("#patientQ").attr("loaded", "true");
                         self.onBeforeInitClinicalQuestionsSection();
@@ -2499,7 +2506,7 @@
             },
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
-                return this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff();
+                return this.isTestEnvironment() || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}

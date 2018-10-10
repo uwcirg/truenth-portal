@@ -17,6 +17,7 @@
         this.mainSections = {};
         this.dependencies = dependencies || {};
         this.orgTool = null;
+        this.ACCEPT_ON_NEXT = false;
 
     };
 
@@ -217,6 +218,7 @@
         }
         var ACCEPT_ON_NEXT = "ACCEPT_ON_NEXT"; /* example data format:[{"field": "name"}, {"field": "website_terms_of_use", "collection_method": "ACCEPT_ON_NEXT"}]*/
         var acceptOnNextCheckboxes = [];
+        var self = this;
         (data.still_needed).forEach(function(item) {
             var matchedTermsCheckbox = $("#termsCheckbox [data-type='terms'][data-core-data-type='" + $.trim(item.field) + "']");
             if (matchedTermsCheckbox.length === 0) {
@@ -236,6 +238,7 @@
         if (acceptOnNextCheckboxes.length === 0) {
             return false;
         }
+        this.ACCEPT_ON_NEXT = true; //set flag
         //require for accept on next collection method
         $("#termsCheckbox, #topTerms .terms-of-use-intro").addClass("tnth-hide");
         $("#termsText").addClass("agreed");
@@ -326,7 +329,8 @@
 
     FieldsChecker.prototype.continueToFinish = function(sectionId) {
         this.hideSectionSavingLoader(sectionId);
-        if ($("div.reg-complete-container").hasClass("inactive")) {
+        if ($("div.reg-complete-container").hasClass("inactive") || this.ACCEPT_ON_NEXT) { //button not needed continue to next directly
+            window.location.reload();
             return false;
         }
         $("#progressWrapper").hide();
@@ -344,6 +348,7 @@
         this.hideSectionSavingLoader(sectionId);
         $("#buttonsContainer").removeClass("continue");
         $("#updateProfile").attr("disabled", true).removeClass("open");
+        $("#buttonsContainer .loading-message-indicator").hide();
         $("div.reg-complete-container").fadeOut();
         $("#next").attr("disabled", true).addClass("open");
         this.setProgressBar(sectionId);
@@ -384,7 +389,7 @@
             "topTerms": function() {
                 $("#aboutForm").addClass("full-size");
                 $("#topTerms").removeClass("hide-terms").show();
-                if (!window.performance) {
+                if (!window.performance || self.ACCEPT_ON_NEXT) {
                     return false;
                 }
                 if (performance.navigation.type === 1) {
@@ -491,10 +496,14 @@
         /*** event for the next button ***/
         $("#next").on("click", function() {
             $(this).hide();
-            $(".loading-message-indicator").show();
-            setTimeout(function() {
-                window.location.reload();
-            }, 150);
+            $("#buttonsContainer .loading-message-indicator").show();
+            if (self.ACCEPT_ON_NEXT) {
+                self.handlePostEvent("topTerms");
+            } else {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 150);
+            }
         });
         /*** event for the arrow in the header**/
         $("div.heading").on("click", function() {
@@ -717,9 +726,11 @@
                         }
                         if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                             var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
-                            if (hasValue(topOrg)) {
-                                theTerms["organization_id"] = topOrg;
-                            }
+                            theTerms["organization_id"] = topOrg || userOrgId;
+                        }
+                        if (!theTerms["agreement_url"]) { //this will display error to user if information is missing - can't check for org id as user might not belong to an org just yet
+                            $("#topTerms .post-tou-error").html(i18next.t("Missing information for consent agreement.  Unable to complete request."));
+                            return;
                         }
                         tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
                     });

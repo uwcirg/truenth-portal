@@ -437,9 +437,9 @@ body.landing {
       font-weight: 500;
       text-align: center;
       letter-spacing: 0.1rem;
-      margin: 0.55em auto 0.25em;
+      margin: 0.375em auto 0.25em;
       color: @headlineColor;
-      padding: 0.5em 0.75em;
+      padding: 0.5em;
       font-size: @mobileJumbotranSize;
     }
     .footer {
@@ -513,6 +513,7 @@ body.landing {
   .copyright {
     font-weight: normal;
     letter-spacing: 0.1rem;
+    opacity: 0.8;
   }
 
   footer {
@@ -560,7 +561,7 @@ body.landing {
     }
     .login {
       top: -7em;
-      width: 65vw;
+      width: 70vw;
       .input-field-container {
         input {
           width: 375px;
@@ -592,7 +593,7 @@ body.landing {
       justify-content: space-between;
     }
     .image {
-      background-position: 10% center;
+      background-position: 20% center;
       height: 100vh;
       position: relative;
       flex-grow: 2;
@@ -601,6 +602,9 @@ body.landing {
       top: 0;
       align-items: center;
       justify-content: center;
+      form {
+        min-height: 60vh;
+      }
       .headline {
         width: 450px;
         max-width: 100%;
@@ -678,6 +682,13 @@ body.landing {
         left: 3.5em;
         right: 3.5em
       }
+    }
+  }
+}
+@media (min-width: 1741px) {
+  body.landing {
+    #timeOutMessageContainer {
+      width: 80%;
     }
   }
 }

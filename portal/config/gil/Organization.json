@@ -1239,7 +1239,7 @@
           "value": "Suburban"
         }
       ],
-      "name": "Surburban Hospital",
+      "name": "Suburban Hospital",
       "partOf": {
         "display": "Johns Hopkins University",
         "reference": "api/organization/1402"

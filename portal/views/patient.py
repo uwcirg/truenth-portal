@@ -13,7 +13,9 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
+from ..models.fhir import bundle_results
 from ..models.identifier import Identifier, UserIdentifier
+from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from .demographics import demographics
@@ -24,19 +26,26 @@ patient_api = Blueprint('patient_api', __name__)
 @patient_api.route('/api/patient/')
 @oauth.require_oauth()
 def patient_search():
-    """Looks up patient from given parameters, returns FHIR Patient if found
+    """Looks up patient(s) from given parameters, returns FHIR Patient bundle
 
-    Takes key=value pairs to look up.  At this time, only email is supported.
+    Takes key=value pairs to look up.  Email, identifier searches supported.
 
-    Example search:
+    Example searches:
         /api/patient?email=username@server.com
+        /api/patient?identifier=http://us.truenth.org/identity-codes/external-study-id|123-45-678
 
-    Returns a FHIR patient resource (http://www.hl7.org/fhir/patient.html)
-    formatted in JSON if a match is found, 404 otherwise.
+    Identifier search pattern:
+        ?identifier=<system>|<value>
+
+    Deleted users and users for which the authenticated user does not have
+    permission to view will NOT be included in the results.
 
     NB - the results are restricted to users with the patient role.  It is
     therefore possible to get no results from this and still see a unique email
     collision from existing non-patient users.
+
+    Returns a FHIR bundle resource (https://www.hl7.org/fhir/DSTU2/bundle.html)
+    formatted in JSON for all matching valid, accessible patients.
 
     ---
     tags:
@@ -49,10 +58,8 @@ def patient_search():
         in: query
         description:
             Search parameters, such as `email` or `identifier`.  For
-            identifier, URL-encode a serialized JSON object with the `system`
-            and `value` attributes defined.  An example looking up a patient
-            by a fake identifier
-            `api/patient/?identifier={"system":%20"http://fake.org/id",%20"value":%20"12a7"}`
+            identifier, URL-encode the `system` and `value` using '|' (pipe)
+            delimiter, i.e. `api/patient/?identifier=http://fake.org/id|12a7`
         required: true
         type: string
     responses:
@@ -70,48 +77,57 @@ def patient_search():
           up details on the match.
 
     """
-    search_params = {}
-    for k, v in request.args.items():
-        if k == 'email':
-            search_params[k] = v
-        elif k == 'identifier':
+    if not request.args.items():
+        abort(400, "missing search criteria")
+
+    def parse_identifier_params(v):
+        # Supporting pipe delimiter and legacy dict parameters
+        if '|' in v:
+            system, value = v.split('|')
+        else:
             try:
                 ident_dict = json.loads(v)
-                if not (ident_dict.get('system') and ident_dict.get('value')):
-                    abort(400,
-                          "need 'system' and 'value' to look up identifier")
-                ui = UserIdentifier.query.join(
-                    Identifier).filter(and_(
-                        UserIdentifier.identifier_id == Identifier.id,
-                        Identifier.system == ident_dict['system'],
-                        Identifier._value == ident_dict['value'])).first()
-                if ui:
-                    search_params['id'] = ui.user_id
+                system = ident_dict.get('system')
+                value = ident_dict.get('value')
             except ValueError:
                 abort(400, "Ill formed identifier parameter")
+        return system, value
+
+    query = User.query.filter(User.deleted_id.is_(None))
+    for k, v in request.args.items():
+        if k == 'email':
+            query = query.filter(User.email == v)
+        elif k == 'identifier':
+            system, value = parse_identifier_params(v)
+            if not (system and value):
+                abort(400, "need 'system' and 'value' to look up identifier")
+
+            query = query.join(UserIdentifier).join(
+                Identifier).filter(and_(
+                    UserIdentifier.identifier_id == Identifier.id,
+                    Identifier.system == system,
+                    Identifier._value == value))
+
         else:
             abort(400, "can't search on '{}' at this time".format(k))
 
-    if not search_params:
-        # Nothing found worth looking up above
-        abort(404)
-    match = User.query.filter_by(**search_params)
-    if match.count() > 1:
-        abort(400, "can't yet bundle results, multiple found")
-    if match.count() == 1:
-        user = match.one()
+    # Validate permissions to see every requested user - omitting those w/o
+    patients = []
+    for user in query:
         try:
             current_user().check_role(permission='view', other_id=user.id)
             if user.has_role(ROLE.PATIENT.value):
-                return demographics(patient_id=user.id)
+                patients.append(
+                    {'resource': Reference.patient(user.id).as_fhir()})
         except Unauthorized:
             # Mask unauthorized as a not-found.  Don't want unauthed users
-            # farming information
+            # farming information - i.e. don't add to results
             auditable_event("looking up users with inadequate permission",
                             user_id=current_user().id, subject_id=user.id,
                             context='authentication')
-            abort(404)
-    abort(404)
+
+    link = {"rel": "self", "href": request.url}
+    return jsonify(bundle_results(elements=patients, links=[link]))
 
 
 @patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
@@ -155,8 +171,8 @@ def post_patient_deceased(patient_id):
           resource](http://www.hl7.org/fhir/patient.html) in JSON.
       400:
         description:
-          if given parameters don't function, such as a false deceasedBoolean AND
-          a deceasedDateTime value.
+          if given parameters don't function, such as a false
+          deceasedBoolean AND a deceasedDateTime value.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -178,14 +194,16 @@ def post_patient_deceased(patient_id):
     return jsonify(patient.as_fhir(include_empties=False))
 
 
-@patient_api.route('/api/patient/<int:patient_id>/birthdate', methods=('POST',))
-@patient_api.route('/api/patient/<int:patient_id>/birthDate', methods=('POST',))
+@patient_api.route(
+    '/api/patient/<int:patient_id>/birthdate', methods=('POST',))
+@patient_api.route(
+    '/api/patient/<int:patient_id>/birthDate', methods=('POST',))
 @oauth.require_oauth()
 def post_patient_dob(patient_id):
     """POST date of birth for a patient
 
-    This convenience API wraps the ability to set a patient's birthDate - generally
-    the /api/demographics API should be preferred.
+    This convenience API wraps the ability to set a patient's birthDate.
+    Generally the /api/demographics API should be preferred.
 
     ---
     tags:

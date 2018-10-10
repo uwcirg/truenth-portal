@@ -10,6 +10,7 @@ from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.identifier import Identifier, UserIdentifier
+from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user import User
 from tests import TEST_USER_ID, TEST_USERNAME, TestCase
@@ -23,17 +24,23 @@ class TestPatient(TestCase):
         response = self.client.get(
             '/api/patient?email={}'.format(TEST_USERNAME),
             follow_redirects=True)
-        # Known patient but w/o patient role should 404
+        # Known patient should return bundle of one
         assert response.status_code == 200
-        assert response.json['resourceType'] == 'Patient'
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 1
+        assert (
+            response.json['entry'][0]['resource'] ==
+            Reference.patient(TEST_USER_ID).as_fhir())
 
     def test_email_search_non_patient(self):
         self.login()
         response = self.client.get(
             '/api/patient?email={}'.format(TEST_USERNAME),
             follow_redirects=True)
-        # Known patient but w/o patient role should 404
-        assert response.status_code == 404
+        # Known patient but w/o patient role should return empty bundle
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 0
 
     def test_inadequate_perms(self):
         dummy = self.add_user(username='dummy@example.com')
@@ -42,8 +49,10 @@ class TestPatient(TestCase):
         response = self.client.get(
             '/api/patient?email={}'.format('dummy@example.com'),
             follow_redirects=True)
-        # w/o permission, should see a 404 not a 401 on search
-        assert response.status_code == 404
+        # w/o permission, should see empty result set
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 0
 
     def test_ident_search(self):
         ident = Identifier(system='http://example.com', value='testy')
@@ -59,6 +68,90 @@ class TestPatient(TestCase):
             '/api/patient?identifier={}'.format(json.dumps(ident.as_fhir())),
             follow_redirects=True)
         assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 1
+        assert (
+            response.json['entry'][0]['resource'] ==
+            Reference.patient(TEST_USER_ID).as_fhir())
+
+    def test_ident_pipe_search(self):
+        ident = Identifier(system='http://example.com', value='testy')
+        ui = UserIdentifier(identifier=ident, user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(ident)
+            db.session.add(ui)
+            db.session.commit()
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        ident = db.session.merge(ident)
+        response = self.client.get('/api/patient/', query_string={
+            'identifier': '{}|{}'.format(ident.system, ident.value)},
+            follow_redirects=True)
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 1
+        assert (
+            response.json['entry'][0]['resource'] ==
+            Reference.patient(TEST_USER_ID).as_fhir())
+
+    def test_multimatch_search(self):
+        second = self.add_user(username='second')
+        second_id = second.id
+        self.promote_user(user=second, role_name=ROLE.PATIENT.value)
+        ident = Identifier(system='http://example.com', value='testy')
+        ui = UserIdentifier(identifier=ident, user_id=TEST_USER_ID)
+        ui2 = UserIdentifier(identifier=ident, user_id=second_id)
+        with SessionScope(db):
+            db.session.add(ident)
+            db.session.add(ui)
+            db.session.add(ui2)
+            db.session.commit()
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.ADMIN.value)  # skip org/staff steps
+        self.login()
+        ident = db.session.merge(ident)
+        response = self.client.get('/api/patient/', query_string={
+            'identifier': '{}|{}'.format(ident.system, ident.value)},
+            follow_redirects=True)
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 2
+        assert response.json['type'] == 'searchset'
+
+    def test_deleted_search(self):
+        second = self.add_user(username='second')
+        second_id = second.id
+        self.promote_user(user=second, role_name=ROLE.PATIENT.value)
+        ident = Identifier(system='http://example.com', value='testy')
+        ui = UserIdentifier(identifier=ident, user_id=TEST_USER_ID)
+        ui2 = UserIdentifier(identifier=ident, user_id=second_id)
+        with SessionScope(db):
+            db.session.add(ident)
+            db.session.add(ui)
+            db.session.add(ui2)
+            db.session.commit()
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.ADMIN.value)  # skip org/staff steps
+
+        # Mark second user as deleted - should therefore be excluded
+        second = db.session.merge(second)
+        second.deleted = Audit(
+            user_id=second_id, subject_id=second_id, comment='deleted')
+        with SessionScope(db):
+            db.session.commit()
+
+        self.login()
+        ident = db.session.merge(ident)
+        response = self.client.get('/api/patient/', query_string={
+            'identifier': '{}|{}'.format(ident.system, ident.value)},
+            follow_redirects=True)
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 1
+        assert response.json['type'] == 'searchset'
+        assert (
+            response.json['entry'][0]['resource'] ==
+            Reference.patient(TEST_USER_ID).as_fhir())
 
     def test_ident_nomatch_search(self):
         ident = Identifier(system='http://example.com', value='testy')
@@ -76,7 +169,11 @@ class TestPatient(TestCase):
         response = self.client.get(
             '/api/patient?identifier={}'.format(id_str),
             follow_redirects=True)
-        assert response.status_code == 404
+
+        # expect empty bundle
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 0
 
     def test_ill_formed_ident_search(self):
         ident = Identifier(system='http://example.com', value='testy')

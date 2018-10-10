@@ -30,8 +30,11 @@ services:
       - celeryworker
       - celerybeat
     volumes:
-      - source: persistence-data
-        target: /var/lib/persistence/data
+      - source: user-documents
+        target: ${FILE_UPLOAD_DIR:-/var/lib/portal/uploads}
+        type: volume
+      - source: tmp-persistence-data
+        target: ${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}
         type: volume
 
   celeryworker:
@@ -76,5 +79,6 @@ services:
         type: volume
 
 volumes:
-    persistence-data: {}
     postgres-data: {}
+    user-documents: {}
+    tmp-persistence-data: {}

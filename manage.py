@@ -18,7 +18,7 @@ from portal.audit import auditable_event
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
-from portal.models.fhir import add_static_concepts
+from portal.models.clinical_constants import add_static_concepts
 from portal.models.i18n import smartling_download, smartling_upload
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
@@ -65,7 +65,13 @@ def upgrade_db():
 
 
 def flush_cache():
-    """Flush redis of all values. Cached values may not longer correspond with new DB entries"""
+    """Flush redis of all values.
+
+    Cached values may no longer correspond with new DB entries.
+    NB this may incur a significant performance hit as all cached
+    entries will be invalidated.
+
+    """
     if app.config.get('FLUSH_CACHE_ON_SYNC'):
         r = redis.from_url(app.config['REDIS_URL'])
         r.flushdb()
@@ -141,6 +147,9 @@ def export_site(directory, staging_exclusion):
     other static data.
 
     """
+    if staging_exclusion and not directory:
+        directory = app.config.get("PERSISTENCE_EXCLUSIONS_DIR")
+
     SitePersistence(target_dir=directory).export(
         staging_exclusion=staging_exclusion)
 
@@ -154,6 +163,9 @@ def import_site_exclusions(directory):
       files
 
     """
+    if not directory:
+        directory = app.config.get("PERSISTENCE_EXCLUSIONS_DIR")
+
     SitePersistence(target_dir=directory).import_(
         staging_exclusion=True, keep_unmentioned=True)
 

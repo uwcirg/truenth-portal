@@ -17,8 +17,8 @@ from portal.config.site_persistence import SitePersistence
 from portal.extensions import db
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
+from portal.models.clinical_constants import CC
 from portal.models.encounter import Encounter
-from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.questionnaire_bank import (

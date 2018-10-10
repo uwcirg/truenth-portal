@@ -28,9 +28,9 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from ..database import db
 from ..date_tools import localize_datetime
 from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
+from .clinical_constants import CC
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from .fhir import CC
 from .identifier import Identifier
 from .intervention import INTERVENTION, Intervention, UserIntervention
 from .organization import Organization, OrganizationIdentifier, OrgTree
@@ -292,7 +292,8 @@ def update_card_html_on_completion():
                     reminder = _(
                         "Please complete your %(assigning_authority)s "
                         "questionnaire by %(due_date)s.",
-                        assigning_authority=assessment_status.assigning_authority,
+                        assigning_authority=_(
+                            assessment_status.assigning_authority),
                         due_date=due_date)
 
                 return """
@@ -308,7 +309,8 @@ def update_card_html_on_completion():
                 reminder = _(
                     "Please complete your %(assigning_authority)s "
                     "questionnaire at your convenience.",
-                    assigning_authority=assessment_status.assigning_authority)
+                    assigning_authority=_(
+                        assessment_status.assigning_authority))
                 return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting},</h2>
@@ -384,7 +386,7 @@ def update_card_html_on_completion():
             message = _(
                 "Please complete your %(assigning_authority)s "
                 "questionnaire here.",
-                assigning_authority=assessment_status.assigning_authority)
+                assigning_authority=_(assessment_status.assigning_authority))
             card_html = """
             {intro}
             <div class="portal-main portal-flex-container">
@@ -414,7 +416,7 @@ def update_card_html_on_completion():
             message = _(
                 "Please complete your %(assigning_authority)s "
                 "questionnaire here.",
-                assigning_authority=assessment_status.assigning_authority)
+                assigning_authority=_(assessment_status.assigning_authority))
             card_html = """
             {intro}
             <div class="portal-main portal-flex-container">

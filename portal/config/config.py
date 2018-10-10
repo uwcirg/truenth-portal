@@ -101,6 +101,7 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
+    PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
@@ -146,7 +147,7 @@ class BaseConfig(object):
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
-    FILE_UPLOAD_DIR = 'uploads'
+    FILE_UPLOAD_DIR = os.environ.get('FILE_UPLOAD_DIR', 'uploads')
 
     LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://stg-lr7.us.truenth.org')
     LR_GROUP = os.environ.get('LR_GROUP', 20145)
