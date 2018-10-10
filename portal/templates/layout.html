@@ -98,6 +98,8 @@
     {% endblock %}
     <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
     <input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
+    {%- from "flask_user/_macros.html" import checkCookieMonster -%}
+    {{checkCookieMonster()}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>

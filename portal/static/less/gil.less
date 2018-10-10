@@ -5059,6 +5059,26 @@ only screen and (min-resolution:2dppx) {
     }
 }
 
+.cookie-disabled {
+    position: relative;
+}
+.cookie-disabled:after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: block;
+    background: #FFF;
+    opacity: 0.6;
+    z-index: 20;
+}
+.cookie-disabled:hover {
+    cursor: auto;
+    background: transparent;
+}
+
 .button,
 .box-modal form button,
 .side-nav-items__button a {
@@ -6457,7 +6477,6 @@ a:hover {
     font-weight: 500;
     margin: 0
 }
-
 .upper-banner__text:active,
 .upper-banner__text:hover,
 .upper-banner__text:visited {

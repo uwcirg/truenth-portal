@@ -137,6 +137,37 @@ body {
   }
 }
 
+.cookie-disabled {
+  position: relative;
+  &:after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: block;
+    background: #FFF;
+    opacity: 0.6;
+    z-index: 2;
+  }
+}
+.cookie-disabled:after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: block;
+  background: #FFF;
+  opacity: 0.6;
+  z-index: 2;
+}
+.cookie-disabled:hover {
+  cursor: auto;
+}
+
 .form-control,
 input,
 select,

@@ -1913,7 +1913,14 @@ var tnthDates = {
     },
     "getUserLocale": function() {
         var sessionKey = this.localeSessionKey;
-        var sessionLocale = sessionStorage.getItem(sessionKey);
+        var sessionLocale = "en-us";
+        try {
+            if (sessionStorage.getItem(sessionKey)) {
+                sessionLocale = sessionStorage.getItem(sessionKey)
+            }
+        } catch(e) {
+
+        }
         var locale = "";
         if ($("#userSessionLocale").val()) {
             return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
@@ -2054,7 +2061,12 @@ var Global = {
         });
     },
     "loginAs": function() {
-        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+        var LOGIN_AS_PATIENT;
+        try {
+            LOGIN_AS_PATIENT = sessionStorage.getItem("loginAsPatient");
+        } catch(e) {
+            
+        }
         if (LOGIN_AS_PATIENT) {
             tnthDates.clearSessionLocale();
             tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
@@ -2316,7 +2328,6 @@ var Global = {
         }).off("input.bs.validator change.bs.validator"); // Only check on blur (turn off input)   to turn off change - change.bs.validator
     }
 };
-
 var userSetLang = tnthDates.getUserLocale();
 /*global __i18next*/
 Global.registerModules();
