@@ -198,10 +198,10 @@ class TestReporting(TestCase):
         assert '<th>6-10 Days</th>' in table1
         assert '<td>{}</td>'.format(org.name) in table1
         org_row = r'\s*'.join((
-            '<td>{}<\/td>',
-            '<td>1<\/td>',
-            '<td>2<\/td>',
-            '<td>3<\/td>',
+            '<td>{}</td>',
+            '<td>1</td>',
+            '<td>2</td>',
+            '<td>3</td>',
         )).format(org.name)
         assert search(org_row, table1)
         # confirm alphabetical order
