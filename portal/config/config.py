@@ -192,7 +192,7 @@ class BaseConfig(object):
         ROLE.SERVICE.value,
     ]
 
-    CORS_WHITELIST = [
+    CORS_DOMAIN_WHITELIST = [
         '',
     ]
 

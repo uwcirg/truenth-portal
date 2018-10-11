@@ -277,7 +277,7 @@ def validate_origin(origin):
     po = urlparse(origin)
     if po.netloc and (
         po.netloc == current_app.config.get("SERVER_NAME") or
-        po.netloc in current_app.config.get("CORS_WHITELIST")
+        po.netloc in current_app.config.get("CORS_DOMAIN_WHITELIST")
     ):
         return True
 
