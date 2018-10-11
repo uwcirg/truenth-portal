@@ -192,8 +192,8 @@ class BaseConfig(object):
         ROLE.SERVICE.value,
     ]
 
-    CORS_DOMAIN_WHITELIST = [
-        '',
+    CORS_WHITELIST = [
+        'uwcirg.github.io',
     ]
 
 

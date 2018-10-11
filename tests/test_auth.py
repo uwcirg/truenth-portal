@@ -351,6 +351,21 @@ class TestAuth(TestCase):
         assert validate_origin(local_url)
         assert pytest.raises(Unauthorized, validate_origin, invalid_url)
 
+    def test_origin_validation_origin_not_in_whitelist(self):
+        valid_origin = 'www.domain.com'
+        self.app.config['CORS_WHITELIST'] = [valid_origin]
+        invalid_origin = 'www.invaliddomain.com'
+        url = 'http://{}/'.format(invalid_origin)
+
+        assert pytest.raises(Unauthorized, validate_origin, url)
+
+    def test_origin_validation_origin_in_whitelist(self):
+        valid_origin = 'www.domain.com'
+        self.app.config['CORS_WHITELIST'] = [valid_origin]
+        url = 'http://{}/'.format(valid_origin)
+
+        assert validate_origin(url)
+
     def test_oauth_with_new_auth_provider_and_new_user(self):
         # Login using the test backdoor
         response = self.login(oauth_info=OAUTH_INFO_PROVIDER_LOGIN)
