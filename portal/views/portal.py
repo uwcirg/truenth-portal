@@ -2,8 +2,8 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
-import json
 from pprint import pformat
+from urllib import urlencode
 
 from celery.result import AsyncResult
 from flask import (
@@ -261,6 +261,28 @@ def specific_clinic_landing(clinic_alias):
     return redirect(url_for('user.register'))
 
 
+@portal.route('/require_cookies')
+def require_cookies():
+    """give front end opportunity to verify cookies
+
+    Renders HTML including cookie check, then redirects back to `target`
+    NB - query string 'cookies_tested=True' added to target for client
+    to confirm this process happened.
+
+    """
+    mutable_args = request.args.copy()
+    target = mutable_args.pop('target')
+    if not target:
+        raise ValueError("require cookies needs a `target`")
+
+    mutable_args['cookies_tested'] = True
+    query_string = urlencode(mutable_args)
+    delimiter = '&' if '?' in target else '?'
+    target = "{}{}{}".format(target, delimiter, query_string)
+
+    return render_template('require_cookies.html', target=target)
+
+
 @portal.route('/access/<string:token>', defaults={'next_step': None})
 @portal.route('/access/<string:token>/<string:next_step>')
 def access_via_token(token, next_step=None):
@@ -280,6 +302,10 @@ def access_via_token(token, next_step=None):
         vocabulary - see `NextStep`
 
     """
+    # Before going any further, confirm cookies are enabled
+    if not request.args.get('cookies_tested'):
+        return redirect(url_for('portal.require_cookies', target=request.url))
+
     # logout current user if one is logged in.
     if current_user():
         logout(prevent_redirect=True, reason="forced from /access_via_token")
