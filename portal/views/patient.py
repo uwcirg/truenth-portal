@@ -25,7 +25,7 @@ patient_api = Blueprint('patient_api', __name__)
 
 
 @patient_api.route('/api/patient/', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def patient_search():
     """Looks up patient(s) from given parameters, returns FHIR Patient bundle
@@ -137,7 +137,7 @@ def patient_search():
 @patient_api.route(
     '/api/patient/<int:patient_id>/deceased',
     methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def post_patient_deceased(patient_id):
     """POST deceased datetime or status for a patient

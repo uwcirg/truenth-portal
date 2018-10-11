@@ -15,7 +15,7 @@ identifier_api = Blueprint('identifier_api', __name__)
 @identifier_api.route(
     '/api/user/<int:user_id>/identifier',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def identifiers(user_id):
     """Returns list of user's current identifiers
@@ -78,7 +78,7 @@ def identifiers(user_id):
 @identifier_api.route(
     '/api/user/<int:user_id>/identifier',
     methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def add_identifier(user_id):
     """Add additional identifier(s) to a user

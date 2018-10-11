@@ -18,7 +18,7 @@ procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
 @procedure_api.route(
     '/patient/<int:patient_id>/procedure',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def procedure(patient_id):
     """Access procedure data as a FHIR bundle of procedures (in JSON)
@@ -64,7 +64,7 @@ def procedure(patient_id):
 
 
 @procedure_api.route('/procedure', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def post_procedure():
     """Add procedure via FHIR Procedure Resource
@@ -168,7 +168,7 @@ def post_procedure():
 @procedure_api.route(
     '/procedure/<int:procedure_id>',
     methods=('OPTIONS', 'DELETE'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def procedure_delete(procedure_id):
     """Delete a procedure by ID.
@@ -225,7 +225,7 @@ def procedure_delete(procedure_id):
 @procedure_api.route(
     '/procedure/valueset/<valueset>',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 def procedure_value_sets(valueset):
     """Returns Valueset for treatment {started,not-started} codes
 

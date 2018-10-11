@@ -17,7 +17,7 @@ tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 
 @tou_api.route('/tou', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def get_current_tou_url():
     """Return current ToU URL
@@ -43,7 +43,7 @@ def get_current_tou_url():
 
 
 @tou_api.route('/user/<int:user_id>/tou', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def get_tou(user_id):
     """Access all Terms Of Use info for given user
@@ -110,7 +110,7 @@ def get_tou(user_id):
 @tou_api.route(
     '/user/<int:user_id>/tou/<string:tou_type>',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def get_tou_by_type(user_id, tou_type):
     """Access Terms Of Use info for given user & ToU type
@@ -190,7 +190,7 @@ def get_tou_by_type(user_id, tou_type):
 
 
 @tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
     """Accept Terms Of Use on behalf of user
@@ -251,7 +251,7 @@ def post_user_accepted_tou(user_id):
 
 
 @tou_api.route('/tou/accepted', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def accept_tou(user_id=None):
     """Accept Terms Of Use info for authenticated user

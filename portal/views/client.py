@@ -131,7 +131,7 @@ class ClientEditForm(FlaskForm):
 
 
 @client_api.route('/client', methods=('OPTIONS','GET', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_reg():
@@ -220,7 +220,7 @@ def client_reg():
 
 
 @client_api.route('/client/<client_id>', methods=('OPTIONS','GET', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
 def client_edit(client_id):
@@ -386,7 +386,7 @@ def client_edit(client_id):
 
 
 @client_api.route('/clients', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @roles_required([ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value])
 @oauth.require_oauth()
 def clients_list():

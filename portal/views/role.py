@@ -11,7 +11,7 @@ role_api = Blueprint('role_api', __name__)
 
 
 @role_api.route('/api/roles', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def system_roles():
     """Returns simple JSON defining all system roles
@@ -63,7 +63,7 @@ def system_roles():
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def roles(user_id):
     """Returns simple JSON defining user roles
@@ -106,7 +106,7 @@ def roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def add_roles(user_id):
     """Add roles to user, returns simple JSON defining user roles
@@ -178,7 +178,7 @@ def add_roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'DELETE'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def delete_roles(user_id):
     """Delete roles from user, returns simple JSON listing remaining roles
@@ -249,7 +249,7 @@ def delete_roles(user_id):
 
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('OPTIONS', 'PUT'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles

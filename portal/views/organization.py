@@ -28,7 +28,7 @@ org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
 
 @org_api.route('/organization', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
@@ -159,7 +159,7 @@ def organization_search():
 
 
 @org_api.route('/organization/<string:id_or_code>', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def organization_get(id_or_code):
     """Access to the requested organization as a FHIR resource
@@ -229,7 +229,7 @@ def organization_get(id_or_code):
 @org_api.route(
     '/organization/<int:organization_id>',
     methods=('OPTIONS','DELETE'))
-@crossdomain(origin='*')
+@crossdomain()
 @roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
 def organization_delete(organization_id):
@@ -280,7 +280,7 @@ def organization_delete(organization_id):
 
 
 @org_api.route('/organization', methods=('OPTIONS','POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_post():
@@ -356,7 +356,7 @@ def organization_post():
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('OPTIONS','PUT'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def organization_put(organization_id):
@@ -436,7 +436,7 @@ def organization_put(organization_id):
 
 
 @org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def user_organizations(user_id):
     """Obtain list of organization references currently associated with user
@@ -492,7 +492,7 @@ def user_organizations(user_id):
 
 
 @org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def add_user_organizations(user_id):
     """Associate organization with user via reference

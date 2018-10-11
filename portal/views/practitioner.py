@@ -21,7 +21,7 @@ practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 
 
 @practitioner_api.route('/practitioner', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def practitioner_search():
     """Obtain a bundle (list) of all matching practitioners
@@ -131,7 +131,7 @@ def practitioner_search():
 @practitioner_api.route(
     '/practitioner/<string:id_or_code>',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def practitioner_get(id_or_code):
     """Access to the requested practitioner as a FHIR resource
@@ -185,7 +185,7 @@ def practitioner_get(id_or_code):
 
 
 @practitioner_api.route('/practitioner', methods=('OPTIONS','POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_post():
@@ -253,7 +253,7 @@ def practitioner_post():
 
 @practitioner_api.route('/practitioner/<string:id_or_code>',
                         methods=('OPTIONS', 'PUT'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_put(id_or_code):

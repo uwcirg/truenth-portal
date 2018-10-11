@@ -14,7 +14,7 @@ group_api = Blueprint('group_api', __name__, url_prefix='/api/group')
 
 
 @group_api.route('/', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def current_groups():
     """Returns simple JSON defining all current groups
@@ -55,7 +55,7 @@ def current_groups():
 
 
 @group_api.route('/<string:group_name>', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def group_by_name(group_name):
     """Returns simple JSON for the requested group
@@ -103,7 +103,7 @@ def group_by_name(group_name):
 
 
 @group_api.route('/', methods=('OPTIONS','POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def add_group():
@@ -177,7 +177,7 @@ def add_group():
 
 
 @group_api.route('/<string:group_name>', methods=('OPTIONS','PUT'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def edit_group(group_name):

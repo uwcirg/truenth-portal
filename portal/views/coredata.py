@@ -120,7 +120,7 @@ def optional(user_id):
 
 
 @coredata_api.route('/acquire', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def acquire():
     """Redirection target to acquire coredata from the user

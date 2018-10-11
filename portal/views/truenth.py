@@ -32,7 +32,7 @@ def ping():
 
 
 @truenth_api.route('/auditlog', methods=('OPTIONS', 'POST'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def auditlog_addevent():
     """Add event to audit log
@@ -85,7 +85,7 @@ def auditlog_addevent():
 
 
 @truenth_api.route('/portal-wrapper-html/', methods=('GET', 'OPTIONS'))
-@crossdomain(origin='*')
+@crossdomain()
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
@@ -202,7 +202,7 @@ def portal_wrapper_html():
 
 
 @truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
-@crossdomain(origin='*')
+@crossdomain()
 def portal_footer_html():
     """Returns portal footer for insertion at bottom of interventions
 

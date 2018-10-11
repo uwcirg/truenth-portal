@@ -10,7 +10,7 @@ questionnaire_api = Blueprint('questionnaire_api', __name__)
 
 
 @questionnaire_api.route('/api/questionnaire_bank', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def questionnaire_bank_list():
     """Obtain a bundle (list) of all QuestionnaireBanks
@@ -37,7 +37,7 @@ def questionnaire_bank_list():
 
 
 @questionnaire_api.route('/api/questionnaire', methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def questionnaire_list():
     """Obtain a bundle (list) of all Questionnaires
@@ -66,7 +66,7 @@ def questionnaire_list():
 @questionnaire_api.route(
     '/api/questionnaire/<string:value>',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def get_questionnaire(value):
     """Return the specified Questionnaire

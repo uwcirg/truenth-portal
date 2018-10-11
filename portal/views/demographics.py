@@ -20,7 +20,7 @@ demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 @demographics_api.route(
     '/demographics/<int:patient_id>',
     methods=('OPTIONS', 'GET'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def demographics(patient_id):
     """Get patient (or any user's) demographics
@@ -84,7 +84,7 @@ def demographics(patient_id):
 @demographics_api.route(
     '/demographics/<int:patient_id>',
     methods=('OPTIONS', 'PUT'))
-@crossdomain(origin='*')
+@crossdomain()
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient
