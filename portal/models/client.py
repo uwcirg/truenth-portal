@@ -275,8 +275,7 @@ def validate_origin(origin):
         abort(401, "Can't validate missing origin")
 
     po = urlparse(origin)
-    if po.netloc and
-    (
+    if po.netloc and (
         po.netloc == current_app.config.get("SERVER_NAME") or
         po.netloc in current_app.config.get("CORS_WHITELIST")
     ):
