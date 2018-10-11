@@ -2573,7 +2573,8 @@ div.noOrg-container {
 }
 
 /*.loading-indicator {*/
-#loadingIndicator{
+#loadingIndicator,
+.loading-indicator-placeholder {
   /*display: none;*/
   position: fixed;
   top: 0;
@@ -2589,7 +2590,8 @@ div.noOrg-container {
   margin: auto;
   background: transparent;
 }
-#loadingIndicator:before {
+#loadingIndicator:before,
+.loading-indicator-placeholder:before {
   content: ' ';
   display: block;
   position: fixed;
@@ -2607,7 +2609,8 @@ div.noOrg-container {
 }
 
 /* :not(:required) hides these rules from IE9 and below */
-#loadingIndicator:not(:required) {
+#loadingIndicator:not(:required),
+.loading-indicator-placeholder:not(:required) {
   /* hide "loading..." text */
   font: 0/0 a;
   color: transparent;
@@ -2616,7 +2619,8 @@ div.noOrg-container {
   border: 0;
 }
 
-#loadingIndicator:not(:required):after {
+#loadingIndicator:not(:required):after,
+.loading-indicator-placeholder:not(:required):after {
   content: ' ';
   display: block;
   font-size: 10px;
@@ -2781,6 +2785,9 @@ div.noOrg-container {
   background-color: #606a73;
   color: #FFF;
 }
+.modal-content {
+  border-radius: 0;
+}
 .modal-body {
   padding: 2em 2.5em;
   font-size: @baseMobileFontSize;
@@ -2788,13 +2795,14 @@ div.noOrg-container {
 .modal-title {
   font-weight: normal;
   font-size: @baseFontSize;
+  letter-spacing: 1px;
 }
 .modal-footer {
-  padding: 0.75em;
+  padding: 0.55em;
 }
 .modal-header {
   font-size: @baseMobileFontSize;
-  min-height: 3em;
+  min-height: 2.5em;
 }
 .modal-header button,
 .modal-header button * {
@@ -2807,9 +2815,26 @@ div.noOrg-container {
 .modal a.btn {
   font-size: @baseMobileFontSize;
 }
+.modal-backdrop {
+  opacity: 0.6
+}
 #emailBodyModal .body-content {
   overflow: hidden;
   font-size: @mediumText;
+}
+#modalCookieEnableWarning {
+  &.in .modal-dialog {
+    transform: translate(0,50%);
+  }
+}
+.cookie-monster-modal-backdrop-cover {
+  position: fixed;
+  background: #FFF;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
 }
 .hide {
   display: none;

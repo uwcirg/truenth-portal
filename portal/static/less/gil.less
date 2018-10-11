@@ -5129,7 +5129,8 @@ only screen and (min-resolution:2dppx) {
 .button--teal,
 .box-modal form button {
     background: #7C959E;
-    color: white
+    color: white;
+    border-radius: 0;
 }
 
 .button--teal:hover,
@@ -6402,6 +6403,33 @@ body.modal-open .modal.is-modal-active .modal-dialog {
 .box-modal__footer form input {
     background: #FFF;
     border-color: #FFF
+}
+#modalCookieEnableWarning {
+    &.in .modal-dialog {
+        transform: translate(0,25%);
+    }
+    .modal-header {
+        border-bottom: 0;
+    }
+    .modal-footer {
+        border-top: 0;
+    }
+    .modal-title {
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
+    .modal-body {
+        padding: 0 1.5em 0.5em;
+    }
+}
+.cookie-monster-modal-backdrop-cover {
+    position: fixed;
+    background: #FFF;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 1000;
 }
 
 @media (max-width:767px) {
@@ -8568,7 +8596,8 @@ aside .module--flex {
     transition: visibility 0.5s, opacity 0.5s ease-in
 }
 
-#loadingIndicator {
+#loadingIndicator,
+.loading-indicator-placeholder {
     position: fixed;
     top: 0;
     left: 0;
@@ -8584,7 +8613,8 @@ aside .module--flex {
     margin: auto
 }
 
-#loadingIndicator:before {
+#loadingIndicator:before,
+.loading-indicator-placeholder {
     content: ' ';
     display: block;
     position: fixed;
@@ -8600,11 +8630,13 @@ aside .module--flex {
     opacity: .6
 }
 
-#loadingIndicator i {
+#loadingIndicator i,
+.loading-indicator-placeholder i {
     font-size: 1em
 }
 
-#loadingIndicator:not(:required) {
+#loadingIndicator:not(:required),
+.loading-indicator-placeholder:not(:required) {
     font: 0/0 a;
     color: transparent;
     text-shadow: none;
@@ -8612,7 +8644,8 @@ aside .module--flex {
     border: 0
 }
 
-#loadingIndicator:not(:required):after {
+#loadingIndicator:not(:required):after,
+.loading-indicator-placeholder:not(:required):after {
     content: ' ';
     display: block;
     font-size: 10px;

@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Require Cookies</title>
-</head>
-<body>
-
-Once the cookie test passes, can we use JS to auto-redirect to <a href="{{ target }}">{{ target }}</a> ?
-
-</body>
+<html>
+    <head>
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta http-equiv="x-ua-compatible" content="IE=edge">
+        <title>{{ app_text('layout title') }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{config.PORTAL_STYLESHEET}}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+        <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
+    </head>
+    <body>
+        <div class="loading-indicator-placeholder"></div>
+        {%- from "flask_user/_macros.html" import checkCookieMonster -%}
+        <div id="requiredCookieContainer" class="standalone">
+            {{checkCookieMonster(target=target)}}
+        </div>
+    </body>
+    <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
 </html>
+
+
+

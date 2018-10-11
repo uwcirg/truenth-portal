@@ -191,16 +191,6 @@ function sendRequest(url, params, callback) { /*generic function for sending GET
     var useFunc = getIEVersion() ? newHttpRequest: ajaxRequest; //NOTE JQuery ajax request does not work for IE <= 9
     useFunc(url, params, function(data) { callback(data);});
 }
-function isStorageSupported(storage) {
-    try {
-        const testKey = "__some_random_key_that_is_not_going_to_use__";
-        storage.setItem(testKey, testKey);
-        storage.removeItem(testKey);
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
 function LRKeyEvent() {
     var LR_INVOKE_KEYCODE = 187;
     if ($(".button--LR").length > 0) {

@@ -3533,8 +3533,7 @@ input.clinic {
 .radio-inline input[type=radio] {
   margin-left: -18px;
 }
-
-.modal-dialog {
+.modal-content {
   border-radius: 0;
 }
 .modal-header,
@@ -3572,6 +3571,54 @@ input.clinic {
 .modal a.btn {
   font-size: @modalButtonSize;
 }
+.modal-backdrop {
+  opacity: 0.6
+}
+#modalCookieEnableWarning {
+  &.in .modal-dialog {
+    transform: translate(0,50%);
+  }
+}
+.cookie-monster-modal-backdrop-cover {
+  position: fixed;
+  background: #FFF;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+}
+.cookie-disabled {
+  position: relative;
+  &:after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: block;
+    background: #FFF;
+    opacity: 0.6;
+    z-index: 2;
+  }
+}
+.cookie-disabled:after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: block;
+  background: #FFF;
+  opacity: 0.6;
+  z-index: 2;
+}
+.cookie-disabled:hover {
+  cursor: auto;
+}
+
 #manualEntryModal {
   .modal-dialog {
     width: auto;

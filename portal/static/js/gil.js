@@ -6,6 +6,8 @@ $.ajaxSetup({
   }
 });
 
+window.__i18next.init({"debug": false, "initImmediate": false});
+
 var RETURN_KEY_CODE = 13;
 
 
@@ -1367,9 +1369,6 @@ module.exports = utilObj = (function() {
 
 $(document).ready(function(){
 
-  setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
-  window.__i18next.init({"debug": false, "initImmediate": false});
-
   var currentUserId = $("#currentUserId").val();
   // Configure and start the session timeout monitor
   if (currentUserId !== "") {
@@ -1428,4 +1427,5 @@ $(document).ready(function(){
   window.app.menuObj.init(currentUserId);
   window.app.interventionSessionObj.clearSession($("main").attr("data-link-identifier"));
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
+  setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
 });

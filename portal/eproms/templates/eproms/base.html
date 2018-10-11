@@ -98,6 +98,8 @@
             {%- endwith %}
         {% endblock %}
     {%- endblock -%}
+    {%- from "flask_user/_macros.html" import checkCookieMonster -%}
+    {{checkCookieMonster()}}
 <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
 <input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>

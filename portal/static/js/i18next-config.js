@@ -16,10 +16,8 @@ var __i18next = window.__i18next = (function() {
             return b;
         })(window.location.search.substr(1).split("&"));
 
-        if (isStorageSupported(localStorage)) { /*global isStorageSupported */
-            if (window.localStorage.getItem("i18nextLng")) {
-                window.localStorage.removeItem("i18nextLng");
-            }
+        if (typeof window.localStorage !== "undefined" && window.localStorage.getItem("i18nextLng")) { //mere reference to localStorage will generate error is cookies disabled
+            window.localStorage.removeItem("i18nextLng");
         }
 
         var source = options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
@@ -38,10 +36,6 @@ var __i18next = window.__i18next = (function() {
             saveMissing: false,
             missingKeyHandler: false,
             parseMissingKeyHandler: function(key) { //allow lookup for translated text for missing key
-                if (!isStorageSupported(sessionStorage)) {
-                    console.log("security uncaught error - sessionStorage undefined or not accessible"); //display error in console for debugging
-                    return false;
-                }
                 var sessionData = sessionStorage.getItem("i18nextData_" + this.lng);
                 if (!sessionData) {
                     return key;
@@ -142,7 +136,13 @@ var __i18next = window.__i18next = (function() {
     }
     return {
         init: function(options, callback) {
-            init(options, callback);
+            try {
+                init(options, callback);
+            } catch(e) {
+                console.log("Error occurred initialized i18next"); 
+                console.log(e.message);
+                callback();
+            }
         }
     };
 })();

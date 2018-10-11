@@ -116,21 +116,26 @@
     <a href="{%-if config.MOVEMER_LINK_URL-%}{{config.MOVEMER_LINK_URL}}{%-endif-%}" class="logo-link" title="{{ _('Movember') }}" target="_blank">
     {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" alt="Movember Logo"/>{%-endif-%}</a>
 {%- endmacro %}
-
-{% macro checkCookieMonster(selectorsToDisable) -%}
+{% macro checkCookieMonster(selectorsToDisable="", target="") -%}
+    <input type="hidden" id="cookieCheckTargetUrl" value="{{target}}" />
     <div class="modal fade" tabindex="-1" role="dialog" id="modalCookieEnableWarning" data-disable-selectors="{{selectorsToDisable}}">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header"><h2 class="modal-title">{{_("Cookie Disabled")}}</h2></div>
+            <div class="modal-content box-modal">
+                <div class="modal-header"><h2 class="modal-title box-modal__title">{{_("Browser Cookies Disabled")}}</h2></div>
                 <div class="modal-body box-modal__copy">
-                    <p class="modal-body__copy text-left">{{_("Your web browser is currently set to disable cookies. To make full use of this website, your computer or mobile device will need to accept cookies, as the site will not function properly without them. In addition, cookies are required in order to provide you with personalized features on this website. To learn how to allow cookies, check the online help in your web browser.")}}</p>
+                    <p class="modal-body__copy text-left">
+                        {% trans %}
+                        Our website needs to use cookies to bring you the best, personalized, browsing experience. Your web browser is currently <b>not</b> allowing cookies. Help us fix this.
+                        {% endtrans %}
+                    </p>
+                    <p class="modal-body__copy text-left">{{_("Please enable cookies within your browser settings to continue. To learn how to allow cookies, check online for your web browser’s specific instructions.")}}</p>
                     <p class="modal-body__copy text-left">
                         {% trans privacy_url="/privacy?redirect=true" -%}
-                            Click <u><a href="{{privacy_url}}">here</a></u> to view privacy policy
+                        For more information on how we use cookies, see our <u><a href="{{privacy_url}}">Privacy Policy</a></u>.
                         {%- endtrans %}
                     </p>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-default btn-tnth-primary button button--teal" data-dismiss="modal">{{ _("Close") }}</button></div>
+                <div class="modal-footer"><button id="btnCookieTryAgain" type="button" class="btn btn-default btn-tnth-primary button button--teal">{{ _("Try Again") }}</button></div>
             </div>
         </div>
     </div>

@@ -1912,26 +1912,12 @@ var tnthDates = {
         sessionStorage.removeItem(this.localeSessionKey);
     },
     "getUserLocale": function() {
-        var sessionKey = this.localeSessionKey;
-        var sessionLocale = "en-us";
-        try {
-            if (sessionStorage.getItem(sessionKey)) {
-                sessionLocale = sessionStorage.getItem(sessionKey)
-            }
-        } catch(e) {
-
-        }
         var locale = "";
         if ($("#userSessionLocale").val()) {
             return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
         }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
-        }
-        var userSessionLocale = $("#userSessionLocale").val();
-        if (userSessionLocale) {
-            sessionStorage.setItem(sessionKey, userSessionLocale);
-            return userSessionLocale;
         }
         $.ajax({
             type: "GET",
@@ -1956,7 +1942,6 @@ var tnthDates = {
                 data.communication.forEach(function(item) {
                     if (item.language) {
                         locale = item.language.coding[0].code;
-                        sessionStorage.setItem(sessionKey, locale);
                     }
                 });
             });
@@ -2061,11 +2046,13 @@ var Global = {
         });
     },
     "loginAs": function() {
-        var LOGIN_AS_PATIENT;
+        var LOGIN_AS_PATIENT = null;
         try {
-            LOGIN_AS_PATIENT = sessionStorage.getItem("loginAsPatient");
+            if (typeof sessionStorage !== "undefined") {
+                LOGIN_AS_PATIENT = sessionStorage.getItem("loginAsPatient");
+            }
         } catch(e) {
-            
+            console.log("Error accessing session storage variable - check browser setting"); //shown in browser console
         }
         if (LOGIN_AS_PATIENT) {
             tnthDates.clearSessionLocale();
