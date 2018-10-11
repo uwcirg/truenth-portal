@@ -192,6 +192,10 @@ class BaseConfig(object):
         ROLE.SERVICE.value,
     ]
 
+    CORS_WHITELIST = [
+        '',
+    ]
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
