@@ -13,7 +13,7 @@
     };
     CookieMonster.prototype.isCookieEnabled = function() {
         var cookieEnabled = navigator.cookieEnabled;
-        if (!cookieEnabled) { 
+        if (!cookieEnabled) {
             document.cookie = this.testCookieName;
             cookieEnabled = document.cookie.indexOf(this.testCookieName) !== -1;
         }
@@ -39,17 +39,8 @@
             return;
         }
         for (var index = 0; index < loadingElements.length; index++) {
-            loadingElements[index].setAttribute("style", "display:none; visibility:hidden;"); 
+            loadingElements[index].setAttribute("style", "display:none; visibility:hidden;");
         }
-    };
-    CookieMonster.prototype.setElementVis = function(el) {
-        if (!el) {
-            return;
-        }
-        el.classList.add("disabled", "cookie-disabled");
-        el.style.zIndex = -1;
-        el.removeAttribute("data-toggle");
-        el.setAttribute("disabled", "disabled");
     };
     CookieMonster.prototype.addModalBackdrops = function() {
         if (!document.querySelector(".modal-backdrop")) { //modal darker background
@@ -90,20 +81,28 @@
             window.location.replace(targetRedirectElement.value);
         }
     };
-    CookieMonster.prototype.initCheckAndPostProcesses = function() {
-        if (document.getElementById("manualCheckCookieSetting")) { //if manual check is on, don't initiate autocheck
-            return false;
-        }
-        if (this.isCookieEnabled()) {
-            this.deleteTestCookie();
-            this.checkSuccessTargetRedirect();
-            return true;
-        }
+    CookieMonster.prototype.onSuccessCheck = function() {
+        this.deleteTestCookie();
+        this.checkSuccessTargetRedirect();
+    };
+    CookieMonster.prototype.onFailCheck = function() {
+        document.querySelector("body").classList.add("browser-cookie-disabled");
         this.initModal();
         var self = this;
         setTimeout(function() {
             self.restoreVis();
         }, 150);
+    };
+    CookieMonster.prototype.initCheckAndPostProcesses = function() {
+        if (document.getElementById("manualCheckCookieSetting")) { //if manual check is on, don't initiate autocheck
+            return false;
+        }
+        if (this.isCookieEnabled()) {
+            this.onSuccessCheck();
+            return true;
+        }
+        this.onFailCheck();
+
     };
     window.onload = function() {
         var cookieEvil = new CookieMonster();

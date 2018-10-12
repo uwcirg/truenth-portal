@@ -6406,7 +6406,7 @@ body.modal-open .modal.is-modal-active .modal-dialog {
 }
 #modalCookieEnableWarning {
     &.in .modal-dialog {
-        transform: translate(0,25%);
+        transform: translate(0,0);
     }
     .modal-header {
         border-bottom: 0;
@@ -6420,6 +6420,13 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     }
     .modal-body {
         padding: 0 1.5em 0.5em;
+    }
+}
+@media (min-width: 520px) {
+    #modalCookieEnableWarning {
+        &.in .modal-dialog {
+            transform: translate(0,20%);
+        }
     }
 }
 .cookie-monster-modal-backdrop-cover {
@@ -6914,6 +6921,18 @@ html.is-nav-expanded body {
 @media (max-width:767px) {
     html.is-nav-expanded {
         left: 0
+    }
+}
+
+body.browser-cookie-disabled {
+    .header__meta,
+    .upper-banner,
+    [data-target="#modal-register"],
+    [data-target="#modal-login"] {
+        display: none;
+    }
+    .page-border__top {
+        top: 0;
     }
 }
 
