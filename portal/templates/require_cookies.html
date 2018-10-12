@@ -15,6 +15,7 @@
         <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
     </head>
     <body>
+        <!-- standalone page for display cookie disabled message via redirect-->
         <div class="loading-indicator-placeholder"></div>
         {%- from "flask_user/_macros.html" import checkCookieMonster -%}
         <div id="requiredCookieContainer" class="standalone">
@@ -23,6 +24,4 @@
     </body>
     <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
 </html>
-
-
 
