@@ -66,13 +66,8 @@ class TestUserConsent(TestCase):
         assert len(response.json['consent_agreements']) == 2
         assert 'send_reminders' not in response.json['consent_agreements'][0]
         assert 'staff_editable' in response.json['consent_agreements'][0]
-        org1, org2 = db.session.merge(org1), db.session.merge(org2)
-        org1_consent = [ca for ca in response.json[
-            'consent_agreements'] if ca['organization_id'] == org1.id][0]
-        org2_consent = [ca for ca in response.json[
-            'consent_agreements'] if ca['organization_id'] == org2.id][0]
-        assert org1_consent['status'] == 'consented'
-        assert org2_consent['status'] == 'suspended'
+        assert response.json['consent_agreements'][0]['status'] == 'consented'
+        assert response.json['consent_agreements'][1]['status'] == 'suspended'
 
     def test_consent_order(self):
         self.shallow_org_tree()
@@ -151,41 +146,6 @@ class TestUserConsent(TestCase):
             consent.audit.comment ==
             "Consent agreement {} signed".format(consent.id))
         assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
-
-    def test_post_multi_user_consent_dates(self):
-        """Confirm default "now" isn't stuck in time"""
-        self.shallow_org_tree()
-        org1 = Organization.query.filter(Organization.id > 0).first()
-        data = {'organization_id': org1.id,
-                'agreement_url': self.url,}
-        self.login()
-        response = self.client.post(
-            '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
-        assert response.status_code == 200
-        self.test_user = db.session.merge(self.test_user)
-        assert self.test_user.valid_consents.count() == 1
-        consent = self.test_user.valid_consents[0]
-        assert consent.organization_id == org1.id
-        assert (
-            consent.audit.comment ==
-            "Consent agreement {} signed".format(consent.id))
-        assert (datetime.utcnow() - consent.audit.timestamp).seconds < 30
-        first_user_acceptance_date = consent.acceptance_date
-
-        # now add second, confirm time moved
-        second_user = self.add_user('second')
-        self.login(user_id=second_user.id)
-        response = self.client.post(
-            '/api/user/{}/consent'.format(second_user.id),
-            content_type='application/json',
-            data=json.dumps(data))
-        assert response.status_code == 200
-        second_user = db.session.merge(second_user)
-        assert second_user.valid_consents.count() == 1
-        consent = second_user.valid_consents[0]
-        assert first_user_acceptance_date != consent.acceptance_date
 
     def test_post_user_future_consent_date(self):
         """Shouldn't allow future consent date"""
