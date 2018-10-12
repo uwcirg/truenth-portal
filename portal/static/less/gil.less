@@ -6405,6 +6405,11 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     border-color: #FFF
 }
 #modalCookieEnableWarning {
+    .modal-dialog {
+        width: 600px;
+        max-width: 100%;
+        margin: auto;
+    }
     &.in .modal-dialog {
         transform: translate(0,0);
     }
@@ -6420,13 +6425,6 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     }
     .modal-body {
         padding: 0 1.5em 0.5em;
-    }
-}
-@media (min-width: 520px) {
-    #modalCookieEnableWarning {
-        &.in .modal-dialog {
-            transform: translate(0,20%);
-        }
     }
 }
 .cookie-monster-modal-backdrop-cover {

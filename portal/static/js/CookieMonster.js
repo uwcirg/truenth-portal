@@ -1,6 +1,8 @@
 (function() {
     var CookieMonster = window.CookieMonster = function() {
+        this.modalElementId = "modalCookieEnableWarning";
         this.testCookieName = "testCookieMonster";
+        this.resizeTimer = 0;
     };
     CookieMonster.prototype.getSelectorsToDisable = function() {
         return this.selectorsToDisable || this.defaultSelectorsToDisable;
@@ -17,20 +19,24 @@
             document.cookie = this.testCookieName;
             cookieEnabled = document.cookie.indexOf(this.testCookieName) !== -1;
         }
-        cookieEnabled = this.storageAccessCheck();
+        //browsers variations here - safari allowed setting of cookies even when enabling cookie is turned off, but raise runtime security error
+        var didRaiseError = this.storageSecurityAccessErrorCheck();
+        if (didRaiseError) {
+            cookieEnabled = false;
+        }
         return (cookieEnabled);
     };
-    CookieMonster.prototype.storageAccessCheck = function() {
-        var accessEnabled = true;
-        try {  //workaround for safari - which allows cookie setting even setting blocking cookies in preference
+    CookieMonster.prototype.storageSecurityAccessErrorCheck = function() {
+        var hasError = false;
+        try { 
             sessionStorage.setItem("__cookiemonstertest__", "just a storage access test");
             sessionStorage.removeItem("__cookiemonstertest__");
         } catch(e) {
             if (e.name && String(e.name).toLowerCase() === "securityerror") {
-                accessEnabled = false;
+                hasError = true;
             }
         }
-        return accessEnabled;
+        return hasError;
     };
     CookieMonster.prototype.restoreVis = function() {
         var loadingElements = document.querySelectorAll("#loadingIndicator, .loading-indicator, .loading-indicator-placeholder"), mainElement = document.getElementById("mainHolder");
@@ -62,18 +68,40 @@
             });
         }
     };
+    CookieMonster.prototype.positionModal = function() {
+        var dialogElement =  document.querySelector("#" + this.modalElementId + " .modal-dialog");
+        if (!dialogElement) {
+            return;
+        }
+        var domRect = dialogElement.getBoundingClientRect();
+        if (!domRect || !domRect.width || !domRect.height) {
+            return;
+        }
+        dialogElement.style.position = "absolute";
+        dialogElement.style.left = ((window.innerWidth - domRect.width) / 2) + "px";
+        dialogElement.style.top = ((window.innerHeight - domRect.height) / 3) + "px";
+    };
     CookieMonster.prototype.initModal = function() {
         if (getUrlParameter("redirect")) { /*global getUrlParameter */
             return false; //do not init modal if this is coming from a redirect as to privacy page
         }
-        var modalElement = document.getElementById("modalCookieEnableWarning");
-        if (modalElement) {
-            modalElement.classList.add("in");
-            document.querySelector("body").classList.add("modal-open");
-            modalElement.style.display = "block";
+        var modalElement = document.getElementById(this.modalElementId);
+        if (!modalElement) {
+            return;
         }
         this.addModalBackdrops();
         this.initModalElementEvents();
+        modalElement.classList.add("in");
+        document.querySelector("body").classList.add("modal-open");
+        modalElement.style.display = "block";
+        this.positionModal();
+        var self = this;
+        window.addEventListener("resize", function() {
+            this.clearTimeout(self.resizeTimer);
+            setTimeout(function() {
+                self.positionModal();
+            }, 50);
+        });
     };
     CookieMonster.prototype.checkSuccessTargetRedirect = function() {
         var targetRedirectElement = document.getElementById("cookieCheckTargetUrl");

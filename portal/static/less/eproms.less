@@ -3574,9 +3574,14 @@ input.clinic {
 .modal-backdrop {
   opacity: 0.6
 }
-#modalCookieEnableWarning {
-  &.in .modal-dialog {
-    transform: translate(0,25%);
+#modalCookieEnableWarning  {
+  .modal-dialog {
+    width: 600px;
+    max-width: 100%;
+    margin: auto;
+  }
+  .modal-body__privacy {
+    display: none;
   }
 }
 .cookie-monster-modal-backdrop-cover {
