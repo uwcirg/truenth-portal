@@ -2178,7 +2178,7 @@ def invite(user_id):
     return jsonify(message=message)
 
 
-@user_api.route('/user/<int:user_id>/messages', methods=('OPTIONS','POST'))
+@user_api.route('/user/<int:user_id>/messages', methods=('OPTIONS','GET'))
 @crossdomain()
 @oauth.require_oauth()
 @roles_required(
