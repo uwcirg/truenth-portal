@@ -895,7 +895,7 @@ def reporting_dashboard():
 
 
 @portal.route('/spec')
-@crossdomain()
+@crossdomain(origin="*")
 def spec():
     """generate swagger friendly docs from code and comments
 
