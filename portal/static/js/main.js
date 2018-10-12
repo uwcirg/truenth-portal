@@ -1912,12 +1912,19 @@ var tnthDates = {
         sessionStorage.removeItem(this.localeSessionKey);
     },
     "getUserLocale": function() {
+        var sessionKey = this.localeSessionKey;
+        var sessionLocale = sessionStorage.getItem(sessionKey);
         var locale = "";
         if ($("#userSessionLocale").val()) {
             return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
         }
         if (!checkJQuery()) { /*global checkJQuery */
             return false;
+        }
+        var userSessionLocale = $("#userSessionLocale").val();
+        if (userSessionLocale) {
+            sessionStorage.setItem(sessionKey, userSessionLocale);
+            return userSessionLocale;
         }
         $.ajax({
             type: "GET",
@@ -1942,6 +1949,7 @@ var tnthDates = {
                 data.communication.forEach(function(item) {
                     if (item.language) {
                         locale = item.language.coding[0].code;
+                        sessionStorage.setItem(sessionKey, locale);
                     }
                 });
             });
@@ -2046,14 +2054,7 @@ var Global = {
         });
     },
     "loginAs": function() {
-        var LOGIN_AS_PATIENT = null;
-        try {
-            if (typeof sessionStorage !== "undefined") {
-                LOGIN_AS_PATIENT = sessionStorage.getItem("loginAsPatient");
-            }
-        } catch(e) {
-            console.log("Error accessing session storage variable - check browser setting"); //shown in browser console
-        }
+        var LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
         if (LOGIN_AS_PATIENT) {
             tnthDates.clearSessionLocale();
             tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
@@ -2315,6 +2316,7 @@ var Global = {
         }).off("input.bs.validator change.bs.validator"); // Only check on blur (turn off input)   to turn off change - change.bs.validator
     }
 };
+
 var userSetLang = tnthDates.getUserLocale();
 /*global __i18next*/
 Global.registerModules();
