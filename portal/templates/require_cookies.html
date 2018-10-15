@@ -21,6 +21,10 @@
         <div id="requiredCookieContainer" class="standalone">
             {{checkCookieMonster(target=target)}}
         </div>
+        <div class="default-content tnth-hide">
+            <div>{{_("Browser cookie setting check complete")}}</div>
+            <div><a href="/">Home</a></div>
+        </div>
     </body>
     <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
 </html>

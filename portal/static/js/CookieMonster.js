@@ -28,7 +28,7 @@
     };
     CookieMonster.prototype.storageSecurityAccessErrorCheck = function() {
         var hasError = false;
-        try { 
+        try {
             sessionStorage.setItem("__cookiemonstertest__", "just a storage access test");
             sessionStorage.removeItem("__cookiemonstertest__");
         } catch(e) {
@@ -46,6 +46,24 @@
         }
         for (var index = 0; index < loadingElements.length; index++) {
             loadingElements[index].setAttribute("style", "display:none; visibility:hidden;");
+        }
+    };
+    CookieMonster.prototype.clearModal = function() {
+        var modalElement = document.getElementById(this.modalElementId);
+        if (!modalElement) {
+            return;
+        }
+        modalElement.style.display = "none";
+        this.removeModalBackdrops();
+    };
+    CookieMonster.prototype.removeModalBackdrops = function() {
+        var modalBackdropElement = document.querySelector(".modal-backdrop");
+        if (modalBackdropElement) {
+            modalBackdropElement.parentNode.remove();
+        }
+        var modalBackdropCoverElement = document.querySelector(".cookie-monster-modal-backdrop-cover");
+        if (modalBackdropCoverElement) {
+            modalBackdropCoverElement.parentNode.remove();
         }
     };
     CookieMonster.prototype.addModalBackdrops = function() {
@@ -107,11 +125,21 @@
         var targetRedirectElement = document.getElementById("cookieCheckTargetUrl");
         if (targetRedirectElement && targetRedirectElement.value) {
             window.location.replace(targetRedirectElement.value);
+            return true;
         }
+        return false;
     };
     CookieMonster.prototype.onSuccessCheck = function() {
         this.deleteTestCookie();
-        this.checkSuccessTargetRedirect();
+        var hasTargetRedirect = this.checkSuccessTargetRedirect();
+        if (!hasTargetRedirect) {
+            this.restoreVis();
+            this.clearModal();
+            var defaultContentElement = document.querySelector(".default-content");
+            if (defaultContentElement) {
+                defaultContentElement.classList.remove("tnth-hide");
+            }
+        }
     };
     CookieMonster.prototype.onFailCheck = function() {
         document.querySelector("body").classList.add("browser-cookie-disabled");

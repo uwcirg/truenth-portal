@@ -3266,7 +3266,8 @@ input.clinic {
 }
 
 /*.loading-indicator {*/
-#loadingIndicator{
+#loadingIndicator,
+.loading-indicator-placeholder{
   /*display: none;*/
   position: fixed;
   top: 0;
@@ -3282,7 +3283,8 @@ input.clinic {
   margin: auto;
   background: transparent;
 }
-#loadingIndicator:before {
+#loadingIndicator:before,
+.loading-indicator-placeholder:before {
   content: ' ';
   display: block;
   position: fixed;
@@ -3299,12 +3301,14 @@ input.clinic {
   opacity: 0.6;
 }
 
-#loadingIndicator i {
+#loadingIndicator i,
+.loading-indicator-placeholder i {
   font-size: @baseFontSize;
 }
 
 /* :not(:required) hides these rules from IE9 and below */
-#loadingIndicator:not(:required) {
+#loadingIndicator:not(:required),
+.loading-indicator-placeholder:not(:required) {
   /* hide "loading..." text */
   font: 0/0 a;
   color: transparent;
@@ -3313,7 +3317,8 @@ input.clinic {
   border: 0;
 }
 
-#loadingIndicator:not(:required):after {
+#loadingIndicator:not(:required):after,
+.loading-indicator-placeholder:not(:required):after {
   content: ' ';
   display: block;
   font-size: 10px;
