@@ -1428,3 +1428,4 @@ $(document).ready(function(){
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
   setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
 });
+

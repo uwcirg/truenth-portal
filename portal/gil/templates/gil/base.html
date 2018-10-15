@@ -275,7 +275,7 @@
       </div>
     </div>
     {% block init_cookie_check %}
-      {%- from "flask_user/_macros.html" import checkCookieMonster -%}
+      {%- from "require_cookies.html" import checkCookieMonster -%}
       {{checkCookieMonster()}}
     {% endblock %}
 {% endblock %}
