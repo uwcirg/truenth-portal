@@ -56,14 +56,15 @@ def upgrade():
         old_acceptance_date, new_acceptance_date = dates
         msg = "Correct stale default acceptance_date {} to {}".format(
             old_acceptance_date, new_acceptance_date)
+        uc = session.query(UserConsent).get(uc_id)
         audit = Audit(
             user_id=admin_id, subject_id=uc.user_id, context='consent',
             comment=msg)
-        uc = session.query(UserConsent).get(uc_id)
         uc.audit = audit
         uc.acceptance_date = new_acceptance_date
 
     session.commit()
+
 
 def downgrade():
     # no value in undoing that mess
