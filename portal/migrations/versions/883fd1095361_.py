@@ -38,6 +38,7 @@ def upgrade():
         Audit, UserConsent.audit_id == Audit.id).with_entities(
         UserConsent, Audit.timestamp)
 
+    eligible_uc_ids = {}
     for uc, timestamp in query:
         if uc.acceptance_date.microsecond != 0:
             # skip the honest ones, that differ by milliseconds
@@ -47,15 +48,20 @@ def upgrade():
                 raise ValueError(
                     "too big of a jump - please review {} {} {}".format(
                         uc.user_id, timestamp, uc.acceptance_date))
-            msg = "Correct stale default acceptance_date {} to {}".format(
+            eligible_uc_ids[uc.id] = (
                 uc.acceptance_date, timestamp.replace(microsecond=0))
-            audit = Audit(
-                user_id=admin_id, subject_id=uc.user_id, context='consent',
-                comment=msg)
-            uc.audit = audit
-            # Chop microseconds in case of downgrade/upgrade cycle
-            # don't want to move all till last time this was run
-            uc.acceptance_date = timestamp.replace(microsecond=0)
+
+    # now update each in eligible list outside of initial query
+    for uc_id, dates in eligible_uc_ids.items():
+        old_acceptance_date, new_acceptance_date = dates
+        msg = "Correct stale default acceptance_date {} to {}".format(
+            old_acceptance_date, new_acceptance_date)
+        audit = Audit(
+            user_id=admin_id, subject_id=uc.user_id, context='consent',
+            comment=msg)
+        uc = session.query(UserConsent).get(uc_id)
+        uc.audit = audit
+        uc.acceptance_date = new_acceptance_date
 
     session.commit()
 
