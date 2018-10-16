@@ -18,7 +18,6 @@ tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 @tou_api.route('/tou')
 @crossdomain()
-@oauth.require_oauth()
 def get_current_tou_url():
     """Return current ToU URL
 
