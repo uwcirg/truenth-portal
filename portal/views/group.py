@@ -235,6 +235,7 @@ def edit_group(group_name):
     security:
       - ServiceToken: []
       - OAuth2AuthzFlow: []
+
     """
     g = Group.query.filter_by(name=group_name).first()
     if not g:
