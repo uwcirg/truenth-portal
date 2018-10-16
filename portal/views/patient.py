@@ -24,7 +24,7 @@ from .demographics import demographics
 patient_api = Blueprint('patient_api', __name__)
 
 
-@patient_api.route('/api/patient/', methods=('OPTIONS', 'GET'))
+@patient_api.route('/api/patient/')
 @crossdomain()
 @oauth.require_oauth()
 def patient_search():
@@ -134,9 +134,7 @@ def patient_search():
     return jsonify(bundle_results(elements=patients, links=[link]))
 
 
-@patient_api.route(
-    '/api/patient/<int:patient_id>/deceased',
-    methods=('OPTIONS', 'POST'))
+@patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def post_patient_deceased(patient_id):
@@ -204,9 +202,9 @@ def post_patient_deceased(patient_id):
 
 
 @patient_api.route(
-    '/api/patient/<int:patient_id>/birthdate', methods=('OPTIONS', 'POST'))
+    '/api/patient/<int:patient_id>/birthdate', methods=('POST',))
 @patient_api.route(
-    '/api/patient/<int:patient_id>/birthDate', methods=('OPTIONS', 'POST'))
+    '/api/patient/<int:patient_id>/birthDate', methods=('POST',))
 @oauth.require_oauth()
 def post_patient_dob(patient_id):
     """POST date of birth for a patient

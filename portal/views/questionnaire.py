@@ -9,7 +9,7 @@ from .crossdomain import crossdomain
 questionnaire_api = Blueprint('questionnaire_api', __name__)
 
 
-@questionnaire_api.route('/api/questionnaire_bank', methods=('OPTIONS', 'GET'))
+@questionnaire_api.route('/api/questionnaire_bank')
 @crossdomain()
 @oauth.require_oauth()
 def questionnaire_bank_list():
@@ -36,7 +36,7 @@ def questionnaire_bank_list():
     return jsonify(bundle)
 
 
-@questionnaire_api.route('/api/questionnaire', methods=('OPTIONS', 'GET'))
+@questionnaire_api.route('/api/questionnaire')
 @crossdomain()
 @oauth.require_oauth()
 def questionnaire_list():
@@ -63,9 +63,7 @@ def questionnaire_list():
     return jsonify(bundle)
 
 
-@questionnaire_api.route(
-    '/api/questionnaire/<string:value>',
-    methods=('OPTIONS', 'GET'))
+@questionnaire_api.route('/api/questionnaire/<string:value>')
 @crossdomain()
 @oauth.require_oauth()
 def get_questionnaire(value):

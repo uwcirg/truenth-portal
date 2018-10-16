@@ -16,7 +16,7 @@ from .crossdomain import crossdomain
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 
-@tou_api.route('/tou', methods=('OPTIONS', 'GET'))
+@tou_api.route('/tou')
 @crossdomain()
 @oauth.require_oauth()
 def get_current_tou_url():
@@ -42,7 +42,7 @@ def get_current_tou_url():
     return jsonify(url=terms.url)
 
 
-@tou_api.route('/user/<int:user_id>/tou', methods=('OPTIONS', 'GET'))
+@tou_api.route('/user/<int:user_id>/tou')
 @crossdomain()
 @oauth.require_oauth()
 def get_tou(user_id):
@@ -107,9 +107,7 @@ def get_tou(user_id):
     return jsonify(tous=[d.as_json() for d in tous])
 
 
-@tou_api.route(
-    '/user/<int:user_id>/tou/<string:tou_type>',
-    methods=('OPTIONS', 'GET'))
+@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
 @crossdomain()
 @oauth.require_oauth()
 def get_tou_by_type(user_id, tou_type):
@@ -189,7 +187,7 @@ def get_tou_by_type(user_id, tou_type):
     return jsonify(accepted=False)
 
 
-@tou_api.route('/user/<user_id>/tou/accepted', methods=('OPTIONS', 'POST'))
+@tou_api.route('/user/<user_id>/tou/accepted', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
@@ -250,7 +248,7 @@ def post_user_accepted_tou(user_id):
     return accept_tou(user_id)
 
 
-@tou_api.route('/tou/accepted', methods=('OPTIONS', 'POST'))
+@tou_api.route('/tou/accepted', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def accept_tou(user_id=None):

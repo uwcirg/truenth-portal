@@ -23,8 +23,7 @@ intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
 
 @intervention_api.route(
-    '/intervention/<string:intervention_name>/user/<int:user_id>',
-    methods=('OPTIONS', 'GET'))
+    '/intervention/<string:intervention_name>/user/<int:user_id>')
 @crossdomain()
 @oauth.require_oauth()
 def user_intervention_get(intervention_name, user_id):
@@ -138,7 +137,7 @@ def integration_delay_hack(intervention, key, value):
 
 
 @intervention_api.route('/intervention/<string:intervention_name>',
-                        methods=('OPTIONS','PUT'))
+                        methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(ROLE.SERVICE.value)
@@ -354,8 +353,7 @@ def intervention_rule_set(intervention_name):
 
 
 @intervention_api.route(
-    '/intervention/<string:intervention_name>/communicate',
-    methods=('OPTIONS','POST'))
+    '/intervention/<string:intervention_name>/communicate', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def intervention_communicate(intervention_name):

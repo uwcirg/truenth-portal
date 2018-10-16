@@ -20,7 +20,7 @@ from .crossdomain import crossdomain
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 
 
-@practitioner_api.route('/practitioner', methods=('OPTIONS', 'GET'))
+@practitioner_api.route('/practitioner')
 @crossdomain()
 @oauth.require_oauth()
 def practitioner_search():
@@ -128,9 +128,7 @@ def practitioner_search():
     return jsonify(bundle_results(elements=practitioners, links=[link]))
 
 
-@practitioner_api.route(
-    '/practitioner/<string:id_or_code>',
-    methods=('OPTIONS', 'GET'))
+@practitioner_api.route('/practitioner/<string:id_or_code>')
 @crossdomain()
 @oauth.require_oauth()
 def practitioner_get(id_or_code):
@@ -184,7 +182,7 @@ def practitioner_get(id_or_code):
     return jsonify(practitioner.as_fhir())
 
 
-@practitioner_api.route('/practitioner', methods=('OPTIONS','POST'))
+@practitioner_api.route('/practitioner', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
@@ -252,7 +250,7 @@ def practitioner_post():
 
 
 @practitioner_api.route('/practitioner/<string:id_or_code>',
-                        methods=('OPTIONS', 'PUT'))
+                        methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])

@@ -53,7 +53,7 @@ from .crossdomain import crossdomain
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
 
-@user_api.route('/me', methods=('OPTIONS', 'GET'))
+@user_api.route('/me')
 @crossdomain()
 @oauth.require_oauth()
 def me():
@@ -97,7 +97,7 @@ def me():
         id=user.id, username=user.username, email=user.email)
 
 
-@user_api.route('/account', methods=('OPTIONS', 'POST'))
+@user_api.route('/account', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -286,7 +286,7 @@ def account():
     return jsonify(user_id=user.id)
 
 
-@user_api.route('/user/<int:user_id>', methods=['OPTIONS','DELETE'])
+@user_api.route('/user/<int:user_id>', methods=('DELETE',))
 @crossdomain()
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
@@ -344,7 +344,7 @@ def delete_user(user_id):
     return jsonify(message="deleted")
 
 
-@user_api.route('/user/<int:user_id>/reactivate', methods=['OPTIONS','POST'])
+@user_api.route('/user/<int:user_id>/reactivate', methods=('POST',))
 @crossdomain()
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
@@ -404,7 +404,7 @@ def reactivate_user(user_id):
     return jsonify(message="reactivated")
 
 
-@user_api.route('/user/<int:user_id>/access_url', methods=('OPTIONS','GET'))
+@user_api.route('/user/<int:user_id>/access_url')
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -484,7 +484,7 @@ def access_url(user_id):
     return jsonify(access_url=url)
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/consent')
 @crossdomain()
 @oauth.require_oauth()
 def user_consents(user_id):
@@ -592,7 +592,7 @@ def user_consents(user_id):
                                        user.all_consents])
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'POST'))
+@user_api.route('/user/<int:user_id>/consent', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def set_user_consents(user_id):
@@ -716,7 +716,7 @@ def set_user_consents(user_id):
 
 
 @user_api.route('/user/<int:user_id>/consent/withdraw',
-                methods=('OPTIONS', 'POST', 'PUT'))
+                methods=('POST', 'PUT'))
 @crossdomain()
 @oauth.require_oauth()
 def withdraw_user_consent(user_id):
@@ -825,7 +825,7 @@ def withdraw_user_consent(user_id):
     return jsonify(uc.as_json())
 
 
-@user_api.route('/user/<int:user_id>/consent', methods=('OPTIONS', 'DELETE'))
+@user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
 @crossdomain()
 @oauth.require_oauth()
 def delete_user_consents(user_id):
@@ -914,7 +914,7 @@ def delete_user_consents(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/groups')
 @crossdomain()
 @oauth.require_oauth()
 def user_groups(user_id):
@@ -968,7 +968,7 @@ def user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/user/<int:user_id>/groups', methods=('OPTIONS', 'PUT'))
+@user_api.route('/user/<int:user_id>/groups', methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()
 def set_user_groups(user_id):
@@ -1080,7 +1080,7 @@ def set_user_groups(user_id):
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
-@user_api.route('/relationships', methods=('OPTIONS', 'GET'))
+@user_api.route('/relationships')
 @crossdomain()
 @oauth.require_oauth()
 def system_relationships():
@@ -1123,9 +1123,7 @@ def system_relationships():
     return jsonify(relationships=results)
 
 
-@user_api.route(
-    '/user/<int:user_id>/relationships',
-    methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/relationships')
 @crossdomain()
 @oauth.require_oauth()
 def relationships(user_id):
@@ -1203,7 +1201,7 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/register-now', methods=('OPTIONS', 'GET'))
+@user_api.route('/user/register-now')
 @crossdomain()
 @oauth.require_oauth()
 def register_now():
@@ -1265,9 +1263,7 @@ def register_now():
     return redirect(url_for('user.register', email=user.email))
 
 
-@user_api.route(
-    '/user/<int:user_id>/relationships',
-    methods=('OPTIONS', 'PUT'))
+@user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()
 def set_relationships(user_id):
@@ -1409,7 +1405,7 @@ def set_relationships(user_id):
     return relationships(user.id)
 
 
-@user_api.route('/user/<int:user_id>/email_ready', methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/email_ready')
 @crossdomain()
 @oauth.require_oauth()
 def email_ready(user_id):
@@ -1466,7 +1462,7 @@ def email_ready(user_id):
         return jsonify(ready=ready, reason=reason)
 
 
-@user_api.route('/unique_email', methods=('OPTIONS', 'GET'))
+@user_api.route('/unique_email')
 @crossdomain()
 def unique_email():
     """Confirm a given email is unique
@@ -1549,9 +1545,7 @@ def unique_email():
     return jsonify(unique=True)
 
 
-@user_api.route(
-    '/user/<int:user_id>/user_documents',
-    methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/user_documents')
 @crossdomain()
 @oauth.require_oauth()
 def user_documents(user_id):
@@ -1646,9 +1640,7 @@ def user_documents(user_id):
                                    results])
 
 
-@user_api.route(
-    '/user/<int:user_id>/user_documents/<int:doc_id>',
-    methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>')
 @crossdomain()
 @oauth.require_oauth()
 def download_user_document(user_id, doc_id):
@@ -1719,9 +1711,7 @@ def download_user_document(user_id, doc_id):
     return response
 
 
-@user_api.route(
-    '/user/<int:user_id>/patient_report',
-    methods=('OPTIONS', 'POST'))
+@user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def upload_user_document(user_id):
@@ -1836,7 +1826,7 @@ def upload_user_document(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/password_reset', methods=('OPTIONS','POST'))
+@user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
@@ -1901,9 +1891,7 @@ def trigger_password_reset_email(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route(
-    '/user/<int:user_id>/table_preferences/<string:table_name>',
-    methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/table_preferences/<string:table_name>')
 @crossdomain()
 @oauth.require_oauth()
 def get_table_preferences(user_id, table_name):
@@ -1986,7 +1974,7 @@ def get_table_preferences(user_id, table_name):
 
 @user_api.route(
     '/user/<int:user_id>/table_preferences/<string:table_name>',
-    methods=('OPTIONS', 'PUT', 'POST'))
+    methods=('PUT', 'POST'))
 @crossdomain()
 @oauth.require_oauth()
 def set_table_preferences(user_id, table_name):
@@ -2091,7 +2079,7 @@ def set_table_preferences(user_id, table_name):
     return jsonify(pref.as_json())
 
 
-@user_api.route('/user/<int:user_id>/invite', methods=('OPTIONS','POST'))
+@user_api.route('/user/<int:user_id>/invite', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.SERVICE.value])
@@ -2178,7 +2166,7 @@ def invite(user_id):
     return jsonify(message=message)
 
 
-@user_api.route('/user/<int:user_id>/messages', methods=('OPTIONS','GET'))
+@user_api.route('/user/<int:user_id>/messages')
 @crossdomain()
 @oauth.require_oauth()
 @roles_required(
@@ -2252,9 +2240,7 @@ def get_user_messages(user_id):
     return jsonify(messages=[m.as_json() for m in messages])
 
 
-@user_api.route(
-    '/user/<int:user_id>/questionnaire_bank',
-    methods=('OPTIONS', 'GET'))
+@user_api.route('/user/<int:user_id>/questionnaire_bank')
 @crossdomain()
 @oauth.require_oauth()
 def get_current_user_qb(user_id):

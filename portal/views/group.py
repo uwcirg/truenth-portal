@@ -13,7 +13,7 @@ from .crossdomain import crossdomain
 group_api = Blueprint('group_api', __name__, url_prefix='/api/group')
 
 
-@group_api.route('/', methods=('OPTIONS', 'GET'))
+@group_api.route('/')
 @crossdomain()
 @oauth.require_oauth()
 def current_groups():
@@ -54,7 +54,7 @@ def current_groups():
     return jsonify(groups=results)
 
 
-@group_api.route('/<string:group_name>', methods=('OPTIONS', 'GET'))
+@group_api.route('/<string:group_name>')
 @crossdomain()
 @oauth.require_oauth()
 def group_by_name(group_name):
@@ -102,7 +102,7 @@ def group_by_name(group_name):
     return jsonify(group=g.as_json())
 
 
-@group_api.route('/', methods=('OPTIONS','POST'))
+@group_api.route('/', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
@@ -176,7 +176,7 @@ def add_group():
     return jsonify(message="ok")
 
 
-@group_api.route('/<string:group_name>', methods=('OPTIONS','PUT'))
+@group_api.route('/<string:group_name>', methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])

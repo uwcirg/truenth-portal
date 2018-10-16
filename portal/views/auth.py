@@ -682,7 +682,7 @@ def logout(prevent_redirect=False, reason=None):
     return redirect('/' if not timed_out else '/?timed_out=1')
 
 
-@auth.route('/oauth/token-status', methods=('OPTIONS', 'GET'))
+@auth.route('/oauth/token-status')
 @crossdomain()
 @oauth.require_oauth()
 def token_status():
@@ -755,7 +755,7 @@ def token_status():
         scope=token._scopes, scopes=token._scopes)
 
 
-@auth.route('/oauth/errors', methods=('OPTIONS', 'GET', 'POST'))
+@auth.route('/oauth/errors', methods=('GET', 'POST'))
 @crossdomain()
 @csrf.exempt
 def oauth_errors():
@@ -788,7 +788,7 @@ def oauth_errors():
     return jsonify(error=request.args.get('error')), 400
 
 
-@auth.route('/oauth/token', methods=('OPTIONS', 'GET', 'POST'))
+@auth.route('/oauth/token', methods=('GET', 'POST'))
 @crossdomain()
 @csrf.exempt
 @oauth.token_handler
@@ -879,7 +879,7 @@ def access_token():
     return None
 
 
-@auth.route('/oauth/authorize', methods=('OPTIONS', 'GET', 'POST'))
+@auth.route('/oauth/authorize', methods=('GET', 'POST'))
 @crossdomain()
 @csrf.exempt
 @oauth.authorize_handler

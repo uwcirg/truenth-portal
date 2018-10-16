@@ -130,7 +130,7 @@ class ClientEditForm(FlaskForm):
                     "URL host must match a provided Application Origin URL")
 
 
-@client_api.route('/client', methods=('OPTIONS','GET', 'POST'))
+@client_api.route('/client', methods=('GET', 'POST'))
 @crossdomain()
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
@@ -219,7 +219,7 @@ def client_reg():
     return redirect(url_for('.client_edit', client_id=client.client_id))
 
 
-@client_api.route('/client/<client_id>', methods=('OPTIONS','GET', 'POST'))
+@client_api.route('/client/<client_id>', methods=('GET', 'POST'))
 @crossdomain()
 @roles_required(ROLE.APPLICATION_DEVELOPER.value)
 @oauth.require_oauth()
@@ -385,7 +385,7 @@ def client_edit(client_id):
     return redirect(redirect_target)
 
 
-@client_api.route('/clients', methods=('OPTIONS', 'GET'))
+@client_api.route('/clients')
 @crossdomain()
 @roles_required([ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value])
 @oauth.require_oauth()

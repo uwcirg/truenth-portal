@@ -119,7 +119,7 @@ def optional(user_id):
     return jsonify(optional=results)
 
 
-@coredata_api.route('/acquire', methods=('OPTIONS', 'GET'))
+@coredata_api.route('/acquire')
 @crossdomain()
 @oauth.require_oauth()
 def acquire():

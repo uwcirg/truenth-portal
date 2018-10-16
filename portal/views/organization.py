@@ -27,7 +27,7 @@ from .crossdomain import crossdomain
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
 
-@org_api.route('/organization', methods=('OPTIONS', 'GET'))
+@org_api.route('/organization')
 @crossdomain()
 @oauth.require_oauth()
 def organization_search():
@@ -158,7 +158,7 @@ def organization_search():
     return jsonify(bundle)
 
 
-@org_api.route('/organization/<string:id_or_code>', methods=('OPTIONS', 'GET'))
+@org_api.route('/organization/<string:id_or_code>')
 @crossdomain()
 @oauth.require_oauth()
 def organization_get(id_or_code):
@@ -226,9 +226,7 @@ def organization_get(id_or_code):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route(
-    '/organization/<int:organization_id>',
-    methods=('OPTIONS','DELETE'))
+@org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
 @crossdomain()
 @roles_required(ROLE.ADMIN.value)
 @oauth.require_oauth()
@@ -279,7 +277,7 @@ def organization_delete(organization_id):
     return jsonify(message='deleted organization {}'.format(org))
 
 
-@org_api.route('/organization', methods=('OPTIONS','POST'))
+@org_api.route('/organization', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
@@ -355,7 +353,7 @@ def organization_post():
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/organization/<int:organization_id>', methods=('OPTIONS','PUT'))
+@org_api.route('/organization/<int:organization_id>', methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
@@ -435,7 +433,7 @@ def organization_put(organization_id):
     return jsonify(org.as_fhir(include_empties=False))
 
 
-@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'GET'))
+@org_api.route('/user/<int:user_id>/organization')
 @crossdomain()
 @oauth.require_oauth()
 def user_organizations(user_id):
@@ -491,7 +489,7 @@ def user_organizations(user_id):
         for org in user.organizations])
 
 
-@org_api.route('/user/<int:user_id>/organization', methods=('OPTIONS', 'POST'))
+@org_api.route('/user/<int:user_id>/organization', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def add_user_organizations(user_id):

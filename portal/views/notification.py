@@ -11,9 +11,7 @@ from .crossdomain import crossdomain
 notification_api = Blueprint('notification_api', __name__, url_prefix='/api')
 
 
-@notification_api.route(
-    '/user/<int:user_id>/notification',
-    methods=('OPTIONS', 'GET'))
+@notification_api.route('/user/<int:user_id>/notification')
 @crossdomain()
 @oauth.require_oauth()
 def get_user_notification(user_id):
@@ -91,7 +89,7 @@ def get_user_notification(user_id):
 
 @notification_api.route(
     '/user/<int:user_id>/notification/<int:notification_id>',
-    methods=('OPTIONS', 'DELETE'))
+    methods=('DELETE',))
 @crossdomain()
 @oauth.require_oauth()
 def delete_user_notification(user_id, notification_id):

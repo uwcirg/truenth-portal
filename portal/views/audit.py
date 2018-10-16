@@ -12,7 +12,7 @@ from .crossdomain import crossdomain
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 
 
-@audit_api.route('/user/<int:user_id>/audit', methods=('OPTIONS', 'GET'))
+@audit_api.route('/user/<int:user_id>/audit')
 @crossdomain()
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])

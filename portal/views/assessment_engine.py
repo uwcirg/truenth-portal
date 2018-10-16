@@ -53,10 +53,10 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
     defaults={'instrument_id': None},
-    methods=('OPTIONS', 'GET'))
+)
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment/<string:instrument_id>',
-    methods=('OPTIONS', 'GET'))
+)
 @crossdomain()
 @oauth.require_oauth()
 def assessment(patient_id, instrument_id):
@@ -643,7 +643,7 @@ def assessment(patient_id, instrument_id):
     return jsonify(bundle_results(elements=documents, links=[link]))
 
 
-@assessment_engine_api.route('/patient/assessment', methods=('OPTIONS', 'GET'))
+@assessment_engine_api.route('/patient/assessment')
 @crossdomain()
 @roles_required(
     [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
@@ -772,7 +772,7 @@ def get_assessments():
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
-    methods=('OPTIONS', 'PUT')
+    methods=('PUT',)
 )
 @crossdomain()
 @oauth.require_oauth()
@@ -878,7 +878,9 @@ def assessment_update(patient_id):
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment', methods=('OPTIONS', 'POST'))
+    '/patient/<int:patient_id>/assessment',
+    methods=('POST',)
+)
 @crossdomain()
 @oauth.require_oauth()
 def assessment_add(patient_id):
@@ -1458,7 +1460,7 @@ def present_needed():
     return redirect(url, code=302)
 
 
-@assessment_engine_api.route('/present-assessment', methods=('OPTIONS','GET'))
+@assessment_engine_api.route('/present-assessment')
 @crossdomain()
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
@@ -1601,7 +1603,7 @@ def deprecated_present_assessment(instrument_id):
     return present_assessment(instruments=[instrument_id])
 
 
-@assessment_engine_api.route('/complete-assessment', methods=('OPTIONS','GET'))
+@assessment_engine_api.route('/complete-assessment')
 @crossdomain()
 @oauth.require_oauth()
 def complete_assessment():
@@ -1655,9 +1657,7 @@ def complete_assessment():
     return redirect(next_url, code=303)
 
 
-@assessment_engine_api.route(
-    '/consent-assessment-status',
-    methods=('OPTIONS', 'GET'))
+@assessment_engine_api.route('/consent-assessment-status')
 @crossdomain()
 @oauth.require_oauth()
 def batch_assessment_status():
@@ -1741,9 +1741,7 @@ def batch_assessment_status():
     return jsonify(status=results)
 
 
-@assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment-status',
-    methods=('OPTIONS', 'GET'))
+@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status')
 @crossdomain()
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):

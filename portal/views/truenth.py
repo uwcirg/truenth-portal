@@ -21,7 +21,7 @@ from .crossdomain import crossdomain
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
 
 
-@truenth_api.route("/ping", methods=('OPTIONS', 'POST'))
+@truenth_api.route("/ping", methods=('POST',))
 @csrf.portal_exempt
 @crossdomain()
 def ping():
