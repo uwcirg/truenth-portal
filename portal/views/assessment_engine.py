@@ -55,7 +55,7 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
     defaults={'instrument_id': None},
 )
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment/<string:instrument_id>',
+    '/patient/<int:patient_id>/assessment/<string:instrument_id>'
 )
 @crossdomain()
 @oauth.require_oauth()
@@ -772,7 +772,7 @@ def get_assessments():
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
-    methods=('PUT',)
+    methods=('PUT',),
 )
 @crossdomain()
 @oauth.require_oauth()
@@ -878,9 +878,7 @@ def assessment_update(patient_id):
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment',
-    methods=('POST',)
-)
+    '/patient/<int:patient_id>/assessment', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def assessment_add(patient_id):

@@ -127,10 +127,8 @@ def pca_localized(patient_id):
                                      codeable_concept=CC.PCaLocalized)
 
 
-@clinical_api.route(
-    '/patient/<int:patient_id>/clinical/biopsy',
-    methods=('POST', 'PUT')
-)
+@clinical_api.route('/patient/<int:patient_id>/clinical/biopsy',
+                    methods=('POST', 'PUT'))
 @crossdomain()
 @oauth.require_oauth()
 def biopsy_set(patient_id):
@@ -192,10 +190,8 @@ def biopsy_set(patient_id):
                                      codeable_concept=CC.BIOPSY)
 
 
-@clinical_api.route(
-    '/patient/<int:patient_id>/clinical/pca_diag',
-    methods=('POST', 'PUT')
-)
+@clinical_api.route('/patient/<int:patient_id>/clinical/pca_diag',
+                    methods=('POST', 'PUT'))
 @crossdomain()
 @oauth.require_oauth()
 def pca_diag_set(patient_id):
@@ -255,10 +251,8 @@ def pca_diag_set(patient_id):
                                      codeable_concept=CC.PCaDIAG)
 
 
-@clinical_api.route(
-    '/patient/<int:patient_id>/clinical/pca_localized',
-    methods=('POST', 'PUT')
-)
+@clinical_api.route('/patient/<int:patient_id>/clinical/pca_localized',
+                    methods=('POST', 'PUT'))
 @crossdomain()
 @oauth.require_oauth()
 def pca_localized_set(patient_id):
@@ -373,10 +367,8 @@ def clinical(patient_id):
         requestURL=request.url, patch_dstu2=patch_dstu2))
 
 
-@clinical_api.route(
-    '/patient/<int:patient_id>/clinical',
-    methods=('POST', 'PUT')
-)
+@clinical_api.route('/patient/<int:patient_id>/clinical',
+                    methods=('POST', 'PUT'))
 @crossdomain()
 @oauth.require_oauth()
 def clinical_set(patient_id):
@@ -456,9 +448,8 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
-@clinical_api.route(
-    '/patient/<int:patient_id>/clinical/<int:observation_id>',
-    methods=('PUT',))
+@clinical_api.route('/patient/<int:patient_id>/clinical/<int:observation_id>',
+                    methods=('PUT',))
 @crossdomain()
 @oauth.require_oauth()
 def clinical_update(patient_id, observation_id):
