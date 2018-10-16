@@ -38,7 +38,7 @@ class UserConsent(db.Model):
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=False)
     acceptance_date = db.Column(
-        db.DateTime, default=datetime.utcnow(), nullable=False)
+        db.DateTime, default=datetime.utcnow, nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     deleted_id = db.Column(db.ForeignKey('audit.id'), nullable=True)
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
