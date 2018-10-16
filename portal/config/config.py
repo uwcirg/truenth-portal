@@ -193,6 +193,10 @@ class BaseConfig(object):
         ROLE.SERVICE.value,
     ]
 
+    CORS_WHITELIST = [
+        'uwcirg.github.io',
+    ]
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

@@ -18,12 +18,14 @@ from ..models.identifier import Identifier, UserIdentifier
 from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
+from .crossdomain import crossdomain
 from .demographics import demographics
 
 patient_api = Blueprint('patient_api', __name__)
 
 
 @patient_api.route('/api/patient/')
+@crossdomain()
 @oauth.require_oauth()
 def patient_search():
     """Looks up patient(s) from given parameters, returns FHIR Patient bundle
@@ -75,6 +77,8 @@ def patient_search():
         description:
           if there is no match found, or the user lacks permission to look
           up details on the match.
+    security:
+      - ServiceToken: []
 
     """
     if not request.args.items():
@@ -131,6 +135,7 @@ def patient_search():
 
 
 @patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 def post_patient_deceased(patient_id):
     """POST deceased datetime or status for a patient
@@ -177,6 +182,8 @@ def post_patient_deceased(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -237,6 +244,8 @@ def post_patient_dob(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit requested patient
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)

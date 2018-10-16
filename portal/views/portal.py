@@ -921,6 +921,20 @@ def spec():
             },
         },
         "schemes": ("http", "https"),
+        "securityDefinitions": {
+            "ServiceToken": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+            },
+            "OAuth2AuthzFlow": {
+                "type": "oauth2",
+                "authorizationUrl": url_for('auth.authorize', _external=True),
+                "tokenUrl": url_for('auth.access_token', _external=True),
+                "flow": "accessCode",
+                "scopes": {},
+            }
+        },
     })
 
     # Todo: figure out why description isn't always set

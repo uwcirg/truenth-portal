@@ -15,11 +15,13 @@ from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
 from ..type_tools import check_int
+from .crossdomain import crossdomain
 
 practitioner_api = Blueprint('practitioner_api', __name__, url_prefix='/api')
 
 
 @practitioner_api.route('/practitioner')
+@crossdomain()
 @oauth.require_oauth()
 def practitioner_search():
     """Obtain a bundle (list) of all matching practitioners
@@ -76,6 +78,8 @@ def practitioner_search():
       404:
         description:
           if no practitioners found for given search parameters
+    security:
+      - ServiceToken: []
 
     """
     query = Practitioner.query
@@ -125,6 +129,7 @@ def practitioner_search():
 
 
 @practitioner_api.route('/practitioner/<string:id_or_code>')
+@crossdomain()
 @oauth.require_oauth()
 def practitioner_get(id_or_code):
     """Access to the requested practitioner as a FHIR resource
@@ -159,6 +164,8 @@ def practitioner_get(id_or_code):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     system = request.args.get('system')
@@ -176,6 +183,7 @@ def practitioner_get(id_or_code):
 
 
 @practitioner_api.route('/practitioner', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_post():
@@ -220,6 +228,9 @@ def practitioner_post():
         description:
           if attempting to update Practitioner with an identifier in use by
           another Practitioner
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or
@@ -240,6 +251,7 @@ def practitioner_post():
 
 @practitioner_api.route('/practitioner/<string:id_or_code>',
                         methods=('PUT',))
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 def practitioner_put(id_or_code):
@@ -296,6 +308,9 @@ def practitioner_put(id_or_code):
         description:
           if attempting to update Practitioner with an identifier in use by
           another Practitioner
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     if (not request.json or 'resourceType' not in request.json or

@@ -102,7 +102,8 @@ DEFAULT_BLUEPRINTS = (
     staff,
     truenth_api,
     tou_api,
-    user_api,)
+    user_api,
+)
 
 
 def create_app(config=None, app_name=None, blueprints=None):

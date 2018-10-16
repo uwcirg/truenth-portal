@@ -55,6 +55,7 @@ from ..models.user import (
     current_user,
     get_user_or_abort,
 )
+from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
 
@@ -682,6 +683,7 @@ def logout(prevent_redirect=False, reason=None):
 
 
 @auth.route('/oauth/token-status')
+@crossdomain()
 @oauth.require_oauth()
 def token_status():
     """Return remaining valid time and other info for oauth token
@@ -734,6 +736,8 @@ def token_status():
             scopes:
               type: string
               description: Deprecated version of `scope` containing identical data.
+    security:
+      - ServiceToken: []
 
     """
     authorization = request.headers.get('Authorization')
@@ -752,6 +756,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
@@ -775,6 +780,8 @@ def oauth_errors():
             error:
               type: string
               description: Known details of error situation.
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.warn(request.args.get('error'))
@@ -782,6 +789,7 @@ def oauth_errors():
 
 
 @auth.route('/oauth/token', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 @oauth.token_handler
 def access_token():
@@ -860,6 +868,9 @@ def access_token():
             scope:
               type: string
               description: The authorized scope.
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     for field in request.form:
@@ -869,6 +880,7 @@ def access_token():
 
 
 @auth.route('/oauth/authorize', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
@@ -939,6 +951,9 @@ def authorize(*args, **kwargs):
           exchanged for such an access token. In the
           event of an error, redirection will target /oauth/errors
           of TrueNTH.
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     # Interventions may include additional text to display as a way

@@ -8,12 +8,14 @@ from ..database import db
 from ..extensions import oauth
 from ..models.reference import MissingReference
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 
 
 @demographics_api.route('/demographics', defaults={'patient_id': None})
 @demographics_api.route('/demographics/<int:patient_id>')
+@crossdomain()
 @oauth.require_oauth()
 def demographics(patient_id):
     """Get patient (or any user's) demographics
@@ -62,6 +64,8 @@ def demographics(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     if patient_id:
@@ -73,6 +77,7 @@ def demographics(patient_id):
 
 
 @demographics_api.route('/demographics/<int:patient_id>', methods=('PUT',))
+@crossdomain()
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics (for any user) via FHIR Resource Patient
@@ -138,6 +143,8 @@ def demographics_set(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     current_user().check_role(permission='edit', other_id=patient_id)
