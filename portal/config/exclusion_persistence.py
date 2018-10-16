@@ -25,7 +25,8 @@ def client_users_filter():
     """Return query restricted to service users and those with client FKs"""
     return (
         User.query.join(Client).union(User.query.join(UserRoles).join(
-            Role).filter(Role.name == ROLE.SERVICE.value)))
+            Role).filter(Role.name == ROLE.SERVICE.value)).filter(
+            User.deleted_id.is_(None)))
 
 
 def relationship_filter():
