@@ -14,11 +14,12 @@ if not pytest.config.getoption("--include-ui-testing"):
         allow_module_level=True,
     )
 
-from selenium import webdriver  # isort:skip
-import xvfbwrapper  # isort:skip
+from selenium import webdriver  # noqa isort:skip
+import xvfbwrapper  # noqa isort:skip
 
-from .pages import LoginPage  # isort:skip
-from tests import TestCase  # isort:skip
+from .pages import LoginPage  # noqa isort:skip
+from tests import TestCase  # noqa isort:skip
+
 
 @unittest.skipUnless(
     (
