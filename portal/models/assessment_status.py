@@ -9,10 +9,7 @@ from ..trace import trace
 from .clinical_constants import CC
 from .organization import OrgTree
 from .questionnaire_bank import QuestionnaireBank
-from .questionnaire_response import (
-    QuestionnaireResponse,
-    qnr_document_id,
-)
+from .questionnaire_response import QuestionnaireResponse, qnr_document_id
 from .user import User
 from .user_consent import UserConsent
 

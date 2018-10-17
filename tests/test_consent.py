@@ -2,10 +2,10 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import json
 
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_webtest import SessionScope
 

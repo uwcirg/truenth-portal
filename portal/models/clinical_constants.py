@@ -2,13 +2,16 @@
 import requests
 
 from ..database import db
-from ..system_uri import NHHD_291036
+from ..system_uri import (
+    NHHD_291036,
+    TRUENTH_CLINICAL_CODE_SYSTEM,
+    TRUENTH_VALUESET,
+)
 from ..views.fhir import valueset_nhhd_291036
 from .codeable_concept import CodeableConcept, Coding
 from .encounter import EC
 from .lazy import lazyprop
 from .locale import LocaleConstants
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
 from .value_quantity import ValueQuantity
 
 

@@ -4,8 +4,8 @@ from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
-import tempfile
 import sys
+import tempfile
 import urllib
 from urllib.parse import urlencode
 
@@ -22,11 +22,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import User, get_user
-from tests import (
-    OAUTH_INFO_PROVIDER_LOGIN,
-    TEST_USER_ID,
-    TestCase
-)
+from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 
 
 class TestPortal(TestCase):

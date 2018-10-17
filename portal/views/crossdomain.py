@@ -1,10 +1,9 @@
 """Cross Domain Decorators"""
-from past.builtins import basestring
-
 from datetime import timedelta
 from functools import update_wrapper
 
 from flask import current_app, make_response, request
+from past.builtins import basestring
 
 from ..models.client import validate_origin
 

@@ -1,9 +1,10 @@
 from http.cookies import SimpleCookie
 
 from flask_webtest import SessionScope
+
 from portal.database import db
-from portal.models.intervention import UserIntervention, INTERVENTION
-from tests import TestCase, TEST_USER_ID
+from portal.models.intervention import INTERVENTION, UserIntervention
+from tests import TEST_USER_ID, TestCase
 
 
 class TestIntervention(TestCase):

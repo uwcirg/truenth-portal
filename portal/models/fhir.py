@@ -2,6 +2,7 @@
 from enum import Enum
 
 from flask import abort, current_app
+
 from ..date_tools import FHIR_datetime
 
 BundleType = Enum(

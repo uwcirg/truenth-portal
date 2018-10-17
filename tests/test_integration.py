@@ -7,18 +7,21 @@ import unittest
 
 from flask_testing import LiveServerTestCase
 import pytest
-if not pytest.config.getoption("--include-ui-testing"):
-    pytest.skip(
-        "--include-ui-testing is missing, skipping tests",
-        allow_module_level=True,
-    )
-
 from selenium import webdriver
 import xvfbwrapper
 
 from tests import TestCase
 
 from .pages import LoginPage
+
+if not pytest.config.getoption("--include-ui-testing"):
+    pytest.skip(
+        "--include-ui-testing is missing, skipping tests",
+        allow_module_level=True,
+    )
+
+
+
 
 @unittest.skipUnless(
     (

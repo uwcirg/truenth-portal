@@ -1,9 +1,9 @@
 from alembic import op
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_response import QuestionnaireResponse
 
 """empty message
 

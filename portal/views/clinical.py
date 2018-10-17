@@ -7,8 +7,8 @@ from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.clinical_constants import CC
 from ..models.observation import Observation
-from ..models.value_quantity import ValueQuantity
 from ..models.user import current_user, get_user_or_abort
+from ..models.value_quantity import ValueQuantity
 from .crossdomain import crossdomain
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')

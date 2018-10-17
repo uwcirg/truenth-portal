@@ -8,7 +8,6 @@ from ..models.role import ROLE, Role
 from ..models.user import User, UserRelationship, UserRoles
 from .model_persistence import ModelPersistence, require
 
-
 # StagingExclusions capture details exclusive of a full db overwrite
 # that are to be restored *after* db migration.  For example, when
 # bringing the production db to staging, retain the staging

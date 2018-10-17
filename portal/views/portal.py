@@ -54,7 +54,7 @@ from ..models.app_text import (
 )
 from ..models.assessment_status import (
     invalidate_assessment_status_cache,
-    overall_assessment_status
+    overall_assessment_status,
 )
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args

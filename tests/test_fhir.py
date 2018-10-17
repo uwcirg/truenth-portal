@@ -6,10 +6,10 @@ from datetime import datetime
 from flask_webtest import SessionScope
 import pytz
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
-from portal.date_tools import FHIR_datetime
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.value_quantity import ValueQuantity
 from portal.system_uri import SNOMED
