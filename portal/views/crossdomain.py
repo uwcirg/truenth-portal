@@ -94,6 +94,9 @@ def crossdomain(
             return resp
 
         f.provide_automatic_options = False
+        f.required_methods = getattr(f, 'required_methods', set())
+        f.required_methods.add('OPTIONS')
+
         return update_wrapper(wrapped_function, f)
 
     return decorator
