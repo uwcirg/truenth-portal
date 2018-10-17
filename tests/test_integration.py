@@ -7,12 +7,6 @@ import unittest
 
 from flask_testing import LiveServerTestCase
 import pytest
-from selenium import webdriver
-import xvfbwrapper
-
-from tests import TestCase
-
-from .pages import LoginPage
 
 if not pytest.config.getoption("--include-ui-testing"):
     pytest.skip(
@@ -20,8 +14,11 @@ if not pytest.config.getoption("--include-ui-testing"):
         allow_module_level=True,
     )
 
+from selenium import webdriver  # isort:skip
+import xvfbwrapper  # isort:skip
 
-
+from .pages import LoginPage  # isort:skip
+from tests import TestCase  # isort:skip
 
 @unittest.skipUnless(
     (
