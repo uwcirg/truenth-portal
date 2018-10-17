@@ -259,11 +259,14 @@ class TestPortal(TestCase):
             for config_key in response.json
         )
 
+
 class TestPortalEproms(TestCase):
     """Portal views depending on eproms blueprint"""
 
     def create_app(self):
-        """Overload base version to hide the GIL (allows registration of eproms)"""
+        """
+        Overload base version to hide the GIL (allows registration of ePROMs)
+        """
         tc = TestConfig()
         setattr(tc, 'HIDE_GIL', True)
         self._app = create_app(tc)
