@@ -8,11 +8,11 @@ from ..models.role import ROLE, Role
 from ..models.user import User, UserRelationship, UserRoles
 from .model_persistence import ModelPersistence, require
 
-
 # StagingExclusions capture details exclusive of a full db overwrite
 # that are to be restored *after* db migration.  For example, when
 # bringing the production db to staging, retain the staging
 # config for interventions, application_developers and service users
+
 
 def auth_providers_filter():
     """Return query restricted to application developer users"""
@@ -131,8 +131,8 @@ def preflight(target_dir):
         if candidate_email == local.email:
             continue
         raise ValueError(
-            "persisted user<{}> will overwrite local <{}>; can't continue".format(
-                candidate_email, local.email))
+            "persisted user<{}> will overwrite local <{}>; "
+            "can't continue".format(candidate_email, local.email))
     return True
 
 

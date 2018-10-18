@@ -32,6 +32,7 @@ from flask_user.signals import (
 )
 import requests
 from sqlalchemy.orm.exc import NoResultFound
+
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -40,21 +41,16 @@ from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
-from ..models.intervention import Intervention, UserIntervention
-from ..models.login import login_user
 from ..models.flaskdanceprovider import (
     FacebookFlaskDanceProvider,
     FlaskProviderUserInfo,
     GoogleFlaskDanceProvider,
     MockFlaskDanceProvider,
 )
+from ..models.intervention import Intervention, UserIntervention
+from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import (
-    User,
-    add_user,
-    current_user,
-    get_user_or_abort,
-)
+from ..models.user import User, add_user, current_user, get_user_or_abort
 from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
@@ -572,7 +568,6 @@ def next_after_login():
                 "{}_TIMEOUT".format(i.name.upper()), 0)
             max_found = max(max_found, intervention_timeout)
 
-
         resp.set_cookie(inactivity_cookie, str(max_found))
 
     update_timeout()
@@ -735,7 +730,8 @@ def token_status():
               description: The authorized scope.
             scopes:
               type: string
-              description: Deprecated version of `scope` containing identical data.
+              description:
+                Deprecated version of `scope` containing identical data.
     security:
       - ServiceToken: []
 

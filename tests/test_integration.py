@@ -7,18 +7,19 @@ import unittest
 
 from flask_testing import LiveServerTestCase
 import pytest
+
 if not pytest.config.getoption("--include-ui-testing"):
     pytest.skip(
         "--include-ui-testing is missing, skipping tests",
         allow_module_level=True,
     )
 
-from selenium import webdriver
-import xvfbwrapper
+from selenium import webdriver  # noqa isort:skip
+import xvfbwrapper  # noqa isort:skip
 
-from tests import TestCase
+from .pages import LoginPage  # noqa isort:skip
+from tests import TestCase  # noqa isort:skip
 
-from .pages import LoginPage
 
 @unittest.skipUnless(
     (
@@ -58,8 +59,8 @@ class TestUI(TestCase, LiveServerTestCase):
             capabilities.update(platform)
             capabilities.update(metadata)
 
-            url = "http://{username}:{access_key}@localhost:4445/wd/hub".format(
-                username=os.environ["SAUCE_USERNAME"],
+            url = "http://{user}:{access_key}@localhost:4445/wd/hub".format(
+                user=os.environ["SAUCE_USERNAME"],
                 access_key=os.environ["SAUCE_ACCESS_KEY"],
             )
 

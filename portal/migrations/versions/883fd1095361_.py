@@ -1,12 +1,12 @@
-from alembic import op
 from datetime import timedelta
+
+from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.user import User, UserRoles
-from portal.models.role import Role
-
 from portal.models.audit import Audit
+from portal.models.role import Role
+from portal.models.user import User, UserRoles
 from portal.models.user_consent import UserConsent
 
 """Correct user_consent acceptance_date as default arg wasn't updating

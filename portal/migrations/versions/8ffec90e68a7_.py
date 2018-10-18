@@ -1,9 +1,9 @@
 from alembic import op
 from sqlalchemy.orm import sessionmaker
 
-from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_response import QuestionnaireResponse
 
 """empty message
 
@@ -30,14 +30,17 @@ def upgrade():
             qn_name = qn_ref.split("/")[-1] if qn_ref else None
             qn = Questionnaire.query.filter_by(name=qn_name).first()
 
-            qbd = QuestionnaireBank.most_current_qb(qnr.subject,
-                                                       as_of_date=qnr.authored)
+            qbd = QuestionnaireBank.most_current_qb(
+                qnr.subject, as_of_date=qnr.authored)
             qb = qbd.questionnaire_bank
             ic = qbd.iteration
-            if qb and qn and (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires]):
+            if qb and qn and (qn.id in [qbq.questionnaire.id for qbq in
+                                        qb.questionnaires]):
                 ic = ic or 'NULL'
-                session.execute('UPDATE questionnaire_responses SET questionnaire_bank_id = {}, '
-                                'qb_iteration = {} WHERE id = {}'.format(qb.id, ic, qnr.id))
+                session.execute(
+                    'UPDATE questionnaire_responses SET '
+                    'questionnaire_bank_id = {}, qb_iteration = {} WHERE '
+                    'id = {}'.format(qb.id, ic, qnr.id))
 
 
 def downgrade():

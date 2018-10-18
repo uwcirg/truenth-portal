@@ -1,10 +1,9 @@
 """Cross Domain Decorators"""
-from past.builtins import basestring
-
 from datetime import timedelta
 from functools import update_wrapper
 
 from flask import current_app, make_response, request
+from past.builtins import basestring
 
 from ..models.client import validate_origin
 
@@ -39,7 +38,8 @@ def crossdomain(
         otherwise the view function will be called to generate an
         appropriate response.
 
-    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if no origin is provided and the one in
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`:
+        if no origin is provided and the one in
         request.headers['Origin'] doesn't validate as one we know.
 
     """

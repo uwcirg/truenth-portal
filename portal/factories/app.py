@@ -21,14 +21,7 @@ from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
-from ..extensions import (
-    babel,
-    mail,
-    oauth,
-    recaptcha,
-    session,
-    user_manager,
-)
+from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
 from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
@@ -190,10 +183,10 @@ def configure_extensions(app):
 
     # flask-user
 
-    ## The default login and register view functions fail to capture
-    ## the next parameter in a reliable fashion.  Using a simple closure
-    ## capture 'next' before redirecting to the real view function to
-    ## manage the flask-user business logic
+    # The default login and register view functions fail to capture
+    # the next parameter in a reliable fashion.  Using a simple closure
+    # capture 'next' before redirecting to the real view function to
+    # manage the flask-user business logic
 
     from flask_user.views import login, register
     from ..views.patch_flask_user import (

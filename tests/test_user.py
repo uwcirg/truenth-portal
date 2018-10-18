@@ -9,12 +9,16 @@ import json
 import re
 import urllib
 import urllib.parse
-from werkzeug.exceptions import HTTPException
 
 from flask_webtest import SessionScope
 import pytest
 from sqlalchemy import and_
-from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
+from werkzeug.exceptions import (
+    BadRequest,
+    HTTPException,
+    NotFound,
+    Unauthorized,
+)
 
 from portal.extensions import db
 from portal.models.audit import Audit

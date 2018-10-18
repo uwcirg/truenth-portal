@@ -1,11 +1,11 @@
 from datetime import datetime
+
 from flask import Blueprint, current_app
 import redis
 from sqlalchemy import text
 
-from ..factories.celery import create_celery
 from ..database import db
-
+from ..factories.celery import create_celery
 
 healthcheck_blueprint = Blueprint('healthcheck', __name__)
 

@@ -17,8 +17,8 @@ from ..database import db
 from ..date_tools import localize_datetime
 from ..extensions import user_manager
 from ..trace import dump_trace, establish_trace, trace
-from .assessment_status import overall_assessment_status
 from .app_text import MailResource
+from .assessment_status import overall_assessment_status
 from .intervention import INTERVENTION
 from .message import EmailMessage
 from .practitioner import Practitioner

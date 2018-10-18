@@ -4,16 +4,11 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
-from portal.models.encounter import initiate_encounter
 from portal.models.clinical_constants import CC
-from portal.models.organization import (
-    Organization,
-    OrgTree,
-    UserOrganization,
-)
-from portal.models.user import User, UserRoles
+from portal.models.encounter import initiate_encounter
+from portal.models.organization import Organization, OrgTree, UserOrganization
 from portal.models.role import Role
-
+from portal.models.user import User, UserRoles
 
 """Add PCa_localized observation to LOCALIZED_AFFILIATE_ORG
 

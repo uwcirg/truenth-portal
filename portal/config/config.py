@@ -1,5 +1,6 @@
 """Configuration"""
 import os
+
 import redis
 
 from portal.models.role import ROLE

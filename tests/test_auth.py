@@ -9,11 +9,7 @@ import pytest
 from werkzeug.exceptions import Unauthorized
 
 from portal.extensions import db
-from portal.models.auth import (
-    AuthProvider,
-    Token,
-    create_service_token,
-)
+from portal.models.auth import AuthProvider, Token, create_service_token
 from portal.models.client import Client, validate_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
@@ -24,11 +20,7 @@ from portal.models.user import (
     add_role,
     add_user,
 )
-from tests import (
-    OAUTH_INFO_PROVIDER_LOGIN,
-    TEST_USER_ID,
-    TestCase,
-)
+from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 
 
 class TestAuth(TestCase):

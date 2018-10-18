@@ -17,7 +17,7 @@ from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
 import regex
-from sqlalchemy import UniqueConstraint, and_, or_, text, func
+from sqlalchemy import UniqueConstraint, and_, func, or_, text
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym

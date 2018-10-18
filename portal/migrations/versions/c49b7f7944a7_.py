@@ -1,5 +1,6 @@
-from alembic import op
 import logging
+
+from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 

@@ -1,8 +1,8 @@
 from datetime import datetime
+
 from flask import url_for
 from mock import Mock, patch
 import redis
-from tests import TestCase
 
 from portal.views.healthcheck import (
     celery_available,
@@ -10,6 +10,7 @@ from portal.views.healthcheck import (
     postgresql_available,
     redis_available,
 )
+from tests import TestCase
 
 
 class TestHealthcheck(TestCase):

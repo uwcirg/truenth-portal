@@ -1,5 +1,6 @@
 """Identifier Model Module"""
 from builtins import str
+
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
