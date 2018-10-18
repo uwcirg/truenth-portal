@@ -568,7 +568,6 @@ def next_after_login():
                 "{}_TIMEOUT".format(i.name.upper()), 0)
             max_found = max(max_found, intervention_timeout)
 
-
         resp.set_cookie(inactivity_cookie, str(max_found))
 
     update_timeout()
@@ -731,7 +730,8 @@ def token_status():
               description: The authorized scope.
             scopes:
               type: string
-              description: Deprecated version of `scope` containing identical data.
+              description:
+                Deprecated version of `scope` containing identical data.
     security:
       - ServiceToken: []
 

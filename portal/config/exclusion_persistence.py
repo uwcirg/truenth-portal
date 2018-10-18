@@ -13,6 +13,7 @@ from .model_persistence import ModelPersistence, require
 # bringing the production db to staging, retain the staging
 # config for interventions, application_developers and service users
 
+
 def auth_providers_filter():
     """Return query restricted to application developer users"""
     return (
@@ -130,8 +131,8 @@ def preflight(target_dir):
         if candidate_email == local.email:
             continue
         raise ValueError(
-            "persisted user<{}> will overwrite local <{}>; can't continue".format(
-                candidate_email, local.email))
+            "persisted user<{}> will overwrite local <{}>; "
+            "can't continue".format(candidate_email, local.email))
     return True
 
 

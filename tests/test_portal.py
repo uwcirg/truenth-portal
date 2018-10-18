@@ -4,10 +4,8 @@ from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
-import sys
 import tempfile
 import urllib
-from urllib.parse import urlencode
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope

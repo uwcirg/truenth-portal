@@ -183,10 +183,10 @@ def configure_extensions(app):
 
     # flask-user
 
-    ## The default login and register view functions fail to capture
-    ## the next parameter in a reliable fashion.  Using a simple closure
-    ## capture 'next' before redirecting to the real view function to
-    ## manage the flask-user business logic
+    # The default login and register view functions fail to capture
+    # the next parameter in a reliable fashion.  Using a simple closure
+    # capture 'next' before redirecting to the real view function to
+    # manage the flask-user business logic
 
     from flask_user.views import login, register
     from ..views.patch_flask_user import (

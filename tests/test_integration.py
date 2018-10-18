@@ -59,8 +59,8 @@ class TestUI(TestCase, LiveServerTestCase):
             capabilities.update(platform)
             capabilities.update(metadata)
 
-            url = "http://{username}:{access_key}@localhost:4445/wd/hub".format(
-                username=os.environ["SAUCE_USERNAME"],
+            url = "http://{user}:{access_key}@localhost:4445/wd/hub".format(
+                user=os.environ["SAUCE_USERNAME"],
                 access_key=os.environ["SAUCE_ACCESS_KEY"],
             )
 
