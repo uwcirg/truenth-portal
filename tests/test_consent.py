@@ -156,8 +156,7 @@ class TestUserConsent(TestCase):
         """Confirm default "now" isn't stuck in time"""
         self.shallow_org_tree()
         org1 = Organization.query.filter(Organization.id > 0).first()
-        data = {'organization_id': org1.id,
-                'agreement_url': self.url,}
+        data = {'organization_id': org1.id, 'agreement_url': self.url}
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
