@@ -231,6 +231,7 @@ class TestUserConsent(TestCase):
             json=data,
         )
         assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
@@ -270,13 +271,15 @@ class TestUserConsent(TestCase):
             json=data,
         )
         assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
 
         # We no longer omit deleted consent rows, but rather, include
         # their audit data.
         response = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
-        assert 'deleted' in json.dumps(response.json)
+        assert [ca for ca in response.json['consent_agreements']
+                if 'deleted' in ca]
 
         # confirm deleted status
         dc = UserConsent.query.filter_by(
