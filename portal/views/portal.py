@@ -3,7 +3,7 @@ from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from pprint import pformat
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from celery.result import AsyncResult
 from flask import (
