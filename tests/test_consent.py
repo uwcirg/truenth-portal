@@ -2,7 +2,6 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
-import json
 
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
@@ -118,8 +117,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -139,8 +138,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -160,8 +159,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -178,8 +177,8 @@ class TestUserConsent(TestCase):
         self.login(user_id=second_user.id)
         response = self.client.post(
             '/api/user/{}/consent'.format(second_user.id),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         second_user = db.session.merge(second_user)
         assert second_user.valid_consents.count() == 1
@@ -198,8 +197,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 400
 
     def test_post_replace_user_consent(self):
@@ -212,8 +211,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -229,8 +228,8 @@ class TestUserConsent(TestCase):
         data['status'] = 'suspended'
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
@@ -268,8 +267,8 @@ class TestUserConsent(TestCase):
 
         response = self.client.delete(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
@@ -303,7 +302,8 @@ class TestUserConsent(TestCase):
         self.login()
         resp = self.client.post(
             '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
-            content_type='application/json', data=json.dumps(data))
+            json=data,
+        )
         assert resp.status_code == 200
 
         # check that old consent is marked as deleted
