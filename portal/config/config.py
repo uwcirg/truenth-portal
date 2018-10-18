@@ -102,7 +102,8 @@ class BaseConfig(object):
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
-    PIWIK_DOMAINS = os.environ.get('PIWIK_DOMAINS')
+    PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
+        if os.environ.get('PIWIK_DOMAINS') else None
     PIWIK_SITEID = os.environ.get('PIWIK_SITEID')
     PORTAL_STYLESHEET = 'css/portal.css'
     PRE_REGISTERED_ROLES = [
