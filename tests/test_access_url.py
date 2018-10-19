@@ -40,8 +40,7 @@ class TestAccessUrl(TestCase):
 
         token = user_manager.token_manager.generate_token(onetime.id)
         access_url = url_for(
-            'portal.access_via_token', token=token, cookies_tested=True,
-            _external=True)
+            'portal.access_via_token', token=token, _external=True)
 
         response = self.client.get(access_url)
         self.assert_redirects(
@@ -50,8 +49,7 @@ class TestAccessUrl(TestCase):
 
     def test_bad_token(self):
         token = 'TBKSYw7iHndUT3DfaED9tw.DHZMrQ.Wwr8SPM7ylABWf0mQHhGHHwttYk'
-        access_url = url_for(
-            'portal.access_via_token', token=token, cookies_tested=True)
+        access_url = url_for('portal.access_via_token', token=token)
 
         response = self.client.get(access_url)
         assert response.status_code == 404

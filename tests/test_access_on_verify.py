@@ -40,8 +40,7 @@ class TestAccessOnVerify(TestCase):
 
         token = user_manager.token_manager.generate_token(weak_access_user.id)
         access_url = url_for(
-            'portal.access_via_token', token=token, cookies_tested=True,
-            _external=True)
+            'portal.access_via_token', token=token, _external=True)
 
         response = self.client.get(access_url)
         assert response.status_code == 400
