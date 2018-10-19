@@ -449,6 +449,8 @@ def challenge_identity(
     session_keys = [k for k in session if k not in ('_fresh', '_permanent')]
     if not session_keys:
         request_path = request.args.get('request_path', request_path)
+        current_app.logger.warning(
+            "failed request due to lack of cookies: {}".format(request_path))
         return redirect(url_for(
             'portal.require_cookies', target=request_path))
 
