@@ -1377,7 +1377,6 @@ $(document).ready(function(){
     window.app.orgTool.getOrgs(currentUserId);
   }
 
-
   $(".button--login--register").on("click", function () {
     $("#modal-login-register").modal("hide");
     setTimeout(function() { $("#modal-login").modal("show"); }, 400);
@@ -1429,3 +1428,4 @@ $(document).ready(function(){
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
   setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
 });
+

@@ -2,8 +2,8 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
-import json
 from pprint import pformat
+from urllib.parse import urlencode
 
 from celery.result import AsyncResult
 from flask import (
@@ -261,6 +261,28 @@ def specific_clinic_landing(clinic_alias):
     return redirect(url_for('user.register'))
 
 
+@portal.route('/require_cookies')
+def require_cookies():
+    """give front end opportunity to verify cookies
+
+    Renders HTML including cookie check, then redirects back to `target`
+    NB - query string 'cookies_tested=True' added to target for client
+    to confirm this process happened.
+
+    """
+    mutable_args = request.args.copy()
+    target = mutable_args.pop('target')
+    if not target:
+        raise ValueError("require cookies needs a `target`")
+
+    mutable_args['cookies_tested'] = True
+    query_string = urlencode(mutable_args)
+    delimiter = '&' if '?' in target else '?'
+    target = "{}{}{}".format(target, delimiter, query_string)
+
+    return render_template('require_cookies.html', target=target)
+
+
 @portal.route('/access/<string:token>', defaults={'next_step': None})
 @portal.route('/access/<string:token>/<string:next_step>')
 def access_via_token(token, next_step=None):
@@ -376,7 +398,8 @@ def access_via_token(token, next_step=None):
             session['challenge.next_url'] = url_for(
                 'user.register', email=user.email)
             session['challenge.merging_accounts'] = True
-        return redirect(url_for('portal.challenge_identity'))
+        return redirect(
+            url_for('portal.challenge_identity', request_path=request.url))
 
     # If not WRITE_ONLY user, redirect to login page
     # Email field is auto-populated unless using alt auth (fb/google/etc)
@@ -402,7 +425,7 @@ class ChallengeIdForm(FlaskForm):
 @portal.route('/challenge', methods=['GET', 'POST'])
 def challenge_identity(
         user_id=None, next_url=None, merging_accounts=False,
-        access_on_verify=False):
+        access_on_verify=False, request_path=None):
     """Challenge the user to verify themselves
 
     Can't expose the parameters for security reasons - use the session,
@@ -416,15 +439,30 @@ def challenge_identity(
         authenicated WRITE_ONLY invite account
     :param access_on_verify: boolean value, set true IFF on success, the
         user should be logged in once validated, i.e. w/o a password
+    :param request_path: the requested url prior to redirection to here
+        necessary in no cookie situations, to redirect user back
 
     """
+    # At this point, we can expect a session, or the user likely
+    # doesn't have cookies enabled.  (ignore misleading `_fresh`
+    # and `_permanent` keys)
+    session_keys = [k for k in session if k not in ('_fresh', '_permanent')]
+    if not session_keys:
+        request_path = request.args.get('request_path', request_path)
+        current_app.logger.warning(
+            "failed request due to lack of cookies: {}".format(request_path))
+        return redirect(url_for(
+            'portal.require_cookies', target=request_path))
+
     if request.method == 'GET':
         # Pull parameters from session if not defined
         if not (user_id and next_url):
             user_id = session.get('challenge.user_id')
             next_url = session.get('challenge.next_url')
-            merging_accounts = session.get('challenge.merging_accounts', False)
-            access_on_verify = session.get('challenge.access_on_verify', False)
+            merging_accounts = session.get(
+                'challenge.merging_accounts', False)
+            access_on_verify = session.get(
+                'challenge.access_on_verify', False)
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)

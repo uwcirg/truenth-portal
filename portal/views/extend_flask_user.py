@@ -1,5 +1,5 @@
 """Module to extend or specialize flask user views for our needs"""
-from flask import abort, current_app, session, url_for
+from flask import abort, current_app, request, session, url_for
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
@@ -42,7 +42,8 @@ def reset_password_view_function(token):
         return reset_password(token)
 
     next_url = url_for('user.reset_password', token=token)
-    return challenge_identity(user_id=user_id, next_url=next_url)
+    return challenge_identity(
+        user_id=user_id, next_url=next_url, request_path=request.url)
 
 
 class LockoutLoginForm(LoginForm):

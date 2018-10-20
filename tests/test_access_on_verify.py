@@ -39,7 +39,8 @@ class TestAccessOnVerify(TestCase):
         assert not weak_access_user.birthdate
 
         token = user_manager.token_manager.generate_token(weak_access_user.id)
-        access_url = url_for('portal.access_via_token', token=token)
+        access_url = url_for(
+            'portal.access_via_token', token=token, _external=True)
 
         response = self.client.get(access_url)
         assert response.status_code == 400
@@ -51,5 +52,7 @@ class TestAccessOnVerify(TestCase):
         with SessionScope(db):
             db.session.commit()
 
-            response = self.client.get(access_url)
-        self.assert_redirects(response, url_for('portal.challenge_identity'))
+        response = self.client.get(access_url)
+        self.assert_redirects(
+            response,
+            url_for('portal.challenge_identity', request_path=access_url))

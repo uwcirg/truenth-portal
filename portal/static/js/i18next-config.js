@@ -137,7 +137,13 @@ var __i18next = window.__i18next = (function() {
     }
     return {
         init: function(options, callback) {
-            init(options, callback);
+            callback = callback || function() {};
+            try {
+                init(options, callback);
+            } catch(e) {
+                console.log("Error initialized i18next ", e.message); //note i18next makes use of session storage/local storage, the access of which creates JS runtime error when cookies are disabled, so we need to catch them
+                callback();
+            }
         }
     };
 })();

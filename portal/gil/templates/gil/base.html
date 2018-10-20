@@ -9,7 +9,6 @@
       <meta name="description" content="">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
       <link rel="apple-touch-icon" href="apple-touch-icon.png">
       <link rel="stylesheet" href="{{ url_for('.static', filename='../../../gil/static/css/gil.css') }}">
       <!--[if lte IE 6]>
@@ -275,6 +274,10 @@
         </div>
       </div>
     </div>
+    {% block init_cookie_check %}
+      {%- from "require_cookies.html" import checkCookieMonster -%}
+      {{checkCookieMonster()}}
+    {% endblock %}
 {% endblock %}
 {# One-time system messages called Flash messages #}
 {% block flash_messages %}
@@ -323,6 +326,7 @@
     {% endif %}
 {% endblock %}
 {% block init_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
     <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
