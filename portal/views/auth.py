@@ -230,7 +230,11 @@ def login_user_with_provider(request, provider):
             db.session.commit()
 
             auditable_event(
-                "register new user via {0}".format(provider.name),
+                "registered new user {0} via provider {1} from input {2}".format(
+                    user.id,
+                    provider.name,
+                    json.dumps(user_info.__dict__),
+                ),
                 user_id=user.id,
                 subject_id=user.id,
                 context='account'
@@ -247,6 +251,16 @@ def login_user_with_provider(request, provider):
 
     # Finally, commit all of our changes
     db.session.commit()
+
+    auditable_event(
+        "Updated user's image url to {0} based on data from provider {1}".format(
+            user_info.image_url,
+            provider.name,
+        ),
+        user_id=auth_provider.user.id,
+        subject_id=auth_provider.user.id,
+        context='user'
+    )
 
     # Update our session
     session['id'] = auth_provider.user.id
