@@ -63,6 +63,7 @@ def landing():
     init_login_modal = False
     if 'pending_authorize_args' in session:
         init_login_modal = True
+
     return render_template(
         'gil/index.html', user=None, no_nav="true", timed_out=timed_out,
         init_login_modal=init_login_modal)
@@ -89,21 +90,11 @@ def home():
     if not user:
         return redirect(url_for('gil.landing'))
 
-    # Enforce flow - don't expect 'next' params here
-    if 'next' in session and session['next']:
-        abort(500, "session['next'] found in /home for user {}".format(user))
-
-    # Enforce flow - confirm we have acquired initial data
-    if not Coredata().initial_obtained(user):
-        # For flows including `suspend_initial_queries`, notify of this
-        # invalid state in a sane manner, otherwise, unexpected, treat
-        # as server error
-        status_code = (
-            400 if session and session.get('suspend_initial_queries') else 500)
-        still_needed = Coredata().still_needed(user)
-        abort(
-            status_code,
-            'Missing inital data still needed: {}'.format(still_needed))
+    # Possible user attempted to avoid flow via browser back
+    # and needs to be sent immediately back to appropriate page
+    if (not Coredata().initial_obtained(user) or
+            'next' in session and session['next']):
+        return next_after_login()
 
     # All checks passed - present appropriate view for user role
     if (user.has_role(ROLE.STAFF.value) or
