@@ -68,7 +68,7 @@ services:
       - target: 6379
 
   db:
-    image: postgres
+    image: postgres:${POSTGRES_VERSION:-10}
     ports:
       - target: 5432
     environment:
