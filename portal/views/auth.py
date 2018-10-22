@@ -230,7 +230,8 @@ def login_user_with_provider(request, provider):
             db.session.commit()
 
             auditable_event(
-                "registered new user {0} via provider {1} from input {2}".format(
+                "registered new user {0} via provider {1} "
+                "from input {2}".format(
                     user.id,
                     provider.name,
                     json.dumps(user_info.__dict__),
@@ -247,20 +248,24 @@ def login_user_with_provider(request, provider):
 
     # Update the user's image in case they're logging in from
     # a different IDP or their image url changed
+    original_image_url = auth_provider.user.image_url
     auth_provider.user.image_url = user_info.image_url
 
     # Finally, commit all of our changes
     db.session.commit()
 
-    auditable_event(
-        "Updated user's image url to {0} based on data from provider {1}".format(
-            user_info.image_url,
-            provider.name,
-        ),
-        user_id=auth_provider.user.id,
-        subject_id=auth_provider.user.id,
-        context='user'
-    )
+    if original_image_url != user_info.image_url:
+        auditable_event(
+            "Updated user's image url from '{0}' to '{1}' "
+            "based on data from provider {2}".format(
+                original_image_url,
+                user_info.image_url,
+                provider.name,
+            ),
+            user_id=auth_provider.user.id,
+            subject_id=auth_provider.user.id,
+            context='user'
+        )
 
     # Update our session
     session['id'] = auth_provider.user.id
