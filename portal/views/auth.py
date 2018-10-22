@@ -246,33 +246,35 @@ def login_user_with_provider(request, provider):
         auth_provider.user = user
         db.session.add(auth_provider)
 
+    user = auth_provider.user
+
     # Update the user's image in case they're logging in from
     # a different IDP or their image url changed
-    original_image_url = auth_provider.user.image_url
-    auth_provider.user.image_url = user_info.image_url
+    original_image_url = user.image_url
+    user.image_url = user_info.image_url
 
     # Finally, commit all of our changes
     db.session.commit()
 
-    if original_image_url != user_info.image_url:
+    if original_image_url != user.image_url:
         auditable_event(
             "Updated user's image url from '{0}' to '{1}' "
             "based on data from provider {2}".format(
                 original_image_url,
-                user_info.image_url,
+                user.image_url,
                 provider.name,
             ),
-            user_id=auth_provider.user.id,
-            subject_id=auth_provider.user.id,
+            user_id=user.id,
+            subject_id=user.id,
             context='user'
         )
 
     # Update our session
-    session['id'] = auth_provider.user.id
+    session['id'] = user.id
     session['remote_token'] = provider.token
 
     # Log the user in
-    login_user(auth_provider.user, 'password_authenticated')
+    login_user(user, 'password_authenticated')
 
     return next_after_login()
 
