@@ -63,6 +63,7 @@ def landing():
     init_login_modal = False
     if 'pending_authorize_args' in session:
         init_login_modal = True
+
     return render_template(
         'gil/index.html', user=None, no_nav="true", timed_out=timed_out,
         init_login_modal=init_login_modal)
