@@ -46,8 +46,19 @@ def patient_search():
     therefore possible to get no results from this and still see a unique email
     collision from existing non-patient users.
 
+    NB - currently out of FHIR DSTU2 spec by default.  Include query string
+    parameter ``patch_dstu2=True`` to properly return a FHIR bundle resource
+    (https://www.hl7.org/fhir/DSTU2/bundle.html) naming the ``total`` matches
+    and references to all matching patients.  With ``patch_dstu2=True``, the
+    total will be zero if no matches are found, whereas the default (old,
+    non-compliant) behavior is to return a 404 when no match is found.
+    Please consider using the ``patch_dstu2=True`` parameter, as this will
+    become the default behavior in the future.
+
     Returns a FHIR bundle resource (https://www.hl7.org/fhir/DSTU2/bundle.html)
-    formatted in JSON for all matching valid, accessible patients.
+    formatted in JSON for all matching valid, accessible patients, with
+    ``patch_dstu2=True`` set (preferred).  Default returns single patient on a
+    match, 404 on no match, and 400 for multiple as it's not supported.
 
     ---
     tags:
@@ -64,6 +75,12 @@ def patient_search():
             delimiter, i.e. `api/patient/?identifier=http://fake.org/id|12a7`
         required: true
         type: string
+      - name: patch_dstu2
+        in: query
+        description: whether or not to return DSTU2 compliant bundle
+        required: false
+        type: boolean
+        default: false
     responses:
       200:
         description:
@@ -111,7 +128,9 @@ def patient_search():
                     UserIdentifier.identifier_id == Identifier.id,
                     Identifier.system == system,
                     Identifier._value == value))
-
+        elif k == 'patch_dstu2':
+            # not search criteria, but valid
+            continue
         else:
             abort(400, "can't search on '{}' at this time".format(k))
 
@@ -130,8 +149,18 @@ def patient_search():
                             user_id=current_user().id, subject_id=user.id,
                             context='authentication')
 
-    link = {"rel": "self", "href": request.url}
-    return jsonify(bundle_results(elements=patients, links=[link]))
+    if request.args.get('patch_dstu2', False):
+        link = {"rel": "self", "href": request.url}
+        return jsonify(bundle_results(elements=patients, links=[link]))
+    else:
+        # Emulate old results
+        if len(patients) == 0:
+            abort(404)
+        if len(patients) > 1:
+            abort(400, "multiple results found, include `patch_dstu2=True`")
+
+        ref = Reference.parse(patients[0]['resource'])
+        return demographics(patient_id=ref.id)
 
 
 @patient_api.route('/api/patient/<int:patient_id>/deceased', methods=('POST',))
