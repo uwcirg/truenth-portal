@@ -102,6 +102,10 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
+    # Medidata integration configuration
+    # disable creation and editing of patients when active
+    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
+
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
         if os.environ.get('PIWIK_DOMAINS') else None
