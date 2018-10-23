@@ -44,6 +44,7 @@ def testing_sql_url():
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
     TESTING = False
+    DEBUG = False
 
     SERVER_NAME = os.environ.get(
         'SERVER_NAME',
@@ -86,7 +87,6 @@ class BaseConfig(object):
 
     CELERY_IMPORTS = ('portal.tasks',)
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
-    DEBUG = False
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
@@ -101,6 +101,10 @@ class BaseConfig(object):
     DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
+
+    # Medidata integration configuration
+    # disable creation and editing of patients when active
+    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
 
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
@@ -125,8 +129,6 @@ class BaseConfig(object):
         REDIS_URL
     )
 
-    # Todo: create issue @ fengsp/flask-session
-    # config values aren't typically objects...
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
     UPDATE_PATIENT_TASK_BATCH_SIZE = 16
