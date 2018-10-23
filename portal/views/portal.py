@@ -629,7 +629,7 @@ def invite():
     email.send_message()
     db.session.add(email)
     db.session.commit()
-    return redirect(url_for('.invite_sent', message_id=email.id))
+    return invite_sent(message_id=email.id)
 
 
 @portal.route('/invite/<int:message_id>')
