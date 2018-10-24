@@ -20,7 +20,7 @@ decorator==4.3.0          # via validators
 docutils==0.14            # via sphinx
 dogpile.cache==0.6.7      # via flask-dogpile-cache
 enum34==1.1.6
-flask-babel==0.11.2
+flask-babel==0.12.0
 flask-dance[sqla]==1.1.0
 git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache
 flask-login==0.4.1        # via flask-user
