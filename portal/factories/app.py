@@ -45,7 +45,11 @@ from ..views.extend_flask_user import (
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
-from ..views.healthcheck import HEALTH_CHECKS, healthcheck_blueprint
+from ..views.healthcheck import (
+    HEALTH_CHECKS,
+    HEALTHCHECK_FAILURE_STATUS_CODE,
+    healthcheck_blueprint,
+)
 from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
@@ -340,12 +344,12 @@ def configure_cache(app):
 
 def configure_healthcheck(app):
     """Configure the API used to check the health of our dependencies"""
-    # Adds the /healthcheck API that returns
+    # Initializes the /healthcheck API that returns
     # the health of the service's dependencies based
-    # on the results of the below checks
-    health = HealthCheck(app, '/healthcheck')
-
-    # Functions that are called whose return values
-    # determine the health of the service's dependencies
-    for check in HEALTH_CHECKS:
-        health.add_check(check)
+    # on the results of the given checks
+    app.healthcheck = HealthCheck(
+        app=app,
+        path='/healthcheck',
+        checkers=HEALTH_CHECKS,
+        failed_status=HEALTHCHECK_FAILURE_STATUS_CODE,
+    )
