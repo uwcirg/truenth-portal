@@ -32,6 +32,7 @@
     },
     {
       "active": true,
+      "id": 8,
       "kwargs": null,
       "name": "Celery Beat Health Check",
       "resourceType": "ScheduledJob",
