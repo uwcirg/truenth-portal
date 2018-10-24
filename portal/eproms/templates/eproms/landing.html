@@ -60,6 +60,7 @@
         <img class="logo-footer mobile" src="{{url_for('static', filename='img/movember_logo.jpg') }}" alt="{{_('TrueNTH Footer Logo')}}"/>
     </picture>
 </footer>
+{% block flash_messages %}{{super()}}{% endblock %}<!-- Note previous body block replaces inherited content, need to call flash message block to show flash message-->
 {% endblock %}
 {% block footer %}<!--empty-->{% endblock %}
 {% block additional_scripts %}<script src="{{ url_for('.static', filename='js/landing.js') }}"></script>{% endblock %}
