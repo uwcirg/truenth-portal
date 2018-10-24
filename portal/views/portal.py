@@ -958,7 +958,7 @@ def spec():
                 "url": metadata['home-page'],
             },
         },
-        "schemes": ("http", "https"),
+        "schemes": (current_app.config['PREFERRED_URL_SCHEME'],),
         "securityDefinitions": {
             "ServiceToken": {
                 "type": "apiKey",
