@@ -10,11 +10,13 @@ from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..trace import trace
-from .fhir import CC, QuestionnaireResponse
+from .clinical_constants import CC
+from .fhir import bundle_results
 from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
+from .questionnaire_response import QuestionnaireResponse
 from .recur import Recur
 from .reference import Reference
 
@@ -209,22 +211,11 @@ class QuestionnaireBank(db.Model):
         if limit_to_ids:
             query = query.filter(QuestionnaireBank.id.in_(limit_to_ids))
 
-        objs = [q.as_json() for q in query]
-
-        bundle = {
-            'resourceType': 'Bundle',
-            'updated': FHIR_datetime.now(),
-            'total': len(objs),
-            'type': 'searchset',
-            'link': {
-                'rel': 'self',
-                'href': url_for(
-                    'questionnaire_api.questionnaire_bank_list',
-                    _external=True),
-            },
-            'entry': objs,
-        }
-        return bundle
+        objs = [{'resource': q.as_json()} for q in query]
+        link = {
+            'rel': 'self', 'href': url_for(
+                'questionnaire_api.questionnaire_bank_list', _external=True)}
+        return bundle_results(elements=objs, links=[link])
 
     @staticmethod
     def qbs_for_user(user, classification, as_of_date):
@@ -298,8 +289,8 @@ class QuestionnaireBank(db.Model):
             # At this time, doesn't apply to metastatic patients.
             if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
 
-                # Complicated rules (including strategies and UserIntervention rows)
-                # define a user's access to an intervention.  Rely on the
+                # Complicated rules (including strategies and UserIntervention
+                # rows) define a user's access to an intervention. Rely on the
                 # same check used to display the intervention cards, and only
                 # check if intervention is associated with QBs.
                 intervention_qbs = QuestionnaireBank.query.filter(
@@ -322,7 +313,8 @@ class QuestionnaireBank(db.Model):
         # collate submitted QBs, QBs by org and QBs by intervention
         in_progress = submitted_qbs(user=user, classification=classification)
         by_org = qbs_by_org(user=user, classification=classification)
-        by_intervention = qbs_by_intervention(user=user, classification=classification)
+        by_intervention = qbs_by_intervention(
+            user=user, classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
             # Need one QB for baseline, indef - prefer in_progress

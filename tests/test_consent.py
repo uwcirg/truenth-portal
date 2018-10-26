@@ -2,10 +2,9 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import json
 
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from flask import current_app
 from flask_webtest import SessionScope
 
@@ -118,8 +117,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -139,8 +138,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -156,13 +155,12 @@ class TestUserConsent(TestCase):
         """Confirm default "now" isn't stuck in time"""
         self.shallow_org_tree()
         org1 = Organization.query.filter(Organization.id > 0).first()
-        data = {'organization_id': org1.id,
-                'agreement_url': self.url,}
+        data = {'organization_id': org1.id, 'agreement_url': self.url}
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -179,8 +177,8 @@ class TestUserConsent(TestCase):
         self.login(user_id=second_user.id)
         response = self.client.post(
             '/api/user/{}/consent'.format(second_user.id),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         second_user = db.session.merge(second_user)
         assert second_user.valid_consents.count() == 1
@@ -199,8 +197,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 400
 
     def test_post_replace_user_consent(self):
@@ -213,8 +211,8 @@ class TestUserConsent(TestCase):
         self.login()
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
@@ -230,9 +228,10 @@ class TestUserConsent(TestCase):
         data['status'] = 'suspended'
         response = self.client.post(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
@@ -269,16 +268,18 @@ class TestUserConsent(TestCase):
 
         response = self.client.delete(
             '/api/user/{}/consent'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data))
+            json=data,
+        )
         assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
 
         # We no longer omit deleted consent rows, but rather, include
         # their audit data.
         response = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
-        assert 'deleted' in json.dumps(response.json)
+        assert [ca for ca in response.json['consent_agreements']
+                if 'deleted' in ca]
 
         # confirm deleted status
         dc = UserConsent.query.filter_by(
@@ -304,7 +305,8 @@ class TestUserConsent(TestCase):
         self.login()
         resp = self.client.post(
             '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
-            content_type='application/json', data=json.dumps(data))
+            json=data,
+        )
         assert resp.status_code == 200
 
         # check that old consent is marked as deleted

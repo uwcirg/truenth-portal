@@ -10,11 +10,13 @@ from ..models.audit import Audit
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxNotStartedConstants, TxStartedConstants
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
 
 
 @procedure_api.route('/patient/<int:patient_id>/procedure')
+@crossdomain()
 @oauth.require_oauth()
 def procedure(patient_id):
     """Access procedure data as a FHIR bundle of procedures (in JSON)
@@ -50,6 +52,8 @@ def procedure(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
     patient = get_user_or_abort(patient_id)
@@ -58,6 +62,7 @@ def procedure(patient_id):
 
 
 @procedure_api.route('/procedure', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 def post_procedure():
     """Add procedure via FHIR Procedure Resource
@@ -116,6 +121,8 @@ def post_procedure():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
+    security:
+      - ServiceToken: []
 
     """
 
@@ -157,6 +164,7 @@ def post_procedure():
 
 
 @procedure_api.route('/procedure/<int:procedure_id>', methods=('DELETE',))
+@crossdomain()
 @oauth.require_oauth()
 def procedure_delete(procedure_id):
     """Delete a procedure by ID.
@@ -192,6 +200,8 @@ def procedure_delete(procedure_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
+    security:
+      - ServiceToken: []
 
     """
     procedure = Procedure.query.get_or_404(procedure_id)
@@ -209,6 +219,7 @@ def procedure_delete(procedure_id):
 
 
 @procedure_api.route('/procedure/valueset/<valueset>')
+@crossdomain()
 def procedure_value_sets(valueset):
     """Returns Valueset for treatment {started,not-started} codes
 
@@ -230,6 +241,8 @@ def procedure_value_sets(valueset):
         description:
           Returns FHIR like Valueset (https://www.hl7.org/FHIR/valueset.html)
           for requested coding type.
+    security:
+      - ServiceToken: []
 
     """
     options = ('tx-started', 'tx-not-started')

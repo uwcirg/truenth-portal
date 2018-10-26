@@ -8,6 +8,7 @@
 *.swp
 application.cfg
 site.cfg
+celerybeat.pid
 celerybeat-schedule
 env
 lib
@@ -18,7 +19,9 @@ pip-selfcheck.json
 log
 portal/test_uploads
 docker/portal.env
+
 geckodriver.log
+coverage.xml
 
 .coverage
 .idea

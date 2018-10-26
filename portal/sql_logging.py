@@ -4,11 +4,11 @@ This file is imported from factories/app.py but ONLY when LOG_SQL is set
 in the configuration - as it's expensive and noisy to run
 
 """
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
 import time
 
 from flask import current_app
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 
 @event.listens_for(Engine, "before_cursor_execute")

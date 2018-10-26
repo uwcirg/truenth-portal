@@ -39,12 +39,15 @@ class TestPractitioner(TestCase):
         assert resp.json['entry'][0]['name'][0]['family'] == 'Watson'
 
         # test query with multiple search parameters
-        resp = self.client.get(
-            '/api/practitioner?first_name=John&last_name=Zoidberg')
+        resp = self.client.get('/api/practitioner', query_string={
+            'first_name': 'John',
+            'last_name': 'Zoidberg',
+            'patch_dstu2': True})
         assert resp.status_code == 200
 
         assert resp.json['total'] == 1
-        assert resp.json['entry'][0]['name'][0]['family'] == 'Zoidberg'
+        resource = resp.json['entry'][0]['resource']
+        assert resource['name'][0]['family'] == 'Zoidberg'
 
         # test query using identifier system/value
         resp = self.client.get(

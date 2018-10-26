@@ -12,7 +12,7 @@ from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.reference import Reference
 from portal.models.role import ROLE
-from portal.models.user import User, NO_EMAIL_PREFIX
+from portal.models.user import NO_EMAIL_PREFIX, User
 from portal.system_uri import US_NPI
 from tests import (
     FIRST_NAME,

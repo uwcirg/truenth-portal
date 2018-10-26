@@ -30,19 +30,21 @@ from ..models.assessment_status import (
     overall_assessment_status,
 )
 from ..models.client import validate_origin
-from ..models.fhir import (
-    EC,
+from ..models.encounter import EC
+from ..models.fhir import bundle_results
+from ..models.intervention import INTERVENTION
+from ..models.questionnaire import Questionnaire
+from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.questionnaire_response import (
     QuestionnaireResponse,
     aggregate_responses,
     generate_qnr_csv,
 )
-from ..models.intervention import INTERVENTION
-from ..models.questionnaire import Questionnaire
-from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from ..trace import dump_trace, establish_trace
 from ..type_tools import check_int
+from .crossdomain import crossdomain
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
@@ -55,6 +57,7 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment/<string:instrument_id>'
 )
+@crossdomain()
 @oauth.require_oauth()
 def assessment(patient_id, instrument_id):
     """Return a patient's responses to questionnaire(s)
@@ -594,6 +597,8 @@ def assessment(patient_id, instrument_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
 
     """
 
@@ -634,22 +639,12 @@ def assessment(patient_id, instrument_id):
 
         documents.append(qnr.document)
 
-    bundle = {
-        'resourceType': 'Bundle',
-        'updated': FHIR_datetime.now(),
-        'total': len(documents),
-        'type': 'searchset',
-        'link': {
-            'rel': 'self',
-            'href': request.url,
-        },
-        'entry': documents,
-    }
-
-    return jsonify(bundle)
+    link = {'rel': 'self', 'href': request.url}
+    return jsonify(bundle_results(elements=documents, links=[link]))
 
 
 @assessment_engine_api.route('/patient/assessment')
+@crossdomain()
 @roles_required(
     [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
@@ -742,6 +737,9 @@ def get_assessments():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     # Rather than call current_user.check_role() for every patient
@@ -776,6 +774,7 @@ def get_assessments():
     '/patient/<int:patient_id>/assessment',
     methods=('PUT',),
 )
+@crossdomain()
 @oauth.require_oauth()
 def assessment_update(patient_id):
     """Update an existing questionnaire response on a patient's record
@@ -806,6 +805,9 @@ def assessment_update(patient_id):
           to view requested patient
       404:
         description: existing QuestionnaireResponse not found
+    security:
+      - ServiceToken: []
+
     """
 
     if not hasattr(request, 'json') or not request.json:
@@ -877,6 +879,7 @@ def assessment_update(patient_id):
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
@@ -1302,6 +1305,9 @@ def assessment_add(patient_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+
     """
 
     if not hasattr(request, 'json') or not request.json:
@@ -1453,6 +1459,7 @@ def present_needed():
 
 
 @assessment_engine_api.route('/present-assessment')
+@crossdomain()
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_assessment(instruments=None):
@@ -1520,6 +1527,9 @@ def present_assessment(instruments=None):
             format: url
       401:
         description: if missing valid OAuth token or bad `next` parameter
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     # Todo: replace with proper models
@@ -1592,6 +1602,7 @@ def deprecated_present_assessment(instrument_id):
 
 
 @assessment_engine_api.route('/complete-assessment')
+@crossdomain()
 @oauth.require_oauth()
 def complete_assessment():
     """Return to the last intervention that requested an assessment be presented
@@ -1616,6 +1627,9 @@ def complete_assessment():
             format: url
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
 
@@ -1642,6 +1656,7 @@ def complete_assessment():
 
 
 @assessment_engine_api.route('/consent-assessment-status')
+@crossdomain()
 @oauth.require_oauth()
 def batch_assessment_status():
     """Return a batch of consent and assessment states for list of users
@@ -1698,6 +1713,8 @@ def batch_assessment_status():
                           description: User's assessment status
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     acting_user = current_user()
@@ -1723,6 +1740,7 @@ def batch_assessment_status():
 
 
 @assessment_engine_api.route('/patient/<int:patient_id>/assessment-status')
+@crossdomain()
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
     """Return current assessment status for a given patient
@@ -1749,6 +1767,8 @@ def patient_assessment_status(patient_id):
           to view requested patient
       404:
         description: if patient id is invalid
+    security:
+      - ServiceToken: []
 
     """
     patient = get_user_or_abort(patient_id)

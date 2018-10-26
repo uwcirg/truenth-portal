@@ -8,6 +8,7 @@ import os
 import sys
 
 from flask import Flask
+from healthcheck import HealthCheck
 from pkg_resources import get_distribution
 import redis
 import requests_cache
@@ -20,14 +21,7 @@ from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..dogpile_cache import dogpile_cache
-from ..extensions import (
-    babel,
-    mail,
-    oauth,
-    recaptcha,
-    session,
-    user_manager,
-)
+from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
 from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
@@ -51,6 +45,11 @@ from ..views.extend_flask_user import (
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
+from ..views.healthcheck import (
+    HEALTH_CHECKS,
+    HEALTHCHECK_FAILURE_STATUS_CODE,
+    healthcheck_blueprint,
+)
 from ..views.identifier import identifier_api
 from ..views.intervention import intervention_api
 from ..views.notification import notification_api
@@ -83,6 +82,7 @@ DEFAULT_BLUEPRINTS = (
     filters_blueprint,
     google_blueprint,
     group_api,
+    healthcheck_blueprint,
     identifier_api,
     intervention_api,
     notification_api,
@@ -99,7 +99,8 @@ DEFAULT_BLUEPRINTS = (
     staff,
     truenth_api,
     tou_api,
-    user_api,)
+    user_api,
+)
 
 
 def create_app(config=None, app_name=None, blueprints=None):
@@ -123,6 +124,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_metadata(app)
     configure_coredata(app)
     configure_cache(app)
+    configure_healthcheck(app)
     return app
 
 
@@ -185,10 +187,10 @@ def configure_extensions(app):
 
     # flask-user
 
-    ## The default login and register view functions fail to capture
-    ## the next parameter in a reliable fashion.  Using a simple closure
-    ## capture 'next' before redirecting to the real view function to
-    ## manage the flask-user business logic
+    # The default login and register view functions fail to capture
+    # the next parameter in a reliable fashion.  Using a simple closure
+    # capture 'next' before redirecting to the real view function to
+    # manage the flask-user business logic
 
     from flask_user.views import login, register
     from ..views.patch_flask_user import (
@@ -337,4 +339,17 @@ def configure_cache(app):
         include_get_headers=True,
         old_data_on_error=True,
         connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),
+    )
+
+
+def configure_healthcheck(app):
+    """Configure the API used to check the health of our dependencies"""
+    # Initializes the /healthcheck API that returns
+    # the health of the service's dependencies based
+    # on the results of the given checks
+    app.healthcheck = HealthCheck(
+        app=app,
+        path='/healthcheck',
+        checkers=HEALTH_CHECKS,
+        failed_status=HEALTHCHECK_FAILURE_STATUS_CODE,
     )

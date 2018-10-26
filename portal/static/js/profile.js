@@ -2061,16 +2061,16 @@
                 if (!data) { return false; }
                 var self = this;
                 var sortedArray = data.sort(function(a, b) {
-                    return b.content.id - a.content.id;
+                    return b.resource.id - a.resource.id;
                 });
                 for (var i = 0; i < sortedArray.length; i++) {
                     var val = sortedArray[i];
-                    var clinicalItem = String(val.content.code.coding[0].display);
-                    var clinicalValue = val.content.valueQuantity.value;
-                    var clinicalUnit = val.content.valueQuantity.units;
+                    var clinicalItem = String(val.resource.code.coding[0].display);
+                    var clinicalValue = val.resource.valueQuantity.value;
+                    var clinicalUnit = val.resource.valueQuantity.units;
                     var truesyValue = parseInt(clinicalValue) === 1 && !clinicalUnit;
                     var falsyValue = parseInt(clinicalValue) === 0 && !clinicalUnit;
-                    var status = val.content.status;
+                    var status = val.resource.status;
                     if (clinicalItem === "PCa diagnosis") {
                         clinicalItem = "pca_diag";
                     } else if (clinicalItem === "PCa localized diagnosis") {
@@ -2095,8 +2095,8 @@
                             }
                             if (clinicalItem === "biopsy") {
                                 if (String(clinicalValue) === "true" || truesyValue) {
-                                    if (val.content.issued) {
-                                        var dString = self.modules.tnthDates.formatDateString(val.content.issued, "iso-short");
+                                    if (val.resource.issued) {
+                                        var dString = self.modules.tnthDates.formatDateString(val.resource.issued, "iso-short");
                                         var dArray = dString.split("-");
                                         $("#biopsyDate").val(dString);
                                         $("#biopsy_year").val(dArray[0]);
@@ -2153,7 +2153,7 @@
                 var self = this;
                 self.modules.tnthAjax.getTreatment(self.subjectId, {useWorker:true}, function(data) {
                     self.updateTreatment(data);
-                    self.modules.tnthAjax.getClinical(self.subjectId, {useWorker:true}, function(data) {
+                    self.modules.tnthAjax.getClinical(self.subjectId,{useWorker:true, data:{patch_dstu2: true}}, function(data) {
                         self.updateClinicalSection(data.entry);
                         $("#patientQ").attr("loaded", "true");
                         self.onBeforeInitClinicalQuestionsSection();

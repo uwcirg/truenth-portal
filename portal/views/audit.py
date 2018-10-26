@@ -7,11 +7,13 @@ from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 
 
 @audit_api.route('/user/<int:user_id>/audit')
+@crossdomain()
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
@@ -70,6 +72,9 @@ def get_audit(user_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     user = get_user_or_abort(user_id)

@@ -5,9 +5,7 @@ from future import standard_library  # isort:skip
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import tempfile
-import sys
 import urllib
-from urllib.parse import urlencode
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
@@ -22,11 +20,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import User, get_user
-from tests import (
-    OAUTH_INFO_PROVIDER_LOGIN,
-    TEST_USER_ID,
-    TestCase
-)
+from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 
 
 class TestPortal(TestCase):
@@ -263,11 +257,14 @@ class TestPortal(TestCase):
             for config_key in response.json
         )
 
+
 class TestPortalEproms(TestCase):
     """Portal views depending on eproms blueprint"""
 
     def create_app(self):
-        """Overload base version to hide the GIL (allows registration of eproms)"""
+        """
+        Overload base version to hide the GIL (allows registration of ePROMs)
+        """
         tc = TestConfig()
         setattr(tc, 'HIDE_GIL', True)
         self._app = create_app(tc)

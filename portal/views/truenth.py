@@ -21,7 +21,7 @@ from .crossdomain import crossdomain
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
 
 
-@truenth_api.route("/ping", methods=('OPTIONS', 'POST'))
+@truenth_api.route("/ping", methods=('POST',))
 @csrf.portal_exempt
 @crossdomain()
 def ping():
@@ -32,6 +32,7 @@ def ping():
 
 
 @truenth_api.route('/auditlog', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 def auditlog_addevent():
     """Add event to audit log
@@ -71,6 +72,8 @@ def auditlog_addevent():
               description: Result, typically "ok"
       401:
         description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
 
     """
     message = request.form.get('message')
@@ -129,6 +132,9 @@ def portal_wrapper_html():
         description:
           if a login_url is provided with an origin other than one
           registered as a client app or intervention
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     # Unlike all other oauth protected resources, we manually check
@@ -216,6 +222,8 @@ def portal_footer_html():
         description:
           html for direct insertion near the bottom of the intervention's
           page.
+    security:
+      - ServiceToken: []
 
     """
     # Unlike all other oauth protected resources, we manually check

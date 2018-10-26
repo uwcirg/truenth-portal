@@ -4,11 +4,11 @@ from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
+from io import BytesIO
 import os
 
 from flask import current_app
 from flask_webtest import SessionScope
-from io import BytesIO
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db

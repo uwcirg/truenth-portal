@@ -75,7 +75,7 @@ PORTAL_STYLESHEET::
     PORTAL_STYLESHEET = 'css/eproms.css'
 
 To update the ``site.cfg`` file contents, edit the
-``site_persistence_file.json`` file or use the ``FLASK_APP=manage.py flask export_site``
+``site_persistence_file.json`` file or use the ``FLASK_APP=manage.py flask export-site``
 command and commit the changed ``site_persistence_file.json`` to the
 appropriate repository.
 
@@ -121,7 +121,7 @@ Site persistence files can be generated in the ``PERSISTENCE_DIR``.  See
 above for correct setting.  To generate persistence files from current
 database values, execute::
 
-```FLASK_APP=manage.py flask export_site```
+```FLASK_APP=manage.py flask export-site```
 
 Import
 ------

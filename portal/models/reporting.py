@@ -11,8 +11,8 @@ from ..dogpile_cache import dogpile_cache
 from ..views.reporting import generate_overdue_table_html
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .assessment_status import AssessmentStatus
+from .clinical_constants import CC
 from .communication import load_template_args
-from .fhir import CC
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree

@@ -32,6 +32,7 @@ from flask_user.signals import (
 )
 import requests
 from sqlalchemy.orm.exc import NoResultFound
+
 from ..audit import auditable_event
 from ..csrf import csrf
 from ..database import db
@@ -40,21 +41,17 @@ from ..models.auth import AuthProvider, Token
 from ..models.client import client_event_dispatch, validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
-from ..models.intervention import Intervention, UserIntervention
-from ..models.login import login_user
 from ..models.flaskdanceprovider import (
     FacebookFlaskDanceProvider,
     FlaskProviderUserInfo,
     GoogleFlaskDanceProvider,
     MockFlaskDanceProvider,
 )
+from ..models.intervention import Intervention, UserIntervention
+from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import (
-    User,
-    add_user,
-    current_user,
-    get_user_or_abort,
-)
+from ..models.user import User, add_user, current_user, get_user_or_abort
+from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
 
@@ -233,7 +230,12 @@ def login_user_with_provider(request, provider):
             db.session.commit()
 
             auditable_event(
-                "register new user via {0}".format(provider.name),
+                "registered new user {0} via provider {1} "
+                "from input {2}".format(
+                    user.id,
+                    provider.name,
+                    json.dumps(user_info.__dict__),
+                ),
                 user_id=user.id,
                 subject_id=user.id,
                 context='account'
@@ -244,19 +246,35 @@ def login_user_with_provider(request, provider):
         auth_provider.user = user
         db.session.add(auth_provider)
 
+    user = auth_provider.user
+
     # Update the user's image in case they're logging in from
     # a different IDP or their image url changed
-    auth_provider.user.image_url = user_info.image_url
+    original_image_url = user.image_url
+    user.image_url = user_info.image_url
 
     # Finally, commit all of our changes
     db.session.commit()
 
+    if original_image_url != user.image_url:
+        auditable_event(
+            "Updated user's image url from '{0}' to '{1}' "
+            "based on data from provider {2}".format(
+                original_image_url,
+                user.image_url,
+                provider.name,
+            ),
+            user_id=user.id,
+            subject_id=user.id,
+            context='user'
+        )
+
     # Update our session
-    session['id'] = auth_provider.user.id
+    session['id'] = user.id
     session['remote_token'] = provider.token
 
     # Log the user in
-    login_user(auth_provider.user, 'password_authenticated')
+    login_user(user, 'password_authenticated')
 
     return next_after_login()
 
@@ -571,7 +589,6 @@ def next_after_login():
                 "{}_TIMEOUT".format(i.name.upper()), 0)
             max_found = max(max_found, intervention_timeout)
 
-
         resp.set_cookie(inactivity_cookie, str(max_found))
 
     update_timeout()
@@ -682,6 +699,7 @@ def logout(prevent_redirect=False, reason=None):
 
 
 @auth.route('/oauth/token-status')
+@crossdomain()
 @oauth.require_oauth()
 def token_status():
     """Return remaining valid time and other info for oauth token
@@ -733,7 +751,10 @@ def token_status():
               description: The authorized scope.
             scopes:
               type: string
-              description: Deprecated version of `scope` containing identical data.
+              description:
+                Deprecated version of `scope` containing identical data.
+    security:
+      - ServiceToken: []
 
     """
     authorization = request.headers.get('Authorization')
@@ -752,6 +773,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
@@ -775,6 +797,8 @@ def oauth_errors():
             error:
               type: string
               description: Known details of error situation.
+    security:
+      - ServiceToken: []
 
     """
     current_app.logger.warn(request.args.get('error'))
@@ -782,6 +806,7 @@ def oauth_errors():
 
 
 @auth.route('/oauth/token', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 @oauth.token_handler
 def access_token():
@@ -860,6 +885,9 @@ def access_token():
             scope:
               type: string
               description: The authorized scope.
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     for field in request.form:
@@ -869,6 +897,7 @@ def access_token():
 
 
 @auth.route('/oauth/authorize', methods=('GET', 'POST'))
+@crossdomain()
 @csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
@@ -939,6 +968,9 @@ def authorize(*args, **kwargs):
           exchanged for such an access token. In the
           event of an error, redirection will target /oauth/errors
           of TrueNTH.
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     # Interventions may include additional text to display as a way

@@ -15,10 +15,11 @@ from portal.models.audit import Audit
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
-from portal.models.fhir import Observation, UserObservation, ValueQuantity
+from portal.models.observation import Observation, UserObservation
 from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.user import User
+from portal.models.value_quantity import ValueQuantity
 from tests import TEST_USER_ID, TestCase
 
 
@@ -72,6 +73,24 @@ class TestClinical(TestCase):
         found = found.replace(tzinfo=None)
         self.assertAlmostEqual(datetime.utcnow(), found,
                                delta=timedelta(seconds=5))
+
+    def test_dstu2GET(self):
+        self.prep_db_for_clinical()
+        self.login()
+        response = self.client.get(
+            '/api/patient/%s/clinical' % TEST_USER_ID,
+            query_string={'patch_dstu2': True})
+
+        clinical_data = response.json
+        assert len(clinical_data['entry']) == 1
+        assert 'resource' in clinical_data['entry'][0]
+        assert ('Gleason score' ==
+                clinical_data['entry'][0]['resource']['code']['coding'][0][
+                   'display'])
+        assert ('2' == clinical_data['entry'][0][
+            'resource']['valueQuantity']['value'])
+        assert (json.dumps(Reference.patient(TEST_USER_ID).as_fhir())
+                == clinical_data['entry'][0]['resource']['performer'][0])
 
     def test_clinicalPOST(self):
         data = {

@@ -16,13 +16,8 @@ from portal.models.assessment_status import (
     invalidate_assessment_status_cache,
 )
 from portal.models.audit import Audit
+from portal.models.clinical_constants import CC
 from portal.models.encounter import Encounter
-from portal.models.fhir import (
-    aggregate_responses,
-    CC,
-    QuestionnaireResponse,
-    qnr_document_id,
-)
 from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
@@ -30,6 +25,11 @@ from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
+)
+from portal.models.questionnaire_response import (
+    QuestionnaireResponse,
+    aggregate_responses,
+    qnr_document_id,
 )
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol

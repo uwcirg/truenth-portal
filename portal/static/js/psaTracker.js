@@ -319,7 +319,7 @@
             getData: function() {
                 var self = this;
                 this.loading = true;
-                this.tnthAjax.getClinical(this.getCurrentUserId(), false, function(data) {
+                this.tnthAjax.getClinical(this.getCurrentUserId(), {data: {patch_dstu2: true}}, function(data) {
                     if(data.error) {
                         $("#psaTrackerErrorMessageContainer").html(self.i18next.t("Error occurred retrieving PSA result data"));
                         self.loading = false;
@@ -331,7 +331,8 @@
                         return false;
                     }
                     var results = (data.entry).map(function(item) {
-                        var dataObj = {}, content = item.content, contentCoding = content.code.coding[0];
+                        var dataObj = {}, content = item.resource, contentCoding = content.code.coding[0];
+                        item.updated = item.updated || "";
                         dataObj.id = content.id;
                         dataObj.code = contentCoding.code;
                         dataObj.display = contentCoding.display;

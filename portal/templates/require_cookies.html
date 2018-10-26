@@ -1,0 +1,55 @@
+{% macro checkCookieMonster(target="") -%}
+    <input type="hidden" id="cookieCheckTargetUrl" value="{{target}}" />
+    <div class="modal fade" tabindex="-1" role="dialog" id="modalCookieEnableWarning">
+        <div class="modal-dialog">
+            <div class="modal-content box-modal">
+                <div class="modal-header"><h2 class="modal-title box-modal__title">{{_("Browser Cookies Disabled")}}</h2></div>
+                <div class="modal-body box-modal__copy">
+                    <p class="modal-body__copy text-left">
+                        {% trans -%}
+                        Our website needs to use cookies to bring you the best, personalized, browsing experience. Your web browser is currently <b>not</b> allowing cookies. Help us fix this.
+                        {%- endtrans %}
+                    </p>
+                    <p class="modal-body__copy text-left">{{_("Please enable cookies within your browser settings to continue. To learn how to allow cookies, check online for your web browser's specific instructions.")}}</p>
+                    <p class="modal-body__copy text-left modal-body__privacy">
+                        {% trans privacy_url="/privacy?redirect=true" -%}
+                        For more information on how we use cookies, see our <u><a href="{{privacy_url}}">Privacy Policy</a></u>.
+                        {%- endtrans %}
+                    </p>
+                </div>
+                <div class="modal-footer"><button id="btnCookieTryAgain" type="button" class="btn btn-default btn-tnth-primary button button--teal">{{ _("Try Again") }}</button></div>
+            </div>
+        </div>
+    </div>
+    <script src="{{url_for('static', filename='js/CookieMonster.js')}}"></script>
+{%- endmacro %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta http-equiv="x-ua-compatible" content="IE=edge">
+        <title>{{ app_text('layout title') }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{config.PORTAL_STYLESHEET}}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+        <noscript><meta http-equiv="refresh" content="0; url={{url_for('portal.no_script')}}" /></noscript>
+    </head>
+    <body>
+        <!-- standalone page for display cookie disabled message via redirect-->
+        <div class="loading-indicator-placeholder"></div>
+        <div id="requiredCookieContainer" class="standalone">
+            {{checkCookieMonster(target=target)}}
+        </div>
+        <div class="default-content tnth-hide">
+            <div>{{_("Browser cookie setting check complete")}}</div>
+            <div><a href="/">Home</a></div>
+        </div>
+    </body>
+    <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
+</html>
+

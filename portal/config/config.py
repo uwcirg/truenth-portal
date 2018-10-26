@@ -1,5 +1,6 @@
 """Configuration"""
 import os
+
 import redis
 
 from portal.models.role import ROLE
@@ -43,6 +44,7 @@ def testing_sql_url():
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
     TESTING = False
+    DEBUG = False
 
     SERVER_NAME = os.environ.get(
         'SERVER_NAME',
@@ -84,7 +86,7 @@ class BaseConfig(object):
     FLUSH_CACHE_ON_SYNC = True
 
     CELERY_IMPORTS = ('portal.tasks',)
-    DEBUG = False
+    LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
@@ -100,9 +102,14 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
 
+    # Medidata integration configuration
+    # disable creation and editing of patients when active
+    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
+
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
-    PIWIK_DOMAINS = ""
-    PIWIK_SITEID = 0
+    PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
+        if os.environ.get('PIWIK_DOMAINS') else None
+    PIWIK_SITEID = os.environ.get('PIWIK_SITEID')
     PORTAL_STYLESHEET = 'css/portal.css'
     PRE_REGISTERED_ROLES = [
         'access_on_verify', 'write_only', 'promote_without_identity_challenge']
@@ -122,8 +129,6 @@ class BaseConfig(object):
         REDIS_URL
     )
 
-    # Todo: create issue @ fengsp/flask-session
-    # config values aren't typically objects...
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
     UPDATE_PATIENT_TASK_BATCH_SIZE = 16
@@ -190,6 +195,10 @@ class BaseConfig(object):
         ROLE.STAFF.value,
         ROLE.STAFF_ADMIN.value,
         ROLE.SERVICE.value,
+    ]
+
+    CORS_WHITELIST = [
+        'uwcirg.github.io',
     ]
 
 

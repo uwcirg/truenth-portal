@@ -1,10 +1,9 @@
 """Cross Domain Decorators"""
-from past.builtins import basestring
-
 from datetime import timedelta
 from functools import update_wrapper
 
 from flask import current_app, make_response, request
+from past.builtins import basestring
 
 from ..models.client import validate_origin
 
@@ -12,7 +11,12 @@ from ..models.client import validate_origin
 def crossdomain(
         origin=None,
         methods=None,
-        headers=('Authorization', 'X-Requested-With', 'X-CSRFToken'),
+        headers=(
+            'Authorization',
+            'X-Requested-With',
+            'X-CSRFToken',
+            'Content-Type'
+        ),
         max_age=21600, automatic_options=True):
     """Decorator to add specified crossdomain headers to response
 
@@ -34,7 +38,8 @@ def crossdomain(
         otherwise the view function will be called to generate an
         appropriate response.
 
-    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if no origin is provided and the one in
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`:
+        if no origin is provided and the one in
         request.headers['Origin'] doesn't validate as one we know.
 
     """
@@ -89,6 +94,9 @@ def crossdomain(
             return resp
 
         f.provide_automatic_options = False
+        f.required_methods = getattr(f, 'required_methods', set())
+        f.required_methods.add('OPTIONS')
+
         return update_wrapper(wrapped_function, f)
 
     return decorator

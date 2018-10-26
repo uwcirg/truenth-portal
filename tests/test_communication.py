@@ -12,13 +12,13 @@ import regex
 from portal.database import db
 from portal.models.assessment_status import overall_assessment_status
 from portal.models.audit import Audit
+from portal.models.clinical_constants import CC
 from portal.models.communication import (
     Communication,
     DynamicDictLookup,
     load_template_args,
 )
 from portal.models.communication_request import CommunicationRequest
-from portal.models.fhir import CC
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.questionnaire_bank import QuestionnaireBank

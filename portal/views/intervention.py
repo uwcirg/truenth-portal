@@ -17,12 +17,14 @@ from ..models.message import EmailMessage
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
 from ..models.user import User, current_user
+from .crossdomain import crossdomain
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/user/<int:user_id>')
+@crossdomain()
 @oauth.require_oauth()
 def user_intervention_get(intervention_name, user_id):
     """Get settings for named user and intervention
@@ -98,6 +100,8 @@ def user_intervention_get(intervention_name, user_id):
       404:
         description:
           if either the intervention name or the user_id given can't be found
+    security:
+      - ServiceToken: []
 
     """
     intervention = getattr(INTERVENTION, intervention_name)
@@ -134,6 +138,7 @@ def integration_delay_hack(intervention, key, value):
 
 @intervention_api.route('/intervention/<string:intervention_name>',
                         methods=('PUT',))
+@crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(ROLE.SERVICE.value)
 def user_intervention_set(intervention_name):
@@ -226,6 +231,9 @@ def user_intervention_set(intervention_name):
         description:
           if missing valid OAuth SERVICE token or the service user owning
           the token isn't sponsored by the named intervention owner.
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     try:
@@ -346,6 +354,7 @@ def intervention_rule_set(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/communicate', methods=('POST',))
+@crossdomain()
 @oauth.require_oauth()
 def intervention_communicate(intervention_name):
     """POST a message or trigger communication as detailed
@@ -408,6 +417,9 @@ def intervention_communicate(intervention_name):
           the token isn't sponsored by the named intervention owner.
       404:
         description: if the named intervention doesn't exist
+    security:
+      - ServiceToken: []
+      - OAuth2AuthzFlow: []
 
     """
     intervention = getattr(INTERVENTION, intervention_name)
