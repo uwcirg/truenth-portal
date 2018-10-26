@@ -13,10 +13,12 @@ services:
       - portal.env
     environment:
       PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
-      PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-""}
-      PGHOST: ${PGHOST:-db}
+
+      # cross-service defaults
       PGDATABASE: ${PGDATABASE:-portaldb}
+      PGHOST: ${PGHOST:-db}
+      PGPASSWORD: ${PGPASSWORD:-""}
+      PGUSER: ${PGUSER:-postgres}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
 
   web:

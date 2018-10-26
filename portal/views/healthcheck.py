@@ -7,6 +7,8 @@ from sqlalchemy import text
 from ..database import db
 from ..factories.celery import create_celery
 
+HEALTHCHECK_FAILURE_STATUS_CODE = 200
+
 healthcheck_blueprint = Blueprint('healthcheck', __name__)
 
 

@@ -97,3 +97,47 @@ class TestHealthcheck(TestCase):
             redis.ConnectionError()
         results = redis_available()
         assert results[0] is False
+
+    def test_successful_healthcheck_has_200_status_code(self):
+        # Initialize the healthcheck
+        self.app.healthcheck.checkers = [success_health_check]
+
+        # Call the healthcheck API
+        response = self.client.get('/healthcheck')
+
+        # assert response
+        assert 200 == response.status_code
+
+        json = response.json
+        assert json['status'] == "success"
+
+        results = json['results']
+        assert len(results) == 1
+        assert results[0]['checker'] == 'success_health_check'
+        assert results[0]['passed'] is True
+
+    def test_failed_healthcheck_has_200_status_code(self):
+        # Initialize the healthcheck
+        self.app.healthcheck.checkers = [failure_health_check]
+
+        # Call the healthcheck API
+        response = self.client.get('/healthcheck')
+
+        # assert response
+        assert 200 == response.status_code
+
+        json = response.json
+        assert json['status'] == "failure"
+
+        results = json['results']
+        assert len(results) == 1
+        assert results[0]['checker'] == 'failure_health_check'
+        assert results[0]['passed'] is False
+
+
+def success_health_check():
+    return True, 'Success'
+
+
+def failure_health_check():
+    return False, 'Failure'

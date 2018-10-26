@@ -57,7 +57,7 @@
         this.removeModalBackdrops();
     };
     CookieMonster.prototype.removeModalBackdrops = function() {
-        var modalBackdropElement = document.querySelector(".modal-backdrop");
+        var modalBackdropElement = document.querySelector(".cookie-monster-backdrop");
         if (modalBackdropElement) {
             modalBackdropElement.parentNode.remove();
         }
@@ -67,7 +67,7 @@
         }
     };
     CookieMonster.prototype.addModalBackdrops = function() {
-        if (!document.querySelector(".modal-backdrop")) { //modal darker background
+        if (!document.querySelector(".cookie-monster-backdrop")) { //modal darker background
             var backdropElement = document.createElement("div");
             backdropElement.classList.add("modal-backdrop","fade", "in", "cookie-monster-backdrop");
             document.querySelector("body").appendChild(backdropElement);
@@ -142,7 +142,10 @@
         }
     };
     CookieMonster.prototype.onFailCheck = function() {
-        document.querySelector("body").classList.add("browser-cookie-disabled");
+        var bodyElement = document.querySelector("body");
+        if (bodyElement) {
+            bodyElement.classList.add("browser-cookie-disabled");
+        }
         this.initModal();
         var self = this;
         setTimeout(function() {
@@ -165,3 +168,4 @@
         cookieEvil.initCheckAndPostProcesses();
     };
 }) ();
+
