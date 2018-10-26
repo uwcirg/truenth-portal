@@ -85,7 +85,7 @@ flask sync
 
 if [ -n "$(flask config --config_key SMARTLING_USER_SECRET)" ]; then
     echo "Downloading translations from Smartling"
-    flask translation_download
+    flask translation-download
 
     echo "Transforming translations for frontend"
     "${GIT_WORK_TREE}/bin/build-frontend-translations.sh"
