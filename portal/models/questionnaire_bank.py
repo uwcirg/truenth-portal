@@ -8,7 +8,7 @@ from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
-from ..date_tools import FHIR_datetime, RelativeDelta
+from ..date_tools import RelativeDelta
 from ..trace import trace
 from .clinical_constants import CC
 from .fhir import bundle_results
@@ -440,6 +440,28 @@ class QuestionnaireBank(db.Model):
 
         return indefinite_qb[0].calculated_start(
             trigger_date=trigger_date, as_of_date=as_of_date)
+
+    def recurring_starts(self, trigger_date):
+        """Generator for each successive QBD in a recurrence
+
+        :param trigger_date: initial trigger utc time value
+        :returns: QBD for each valid iteration till the QB recurrences
+            are terminated
+
+        """
+        for recur in self.recurs:
+            ic = 0  # reset iteration count on each recur instance
+            term_date = trigger_date + RelativeDelta(recur.termination)
+            while True:
+                start = (trigger_date + RelativeDelta(self.start) +
+                         RelativeDelta(recur.start) +
+                         (ic * RelativeDelta(recur.cycle_length)))
+                if start > term_date:
+                    break
+                yield QBD(
+                    relative_start=start, iteration=ic, recur=recur,
+                    questionnaire_bank=self)
+                ic += 1
 
     def calculated_start(self, trigger_date, as_of_date):
         """Return namedtuple (QBD) for QB
