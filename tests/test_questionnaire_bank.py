@@ -2,9 +2,9 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
-
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
@@ -302,6 +302,24 @@ class TestQuestionnaireBank(TestCase):
         due = qb.calculated_due(trigger_date, as_of_date=now)
         expected_due = datetime.strptime('2000-01-04', '%Y-%m-%d')
         assert due == expected_due
+
+    def test_recurring_starts(self):
+        # should get full list of QBDs for recurring qb
+        self.setup_qbs()
+        td = datetime.utcnow().replace(month=1, day=1)
+
+        sixMoQB = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == 'CRV_recurring_6mo_period v2').one()
+        results = sixMoQB.recurring_starts(trigger_date=td)
+        # Expect in order, 6mo, 18mo, 30mo
+        expect6 = next(results)
+        assert visit_name(expect6) == 'Month 6'
+        expect18 = next(results)
+        assert visit_name(expect18) == 'Month 18'
+        expect30 = next(results)
+        assert visit_name(expect30) == 'Month 30'
+        with pytest.raises(StopIteration):
+            next(results)
 
     def test_questionnaire_serialize(self):
         q1 = self.add_questionnaire(name='q1')
