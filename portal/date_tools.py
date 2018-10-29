@@ -71,7 +71,7 @@ class FHIR_datetime(object):
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:
                 dt = dt.astimezone(pytz.utc)
-            # Delete tzinfo for safe comparisons with other non tz aware objects
+            # Delete tzinfo for safe comparisons with other non tz aware objs
             # All datetime values stored in the db are expected to be in
             # UTC, and timezone unaware.
             dt = dt.replace(tzinfo=None)
