@@ -91,28 +91,41 @@ class FHIR_datetime(object):
 class RelativeDelta(relativedelta):
     """utility class to simplify storing relative deltas in SQL strings"""
 
-    def __init__(self, paramstring):
+    def __init__(self, paramstring=None, **kwargs):
         """Expects a JSON string of parameters
 
         :param paramstring: like '{\"months\": 3, \"days\": -14}' is parsed
             using JSON and passed to dateutl.relativedelta.  All parameters
             supported by relativedelta should work.
+        :param kwargs: passed directly to relativedelta init - making copy
+            constructors and the like function as base class.
 
         :returns instance for use in date math such as:
             tomorrow = `utcnow() + RelativeDelta('{"days":1}')`
 
         """
-        try:
-            d = json.loads(paramstring)
-        except ValueError:
+        if paramstring:
+            try:
+                d = json.loads(paramstring)
+            except ValueError:
+                raise ValueError(
+                    "Unable to parse RelativeDelta value from `{}`".format(
+                        paramstring))
+            # for now, only using class for relative info, not absolute info
+            if any(key[-1] != 's' for key, val in d.items()):
+                raise ValueError(
+                    "Singular key found in RelativeDelta params: {}".format(
+                        paramstring))
+        else:
+            d = {}
+
+        # confirm no collisions between param string and kwargs
+        if kwargs and not set(d.keys()).isdisjoint(set(kwargs.keys())):
             raise ValueError(
-                "Unable to parse RelativeDelta value from `{}`".format(
-                    paramstring))
-        # for now, only using class for relative info, not absolute info
-        if any(key[-1] != 's' for key, val in d.items()):
-            raise ValueError(
-                "Singular key found in RelativeDelta params: {}".format(
-                    paramstring))
+                "collision with paramstring: {} and kwargs {}".format(
+                    paramstring, kwargs))
+        if kwargs:
+            d.update(kwargs)
         super(RelativeDelta, self).__init__(**d)
 
     @staticmethod
