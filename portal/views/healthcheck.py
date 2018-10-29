@@ -48,18 +48,20 @@ def celery_available():
 def celery_beat_available():
     """Determines whether celery beat is available"""
     # https://github.com/celery/celery/issues/3694
-    # HealthCheck from https://steemit.com/code/@qrul/celery-beat-and-workers-healthchecks
+    # HealthCheck from https://goo.gl/tgbLeC
 
     now = datetime.now(tz=pytz.utc)
 
-    # Name of the file used by PersistentScheduler to store the last run times of periodic tasks.
+    # Name of the file used by PersistentScheduler to store
+    # the last run times of periodic tasks.
     file_data = shelve.open('celerybeat-schedule')
 
     for task_name, task in file_data['entries'].items():
         try:
-            assert now  < task.last_run_at + task.schedule.run_every
+            assert now < task.last_run_at + task.schedule.run_every
         except AttributeError:
-            assert timedelta() < task.schedule.remaining_estimate(task.last_run_at)
+            estimate = task.schedule.remaining_estimate(task.last_run_at)
+            assert timedelta() < estimate
             return False, 'Celery beat is not available.'
 
     return True, 'Celery beat is available.'
