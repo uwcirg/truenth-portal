@@ -67,7 +67,7 @@ python-dateutil==2.7.5
 python-editor==1.0.3      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
-pytz==2018.6              # via babel, celery
+pytz==2018.7              # via babel, celery
 pyyaml==3.13              # via flask-swagger, swagger-spec-validator
 redis==2.10.6
 regex==2018.08.29
