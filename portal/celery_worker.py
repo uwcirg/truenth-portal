@@ -41,7 +41,8 @@ def setup_periodic_tasks(sender, **kwargs):
         if task:
             if not task.func_dict.get('scheduled_task', False):
                 logger.error("Scheduled job {} does not have "
-                             "the scheduled_task decorator".format(task.job.task))
+                             "the scheduled_task decorator".format(
+                                 task.job.task))
             logger.info("Adding task (id=`{}`, task=`{}` "
                         "to CeleryBeat".format(job.id, job.task))
             args_in = job.args.split(',') if job.args else []
