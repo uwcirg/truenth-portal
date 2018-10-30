@@ -308,6 +308,7 @@ def config(config_key):
         indent=2,
     ))
 
+
 @app.cli.command()
 def initialize_celery_beat_healthcheck():
     return celery_beat_health_check()
