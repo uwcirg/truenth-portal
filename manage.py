@@ -30,6 +30,7 @@ from portal.models.user import (
     permanently_delete_user,
     validate_email,
 )
+from portal.tasks import celery_beat_health_check
 
 app = create_app()
 
@@ -306,3 +307,7 @@ def config(config_key):
         {k: v for k, v in app.config.items() if isinstance(v, basestring)},
         indent=2,
     ))
+
+@app.cli.command()
+def initialize_celery_beat_healthcheck():
+    return celery_beat_health_check()
