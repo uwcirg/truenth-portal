@@ -323,3 +323,8 @@ def healthcheck():
         url_for('check')
     )
     print(result.text)
+
+    if not result.ok:
+        return result.status_code
+
+    return 0
