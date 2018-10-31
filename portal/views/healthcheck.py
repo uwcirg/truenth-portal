@@ -73,7 +73,7 @@ def celery_beat_available():
     if last_celery_beat_ping:
         return True, 'Celery beat is available.'
 
-    return False, 'Celery beat is not aviailable.'
+    return False, 'Celery beat is not available.'
 
 
 def postgresql_available():
