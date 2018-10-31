@@ -310,5 +310,5 @@ def config(config_key):
 
 
 @app.cli.command()
-def initialize_celery_beat_healthcheck():
+def set_celery_beat_healthy():
     return celery_beat_health_check()

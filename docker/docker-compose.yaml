@@ -55,7 +55,7 @@ services:
     command: bash -c '
       env &&
       wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
-      flask initialize_celery_beat_healthcheck &&
+      flask set-celery-beat-healthy &&
       celery beat
         --app portal.celery_worker.celery
         --loglevel debug
