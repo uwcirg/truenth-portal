@@ -798,26 +798,29 @@ def withdraw_user_consent(user_id):
 
     current_app.logger.debug('withdraw user consent called for user {} '
                              'and org {}'.format(user.id, org_id))
+    return withdraw_consent(user, org_id, acting_user=current_user())
 
-    uc = UserConsent.query.filter_by(user_id=user.id,
-                                     organization_id=org_id,
-                                     status='consented').first()
+
+def withdraw_consent(user, org_id, acting_user):
+    """execute consent withdrawal - view and test friendly function"""
+    uc = UserConsent.query.filter_by(
+        user_id=user.id, organization_id=org_id, status='consented').first()
 
     if not uc:
-        abort(404, "no UserConsent found for user ID {} and org ID "
-                   "{}".format(user.id, org_id))
+        abort(404, "no UserConsent found for user ID {} and org ID {}".format(
+            user.id, org_id))
     try:
         # Make a copy of the found UserConsent via `make_transient`
         # and setting the id to None, so update_consents can store as new
         make_transient(uc)
         uc.id = None
         uc.status = 'suspended'
+        uc.acceptance_date = datetime.utcnow()  # mark time of suspension
         uc.send_reminders = False
         uc.include_in_reports = True
         uc.staff_editable = (not current_app.config.get('GIL'))
-        consent_list = [uc, ]
         user.update_consents(
-            consent_list=consent_list, acting_user=current_user())
+            consent_list=[uc], acting_user=acting_user)
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
         invalidate_assessment_status_cache(user_id=user.id)
