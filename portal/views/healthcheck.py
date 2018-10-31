@@ -4,6 +4,7 @@ from flask import Blueprint, current_app
 import redis
 from sqlalchemy import text
 
+from portal import celery_test, celery_result
 from ..database import db
 from ..factories.celery import create_celery
 
@@ -34,12 +35,22 @@ def celery_beat_ping():
 
 def celery_available():
     """Determines whether celery is available"""
-    celery = create_celery(current_app)
-    result = celery.control.inspect().ping()
-    if result:
+    x = 1
+    y = 1
+    result = 0
+    try:
+        celery_test_response = celery_test(x, y)
+        task_id = celery_test_response.json['task_id']
+        result = celery_result(task_id)
+    except Exception as e:
+        current_app.logger.error(
+            'failed to get result of celery_test. Error: {}'.format(e)
+        )
+
+    if int(result) == (x + y):
         return True, 'Celery is available.'
     else:
-        return False, 'Celery is not available'
+        return False, 'Celery is not available.'
 
 
 def celery_beat_available():

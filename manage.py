@@ -8,9 +8,11 @@ import os
 
 import alembic.config
 import click
+from flask import url_for
 from flask_migrate import Migrate
 from past.builtins import basestring
 import redis
+import requests
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -306,3 +308,12 @@ def config(config_key):
         {k: v for k, v in app.config.items() if isinstance(v, basestring)},
         indent=2,
     ))
+
+
+@app.cli.command()
+def healthcheck():
+    """Calls the healthcheck API"""
+    result = requests.get(
+        url_for('check')
+    )
+    print(result.text)
