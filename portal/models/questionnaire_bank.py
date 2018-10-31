@@ -226,6 +226,71 @@ class QuestionnaireBank(db.Model):
         return bundle_results(elements=objs, links=[link])
 
     @staticmethod
+    def current_rps(user, as_of_date):
+        """returns current research protocols for user's orgs
+
+        :param user: subject of the query
+        :param as_of_date: define to return best RP for org considering
+            retired date (when org moves to new protocol).  Set to None
+            to get all known.
+        :returns: list of research protocol identifiers
+
+        """
+        user_rps = set()
+        for org in (o for o in user.organizations if o.id):
+            rp = org.research_protocol(as_of_date=as_of_date)
+            if rp:
+                user_rps.add(rp.id)
+        return user_rps
+
+    @staticmethod
+    def qbs_by_org(user, classification, as_of_date):
+        """return QBs associated with the user via organizations
+
+        :param user: subject of the query
+        :param classification: set to restrict to given classification
+        :param as_of_date: set to restrict to org's "current" rp WRT given
+            date
+
+        """
+        results = QuestionnaireBank.query.filter(
+            QuestionnaireBank.research_protocol_id.in_(
+                QuestionnaireBank.current_rps(user, as_of_date)))
+        if classification:
+            results = results.filter(
+                QuestionnaireBank.classification == classification)
+        return results.all()
+
+    @staticmethod
+    def qbs_by_intervention(user, classification):
+        """returns QBs associated with the user via intervention"""
+        results = []
+
+        # At this time, doesn't apply to metastatic patients.
+        if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
+
+            # Complicated rules (including strategies and UserIntervention
+            # rows) define a user's access to an intervention. Rely on the
+            # same check used to display the intervention cards, and only
+            # check if intervention is associated with QBs.
+            intervention_qbs = QuestionnaireBank.query.filter(
+                QuestionnaireBank.intervention_id.isnot(None))
+            if classification:
+                intervention_qbs = intervention_qbs.filter(
+                    QuestionnaireBank.classification == classification)
+
+            for qb in intervention_qbs:
+                intervention = Intervention.query.get(qb.intervention_id)
+                if intervention.quick_access_check(user):
+                    # TODO: business rule details like the following should
+                    # move to site persistence for QB to user mappings.
+                    check_func = observation_check("biopsy", 'true')
+                    if check_func(intervention=intervention, user=user):
+                        if qb not in results:
+                            results.append(qb)
+        return results
+
+    @staticmethod
     def qbs_for_user(user, classification, as_of_date):
         """Returns questionnaire banks applicable to (user, classification)
 
@@ -249,7 +314,7 @@ class QuestionnaireBank(db.Model):
             """Only allow a single QB for baseline and indefinite"""
             if qbs and qbs[0].classification == 'recurring':
                 return
-            if (len(qbs) > 1):
+            if len(qbs) > 1:
                 errstr = ("multiple QuestionnaireBanks for {user} with "
                           "{classification} found.  The UI won't correctly "
                           "display more than one at this "
@@ -258,15 +323,6 @@ class QuestionnaireBank(db.Model):
                 if current_app.config.get('TESTING'):
                     raise ValueError(errstr)
                 current_app.logger.error(errstr)
-
-        def current_rps(user):
-            """returns current research protocols for user's orgs"""
-            user_rps = set()
-            for org in (o for o in user.organizations if o.id):
-                rp = org.research_protocol(as_of_date=as_of_date)
-                if rp:
-                    user_rps.add(rp.id)
-            return user_rps
 
         def submitted_qbs(user, classification):
             """return list QBs for which the user already submitted work"""
@@ -281,47 +337,11 @@ class QuestionnaireBank(db.Model):
                     QuestionnaireBank.classification == classification)
             return submitted.all()
 
-        def qbs_by_org(user, classification):
-            """return QBs associated with the user via organizations"""
-            results = QuestionnaireBank.query.filter(
-                QuestionnaireBank.research_protocol_id.in_(current_rps(user)))
-            if classification:
-                results = results.filter(
-                    QuestionnaireBank.classification == classification)
-            return results.all()
-
-        def qbs_by_intervention(user, classification):
-            """returns QBs associated with the user via intervention"""
-            results = []
-
-            # At this time, doesn't apply to metastatic patients.
-            if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
-
-                # Complicated rules (including strategies and UserIntervention
-                # rows) define a user's access to an intervention. Rely on the
-                # same check used to display the intervention cards, and only
-                # check if intervention is associated with QBs.
-                intervention_qbs = QuestionnaireBank.query.filter(
-                    QuestionnaireBank.intervention_id.isnot(None))
-                if classification:
-                    intervention_qbs = intervention_qbs.filter(
-                        QuestionnaireBank.classification == classification)
-
-                for qb in intervention_qbs:
-                    intervention = Intervention.query.get(qb.intervention_id)
-                    if intervention.quick_access_check(user):
-                        # TODO: business rule details like the following should
-                        # move to site persistence for QB to user mappings.
-                        check_func = observation_check("biopsy", 'true')
-                        if check_func(intervention=intervention, user=user):
-                            if qb not in results:
-                                results.append(qb)
-            return results
-
         # collate submitted QBs, QBs by org and QBs by intervention
         in_progress = submitted_qbs(user=user, classification=classification)
-        by_org = qbs_by_org(user=user, classification=classification)
-        by_intervention = qbs_by_intervention(
+        by_org = QuestionnaireBank.qbs_by_org(
+            user=user, classification=classification, as_of_date=as_of_date)
+        by_intervention = QuestionnaireBank.qbs_by_intervention(
             user=user, classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
@@ -553,11 +573,16 @@ class QuestionnaireBank(db.Model):
                     return self.__trigger_date
             # otherwise, use the common top level consent date
             if user.valid_consents and user.valid_consents.count() > 0:
-                self.__trigger_date = user.valid_consents[0].acceptance_date
-                trace(
-                    'found valid_consent with trigger_date {}'.format(
-                        self.__trigger_date))
-                return self.__trigger_date
+                # consents are ordered desc(acceptance_date), ignore suspended
+                # but include deleted, as in a suspended state, the previous
+                # acceptance will now be marked deleted.
+                for con in user.all_consents:
+                    if con.status != 'suspended':
+                        self.__trigger_date = con.acceptance_date
+                        trace(
+                            'found valid_consent with trigger_date {}'.format(
+                                self.__trigger_date))
+                        return self.__trigger_date
             else:
                 trace(
                     "questionnaire_bank affiliated with RP {}, user has "
@@ -589,6 +614,26 @@ class QuestionnaireBank(db.Model):
             raise ValueError(
                 "Can't compute trigger_date on QuestionnaireBank with "
                 "neither research protocol nor intervention associated")
+
+    @staticmethod
+    def withdrawal_date(user):
+        """Return withdrawal date for user via QB association
+
+        Withdrawal date currently has little to do with the QB, defined here
+        for symmetry with trigger_date.
+
+        :return: UTC datetime of withdrawal for given user, or None if N/A
+
+        """
+        if user.valid_consents and user.valid_consents.count() > 0:
+            # consents are ordered desc(acceptance_date).  only if the
+            # first is 'suspended' are we in a withdrawn state
+            top_consent = user.valid_consents[0]
+            if top_consent.status == 'suspended':
+                trace(
+                    'found withdrawn {}'.format(top_consent.acceptance_date))
+                return top_consent.acceptance_date
+        return None
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
