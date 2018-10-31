@@ -86,7 +86,8 @@ class BaseConfig(object):
     FLUSH_CACHE_ON_SYNC = True
 
     CELERY_IMPORTS = ('portal.tasks',)
-    CELERYD_MAX_TASKS_PER_CHILD = os.environ.get('CELERYD_MAX_TASKS_PER_CHILD')
+    CELERYD_MAX_TASKS_PER_CHILD = int(os.environ['CELERYD_MAX_TASKS_PER_CHILD']) \
+        if os.environ.get('CELERYD_MAX_TASKS_PER_CHILD') else None
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
