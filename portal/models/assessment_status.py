@@ -1,6 +1,7 @@
 """AssessmentStatus module"""
 from collections import OrderedDict
 from datetime import datetime
+from enum import Enum
 
 from flask import current_app
 
@@ -12,6 +13,31 @@ from .questionnaire_bank import QuestionnaireBank
 from .questionnaire_response import QuestionnaireResponse, qnr_document_id
 from .user import User
 from .user_consent import UserConsent
+
+
+class OverallStatus(Enum):
+    """ Overall assessment status for a given (QB, user)
+
+    'Completed': if all questionnaires in the bank were completed.
+    'Due': if all questionnaires are unstarted and the days since
+        consenting hasn't exceeded the 'days_till_due' for all
+        questionnaires.
+    'Expired': if we don't have a consent date for the user, or
+        if there are no questionnaires assigned to the user, or
+        if all questionnaires in the bank have expired.
+    'Overdue': if all questionnaires are unstarted and the days since
+        consenting hasn't exceeded the 'days_till_overdue' for all
+        questionnaires.  (NB - check for 'due' runs first)
+    'Partially Completed': if one or more questionnaires were at least
+        started and at least one questionnaire is expired.
+    'In Progress': if one or more questionnaires were at least
+        started and the remaining unfinished questionnaires are not
+        expired.
+    'Withdrawn': if the user's consent agreement with QB organization
+        includes "send_reminders: False".
+    """
+    (completed, due, expired, overdue, partially_completed, in_progress,
+     withdrawn) = range(7)
 
 
 def recent_qnr_status(user, questionnaire_name, qbd):
