@@ -1098,7 +1098,7 @@ class User(db.Model, UserMixin):
         for replaced in delete_consents:
             replaced.deleted = Audit(
                 comment="new consent replacing existing",
-                user_id=current_user().id,
+                user_id=acting_user.id,
                 subject_id=self.id, context='consent')
             replaced.status = "deleted"
             db.session.add(replaced)
