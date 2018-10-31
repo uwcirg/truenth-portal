@@ -4,9 +4,7 @@ from flask import Blueprint, current_app
 import redis
 from sqlalchemy import text
 
-from portal import celery_test, celery_result
 from ..database import db
-from ..factories.celery import create_celery
 
 HEALTHCHECK_FAILURE_STATUS_CODE = 200
 
@@ -29,25 +27,32 @@ def celery_beat_ping():
     return 'PONG'
 
 
-##############################
-# Healthcheck functions below
-##############################
-
-def celery_available():
+def is_celery_available():
     """Determines whether celery is available"""
     x = 1
     y = 1
     result = 0
     try:
+        from portal import celery_test, celery_result
         celery_test_response = celery_test(x, y)
         task_id = celery_test_response.json['task_id']
         result = celery_result(task_id)
+        return int(result) == (x + y)
     except Exception as e:
         current_app.logger.error(
             'failed to get result of celery_test. Error: {}'.format(e)
         )
+        return False
 
-    if int(result) == (x + y):
+
+##############################
+# Healthcheck functions below
+##############################
+
+def celery_available():
+    """Checkes whether celery is available"""
+    celery_available = is_celery_available()
+    if celery_available:
         return True, 'Celery is available.'
     else:
         return False, 'Celery is not available.'

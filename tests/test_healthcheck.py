@@ -16,36 +16,22 @@ from tests import TestCase
 class TestHealthcheck(TestCase):
     """Health check module and view tests"""
 
-    @patch('portal.views.healthcheck.celery_result')
-    @patch('portal.views.healthcheck.celery_test')
+    @patch('portal.views.healthcheck.is_celery_available')
     def test_celery_available_succeeds_when_celery_test_success(
         self,
-        celery_test_mock,
-        celery_result_mock
+        is_celery_available_mock
     ):
-        celery_test_mock.return_value.json = {
-            'task_id': '1234',
-        }
-
-        celery_result_mock.return_value = '2'
+        is_celery_available_mock.return_value = True
 
         results = celery_available()
         assert results[0] is True
 
-    @patch('portal.views.healthcheck.celery_result')
-    @patch('portal.views.healthcheck.celery_test')
+    @patch('portal.views.healthcheck.is_celery_available')
     def test_celery_available_fails_when_celery_ping_fails(
         self,
-        celery_test_mock,
-        celery_result_mock
+        is_celery_available_mock
     ):
-        celery_test_mock.return_value.json = {
-            'task_id': '1234',
-        }
-
-        celery_result_mock.side_effect = Mock(
-            side_effect=Exception('Something went wrong')
-        )
+        is_celery_available_mock.return_value = False
 
         results = celery_available()
         assert results[0] is False
