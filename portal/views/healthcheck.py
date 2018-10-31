@@ -66,14 +66,9 @@ def celery_beat_available():
     # celery beat is not available
     last_celery_beat_ping = rs.get('last_celery_beat_ping')
     if last_celery_beat_ping:
-        return (
-            True,
-            'Celery beat is available. Last check: {}'.format(
-                last_celery_beat_ping
-            )
-        )
+        return True, 'Celery beat is available.'
 
-    return False, 'Celery beat is not running jobs'
+    return False, 'Celery beat is not aviailable.'
 
 
 def postgresql_available():
@@ -83,12 +78,12 @@ def postgresql_available():
     # If it fails we assume psotgresql is not available.
     try:
         db.engine.execute(text('SELECT 1'))
-        return True, 'PostgreSQL is available'
+        return True, 'PostgreSQL is available.'
     except Exception as e:
         current_app.logger.error(
             'sql alchemy not connected to postgreSQL. Error: {}'.format(e)
         )
-        return False, 'PostgreSQL is not available'
+        return False, 'PostgreSQL is not available.'
 
 
 def redis_available():
@@ -99,12 +94,12 @@ def redis_available():
     rs = redis.from_url(current_app.config["REDIS_URL"])
     try:
         rs.ping()
-        return True, 'Redis is available'
+        return True, 'Redis is available.'
     except Exception as e:
         current_app.logger.error(
             'Unable to connect to redis. Error {}'.format(e)
         )
-        return False, 'Redis is not available'
+        return False, 'Redis is not available.'
 
 
 # The checks that determine the health
