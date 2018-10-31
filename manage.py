@@ -323,4 +323,3 @@ def healthcheck():
         url_for('check')
     )
     print(result.text)
-
