@@ -360,7 +360,7 @@ function displaySystemOutageMessage() {
             messageElement.classList.add("message-container");
             document.getElementById(systemMaintenanceElId).appendChild(messageElement);
         }
-        if (data.MAINTENANCE_MESSAGE) {  //allow config system message if present
+        if (data.MAINTENANCE_MESSAGE) {
             messageElement.innerHTML = unescape(data.MAINTENANCE_MESSAGE);
             return;
         } 
@@ -371,15 +371,15 @@ function displaySystemOutageMessage() {
             }
             return Math.floor(((d2.getTime() - d1.getTime())/ (1000 * 60 * 60)) % 24);
         }
-        var startDate = new Date(data.MAINTENANCE_WINDOW[0]); //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
-        var endDate = new Date(data.MAINTENANCE_WINDOW[1]);
+        //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
+        var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
         var duration = hoursDiff(startDate, endDate), hoursTil = hoursDiff(new Date(), startDate);
-        console.log("start date? ", startDate, " end date? ", endDate, " today? ", (new Date()))
         if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
             messageElement.innerHTML = "";
             return;
         } 
         /*global i18next */
+        //construct message based on maintenance window
         messageElement.innerHTML = "<div><b>" + i18next.t("Please Note:") + "</b></div><div>" + i18next.t("This website will be unavailable due to scheduled maintenance in {hourstil} hours. The outage is expected to last for {duration} hours.".replace("{hourstil}", hoursTil).replace("{duration}", duration)) + "</div>";    
     });
 };
