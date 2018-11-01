@@ -880,6 +880,8 @@ def config_settings(config_key):
         'MEDIDATA_RAVE_ORG',
         'LOCALIZED_AFFILIATE_ORG',
         'COPYRIGHT',
+        'MAINTENANCE_MESSAGE',
+        'MAINTENANCE_WINDOW',
     )
     if config_key:
         key = config_key.upper()

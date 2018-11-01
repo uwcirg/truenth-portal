@@ -12,17 +12,6 @@
             <a href="/"><img src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="{{_('TrueNTH Logo')}}" /></a>
         </div>
     </header>
-    <section class="message-section">
-        {% if config.MAINTENANCE_MESSAGE -%}
-            <div class="sys-maintenance">
-                <img src="{{ url_for('static', filename='img/logo_wordmark_topnav.png') }}" alt="{{_('TrueNTH Logo')}}" width="100px" />
-                <div class="message-container">
-                    <p class="title">{{_("Please note")}}</p>
-                    <p class="message">{{config.MAINTENANCE_MESSAGE | safe}}</p>
-                </div>
-            </div>
-        {%- endif %}
-    </section>
     <section class="image"></section>
     <section class="login">
         <form action="{{url_for('user.login')}}" method="POST" class="form tnth-form to-validate" role="form" data-toggle="validator">
