@@ -93,6 +93,7 @@ class BaseConfig(object):
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
+        ('qb_query_cache', 60*60*24),
         ('reporting_cache_region', 60*60*12)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
 
