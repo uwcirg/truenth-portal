@@ -84,7 +84,7 @@ sqlalchemy==1.2.13         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.1
 tox==3.5.3
 typing==3.6.6             # via sphinx
-urllib3==1.24             # via requests
+urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4               # via amqp
 virtualenv==16.1.0        # via tox
