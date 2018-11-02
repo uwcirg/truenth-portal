@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import RelativeDelta
+from ..dogpile_cache import dogpile_cache
 from ..trace import trace
 from .clinical_constants import CC
 from .fhir import bundle_results
@@ -19,6 +20,7 @@ from .questionnaire import Questionnaire
 from .questionnaire_response import QuestionnaireResponse
 from .recur import Recur
 from .reference import Reference
+from .user_consent import latest_consent
 
 classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
@@ -563,18 +565,16 @@ class QuestionnaireBank(db.Model):
                             tx_date))
                     self.__trigger_date = tx_date
                     return self.__trigger_date
+
             # otherwise, use the common top level consent date
-            if user.valid_consents and user.valid_consents.count() > 0:
-                # consents are ordered desc(acceptance_date), ignore suspended
-                # but include deleted, as in a suspended state, the previous
-                # acceptance will now be marked deleted.
-                for con in user.all_consents:
-                    if con.status != 'suspended':
-                        self.__trigger_date = con.acceptance_date
-                        trace(
-                            'found valid_consent with trigger_date {}'.format(
-                                self.__trigger_date))
-                        return self.__trigger_date
+            consent = latest_consent(user)
+            if consent:
+                self.__trigger_date = consent.acceptance_date
+                trace(
+                    'found valid_consent with trigger_date {}'.format(
+                        self.__trigger_date))
+                return self.__trigger_date
+
             else:
                 trace(
                     "questionnaire_bank affiliated with RP {}, user has "
@@ -606,26 +606,6 @@ class QuestionnaireBank(db.Model):
             raise ValueError(
                 "Can't compute trigger_date on QuestionnaireBank with "
                 "neither research protocol nor intervention associated")
-
-    @staticmethod
-    def withdrawal_date(user):
-        """Return withdrawal date for user via QB association
-
-        Withdrawal date currently has little to do with the QB, defined here
-        for symmetry with trigger_date.
-
-        :return: UTC datetime of withdrawal for given user, or None if N/A
-
-        """
-        if user.valid_consents and user.valid_consents.count() > 0:
-            # consents are ordered desc(acceptance_date).  only if the
-            # first is 'suspended' are we in a withdrawn state
-            top_consent = user.valid_consents[0]
-            if top_consent.status == 'suspended':
-                trace(
-                    'found withdrawn {}'.format(top_consent.acceptance_date))
-                return top_consent.acceptance_date
-        return None
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
@@ -703,6 +683,23 @@ class QuestionnaireBankQuestionnaire(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
+
+
+@dogpile_cache.region('qb_query_cache')
+def qbs_by_rp(rp_id, classification):
+    """return QBs associated with a given research protocol
+
+    :param rp_id: research protocol id associated with QBs
+    :param classification: set to restrict to given classification
+    :returns: all matching QuestionnaireBanks
+
+    """
+    results = QuestionnaireBank.query.filter(
+        QuestionnaireBank.research_protocol_id == rp_id)
+    if classification:
+        results = results.filter(
+            QuestionnaireBank.classification == classification)
+    return results.all()
 
 
 def visit_name(qbd):
