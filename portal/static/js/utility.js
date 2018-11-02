@@ -344,7 +344,7 @@ function getUrlParameter(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 function displaySystemOutageMessage() {
-    ajaxRequest("api/settings", {cntentType: "application/json; charset=utf-8"}, function(data) {
+    ajaxRequest("api/settings", {contentType: "application/json; charset=utf-8"}, function(data) {
         if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
             return false;
         }
@@ -363,26 +363,27 @@ function displaySystemOutageMessage() {
         if (data.MAINTENANCE_MESSAGE) {
             messageElement.innerHTML = unescape(data.MAINTENANCE_MESSAGE);
             return;
-        } 
+        }
         //use maintenance window specified in config to compose the message, assuming in following example format: ["2018-11-02T12:00:00Z", "2018-11-02T18:00:00Z"], dates in system ISO format
         var hoursDiff = function(d1, d2) {
             if (!d1 || !d2) {
                 return 0;
             }
             return Math.floor(((d2.getTime() - d1.getTime())/ (1000 * 60 * 60)) % 24);
-        }
+        };
         //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
         var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
         var duration = hoursDiff(startDate, endDate), hoursTil = hoursDiff(new Date(), startDate);
         if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
             messageElement.innerHTML = "";
             return;
-        } 
+        }
         /*global i18next */
         //construct message based on maintenance window
-        messageElement.innerHTML = "<div><b>" + i18next.t("Please Note:") + "</b></div><div>" + i18next.t("This website will be unavailable due to scheduled maintenance in {hourstil} hours. The outage is expected to last for {duration} hours.".replace("{hourstil}", hoursTil).replace("{duration}", duration)) + "</div>";    
+        var options = {year: "numeric", day: "numeric", month: "short", hour: "numeric", minute: "numeric", second: "numeric", hour12: false};
+        messageElement.innerHTML = "<div><b>" + i18next.t("Please Note:") + "</b></div><div>" + i18next.t("This website will be unavailable due to scheduled maintenance between {startdate} and {enddate} local time. The outage will begin in approximately {hourstil} hours and is expected to last for {duration} hours.".replace("{hourstil}", hoursTil).replace("{duration}", duration).replace("{startdate}", startDate.toLocaleString(options)).replace("{enddate}", endDate.toLocaleString(options))) + "</div>";
     });
-};
+}
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
  * unless dev tools are open, and IE doesn't define console.debug
