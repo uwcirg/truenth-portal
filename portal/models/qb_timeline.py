@@ -1,9 +1,10 @@
 from datetime import datetime, MAXYEAR
 
-from .assessment_status import OverallStatus
-from .questionnaire_bank import QuestionnaireBank, QBD
 from ..trace import trace
 from ..database import db
+from .assessment_status import OverallStatus
+from .questionnaire_bank import QuestionnaireBank, QBD, qbs_by_rp
+from .user_consent import consent_withdrawal_dates
 
 
 class QBT(db.Model):
@@ -43,6 +44,72 @@ class QBT(db.Model):
         self._status = getattr(OverallStatus, value).name
 
 
+system_trigger = datetime(2015, 1, 1, 12, 0, 0)
+"""A consistent point in time for date comparisons with relative deltas"""
+
+
+def ordered_rp_qbs(rp_id):
+    """Generator to yield ordered qbs by research protocol alone"""
+    # to order, need a somewhat arbitrary date as a fake trigger
+    baselines = qbs_by_rp(rp_id, 'baseline')
+    if len(baselines) != 1:
+        raise RuntimeError(
+            "Expect exactly one QB for baseline by rp {}".format(rp_id))
+    baseline = baselines[0]
+    if baseline not in db.session:
+        baseline = db.session.merge(baseline, load=False)
+    start = baseline.calculated_start(
+        as_of_date=system_trigger, trigger_date=system_trigger)
+    yield start
+
+    qbs_by_start = {}
+    recurring = qbs_by_rp(rp_id, 'recurring')
+    for qb in recurring:
+        if qb not in db.session:
+            qb = db.session.merge(qb, load=False)
+
+        for qbd in qb.recurring_starts(system_trigger):
+            qbs_by_start[qbd.relative_start] = qbd
+
+    # continue to yield in order
+    for start_date in sorted(qbs_by_start.keys()):
+        yield qbs_by_start[start_date]
+
+
+def calc_and_adjust_start(user, qbd, initial_trigger):
+    """Calculate correct start for user on given QBD
+
+    A QBD is initially generated with a generic trigger date for
+    caching and sorting needs.  This function translates the
+    given QBD.relative_start to the users situation.
+
+    :param user: subject user
+    :param qbd: QBD with respect to system trigger
+    :param initial_trigger: datetime value used in initial QBD calculation
+
+    :returns adjusted `relative_start` for user
+
+    """
+    users_trigger = qbd.questionnaire_bank.trigger_date(user)
+    if initial_trigger > users_trigger:
+        raise RuntimeError(
+            "user {} has unexpected trigger date before system value".format(
+                user.id))
+
+    delta = users_trigger - initial_trigger
+    return qbd.relative_start + delta
+
+
+max_sort_time = datetime(year=MAXYEAR, month=12, day=31)
+
+
+def second_null_safe_datetime(x):
+    """datetime sort accessor treats None as far off in the future"""
+    if not x[1]:
+        return max_sort_time
+    return x[1]
+
+
 def ordered_qbs(user):
     """Generator to yield ordered qbs for a user
 
@@ -56,55 +123,77 @@ def ordered_qbs(user):
     :returns: QBD named tuple for each (QB, iteration)
 
     """
-    # Starts with baseline
-    as_of = datetime.utcnow()
-    baseline = QuestionnaireBank.qbs_for_user(
-        user, as_of_date=as_of, classification='baseline')
-    if not baseline:
+
+    # bootstrap problem - don't know initial `as_of_date` w/o a QB
+    # use consent date as best guess.
+    consent_date, withdrawal_date = consent_withdrawal_dates(user)
+    if not consent_date:
+        # TODO: are there use cases w/o a consent, yet a valid trigger_date?
         raise StopIteration
-    if len(baseline) != 1:
-        raise RuntimeError('unexpected multiple baselines')
-
-    trigger_date = baseline[0].trigger_date(user)
-    if not trigger_date:
-        raise StopIteration
-    start = baseline[0].calculated_start(
-        as_of_date=as_of, trigger_date=trigger_date)
-    yield QBD(
-        relative_start=start, iteration=None, recur=None,
-        questionnaire_bank=baseline[0])
-
-    # Trigger date sometimes changes by classification - force fresh lookup
-    trigger_date = None
-
-    # Move on to recurring - sort requires pre-fetch as they often overlap
-    qbs_by_start = {}
 
     # Zero to one RP makes things significantly easier - otherwise
     # swap in a strategy that can work with the change.
-    rps = QuestionnaireBank.current_rps(user, as_of_date=None)
+    rps = set()
+    for org in user.organizations:
+        for r in org.rps_w_retired():
+            rps.add(r)
+
     if len(rps) > 1:
-        raise NotImplementedError("need strategy for changing RPs")
+        # With a multiple RPs, move in lock step, determine when to switch.
+        sorted_rps = sorted(
+            list(rps), key=second_null_safe_datetime, reverse=True)
 
-    # Users have org or intervention associated QBs
-    org_recurring = QuestionnaireBank.qbs_by_org(
-        user, classification='recurring', as_of_date=None)
-    intervention_recurring = QuestionnaireBank.qbs_by_intervention(
-        user, classification='recurring')
-    for qb in org_recurring + intervention_recurring:
+        # Start with oldest (current) till it's time to progress (next)
+        current_rp, current_retired = sorted_rps.pop()
+        current_qbds = ordered_rp_qbs(current_rp.id)
+        next_rp, next_retired = sorted_rps.pop()
+        next_qbds = ordered_rp_qbs(next_rp.id)
 
-        # acquire trigger for this classification if not defined
-        trigger_date = trigger_date if trigger_date else qb.trigger_date(user)
+        if sorted_rps:
+            raise ValueError("can't cope with > 2 RPs at this time")
 
-        for qbd in qb.recurring_starts(trigger_date):
-            qbs_by_start[qbd.relative_start] = qbd
+        while True:
+            # Advance both in sync while both are defined
+            current_qbd = next(current_qbds)
+            if next_qbds:
+                next_qbd = next(next_qbds)
+            users_start = calc_and_adjust_start(
+                user=user, qbd=current_qbd, initial_trigger=system_trigger)
 
-    # continue to yield in order
-    withdrawal_date = QuestionnaireBank.withdrawal_date(user)
-    for start_date in sorted(qbs_by_start.keys()):
-        if withdrawal_date and withdrawal_date < start_date:
-            break
-        yield qbs_by_start[start_date]
+            # if there's still a next and current retired before the user's
+            # start, switch over
+            # TODO don't switch yet if user submitted any results for this qbd
+            if next_qbds and current_retired < users_start:
+                current_qbds = next_qbds
+                current_qbd, current_retired = next_qbd, next_retired
+                next_qbds, next_retired = None, None
+                users_start = calc_and_adjust_start(
+                    user=user, qbd=current_qbd,
+                    initial_trigger=system_trigger)
+
+            # done if user withdrew before the next start
+            if withdrawal_date and withdrawal_date < users_start:
+                break
+
+            adjusted = current_qbd._replace(relative_start=users_start)
+            yield adjusted
+
+    if len(rps) == 1:
+        # With a single RP, just need to adjust the start to fit
+        # this user
+        rp, _ = rps.pop()
+        qbds_by_rp = ordered_rp_qbs(rp.id)
+        while True:
+            qbd = next(qbds_by_rp)
+            users_start = calc_and_adjust_start(
+                user=user, qbd=qbd, initial_trigger=system_trigger)
+
+            # done if user withdrew before the next start
+            if withdrawal_date and withdrawal_date < users_start:
+                break
+
+            adjusted = qbd._replace(relative_start=users_start)
+            yield adjusted
 
 
 def update_users_QBT(user, invalidate_existing=False):
