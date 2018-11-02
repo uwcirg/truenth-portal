@@ -341,6 +341,11 @@ class TestCase(Base):
           happening at exact time in the past
 
         """
+        # doesn't make sense to consent w/o an association, add if missing
+        user = User.query.get(user_id)
+        if org_id not in (o.id for o in user.organizations):
+            user.organizations.append(Organization.query.get(org_id))
+
         acceptance_date = calc_date_params(
             backdate=backdate, setdate=setdate)
         consent = UserConsent.query.filter(
