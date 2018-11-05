@@ -3,7 +3,8 @@ from datetime import datetime, MAXYEAR
 from ..trace import trace
 from ..database import db
 from .assessment_status import OverallStatus
-from .questionnaire_bank import QuestionnaireBank, QBD, qbs_by_rp
+from .questionnaire_bank import QuestionnaireBank, qbs_by_rp
+from .questionnaire_response import QNR_results
 from .user_consent import consent_withdrawal_dates
 
 
@@ -139,6 +140,10 @@ def ordered_qbs(user):
             rps.add(r)
 
     if len(rps) > 1:
+        # RP switch is delayed if user submitted any results for the then
+        # active QB on the RP active at that time.
+        user_qnrs = QNR_results(user)
+
         # With a multiple RPs, move in lock step, determine when to switch.
         sorted_rps = sorted(
             list(rps), key=second_null_safe_datetime, reverse=True)
@@ -161,9 +166,11 @@ def ordered_qbs(user):
                 user=user, qbd=current_qbd, initial_trigger=system_trigger)
 
             # if there's still a next and current retired before the user's
-            # start, switch over
-            # TODO don't switch yet if user submitted any results for this qbd
-            if next_qbds and current_retired < users_start:
+            # start, switch over *unless* user submitted a matching QNR
+            if (next_qbds and current_retired < users_start and
+                    not user_qnrs.contains(
+                        qb_id=current_qbd.questionnaire_bank.id,
+                        iteration=current_qbd.iteration)):
                 current_qbds = next_qbds
                 current_qbd, current_retired = next_qbd, next_retired
                 next_qbds, next_retired = None, None

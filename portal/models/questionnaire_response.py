@@ -59,6 +59,25 @@ class QuestionnaireResponse(db.Model):
                "{0.status} {0.authored}".format(self)
 
 
+class QNR_results(object):
+    """API for QuestionnaireResponses for a user"""
+
+    def __init__(self, user):
+        self.user = user
+        self.qnrs = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user.id).with_entities(
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration)
+
+    def contains(self, qb_id, iteration):
+        """Returns true if QNR exists for given qb, iteration"""
+        for qnr in self.qnrs:
+            if (qnr.questionnaire_bank_id == qb_id and
+                    qnr.qb_iteration == iteration):
+                return True
+        return False
+
+
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     """Build a bundle of QuestionnaireResponses
 
