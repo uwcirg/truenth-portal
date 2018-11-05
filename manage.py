@@ -327,5 +327,8 @@ def healthcheck():
     print(json.dumps(result.json(), indent=4))
 
     # Return success (0) if passing status code
-    # otherwise return fail (1)
-    return sys.exit(int(not result.ok))
+    if result.ok:
+        return sys.exit()
+
+    # Healthcheck failed. Return a failing status code
+    return sys.exit(result.status_code)
