@@ -10,7 +10,6 @@ import alembic.config
 import click
 from flask import url_for
 from flask_migrate import Migrate
-import json
 from past.builtins import basestring
 import redis
 import requests
