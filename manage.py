@@ -8,11 +8,15 @@ import os
 
 import alembic.config
 import click
+from flask import url_for
 from flask_migrate import Migrate
+import json
 from past.builtins import basestring
 import redis
+import requests
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
+import sys
 
 from portal.audit import auditable_event
 from portal.config.site_persistence import SitePersistence
@@ -312,3 +316,19 @@ def config(config_key):
 @app.cli.command()
 def set_celery_beat_healthy():
     return celery_beat_health_check()
+
+
+@app.cli.command()
+def healthcheck():
+    """Calls the healthcheck API"""
+    result = requests.get(
+        url_for('check')
+    )
+    print(json.dumps(result.json(), indent=4))
+
+    # Return success (0) if passing status code
+    if result.ok:
+        return sys.exit()
+
+    # Healthcheck failed. Return a failing status code
+    return sys.exit(result.status_code)

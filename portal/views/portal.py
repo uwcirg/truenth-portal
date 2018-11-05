@@ -1051,7 +1051,7 @@ def celery_test(x=16, y=16):
     context = {"id": res.task_id, "x": x, "y": y}
     result = "add((x){}, (y){})".format(context['x'], context['y'])
     task_id = "{}".format(context['id'])
-    result_url = url_for('.celery_result', task_id=task_id)
+    result_url = url_for('portal.celery_result', task_id=task_id)
     if request.args.get('redirect-to-result', None):
         return redirect(result_url)
     return jsonify(result=result, task_id=task_id, result_url=result_url)
