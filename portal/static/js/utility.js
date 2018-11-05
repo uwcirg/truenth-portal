@@ -376,6 +376,7 @@ function displaySystemOutageMessage() {
         var duration = hoursDiff(startDate, endDate), hoursTil = hoursDiff(new Date(), startDate);
         if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
             messageElement.innerHTML = "";
+            document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
             return;
         }
         /*global i18next */
