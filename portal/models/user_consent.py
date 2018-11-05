@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
-from validators import url as url_validation
+from validators import ValidationFailure, url as url_validation
 
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -125,7 +125,7 @@ class UserConsent(db.Model):
         url = data.get('agreement_url')
         try:
             url_validation(url)
-        except:
+        except ValidationFailure:
             raise ValueError("requires a valid agreement_url")
 
         obj = cls(
