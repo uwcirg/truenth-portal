@@ -343,7 +343,8 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
-function displaySystemOutageMessage() {
+function displaySystemOutageMessage(locale) {
+    locale = locale || "en-us";
     ajaxRequest("api/settings", {contentType: "application/json; charset=utf-8"}, function(data) {
         if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
             return false;
@@ -380,9 +381,14 @@ function displaySystemOutageMessage() {
             return;
         }
         /*global i18next */
-        //construct message based on maintenance window
-        var options = {year: "numeric", day: "numeric", month: "short", hour: "numeric", minute: "numeric", second: "numeric", hour12: false};
-        messageElement.innerHTML = "<div><b>" + i18next.t("Please Note:") + "</b></div><div>" + i18next.t("This website will be unavailable due to scheduled maintenance between {startdate} and {enddate} local time. The outage will begin in approximately {hourstil} hours and is expected to last for {duration} hours.".replace("{hourstil}", hoursTil).replace("{duration}", duration).replace("{startdate}", startDate.toLocaleString(options)).replace("{enddate}", endDate.toLocaleString(options))) + "</div>";
+        //construct message based on maintenance window 
+        var options = {year: 'numeric', month: 'long', day: 'numeric', hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
+        var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " ");
+        var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
+        var message = ["<div>" + i18next.t("Hi there.") + "</div>", 
+                        "<div>" + i18next.t("TrueNTH will be down for website maintenance on <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
+                        "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
+        messageElement.innerHTML = message;
     });
 }
 /**
