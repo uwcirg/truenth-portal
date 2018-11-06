@@ -349,13 +349,11 @@ function displaySystemOutageMessage(locale) {
         if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
             return false;
         }
-        var systemMaintenanceElId = "systemMaintenanceContainer", messageElement = document.querySelector(".message-container");
-        if (!document.getElementById(systemMaintenanceElId)) { //dynamically generate system outage maintenance message element
-            var container = document.createElement("div");
-            container.setAttribute("id", systemMaintenanceElId);
-            container.classList.add("sys-maintenance");
-            document.body.insertBefore(container, document.body.firstChild);
+        var systemMaintenanceElId = "systemMaintenanceContainer";
+        if (!document.getElementById(systemMaintenanceElId)) { //check for system outage maintenance message element
+            return;
         }
+        var messageElement = document.querySelector(".message-container");
         if (!messageElement) {
             messageElement = document.createElement("div");
             messageElement.classList.add("message-container");
@@ -374,20 +372,20 @@ function displaySystemOutageMessage(locale) {
         };
         //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
         var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
-        var duration = hoursDiff(startDate, endDate), hoursTil = hoursDiff(new Date(), startDate);
+        var hoursTil = hoursDiff(new Date(), startDate);
         if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
             messageElement.innerHTML = "";
             document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
             return;
         }
         /*global i18next */
-        //construct message based on maintenance window 
+        //construct message based on maintenance window
         try {
             var options = {year: 'numeric', month: 'long', day: 'numeric', hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
-            var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " ");
+            var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " "); //display language-sensitive representation of date/time
             var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
-            var message = ["<div>" + i18next.t("Hi there.") + "</div>", 
-                            "<div>" + i18next.t("TrueNTH will be down for website maintenance on <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
+            var message = ["<div>" + i18next.t("Hi there.") + "</div>",
+                            "<div>" + i18next.t("TrueNTH will be down for website maintenance starting <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
                             "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
             messageElement.innerHTML = message;
         } catch(e) {
