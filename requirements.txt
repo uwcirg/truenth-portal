@@ -70,7 +70,7 @@ python-memcached==1.59    # via flask-dogpile-cache
 pytz==2018.7              # via babel, celery
 pyyaml==3.13              # via flask-swagger, swagger-spec-validator
 redis==2.10.6
-regex==2018.11.03
+regex==2018.11.06
 requests-cache==0.4.13
 requests-oauthlib==1.0.0  # via flask-oauthlib
 requests==2.20.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
