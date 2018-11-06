@@ -175,10 +175,8 @@ body {
 .sys-maintenance {
   margin: auto;
   font-size: 0.8em;
-  padding: 4px 8px;
   color: #FFF;
   width: 100%;
-  background: @alertColor;
   text-align: center;
   max-width: 100%;
   display: flex;
@@ -194,8 +192,9 @@ body {
     display: inline-block;
   }
   .message-container {
+    background: @alertColor;
     text-align: center;
-    margin: 0.45em 0 0.15em;
+    padding: 0.25em 0 0.25em;
     width: 100%;
   }
   .message {
@@ -213,9 +212,6 @@ body {
 @media (min-width: 992px) {
   .sys-maintenance {
     font-size: @baseFontSize;
-    .message-container {
-      width: 90%;
-    }
     img {
       margin: 0.5em 1.5em;
       width: 150px;
