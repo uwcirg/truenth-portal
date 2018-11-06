@@ -2,12 +2,7 @@
 {% block title %}{{super()}} Home{% endblock %}
 {% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
-    {% if config.MAINTENANCE_MESSAGE -%}
-      <div class="sys-maintenance">
-          <h4 class="title">{{_("Please note")}}</h4>
-          <h4 class="message">{{config.MAINTENANCE_MESSAGE | safe}}</h4>
-      </div>
-    {%- endif %}
+    <div id="systemMaintenanceContainer" class="sys-maintenance"></div>
     <main class="main" data-section="home">
       {% if init_login_modal %}<input type="hidden" id="initLoginModal" value="true" />{% endif %}
       {{ super() }}
