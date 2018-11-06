@@ -345,6 +345,7 @@ function getUrlParameter(name) {
 }
 function displaySystemOutageMessage(locale) {
     locale = locale || "en-us";
+    locale = locale.replace("_", "-");
     ajaxRequest("api/settings", {contentType: "application/json; charset=utf-8"}, function(data) {
         if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
             return false;

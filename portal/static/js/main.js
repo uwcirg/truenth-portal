@@ -2326,7 +2326,7 @@ __i18next.init({"lng": userSetLang
     if (typeof i18next === "undefined") { i18next = {t: function(key) { return key; }}; } //fallback for i18next in older browser?
     $(document).ready(function() {
         //note: display system outage message only after i18next has been instantiated - allowing message to be translated
-        displaySystemOutageMessage(userSetLang.replace("_", "-")); /*global displaySystemOutageMessage */
+        displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
         if (PORTAL_NAV_PAGE) {
             loader(true); /*global loader restoreVis*/
