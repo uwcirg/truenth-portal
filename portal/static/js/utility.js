@@ -382,13 +382,19 @@ function displaySystemOutageMessage(locale) {
         }
         /*global i18next */
         //construct message based on maintenance window 
-        var options = {year: 'numeric', month: 'long', day: 'numeric', hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
-        var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " ");
-        var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
-        var message = ["<div>" + i18next.t("Hi there.") + "</div>", 
-                        "<div>" + i18next.t("TrueNTH will be down for website maintenance on <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
-                        "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
-        messageElement.innerHTML = message;
+        try {
+            var options = {year: 'numeric', month: 'long', day: 'numeric', hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
+            var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " ");
+            var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
+            var message = ["<div>" + i18next.t("Hi there.") + "</div>", 
+                            "<div>" + i18next.t("TrueNTH will be down for website maintenance on <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
+                            "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
+            messageElement.innerHTML = message;
+        } catch(e) {
+            console.log("Error occurred converting system outage date/time ", e);
+            messageElement.innerHTML = "";
+            document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+        }
     });
 }
 /**
