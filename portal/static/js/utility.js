@@ -360,7 +360,10 @@ function displaySystemOutageMessage(locale) {
             document.getElementById(systemMaintenanceElId).appendChild(messageElement);
         }
         if (data.MAINTENANCE_MESSAGE) {
-            messageElement.innerHTML = unescape(data.MAINTENANCE_MESSAGE);
+            messageElement.innerHTML = escapeHtml(data.MAINTENANCE_MESSAGE);
+            return;
+        }
+        if (!data.MAINTENANCE_WINDOW || !data.MAINTENANCE_WINDOW.length) {
             return;
         }
         //use maintenance window specified in config to compose the message, assuming in following example format: ["2018-11-02T12:00:00Z", "2018-11-02T18:00:00Z"], dates in system ISO format
@@ -374,23 +377,21 @@ function displaySystemOutageMessage(locale) {
         var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
         var hoursTil = hoursDiff(new Date(), startDate);
         if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
-            messageElement.innerHTML = "";
             document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
             return;
         }
         /*global i18next */
         //construct message based on maintenance window
         try {
-            var options = {year: 'numeric', month: 'long', day: 'numeric', hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
+            var options = {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true, timeZoneName:"short"};
             var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " "); //display language-sensitive representation of date/time
             var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
             var message = ["<div>" + i18next.t("Hi there.") + "</div>",
                             "<div>" + i18next.t("TrueNTH will be down for website maintenance starting <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
                             "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
-            messageElement.innerHTML = message;
+            messageElement.innerHTML = escapeHtml(message);
         } catch(e) {
             console.log("Error occurred converting system outage date/time ", e);
-            messageElement.innerHTML = "";
             document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
         }
     });
