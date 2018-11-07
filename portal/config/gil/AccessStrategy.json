@@ -486,43 +486,71 @@
         "kwargs": [
           {
             "name": "combinator",
-            "value": "any"
+            "value": "all"
           },
           {
-            "name": "strategy_1",
-            "value": "observation_check"
+            "name": "strategy_3",
+            "value": "in_role_list"
           },
           {
-            "name": "strategy_1_kwargs",
+            "name": "strategy_3_kwargs",
             "value": [
               {
-                "name": "display",
-                "value": "PCa localized diagnosis"
-              },
-              {
-                "name": "boolean_value",
-                "value": "true"
+                "name": "role_list",
+                "value": [
+                  "patient"
+                ]
               }
             ]
           },
           {
-            "name": "strategy_2",
-            "value": "observation_check"
-          },
+            "name": "strategy_4",
+            "value": "combine_strategies"
+          },              
           {
-            "name": "strategy_2_kwargs",
-            "value": [
+            "name": "strategy_4_kwargs",
+            "value": [  
               {
-                "name": "display",
-                "value": "PCa diagnosis"
+                "name": "combinator",
+                "value": "any"
               },
               {
-                "name": "boolean_value",
-                "value": "true"
+                "name": "strategy_1",
+                "value": "observation_check"
               },
               {
-                "name": "invert_logic",
-                "value": "true"
+                "name": "strategy_1_kwargs",
+                "value": [
+                  {
+                    "name": "display",
+                    "value": "PCa localized diagnosis"
+                  },
+                  {
+                    "name": "boolean_value",
+                    "value": "true"
+                  }
+                ]
+              },
+              {
+                "name": "strategy_2",
+                "value": "observation_check"
+              },
+              {
+                "name": "strategy_2_kwargs",
+                "value": [
+                  {
+                    "name": "display",
+                    "value": "PCa diagnosis"
+                  },
+                  {
+                    "name": "boolean_value",
+                    "value": "true"
+                  },
+                  {
+                    "name": "invert_logic",
+                    "value": "true"
+                  }
+                ]
               }
             ]
           }
