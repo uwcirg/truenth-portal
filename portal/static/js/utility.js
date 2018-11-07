@@ -346,13 +346,13 @@ function getUrlParameter(name) {
 function displaySystemOutageMessage(locale) {
     locale = locale || "en-us";
     locale = locale.replace("_", "-");
+    var systemMaintenanceElId = "systemMaintenanceContainer";
+    if (!document.getElementById(systemMaintenanceElId)) { //check for system outage maintenance message element
+        return;
+    }
     ajaxRequest("api/settings", {contentType: "application/json; charset=utf-8"}, function(data) {
         if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
             return false;
-        }
-        var systemMaintenanceElId = "systemMaintenanceContainer";
-        if (!document.getElementById(systemMaintenanceElId)) { //check for system outage maintenance message element
-            return;
         }
         var messageElement = document.querySelector(".message-container");
         if (!messageElement) {
