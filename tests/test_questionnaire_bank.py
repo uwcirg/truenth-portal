@@ -83,6 +83,7 @@ class TestQuestionnaireBank(TestCase):
         org, rp, rp_id = self.setup_org_n_rp(
             org=org, org_name='CRV', rp_name=rp_name,
             retired_as_of=retired_as_of)
+        eortc = self.add_questionnaire(name='eortc_{}'.format(rp_name))
         epic26 = self.add_questionnaire(name='epic26_{}'.format(rp_name))
         recur3 = Recur(
             start='{"months": 3}', cycle_length='{"months": 6}',
@@ -103,12 +104,13 @@ class TestQuestionnaireBank(TestCase):
             recur6 = exists
 
         with SessionScope(db):
+            db.session.add(eortc)
             db.session.add(epic26)
             db.session.add(recur3)
             db.session.add(recur6)
             db.session.commit()
-        org, epic26, recur3, recur6 = map(
-            db.session.merge, (org, epic26, recur3, recur6))
+        org, eortc, epic26, recur3, recur6 = map(
+            db.session.merge, (org, eortc, epic26, recur3, recur6))
 
         qb_base = QuestionnaireBank(
             name='CRV Baseline {}'.format(rp_name),
@@ -118,7 +120,9 @@ class TestQuestionnaireBank(TestCase):
             overdue='{"days": 30}',
             expired='{"months": 3}')
         qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eortc, rank=1)
         qb_base.questionnaires.append(qbq)
+        qb_base.questionnaires.append(qbq2)
 
         qb_m3 = QuestionnaireBank(
             name='CRV_recurring_3mo_period {}'.format(rp_name),
@@ -129,7 +133,9 @@ class TestQuestionnaireBank(TestCase):
             expired='{"months": 3}',
             recurs=[recur3])
         qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eortc, rank=1)
         qb_m3.questionnaires.append(qbq)
+        qb_m3.questionnaires.append(qbq2)
 
         qb_m6 = QuestionnaireBank(
             name='CRV_recurring_6mo_period {}'.format(rp_name),
@@ -140,15 +146,15 @@ class TestQuestionnaireBank(TestCase):
             expired='{"months": 3}',
             recurs=[recur6])
         qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eortc, rank=1)
         qb_m6.questionnaires.append(qbq)
+        qb_m6.questionnaires.append(qbq2)
 
         with SessionScope(db):
             db.session.add(qb_base)
             db.session.add(qb_m3)
             db.session.add(qb_m6)
             db.session.commit()
-        qb_base, qb_m3, qb_m6 = map(
-            db.session.merge, (qb_base, qb_m3, qb_m6))
 
         return db.session.merge(org)
 
@@ -845,16 +851,19 @@ class TestQuestionnaireBank(TestCase):
         assert (a_s.qb_data.qbd.questionnaire_bank.name
                 == 'CRV_recurring_3mo_period v2')
         assert a_s.qb_name == 'CRV_recurring_3mo_period v2'
-        assert a_s.instruments_needing_full_assessment() == ['epic26_v2']
+        assert a_s.instruments_needing_full_assessment() == [
+            'epic26_v2', 'eortc_v2']
 
         # Now, should still be rp v3, 3mo recurrence
         a_s = AssessmentStatus(user=user, as_of_date=now)
         assert (a_s.qb_data.qbd.questionnaire_bank.name
                 == 'CRV_recurring_3mo_period v3')
-        assert a_s.instruments_needing_full_assessment() == ['epic26_v3']
+        assert a_s.instruments_needing_full_assessment() == [
+            'epic26_v3', 'eortc_v3']
 
         # Complete the questionnaire from the 3mo v2 QB
         mock_qr('epic26_v2', timestamp=twoweeksago, qb=v2qb, iteration=0)
+        mock_qr('eortc_v2', timestamp=twoweeksago, qb=v2qb, iteration=0)
 
         # Two weeks ago, should be completed
         user = db.session.merge(user)
