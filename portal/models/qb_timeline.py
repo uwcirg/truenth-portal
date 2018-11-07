@@ -1,7 +1,7 @@
 from datetime import datetime, MAXYEAR
 
-from ..trace import trace
 from ..database import db
+from ..date_tools import RelativeDelta
 from .assessment_status import OverallStatus
 from .questionnaire_bank import QuestionnaireBank, qbs_by_rp
 from .questionnaire_response import QNR_results
@@ -210,40 +210,81 @@ def update_users_QBT(user, invalidate_existing=False):
     :param invalidate_existing: set true to wipe any current rows first
 
     """
-    def last_row(qb_id, iteration, start, status):
-        """add last row for user and commit"""
-        last = QBT(
-            user_id=user.id, qb_id=qb_id, qb_iteration=iteration, status=status)
-        if not start:
-            # no start implies we have no future plans for user
-            start = datetime(year=MAXYEAR, month=12, day=31)
-        last.start = start
-        db.session.add(last)
-        db.session.commit()
-
     if invalidate_existing:
         QBT.query.filter(QBT.user_id == user.id).delete()
 
+    # don't expect any rows at this point for user - sanity check
+    assert QBT.query.filter(QBT.user_id == user.id).count() == 0
+
     # Create time line for user, from initial trigger date
-    now = datetime.utcnow()
-    baseline = QuestionnaireBank.qbs_for_user(
-        user, classification='baseline', as_of_date=now)
+    qb_generator = ordered_qbs(user)
+    user_qbrs = QNR_results(user)
 
-    trigger_date = baseline[0].trigger_date(user)
+    # As we move forward, capture state at each time point
 
-    if not trigger_date:
-        trace("no baseline trigger date, can't continue")
-        last_row(qb_id=None, iteration=None, status='expired')
-        return
+    pending_qbts = []
+    for qbd in qb_generator:
+        kwargs = {
+            "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
+            "qb_iteration": qbd.iteration}
+        start = qbd.relative_start
+        # Always add start (due)
+        pending_qbts.append(QBT(at=start, status='due', **kwargs))
 
-    qb = baseline[0]
-    qbd_start = qb.calculated_start(trigger_date=trigger_date, as_of_date=now)
-    due = qb.calculated_due(trigger_date=trigger_date, as_of_date=now)
-    initial = QBT(
-        user_id=user.id, qb_id=qb.id, iteration=None, status='due',
-        start=due or qbd_start.relative_start)
-    db.session.add(initial)
+        expired_date = start + RelativeDelta(qbd.questionnaire_bank.expired)
+        overdue_date = None
+        if qbd.questionnaire_bank.overdue:  # not all qbs define overdue
+            overdue_date = start + RelativeDelta(
+                qbd.questionnaire_bank.overdue)
+        partial_date = user_qbrs.earliest_result(
+            qbd.questionnaire_bank.id, qbd.iteration)
+        include_overdue, include_expired = True, True
+        complete_date, expired_as_partial = None, False
 
-    # If user submitted a response for the QB, the authored date
-    # changed the status
-    in_progress = QuestionnaireBank.submitted_qbs(user=user, classification=baseline)
+        # If we have at least one result for this (QB, iteration):
+        if partial_date:
+            if overdue_date and partial_date < overdue_date:
+                include_overdue = False
+            if partial_date < expired_date:
+                pending_qbts.append(QBT(
+                    at=partial_date, status='in_progress', **kwargs))
+                # Without subsequent results, expired will become partial
+                include_expired = False
+                expired_as_partial = True
+            else:
+                pending_qbts.append(QBT(
+                    at=partial_date, status='partially_completed', **kwargs))
+
+            complete_date = user_qbrs.completed_date(
+                qbd.questionnaire_bank.id, qbd.iteration)
+            if complete_date:
+                pending_qbts.append(QBT(
+                    at=complete_date, status='completed',
+                    **kwargs))
+                if complete_date < expired_date:
+                    include_expired = False
+                    expired_as_partial = False
+
+        if include_overdue and overdue_date:
+            pending_qbts.append(QBT(
+                at=overdue_date, status='overdue', **kwargs))
+
+        if expired_as_partial:
+            pending_qbts.append(QBT(
+                at=expired_date, status="partially_completed", **kwargs))
+            if include_expired:
+                raise RuntimeError("conflicting state")
+
+        if include_expired:
+            pending_qbts.append(QBT(
+                at=expired_date, status='expired', **kwargs))
+
+    # If user withdrew from study - remove any rows post withdrawal
+    consent_date, withdrawal_date = consent_withdrawal_dates(user)
+    if withdrawal_date:
+        store_rows = [qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
+        db.session.add_all(store_rows)
+    else:
+        db.session.add_all(pending_qbts)
+
+    db.session.commit()
