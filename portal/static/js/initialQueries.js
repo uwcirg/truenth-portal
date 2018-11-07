@@ -327,12 +327,12 @@
         }(), 800);
     };
 
+    FieldsChecker.prototype.isAcceptOnNext = function() {
+        return $("div.reg-complete-container").hasClass("inactive") || this.ACCEPT_ON_NEXT;
+    }
+
     FieldsChecker.prototype.continueToFinish = function(sectionId) {
         this.hideSectionSavingLoader(sectionId);
-        if ($("div.reg-complete-container").hasClass("inactive") || this.ACCEPT_ON_NEXT) { //button not needed continue to next directly
-            window.location.reload();
-            return false;
-        }
         $("#progressWrapper").hide();
         $("#iqRefresh").addClass("tnth-hide");
         $("#next").attr("disabled", true).removeClass("open");
@@ -361,11 +361,11 @@
         $("#iqRefresh").addClass("tnth-hide");
         $("#buttonsContainer").removeClass("continue");
         $("div.reg-complete-container").fadeOut();
+        $("#buttonsContainer .loading-message-indicator").hide();
         $("#next").removeAttr("disabled").addClass("open");
         this.scrollTo($("#next"));
         $("#updateProfile").attr("disabled", true).removeClass("open");
     };
-
 
     FieldsChecker.prototype.getNext = function() {
         var found = false,
@@ -485,7 +485,7 @@
 
         $("#updateProfile").on("click", function() {
             $(this).hide();
-            $("#next").hide();
+            $("#next").removeClass("open");
             $(".loading-message-indicator").show();
             $("#queriesForm").submit();
         });
@@ -495,7 +495,7 @@
         });
         /*** event for the next button ***/
         $("#next").on("click", function() {
-            $(this).hide();
+            $(this).removeClass("open"); //next button is hidden by default, the class open makes it visible
             $("#buttonsContainer .loading-message-indicator").show();
             if (self.ACCEPT_ON_NEXT) {
                 self.handlePostEvent("topTerms");
@@ -625,6 +625,10 @@
                     self.stopContinue(sectionId);
                     return false;
                 }
+                if (self.isAcceptOnNext()) { //no need to show button(s), just continue
+                    location.reload();
+                    return;
+                }
                 if (!data.still_needed || !data.still_needed.length) {//finished all sections
                     self.continueToFinish(sectionId);
                     return true;
@@ -662,7 +666,6 @@
                     if (typeInTous(type, "active")) {
                         item_found++;
                         $("#termsCheckbox [data-tou-type='" + type + "']").attr("data-agree", "true"); //set the data-agree attribute for the corresponding consent item
-
                     }
                     if (typeInTous(type, "inactive")) {
                         self.attr("data-reconsent", "true");
