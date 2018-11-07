@@ -4,7 +4,12 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
-from portal.models.qb_timeline import ordered_qbs, second_null_safe_datetime
+from portal.models.qb_timeline import (
+    QBT,
+    ordered_qbs,
+    second_null_safe_datetime,
+    update_users_QBT,
+)
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.views.user import withdraw_consent
 from tests import associative_backdate
@@ -14,9 +19,6 @@ from tests.test_questionnaire_bank import TestQuestionnaireBank
 """Additional Test cases needed:
 
 For ordered_qbs generator:
- - on initial submission - clear results till next qb
- - on completed submission - correct status
- - on partial submission - correct status before and after overdue
  - intervention associated QBs
  
 """
@@ -61,6 +63,103 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         with pytest.raises(StopIteration):
             next(gen)
+
+    def test_zero_input(self):
+        # Basic w/o any QNR submission should generate all default QBTs
+        crv = self.setup_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+        user = db.session.merge(self.test_user)
+        update_users_QBT(user)
+        # expect (due, overdue, expired) for each QB (8)
+        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        assert QBT.query.filter(QBT._status == 'overdue').count() == 8
+        assert QBT.query.filter(QBT._status == 'expired').count() == 8
+
+    def test_partial_input(self):
+        crv = self.setup_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+
+        # submit a mock response for 3 month QB
+        # which should result in status change
+        qb_name = "CRV_recurring_3mo_period v2"
+        threeMo = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+        mock_qr('epic26_v2', qb=threeMo, iteration=0)
+
+        user = db.session.merge(self.test_user)
+        update_users_QBT(user)
+        for q in QBT.query.all():
+            print q.qb_id, q.qb_iteration, q.at, q.status
+        # for the 8 QBs and verify counts
+        # given the partial results, we find one in progress and one
+        # partially completed, matching expectations
+        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        # should be one less overdue as it became in_progress
+        assert QBT.query.filter(QBT._status == 'overdue').count() == 7
+        # should be one less expired as it became partially_completed
+        assert QBT.query.filter(QBT._status == 'expired').count() == 7
+        assert QBT.query.filter(QBT._status == 'in_progress').one()
+        assert QBT.query.filter(
+            QBT._status == 'partially_completed').one()
+
+    def test_partial_post_overdue_input(self):
+        crv = self.setup_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+
+        # submit a mock response for 3 month QB after overdue
+        # before expired
+        post_overdue = datetime.now() + relativedelta(months=4, weeks=1)
+        qb_name = "CRV_recurring_3mo_period v2"
+        threeMo = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+        mock_qr('epic26_v2', qb=threeMo, iteration=0, timestamp=post_overdue)
+
+        user = db.session.merge(self.test_user)
+        update_users_QBT(user)
+        for q in QBT.query.all():
+            print q.qb_id, q.qb_iteration, q.at, q.status
+        # for the 8 QBs and verify counts
+        # given the partial results, we find one in progress and one
+        # partially completed, matching expectations
+        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        assert QBT.query.filter(QBT._status == 'overdue').count() == 8
+        # should be one less expired as it became partially_completed
+        assert QBT.query.filter(QBT._status == 'expired').count() == 7
+        assert QBT.query.filter(QBT._status == 'in_progress').one()
+        assert QBT.query.filter(
+            QBT._status == 'partially_completed').one()
+
+    def test_completed_input(self):
+        # Basic w/ one complete QB
+        crv = self.setup_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user.organizations.append(crv)
+
+        # submit a mock response for all q's in 3 mo qb
+        # which should result in completed status
+        qb_name = "CRV_recurring_3mo_period v2"
+        threeMo = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+
+        for q in threeMo.questionnaires:
+            q = db.session.merge(q)
+            mock_qr(q.name, qb=threeMo, iteration=0)
+
+        user = db.session.merge(self.test_user)
+        update_users_QBT(user)
+        # for the 8 QBs and verify counts
+        # given the partial results, we find one in progress and one
+        # partially completed, matching expectations
+        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        # should be one less overdue as it became in_progress
+        assert QBT.query.filter(QBT._status == 'overdue').count() == 7
+        # should be one less expired as it became partially_completed
+        assert QBT.query.filter(QBT._status == 'expired').count() == 7
+        assert QBT.query.filter(QBT._status == 'in_progress').one()
+        assert QBT.query.filter(QBT._status == 'completed').one()
 
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
