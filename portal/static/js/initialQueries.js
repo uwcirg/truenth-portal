@@ -329,7 +329,7 @@
 
     FieldsChecker.prototype.isAcceptOnNext = function() {
         return $("div.reg-complete-container").hasClass("inactive") || this.ACCEPT_ON_NEXT;
-    }
+    };
 
     FieldsChecker.prototype.continueToFinish = function(sectionId) {
         this.hideSectionSavingLoader(sectionId);
