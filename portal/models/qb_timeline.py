@@ -204,7 +204,7 @@ def ordered_qbs(user):
 
 
 def update_users_QBT(user, invalidate_existing=False):
-    """Populate the QBT rows up till one future event for given user
+    """Populate the QBT rows for given user
 
     :param user: the user to add QBT rows for
     :param invalidate_existing: set true to wipe any current rows first
