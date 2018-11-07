@@ -1,3 +1,4 @@
+from collections import namedtuple
 from html.parser import HTMLParser
 import json
 
@@ -59,23 +60,63 @@ class QuestionnaireResponse(db.Model):
                "{0.status} {0.authored}".format(self)
 
 
+QNR = namedtuple('QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
+
+
 class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
     def __init__(self, user):
         self.user = user
-        self.qnrs = QuestionnaireResponse.query.filter(
+        query = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == user.id).with_entities(
             QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration)
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.status,
+            QuestionnaireResponse.document[
+                ('questionnaire', 'reference')].label('instrument_id'),
+            QuestionnaireResponse.authored).order_by(
+            QuestionnaireResponse.authored)
+        self.qnrs = []
+        for qnr in query:
+            self.qnrs.append(QNR(
+                qb_id=qnr.questionnaire_bank_id,
+                iteration=qnr.qb_iteration,
+                status=qnr.status,
+                instrument=qnr.instrument_id.split('/')[-1],
+                authored=qnr.authored))
 
-    def contains(self, qb_id, iteration):
-        """Returns true if QNR exists for given qb, iteration"""
+    def earliest_result(self, qb_id, iteration):
+        """Returns timestamp of earliest result for given params, or None"""
         for qnr in self.qnrs:
-            if (qnr.questionnaire_bank_id == qb_id and
-                    qnr.qb_iteration == iteration):
-                return True
-        return False
+            if (qnr.qb_id == qb_id and
+                    qnr.iteration == iteration):
+                return qnr.authored
+
+    def completed_date(self, qb_id, iteration):
+        """Returns timestamp when named QB was completed, or None"""
+        from .questionnaire_bank import QuestionnaireBank  # avoid import cyc.
+
+        # Gather required instrument list from QB
+        qb = QuestionnaireBank.query.get(qb_id)
+        required = {q.name for q in qb.questionnaires}
+        have = {qnr.instrument for qnr in self.qnrs if
+                qnr.qb_id == qb_id
+                and qnr.iteration == iteration
+                and qnr.status == "completed"}
+        if required - have:
+            # incomplete set
+            return None
+        # Return time when last completed in required came in
+        germane = [qnr for qnr in self.qnrs if
+                   qnr.qb_id == qb_id
+                   and qnr.iteration == iteration
+                   and qnr.status == "completed"]
+        for item in germane:
+            required.remove(item.instrument)
+            if not required:
+                return item.authored
+        raise RuntimeError("should have found authored for all required")
 
 
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
