@@ -73,7 +73,7 @@ redis==2.10.6
 regex==2018.11.06
 requests-cache==0.4.13
 requests-oauthlib==1.0.0  # via flask-oauthlib
-requests==2.20.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
+requests==2.20.1          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
 selenium==3.141.0
 six==1.11.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
