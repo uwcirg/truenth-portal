@@ -93,7 +93,6 @@ webob==1.8.3              # via webtest
 webtest==2.0.32           # via flask-webtest
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
-xvfbwrapper==0.2.9
 -e .
 
 ###
