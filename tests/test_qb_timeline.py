@@ -4,6 +4,8 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
+from portal.models.audit import Audit
+from portal.models.clinical_constants import CC
 from portal.models.qb_timeline import (
     QBT,
     ordered_qbs,
@@ -12,16 +14,9 @@ from portal.models.qb_timeline import (
 )
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.views.user import withdraw_consent
-from tests import associative_backdate
+from tests import associative_backdate, TEST_USER_ID
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
-
-"""Additional Test cases needed:
-
-For ordered_qbs generator:
- - intervention associated QBs
- 
-"""
 
 
 def test_sort():
@@ -41,14 +36,14 @@ class TestQbTimeline(TestQuestionnaireBank):
 
     def test_empty(self):
         # Basic case, without org, empty list
-        self.setup_qbs()
+        self.setup_org_qbs()
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user=user)
         with pytest.raises(StopIteration):
             next(gen)
 
     def test_full_list(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
         user = db.session.merge(self.test_user)
@@ -64,9 +59,32 @@ class TestQbTimeline(TestQuestionnaireBank):
         with pytest.raises(StopIteration):
             next(gen)
 
+    def test_intervention_list(self):
+        self.setup_intervention_qbs()
+        self.bless_with_basics()  # pick up a consent, etc.
+        # user with biopsy should return biopsy date
+        self.login()
+        user = db.session.merge(self.test_user)
+        user.save_observation(
+            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
+            status='', issued=None)
+        user = db.session.merge(self.test_user)
+
+        gen = ordered_qbs(user=user)
+
+        # expect all intervention QBs - baseline then every 3mos
+        expect_baseline = next(gen)
+        assert visit_name(expect_baseline) == 'Baseline'
+        for n in (3, 9, 15, 21, 27):
+            assert visit_name(next(gen)) == 'Month {}'.format(n)
+
+        with pytest.raises(StopIteration):
+            next(gen)
+
     def test_zero_input(self):
         # Basic w/o any QNR submission should generate all default QBTs
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
         user = db.session.merge(self.test_user)
@@ -77,7 +95,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert QBT.query.filter(QBT._status == 'expired').count() == 8
 
     def test_partial_input(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
 
@@ -90,8 +108,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         user = db.session.merge(self.test_user)
         update_users_QBT(user)
-        for q in QBT.query.all():
-            print q.qb_id, q.qb_iteration, q.at, q.status
+
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
@@ -105,7 +122,7 @@ class TestQbTimeline(TestQuestionnaireBank):
             QBT._status == 'partially_completed').one()
 
     def test_partial_post_overdue_input(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
 
@@ -134,7 +151,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
     def test_completed_input(self):
         # Basic w/ one complete QB
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
 
@@ -163,7 +180,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         crv_id = crv.id
         # consent 17 months in past
         backdate = datetime.utcnow() - relativedelta(months=17)
@@ -192,9 +209,9 @@ class TestQbTimeline(TestQuestionnaireBank):
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=14))
-        org = self.setup_qbs(rp_name='v2', retired_as_of=back7)
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back7)
         org_id = org.id
-        self.setup_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3')
         self.consent_with_org(org_id=org_id, setdate=back14)
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user)
@@ -222,9 +239,9 @@ class TestQbTimeline(TestQuestionnaireBank):
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=14))
-        org = self.setup_qbs(rp_name='v2', retired_as_of=back14)
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back14)
         org_id = org.id
-        self.setup_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3')
         self.consent_with_org(org_id=org_id, setdate=back7)
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user)
@@ -248,9 +265,9 @@ class TestQbTimeline(TestQuestionnaireBank):
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=14))
-        org = self.setup_qbs(rp_name='v2', retired_as_of=back7)
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back7)
         org_id = org.id
-        self.setup_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3')
         self.consent_with_org(org_id=org_id, setdate=back14)
 
         # submit a mock response for 9 month QB on old RP
@@ -286,9 +303,9 @@ class TestQbTimeline(TestQuestionnaireBank):
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=14))
-        org = self.setup_qbs(rp_name='v2', retired_as_of=back14)
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back14)
         org_id = org.id
-        self.setup_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3')
         self.consent_with_org(org_id=org_id, setdate=back7)
 
         # submit a mock response for baseline QB on old RP

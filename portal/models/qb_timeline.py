@@ -3,7 +3,7 @@ from datetime import datetime, MAXYEAR
 from ..database import db
 from ..date_tools import RelativeDelta
 from .assessment_status import OverallStatus
-from .questionnaire_bank import QuestionnaireBank, qbs_by_rp
+from .questionnaire_bank import qbs_by_rp, qbs_by_intervention
 from .questionnaire_response import QNR_results
 from .user_consent import consent_withdrawal_dates
 
@@ -65,6 +65,34 @@ def ordered_rp_qbs(rp_id):
 
     qbs_by_start = {}
     recurring = qbs_by_rp(rp_id, 'recurring')
+    for qb in recurring:
+        if qb not in db.session:
+            qb = db.session.merge(qb, load=False)
+
+        for qbd in qb.recurring_starts(system_trigger):
+            qbs_by_start[qbd.relative_start] = qbd
+
+    # continue to yield in order
+    for start_date in sorted(qbs_by_start.keys()):
+        yield qbs_by_start[start_date]
+
+
+def ordered_intervention_qbs(user):
+    """Generator to yield ordered qbs by intervention"""
+    # to order, need a somewhat arbitrary date as a fake trigger
+    baselines = qbs_by_intervention(user, 'baseline')
+    if len(baselines) != 1:
+        raise RuntimeError(
+            "Expect exactly one QB for baseline by intervention")
+    baseline = baselines[0]
+    if baseline not in db.session:
+        baseline = db.session.merge(baseline, load=False)
+    start = baseline.calculated_start(
+        as_of_date=system_trigger, trigger_date=system_trigger)
+    yield start
+
+    qbs_by_start = {}
+    recurring = qbs_by_intervention(user, 'recurring')
     for qb in recurring:
         if qb not in db.session:
             qb = db.session.merge(qb, load=False)
@@ -168,7 +196,7 @@ def ordered_qbs(user):
             # if there's still a next and current retired before the user's
             # start, switch over *unless* user submitted a matching QNR
             if (next_qbds and current_retired < users_start and
-                    not user_qnrs.contains(
+                    not user_qnrs.earliest_result(
                         qb_id=current_qbd.questionnaire_bank.id,
                         iteration=current_qbd.iteration)):
                 current_qbds = next_qbds
@@ -185,7 +213,7 @@ def ordered_qbs(user):
             adjusted = current_qbd._replace(relative_start=users_start)
             yield adjusted
 
-    if len(rps) == 1:
+    elif len(rps) == 1:
         # With a single RP, just need to adjust the start to fit
         # this user
         rp, _ = rps.pop()
@@ -202,6 +230,16 @@ def ordered_qbs(user):
             adjusted = qbd._replace(relative_start=users_start)
             yield adjusted
 
+    else:
+        # Neither RP case hit, try intervention associated QBs
+        iqbds = ordered_intervention_qbs(user)
+        while True:
+            qbd = next(iqbds)
+            users_start = calc_and_adjust_start(
+                user=user, qbd=qbd, initial_trigger=system_trigger)
+
+            adjusted = qbd._replace(relative_start=users_start)
+            yield adjusted
 
 def update_users_QBT(user, invalidate_existing=False):
     """Populate the QBT rows for given user
@@ -214,7 +252,9 @@ def update_users_QBT(user, invalidate_existing=False):
         QBT.query.filter(QBT.user_id == user.id).delete()
 
     # don't expect any rows at this point for user - sanity check
-    assert QBT.query.filter(QBT.user_id == user.id).count() == 0
+    if QBT.query.filter(QBT.user_id == user.id).count():
+        raise RuntimeError("Found unexpected QBT rows for {}".format(
+            user))
 
     # Create time line for user, from initial trigger date
     qb_generator = ordered_qbs(user)
@@ -280,7 +320,7 @@ def update_users_QBT(user, invalidate_existing=False):
                 at=expired_date, status='expired', **kwargs))
 
     # If user withdrew from study - remove any rows post withdrawal
-    consent_date, withdrawal_date = consent_withdrawal_dates(user)
+    _, withdrawal_date = consent_withdrawal_dates(user)
     if withdrawal_date:
         store_rows = [qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
         db.session.add_all(store_rows)
