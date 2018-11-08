@@ -27,7 +27,7 @@ from portal.models.user import NO_EMAIL_PREFIX
 from portal.system_uri import ICHOM, TRUENTH_CR_NAME
 from portal.tasks import update_patient_loop
 from tests import TEST_USER_ID, TEST_USERNAME
-from tests.test_assessment_status import (
+from tests.unit_tests.test_assessment_status import (
     TestQuestionnaireSetup,
     mock_qr,
     symptom_tracker_instruments,

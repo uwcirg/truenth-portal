@@ -26,7 +26,7 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.user_consent import UserConsent
 from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase, associative_backdate
-from tests.test_assessment_status import mock_qr
+from tests.unit_tests.test_assessment_status import mock_qr
 
 now = datetime.utcnow()
 
