@@ -58,8 +58,8 @@ class TestModelPersistence(TestCase):
 
     def test_identifier_lookup(self):
         # setup a minimal communication request
-        from tests.test_communication import mock_communication_request
-        from tests.test_assessment_status import mock_tnth_questionnairebanks
+        from tests.unit_tests.test_communication import mock_communication_request
+        from tests.unit_tests.test_assessment_status import mock_tnth_questionnairebanks
         from portal.system_uri import TRUENTH_CR_NAME
         from portal.models.identifier import Identifier
         mock_tnth_questionnairebanks()
