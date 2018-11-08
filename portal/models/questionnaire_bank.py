@@ -22,7 +22,7 @@ from .recur import Recur
 from .reference import Reference
 from .user_consent import latest_consent
 
-classification_types = ('baseline', 'followup', 'recurring', 'indefinite')
+classification_types = ('baseline', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
 
@@ -264,35 +264,6 @@ class QuestionnaireBank(db.Model):
         return results.all()
 
     @staticmethod
-    def qbs_by_intervention(user, classification):
-        """returns QBs associated with the user via intervention"""
-        results = []
-
-        # At this time, doesn't apply to metastatic patients.
-        if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
-
-            # Complicated rules (including strategies and UserIntervention
-            # rows) define a user's access to an intervention. Rely on the
-            # same check used to display the intervention cards, and only
-            # check if intervention is associated with QBs.
-            intervention_qbs = QuestionnaireBank.query.filter(
-                QuestionnaireBank.intervention_id.isnot(None))
-            if classification:
-                intervention_qbs = intervention_qbs.filter(
-                    QuestionnaireBank.classification == classification)
-
-            for qb in intervention_qbs:
-                intervention = Intervention.query.get(qb.intervention_id)
-                if intervention.quick_access_check(user):
-                    # TODO: business rule details like the following should
-                    # move to site persistence for QB to user mappings.
-                    check_func = observation_check("biopsy", 'true')
-                    if check_func(intervention=intervention, user=user):
-                        if qb not in results:
-                            results.append(qb)
-        return results
-
-    @staticmethod
     def qbs_for_user(user, classification, as_of_date):
         """Returns questionnaire banks applicable to (user, classification)
 
@@ -343,7 +314,7 @@ class QuestionnaireBank(db.Model):
         in_progress = submitted_qbs(user=user, classification=classification)
         by_org = QuestionnaireBank.qbs_by_org(
             user=user, classification=classification, as_of_date=as_of_date)
-        by_intervention = QuestionnaireBank.qbs_by_intervention(
+        by_intervention = qbs_by_intervention(
             user=user, classification=classification)
 
         if in_progress and classification in ('baseline', 'indefinite'):
@@ -693,9 +664,67 @@ class QuestionnaireBankQuestionnaire(db.Model):
         return self
 
 
+def qbs_by_intervention(user, classification):
+    """returns QBs associated with the user via intervention"""
+    results = []
+
+    # Some systems have zero intervention qbs - bail early if that's the case
+    # Dogpile caching requires sync with session
+    iqbs = [db.session.merge(i, load=False)
+            for i in intervention_qbs(classification)]
+    if not iqbs:
+        return results
+
+    # At this time, doesn't apply to metastatic patients.
+    if user.concept_value(CC.PCaLocalized) in ('unknown', 'true'):
+
+        # Complicated rules (including strategies and UserIntervention
+        # rows) define a user's access to an intervention. Rely on the
+        # same check used to display the intervention cards, and only
+        # check if intervention is associated with QBs.
+
+        for qb in iqbs:
+            intervention = Intervention.query.get(qb.intervention_id)
+            if intervention.quick_access_check(user):
+                # TODO: business rule details like the following should
+                # move to site persistence for QB to user mappings.
+                check_func = observation_check("biopsy", 'true')
+                if check_func(intervention=intervention, user=user):
+                    if qb not in results:
+                        results.append(qb)
+    return results
+
+
+@dogpile_cache.region('qb_query_cache')
+def intervention_qbs(classification):
+    """return all QBs associated with interventions
+
+    NB - as the results may be cached and expected to be live db session
+    objects, clients should confirm results are in the session or call
+    db.session.merge(load=False)
+
+    :param classification: set to restrict to given classification
+    :returns: all matching QuestionnaireBanks
+
+    """
+    query = QuestionnaireBank.query.filter(
+        QuestionnaireBank.intervention_id.isnot(None))
+    if classification:
+        query = query.filter(
+            QuestionnaireBank.classification == classification)
+
+    if not query.count():
+        return []
+    return query.all()
+
+
 @dogpile_cache.region('qb_query_cache')
 def qbs_by_rp(rp_id, classification):
     """return QBs associated with a given research protocol
+
+    NB - as the results may be cached and expected to be live db session
+    objects, clients should confirm results are in the session or call
+    db.session.merge(load=False)
 
     :param rp_id: research protocol id associated with QBs
     :param classification: set to restrict to given classification

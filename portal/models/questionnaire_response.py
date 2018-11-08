@@ -60,7 +60,8 @@ class QuestionnaireResponse(db.Model):
                "{0.status} {0.authored}".format(self)
 
 
-QNR = namedtuple('QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
+QNR = namedtuple(
+    'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
 
 
 class QNR_results(object):

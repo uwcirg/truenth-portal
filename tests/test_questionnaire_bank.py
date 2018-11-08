@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import pytest
 
+from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
 from portal.models.assessment_status import AssessmentStatus
 from portal.models.audit import Audit
@@ -19,6 +20,7 @@ from portal.models.organization import (
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
+    intervention_qbs,
     visit_name,
 )
 from portal.models.recur import Recur
@@ -32,6 +34,11 @@ now = datetime.utcnow()
 
 
 class TestQuestionnaireBank(TestCase):
+
+    def setUp(self):
+        """Clear qb cache as tests often alter qbs"""
+        super(TestQuestionnaireBank, self).setUp()
+        dogpile_cache.invalidate_region('qb_query_cache')
 
     @staticmethod
     def setup_org_n_rp(
@@ -79,7 +86,7 @@ class TestQuestionnaireBank(TestCase):
             db.session.commit()
         return db.session.merge(qb)
 
-    def setup_qbs(self, org=None, rp_name='v2', retired_as_of=None):
+    def setup_org_qbs(self, org=None, rp_name='v2', retired_as_of=None):
         org, rp, rp_id = self.setup_org_n_rp(
             org=org, org_name='CRV', rp_name=rp_name,
             retired_as_of=retired_as_of)
@@ -158,8 +165,66 @@ class TestQuestionnaireBank(TestCase):
 
         return db.session.merge(org)
 
+    def setup_intervention_qbs(self, intervention=None):
+        if not intervention:
+            intervention = Intervention(
+                name='symptom tracker', description='test')
+            with SessionScope(db):
+                db.session.add(intervention)
+                db.session.commit()
+
+        eq5d = self.add_questionnaire(name='eq5d')
+        epic26 = self.add_questionnaire(name='epic26')
+        recur6 = Recur(
+            start='{"months": 3, "weeks": -2}',
+            cycle_length='{"months": 6}',
+            termination='{"months": 27}')
+        exists = Recur.query.filter_by(
+            start=recur6.start, cycle_length=recur6.cycle_length,
+            termination=recur6.termination).first()
+        if exists:
+            recur6 = exists
+
+        with SessionScope(db):
+            db.session.add(eq5d)
+            db.session.add(epic26)
+            db.session.add(recur6)
+            db.session.commit()
+        intervention, eq5d, epic26, recur6 = map(
+            db.session.merge, (intervention, eq5d, epic26, recur6))
+
+        qb_base = QuestionnaireBank(
+            name='Symptom Tracker Baseline',
+            classification='baseline',
+            intervention_id=intervention.id,
+            start='{"days": 0}',
+            expired='{"months": 3, "days": -14}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eq5d, rank=1)
+        qb_base.questionnaires.append(qbq)
+        qb_base.questionnaires.append(qbq2)
+
+        qb_r6 = QuestionnaireBank(
+            name='Symptom Tracker Recurring',
+            classification='recurring',
+            intervention_id=intervention.id,
+            start='{"days": 0}',
+            expired='{"months": 3}',
+            recurs=[recur6])
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
+        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eq5d, rank=1)
+        qb_r6.questionnaires.append(qbq)
+        qb_r6.questionnaires.append(qbq2)
+
+        with SessionScope(db):
+            db.session.add(qb_base)
+            db.session.add(qb_r6)
+            db.session.commit()
+
+        return db.session.merge(intervention)
+
     def test_display_name(self):
-        self.setup_qbs()
+        self.setup_org_qbs()
         qbs = QuestionnaireBank.query.all()
         expected = {
             'Crv Baseline V2',
@@ -311,7 +376,7 @@ class TestQuestionnaireBank(TestCase):
 
     def test_recurring_starts(self):
         # should get full list of QBDs for recurring qb
-        self.setup_qbs()
+        self.setup_org_qbs()
         td = datetime.utcnow().replace(month=1, day=1)
 
         sixMoQB = QuestionnaireBank.query.filter(
@@ -393,42 +458,6 @@ class TestQuestionnaireBank(TestCase):
         assert len(qb.questionnaires) == 2
         assert qb.research_protocol_id == rp_id
 
-    def test_import_followup(self):
-        intervention = Intervention(name='testy', description='simple')
-        q1 = self.add_questionnaire(name='q1')
-        q2 = self.add_questionnaire(name='q2')
-        with SessionScope(db):
-            db.session.add(intervention)
-            db.session.commit()
-        intervention, q1, q2 = map(db.session.merge, (intervention, q1, q2))
-
-        data = {
-            'resourceType': 'QuestionnaireBank',
-            'intervention': {'reference': 'api/intervention/{}'.format(
-                intervention.name)},
-            'expired': '{"days": 104}',
-            'start': '{"days": 76}',
-            'questionnaires': [
-                {
-                    'rank': 2,
-                    'questionnaire': {
-                        'reference': 'api/questionnaire/{}?system={}'.format(
-                            q1.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
-                },
-                {
-                    'rank': 1,
-                    'questionnaire': {
-                        'reference': 'api/questionnaire/{}?system={}'.format(
-                            q2.name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)}
-                }
-            ],
-            'id': 1,
-            'name': 'bank',
-            'classification': 'followup'
-        }
-        qb = QuestionnaireBank.from_json(data)
-        assert len(qb.questionnaires) == 2
-
     def test_lookup_for_user(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
         epic26 = self.add_questionnaire(name='epic26')
@@ -494,6 +523,8 @@ class TestQuestionnaireBank(TestCase):
         # User associated with INTV intervention should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
+        x = QuestionnaireBank.most_current_qb(
+            self.test_user, as_of_date=now)
         qb = QuestionnaireBank.most_current_qb(
             self.test_user, as_of_date=now).questionnaire_bank
         results = list(qb.questionnaires)
@@ -540,7 +571,7 @@ class TestQuestionnaireBank(TestCase):
         assert len(resp.json['entry'][0]['resource']['questionnaires']) == 3
 
     def test_visit_baseline(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
@@ -550,7 +581,7 @@ class TestQuestionnaireBank(TestCase):
         assert visit_name(qbd) == "Baseline"
 
     def test_visit_3mo(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=3))
         self.bless_with_basics(setdate=backdate)
@@ -565,7 +596,7 @@ class TestQuestionnaireBank(TestCase):
         assert visit_name(qbd_i2) == "Month 9"
 
     def test_visit_6mo(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=6))
         self.bless_with_basics(setdate=backdate)
@@ -580,7 +611,7 @@ class TestQuestionnaireBank(TestCase):
         assert visit_name(qbd_i2) == "Month 18"
 
     def test_visit_9mo(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=9))
         self.bless_with_basics(setdate=backdate)
@@ -592,7 +623,7 @@ class TestQuestionnaireBank(TestCase):
         assert visit_name(qbd) == "Month 9"
 
     def test_user_current_qb(self):
-        crv = self.setup_qbs()
+        crv = self.setup_org_qbs()
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=3))
         self.bless_with_basics(setdate=backdate)
@@ -828,9 +859,9 @@ class TestQuestionnaireBank(TestCase):
         fourmonthsago = now - timedelta(days=120)
         weekago = now - timedelta(weeks=1)
         twoweeksago = now - timedelta(weeks=2)
-        org = self.setup_qbs(rp_name='v2', retired_as_of=weekago)
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=weekago)
         org_id = org.id
-        self.setup_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3')
 
         self.test_user.organizations.append(org)
         audit = Audit(
