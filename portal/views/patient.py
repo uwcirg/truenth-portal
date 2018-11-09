@@ -15,11 +15,11 @@ from ..database import db
 from ..extensions import oauth
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier, UserIdentifier
+from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from .crossdomain import crossdomain
-from .demographics import demographics
 
 patient_api = Blueprint('patient_api', __name__)
 
@@ -289,3 +289,31 @@ def post_patient_dob(patient_id):
         subject_id=patient.id, context='user')
 
     return jsonify(patient.as_fhir(include_empties=False))
+
+
+@patient_api.route('/api/patient/<int:patient_id>/timeline')
+@oauth.require_oauth()
+def patient_timeline(patient_id):
+    from ..date_tools import FHIR_datetime
+    from ..models.questionnaire_bank import QuestionnaireBank, QBD, visit_name
+    from ..models.recur import Recur
+
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user_or_abort(patient_id)
+
+    update_users_QBT(patient, invalidate_existing=True)
+
+    results = []
+    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(QBT.at):
+        # build qbd for visit name
+        qb = QuestionnaireBank.query.get(qbt.qb_id)
+        recur = Recur.query.get(qbt.qb_recur_id) if qbt.qb_recur_id else None
+        qbd = QBD(
+            relative_start=qbt.at, questionnaire_bank=qb,
+            iteration=qbt.qb_iteration, recur=recur)
+        results.append({
+            'status': qbt.status,
+            'at': FHIR_datetime.as_fhir(qbt.at),
+            'visit': visit_name(qbd)})
+
+    return jsonify(timeline=results)
