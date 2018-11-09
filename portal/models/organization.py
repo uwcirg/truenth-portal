@@ -216,7 +216,7 @@ class Organization(db.Model):
     def timezone(self, value):
         self._timezone = value
 
-    def rps_w_retired(self):
+    def rps_w_retired(self, consider_parents=False):
         """accessor to collate research protocols and retired_as_of values
 
         The SQLAlchemy association proxy doesn't provide easy access to
@@ -225,22 +225,36 @@ class Organization(db.Model):
         in the intermediary table, `retired_as_of` with the research protocols
         for this organization.
 
+        :param consider_parents: if set and the org doesn't have an
+         associated RP, continue up the org hiearchy till one is found.
+
         :returns: ready query for use in iteration or count or other methods.
          Query will produce a list of tuples (ResearchProtocol, retired_as_of)
          associated with the organization, ordered by `retired_as_of` dates
          with nulls last.
 
         """
-        items = OrganizationResearchProtocol.query.join(
-            ResearchProtocol).filter(
-            OrganizationResearchProtocol.research_protocol_id ==
-            ResearchProtocol.id).filter(
-            OrganizationResearchProtocol.organization_id == self.id
-        ).with_entities(
-            ResearchProtocol,
-            OrganizationResearchProtocol.retired_as_of).order_by(
-            OrganizationResearchProtocol.retired_as_of.desc())
-        return items
+        def fetch_for_org(org_id):
+            items = OrganizationResearchProtocol.query.join(
+                ResearchProtocol).filter(
+                OrganizationResearchProtocol.research_protocol_id ==
+                ResearchProtocol.id).filter(
+                OrganizationResearchProtocol.organization_id == org_id
+            ).with_entities(
+                ResearchProtocol,
+                OrganizationResearchProtocol.retired_as_of).order_by(
+                OrganizationResearchProtocol.retired_as_of.desc())
+            return items
+
+        items = fetch_for_org(self.id)
+        if items.count() or not consider_parents:
+            return items
+        org_id = self.partOf_id
+        while org_id:
+            items = fetch_for_org(org_id)
+            if items:
+                return items
+            org_id = Organization.query.get(org_id).partOf_id
 
     def research_protocol(self, as_of_date):
         """Lookup research protocol for this org valid at as_of_date
