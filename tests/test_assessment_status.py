@@ -17,6 +17,7 @@ from portal.models.assessment_status import (
 )
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
+from portal.dogpile_cache import dogpile_cache
 from portal.models.encounter import Encounter
 from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION
@@ -316,6 +317,7 @@ class TestQuestionnaireSetup(TestCase):
 
     def setUp(self):
         super(TestQuestionnaireSetup, self).setUp()
+        dogpile_cache.invalidate_region('qb_query_cache')
         mock_questionnairebanks(self.eproms_or_tnth)
 
 
