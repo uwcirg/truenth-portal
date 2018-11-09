@@ -136,8 +136,6 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         user = db.session.merge(self.test_user)
         update_users_QBT(user)
-        for q in QBT.query.all():
-            print q.qb_id, q.qb_iteration, q.at, q.status
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
