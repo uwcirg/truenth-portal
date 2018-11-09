@@ -1194,7 +1194,7 @@ class TestEpromsStrategies(TestCase):
         from portal.models.research_protocol import ResearchProtocol
 
         eproms_config_dir = os.path.join(
-            os.path.dirname(__file__), "../../portal/config/eproms")
+            os.path.dirname(__file__), "../portal/config/eproms")
 
         # Load minimal set of persistence files for access_strategy, in same
         # order defined in site_persistence
