@@ -27,7 +27,7 @@ from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, TestCase, associative_backdate
-from tests.unit_tests.test_assessment_status import (
+from tests.test_assessment_status import (
     metastatic_baseline_instruments,
     mock_qr,
     mock_questionnairebanks,
