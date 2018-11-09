@@ -1,4 +1,4 @@
-from .pages import LoginPage  # noqa isort:skip
+from .pages import LoginPage
 from tests.integration_tests import IntegrationTestCase  # noqa isort:skip
 
 
