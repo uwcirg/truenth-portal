@@ -1,5 +1,5 @@
 from .pages import LoginPage
-from tests.integration_tests import IntegrationTestCase  # noqa isort:skip
+from tests.integration_tests import IntegrationTestCase
 
 
 class TestLogin(IntegrationTestCase):
