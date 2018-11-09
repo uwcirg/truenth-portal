@@ -47,7 +47,7 @@ class QBT(db.Model):
         self._status = getattr(OverallStatus, value).name
 
 
-system_trigger = datetime(2015, 1, 1, 12, 0, 0)
+system_trigger = datetime(1900, 1, 1, 12, 0, 0)
 """A consistent point in time for date comparisons with relative deltas"""
 
 
