@@ -112,7 +112,7 @@ class RelativeDelta(relativedelta):
                     "Unable to parse RelativeDelta value from `{}`".format(
                         paramstring))
             # for now, only using class for relative info, not absolute info
-            if any(key[-1] != 's' for key, val in d.items()):
+            if any(key.endswith('s') for key, val in d.items()):
                 raise ValueError(
                     "Singular key found in RelativeDelta params: {}".format(
                         paramstring))
