@@ -24,7 +24,7 @@ class QBT(db.Model):
     future date isn't found, that user's data is due for update.
 
     """
-    __tablename__ = 'questionnaire_bank_timeline'
+    __tablename__ = 'qb_timeline'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(
         'users.id', ondelete='cascade'), nullable=False)
@@ -33,6 +33,8 @@ class QBT(db.Model):
         doc="initial date time for state of row")
     qb_id = db.Column(db.ForeignKey(
         'questionnaire_banks.id', ondelete='cascade'), nullable=True)
+    qb_recur_id = db.Column(db.ForeignKey(
+        'recurs.id', ondelete='cascade'), nullable=True)
     qb_iteration = db.Column(db.Integer, nullable=True)
     _status = db.Column('status', db.Text, nullable=False)
 
@@ -164,7 +166,7 @@ def ordered_qbs(user):
     # swap in a strategy that can work with the change.
     rps = set()
     for org in user.organizations:
-        for r in org.rps_w_retired():
+        for r in org.rps_w_retired(consider_parents=True):
             rps.add(r)
 
     if len(rps) > 1:
@@ -241,6 +243,7 @@ def ordered_qbs(user):
             adjusted = qbd._replace(relative_start=users_start)
             yield adjusted
 
+
 def update_users_QBT(user, invalidate_existing=False):
     """Populate the QBT rows for given user
 
@@ -264,9 +267,10 @@ def update_users_QBT(user, invalidate_existing=False):
 
     pending_qbts = []
     for qbd in qb_generator:
+        qb_recur_id = qbd.recur.id if qbd.recur else None
         kwargs = {
             "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
-            "qb_iteration": qbd.iteration}
+            "qb_iteration": qbd.iteration, "qb_recur_id": qb_recur_id}
         start = qbd.relative_start
         # Always add start (due)
         pending_qbts.append(QBT(at=start, status='due', **kwargs))
