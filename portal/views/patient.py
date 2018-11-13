@@ -20,6 +20,7 @@ from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
 from .crossdomain import crossdomain
+from .demographics import demographics
 
 patient_api = Blueprint('patient_api', __name__)
 
