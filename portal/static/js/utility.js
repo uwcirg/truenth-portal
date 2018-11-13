@@ -384,7 +384,7 @@ function displaySystemOutageMessage(locale) {
         /*global i18next */
         //construct message based on maintenance window
         try {
-            var options = {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true};
+            var options = {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true, timeZoneName: "short"};
             var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " "); //display language-sensitive representation of date/time
             var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
             var message = ["<div>" + i18next.t("Hi there.") + "</div>",
