@@ -89,7 +89,7 @@ validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4               # via amqp
 virtualenv==16.1.0        # via tox
 waitress==1.1.0           # via webtest
-webob==1.8.3              # via webtest
+webob==1.8.4              # via webtest
 webtest==2.0.32           # via flask-webtest
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
