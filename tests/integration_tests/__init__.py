@@ -7,10 +7,11 @@ import unittest
 
 from flask_testing import LiveServerTestCase
 import pytest
-from selenium import webdriver  # noqa isort:skip
-import xvfbwrapper  # noqa isort:skip
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+import xvfbwrapper
 
-from tests import TestCase  # noqa isort:skip
+from tests import TestCase
 
 
 @unittest.skipUnless(
@@ -71,8 +72,38 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         self.addCleanup(self.driver.quit)
 
         self.driver.root_uri = self.get_server_url()
+        self.driver.implicitly_wait(30)
+        self.verificationErrors = []
+        self.wait = WebDriverWait(self.driver, 60)
+        self.accept_next_alert = True
 
         super(IntegrationTestCase, self).setUp()
+
+    def is_element_present(self, how, what):
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
+        return True
+
+    def is_alert_present(self):
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException as e:
+            return False
+        return True
+
+    def close_alert_and_get_its_text(self):
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally:
+            self.accept_next_alert = True
 
     def tearDown(self):
         """Clean db session, drop all tables."""
@@ -86,5 +117,7 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
             sys.exc_info() == (None, None, None)
         ):
             self.driver.execute_script("sauce:job-result=passed")
+
+        self.assertEqual([], self.verificationErrors)
 
         super(IntegrationTestCase, self).tearDown()
