@@ -114,7 +114,8 @@ class QNR_results(object):
                    and qnr.iteration == iteration
                    and qnr.status == "completed"]
         for item in germane:
-            required.remove(item.instrument)
+            if item.instrument in required:
+                required.remove(item.instrument)
             if not required:
                 return item.authored
         raise RuntimeError("should have found authored for all required")
