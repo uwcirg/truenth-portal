@@ -2270,9 +2270,10 @@ div.main-state-container .noOrg-container {
   }
   legend {
     color: @legendColor;
-    /*margin-bottom: 0;
-    margin-left: 1em;*/
-    margin: 0.5em 0 0.1em 0;
+    margin: 0.85em 0 0.1em 0;
+    &:first-of-type {
+      margin: 0.5em 0 0.1em 0;
+    }
   }
   .parent-org-container {
     margin: 0.4em 0 0.5em;
@@ -2302,7 +2303,7 @@ div.main-state-container .noOrg-container {
       &.radio-label {
         margin-left: 2px;
       }
-      color: @legendColor;
+      color: @baseColor;
       span {
         display: inline-block;
       }
@@ -2311,7 +2312,7 @@ div.main-state-container .noOrg-container {
       position: relative;
       padding-bottom: 6px;
       label {
-        left: -2px;
+        left: -1px;
         margin-left: 0;
       }
     }
