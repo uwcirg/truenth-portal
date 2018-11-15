@@ -256,6 +256,9 @@ class Organization(db.Model):
                 return items
             org_id = Organization.query.get(org_id).partOf_id
 
+        # no match found; return valid (empty) query for client iteration
+        return items
+
     def research_protocol(self, as_of_date):
         """Lookup research protocol for this org valid at as_of_date
 
