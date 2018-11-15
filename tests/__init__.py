@@ -365,7 +365,8 @@ class TestCase(Base):
             db.session.commit()
 
     def bless_with_basics(
-            self, backdate=None, setdate=None, local_metastatic=None):
+            self, backdate=None, setdate=None, local_metastatic=None,
+            make_patient=True):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
@@ -378,12 +379,14 @@ class TestCase(Base):
         :param local_metastatic: set to 'localized' or 'metastatic' for
           tests needing those respective orgs assigned to the test user
 
+        :param make_patient: add patient role unless set False
+
         """
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
 
-        # Make a patient
-        self.promote_user(role_name=ROLE.PATIENT.value)
+        if make_patient:
+            self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Register with a clinic
         self.shallow_org_tree()

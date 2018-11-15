@@ -64,7 +64,6 @@ class TestEncounter(TestCase):
 
     def test_login_as(self):
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PATIENT.value)
         self.promote_user(role_name=ROLE.WRITE_ONLY.value)
         self.test_user = db.session.merge(self.test_user)
         consented_org = self.test_user.valid_consents[0].organization_id
@@ -83,8 +82,8 @@ class TestEncounter(TestCase):
                 == 'staff_authenticated')
         assert self.test_user._email.startswith(INVITE_PREFIX)
 
-    def test_login_as(self):
-        self.bless_with_basics()
+    def test_login_as_bogus(self):
+        self.bless_with_basics(make_patient=False)
         self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
         consented_org = self.test_user.valid_consents[0].organization_id

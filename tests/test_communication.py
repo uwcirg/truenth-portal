@@ -129,7 +129,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # with no timezone
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         self.bless_with_basics(setdate=dt)
-        self.promote_user(role_name=ROLE.PATIENT.value)
         user = db.session.merge(self.test_user)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
@@ -173,7 +172,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=13), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -193,7 +191,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -211,7 +208,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -228,7 +224,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=22), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
@@ -245,7 +240,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=22), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.email = NO_EMAIL_PREFIX
         with SessionScope(db):
@@ -264,7 +258,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add')
         mock_qr(instrument_id='epic26')
         mock_qr(instrument_id='comorb')

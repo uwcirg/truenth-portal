@@ -51,7 +51,7 @@ class TestCoredata(TestCase):
     def test_partner(self):
         """Partner doesn't need dx etc., set min and check pass"""
         self.config_as(TRUENTH)
-        self.bless_with_basics()
+        self.bless_with_basics(make_patient=False)
         self.promote_user(role_name=ROLE.PARTNER.value)
         self.test_user = db.session.merge(self.test_user)
         assert Coredata().initial_obtained(self.test_user)
@@ -60,7 +60,6 @@ class TestCoredata(TestCase):
         """Patient has additional requirements"""
         self.config_as(TRUENTH)
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
         # Prior to adding clinical data, should return false
         Coredata()
