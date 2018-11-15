@@ -32,6 +32,7 @@ from .models.assessment_status import (
 )
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.qb_timeline import update_users_QBT
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.reporting import generate_and_send_summaries, get_reporting_stats
 from .models.role import ROLE, Role
@@ -230,7 +231,7 @@ def update_patient_loop(
         User.deleted_id.is_(None),
         UserRoles.role_id == patient_role_id)).with_entities(User.id)
 
-    patients = valid_patients.all()
+    patients = [r[0] for r in valid_patients.all()]
     j = 0
     batchsize = current_app.config['UPDATE_PATIENT_TASK_BATCH_SIZE']
 
@@ -257,7 +258,10 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 
 def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
+    update_timeline = True
     for user_id in patient_list:
+        if update_timeline:
+            update_users_QBT(User.query.get(user_id))
         if update_cache:
             dogpile_cache.invalidate(overall_assessment_status, user_id)
             dogpile_cache.refresh(overall_assessment_status, user_id)
@@ -269,6 +273,7 @@ def update_patients(patient_list, update_cache, queue_messages):
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,
                     iteration_count=qbd.iteration)
+
         db.session.commit()
 
 
