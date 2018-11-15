@@ -382,6 +382,9 @@ class TestCase(Base):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
 
+        # Make a patient
+        self.promote_user(role_name=ROLE.PATIENT.value)
+
         # Register with a clinic
         self.shallow_org_tree()
 
