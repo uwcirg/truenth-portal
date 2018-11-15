@@ -728,6 +728,10 @@ def qbs_by_rp(rp_id, classification):
     if classification:
         results = results.filter(
             QuestionnaireBank.classification == classification)
+        trace("found {} for rp_id {} ({})".format(
+            results.count(), rp_id, classification))
+    else:
+        trace("found {} for rp_id {}".format(results.count(), rp_id))
     return results.all()
 
 
