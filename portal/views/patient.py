@@ -298,11 +298,19 @@ def patient_timeline(patient_id):
     from ..date_tools import FHIR_datetime
     from ..models.questionnaire_bank import QuestionnaireBank, QBD, visit_name
     from ..models.recur import Recur
+    from ..trace import dump_trace, establish_trace
+
+    trace = request.args.get('trace', False)
+    if trace:
+        establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
 
-    update_users_QBT(patient, invalidate_existing=True)
+    try:
+        update_users_QBT(patient, invalidate_existing=True)
+    except ValueError as ve:
+        abort(500, ve.message)
 
     results = []
     for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(QBT.at):
@@ -317,4 +325,7 @@ def patient_timeline(patient_id):
             'at': FHIR_datetime.as_fhir(qbt.at),
             'visit': visit_name(qbd)})
 
+    if trace:
+        return jsonify(
+            timeline=results, trace=dump_trace("END time line lookup"))
     return jsonify(timeline=results)

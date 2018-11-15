@@ -2,9 +2,11 @@ from datetime import datetime, MAXYEAR
 
 from ..database import db
 from ..date_tools import RelativeDelta
+from ..trace import trace
 from .assessment_status import OverallStatus
 from .questionnaire_bank import qbs_by_rp, qbs_by_intervention
 from .questionnaire_response import QNR_results
+from .role import ROLE
 from .user_consent import consent_withdrawal_dates
 
 
@@ -75,6 +77,7 @@ def ordered_rp_qbs(rp_id):
             qbs_by_start[qbd.relative_start] = qbd
 
     # continue to yield in order
+    trace("found {} total recurring QBs".format(len(qbs_by_start)))
     for start_date in sorted(qbs_by_start.keys()):
         yield qbs_by_start[start_date]
 
@@ -83,9 +86,12 @@ def ordered_intervention_qbs(user):
     """Generator to yield ordered qbs by intervention"""
     # to order, need a somewhat arbitrary date as a fake trigger
     baselines = qbs_by_intervention(user, 'baseline')
-    if len(baselines) != 1:
+    if not baselines:
+        raise StopIteration
+    if len(baselines) > 1:
         raise RuntimeError(
-            "Expect exactly one QB for baseline by intervention")
+            "{} has {} baselines by intervention (expected ONE)".format(
+                user, len(baselines)))
     baseline = baselines[0]
     if baseline not in db.session:
         baseline = db.session.merge(baseline, load=False)
@@ -160,16 +166,23 @@ def ordered_qbs(user):
     consent_date, withdrawal_date = consent_withdrawal_dates(user)
     if not consent_date:
         # TODO: are there use cases w/o a consent, yet a valid trigger_date?
+        trace("no consent date therefore nothing from ordered_qbds()")
         raise StopIteration
 
     # Zero to one RP makes things significantly easier - otherwise
     # swap in a strategy that can work with the change.
     rps = set()
     for org in user.organizations:
+        found1 = False
         for r in org.rps_w_retired(consider_parents=True):
+            found1 = True
             rps.add(r)
+        if not found1:
+            trace("no RP assigned to {}".format(org))
 
     if len(rps) > 1:
+        trace("multiple RPs found")
+
         # RP switch is delayed if user submitted any results for the then
         # active QB on the RP active at that time.
         user_qnrs = QNR_results(user)
@@ -210,12 +223,15 @@ def ordered_qbs(user):
 
             # done if user withdrew before the next start
             if withdrawal_date and withdrawal_date < users_start:
+                trace("withdrawn as of {}".format(withdrawal_date))
                 break
 
             adjusted = current_qbd._replace(relative_start=users_start)
             yield adjusted
 
     elif len(rps) == 1:
+        trace("single RP found")
+
         # With a single RP, just need to adjust the start to fit
         # this user
         rp, _ = rps.pop()
@@ -233,6 +249,8 @@ def ordered_qbs(user):
             yield adjusted
 
     else:
+        trace("no RPs found")
+
         # Neither RP case hit, try intervention associated QBs
         iqbds = ordered_intervention_qbs(user)
         while True:
@@ -254,10 +272,13 @@ def update_users_QBT(user, invalidate_existing=False):
     if invalidate_existing:
         QBT.query.filter(QBT.user_id == user.id).delete()
 
-    # don't expect any rows at this point for user - sanity check
+    # if any rows are found, assume this user is current
     if QBT.query.filter(QBT.user_id == user.id).count():
-        raise RuntimeError("Found unexpected QBT rows for {}".format(
-            user))
+        trace("found QBT rows, returning cached for {}".format(user.id))
+        return
+
+    if not user.has_role(ROLE.PATIENT.value):
+        raise ValueError("QB time line only applies to patients")
 
     # Create time line for user, from initial trigger date
     qb_generator = ordered_qbs(user)
@@ -326,7 +347,10 @@ def update_users_QBT(user, invalidate_existing=False):
     # If user withdrew from study - remove any rows post withdrawal
     _, withdrawal_date = consent_withdrawal_dates(user)
     if withdrawal_date:
+        trace("withdrawn as of {}".format(withdrawal_date))
         store_rows = [qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
+        store_rows.append(
+            QBT(at=withdrawal_date, status='withdrawn', **kwargs))
         db.session.add_all(store_rows)
     else:
         db.session.add_all(pending_qbts)
