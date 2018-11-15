@@ -252,7 +252,7 @@ class Organization(db.Model):
         org_id = self.partOf_id
         while org_id:
             items = fetch_for_org(org_id)
-            if items:
+            if items.count():
                 return items
             org_id = Organization.query.get(org_id).partOf_id
 
