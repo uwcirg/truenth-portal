@@ -639,8 +639,8 @@ def set_user_consents(user_id):
               type: string
               format: date-time
               description:
-                optional UTC date-time for when the agreement expires,
-                defaults to utcnow
+                optional UTC date-time for when the agreement is initially
+                valid, defaults to utcnow.  Dates in the future are not valid
             expires:
               type: string
               format: date-time

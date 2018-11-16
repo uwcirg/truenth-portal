@@ -86,6 +86,9 @@ class BaseConfig(object):
     FLUSH_CACHE_ON_SYNC = True
 
     CELERY_IMPORTS = ('portal.tasks',)
+    CELERYD_MAX_TASKS_PER_CHILD = int(os.environ['CELERYD_MAX_TASKS_PER_CHILD']) \
+        if os.environ.get('CELERYD_MAX_TASKS_PER_CHILD') else None
+
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
     DOGPILE_CACHE_REGIONS = [
@@ -201,6 +204,9 @@ class BaseConfig(object):
         'uwcirg.github.io',
     ]
 
+    MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
+    MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
+        if os.environ.get('MAINTENANCE_WINDOW') else None
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

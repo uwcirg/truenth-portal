@@ -1368,7 +1368,8 @@ module.exports = utilObj = (function() {
 },{},[2]);
 
 $(document).ready(function(){
-
+  //note: display system outage message only after i18next has been instantiated - allowing message to be translated
+  displaySystemOutageMessage() /* global displaySystemOutageMessage */
   var currentUserId = $("#currentUserId").val();
   // Configure and start the session timeout monitor
   if (currentUserId !== "") {

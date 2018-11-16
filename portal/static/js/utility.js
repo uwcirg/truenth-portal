@@ -343,6 +343,60 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+function displaySystemOutageMessage(locale) {
+    locale = locale || "en-us";
+    locale = locale.replace("_", "-");
+    var systemMaintenanceElId = "systemMaintenanceContainer";
+    if (!document.getElementById(systemMaintenanceElId)) { //check for system outage maintenance message element
+        return;
+    }
+    ajaxRequest("api/settings", {contentType: "application/json; charset=utf-8"}, function(data) {
+        if (!data || !(data.MAINTENANCE_MESSAGE || data.MAINTENANCE_WINDOW)) {
+            return false;
+        }
+        var messageElement = document.querySelector(".message-container");
+        if (!messageElement) {
+            messageElement = document.createElement("div");
+            messageElement.classList.add("message-container");
+            document.getElementById(systemMaintenanceElId).appendChild(messageElement);
+        }
+        if (data.MAINTENANCE_MESSAGE) {
+            messageElement.innerHTML = escapeHtml(data.MAINTENANCE_MESSAGE);
+            return;
+        }
+        if (!data.MAINTENANCE_WINDOW || !data.MAINTENANCE_WINDOW.length) {
+            return;
+        }
+        //use maintenance window specified in config to compose the message, assuming in following example format: ["2018-11-02T12:00:00Z", "2018-11-02T18:00:00Z"], dates in system ISO format
+        var hoursDiff = function(d1, d2) {
+            if (!d1 || !d2) {
+                return 0;
+            }
+            return Math.floor(((d2.getTime() - d1.getTime())/ (1000 * 60 * 60)) % 24);
+        };
+        //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
+        var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
+        var hoursTil = hoursDiff(new Date(), startDate);
+        if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
+            document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+            return;
+        }
+        /*global i18next */
+        //construct message based on maintenance window
+        try {
+            var options = {year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric", hour12: true, timeZoneName: "short"};
+            var displayStartDate = startDate.toLocaleString(locale,options).replace(/\,/g, " "); //display language-sensitive representation of date/time
+            var displayEndDate = endDate.toLocaleString(locale, options).replace(/\,/g, " ");
+            var message = ["<div>" + i18next.t("Hi there.") + "</div>",
+                            "<div>" + i18next.t("TrueNTH will be down for website maintenance starting <b>{startdate}</b>. This should last until <b>{enddate}</b>.".replace("{startdate}", displayStartDate).replace("{enddate}", displayEndDate)) + "</div>",
+                            "<div>" + i18next.t("Thanks for your patience while we upgrade our site.") + "</div>"].join("");
+            messageElement.innerHTML = escapeHtml(message);
+        } catch(e) {
+            console.log("Error occurred converting system outage date/time ", e);
+            document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+        }
+    });
+}
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
  * unless dev tools are open, and IE doesn't define console.debug

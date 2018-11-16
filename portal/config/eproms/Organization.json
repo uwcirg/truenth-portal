@@ -628,6 +628,13 @@
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-04-26T05:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22110,
@@ -1070,6 +1077,13 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-04-04T04:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14603,
@@ -1114,6 +1128,13 @@
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-04-26T05:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14684,
@@ -1537,7 +1558,7 @@
         {
           "system": "http://pcctc.org/PLACEHOLDER",
           "use": "secondary",
-          "value": "147-02-PLACEHOLDER"
+          "value": "146-55"
         }
       ],
       "language": "en_GB",
@@ -1668,6 +1689,67 @@
       "name": "Kantonsspitals St. Gallen",
       "partOf": {
         "reference": "api/organization/25000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 26000,
+      "language": "en_GB",
+      "name": "United Kingdom (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14656,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-56"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Guys St. Thomas NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
       },
       "resourceType": "Organization"
     },

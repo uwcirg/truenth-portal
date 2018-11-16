@@ -9188,10 +9188,9 @@ a.home--modal-link {
 
 .sys-maintenance {
     position: fixed;
-    top: 5em;
+    top: 5.5em;
     right: 0;
     left: 0;
-    height: 60px;
     background: #a94442;
     z-index: 90;
     text-align: center;
@@ -9203,13 +9202,13 @@ a.home--modal-link {
         margin-bottom: 6px;
         text-transform: uppercase
     }
-    .message {
+    .message-container {
         margin-top: 6px;
         margin-bottom: 6px;
-        line-height: 1.3em;
+        line-height: 1.4;
     }
     .title,
-    .message {
+    .message-container {
         font-size: 12px
     }
 }
@@ -9222,8 +9221,9 @@ a.home--modal-link {
 
 @media (min-width:1200px) {
     .sys-maintenance {
-        .title, .message {
-            font-size: 1.2em
+        padding: 0 8%;
+        .title, .message-container {
+            font-size: 1em
         }
     }
     .home--item-container {

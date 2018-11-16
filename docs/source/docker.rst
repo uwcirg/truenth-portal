@@ -84,14 +84,14 @@ Advanced Usage
 
 Running in Background
 ---------------------
-Docker-compose services can be run in the background by adding the ``--detach`` option. Services started in detached mode will run until stopped or killed.:
+Docker-compose services can be run in the background by adding the ``--detach`` option. Services started in detached mode will run until stopped or killed.::
 
     # Start the "web" service (and dependencies) in background
     docker-compose up --detach web
 
 Viewing Logs
 ------------
-Docker-compose will only show logs of the requested services (usually ``web``), when not run in the background. To view the logs of all running services:
+Docker-compose will only show logs of the requested services (usually ``web``), when not run in the background. To view the logs of all running services::
 
     # Tail and follow logs of all services
     docker-compose logs --follow

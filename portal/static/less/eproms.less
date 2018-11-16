@@ -85,7 +85,7 @@
 @wellColor: #F7F7F7;
 @notificationBgColor: #EB1939;
 @notificationLinkHoverBgColor: #CC112D;
-@alertColor: hsla(1, 44%, 46%, 0.9);
+@alertColor: hsla(1, 44%, 46%, 0.95);
 @HRColor: #eeeeee;
 @landingInputBorderColor: #AFB8C2;
 
@@ -174,17 +174,17 @@ body {
 }
 .sys-maintenance {
   margin: auto;
-  font-size: @smallerText;
-  padding: 4px 12px;
+  font-size: 0.8em;
   color: #FFF;
   width: 100%;
-  background: @alertColor;
   text-align: center;
   max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 20;
   img {
     margin: 1em auto;
     width: 100px;
@@ -192,8 +192,10 @@ body {
     display: inline-block;
   }
   .message-container {
+    background: @alertColor;
     text-align: center;
-    margin: 0.45em 0.25em 0.15em
+    padding: 0.25em 0 0.25em;
+    width: 100%;
   }
   .message {
     line-height: 26px;
@@ -209,9 +211,11 @@ body {
 }
 @media (min-width: 992px) {
   .sys-maintenance {
+    font-size: @baseFontSize;
     img {
-      display: none;
       margin: 0.5em 1.5em;
+      width: 150px;
+      height: auto;
     }
   }
 }
