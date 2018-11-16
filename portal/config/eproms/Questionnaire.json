@@ -1,7 +1,6 @@
 {
   "entry": [
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -955,10 +954,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -1203,10 +1200,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -2182,10 +2177,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -2309,10 +2302,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -2749,10 +2740,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -4061,10 +4050,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -4153,10 +4140,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -4240,10 +4225,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -5086,10 +5069,8 @@
             ]
           }
         ]
-      }
     },
     {
-      "resource": {
         "identifier": [
           {
             "system": "http://us.truenth.org/questionnaire",
@@ -6942,7 +6923,6 @@
             ]
           }
         ]
-      }
     }
   ],
   "id": "SitePersistence v0.2",
