@@ -36,7 +36,7 @@ class TestPortal(TestCase):
 
         self.login()
         self.add_required_clinical_data()
-        self.bless_with_basics()
+        self.bless_with_basics(make_patient=False)
         response = self.client.get('/home')
         assert response.status_code == 200
 
@@ -61,7 +61,7 @@ class TestPortal(TestCase):
 
         self.login()
         self.add_required_clinical_data()
-        self.bless_with_basics()
+        self.bless_with_basics(make_patient=False)
         user = db.session.merge(self.test_user)
 
         response = self.client.get('/home')
@@ -92,7 +92,6 @@ class TestPortal(TestCase):
         self.bless_with_basics()
         self.login()
         self.promote_user(role_name=ROLE.STAFF.value)
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
