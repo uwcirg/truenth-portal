@@ -204,6 +204,9 @@ class BaseConfig(object):
         'uwcirg.github.io',
     ]
 
+    MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
+    MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
+        if os.environ.get('MAINTENANCE_WINDOW') else None
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
