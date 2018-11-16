@@ -331,7 +331,6 @@ class TestAggregateResponses(TestQuestionnaireSetup):
             now=now, backdate=relativedelta(months=9, hours=1))
         self.bless_with_basics(
             setdate=nineback, local_metastatic='metastatic')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         instrument_id = 'eortc'
         for months_back in range(0, 10, 3):
             backdate, _ = associative_backdate(
@@ -373,7 +372,6 @@ class TestAggregateResponses(TestQuestionnaireSetup):
             now=now, backdate=relativedelta(months=9, hours=1))
         self.bless_with_basics(
             setdate=nineback, local_metastatic='metastatic')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         instrument_id = 'eortc'
         mock_qr(instrument_id=instrument_id)
 
