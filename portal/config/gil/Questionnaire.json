@@ -9,700 +9,952 @@
       ],
       "resourceType": "Questionnaire",
       "status": "draft",
-      "group": {
-        "question": [
-          {
-            "text": "Over the past 4 weeks, how often have you leaked urine?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.1.1",
-                "display": "More than once a day"
-              },
-              {
-                "code": "epic26.1.2",
-                "display": "About once a day"
-              },
-              {
-                "code": "epic26.1.3",
-                "display": "More than once a week"
-              },
-              {
-                "code": "epic26.1.4",
-                "display": "About once a week"
-              },
-              {
-                "code": "epic26.1.5",
-                "display": "Rarely or never"
+      "item": [
+        {
+          "type": "choice",
+          "linkId": "epic26.1",
+          "text": "Over the <strong>past 4 weeks</strong>, how often have you leaked urine?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "More than once a day",
+                "code": "epic26.1.1"
               }
-            ],
-            "linkId": "epic26.1"
-          },
-          {
-            "text": "Which of the following best describes your urinary control during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.2.1",
-                "display": "No urinary control whatsoever"
-              },
-              {
-                "code": "epic26.2.2",
-                "display": "Frequent dribbling"
-              },
-              {
-                "code": "epic26.2.3",
-                "display": "Occasional dribbling"
-              },
-              {
-                "code": "epic26.2.4",
-                "display": "Total control"
+            },
+            {
+              "valueCoding": {
+                "display": "About once a day",
+                "code": "epic26.1.2"
               }
-            ],
-            "linkId": "epic26.2"
-          },
-          {
-            "text": "How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.3.1",
-                "display": "None"
-              },
-              {
-                "code": "epic26.3.2",
-                "display": "1 pad per day"
-              },
-              {
-                "code": "epic26.3.3",
-                "display": "2 pads per day"
-              },
-              {
-                "code": "epic26.3.4",
-                "display": "3 or more pads per day"
+            },
+            {
+              "valueCoding": {
+                "display": "More than once a week",
+                "code": "epic26.1.3"
               }
-            ],
-            "linkId": "epic26.3"
-          },
-          {
-            "text": "Dripping or leaking urine",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.4.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.4.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.4.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.4.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.4.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "About once a week",
+                "code": "epic26.1.4"
               }
-            ],
-            "linkId": "epic26.4"
-          },
-          {
-            "text": "Pain or burning on urination",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.5.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.5.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.5.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.5.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.5.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely or never",
+                "code": "epic26.1.5"
               }
-            ],
-            "linkId": "epic26.5"
-          },
-          {
-            "text": "Bleeding with urination",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.6.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.6.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.6.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.6.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.6.5",
-                "display": "Big Problem"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.2",
+          "text": "Which of the following best describes your urinary control <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No urinary control whatsoever",
+                "code": "epic26.2.1"
               }
-            ],
-            "linkId": "epic26.6"
-          },
-          {
-            "text": "Weak urine stream or incomplete emptying",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.7.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.7.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.7.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.7.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.7.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Frequent dribbling",
+                "code": "epic26.2.2"
               }
-            ],
-            "linkId": "epic26.7"
-          },
-          {
-            "text": "Need to urinate frequently during the day",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.8.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.8.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.8.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.8.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.8.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Occasional dribbling",
+                "code": "epic26.2.3"
               }
-            ],
-            "linkId": "epic26.8"
-          },
-          {
-            "text": "Overall, how big a problem has your urinary function been for you during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.9.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.9.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.9.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.9.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.9.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Total control",
+                "code": "epic26.2.4"
               }
-            ],
-            "linkId": "epic26.9"
-          },
-          {
-            "text": "Urgency to have a bowel movement",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.10.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.10.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.10.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.10.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.10.5",
-                "display": "Big Problem"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.3",
+          "text": "How many pads or adult diapers per day did you usually use to control leakage <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "epic26.3.1"
               }
-            ],
-            "linkId": "epic26.10"
-          },
-          {
-            "text": "Increased frequency of bowel movements",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.11.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.11.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.11.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.11.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.11.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "1 pad <u>per day</u>",
+                "code": "epic26.3.2"
               }
-            ],
-            "linkId": "epic26.11"
-          },
-          {
-            "text": "Losing control of your stools",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.12.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.12.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.12.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.12.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.12.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "2 pads <u>per day</u>",
+                "code": "epic26.3.3"
               }
-            ],
-            "linkId": "epic26.12"
-          },
-          {
-            "text": "Bloody stools",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.13.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.13.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.13.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.13.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.13.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "3 or more pads <u>per day</u>",
+                "code": "epic26.3.4"
               }
-            ],
-            "linkId": "epic26.13"
-          },
-          {
-            "text": "Abdominal / Pelvic / Rectal Pain",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.14.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.14.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.14.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.14.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.14.5",
-                "display": "Big Problem"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.4",
+          "text": "Dripping or leaking urine",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.4.1"
               }
-            ],
-            "linkId": "epic26.14"
-          },
-          {
-            "text": "Overall, how big a problem have your bowel habits been for you during the past 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.15.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.15.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.15.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.15.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.15.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.4.2"
               }
-            ],
-            "linkId": "epic26.15"
-          },
-          {
-            "text": "Your ability to have an erection?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.16.1",
-                "display": "Very Poor to None"
-              },
-              {
-                "code": "epic26.16.2",
-                "display": "Poor"
-              },
-              {
-                "code": "epic26.16.3",
-                "display": "Fair"
-              },
-              {
-                "code": "epic26.16.4",
-                "display": "Good"
-              },
-              {
-                "code": "epic26.16.5",
-                "display": "Very Good"
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.4.3"
               }
-            ],
-            "linkId": "epic26.16"
-          },
-          {
-            "text": "Your ability to reach orgasm (climax)?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.17.1",
-                "display": "Very Poor to None"
-              },
-              {
-                "code": "epic26.17.2",
-                "display": "Poor"
-              },
-              {
-                "code": "epic26.17.3",
-                "display": "Fair"
-              },
-              {
-                "code": "epic26.17.4",
-                "display": "Good"
-              },
-              {
-                "code": "epic26.17.5",
-                "display": "Very Good"
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.4.4"
               }
-            ],
-            "linkId": "epic26.17"
-          },
-          {
-            "text": "How would you describe the usual QUALITY of your erections during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.18.1",
-                "display": "None at all"
-              },
-              {
-                "code": "epic26.18.2",
-                "display": "Not firm enough for any sexual activity"
-              },
-              {
-                "code": "epic26.18.3",
-                "display": "Firm enough for masturbation and foreplay only"
-              },
-              {
-                "code": "epic26.18.4",
-                "display": "Firm enough for intercourse"
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.4.5"
               }
-            ],
-            "linkId": "epic26.18"
-          },
-          {
-            "text": "How would you describe the FREQUENCY of your erections during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.19.1",
-                "display": "I NEVER had an erection when I wanted one"
-              },
-              {
-                "code": "epic26.19.2",
-                "display": "I had an erection LESS THAN HALF the time I wanted one"
-              },
-              {
-                "code": "epic26.19.3",
-                "display": "I had an erection ABOUT HALF the time I wanted one"
-              },
-              {
-                "code": "epic26.19.4",
-                "display": "I had an erection MORE THAN HALF the time I wanted one"
-              },
-              {
-                "code": "epic26.19.5",
-                "display": "I had an erection WHENEVER I wanted one"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.5",
+          "text": "Pain or burning on urination",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.5.1"
               }
-            ],
-            "linkId": "epic26.19"
-          },
-          {
-            "text": "Overall, how would you rate your ability to function sexually during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.20.1",
-                "display": "Very Poor"
-              },
-              {
-                "code": "epic26.20.2",
-                "display": "Poor"
-              },
-              {
-                "code": "epic26.20.3",
-                "display": "Fair"
-              },
-              {
-                "code": "epic26.20.4",
-                "display": "Good"
-              },
-              {
-                "code": "epic26.20.5",
-                "display": "Very Good"
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.5.2"
               }
-            ],
-            "linkId": "epic26.20"
-          },
-          {
-            "text": "Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.21.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.21.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.21.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.21.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.21.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.5.3"
               }
-            ],
-            "linkId": "epic26.21"
-          },
-          {
-            "text": "Hot flashes",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.22.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.22.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.22.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.22.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.22.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.5.4"
               }
-            ],
-            "linkId": "epic26.22"
-          },
-          {
-            "text": "Breast tenderness / enlargement",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.23.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.23.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.23.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.23.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.23.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.5.5"
               }
-            ],
-            "linkId": "epic26.23"
-          },
-          {
-            "text": "Feeling depressed",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.24.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.24.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.24.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.24.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.24.5",
-                "display": "Big Problem"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.6",
+          "text": "Bleeding with urination",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.6.1"
               }
-            ],
-            "linkId": "epic26.24"
-          },
-          {
-            "text": "Lack of energy",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.25.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.25.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.25.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.25.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.25.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.6.2"
               }
-            ],
-            "linkId": "epic26.25"
-          },
-          {
-            "text": "Change in body weight",
-            "type": "choice",
-            "option": [
-              {
-                "code": "epic26.26.1",
-                "display": "No problem"
-              },
-              {
-                "code": "epic26.26.2",
-                "display": "Very Small Problem"
-              },
-              {
-                "code": "epic26.26.3",
-                "display": "Small Problem"
-              },
-              {
-                "code": "epic26.26.4",
-                "display": "Moderate Problem"
-              },
-              {
-                "code": "epic26.26.5",
-                "display": "Big Problem"
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.6.3"
               }
-            ],
-            "linkId": "epic26.26"
-          }
-        ]
-      }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.6.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.6.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.7",
+          "text": "Weak urine stream or incomplete emptying",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.7.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.7.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.7.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.7.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.7.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.8",
+          "text": "Need to urinate frequently during the day",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.8.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.8.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.8.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.8.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.8.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.9",
+          "text": "Overall, how big a problem has your urinary function been for you <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.9.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.9.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.9.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.9.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.9.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.10",
+          "text": "Urgency to have a bowel movement",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.10.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.10.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.10.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.10.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.10.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.11",
+          "text": "Increased frequency of bowel movements",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.11.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.11.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.11.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.11.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.11.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.12",
+          "text": "Losing control of your stools",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.12.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.12.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.12.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.12.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.12.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.13",
+          "text": "Bloody stools",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.13.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.13.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.13.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.13.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.13.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.14",
+          "text": "Abdominal / Pelvic / Rectal Pain",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.14.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.14.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.14.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.14.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.14.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.15",
+          "text": "Overall, how big a problem have your bowel habits been for you <strong>during the past 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.15.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.15.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.15.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.15.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.15.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.16",
+          "text": "Your ability to have an erection?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Very Poor to None",
+                "code": "epic26.16.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Poor",
+                "code": "epic26.16.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Fair",
+                "code": "epic26.16.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Good",
+                "code": "epic26.16.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very Good",
+                "code": "epic26.16.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.17",
+          "text": "Your ability to reach orgasm (climax)?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Very Poor to None",
+                "code": "epic26.17.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Poor",
+                "code": "epic26.17.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Fair",
+                "code": "epic26.17.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Good",
+                "code": "epic26.17.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very Good",
+                "code": "epic26.17.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.18",
+          "text": "How would you describe the usual QUALITY of your erections <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None at all",
+                "code": "epic26.18.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Not firm enough for any sexual activity",
+                "code": "epic26.18.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Firm enough for masturbation and foreplay only",
+                "code": "epic26.18.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Firm enough for intercourse",
+                "code": "epic26.18.4"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.19",
+          "text": "How would you describe the FREQUENCY of your erections <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "I NEVER had an erection when I wanted one",
+                "code": "epic26.19.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "I had an erection LESS THAN HALF the time I wanted one",
+                "code": "epic26.19.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "I had an erection ABOUT HALF the time I wanted one",
+                "code": "epic26.19.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "I had an erection MORE THAN HALF the time I wanted one",
+                "code": "epic26.19.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "I had an erection WHENEVER I wanted one",
+                "code": "epic26.19.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.20",
+          "text": "Overall, how would you rate your ability to function sexually <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Very poor",
+                "code": "epic26.20.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Poor",
+                "code": "epic26.20.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Fair",
+                "code": "epic26.20.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Good",
+                "code": "epic26.20.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very good",
+                "code": "epic26.20.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.21",
+          "text": "Overall, how big a problem has your sexual function or lack of sexual function been for you <strong>during the last 4 weeks</strong>?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.21.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.21.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small problem",
+                "code": "epic26.21.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate problem",
+                "code": "epic26.21.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big problem",
+                "code": "epic26.21.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.22",
+          "text": "Hot flashes",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.22.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.22.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.22.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.22.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.22.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.23",
+          "text": "Breast tenderness / enlargement",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.23.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.23.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.23.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.23.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.23.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.24",
+          "text": "Feeling depressed",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.24.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.24.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.24.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.24.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.24.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.25",
+          "text": "Lack of energy",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.25.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.25.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.25.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.25.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.25.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "epic26.26",
+          "text": "Change in body weight",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "No problem",
+                "code": "epic26.26.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very small problem",
+                "code": "epic26.26.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Small Problem",
+                "code": "epic26.26.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate Problem",
+                "code": "epic26.26.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Big Problem",
+                "code": "epic26.26.5"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "identifier": [
