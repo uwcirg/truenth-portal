@@ -8,6 +8,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -963,6 +964,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -1209,6 +1211,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -2186,6 +2189,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -2311,6 +2315,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -2749,6 +2754,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "string",
@@ -4059,6 +4065,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -4149,6 +4156,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -4234,6 +4242,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "choice",
@@ -5078,6 +5087,7 @@
         }
       ],
       "status": "draft",
+      "resourceType": "Questionnaire",
       "item": [
         {
           "type": "string",
