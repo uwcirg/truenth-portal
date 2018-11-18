@@ -101,8 +101,8 @@ Creating a New Integration Test
     g) Replace url with url_for. Include ``_external=True``
     h) Replace user name and password with the test user's credentials. (The test user is automatically created by the automation framework before each test).
 3) Test locally ``pytest -k test_consent_after_login`` where test_consent_after_login is the name of the new function added. (local test runs are inconsistent, so proceed to next step if you don't see any red flags, such as import errors)
-4) Create a new branch, commit and push new test::
-   git checkout -b <new_branch_name>
-   git add tests/integration_tests/test_login.py
-   git commit
-   git push
+4) Create a new branch, commit and push new test
+    a) ``git checkout -b <new_branch_name>``
+    b) ``git add tests/integration_tests/test_login.py``
+    c) ``git commit``
+    d) ``git push``
