@@ -90,19 +90,53 @@ and returns the patient data in FHIR format.
 Creating a New Integration Test
 ===============================
 
-1) Install the Katalon Recorder plugin ``https://addons.mozilla.org/en-US/firefox/addon/katalon-automation-record/``
-2) Record a test (see example below)
-    a) Open Katalon Recorder
-    b) Click the "Record" button
-    c) Click through the website to record the test
-    d) Export to Python and copy test (you may need to copy imports)
-    e) Paste test in test file. In this example I appended to tests/integration_tests/test_login.py. You may need to create a new test file.
-    f) Change name of test function
-    g) Replace url with url_for. Include ``_external=True``
-    h) Replace user name and password with the test user's credentials. (The test user is automatically created by the automation framework before each test).
-3) Test locally ``pytest -k test_consent_after_login`` where test_consent_after_login is the name of the new function added. (local test runs are inconsistent, so proceed to next step if you don't see any red flags, such as import errors)
-4) Create a new branch, commit and push new test
-    a) ``git checkout -b <new_branch_name>``
-    b) ``git add tests/integration_tests/test_login.py``
-    c) ``git commit``
-    d) ``git push``
+Install the Katalon Recorder plugin ``https://addons.mozilla.org/en-US/firefox/addon/katalon-automation-record/``
+
+Open Katalon Recorder
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667652-15660d80-ea90-11e8-909b-4feac9bd8b70.png
+
+
+Click the "Record" button
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667671-81e10c80-ea90-11e8-8130-58f56eca21c4.png
+
+
+Click through the website to record the test
+
+
+Export to Python and copy test (you may need to copy imports)
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667690-d97f7800-ea90-11e8-9c66-06eb98dc71e7.gif
+
+
+Paste test in test file. In this example I appended to tests/integration_tests/test_login.py. You may need to create a new test file.
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667698-ee5c0b80-ea90-11e8-8603-df4b547f6b4c.PNG
+
+
+Change name of test function
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667700-fcaa2780-ea90-11e8-9201-69f83d664081.PNG
+
+
+Replace url with url_for. Include ``_external=True``
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667702-0a5fad00-ea91-11e8-876b-56c8dc791939.PNG
+
+
+Replace user name and password with the test user's credentials. (The test user is automatically created by the automation framework before each test).
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667708-1b102300-ea91-11e8-8904-f38a0922045e.PNG
+
+.. figure:: https://user-images.githubusercontent.com/2764891/48667710-2400f480-ea91-11e8-81fa-b755e7d903d4.PNG
+
+
+Test locally ``pytest -k test_consent_after_login`` where test_consent_after_login is the name of the new function added. (local test runs are inconsistent, so proceed to next step if you don't see any red flags, such as import errors)
+
+
+Create a new branch, commit and push new test
+``git checkout -b <new_branch_name>``
+``git add tests/integration_tests/test_login.py``
+``git commit``
+``git push``
