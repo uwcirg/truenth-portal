@@ -90,7 +90,7 @@ and returns the patient data in FHIR format.
 Creating a New Integration Test
 ===============================
 
-Install the Katalon Recorder plugin ``https://addons.mozilla.org/en-US/firefox/addon/katalon-automation-record/``
+Install the `Katalon Recorder plugin <https://addons.mozilla.org/en-US/firefox/addon/katalon-automation-record/>`_
 
 Open Katalon Recorder
 
@@ -146,3 +146,6 @@ Create a new branch, commit and push new test
 ``git commit``
 
 ``git push``
+
+
+`Create new pull request <https://help.github.com/articles/creating-a-pull-request/>`_ and verify tests pass
