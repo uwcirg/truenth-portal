@@ -24,10 +24,8 @@ class TestLogin(IntegrationTestCase):
         driver.find_element_by_link_text("Log Out of TrueNTH").click()
 
     def test_consent_after_login(self):
-        self.app.config['GIL'] = True
-
         driver = self.driver
-        driver.get(url_for("gil.home", _external=True))
+        driver.get(url_for("eproms.home", _external=True))
         driver.find_element_by_xpath("(.//*[normalize-space(text()) and normalize-space(.)='Menu'])[1]/following::a[2]").click()
         driver.find_element_by_name("email").click()
         driver.find_element_by_name("email").clear()
