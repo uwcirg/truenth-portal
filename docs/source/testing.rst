@@ -104,6 +104,8 @@ Click the "Record" button
 
 Click through the website to record the test
 
+.. figure:: https://user-images.githubusercontent.com/2764891/48667796-3bd97800-ea93-11e8-874b-fbe4fd6f7a2c.gif
+
 
 Export to Python and copy test (you may need to copy imports)
 
@@ -136,7 +138,11 @@ Test locally ``pytest -k test_consent_after_login`` where test_consent_after_log
 
 
 Create a new branch, commit and push new test
+
 ``git checkout -b <new_branch_name>``
+
 ``git add tests/integration_tests/test_login.py``
+
 ``git commit``
+
 ``git push``
