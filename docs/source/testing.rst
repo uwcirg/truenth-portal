@@ -86,3 +86,23 @@ it is needed.
 
 Request ``/api/invalidate/<patient_id>`` invalidates given user's cache,
 and returns the patient data in FHIR format.
+
+Creating a New Integration Test
+===============================
+
+1) Install the Katalon Recorder plugin ``https://addons.mozilla.org/en-US/firefox/addon/katalon-automation-record/``
+2) Record a test (see example below)
+    a) Open Katalon Recorder
+    b) Click the "Record" button
+    c) Click through the website to record the test
+    d) Export to Python and copy test (you may need to copy imports)
+    e) Paste test in test file. In this example I appended to tests/integration_tests/test_login.py. You may need to create a new test file.
+    f) Change name of test function
+    g) Replace url with url_for. Include ``_external=True``
+    h) Replace user name and password with the test user's credentials. (The test user is automatically created by the automation framework before each test).
+3) Test locally ``pytest -k test_consent_after_login`` where test_consent_after_login is the name of the new function added. (local test runs are inconsistent, so proceed to next step if you don't see any red flags, such as import errors)
+4) Create a new branch, commit and push new test::
+   git checkout -b <new_branch_name>
+   git add tests/integration_tests/test_login.py
+   git commit
+   git push
