@@ -308,7 +308,6 @@ def access_via_token(token, next_step=None):
         logout(prevent_redirect=True, reason="forced from /access_via_token")
         assert (not current_user())
 
-
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
