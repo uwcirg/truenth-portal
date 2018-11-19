@@ -33,6 +33,11 @@ from portal.models.user import (
     permanently_delete_user,
     validate_email,
 )
+from portal.models.url_token import (
+    BadSignature,
+    SignatureExpired,
+    verify_token,
+)
 from portal.tasks import celery_beat_health_check
 
 app = create_app()
@@ -249,6 +254,22 @@ def purge_user(email, actor):
     """Purge the given user from the system"""
     # import ipdb; ipdb.set_trace()
     permanently_delete_user(email, actor=actor)
+
+
+@click.option('--token', '-t', help="token to lookup/describe")
+@app.cli.command()
+def token_details(token):
+    valid_seconds = app.config.get(
+        'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
+    try:
+        user_id = verify_token(token, valid_seconds)
+    except SignatureExpired:
+        click.echo("EXPIRED token (older than {} seconds)".format(
+            valid_seconds))
+    except BadSignature:
+        click.echo("INVALID token")
+    else:
+        click.echo("Valid token for user_id {}".format(user_id))
 
 
 @app.cli.command()

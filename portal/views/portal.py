@@ -39,7 +39,7 @@ from wtforms import (
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..extensions import oauth, user_manager
+from ..extensions import oauth
 from ..factories.celery import create_celery
 from ..models.app_text import (
     AppText,
@@ -75,6 +75,7 @@ from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user_or_abort
+from ..models.url_token import BadSignature, SignatureExpired, verify_token
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
 from ..type_tools import check_int
@@ -307,21 +308,18 @@ def access_via_token(token, next_step=None):
         logout(prevent_redirect=True, reason="forced from /access_via_token")
         assert (not current_user())
 
-    def verify_token(valid_seconds):
-        is_valid, has_expired, user_id = (
-            user_manager.token_manager.verify_token(token, valid_seconds))
-        if has_expired:
-            current_app.logger.info("token access failed: "
-                                    "expired token {}".format(token))
-            abort(404, "Access token has expired")
-        if not is_valid:
-            abort(404, "Access token is invalid")
-        return user_id
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
-    user_id = verify_token(valid_seconds)
+    try:
+        user_id = verify_token(token, valid_seconds)
+    except SignatureExpired:
+        current_app.logger.info("token access failed: "
+                                "expired token {}".format(token))
+        abort(404, "URL token has expired")
+    except BadSignature:
+        abort(404, "URL token is invalid")
 
     # Valid token - confirm user id looks legit
     user = get_user_or_abort(user_id)
