@@ -232,7 +232,7 @@ def update_patient_loop(
 
     patients = valid_patients.all()
     j = 0
-    batchsize = current_app.config.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+    batchsize = current_app.config['UPDATE_PATIENT_TASK_BATCH_SIZE']
 
     while True:
         sublist = patients[j:j+batchsize]
