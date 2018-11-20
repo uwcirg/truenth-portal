@@ -208,6 +208,7 @@ class BaseConfig(object):
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
         if os.environ.get('MAINTENANCE_WINDOW') else None
 
+
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
