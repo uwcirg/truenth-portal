@@ -134,7 +134,9 @@ class BaseConfig(object):
 
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
-    UPDATE_PATIENT_TASK_BATCH_SIZE = 16
+    UPDATE_PATIENT_TASK_BATCH_SIZE = int(
+        os.environ.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+    )
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
@@ -207,6 +209,7 @@ class BaseConfig(object):
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
         if os.environ.get('MAINTENANCE_WINDOW') else None
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
