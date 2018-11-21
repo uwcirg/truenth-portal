@@ -72,6 +72,7 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         self.addCleanup(self.driver.quit)
 
         self.driver.root_uri = self.get_server_url()
+        self.driver.implicitly_wait(30)
         self.verificationErrors = []
         self.wait = WebDriverWait(self.driver, 60)
         self.accept_next_alert = True
