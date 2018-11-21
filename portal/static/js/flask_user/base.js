@@ -6,3 +6,4 @@ $(document).on("ready", function() {
         $(this).val($.trim($(this).val()));
     });
 });
+
