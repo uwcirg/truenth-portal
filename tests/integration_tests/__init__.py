@@ -72,7 +72,6 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         self.addCleanup(self.driver.quit)
 
         self.driver.root_uri = self.get_server_url()
-        self.driver.implicitly_wait(30)
         self.verificationErrors = []
         self.wait = WebDriverWait(self.driver, 60)
         self.accept_next_alert = True
@@ -80,6 +79,10 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         super(IntegrationTestCase, self).setUp()
 
     def is_element_present(self, how, what):
+        """Detects whether or not an element can be found in DOM
+
+        This function was export from selenium IDE
+        """
         try:
             self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e:
@@ -87,6 +90,10 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         return True
 
     def is_alert_present(self):
+        """Detects whether an alert message is present
+
+        This function was export from selenium IDE
+        """
         try:
             self.driver.switch_to_alert()
         except NoAlertPresentException as e:
@@ -94,6 +101,12 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         return True
 
     def close_alert_and_get_its_text(self):
+        """Closes an alert, if present, and returns its text
+
+        If an alert is not present a NoAlertPresentException
+        will be thrown.
+        This function was export from selenium IDE
+        """
         try:
             alert = self.driver.switch_to_alert()
             alert_text = alert.text
