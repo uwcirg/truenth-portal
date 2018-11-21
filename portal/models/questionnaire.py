@@ -25,7 +25,7 @@ class Questionnaire(db.Model):
         'Identifier', lazy='dynamic', secondary="questionnaire_identifiers")
     status = db.Column(
         'status', status_types_enum, server_default='draft', nullable=False)
-    group = db.Column(JSONB)
+    item = db.Column(JSONB)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -80,8 +80,8 @@ class Questionnaire(db.Model):
                 self.identifiers.remove(obsolete)
         if 'status' in data:
             self.status = data.get('status')
-        if 'group' in data:
-            self.group = data.get('group')
+        if 'item' in data:
+            self.item = data.get('item')
         self = self.add_if_not_found(commit_immediately=True)
         return self
 
@@ -93,8 +93,8 @@ class Questionnaire(db.Model):
             d['identifier'].append(i.as_fhir())
         if self.status:
             d['status'] = self.status
-        if self.group:
-            d['group'] = self.group
+        if self.item:
+            d['item'] = self.item
         return d
 
     def add_if_not_found(self, commit_immediately=False):
