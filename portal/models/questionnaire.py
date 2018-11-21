@@ -15,6 +15,10 @@ status_types_enum = ENUM(
 
 
 class Questionnaire(db.Model):
+    """
+    Questionnaire FHIR model
+    Implemented against FHIR STU3
+    """
     __tablename__ = 'questionnaires'
     id = db.Column(db.Integer, primary_key=True)
     identifiers = db.relationship(
