@@ -69,6 +69,15 @@
     </div>
 </form>
 <br/>
+<div id="popoverContent" class="tnth-hide">
+    <b>{{_("Password must have at least:")}}</b>
+    <ul id='pwdHintList'>
+        <li class='text-info eight-characters'>{{_("Eight characters")}}</li>
+        <li class='text-info lowercase-letter'>{{_("One lowercase letter")}}</li>
+        <li class='text-info uppercase-letter'>{{_("One uppercase letter")}}</li>
+        <li class='text-info one-number'>{{_("One number")}}</li>
+    </ul>
+</div>
 <div class="modal fade" id="accountModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -96,110 +105,11 @@
 
 {% endblock %}
 {% block document_ready %}
-
-var __passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-function checkValidity(submit) {
-     var allowed = true;
-    ["#email", "#password", "#retype_password"].forEach(function(fieldId) {
-        if ($(fieldId).val() == "") allowed = false;
-    });
-    if ($(".form-group.has-error").length > 0) allowed = false;
-    if (allowed) $("input[type='submit']").removeClass("disabled");
-    else $("input[type='submit']").addClass("disabled");
-    if (submit) $("input[type='submit']").trigger("click");
-}
-
-$(document).ready(function(){
-    // Need to properly form attribute name
-    $("[data-match_error]").each(function(){
-        var theMsg = $(this).attr("data-match_error");
-        $(this).attr("data-match-error", theMsg);
-    });
-
-    var qs = (function(a) {
-    if (a == "") return {};
-    var b = {};
-    for (var i = 0; i < a.length; ++i)
-    {
-        var p=a[i].split('=', 2);
-        if (p.length == 1)
-            b[p[0]] = "";
-        else
-            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-    }
-    return b;
-    })(window.location.search.substr(1).split('&'));
-
-    if (qs["email"]) $("#email").val(qs["email"]);
-
-    $('input[type="submit"]').addClass("disabled");
-    $('input.input-field').each(function() {
-        $(this).on("blur, change, keyup", function() {
-           setTimeout("checkValidity();", 350);
-        });
-        $(this).on("keydown", function(e) {
-            if (e.keyCode == 13) {
-                e.preventDefault();
-                setTimeout("checkValidity(true);", 350);
-            };
-        });
-    });
-
-    $("#password").popover({"content": "<b>{%trans%}Password must have at least:{%endtrans%}</b><ul id='pwdHintList'><li class='text-info eight-characters'>{%trans%}Eight characters{%endtrans%}</li><li class='text-info lowercase-letter'>{%trans%}One lowercase letter{%endtrans%}</li><li class='text-info uppercase-letter'>{%trans%}One uppercase letter{%endtrans%}</li><li class='text-info one-number'>{%trans%}One number{%endtrans%}</li></ul>", "placement": "top", "html": true, "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
-        $(this).trigger("focus");
-        e.stopPropagation();
-    }).on("keyup", function() {
-        var pwd = $(this).val();
-        var l = $('#password').data('bs.popover').tip().find("#pwdHintList");
-        if (__passwordReg.test(pwd)) {
-            $("#errorpassword").text("");
-            l.find("li").removeClass("fail-text").addClass("success-text");
-            setTimeout('$("#password").popover("hide");', 500);
-        } else {
-            if (!$(this).data('bs.popover').tip().hasClass('in')) $(this).popover("show");
-            if (hasValue(pwd)) {
-                if (/[a-z]/.test(pwd)) l.find(".lowercase-letter").removeClass("fail-text").addClass("success-text");
-                else l.find(".lowercase-letter").removeClass("success-text").addClass("fail-text");
-                if (/[A-Z]/.test(pwd)) l.find(".uppercase-letter").removeClass("fail-text").addClass("success-text");
-                else l.find(".uppercase-letter").removeClass("success-text").addClass("fail-text");
-                if (/\d/.test(pwd)) l.find(".one-number").removeClass("fail-text").addClass("success-text");
-                else l.find(".one-number").removeClass("success-text").addClass("fail-text");
-                if (pwd.length >= 8) l.find(".eight-characters").removeClass("fail-text").addClass("success-text");
-                else l.find(".eight-characters").removeClass("success-text").addClass("fail-text");
-            } else {
-                l.find("li").removeClass("success-text").removeClass("fail-text");
-            };
-        };
-    }).on("blur", function() {
-        $(this).popover("hide");
-    }).on("focus", function() {
-        var pwd = $(this).val();
-        if (!__passwordReg.test(pwd)) {
-            if (!$(this).data('bs.popover').tip().hasClass('in')) $(this).popover("show");
-        } else return true;
-    }).on("shown.bs.popover", function () {
-      $(this).trigger("keyup");
-    }).on("paste", function() {
-      $(this).trigger("keyup");
-    });
-
-    $("html").click(function(e) {
-        $("#password").popover("hide");
-    });
-    $("#retype_password").on("blur", function() {
-        if (!hasValue($(this).val())) {
-            $("#errorretype_password").addClass("has-error").text("{%trans%}Please re-type your password.{%endtrans%}");
-        } else {
-            $("#errorretype_password").text("");
-            checkValidity();
-        };
-    });
-    $("#email").on("change", function() {
-        $("#erroremail").text("");
-    })
-
-});
-
+{{super()}}
 {% endblock %}
+{% block additional_scripts -%}
+{{super()}}
+<script src="{{ url_for('static', filename='js/flask_user/register.js') }}"></script>
+{%- endblock %}
+
 
