@@ -1,5 +1,4 @@
 from alembic import op
-import sqlalchemy as sa
 
 
 """rename DSTU2 Questionnaire.group to item
