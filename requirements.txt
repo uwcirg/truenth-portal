@@ -61,7 +61,7 @@ psycopg2==2.7.6.1
 py==1.7.0                 # via tox
 pycparser==2.19           # via cffi
 pycryptodome==3.7.0       # via flask-user
-pygments==2.2.0           # via sphinx
+pygments==2.3.0           # via sphinx
 pyparsing==2.3.0          # via packaging
 python-dateutil==2.7.5
 python-editor==1.0.3      # via alembic
