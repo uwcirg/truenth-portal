@@ -4,6 +4,7 @@
         this.init = function() {
             var self = this;
             $(document).ready(function(){
+                console.log("get to init??")
                 self.initVis();
                 self.initPasswordPopover();
                 self.initFieldEvents();
@@ -69,7 +70,7 @@
         };
         this.initPasswordPopover = function() {
             var self = this;
-            $("#password").popover({"content": $("#popoverContent").html(), "placement": "top", "html": true, "template": "<div class=\"password-popover popover\" role=\"tooltip\"><div class=\"arrow\"></div><h3 class=\"popover-title\"></h3><div class=\"popover-content\"></div></div>', \"container\": \".password-wrapper\", \"trigger\": \"manual\""}).click(function(e) {
+            $("#password").popover({"content": $("#passwordPopover .popover-content").html(), "placement": "top", "html": true, "template": $("#passwordPopover").html(), "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
                 $(this).trigger("focus");
                 e.stopPropagation();
             }).on("keyup", function() {

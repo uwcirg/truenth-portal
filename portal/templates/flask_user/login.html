@@ -54,9 +54,6 @@
     </div>
 </div>
 {% endblock %}
-{% block document_ready %}
-{{super()}}
-{% endblock %}
 {% block additional_scripts -%}
 {{super()}}
 <script src="{{ url_for('static', filename='js/flask_user/login.js') }}"></script>

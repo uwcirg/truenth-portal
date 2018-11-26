@@ -69,14 +69,20 @@
     </div>
 </form>
 <br/>
-<div id="popoverContent" class="tnth-hide">
-    <b>{{_("Password must have at least:")}}</b>
-    <ul id='pwdHintList'>
-        <li class='text-info eight-characters'>{{_("Eight characters")}}</li>
-        <li class='text-info lowercase-letter'>{{_("One lowercase letter")}}</li>
-        <li class='text-info uppercase-letter'>{{_("One uppercase letter")}}</li>
-        <li class='text-info one-number'>{{_("One number")}}</li>
-    </ul>
+<div id="passwordPopover">
+    <div class="password-popover popover" role="tooltip">
+        <div class="arrow"></div>
+        <h3 class="popover-title"></h3>
+        <div class="popover-content">
+            <b>{{_("Password must have at least:")}}</b>
+            <ul id='pwdHintList'>
+                <li class='text-info eight-characters'>{{_("Eight characters")}}</li>
+                <li class='text-info lowercase-letter'>{{_("One lowercase letter")}}</li>
+                <li class='text-info uppercase-letter'>{{_("One uppercase letter")}}</li>
+                <li class='text-info one-number'>{{_("One number")}}</li>
+            </ul>
+        </div>
+    </div>
 </div>
 <div class="modal fade" id="accountModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -102,10 +108,6 @@
         </div>
     </div>
 </div>
-
-{% endblock %}
-{% block document_ready %}
-{{super()}}
 {% endblock %}
 {% block additional_scripts -%}
 {{super()}}
