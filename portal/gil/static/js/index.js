@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    resetBrowserBackHistory(); /* global resetBrowserBackHistory */
     $("body").attr("class", "page-home");
     if ($("#initLoginModal").val() === "true") {
         $("#modal-login-register").modal("show");

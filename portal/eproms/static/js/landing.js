@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    resetBrowserBackHistory(); /* global resetBrowserBackHistory */
     DELAY_LOADING = true; /* global DELAY_LOADING */
     setTimeout(function() {
         DELAY_LOADING = false;

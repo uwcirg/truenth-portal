@@ -343,6 +343,19 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1]);
 }
+function resetBrowserBackHistory() {
+    var historyDefined = typeof history !== "undefined" && history.pushState;
+    if (historyDefined) {
+        history.pushState(null, null, location.href);
+    }
+    window.addEventListener("popstate", function() {
+        if (historyDefined) {
+            history.pushState(null, null, location.href);
+        } else {
+            window.history.forward(1);
+        }
+    });
+}
 function displaySystemOutageMessage(locale) {
     locale = locale || "en-us";
     locale = locale.replace("_", "-");

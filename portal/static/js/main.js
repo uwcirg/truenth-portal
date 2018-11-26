@@ -2058,17 +2058,7 @@ var Global = {
         if (LOGIN_AS_PATIENT) {
             tnthDates.clearSessionLocale();
             tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
-            var historyDefined = typeof history !== "undefined" && history.pushState;
-            if (historyDefined) {
-                history.pushState(null, null, location.href);
-            }
-            window.addEventListener("popstate", function() {
-                if (historyDefined) {
-                    history.pushState(null, null, location.href);
-                } else {
-                    window.history.forward(1);
-                }
-            });
+            resetBrowserBackHistory(); /*global resetBrowserBackHistory */
         }
     },
     "footer": function() {
