@@ -18,3 +18,4 @@ services:
     ports:
       - target: 5555
         published: ${FLOWER_EXTERNAL_PORT:-5555}
+    restart: unless-stopped
