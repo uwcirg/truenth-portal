@@ -1350,11 +1350,6 @@
                 "code": "en_US",
                 "display": "American English",
                 "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "fr_CA",
-                "display": "Canadian French",
-                "system": "urn:ietf:bcp:47"
               }
             ]
           }
@@ -1405,7 +1400,21 @@
       "extension": [
         {
           "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "fr_CA",
+                "display": "Canadian French",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
         }
       ],
       "id": 14701,
@@ -1416,7 +1425,7 @@
           "value": "147-01-PLACEHOLDER"
         }
       ],
-      "language": "en_US",
+      "language": "fr_CA",
       "name": "CHU de Quebec - Universite Laval",
       "partOf": {
         "reference": "api/organization/23000"
