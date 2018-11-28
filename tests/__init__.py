@@ -19,7 +19,6 @@ from sqlalchemy.exc import IntegrityError
 from portal.factories.app import create_app
 from portal.config.config import TestConfig
 from portal.database import db
-from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.client import Client
 from portal.models.clinical_constants import add_static_concepts, CC
@@ -33,6 +32,7 @@ from portal.models.organization import Organization, add_static_organization
 from portal.models.organization import OrgTree
 from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
@@ -172,7 +172,7 @@ class TestCase(Base):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_assessment_status_cache(test_user.id)
+        invalidate_users_QBT(test_user.id)
         return test_user
 
     def promote_user(self, user=None, role_name=None):

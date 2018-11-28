@@ -26,13 +26,9 @@ from .database import db
 from .dogpile_cache import dogpile_cache
 from .factories.app import create_app
 from .factories.celery import create_celery
-from .models.assessment_status import (
-    invalidate_assessment_status_cache,
-    overall_assessment_status,
-)
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
-from .models.qb_timeline import update_users_QBT
+from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.reporting import generate_and_send_summaries, get_reporting_stats
 from .models.role import ROLE, Role
@@ -258,13 +254,9 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 
 def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
-    update_timeline = True
     for user_id in patient_list:
-        if update_timeline:
-            update_users_QBT(User.query.get(user_id))
         if update_cache:
-            dogpile_cache.invalidate(overall_assessment_status, user_id)
-            dogpile_cache.refresh(overall_assessment_status, user_id)
+            update_users_QBT(user_id)
         if queue_messages:
             user = User.query.get(user_id)
             qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
@@ -328,7 +320,7 @@ def send_user_messages(user, force_update=False):
             user=user, reason=reason))
 
     if force_update:
-        invalidate_assessment_status_cache(user_id=user.id)
+        invalidate_users_QBT(user_id=user.id)
         qbd = QuestionnaireBank.most_current_qb(
             user=user, as_of_date=datetime.utcnow())
         if qbd.questionnaire_bank:

@@ -14,6 +14,7 @@ from portal.models.qb_timeline import (
 )
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.views.user import withdraw_consent
+from portal.models.overall_status import OverallStatus
 from tests import associative_backdate, TEST_USER_ID
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
@@ -87,12 +88,14 @@ class TestQbTimeline(TestQuestionnaireBank):
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user.organizations.append(crv)
-        user = db.session.merge(self.test_user)
-        update_users_QBT(user)
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
         # expect (due, overdue, expired) for each QB (8)
-        assert QBT.query.filter(QBT._status == 'due').count() == 8
-        assert QBT.query.filter(QBT._status == 'overdue').count() == 8
-        assert QBT.query.filter(QBT._status == 'expired').count() == 8
+        assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.overdue).count() == 8
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.expired).count() == 8
 
     def test_partial_input(self):
         crv = self.setup_org_qbs()
@@ -106,20 +109,22 @@ class TestQbTimeline(TestQuestionnaireBank):
             QuestionnaireBank.name == qb_name).one()
         mock_qr('epic26_v2', qb=threeMo, iteration=0)
 
-        user = db.session.merge(self.test_user)
-        update_users_QBT(user)
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
 
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
-        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
         # should be one less overdue as it became in_progress
-        assert QBT.query.filter(QBT._status == 'overdue').count() == 7
-        # should be one less expired as it became partially_completed
-        assert QBT.query.filter(QBT._status == 'expired').count() == 7
-        assert QBT.query.filter(QBT._status == 'in_progress').one()
         assert QBT.query.filter(
-            QBT._status == 'partially_completed').one()
+            QBT.status == OverallStatus.overdue).count() == 7
+        # should be one less expired as it became partially_completed
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.expired).count() == 7
+        assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.partially_completed).one()
 
     def test_partial_post_overdue_input(self):
         crv = self.setup_org_qbs()
@@ -134,18 +139,20 @@ class TestQbTimeline(TestQuestionnaireBank):
             QuestionnaireBank.name == qb_name).one()
         mock_qr('epic26_v2', qb=threeMo, iteration=0, timestamp=post_overdue)
 
-        user = db.session.merge(self.test_user)
-        update_users_QBT(user)
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
-        assert QBT.query.filter(QBT._status == 'due').count() == 8
-        assert QBT.query.filter(QBT._status == 'overdue').count() == 8
-        # should be one less expired as it became partially_completed
-        assert QBT.query.filter(QBT._status == 'expired').count() == 7
-        assert QBT.query.filter(QBT._status == 'in_progress').one()
+        assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
         assert QBT.query.filter(
-            QBT._status == 'partially_completed').one()
+            QBT.status == OverallStatus.overdue).count() == 8
+        # should be one less expired as it became partially_completed
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.expired).count() == 7
+        assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.partially_completed).one()
 
     def test_completed_input(self):
         # Basic w/ one complete QB
@@ -163,18 +170,20 @@ class TestQbTimeline(TestQuestionnaireBank):
             q = db.session.merge(q)
             mock_qr(q.name, qb=threeMo, iteration=0)
 
-        user = db.session.merge(self.test_user)
-        update_users_QBT(user)
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
-        assert QBT.query.filter(QBT._status == 'due').count() == 8
+        assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
         # should be one less overdue as it became in_progress
-        assert QBT.query.filter(QBT._status == 'overdue').count() == 7
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.overdue).count() == 7
         # should be one less expired as it became partially_completed
-        assert QBT.query.filter(QBT._status == 'expired').count() == 7
-        assert QBT.query.filter(QBT._status == 'in_progress').one()
-        assert QBT.query.filter(QBT._status == 'completed').one()
+        assert QBT.query.filter(
+            QBT.status == OverallStatus.expired).count() == 7
+        assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
+        assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
 
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
@@ -219,11 +228,11 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert visit_name(expect_baseline) == 'Baseline'
         assert (
             expect_baseline.questionnaire_bank.research_protocol.name == 'v2')
-        for n in (3, 6):
+        for n in (3,):
             qbd = next(gen)
             assert visit_name(qbd) == 'Month {}'.format(n)
             assert qbd.questionnaire_bank.research_protocol.name == 'v2'
-        for n in (9, 15, 18, 21, 30):
+        for n in (6, 9, 15, 18, 21, 30):
             qbd = next(gen)
             assert visit_name(qbd) == 'Month {}'.format(n)
             assert qbd.questionnaire_bank.research_protocol.name == 'v3'
@@ -259,14 +268,14 @@ class TestQbTimeline(TestQuestionnaireBank):
 
     def test_change_midstream_results_rp(self):
         now = datetime.utcnow()
-        back7, nowish = associative_backdate(
-            now=now, backdate=relativedelta(months=7))
-        back14, nowish = associative_backdate(
-            now=now, backdate=relativedelta(months=14))
-        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back7)
+        back1, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=1))
+        back10, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=10))
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back1)
         org_id = org.id
         self.setup_org_qbs(org=org, rp_name='v3')
-        self.consent_with_org(org_id=org_id, setdate=back14)
+        self.consent_with_org(org_id=org_id, setdate=back10)
 
         # submit a mock response for 9 month QB on old RP
         # which should result in v2 for up to 9 month and v3 thereafter
@@ -325,6 +334,61 @@ class TestQbTimeline(TestQuestionnaireBank):
             qbd = next(gen)
             assert visit_name(qbd) == 'Month {}'.format(n)
             assert qbd.questionnaire_bank.research_protocol.name == 'v3'
+
+        with pytest.raises(StopIteration):
+            next(gen)
+
+    def test_indef_change_before_start_rp(self):
+        now = datetime.utcnow()
+        back7, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=7))
+        back14, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=14))
+        org = self.setup_org_qbs(
+            rp_name='v2', retired_as_of=back14, include_indef=True)
+        org_id = org.id
+        self.setup_org_qbs(
+            org=org, rp_name='v3', include_indef=True)
+        self.consent_with_org(org_id=org_id, setdate=back7)
+
+        user = db.session.merge(self.test_user)
+        gen = ordered_qbs(user, classification='indefinite')
+
+        # expect only v3
+        expect_v3 = next(gen)
+        assert (
+            expect_v3.questionnaire_bank.research_protocol.name == 'v3')
+
+        with pytest.raises(StopIteration):
+            next(gen)
+
+    def test_indef_change_before_start_rp_w_result(self):
+        now = datetime.utcnow()
+        back7, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=7))
+        back14, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=14))
+        org = self.setup_org_qbs(
+            rp_name='v2', retired_as_of=back14, include_indef=True)
+        org_id = org.id
+        self.setup_org_qbs(
+            org=org, rp_name='v3', include_indef=True)
+        self.consent_with_org(org_id=org_id, setdate=back7)
+
+        # submit a mock response for indef QB on old RP
+        # which should result in v2
+        qb_name = "indef_v2"
+        i_v2 = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+        mock_qr("irondemog_v2", qb=i_v2, iteration=None)
+
+        user = db.session.merge(self.test_user)
+        gen = ordered_qbs(user, classification='indefinite')
+
+        # expect only v2 given submission
+        expect_v2 = next(gen)
+        assert (
+            expect_v2.questionnaire_bank.research_protocol.name == 'v2')
 
         with pytest.raises(StopIteration):
             next(gen)

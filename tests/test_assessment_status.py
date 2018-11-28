@@ -10,18 +10,17 @@ from flask_webtest import SessionScope
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
+from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.assessment_status import (
-    AssessmentStatus,
-    invalidate_assessment_status_cache,
-)
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
-from portal.dogpile_cache import dogpile_cache
 from portal.models.encounter import Encounter
 from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
@@ -68,8 +67,8 @@ def mock_qr(
         db.session.commit()
     enc = db.session.merge(enc)
     if not qb:
-        qbd = QuestionnaireBank.most_current_qb(
-            get_user(TEST_USER_ID), timestamp)
+        qstats = QB_Status(get_user(TEST_USER_ID), timestamp)
+        qbd = qstats.current_qbd()
         qb, iteration = qbd.questionnaire_bank, qbd.iteration
 
     qr = QuestionnaireResponse(
@@ -83,8 +82,7 @@ def mock_qr(
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
-    invalidate_assessment_status_cache(TEST_USER_ID)
-
+    invalidate_users_QBT(user_id=TEST_USER_ID)
 
 localized_instruments = {'eproms_add', 'epic26', 'comorb'}
 metastatic_baseline_instruments = {
@@ -332,7 +330,7 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=nineback, local_metastatic='metastatic')
         instrument_id = 'eortc'
-        for months_back in range(0, 10, 3):
+        for months_back in (0, 3, 6, 9):
             backdate, _ = associative_backdate(
                 now=now, backdate=relativedelta(months=months_back))
             mock_qr(instrument_id=instrument_id, timestamp=backdate)
@@ -396,7 +394,7 @@ class TestAggregateResponses(TestQuestionnaireSetup):
                 ['identifier'][0])
 
 
-class TestAssessmentStatus(TestQuestionnaireSetup):
+class TestQB_Status(TestQuestionnaireSetup):
 
     def test_qnr_id(self):
         qb = QuestionnaireBank.query.first()
@@ -429,7 +427,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(local_metastatic='metastatic')
         user = db.session.merge(self.test_user)
 
-        a_s = AssessmentStatus(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, as_of_date=now)
         assert a_s.enrolled_in_classification('baseline')
         assert a_s.enrolled_in_classification('indefinite')
 
@@ -438,45 +436,49 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(local_metastatic='localized')
         user = db.session.merge(self.test_user)
 
-        a_s = AssessmentStatus(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, as_of_date=now)
         assert a_s.enrolled_in_classification('baseline')
         assert not a_s.enrolled_in_classification('indefinite')
 
     def test_localized_using_org(self):
-        self.bless_with_basics(local_metastatic='localized')
+        self.bless_with_basics(local_metastatic='localized', setdate=now)
         self.test_user = db.session.merge(self.test_user)
 
         # confirm appropriate instruments
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
         assert (set(a_s.instruments_needing_full_assessment()) ==
                 localized_instruments)
 
     def test_localized_on_time(self):
         # User finished both on time
-        self.bless_with_basics(local_metastatic='localized')
-        mock_qr(instrument_id='eproms_add')
-        mock_qr(instrument_id='epic26')
-        mock_qr(instrument_id='comorb')
+        self.bless_with_basics(local_metastatic='localized', setdate=now)
+        mock_qr(instrument_id='eproms_add', timestamp=now)
+        mock_qr(instrument_id='epic26', timestamp=now)
+        mock_qr(instrument_id='comorb', timestamp=now)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "Completed"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.completed
 
         # confirm appropriate instruments
         assert not a_s.instruments_needing_full_assessment('all')
 
     def test_localized_inprogress_on_time(self):
         # User finished both on time
-        self.bless_with_basics(local_metastatic='localized')
+        self.bless_with_basics(local_metastatic='localized', setdate=now)
         mock_qr(
             instrument_id='eproms_add', status='in-progress',
-            doc_id='eproms_add')
-        mock_qr(instrument_id='epic26', status='in-progress', doc_id='epic26')
-        mock_qr(instrument_id='comorb', status='in-progress', doc_id='comorb')
+            doc_id='eproms_add', timestamp=now)
+        mock_qr(
+            instrument_id='epic26', status='in-progress', doc_id='epic26',
+            timestamp=now)
+        mock_qr(
+            instrument_id='comorb', status='in-progress', doc_id='comorb',
+            timestamp = now)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "In Progress"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.in_progress
 
         # confirm appropriate instruments
         assert not a_s.instruments_needing_full_assessment()
@@ -484,12 +486,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
-        self.bless_with_basics(local_metastatic='localized')
-        mock_qr(instrument_id='eproms_add')
+        self.bless_with_basics(local_metastatic='localized', setdate=now)
+        mock_qr(instrument_id='eproms_add', timestamp=now)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "In Progress"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.in_progress
 
         # confirm appropriate instruments
         assert (localized_instruments -
@@ -499,27 +501,28 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
     def test_metastatic_on_time(self):
         # User finished both on time
-        self.bless_with_basics(local_metastatic='metastatic')
+        self.bless_with_basics(
+            local_metastatic='metastatic', setdate=now)
         for i in metastatic_baseline_instruments:
-            mock_qr(instrument_id=i)
+            mock_qr(instrument_id=i, timestamp=now)
         mi_qb = QuestionnaireBank.query.filter_by(
             name='metastatic_indefinite').first()
-        mock_qr(instrument_id='irondemog', qb=mi_qb)
+        mock_qr(instrument_id='irondemog', qb=mi_qb, timestamp=now)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "Completed"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.completed
 
         # shouldn't need full or any inprocess
         assert not a_s.instruments_needing_full_assessment('all')
         assert not a_s.instruments_in_progress('all')
 
     def test_metastatic_due(self):
-        # hasn't taken, but still in "Due" period
-        self.bless_with_basics(local_metastatic='metastatic')
+        # hasn't taken, but still in OverallStatus.due period
+        self.bless_with_basics(local_metastatic='metastatic', setdate=now)
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.due
 
         # confirm list of expected intruments needing attention
         assert (metastatic_baseline_instruments ==
@@ -541,11 +544,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
             setdate=backdate, local_metastatic='localized')
 
         # backdate so the baseline q's have expired
-        mock_qr(instrument_id='epic26', status='in-progress')
+        mock_qr(
+            instrument_id='epic26', status='in-progress', timestamp=backdate)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == "Partially Completed"
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.partially_completed
 
         # with all q's expired,
         # instruments_needing_full_assessment and instruments_in_progress
@@ -568,11 +572,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         self.test_user = db.session.merge(self.test_user)
         as_of_date = backdate + relativedelta(days=2)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
-        assert a_s.overall_status == "In Progress"
+        a_s = QB_Status(user=self.test_user, as_of_date=as_of_date)
+        assert a_s.overall_status == OverallStatus.in_progress
 
         # with only epic26 started, should see results for both
-        # instruments_needing_full_assessment and insturments_in_progress
+        # instruments_needing_full_assessment and instruments_in_progress
         assert ({'eproms_add', 'comorb'} ==
                 set(a_s.instruments_needing_full_assessment()))
         assert ['doc-26'] == a_s.instruments_in_progress()
@@ -591,8 +595,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         self.test_user = db.session.merge(self.test_user)
         as_of_date = backdate + relativedelta(days=2)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=as_of_date)
-        assert a_s.overall_status == "In Progress"
+        a_s = QB_Status(user=self.test_user, as_of_date=as_of_date)
+        assert a_s.overall_status == OverallStatus.in_progress
 
         # with only epic26 started, should see results for both
         # instruments_needing_full_assessment and instruments_in_progress
@@ -608,8 +612,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='metastatic')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.due
 
         # in the initial window w/ no questionnaires submitted
         # should include all from initial recur
@@ -617,7 +621,7 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
                 metastatic_3)
 
         # confirm iteration 0
-        assert a_s.qb_data.qbd.iteration == 0
+        assert a_s.current_qbd().iteration == 0
 
     def test_2nd_recur_due(self):
 
@@ -628,15 +632,15 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='metastatic')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.due
 
         # in the initial window w/ no questionnaires submitted
         # should include all from initial recur
         assert set(a_s.instruments_needing_full_assessment()) == metastatic_3
 
         # however, we should be looking at iteration 2 (zero index)!
-        assert a_s.qb_data.qbd.iteration == 1
+        assert a_s.current_qbd().iteration == 1
 
     def test_initial_recur_baseline_done(self):
         # backdate to be within the first recurrence window
@@ -656,14 +660,14 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
 
         self.test_user = db.session.merge(self.test_user)
         # Check status during baseline window
-        a_s_baseline = AssessmentStatus(
+        a_s_baseline = QB_Status(
             user=self.test_user, as_of_date=backdated)
-        assert a_s_baseline.overall_status == "Completed"
+        assert a_s_baseline.overall_status == OverallStatus.completed
         assert not a_s_baseline.instruments_needing_full_assessment()
 
         # Whereas "current" status for the initial recurrence show due.
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.due
 
         # in the initial window w/ no questionnaires submitted
         # should include all from initial recur
@@ -678,8 +682,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='metastatic')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.due
 
         # w/ no questionnaires submitted
         # should include all from second recur
@@ -693,18 +697,18 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         assert response.status_code == 200
         assert len(response.json['status']) == 1
         assert (
-                response.json['status'][0]['consents'][0][
-                    'assessment_status'] ==
-                'Expired')
+            response.json['status'][0]['consents'][0]['assessment_status'] ==
+            str(OverallStatus.expired))
 
     def test_none_org(self):
         # check users w/ none of the above org
         self.test_user.organizations.append(Organization.query.get(0))
         self.login()
-        self.bless_with_basics(local_metastatic='metastatic')
+        self.bless_with_basics(
+            local_metastatic='metastatic', setdate=now)
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=now)
-        assert a_s.overall_status == "Due"
+        a_s = QB_Status(user=self.test_user, as_of_date=now)
+        assert a_s.overall_status == OverallStatus.due
 
     def test_boundary_overdue(self):
         self.login()
@@ -713,8 +717,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='localized')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'Overdue'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.overdue
 
     def test_boundary_expired(self):
         "At expired, should be expired"
@@ -724,8 +728,8 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='localized')
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'Expired'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.expired
 
     def test_boundary_in_progress(self):
         self.login()
@@ -734,10 +738,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='localized')
         for instrument in localized_instruments:
-            mock_qr(instrument_id=instrument, status='in-progress')
+            mock_qr(
+                instrument_id=instrument, status='in-progress',
+                timestamp=nowish)
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'In Progress'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.in_progress
 
     def test_boundary_recurring_in_progress(self):
         self.login()
@@ -751,10 +757,10 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         for instrument in metastatic_3:
             mock_qr(
                 instrument_id=instrument, status='in-progress',
-                qb=mr3_qb, iteration=0)
+                qb=mr3_qb, timestamp=nowish, iteration=0)
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'In Progress'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.in_progress
 
     def test_boundary_in_progress_expired(self):
         self.login()
@@ -763,10 +769,12 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
         self.bless_with_basics(
             setdate=backdate, local_metastatic='localized')
         for instrument in localized_instruments:
-            mock_qr(instrument_id=instrument, status='in-progress')
+            mock_qr(
+                instrument_id=instrument, status='in-progress',
+                timestamp=nowish-relativedelta(days=1))
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'Partially Completed'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.partially_completed
 
     def test_all_expired_old_tx(self):
         self.login()
@@ -782,11 +790,11 @@ class TestAssessmentStatus(TestQuestionnaireSetup):
                            system=ICHOM, setdate=tx_date)
 
         self.test_user = db.session.merge(self.test_user)
-        a_s = AssessmentStatus(user=self.test_user, as_of_date=nowish)
-        assert a_s.overall_status == 'Expired'
+        a_s = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert a_s.overall_status == OverallStatus.expired
 
 
-class TestTnthAssessmentStatus(TestQuestionnaireSetup):
+class TestTnthQB_Status(TestQuestionnaireSetup):
     """Tests with Tnth QuestionnaireBanks"""
 
     eproms_or_tnth = 'tnth'
@@ -800,6 +808,7 @@ class TestTnthAssessmentStatus(TestQuestionnaireSetup):
         self.test_user.save_observation(
             codeable_concept=CC.BIOPSY, value_quantity=CC.FALSE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='final', issued=None)
-        assert not QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=now)
+            status='final', issued=now)
+        qstats = QB_Status(self.test_user, now)
+        assert not qstats.current_qbd()
+        assert not qstats.enrolled_in_classification("baseline")

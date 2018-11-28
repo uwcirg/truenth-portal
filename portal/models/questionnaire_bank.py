@@ -1,5 +1,4 @@
 """Questionnaire Bank module"""
-from collections import namedtuple
 from datetime import MAXYEAR, datetime
 
 from flask import current_app, url_for
@@ -17,17 +16,15 @@ from .intervention import Intervention
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
 from .questionnaire import Questionnaire
-from .questionnaire_response import QuestionnaireResponse
+from .qbd import QBD
 from .recur import Recur
 from .reference import Reference
+from .research_protocol import ResearchProtocol
 from .user_consent import latest_consent
 
 classification_types = ('baseline', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
-
-QBD = namedtuple('QBD', ['relative_start', 'iteration',
-                         'recur', 'questionnaire_bank'])
 
 
 class QuestionnaireBank(db.Model):
@@ -228,186 +225,11 @@ class QuestionnaireBank(db.Model):
         return bundle_results(elements=objs, links=[link])
 
     @staticmethod
-    def current_rps(user, as_of_date):
-        """returns current research protocols for user's orgs
-
-        :param user: subject of the query
-        :param as_of_date: define to return best RP for org considering
-            retired date (when org moves to new protocol).  Set to None
-            to get all known.
-        :returns: list of research protocol identifiers
-
-        """
-        user_rps = set()
-        for org in (o for o in user.organizations if o.id):
-            rp = org.research_protocol(as_of_date=as_of_date)
-            if rp:
-                user_rps.add(rp.id)
-        return user_rps
-
-    @staticmethod
-    def qbs_by_org(user, classification, as_of_date):
-        """return QBs associated with the user via organizations
-
-        :param user: subject of the query
-        :param classification: set to restrict to given classification
-        :param as_of_date: set to restrict to org's "current" rp WRT given
-            date
-
-        """
-        results = QuestionnaireBank.query.filter(
-            QuestionnaireBank.research_protocol_id.in_(
-                QuestionnaireBank.current_rps(user, as_of_date)))
-        if classification:
-            results = results.filter(
-                QuestionnaireBank.classification == classification)
-        return results.all()
-
-    @staticmethod
-    def qbs_for_user(user, classification, as_of_date):
-        """Returns questionnaire banks applicable to (user, classification)
-
-        Looks up the appropriate questionnaire banks for the user.
-        Considers both the current mappings (such as affiliation
-        through intervention or organization) as well as any in-progress or
-        completed questionnaire banks.
-
-        :param user: for whom to look up QBs
-        :param classification: set to restrict to a given classification.
-        :param as_of_date: as assigned QBs change over time (due to research
-         protocol upgrades), required to lookup what applied at the given time.
-        :return: list of unique matching QuestionnaireBanks.  Any applicable
-         `in_progress` or `completed` will be at head of list.
-
-        """
-        if not as_of_date:
-            raise ValueError("requires valid as_of_date")
-
-        def validate_classification_count(qbs):
-            """Only allow a single QB for baseline and indefinite"""
-            if qbs and qbs[0].classification == 'recurring':
-                return
-            if len(qbs) > 1:
-                errstr = ("multiple QuestionnaireBanks for {user} with "
-                          "{classification} found.  The UI won't correctly "
-                          "display more than one at this "
-                          "time.").format(user=user,
-                                          classification=classification)
-                if current_app.config.get('TESTING'):
-                    raise ValueError(errstr)
-                current_app.logger.error(errstr)
-
-        def submitted_qbs(user, classification):
-            """return list QBs for which the user already submitted work"""
-            submitted = QuestionnaireBank.query.join(
-                QuestionnaireResponse).filter(
-                    QuestionnaireResponse.subject_id == user.id,
-                    QuestionnaireResponse.questionnaire_bank_id ==
-                    QuestionnaireBank.id).order_by(
-                QuestionnaireResponse.authored.desc())
-            if classification:
-                submitted = submitted.filter(
-                    QuestionnaireBank.classification == classification)
-            return submitted.all()
-
-        # collate submitted QBs, QBs by org and QBs by intervention
-        in_progress = submitted_qbs(user=user, classification=classification)
-        by_org = QuestionnaireBank.qbs_by_org(
-            user=user, classification=classification, as_of_date=as_of_date)
-        by_intervention = qbs_by_intervention(
-            user=user, classification=classification)
-
-        if in_progress and classification in ('baseline', 'indefinite'):
-            # Need one QB for baseline, indef - prefer in_progress
-            results = in_progress
-        else:
-            # combine current with in-progress
-            # maintain order by relative start for most_current_qb filtering
-            # in-progress takes precedence
-            in_progress_set = set(in_progress)  # O(n)
-            others = set(by_org + by_intervention)
-            results = in_progress + [
-                e for e in others if e not in in_progress_set]
-
-            # additional sort is necessary in case of both as in_progress
-            # wasn't necessarily all inclusive (i.e. user may have skipped
-            # one or more).  such gaps break most_current_qb filtering
-            if all((in_progress, others)):
-                someday = datetime(year=MAXYEAR, month=12, day=31)
-                sort_results = {}
-                for qb in results:
-                    trigger_date = qb.trigger_date(user=user)
-                    start = (
-                        qb.calculated_start(
-                            trigger_date=trigger_date,
-                            as_of_date=as_of_date).relative_start or someday)
-
-                    if start not in sort_results:
-                        sort_results[start] = qb
-                results = [
-                    sort_results[k] for k in sorted(sort_results.keys())]
-
-        validate_classification_count(results)
-        return results
-
-    @staticmethod
-    def most_current_qb(user, as_of_date):
-        """Return namedtuple (QBD) for user representing their most current QB
-
-        Return namedtuple of QB Details for user, containing the current QB,
-        the QB's calculated start date, the current QB recurrence, and the
-        recurrence iteration number. Values are set as None if N/A.
-
-        :param as_of_date: utc time value for computation, i.e. utcnow()
-
-        Ideally, return the one current QuestionnaireBank that applies
-        to the user 'as_of_date'.  If none, return the most recently
-        expired.
-
-        NB the `indefinite` classification is outside the scope of this method,
-        and should be treated independently - see `indefinite_qb`
-
-        """
-        assert(as_of_date)
-        baseline = QuestionnaireBank.qbs_for_user(
-            user, 'baseline', as_of_date=as_of_date)
-        if not baseline:
-            trace("no baseline questionnaire_bank, can't continue")
-            return QBD(None, None, None, None)
-
-        if not baseline[0].trigger_date(user):
-            trace("no baseline trigger date, can't continue")
-            return QBD(None, None, None, None)
-
-        # Iterate over users QBs looking for current
-        last_found = QBD(relative_start=None, iteration=None, recur=None,
-                         questionnaire_bank=baseline[0])
-        for classification in classification_types:
-            if classification == 'indefinite':
-                continue
-            for qb in QuestionnaireBank.qbs_for_user(
-                    user, classification, as_of_date=as_of_date):
-                trigger_date = qb.trigger_date(user)
-                qbd = qb.calculated_start(trigger_date, as_of_date)
-                if qbd.relative_start is None:
-                    # indicates QB hasn't started yet, continue
-                    continue
-                expiry = qb.calculated_expiry(trigger_date, as_of_date)
-                last_found = qbd._replace(questionnaire_bank=qb)
-
-                if qbd.relative_start <= as_of_date and as_of_date < expiry:
-                    trace("most_recent found {}".format(last_found))
-                    return last_found
-        trace("most_recent found {}".format(last_found))
-        return last_found
-
-    @staticmethod
     def indefinite_qb(user, as_of_date):
-        """Return namedtuple (QBD) for user representing their indefinite QB
+        """Return QBD for user representing their indefinite QB
 
         The `indefinite` case is special.  Static method for this special case
-        as `most_current_qb()` handles all others.  Same return type, a QBD
-        named tuple.
+        as `most_current_qb()` handles all others.  Same return type, a QBD.
 
         :returns QBD: with values only if the user has an indefinite qb
 
@@ -456,24 +278,26 @@ class QuestionnaireBank(db.Model):
                     questionnaire_bank=self)
                 ic += 1
 
-    def calculated_start(self, trigger_date, as_of_date):
-        """Return namedtuple (QBD) for QB
+    def calculated_start(self, trigger_date):
+        """Return QBD (QB Details) for QB
 
         :param trigger_date: initial trigger utc time value
         :param as_of_date: utc time value for computation, i.e. utcnow()
 
-        Returns namdetuple (QBD) containing the calculated start date in UTC
+        Todo update comment...
+        Returns QBD containing the calculated start date in UTC
         for the QB, the QB's recurrence, and the iteration count.  Generally
         trigger date plus the QB.start.  For recurring, the iteration count may
         be non zero if it takes multiple iterations to reach the active cycle.
 
-        :return: namedtuple QBD (datetime of the questionnaire's start date,
+        :return: QBD (datetime of the questionnaire's start date,
             iteration_count, recurrence, and self QB field);
             QBD(None, None, None, self) if N/A
 
         """
         # On recurring QB, delegate to recur for date
         if len(self.recurs):
+            raise ValueError("don't trust this")
             for recurrence in self.recurs:
                 (relative_start, ic) = recurrence.active_interval_start(
                     trigger_date=trigger_date, as_of_date=as_of_date)
@@ -488,103 +312,112 @@ class QuestionnaireBank(db.Model):
         return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
                    iteration=None, recur=None, questionnaire_bank=self)
 
-    def calculated_expiry(self, trigger_date, as_of_date):
+    def calculated_expiry(self, trigger_date):
         """Return calculated expired date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date, as_of_date).relative_start
+        start = self.calculated_start(trigger_date).relative_start
         if not start:
             return None
         return start + RelativeDelta(self.expired)
 
-    def calculated_due(self, trigger_date, as_of_date):
+    def calculated_due(self, trigger_date):
         """Return calculated due date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date, as_of_date).relative_start
+        start = self.calculated_start(trigger_date).relative_start
         if not (start and self.due):
             return None
 
         return start + RelativeDelta(self.due)
 
-    def calculated_overdue(self, trigger_date, as_of_date):
+    def calculated_overdue(self, trigger_date):
         """Return calculated overdue date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date, as_of_date).relative_start
+        start = self.calculated_start(trigger_date).relative_start
         if not (start and self.overdue):
             return None
 
         return start + RelativeDelta(self.overdue)
 
-    def trigger_date(self, user):
-        """Return trigger date for user via QB association
 
-        The trigger date for a questionnaire bank depends on its
-        association.  i.e. for org affiliated QBs, use the respective
-        consent date.
+def trigger_date(user, qb=None):
+    """Return trigger date for user
 
-        NB `trigger_date` is not the same as the start or valid time frame for
-        all of a user's Questionnaire Banks.  The trigger date defines the
-        initial single period in time for all QBs for a user.  This is an event
-        such as the original date of consent with an organization, or the start
-        date from a procedure.  QBs valid time frame is in reference to this
-        one trigger date.  (Yes, it may be adjusted in time if the user adds a
-        new procedure or the consent date is modified).
+    The trigger date for a questionnaire bank depends on its
+    association.  i.e. for org affiliated QBs, use the respective
+    consent date.
 
-        :return: UTC datetime for the given user / QB, or None if N/A
+    NB `trigger_date` is not the same as the start or valid time frame for
+    all of a user's Questionnaire Banks.  The trigger date defines the
+    initial single period in time for all QBs for a user.  This is an event
+    such as the original date of consent with an organization, or the start
+    date from a procedure.  QBs valid time frame is in reference to this
+    one trigger date.  (Yes, it may be adjusted in time if the user adds a
+    new procedure or the consent date is modified).
 
-        """
-        if hasattr(self, '__trigger_date'):
-            return self.__trigger_date
-        # TODO: business rule details like the following should
-        # move to site persistence for QB to user mappings.
-        elif self.research_protocol_id:
+    :param user: subject of query
+    :param qb: QuestionnaireBank if available (really only necessary
+        to distinguish different behavior on recurring RP case).
+    :return: UTC datetime for the given user / QB, or None if N/A
+
+    """
+
+    def biopsy_date(user):
+        b_date = user.fetch_datetime_for_concept(CC.BIOPSY)
+        if b_date:
+            trace("found biopsy {} for trigger_date".format(b_date))
+            return b_date
+
+    def consent_date(user):
+        consent = latest_consent(user)
+        if consent:
+            trace('found valid_consent with trigger_date {}'.format(
+                consent.acceptance_date))
+            return consent.acceptance_date
+
+    def tx_date(user):
+        t_date = latest_treatment_started_date(user)
+        if t_date:
+            trace(
+                "found latest treatment date {} for trigger_date".format(
+                    t_date))
+        return t_date
+
+    def intervention_trigger(user):
+        # use the patient's last treatment date, if found
+        t = tx_date(user)
+        # otherwise, use the patient's biopsy date
+        if not t:
+            t = biopsy_date(user)
+        if not t:
+            trace("no treatment or biopsy date, no trigger_date")
+        return t
+
+    trigger = None
+
+    # If given a QB, use its details to determine trigger
+    if qb and qb.research_protocol_id:
+        if qb.recurs:
             # if recurring QB, use the patient's last treatment date, if found
-            if self.recurs:
-                tx_date = latest_treatment_started_date(user)
-                if tx_date:
-                    trace(
-                        "found latest treatment date {} "
-                        "for trigger_date".format(
-                            tx_date))
-                    self.__trigger_date = tx_date
-                    return self.__trigger_date
+            trigger = tx_date(user)
 
-            # otherwise, use the common top level consent date
-            consent = latest_consent(user)
-            if consent:
-                self.__trigger_date = consent.acceptance_date
-                trace(
-                    'found valid_consent with trigger_date {}'.format(
-                        self.__trigger_date))
-                return self.__trigger_date
+        if not trigger:
+            trigger = consent_date(user)
 
-            else:
-                trace(
-                    "questionnaire_bank affiliated with RP {}, user has "
-                    "no valid consents, so no trigger_date".format(
-                        self.research_protocol))
-                self.__trigger_date = None
-                return self.__trigger_date
-        elif self.intervention_id:
-            # use the patient's last treatment date, if found
-            tx_date = latest_treatment_started_date(user)
-            if tx_date:
-                trace(
-                    "found latest treatment date {} for trigger_date".format(
-                        tx_date))
-                self.__trigger_date = tx_date
-                return self.__trigger_date
-            # otherwise, use the patient's biopsy date
-            self.__trigger_date = user.fetch_datetime_for_concept(
-                CC.BIOPSY)
-            if self.__trigger_date:
-                trace(
-                    "found biopsy {} for trigger_date".format(
-                        self.__trigger_date))
-                return self.__trigger_date
-            else:
-                trace("no treatment or biopsy date, no trigger_date")
-                return self.__trigger_date
-        else:
-            raise ValueError(
-                "Can't compute trigger_date on QuestionnaireBank with "
-                "neither research protocol nor intervention associated")
+        if not trigger:
+            trace(
+                "questionnaire_bank affiliated with RP {}, user has no"
+                " valid consents, so no trigger_date".format(
+                    qb.research_protocol_id))
+        return trigger
+
+    elif qb and qb.intervention_id:
+        return intervention_trigger(user)
+
+    # Without a qb, use consent date if an RP is found, otherwise try
+    # the intervention method.  (Yes, it's possible the user has neither
+    # intervention nor RP, but the intervention method is too expensive
+    # for a simple trigger date lookup - will be caught in qb_timeline)
+    if ResearchProtocol.assigned_to(user):
+        return consent_date(user)
+    else:
+        return intervention_trigger(user)
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
@@ -695,7 +528,7 @@ def qbs_by_intervention(user, classification):
     return results
 
 
-@dogpile_cache.region('qb_query_cache')
+#@dogpile_cache.region('qb_query_cache')
 def intervention_qbs(classification):
     """return all QBs associated with interventions
 
@@ -718,7 +551,7 @@ def intervention_qbs(classification):
     return query.all()
 
 
-@dogpile_cache.region('qb_query_cache')
+#@dogpile_cache.region('qb_query_cache')
 def qbs_by_rp(rp_id, classification):
     """return QBs associated with a given research protocol
 
