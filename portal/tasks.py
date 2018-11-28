@@ -28,6 +28,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.reporting import generate_and_send_summaries, get_reporting_stats
@@ -259,7 +260,8 @@ def update_patients(patient_list, update_cache, queue_messages):
             update_users_QBT(user_id)
         if queue_messages:
             user = User.query.get(user_id)
-            qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
+            qstats = QB_Status(user, now)
+            qbd = qstats.current_qbd()
             if qbd.questionnaire_bank:
                 queue_outstanding_messages(
                     user=user,
