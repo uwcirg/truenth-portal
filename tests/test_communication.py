@@ -10,7 +10,6 @@ import pytest
 import regex
 
 from portal.database import db
-from portal.models.assessment_status import overall_assessment_status
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.communication import (
@@ -21,6 +20,9 @@ from portal.models.communication import (
 from portal.models.communication_request import CommunicationRequest
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import NO_EMAIL_PREFIX
@@ -398,13 +400,15 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user.birthdate = '1969-07-16'
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qstats.enrolled_in_classification('baseline')
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
-        a_s, _ = overall_assessment_status(TEST_USER_ID)
-        assert 'In Progress' == a_s
+        invalidate_users_QBT(TEST_USER_ID)
+        self.test_user = db.session.merge(self.test_user)
+        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert OverallStatus.in_progress == qstats.overall_status
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         assert expected

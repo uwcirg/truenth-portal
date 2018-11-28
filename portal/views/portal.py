@@ -692,6 +692,7 @@ def patient_invite_email(user_id):
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
+    from ..models.qb_status import QB_Status
     if user_id:
         user = get_user_or_abort(user_id)
     else:
@@ -704,7 +705,10 @@ def patient_reminder_email(user_id):
         else:
             name_key = UserReminderEmail_ATMA.name_key()
         questionnaire_bank_id = None
-        a_s, qbd = overall_assessment_status(user.id)
+        # Todo: optimize this lookup with a direct query on QB timeline
+        # for dates needed in `load_template_args`
+        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qbd = qstats.current_qbd()
         if qbd and qbd.questionnaire_bank:
             questionnaire_bank_id = qbd.questionnaire_bank.id
         # pass in questionnaire bank id to get at the questionnaire due date
