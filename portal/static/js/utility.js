@@ -343,18 +343,28 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? "" : decodeURIComponent(results[1]);
 }
-function resetBrowserBackHistory() {
+function resetBrowserBackHistory(locationUrl, stateObject, title) {
     var historyDefined = typeof history !== "undefined" && history.pushState;
+    locationUrl = locationUrl || location.href;
     if (historyDefined) {
-        history.pushState(null, null, location.href);
+        history.pushState(stateObject, title, locationUrl);
     }
-    window.addEventListener("popstate", function() {
+    window.addEventListener("popstate", function(e) {
         if (historyDefined) {
-            history.pushState(null, null, location.href);
+            history.pushState(stateObject, title, locationUrl);
         } else {
             window.history.forward(1);
         }
     });
+}
+function handlePostLogout() {
+    if (typeof sessionStorage === "undefined") {
+        return false;
+    }
+    if (sessionStorage.getItem("logout")) {
+        resetBrowserBackHistory(); /* global resetBrowserBackHistory */
+        sessionStorage.removeItem("logout");
+    }
 }
 function displaySystemOutageMessage(locale) {
     locale = locale || "en-us";

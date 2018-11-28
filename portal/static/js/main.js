@@ -2045,6 +2045,7 @@ var Global = {
                 $("#tnthNavWrapper .logout").on("click", function(event) {
                     event.stopImmediatePropagation();
                     sessionStorage.clear();
+                    sessionStorage.setItem("logout", "true"); //set session storage logout indicator
                 });
             }, 150);
             self.getNotification(function(data) { //ajax to get notifications information

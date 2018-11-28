@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    resetBrowserBackHistory(); /* global resetBrowserBackHistory */
+    handlePostLogout(); /*global handlePostLogout */
     DELAY_LOADING = true; /* global DELAY_LOADING */
     setTimeout(function() {
         DELAY_LOADING = false;
