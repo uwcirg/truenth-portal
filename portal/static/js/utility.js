@@ -362,7 +362,7 @@ function handlePostLogout() {
         return false;
     }
     if (sessionStorage.getItem("logout")) {
-        resetBrowserBackHistory(); /* global resetBrowserBackHistory */
+        resetBrowserBackHistory(location.orgin, "logout"); /* global resetBrowserBackHistory */
         sessionStorage.removeItem("logout");
     }
 }

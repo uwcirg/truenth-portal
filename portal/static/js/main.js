@@ -2044,8 +2044,7 @@ var Global = {
             setTimeout(function() {
                 $("#tnthNavWrapper .logout").on("click", function(event) {
                     event.stopImmediatePropagation();
-                    sessionStorage.clear();
-                    sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+                    self.handleLogout();
                 });
             }, 150);
             self.getNotification(function(data) { //ajax to get notifications information
@@ -2061,6 +2060,18 @@ var Global = {
             tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
             resetBrowserBackHistory(); /*global resetBrowserBackHistory */
         }
+    },
+    "handleLogout": function() {
+        sessionStorage.clear();
+        sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+    },
+    "unloadEvent": function() {
+        var self = this;
+        $(window).on("beforeunload", function() {
+            if (getUrlParameter("logout")) { //taking into consideration that user may type in logout in url
+                self.handleLogout();
+            }
+        });
     },
     "footer": function() {
         var logoLinks = $("#homeFooter .logo-link");
@@ -2330,6 +2341,7 @@ __i18next.init({"lng": userSetLang
         } else { restoreVis();  }
         if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
         tnthAjax.beforeSend();
+        Global.unloadEvent();
         Global.footer();
         Global.loginAs();
         Global.initValidator();
