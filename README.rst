@@ -157,7 +157,7 @@ password.
 
 .. code:: bash
 
-    flask add_user --email user@server.com --password reDacted! --role admin
+    flask add-user --email user@server.com --password reDacted! --role admin
 
 Password Reset
 ~~~~~~~~~~~~~~
@@ -168,7 +168,7 @@ reset is necessary, an admin may perform the following:
 
 .. code:: bash
 
-    flask --email forgotten_user@server.com --password newPassword --actor <admin's email>
+    flask password-reset --email forgotten_user@server.com --password newPassword --actor <admin's email>
 
 Install the Latest Package, Dependencies and Synchronize DB (via script)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
