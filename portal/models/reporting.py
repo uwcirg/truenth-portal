@@ -10,16 +10,17 @@ from ..audit import auditable_event
 from ..dogpile_cache import dogpile_cache
 from ..views.reporting import generate_overdue_table_html
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
-from .assessment_status import AssessmentStatus
 from .clinical_constants import CC
 from .communication import load_template_args
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
+from .overall_status import OverallStatus
 from .procedure_codes import (
     known_treatment_not_started,
     known_treatment_started,
 )
+from .qb_status import QB_Status
 from .role import ROLE
 from .user import User
 
@@ -103,8 +104,10 @@ def get_reporting_stats():
 
 def calculate_days_overdue(user):
     now = datetime.utcnow()
-    a_s = AssessmentStatus(user, as_of_date=now)
-    if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
+    a_s = QB_Status(user, as_of_date=now)
+    if a_s.overall_status in (
+            OverallStatus.completed, OverallStatus.expired,
+            OverallStatus.partially_completed):
         return 0
     qb = a_s.qb_data.qbd.questionnaire_bank
     if not qb:

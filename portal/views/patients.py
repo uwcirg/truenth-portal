@@ -7,11 +7,10 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
-from ..models.assessment_status import overall_assessment_status
 from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
-from ..models.questionnaire_bank import visit_name
+from ..models.qb_timeline import qb_status_visit_name
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.user import User, UserRoles, current_user, get_user_or_abort
@@ -114,9 +113,9 @@ def patients_root():
             if patient.deleted:
                 patient_list.append(patient)
                 continue
-            a_s, qbd = overall_assessment_status(patient.id)
+            a_s, visit = qb_status_visit_name(patient.id)
             patient.assessment_status = _(a_s)
-            patient.current_qb = visit_name(qbd)
+            patient.current_qb = visit
             patient_list.append(patient)
         patients = patient_list
 

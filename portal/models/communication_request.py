@@ -9,7 +9,6 @@ from ..database import db
 from ..date_tools import RelativeDelta
 from ..system_uri import TRUENTH_CR_NAME
 from ..trace import trace
-from .assessment_status import overall_assessment_status
 from .communication import Communication
 from .identifier import Identifier
 from .reference import Reference

@@ -296,8 +296,8 @@ def post_patient_dob(patient_id):
 @oauth.require_oauth()
 def patient_timeline(patient_id):
     from ..date_tools import FHIR_datetime
-    from ..models.questionnaire_bank import QuestionnaireBank, QBD, visit_name
-    from ..models.recur import Recur
+    from ..models.qbd import QBD
+    from ..models.questionnaire_bank import visit_name
     from ..trace import dump_trace, establish_trace
 
     trace = request.args.get('trace', False)
@@ -305,21 +305,18 @@ def patient_timeline(patient_id):
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
     current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
 
     try:
-        update_users_QBT(patient, invalidate_existing=True)
+        update_users_QBT(patient_id, invalidate_existing=True)
     except ValueError as ve:
         abort(500, ve.message)
 
     results = []
     for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(QBT.at):
         # build qbd for visit name
-        qb = QuestionnaireBank.query.get(qbt.qb_id)
-        recur = Recur.query.get(qbt.qb_recur_id) if qbt.qb_recur_id else None
         qbd = QBD(
-            relative_start=qbt.at, questionnaire_bank=qb,
-            iteration=qbt.qb_iteration, recur=recur)
+            relative_start=qbt.at, qb_id=qbt.qb_id,
+            iteration=qbt.qb_iteration, recur_id=qbt.qb_recur_id)
         results.append({
             'status': qbt.status,
             'at': FHIR_datetime.as_fhir(qbt.at),

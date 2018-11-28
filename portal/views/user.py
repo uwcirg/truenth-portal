@@ -23,7 +23,6 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
 from ..models.app_text import MailResource, UserInviteEmail_ATMA, app_text
-from ..models.assessment_status import invalidate_assessment_status_cache
 from ..models.audit import Audit
 from ..models.auth import Token
 from ..models.client import Client, client_event_dispatch
@@ -32,7 +31,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
-from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.qb_timeline import invalidate_users_QBT
 from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
@@ -708,7 +707,7 @@ def set_user_consents(user_id):
             consent_list=consent_list, acting_user=current_user())
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
-        invalidate_assessment_status_cache(user_id=user.id)
+        invalidate_users_QBT(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
@@ -821,7 +820,7 @@ def withdraw_consent(user, org_id, acting_user):
             consent_list=[uc], acting_user=acting_user)
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
-        invalidate_assessment_status_cache(user_id=user.id)
+        invalidate_users_QBT(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
@@ -911,7 +910,7 @@ def delete_user_consents(user_id):
     remove_uc.status = 'deleted'
     # The deleted consent may have altered the cached assessment
     # status - invalidate this user's data at this time.
-    invalidate_assessment_status_cache(user_id=user_id)
+    invalidate_users_QBT(user_id=user_id)
     db.session.commit()
 
     return jsonify(message="ok")
@@ -2284,6 +2283,7 @@ def get_current_user_qb(user_id):
       - ServiceToken: []
 
     """
+    from ..models.qb_status import QB_Status
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
@@ -2293,31 +2293,15 @@ def get_current_user_qb(user_id):
     # allow date and time info to be available
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 
-    qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=date)
+    qstats = QB_Status(user=user, as_of_date=date)
+    qbd = qstats.current_qbd()
 
-    qbd_json = {}
-
-    qbd_questionnaire_bank = (qbd.questionnaire_bank
-                              if qbd.questionnaire_bank else None)
-
-    expiry = None
-
-    if qbd_questionnaire_bank:
-        expiry = qbd_questionnaire_bank.calculated_expiry(
-            qbd_questionnaire_bank.trigger_date(user), as_of_date=date)
-
-    if date and qbd.relative_start and (date < qbd.relative_start):
-        qbd_json['questionnaire_bank'] = None
-    elif date and expiry and (date >= expiry):
-        qbd_json['questionnaire_bank'] = None
+    if not qbd:
+        qbd_json = {'questionnaire_bank': None}
     else:
-        qbd_json['questionnaire_bank'] = (qbd_questionnaire_bank.as_json()
-                                          if qbd_questionnaire_bank else None)
-        qbd_json['recur'] = qbd.recur.as_json() if qbd.recur else None
-        qbd_json['relative_start'] = (FHIR_datetime.as_fhir(qbd.relative_start)
-                                      if qbd.relative_start else None)
-        qbd_json['relative_expired'] = (FHIR_datetime.as_fhir(expiry)
-                                        if expiry else None)
-        qbd_json['iteration'] = qbd.iteration
+        qbd_json = qbd.as_json()
+        expiry = qstats.expired_date
+        qbd_json['relative_expired'] = (
+            FHIR_datetime.as_fhir(expiry) if expiry else None)
 
     return jsonify(qbd_json)
