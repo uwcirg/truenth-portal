@@ -1792,9 +1792,10 @@ def patient_assessment_status(patient_id):
             classification='indefinite') +
         assessment_status.instruments_in_progress(classification='indefinite')
     )
-
+    qbd = assessment_status.current_qbd()
+    qb_name = qbd.questionnaire_bank.name if qbd else None
     response = {
-        'assessment_status': assessment_status.overall_status,
+        'assessment_status': str(assessment_status.overall_status),
         'outstanding_indefinite_work': outstanding_indefinite_work,
         'questionnaires_ids': (
             assessment_status.instruments_needing_full_assessment(
@@ -1802,8 +1803,8 @@ def patient_assessment_status(patient_id):
         'resume_ids': assessment_status.instruments_in_progress(
             classification='all'),
         'completed_ids': assessment_status.instruments_completed(
-            classfication='all'),
-        'qb_name': assessment_status.current_qbd().questionnare_bank.name
+            classification='all'),
+        'qb_name': qb_name
     }
 
     if trace:
