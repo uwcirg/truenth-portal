@@ -9,10 +9,12 @@ from flask_webtest import SessionScope
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
@@ -138,13 +140,17 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Expired'
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.expired
 
         ostats = self.get_ostats()
         assert len(ostats) == 0
@@ -156,8 +162,9 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Overdue'
+        invalidate_users_QBT(self.test_user.id)
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.overdue
 
         ostats = self.get_ostats()
         assert len(ostats) == 1

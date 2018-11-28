@@ -108,12 +108,13 @@ def patients_root():
 
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+        now = datetime.utcnow()
         patient_list = []
         for patient in patients:
             if patient.deleted:
                 patient_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(patient.id)
+            a_s, visit = qb_status_visit_name(patient.id, now)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
             patient_list.append(patient)
