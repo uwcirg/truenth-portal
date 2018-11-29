@@ -66,7 +66,6 @@ QNR = namedtuple(
 
 class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
-    #Todo: needs to include recur
 
     def __init__(self, user, qb_id=None, qb_iteration=None):
         """Optionally include qb_id, qb_iteration and recur to limit"""
@@ -95,7 +94,6 @@ class QNR_results(object):
 
     def earliest_result(self, qb_id, iteration):
         """Returns timestamp of earliest result for given params, or None"""
-        #Todo: needs recur parameter
         for qnr in self.qnrs:
             if (qnr.qb_id == qb_id and
                     qnr.iteration == iteration):
@@ -109,8 +107,6 @@ class QNR_results(object):
 
     def completed_qs(self, qb_id, iteration):
         """Return set of completed Questionnaire results for given QB"""
-        #Todo: needs recur parameter
-
         return {qnr.instrument for qnr in self.qnrs if
                 qnr.qb_id == qb_id
                 and qnr.iteration == iteration
@@ -118,8 +114,6 @@ class QNR_results(object):
 
     def partial_qs(self, qb_id, iteration):
         """Return set of partial Questionnaire results for given QB"""
-        #Todo: needs recur parameter
-
         return {qnr.instrument for qnr in self.qnrs if
                 qnr.qb_id == qb_id
                 and qnr.iteration == iteration
@@ -127,8 +121,6 @@ class QNR_results(object):
 
     def completed_date(self, qb_id, iteration):
         """Returns timestamp when named QB was completed, or None"""
-        #Todo: needs recur parameter
-
         required = set(self.required_qs(qb_id))
         have = self.completed_qs(qb_id=qb_id, iteration=iteration)
         if required - have:

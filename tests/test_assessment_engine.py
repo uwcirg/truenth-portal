@@ -120,8 +120,8 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
             'example']
-        instrument_id = (completed_qnr['questionnaire']['reference']
-            .split('/')[-1])
+        instrument_id = (completed_qnr['questionnaire']['reference'].split(
+            '/')[-1])
 
         questions = completed_qnr['group']['question']
         incomplete_questions = []
@@ -219,8 +219,8 @@ class TestAssessmentEngine(TestCase):
         response = response.json
 
         assert response['total'] == len(response['entry'])
-        assert (response['entry'][0]['questionnaire']['reference']
-            .endswith(instrument_id))
+        assert (response['entry'][0]['questionnaire']['reference'].endswith(
+            instrument_id))
 
     def test_assessments_csv(self):
         swagger_spec = swagger(self.app)

@@ -90,10 +90,12 @@ class QB_Status(object):
             if row.status == OverallStatus.in_progress:
                 self._in_progress_date = row.at
             if row.status in (
-                    OverallStatus.expired, OverallStatus.partially_completed):
+                    OverallStatus.expired,
+                    OverallStatus.partially_completed):
                 self._expired_date = row.at
 
-        # If the current is already expired, no current was found, make previous
+        # If the current is already expired, then no current was found,
+        # as current is actually the previous
         if self._expired_date and self._expired_date < self.as_of_date:
             self.prev_qbd = cur_qbd
             self._current = None

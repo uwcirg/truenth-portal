@@ -83,6 +83,7 @@ def mock_qr(
         db.session.commit()
     invalidate_users_QBT(user_id=TEST_USER_ID)
 
+
 localized_instruments = {'eproms_add', 'epic26', 'comorb'}
 metastatic_baseline_instruments = {
     'eortc', 'eproms_add', 'ironmisc', 'factfpsi', 'epic23', 'prems'}
@@ -472,7 +473,7 @@ class TestQB_Status(TestQuestionnaireSetup):
             timestamp=now)
         mock_qr(
             instrument_id='comorb', status='in-progress', doc_id='comorb',
-            timestamp = now)
+            timestamp=now)
 
         self.test_user = db.session.merge(self.test_user)
         a_s = QB_Status(user=self.test_user, as_of_date=now)
