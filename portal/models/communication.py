@@ -179,14 +179,15 @@ def load_template_args(
     def _lookup_questionnaire_due_date():
         if not questionnaire_bank_id:
             return ''
+
         # Lookup due date for matching qb, iteration
         qbt = QBT.query.filter(QBT.user_id == user.id).filter(
             QBT.qb_id == questionnaire_bank_id).filter(
             QBT.qb_iteration == qb_iteration).filter(
             QBT.status == OverallStatus.due).one()
 
-        trace("UTC due date: {}".format(qbt.due_date))
-        due_date = localize_datetime(qbt.due_date, user)
+        trace("UTC due date: {}".format(qbt.at))
+        due_date = localize_datetime(qbt.at, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
         return due_date
