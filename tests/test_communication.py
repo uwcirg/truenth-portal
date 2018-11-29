@@ -22,7 +22,7 @@ from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
 from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
-from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import NO_EMAIL_PREFIX
@@ -130,8 +130,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # with no timezone
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
-        self.bless_with_basics(setdate=dt)
+        self.bless_with_basics(setdate=dt, local_metastatic='localized')
         user = db.session.merge(self.test_user)
+        update_users_QBT(user_id=TEST_USER_ID)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
         assert dd['questionnaire_due_date'] == '10 Jun 2017'

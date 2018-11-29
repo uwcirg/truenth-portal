@@ -186,8 +186,14 @@ def load_template_args(
             QBT.qb_iteration == qb_iteration).filter(
             QBT.status == OverallStatus.due).one()
 
-        trace("UTC due date: {}".format(qbt.at))
-        due_date = localize_datetime(qbt.at, user)
+        # Due and start are synonymous in all contexts other than
+        # communicating the "due" date to the user.  Adjust what is
+        # really the start date IFF the qb happens to have a
+        # defined due
+        utc_due = QuestionnaireBank.query.get(qbt.qb_id).calculated_due(
+            qbt.at)
+        trace("UTC due date: {}".format(utc_due))
+        due_date = localize_datetime(utc_due, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
         return due_date

@@ -263,9 +263,9 @@ class QuestionnaireBank(db.Model):
         return start + RelativeDelta(self.expired)
 
     def calculated_due(self, start):
-        """Return calculated due date (UTC) for QB or None"""
+        """Return calculated due date (UTC) for QB or start"""
         if not self.due:
-            return None
+            return start
 
         return start + RelativeDelta(self.due)
 
