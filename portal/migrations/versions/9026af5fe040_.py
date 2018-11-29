@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '9026af5fe040'
-down_revision = '883fd1095361'
+down_revision = 'e5aec2aebe7e'
 
 
 def upgrade():
@@ -47,4 +47,5 @@ def downgrade():
     op.drop_index(op.f('ix_qb_timeline_status'), table_name='qb_timeline')
     op.drop_index(op.f('ix_qb_timeline_at'), table_name='qb_timeline')
     op.drop_table('qb_timeline')
+    op.execute("DROP TYPE overallstatus")
     # ### end Alembic commands ###
