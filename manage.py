@@ -256,7 +256,7 @@ def purge_user(email, actor):
     permanently_delete_user(email, actor=actor)
 
 
-@click.option('--token', '-t', help="token to lookup/describe")
+@click.argument('token')
 @app.cli.command()
 def token_details(token):
     valid_seconds = app.config.get(
