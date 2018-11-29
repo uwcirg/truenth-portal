@@ -351,8 +351,11 @@ def extract_po_file(language, data, fname):
 
 
 def merge_po_into_master(po_path, language, fname):
-    master_path = os.path.join(current_app.root_path, "translations",
-                               language, 'LC_MESSAGES')
+    """Merge (extracted temp) PO file into corresponding per-language PO file"""
+    master_path = os.path.join(
+        current_app.root_path, "translations", language, 'LC_MESSAGES',
+    )
+
     mpo_path = os.path.join(master_path, '{}.po'.format(fname))
     incoming_po = pofile(po_path)
     if os.path.isfile(mpo_path):
@@ -367,11 +370,17 @@ def merge_po_into_master(po_path, language, fname):
         master_po.save(mpo_path)
         master_po.save_as_mofile(
             os.path.join(master_path, '{}.mo'.format(fname)))
+        current_app.logger.debug(
+            "merged {s_file} into {d_file}".format(
+                s_file=os.path.relpath(incoming_po.fpath, current_app.root_path),
+                d_file=os.path.relpath(master_po.fpath, current_app.root_path),
+            )
+        )
     else:
         incoming_po.save(mpo_path)
         incoming_po.save_as_mofile(
             os.path.join(master_path, '{}.mo'.format(fname)))
-
+        current_app.logger.debug('no existing file; saved {}'.format(mpo_path))
 
 @babel.localeselector
 def get_locale():
