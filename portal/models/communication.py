@@ -21,6 +21,7 @@ from .intervention import INTERVENTION
 from .message import EmailMessage
 from .overall_status import OverallStatus
 from .practitioner import Practitioner
+from .qb_timeline import QBT
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
 from .url_token import url_token
@@ -53,7 +54,8 @@ def locale_closure(locale_code, fn):
 
 
 # Todo: requires iteration and recur for accurate dates
-def load_template_args(user, questionnaire_bank_id=None):
+def load_template_args(
+        user, questionnaire_bank_id=None, qb_iteration=None):
     """Capture known variable lookup functions and values
 
     To add additional template variable lookup functions, name the
@@ -177,13 +179,14 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_questionnaire_due_date():
         if not questionnaire_bank_id:
             return ''
-        qb = QuestionnaireBank.query.get(questionnaire_bank_id)
-        trigger_date = qb.trigger_date(user)
-        now = datetime.utcnow()
-        due = qb.calculated_start(trigger_date, now).relative_start
-        due = qb.calculated_due(trigger_date, now) or due
-        trace("UTC due date: {}".format(due))
-        due_date = localize_datetime(due, user)
+        # Lookup due date for matching qb, iteration
+        qbt = QBT.query.filter(QBT.user_id == user.id).filter(
+            QBT.qb_id == questionnaire_bank_id).filter(
+            QBT.qb_iteration == qb_iteration).filter(
+            QBT.status == OverallStatus.due).one()
+
+        trace("UTC due date: {}".format(qbt.due_date))
+        due_date = localize_datetime(qbt.due_date, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
         return due_date
@@ -272,7 +275,9 @@ class Communication(db.Model):
         user = User.query.get(self.user_id)
 
         qb_id = self.communication_request.questionnaire_bank_id
-        args = load_template_args(user=user, questionnaire_bank_id=qb_id)
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qb_id,
+            qb_iteration=self.communication_request.qb_iteration)
         mailresource = MailResource(
             url=self.communication_request.content_url,
             locale_code=user.locale_code,

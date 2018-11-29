@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import pytest
 
-from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -37,11 +36,6 @@ now = datetime.utcnow()
 
 
 class TestQuestionnaireBank(TestCase):
-
-    def setUp(self):
-        """Clear qb cache as tests often alter qbs"""
-        super(TestQuestionnaireBank, self).setUp()
-        dogpile_cache.invalidate_region('qb_query_cache')
 
     @staticmethod
     def setup_org_n_rp(
@@ -343,7 +337,7 @@ class TestQuestionnaireBank(TestCase):
         assert obs.codeable_concept.codings[0].display == 'biopsy'
         assert trigger_date(self.test_user, qb) == obs.issued
 
-        # add mock in-process QB - confirm most_current_qb still returns one
+        # add mock in-process QB - confirm current qb is still correct
         mock_qr('q', 'in-progress', qb=qb)
         self.test_user, qb = map(db.session.merge, (self.test_user, qb))
         qb_stat = QB_Status(user=self.test_user, as_of_date=now)
@@ -364,7 +358,7 @@ class TestQuestionnaireBank(TestCase):
         assert start > trigger_date
         assert start == datetime.strptime('2000-01-02', '%Y-%m-%d')
 
-        end = qb.calculated_expiry(trigger_date)
+        end = qb.calculated_expiry(start)
         expected_expiry = datetime.strptime('2000-01-04', '%Y-%m-%d')
         assert end == expected_expiry
 
@@ -384,7 +378,7 @@ class TestQuestionnaireBank(TestCase):
         assert start > trigger_date
         assert start == datetime.strptime('2000-01-02', '%Y-%m-%d')
 
-        due = qb.calculated_due(trigger_date)
+        due = qb.calculated_due(start)
         expected_due = datetime.strptime('2000-01-04', '%Y-%m-%d')
         assert due == expected_due
 

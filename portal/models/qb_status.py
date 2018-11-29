@@ -91,11 +91,10 @@ class QB_Status(object):
                     OverallStatus.expired, OverallStatus.partially_completed):
                 self._expired_date = row.at
 
-        # If the current is already expired, no current was found
+        # If the current is already expired, no current was found, make previous
         if self._expired_date and self._expired_date < self.as_of_date:
+            self.prev_qbd = cur_qbd
             self._current = None
-            if self.prev_qbd:
-                raise RuntimeError("without a current, shouldn't have a previous!")
         else:
             self._current = cur_qbd
 

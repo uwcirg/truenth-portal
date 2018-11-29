@@ -1,14 +1,12 @@
 """Questionnaire Bank module"""
-from datetime import MAXYEAR, datetime
 
-from flask import current_app, url_for
+from flask import url_for
 from flask_babel import gettext as _
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from ..date_tools import RelativeDelta
-from ..dogpile_cache import dogpile_cache
 from ..trace import trace
 from .clinical_constants import CC
 from .fhir import bundle_results
@@ -224,38 +222,6 @@ class QuestionnaireBank(db.Model):
                 'questionnaire_api.questionnaire_bank_list', _external=True)}
         return bundle_results(elements=objs, links=[link])
 
-    @staticmethod
-    def indefinite_qb(user, as_of_date):
-        """Return QBD for user representing their indefinite QB
-
-        The `indefinite` case is special.  Static method for this special case
-        as `most_current_qb()` handles all others.  Same return type, a QBD.
-
-        :returns QBD: with values only if the user has an indefinite qb
-
-        """
-        indefinite_qb = QuestionnaireBank.qbs_for_user(
-            user, classification='indefinite', as_of_date=as_of_date)
-        no_qb = QBD(None, None, None, None)
-
-        if not indefinite_qb:
-            return no_qb
-
-        if len(indefinite_qb) > 1:
-            raise ValueError("only supporting single indefinite QB")
-
-        as_of_date = as_of_date or datetime.utcnow()
-        trigger_date = indefinite_qb[0].trigger_date(user)
-
-        # Without basic requirements, such as a consent, the trigger
-        # date can't be calculated.  Without a trigger, the user doesn't
-        # get an indefinite qb.
-        if not trigger_date:
-            return no_qb
-
-        return indefinite_qb[0].calculated_start(
-            trigger_date=trigger_date, as_of_date=as_of_date)
-
     def recurring_starts(self, trigger_date):
         """Generator for each successive QBD in a recurrence
 
@@ -282,7 +248,6 @@ class QuestionnaireBank(db.Model):
         """Return QBD (QB Details) for QB
 
         :param trigger_date: initial trigger utc time value
-        :param as_of_date: utc time value for computation, i.e. utcnow()
 
         Todo update comment...
         Returns QBD containing the calculated start date in UTC
@@ -295,45 +260,22 @@ class QuestionnaireBank(db.Model):
             QBD(None, None, None, self) if N/A
 
         """
-        # On recurring QB, delegate to recur for date
-        if len(self.recurs):
-            raise ValueError("don't trust this")
-            for recurrence in self.recurs:
-                (relative_start, ic) = recurrence.active_interval_start(
-                    trigger_date=trigger_date, as_of_date=as_of_date)
-                if relative_start:
-                    return QBD(relative_start=relative_start, iteration=ic,
-                               recur=recurrence, questionnaire_bank=self)
-            # no active recurrence
-            return QBD(relative_start=None, iteration=None,
-                       recur=None, questionnaire_bank=self)
+        if self.classification not in ('baseline', 'indefinite'):
+            raise RuntimeError("unexpected classification")
 
-        # Otherwise, simply trigger plus start (and iteration_count of None)
         return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
                    iteration=None, recur=None, questionnaire_bank=self)
 
-    def calculated_expiry(self, trigger_date):
+    def calculated_expiry(self, start):
         """Return calculated expired date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
-        if not start:
-            return None
         return start + RelativeDelta(self.expired)
 
-    def calculated_due(self, trigger_date):
+    def calculated_due(self, start):
         """Return calculated due date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
-        if not (start and self.due):
+        if not self.due:
             return None
 
         return start + RelativeDelta(self.due)
-
-    def calculated_overdue(self, trigger_date):
-        """Return calculated overdue date (UTC) for QB or None"""
-        start = self.calculated_start(trigger_date).relative_start
-        if not (start and self.overdue):
-            return None
-
-        return start + RelativeDelta(self.overdue)
 
 
 def trigger_date(user, qb=None):
@@ -528,7 +470,6 @@ def qbs_by_intervention(user, classification):
     return results
 
 
-#@dogpile_cache.region('qb_query_cache')
 def intervention_qbs(classification):
     """return all QBs associated with interventions
 
@@ -551,7 +492,6 @@ def intervention_qbs(classification):
     return query.all()
 
 
-#@dogpile_cache.region('qb_query_cache')
 def qbs_by_rp(rp_id, classification):
     """return QBs associated with a given research protocol
 

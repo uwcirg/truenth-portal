@@ -28,6 +28,7 @@ from ..models.client import validate_origin
 from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.intervention import INTERVENTION
+from ..models.qb_status import QB_Status
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import (
@@ -1356,28 +1357,33 @@ def assessment_add(patient_id):
             EC, request.args['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
-    qnr_qb = None
     authored = FHIR_datetime.parse(request.json['authored'])
     qn_ref = request.json.get("questionnaire").get("reference")
     qn_name = qn_ref.split("/")[-1] if qn_ref else None
     qn = Questionnaire.find_by_name(name=qn_name)
-    qbd = QuestionnaireBank.most_current_qb(
-        patient, as_of_date=authored)
-    qb = qbd.questionnaire_bank
+    qbstatus = QB_Status(patient, as_of_date=authored)
+    qbd = qbstatus.current_qbd()
     if (
-        qb and qn and
-        (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+        qbd and qn and (qn.id in [
+        qbq.questionnaire.id for qbq in
+        qbd.questionnaire_bank.questionnaires])
     ):
-        qnr_qb = qb
+        qnr_qb = qbd.questionnaire_bank
     # if a valid qb wasn't found, try the indefinite option
-    if not qnr_qb:
-        qbd = QuestionnaireBank.indefinite_qb(patient, as_of_date=authored)
-        qb = qbd.questionnaire_bank
+    else:
+        qbd = qbstatus.current_qbd('indefinite')
         if (
-            qb and qn and
-            (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+            qbd and qn and (qn.id in [
+            qbq.questionnaire.id for qbq in
+            qbd.questionnaire_bank.questionnaires])
         ):
-            qnr_qb = qb
+            qnr_qb = qbd.questionnaire_bank
+
+    if not qnr_qb:
+        raise ValueError(
+            "Received questionnaire_response yet current QBs for patient {}"
+            "don't contain reference to instrument {}".format(
+                patient_id, qn_name))
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
