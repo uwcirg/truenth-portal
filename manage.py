@@ -246,7 +246,7 @@ def password_reset(email, password, actor):
         "\n\nWARNING!!!\n\n"
         " This will permanently delete the target user and all their related"
         " data.\n"
-        " If you want to contiue,"
+        " If you want to continue,"
         " enter a valid user email as the acting party for our records")
 )
 @app.cli.command()
