@@ -331,7 +331,7 @@ def send_user_messages(user, force_update=False):
                 iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
-        Communication.status == 'preparation').filter(User == user)
+        Communication.status == 'preparation').filter(User.id == user.id)
     for communication in ready:
         communication.generate_and_send()
         db.session.commit()
