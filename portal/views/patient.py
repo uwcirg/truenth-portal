@@ -86,9 +86,9 @@ def patient_search():
     responses:
       200:
         description:
-          Returns FHIR patient resource (http://www.hl7.org/fhir/patient.html)
-          in JSON if a match is found.  Otherwise responds with a 404 status
-          code.
+          Returns FHIR patient resource
+          (https://www.hl7.org/fhir/DSTU2/patient.html) in JSON if a match
+          is found.  Otherwise responds with a 404 status code.
       401:
         description:
           if missing valid OAuth token

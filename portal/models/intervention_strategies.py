@@ -266,11 +266,12 @@ def update_card_html_on_completion():
                     classification='indefinite'))
 
             if assessment_status.overall_status in (
-                    OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress):
+                    OverallStatus.due, OverallStatus.overdue,
+                    OverallStatus.in_progress):
                 greeting = _("Hi, %(full_name)s", full_name=user.display_name)
 
-                if ((assessment_status.overall_status == OverallStatus.overdue) or
-                        (assessment_status.due_date < datetime.utcnow())):
+                if (assessment_status.overall_status == OverallStatus.overdue
+                        or assessment_status.due_date < now):
                     expired_date = localize_datetime(
                         assessment_status.expired_date, user)
                     reminder = _(
@@ -313,7 +314,8 @@ def update_card_html_on_completion():
                       </h4>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
-            if assessment_status.overall_status in (OverallStatus.completed, OverallStatus.withdrawn):
+            if assessment_status.overall_status in (
+                    OverallStatus.completed, OverallStatus.withdrawn):
                 return thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
@@ -368,7 +370,8 @@ def update_card_html_on_completion():
         #  match state of users questionnaires (aka assessments)
         ####
         if assessment_status.overall_status in (
-                OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress):
+                OverallStatus.due, OverallStatus.overdue,
+                OverallStatus.in_progress):
 
             link_label = _('Go to questionnaire')
             # User has unfinished baseline assessment work
@@ -430,7 +433,8 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif assessment_status.overall_status in (OverallStatus.completed, OverallStatus.withdrawn):
+        elif assessment_status.overall_status in (
+                OverallStatus.completed, OverallStatus.withdrawn):
             # User completed both baseline and indefinite
             link_label = _('View previous questionnaire')
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")

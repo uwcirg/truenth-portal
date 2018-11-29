@@ -153,7 +153,8 @@ class TestCoredata(TestCase):
     def test_music_exception(self):
         "For patients with music org, the terms get special handling"
         music_org = Organization(
-            name="Michigan Urological Surgery Improvement Collaborative (MUSIC)")
+            name="Michigan Urological Surgery Improvement Collaborative"
+                 " (MUSIC)")
         with SessionScope(db):
             db.session.add(music_org)
             db.session.commit()
