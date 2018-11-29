@@ -11,7 +11,7 @@ beautifulsoup4==4.6.3     # via webtest
 billiard==3.5.0.4         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
-certifi==2018.10.15        # via requests
+certifi==2018.11.29        # via requests
 cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
