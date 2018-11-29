@@ -26,6 +26,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -98,6 +99,7 @@ class TestAssessmentEngine(TestCase):
             db.session.commit()
         qb = db.session.merge(qb)
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -168,6 +170,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         qnr = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
 
         # Upload QNR
@@ -223,6 +226,7 @@ class TestAssessmentEngine(TestCase):
         instrument_id = example_data['questionnaire']['reference'].split('/')[
             -1]
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         upload_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
