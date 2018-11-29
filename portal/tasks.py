@@ -260,9 +260,9 @@ def update_patients(patient_list, update_cache, queue_messages):
             update_users_QBT(user_id)
         if queue_messages:
             user = User.query.get(user_id)
-            qstats = QB_Status(user, now)
-            qbd = qstats.current_qbd()
-            if qbd.questionnaire_bank:
+            qbstatus = QB_Status(user, now)
+            qbd = qbstatus.current_qbd()
+            if qbd:
                 queue_outstanding_messages(
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,
@@ -323,9 +323,8 @@ def send_user_messages(user, force_update=False):
 
     if force_update:
         invalidate_users_QBT(user_id=user.id)
-        qbd = QuestionnaireBank.most_current_qb(
-            user=user, as_of_date=datetime.utcnow())
-        if qbd.questionnaire_bank:
+        qbd = QB_Status(user=user, as_of_date=datetime.utcnow()).current_qbd()
+        if qbd:
             queue_outstanding_messages(
                 user=user,
                 questionnaire_bank=qbd.questionnaire_bank,

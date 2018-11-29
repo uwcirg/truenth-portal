@@ -10,7 +10,6 @@ from flask_webtest import SessionScope
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -315,7 +314,6 @@ class TestQuestionnaireSetup(TestCase):
 
     def setUp(self):
         super(TestQuestionnaireSetup, self).setUp()
-        dogpile_cache.invalidate_region('qb_query_cache')
         mock_questionnairebanks(self.eproms_or_tnth)
 
 

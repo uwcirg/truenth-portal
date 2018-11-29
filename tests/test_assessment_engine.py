@@ -6,7 +6,6 @@ import json
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
-from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
@@ -22,11 +21,6 @@ from tests import TEST_USER_ID, TestCase
 
 
 class TestAssessmentEngine(TestCase):
-
-    def setUp(self):
-        """Clear qb cache as tests often alter qbs"""
-        super(TestAssessmentEngine, self).setUp()
-        dogpile_cache.invalidate_region('qb_query_cache')
 
     def test_submit_assessment(self):
         swagger_spec = swagger(self.app)

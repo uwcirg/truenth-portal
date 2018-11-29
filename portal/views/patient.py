@@ -4,6 +4,7 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
+from datetime import datetime
 import json
 
 from flask import Blueprint, abort, jsonify, request
@@ -297,6 +298,7 @@ def post_patient_dob(patient_id):
 def patient_timeline(patient_id):
     from ..date_tools import FHIR_datetime
     from ..models.qbd import QBD
+    from ..models.qb_status import QB_Status
     from ..models.questionnaire_bank import visit_name
     from ..trace import dump_trace, establish_trace
 
@@ -306,8 +308,9 @@ def patient_timeline(patient_id):
 
     current_user().check_role(permission='view', other_id=patient_id)
 
+    purge = request.args.get('purge', False)
     try:
-        update_users_QBT(patient_id, invalidate_existing=True)
+        update_users_QBT(patient_id, invalidate_existing=purge)
     except ValueError as ve:
         abort(500, ve.message)
 
@@ -318,11 +321,31 @@ def patient_timeline(patient_id):
             relative_start=qbt.at, qb_id=qbt.qb_id,
             iteration=qbt.qb_iteration, recur_id=qbt.qb_recur_id)
         results.append({
-            'status': qbt.status,
+            'status': str(qbt.status),
             'at': FHIR_datetime.as_fhir(qbt.at),
             'visit': visit_name(qbd)})
 
+    qbstatus = QB_Status(
+        user=User.query.get(patient_id), as_of_date=datetime.now())
+    prev_qbd = qbstatus.prev_qbd
+    current = qbstatus.current_qbd()
+    next_qbd = qbstatus.next_qbd
+    status = {
+        'previous QBD': prev_qbd.as_json() if prev_qbd else None,
+        'current QBD': current.as_json() if current else None,
+        'next QBD': next_qbd.as_json() if next_qbd else None,
+    }
+    if current:
+        status['due'] = qbstatus.due_date
+        status['overdue'] = qbstatus.overdue_date
+        status['expired'] = qbstatus.expired_date
+        status['needing-full'] = qbstatus.instruments_needing_full_assessment()
+        status['in-progress'] = qbstatus.instruments_in_progress()
+        status['completed'] = qbstatus.instruments_completed()
+
     if trace:
         return jsonify(
-            timeline=results, trace=dump_trace("END time line lookup"))
-    return jsonify(timeline=results)
+            status=status,
+            timeline=results,
+            trace=dump_trace("END time line lookup"))
+    return jsonify(status=status, timeline=results)
