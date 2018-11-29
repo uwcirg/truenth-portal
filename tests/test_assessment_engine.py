@@ -6,6 +6,7 @@ import json
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
@@ -37,6 +38,7 @@ class TestAssessmentEngine(TestCase):
         response = response.json
         assert response['ok']
         assert response['valid']
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 1
         assert (
             self.test_user.questionnaire_responses[0].encounter.auth_method
@@ -85,11 +87,12 @@ class TestAssessmentEngine(TestCase):
 
         test_user = get_user(TEST_USER_ID)
         test_user.organizations.append(org)
-
+        authored = FHIR_datetime.parse(data['authored'])
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=authored)
 
         with SessionScope(db):
             db.session.add(qb)
@@ -97,7 +100,6 @@ class TestAssessmentEngine(TestCase):
             db.session.add(audit)
             db.session.add(uc)
             db.session.commit()
-        qb = db.session.merge(qb)
 
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
@@ -108,6 +110,7 @@ class TestAssessmentEngine(TestCase):
         )
         assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
+        qb = db.session.merge(qb)
         assert test_user.questionnaire_responses.count() == 1
         assert (
             test_user.questionnaire_responses[0].questionnaire_bank_id
