@@ -260,7 +260,7 @@ def purge_user(email, actor):
 @app.cli.command()
 def token_details(token):
     valid_seconds = app.config.get(
-        'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
+        'TOKEN_LIFE_IN_DAYS') * 24 * 3600
     try:
         user_id = verify_token(token, valid_seconds)
     except SignatureExpired:

@@ -310,7 +310,7 @@ def access_via_token(token, next_step=None):
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
-        'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
+        'TOKEN_LIFE_IN_DAYS') * 24 * 3600
     try:
         user_id = verify_token(token, valid_seconds)
     except SignatureExpired:

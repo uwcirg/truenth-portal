@@ -104,6 +104,7 @@ class BaseConfig(object):
     DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
+    TOKEN_LIFE_IN_DAYS = 30  # Used for emailed URL tokens
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
