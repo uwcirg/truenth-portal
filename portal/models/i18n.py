@@ -174,7 +174,8 @@ def smartling_upload():
     translation_fpath = os.path.join(current_app.root_path, "translations")
     messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
     config_fpath = os.path.join(
-        current_app.root_path, "../instance/", config_fname)
+        current_app.root_path, "../instance/", config_fname
+    )
 
     # create new .pot file from code
     check_call((
@@ -193,54 +194,53 @@ def smartling_upload():
     current_app.logger.debug("messages.pot file updated with db strings")
 
     fix_references(messages_pot_fpath)
+    upload_pot_file(
+        fpath=messages_pot_fpath,
+        fname='messages.pot',
+        uri='portal/translations/messages.pot',
+    )
 
-    upload_pot_file(messages_pot_fpath, 'messages.pot',
-                    'portal/translations/messages.pot')
-
-    frontend_pot_fpath = os.path.join(translation_fpath, "js",
-                                      "src", "frontend.pot")
+    frontend_pot_fpath = os.path.join(
+        translation_fpath, "js", "src", "frontend.pot"
+    )
 
     fix_references(frontend_pot_fpath)
-
-    upload_pot_file(frontend_pot_fpath, 'frontend.pot',
-                    'portal/translations/js/src/frontend.pot')
+    upload_pot_file(
+        fpath=frontend_pot_fpath,
+        fname='frontend.pot',
+        uri='portal/translations/js/src/frontend.pot'
+    )
 
 
 def upload_pot_file(fpath, fname, uri):
+    upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
-        # authenticate smartling
         auth = smartling_authenticate()
         current_app.logger.debug("authenticated in smartling")
-        # upload .pot file to smartling
         with open(fpath, 'rb') as potfile:
-            headers = {'Authorization': 'Bearer {}'.format(auth)}
-            files = {'file': (fname, potfile)}
-            data = {
-                'fileUri': uri,
-                'fileType': 'gettext'
-            }
-            resp = requests.post('https://api.smartling.com'
-                                 '/files-api/v2/projects/{}'
-                                 '/file'.format(project_id),
-                                 data=data, files=files, headers=headers)
+            resp = requests.post(
+                upload_url.format(project_id),
+                data={'fileUri': uri, 'fileType': 'gettext'},
+                files={'file': (fname, potfile)},
+                headers={'Authorization': 'Bearer {}'.format(auth)},
+            )
             resp.raise_for_status()
         current_app.logger.debug(
             "{} uploaded to smartling project {}".format(fname, project_id)
         )
     else:
-        current_app.logger.warn("missing smartling configuration - file {} "
-                                "not uploaded".format(fname))
+        current_app.logger.warn(
+            "missing smartling config - file {} not uploaded".format(fname)
+        )
 
 
 def smartling_download(state, language=None):
-    translation_fpath = os.path.join(current_app.root_path, "translations")
-    # authenticate smartling
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+
     auth = smartling_authenticate()
     current_app.logger.debug("authenticated in smartling")
-    # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     download_and_extract_po_file(
         language=language,
         fname='messages',
