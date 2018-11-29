@@ -22,7 +22,6 @@ from .intervention import INTERVENTION
 from .message import EmailMessage
 from .overall_status import OverallStatus
 from .practitioner import Practitioner
-from .qb_timeline import QBT
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
 
@@ -63,6 +62,7 @@ def load_template_args(
         `_lookup_first_name` -> `first_name`
 
     """
+    from .qb_timeline import QBT  # avoid cycle
 
     def ae_link():
         token = user_manager.token_manager.generate_token(user.id)
