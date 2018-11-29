@@ -360,8 +360,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         # Being a day short, shouldn't fire
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -378,8 +378,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         for instrument in symptom_tracker_instruments:
             mock_qr(instrument_id=instrument)
@@ -428,11 +428,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             status='final', issued=None)
 
         # Confirm test user doesn't qualify for ST QB
-        assert not QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert not qbstatus.enrolled_in_classification('baseline')
 
         # shouldn't generate a message either
-        mock_qr(instrument_id='epic26')
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         assert not expected
@@ -447,8 +446,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         # Add fresh procedure
         self.add_procedure('4', 'External beam radiation therapy', ICHOM)

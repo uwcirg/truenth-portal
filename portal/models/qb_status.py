@@ -22,6 +22,7 @@ class QB_Status(object):
 
     def _sync_timeline(self):
         """Sync QB timeline and obtain status"""
+        self.prev_qbd, self.next_qbd = None, None
 
         # Update QB_Timeline for user, if necessary
         update_users_QBT(self.user.id)
@@ -53,6 +54,7 @@ class QB_Status(object):
         if not cur_qbd and ordered_qbs[0].relative_start > self.as_of_date:
             self._overall_status = OverallStatus.expired
             self._current = None
+            self.next_qbd = ordered_qbs[0]
             return
 
         if cur_index > 0:
