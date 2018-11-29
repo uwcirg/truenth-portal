@@ -334,7 +334,7 @@ def extract_po_file(language, data, fname):
         'LC_MESSAGES',
         'temp_{}.po'.format(fname),
     )
-    po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
+    temp_po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
 
     # Create directory if necessary
     try:
@@ -343,11 +343,11 @@ def extract_po_file(language, data, fname):
         if not os.path.isdir(po_dir):
             raise
 
-    with open(po_path, "wb") as fout:
+    with open(temp_po_path, "wb") as fout:
         fout.write(data)
     current_app.logger.debug("{} po file extracted".format(language))
-    merge_po_into_master(po_path, language, fname)
-    os.remove(po_path)
+    merge_po_into_master(temp_po_path, language, fname)
+    os.remove(temp_po_path)
 
 
 def merge_po_into_master(po_path, language, fname):
