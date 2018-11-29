@@ -1,5 +1,4 @@
 """QBD (Questionnaire Bank Details) Module"""
-from recur import Recur
 from ..date_tools import FHIR_datetime
 
 
@@ -38,6 +37,7 @@ class QBD(object):
 
     @property
     def recur(self):
+        from recur import Recur
         if not self._recur and self.recur_id is not None:
             self._recur = Recur.query.get(self.recur_id)
         return self._recur
