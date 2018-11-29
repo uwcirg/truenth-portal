@@ -240,12 +240,14 @@ def smartling_download(state, language=None):
     current_app.logger.debug("authenticated in smartling")
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     download_and_extract_po_file(
         language=language,
         fname='messages',
         uri='portal/translations/messages.pot',
         state=state,
         headers=headers,
+        project_id=project_id,
     )
     download_and_extract_po_file(
         language=language,
@@ -253,11 +255,11 @@ def smartling_download(state, language=None):
         uri='portal/translations/js/src/frontend.pot',
         state=state,
         headers=headers,
+        project_id=project_id,
     )
 
 
-def download_and_extract_po_file(language, fname, headers, uri, state):
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+def download_and_extract_po_file(language, fname, headers, uri, state, project_id):
     if language:
         response_content = download_po_file(
             language=language,
