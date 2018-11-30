@@ -709,11 +709,13 @@ def patient_reminder_email(user_id):
         # for dates needed in `load_template_args`
         qstats = QB_Status(user, as_of_date=datetime.utcnow())
         qbd = qstats.current_qbd()
-        if qbd and qbd.questionnaire_bank:
-            questionnaire_bank_id = qbd.questionnaire_bank.id
+        if not qbd:
+            return "Not Available", 204
+
         # pass in questionnaire bank id to get at the questionnaire due date
-        args = load_template_args(user=user,
-                                  questionnaire_bank_id=questionnaire_bank_id)
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qbd.qb_id,
+            qb_iteration=qbd.iteration)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:

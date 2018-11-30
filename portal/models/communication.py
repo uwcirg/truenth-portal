@@ -11,6 +11,7 @@ from flask_babel import force_locale, gettext as _
 import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
 from ..database import db
@@ -62,6 +63,7 @@ def load_template_args(
         `_lookup_first_name` -> `first_name`
 
     """
+    from .qb_status import NoCurrentQB
     from .qb_timeline import QBT  # avoid cycle
 
     def ae_link():
@@ -181,10 +183,13 @@ def load_template_args(
             return ''
 
         # Lookup due date for matching qb, iteration
-        qbt = QBT.query.filter(QBT.user_id == user.id).filter(
-            QBT.qb_id == questionnaire_bank_id).filter(
-            QBT.qb_iteration == qb_iteration).filter(
-            QBT.status == OverallStatus.due).one()
+        try:
+            qbt = QBT.query.filter(QBT.user_id == user.id).filter(
+                QBT.qb_id == questionnaire_bank_id).filter(
+                QBT.qb_iteration == qb_iteration).filter(
+                QBT.status == OverallStatus.due).one()
+        except NoResultFound:
+            raise NoCurrentQB("no applicable QB for {}".format(user))
 
         # Due and start are synonymous in all contexts other than
         # communicating the "due" date to the user.  Adjust what is

@@ -9,6 +9,11 @@ from .questionnaire_response import qnr_document_id, QNR_results
 from ..trace import trace
 
 
+class NoCurrentQB(Exception):
+    """Exception to raise when no current QB is available yet required"""
+    pass
+
+
 class QB_Status(object):
 
     def __init__(self, user, as_of_date):
