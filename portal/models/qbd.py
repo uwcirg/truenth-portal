@@ -37,14 +37,14 @@ class QBD(object):
 
     @property
     def recur(self):
-        from recur import Recur
+        from .recur import Recur
         if not self._recur and self.recur_id is not None:
             self._recur = Recur.query.get(self.recur_id)
         return self._recur
 
     @property
     def questionnaire_bank(self):
-        from questionnaire_bank import QuestionnaireBank
+        from .questionnaire_bank import QuestionnaireBank
         if not self._questionnaire_bank and self.qb_id is not None:
             self._questionnaire_bank = QuestionnaireBank.query.get(self.qb_id)
         return self._questionnaire_bank
