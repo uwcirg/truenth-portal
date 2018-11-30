@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    handlePostLogout(); /*global handlePostLogout */
     DELAY_LOADING = true; /* global DELAY_LOADING */
     setTimeout(function() {
         DELAY_LOADING = false;
