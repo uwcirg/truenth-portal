@@ -153,8 +153,8 @@ def calc_and_adjust_start(user, qbd, initial_trigger):
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
     if initial_trigger > users_trigger:
-        raise RuntimeError(
-            "user {} has unexpected trigger date before system value".format(
+        trace(
+            "user {} has unexpected trigger date before consent date".format(
                 user.id))
 
     delta = users_trigger - initial_trigger
@@ -179,8 +179,8 @@ def calc_and_adjust_expired(user, qbd, initial_trigger):
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
     if initial_trigger > users_trigger:
-        raise RuntimeError(
-            "user {} has unexpected trigger date before system value".format(
+        trace(
+            "user {} has unexpected trigger date before consent date".format(
                 user.id))
 
     expired = qbd.questionnaire_bank.expired
