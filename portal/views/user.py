@@ -46,6 +46,7 @@ from ..models.user import (
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from ..models.url_token import url_token
 from ..type_tools import check_int
 from .auth import logout
 from .crossdomain import crossdomain
@@ -474,11 +475,12 @@ def access_url(user_id):
             400,
             "Access URL restricted to ACCESS_ON_VERIFY or WRITE_ONLY roles")
 
-    # generate an access token
-    token = user_manager.token_manager.generate_token(user_id)
+    # generate URL token
+    token = url_token(user_id)
+
     url = url_for(
         'portal.access_via_token', token=token, _external=True)
-    auditable_event("generated access token {}".format(token),
+    auditable_event("generated URL token {}".format(token),
                     user_id=current_user().id, subject_id=user.id,
                     context='authentication')
     return jsonify(access_url=url)

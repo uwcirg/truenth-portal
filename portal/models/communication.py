@@ -15,7 +15,6 @@ from sqlalchemy.dialects.postgresql import ENUM
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import localize_datetime
-from ..extensions import user_manager
 from ..trace import dump_trace, establish_trace, trace
 from .app_text import MailResource
 from .assessment_status import overall_assessment_status
@@ -24,6 +23,7 @@ from .message import EmailMessage
 from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
+from .url_token import url_token
 
 # https://www.hl7.org/fhir/valueset-event-status.html
 event_status_types = ENUM(
@@ -62,9 +62,9 @@ def load_template_args(user, questionnaire_bank_id=None):
     """
 
     def ae_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         auditable_event(
-            "generated access token {} for ae_link".format(
+            "generated URL token {} for ae_link".format(
                 token), user_id=user.id, subject_id=user.id,
             context='authentication')
 
@@ -113,13 +113,13 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_decision_support_via_access_link())
 
     def _lookup_decision_support_via_access_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         url = url_for(
             'portal.access_via_token', token=token,
             next_step='decision_support', _external=True)
         system_user = User.query.filter_by(email='__system__').one()
         auditable_event(
-            "generated access token for user {} to embed in email".format(
+            "generated URL token for user {} to embed in email".format(
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
@@ -202,12 +202,12 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_verify_account_link(), inline=True)
 
     def _lookup_verify_account_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         url = url_for(
             'portal.access_via_token', token=token, _external=True)
         system_user = User.query.filter_by(email='__system__').one()
         auditable_event(
-            "generated access token for user {} to embed in email".format(
+            "generated URL token for user {} to embed in email".format(
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
