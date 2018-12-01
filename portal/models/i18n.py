@@ -352,14 +352,20 @@ def extract_po_file(language, data, fname):
     os.remove(temp_po_path)
 
 
-def merge_po_into_master(po_path, language, fname):
-    """Merge (extracted temp) PO file into corresponding per-language PO file"""
+def merge_po_into_master(input_po_path, language, dest_po_basename):
+    """
+    Merge PO file into corresponding per-language PO file
+
+    :param input_po_path: input (temp) PO file to merge
+    :param language: language to operate on
+    :param dest_po_basename: destination file basename (without extension) in translations/
+    """
     master_path = os.path.join(
         current_app.root_path, "translations", language, 'LC_MESSAGES',
     )
 
-    mpo_path = os.path.join(master_path, '{}.po'.format(fname))
-    incoming_po = pofile(po_path)
+    mpo_path = os.path.join(master_path, '{}.po'.format(dest_po_basename))
+    incoming_po = pofile(input_po_path)
     if os.path.isfile(mpo_path):
         master_po = pofile(mpo_path)
 
@@ -371,7 +377,7 @@ def merge_po_into_master(po_path, language, fname):
 
         master_po.save(mpo_path)
         master_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(fname)))
+            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
         current_app.logger.debug(
             "merged {s_file} into {d_file}".format(
                 s_file=os.path.relpath(incoming_po.fpath, current_app.root_path),
@@ -381,7 +387,7 @@ def merge_po_into_master(po_path, language, fname):
     else:
         incoming_po.save(mpo_path)
         incoming_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(fname)))
+            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
         current_app.logger.debug('no existing file; saved {}'.format(mpo_path))
 
 @babel.localeselector
