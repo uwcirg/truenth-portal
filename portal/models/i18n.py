@@ -151,13 +151,13 @@ def fix_references(pot_fpath):
 
 
 def smartling_authenticate():
-    url = 'https://api.smartling.com/auth-api/v2/authenticate'
-    headers = {'Content-type': 'application/json'}
-    data = {
-        "userIdentifier": current_app.config["SMARTLING_USER_ID"],
-        "userSecret": current_app.config["SMARTLING_USER_SECRET"],
-    }
-    resp = requests.post(url, json=data, headers=headers)
+    resp = requests.post(
+        url='https://api.smartling.com/auth-api/v2/authenticate',
+        json={
+            "userIdentifier": current_app.config["SMARTLING_USER_ID"],
+            "userSecret": current_app.config["SMARTLING_USER_SECRET"],
+        },
+    )
     if resp.status_code != 200:
         sys.exit("could not connect to smartling")
 
