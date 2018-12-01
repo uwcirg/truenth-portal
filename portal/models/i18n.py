@@ -21,7 +21,7 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
-from .i18n_utils import BearerAuth
+from .i18n_utils import BearerAuth, smartling_authenticate
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -149,24 +149,6 @@ def fix_references(pot_fpath):
 
     os.rename(tmpfile.name, pot_fpath)
     current_app.logger.debug("messages.pot file references fixed")
-
-
-def smartling_authenticate():
-    resp = requests.post(
-        url='https://api.smartling.com/auth-api/v2/authenticate',
-        json={
-            "userIdentifier": current_app.config["SMARTLING_USER_ID"],
-            "userSecret": current_app.config["SMARTLING_USER_SECRET"],
-        },
-    )
-    if resp.status_code != 200:
-        sys.exit("could not connect to smartling")
-
-    try:
-        token = resp.json()['response']['data']['accessToken']
-    except KeyError:
-        sys.exit("no smartling access token found")
-    return token
 
 
 def smartling_upload():
