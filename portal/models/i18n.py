@@ -21,6 +21,7 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
+from .i18n_utils import BearerAuth
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -216,14 +217,14 @@ def upload_pot_file(fpath, fname, uri):
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
-        auth = smartling_authenticate()
+        creds = {'bearer_token': smartling_authenticate()}
         current_app.logger.debug("authenticated in smartling")
         with open(fpath, 'rb') as potfile:
             resp = requests.post(
                 upload_url.format(project_id),
                 data={'fileUri': uri, 'fileType': 'gettext'},
                 files={'file': (fname, potfile)},
-                headers={'Authorization': 'Bearer {}'.format(auth)},
+                auth=BearerAuth(**creds)
             )
             resp.raise_for_status()
         current_app.logger.debug(
@@ -238,15 +239,14 @@ def upload_pot_file(fpath, fname, uri):
 def smartling_download(state, language=None):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
 
-    auth = smartling_authenticate()
+    creds = {'bearer_token': smartling_authenticate()}
     current_app.logger.debug("authenticated in smartling")
-    headers = {'Authorization': 'Bearer {}'.format(auth)}
     download_and_extract_po_file(
         language=language,
         fname='messages',
         uri='portal/translations/messages.pot',
         state=state,
-        headers=headers,
+        credentials=creds,
         project_id=project_id,
     )
     download_and_extract_po_file(
@@ -254,19 +254,19 @@ def smartling_download(state, language=None):
         fname='frontend',
         uri='portal/translations/js/src/frontend.pot',
         state=state,
-        headers=headers,
+        credentials=creds,
         project_id=project_id,
     )
 
 
-def download_and_extract_po_file(language, fname, headers, uri, state, project_id):
+def download_and_extract_po_file(language, fname, credentials, uri, state, project_id):
     if language:
         response_content = download_po_file(
             language=language,
             project_id=project_id,
             uri=uri,
             state=state,
-            headers=headers,
+            credentials=credentials,
         )
         extract_po_file(language, response_content, fname)
     else:
@@ -274,7 +274,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state, project_i
             uri=uri,
             project_id=project_id,
             state=state,
-            headers=headers,
+            credentials=credentials,
         )
         for langfile in zfp.namelist():
             langcode = re.sub('-', '_', langfile.split('/')[0])
@@ -286,7 +286,7 @@ def download_and_extract_po_file(language, fname, headers, uri, state, project_i
         "{}.po files updated, mo files compiled".format(fname))
 
 
-def download_po_file(language, headers, project_id, uri, state):
+def download_po_file(language, credentials, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
     language_id = re.sub('_', '-', language)
@@ -296,7 +296,7 @@ def download_po_file(language, headers, project_id, uri, state):
     )
     resp = requests.get(
         url,
-        headers=headers,
+        auth=BearerAuth(**credentials),
         params={
             'retrievalType': state,
             'fileUri': uri,
@@ -309,17 +309,17 @@ def download_po_file(language, headers, project_id, uri, state):
     return resp.content
 
 
-def download_zip_file(headers, project_id, uri, state):
+def download_zip_file(credentials, project_id, uri, state):
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
         project_id
     )
     resp = requests.get(
         url,
-        headers=headers,
         params={
             'retrievalType': state,
             'fileUri': uri,
         },
+        auth=BearerAuth(**credentials),
     )
     if not resp.content:
         sys.exit('no file returned')
