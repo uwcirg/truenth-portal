@@ -154,16 +154,16 @@ def smartling_authenticate():
     url = 'https://api.smartling.com/auth-api/v2/authenticate'
     headers = {'Content-type': 'application/json'}
     data = {
-        "userIdentifier": current_app.config.get("SMARTLING_USER_ID"),
-        "userSecret": current_app.config.get("SMARTLING_USER_SECRET")
+        "userIdentifier": current_app.config["SMARTLING_USER_ID"],
+        "userSecret": current_app.config["SMARTLING_USER_SECRET"],
     }
     resp = requests.post(url, json=data, headers=headers)
     if resp.status_code != 200:
         sys.exit("could not connect to smartling")
-    resp_json = resp.json()
-    if ('response' in resp_json) and ('data' in resp_json['response']):
-        token = resp_json['response']['data'].get('accessToken')
-    if not token:
+
+    try:
+        token = resp.json()['response']['data']['accessToken']
+    except KeyError:
         sys.exit("no smartling access token found")
     return token
 
