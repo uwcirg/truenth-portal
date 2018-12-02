@@ -249,7 +249,7 @@ def download_and_extract_po_file(language, fname, credentials, uri, state, proje
             state=state,
             credentials=credentials,
         )
-        extract_po_file(language, response_content, fname)
+        write_po_file(language, response_content, fname)
     else:
         zfp = download_zip_file(
             uri=uri,
@@ -258,11 +258,11 @@ def download_and_extract_po_file(language, fname, credentials, uri, state, proje
             credentials=credentials,
         )
         for langfile in zfp.namelist():
-            langcode = re.sub('-', '_', langfile.split('/')[0])
-            data = zfp.read(langfile)
-            if not data or not langcode:
+            langcode = langfile.split('/')[0].replace('-','_')
+            po_data = zfp.read(langfile)
+            if not po_data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
-            extract_po_file(langcode, data, fname)
+            write_po_file(langcode, po_data, fname)
     current_app.logger.debug(
         "{}.po files updated, mo files compiled".format(fname))
 
@@ -290,7 +290,7 @@ def download_po_file(language, credentials, project_id, uri, state):
     return resp.content
 
 
-def extract_po_file(language, data, fname):
+def write_po_file(language, po_data, fname):
     po_dir = os.path.join(
         current_app.root_path,
         "translations",
@@ -308,7 +308,7 @@ def extract_po_file(language, data, fname):
             raise
 
     with open(temp_po_path, "wb") as fout:
-        fout.write(data)
+        fout.write(po_data)
     current_app.logger.debug("{} po file extracted".format(language))
     merge_po_into_master(temp_po_path, language, fname)
     os.remove(temp_po_path)
