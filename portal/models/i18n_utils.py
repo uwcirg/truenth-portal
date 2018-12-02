@@ -31,8 +31,10 @@ def smartling_authenticate():
             "userSecret": current_app.config["SMARTLING_USER_SECRET"],
         },
     )
-    if resp.status_code != 200:
-        sys.exit("could not connect to smartling")
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        sys.exit("Error authenticating with Smartling")
 
     try:
         token = resp.json()['response']['data']['accessToken']
