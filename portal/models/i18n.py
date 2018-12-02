@@ -10,7 +10,6 @@ import re
 from subprocess import check_call
 import sys
 import tempfile
-from zipfile import ZipFile
 
 from babel import negotiate_locale
 from flask import current_app, has_request_context, request, session
@@ -21,7 +20,7 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
-from .i18n_utils import BearerAuth, smartling_authenticate
+from .i18n_utils import BearerAuth, smartling_authenticate, download_zip_file
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -289,25 +288,6 @@ def download_po_file(language, credentials, project_id, uri, state):
     current_app.logger.debug("{} po file downloaded "
                              "from smartling".format(language))
     return resp.content
-
-
-def download_zip_file(credentials, project_id, uri, state):
-    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
-        project_id
-    )
-    resp = requests.get(
-        url,
-        params={
-            'retrievalType': state,
-            'fileUri': uri,
-        },
-        auth=BearerAuth(**credentials),
-    )
-    if not resp.content:
-        sys.exit('no file returned')
-    current_app.logger.debug("zip file downloaded from smartling")
-    fp = BytesIO(resp.content)
-    return ZipFile(fp, "r")
 
 
 def extract_po_file(language, data, fname):

@@ -3,6 +3,9 @@ from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 
+from io import BytesIO
+from zipfile import ZipFile
+
 from flask import current_app
 import requests
 
@@ -41,3 +44,25 @@ def smartling_authenticate():
     except KeyError:
         sys.exit("no smartling access token found")
     return token
+
+
+def download_zip_file(credentials, project_id, uri, state):
+    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
+        project_id
+    )
+    resp = requests.get(
+        url,
+        params={
+            'retrievalType': state,
+            'fileUri': uri,
+        },
+        auth=BearerAuth(**credentials),
+    )
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        sys.exit("Error downloading file from Smartling")
+
+    current_app.logger.debug("zip file downloaded from smartling")
+    fp = BytesIO(resp.content)
+    return ZipFile(fp, "r")
