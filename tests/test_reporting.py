@@ -192,7 +192,10 @@ class TestReporting(TestCase):
         org, org2, org3, false_org, user = map(
             db.session.merge, (org, org2, org3, false_org, user))
 
-        ostats = {org3: [2, 3], org2: [1, 5], org: [1, 8, 9, 11]}
+        ostats = {
+            (org3.id, org3.name): [2, 3],
+            (org2.id, org2.name): [1, 5],
+            (org.id, org.name): [1, 8, 9, 11]}
         cutoffs = [5, 10]
 
         table1 = generate_overdue_table_html(cutoff_days=cutoffs,
