@@ -17,6 +17,7 @@ POT_FILES = (
 
 
 class BearerAuth(requests.auth.AuthBase):
+    """Add bearer token to HTTP headers for authenticated requests to Smartling"""
     def __init__(self, bearer_token):
         # setup any auth-related data here
         self.bearer_token = bearer_token
