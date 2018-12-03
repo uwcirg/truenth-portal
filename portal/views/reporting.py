@@ -67,18 +67,18 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     rows = []
     totals = defaultdict(int)
 
-    for org in sorted(overdue_stats, key=lambda x: x.name):
-        if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
+    for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
+        if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
             continue
         user_accessible = False
         for user_org in user.organizations:
-            if ot.at_or_below_ids(user_org.id, [org.id]):
+            if ot.at_or_below_ids(user_org.id, [org_id]):
                 user_accessible = True
                 break
         if not user_accessible:
             continue
-        counts = overdue_stats[org]
-        org_row = [org.name]
+        counts = overdue_stats[(org_id, org_name)]
+        org_row = [org_name]
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:

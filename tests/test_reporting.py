@@ -168,7 +168,7 @@ class TestReporting(TestCase):
 
         ostats = self.get_ostats()
         assert len(ostats) == 1
-        assert ostats[crv] == [15]
+        assert ostats[(crv.id, crv.name)] == [15]
 
     def test_overdue_table_html(self):
         org = Organization(name='OrgC', id=101)
