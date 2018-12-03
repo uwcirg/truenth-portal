@@ -115,7 +115,6 @@ def msgcat(*po_files):
 
 def download_all_translations(state):
     """Download translations from all Smartling projects and combine"""
-    current_app.config['SMARTLING_PROJECT_IDS'] = ('13f8e2dcf', 'dd112801a')
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
         dest_po_basename = os.path.basename(pot_file_path).split('.pot')[0]
@@ -124,7 +123,9 @@ def download_all_translations(state):
         po_files_to_merge = defaultdict(list)
         for project_id in current_app.config['SMARTLING_PROJECT_IDS']:
             current_app.logger.debug(
-                "Downloading %s from project %s", dest_po_basename, project_id
+                "Downloading %s.pot translations from project %s",
+                dest_po_basename,
+                project_id,
             )
             all_locales_zipfile = download_zip_file(
                 uri=pot_file_path,
@@ -137,14 +138,18 @@ def download_all_translations(state):
 
         for locale_code, po_files in po_files_to_merge.items():
             current_app.logger.debug("Combining PO files")
-            combined_po = msgcat(*po_files)
-
-            dest_po_filename = os.path.join(
+            dest_po_path = os.path.join(
                 current_app.root_path, "translations",
-                locale_code, 'LC_MESSAGES', '{}.po'.format(dest_po_basename),
+                locale_code, 'LC_MESSAGES',
             )
-            combined_po.save(dest_po_filename)
+            dest_po = os.path.join(dest_po_path, '{}.po'.format(dest_po_basename))
+            dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
+
+            combined_po = msgcat(*po_files)
+            combined_po.save(dest_po)
             current_app.logger.info(
                 "Saved combined PO file: %s",
-                os.path.relpath(dest_po_filename, current_app.root_path),
+                os.path.relpath(dest_po, current_app.root_path),
             )
+            combined_po.save_as_mofile(dest_mo)
+            current_app.logger.debug("Saved MO file %s", dest_mo)
