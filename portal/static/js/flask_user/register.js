@@ -4,7 +4,6 @@
         this.init = function() {
             var self = this;
             $(document).ready(function(){
-                console.log("get to init??")
                 self.initVis();
                 self.initPasswordPopover();
                 self.initFieldEvents();
