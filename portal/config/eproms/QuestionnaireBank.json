@@ -282,13 +282,8 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 30}",
-          "termination": "{\"months\": 33}"
-        },
-        {
-          "cycle_length": "{\"years\": 1}",
           "start": "{\"months\": 6, \"days\": -14}",
-          "termination": "{\"months\": 21}"
+          "termination": "{\"months\": 33}"
         }
       ],
       "research_protocol": {
@@ -330,13 +325,8 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 30}",
-          "termination": "{\"months\": 33}"
-        },
-        {
-          "cycle_length": "{\"years\": 1}",
           "start": "{\"months\": 6, \"days\": -14}",
-          "termination": "{\"months\": 21}"
+          "termination": "{\"months\": 33}"
         }
       ],
       "research_protocol": {
