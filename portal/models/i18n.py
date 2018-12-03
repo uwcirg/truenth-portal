@@ -258,7 +258,7 @@ def download_and_extract_po_file(language, fname, credentials, uri, state, proje
             credentials=credentials,
         )
         for langfile in zfp.namelist():
-            langcode = langfile.split('/')[0].replace('-','_')
+            langcode = langfile.split('/')[0].replace('-', '_')
             po_data = zfp.read(langfile)
             if not po_data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
@@ -351,6 +351,7 @@ def merge_po_into_master(input_po_path, language, dest_po_basename):
         incoming_po.save_as_mofile(
             os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
         current_app.logger.debug('no existing file; saved {}'.format(mpo_path))
+
 
 @babel.localeselector
 def get_locale():

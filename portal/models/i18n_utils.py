@@ -82,7 +82,7 @@ def pos_from_zip(zipfile):
     :param zipfile: open Smartling zip archive, each language in its own subdir
     """
     for po_uri in zipfile.namelist():
-        locale_code = po_uri.split('/')[0].replace('-','_')
+        locale_code = po_uri.split('/')[0].replace('-', '_')
         content = zipfile.read(po_uri).decode("utf8")
 
         try:
@@ -95,6 +95,7 @@ def pos_from_zip(zipfile):
                 out_po.write(content)
             sys.exit("Error in extracted PO file ({}); wrote to {}".format(po_uri, bad_po))
         yield locale_code, po
+
 
 def msgcat(*po_files):
     """Concatenate input po_files together, with later files overwriting earlier ones"""
