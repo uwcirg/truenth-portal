@@ -138,7 +138,11 @@ def download_all_translations(state):
                 po_files_to_merge[po_locale_code].append(po)
 
         for locale_code, po_files in po_files_to_merge.items():
-            current_app.logger.debug("Combining PO files")
+            current_app.logger.debug(
+                "Combining PO files for %s.pot (%s)",
+                dest_po_basename,
+                locale_code,
+            )
             dest_po_path = os.path.join(
                 current_app.root_path, "translations",
                 locale_code, 'LC_MESSAGES',
@@ -153,4 +157,7 @@ def download_all_translations(state):
                 os.path.relpath(dest_po, current_app.root_path),
             )
             combined_po.save_as_mofile(dest_mo)
-            current_app.logger.debug("Saved MO file %s", dest_mo)
+            current_app.logger.info(
+                "Saved combined MO file: %s",
+                os.path.relpath(dest_mo, current_app.root_path),
+            )
