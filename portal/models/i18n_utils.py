@@ -3,7 +3,8 @@ from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 
-from io import BytesIO
+import io
+import sys
 from zipfile import ZipFile
 
 from flask import current_app
@@ -64,5 +65,24 @@ def download_zip_file(credentials, project_id, uri, state):
         sys.exit("Error downloading file from Smartling")
 
     current_app.logger.debug("zip file downloaded from smartling")
-    fp = BytesIO(resp.content)
+    fp = io.BytesIO(resp.content)
     return ZipFile(fp, "r")
+
+
+def pos_from_zip(zipfile):
+    """Extract PO files by locale from Smartling archive"""
+    for po_uri in zipfile.namelist():
+        locale_code = po_uri.split('/')[0].replace('-','_')
+        content = zipfile.read(po_uri).decode("utf8")
+
+        try:
+            po = pofile(content)
+        except IOError as e:
+            current_app.logger.error(e)
+
+            bad_po = '/tmp/{}-bad.po'.format(locale_code)
+            with io.open(bad_po, 'w', encoding='utf8') as out_po:
+                out_po.write(content)
+            sys.exit("Error in extracted PO file ({}); wrote to {}".format(po_uri, bad_po))
+        yield locale_code, po
+
