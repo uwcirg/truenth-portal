@@ -247,7 +247,7 @@ def smartling_download(state, language=None):
 def download_po_file(language, credentials, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
-    language_id = re.sub('_', '-', language)
+    language_id = language.replace('_', '-')
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
         project_id,
         language_id,
