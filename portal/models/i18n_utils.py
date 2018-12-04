@@ -241,11 +241,21 @@ def download_all_translations(state):
             dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
 
             combined_po = msgcat(*po_files)
+
+            # Create directory if necessary
+            if not os.path.isdir(dest_po_path):
+                try:
+                    os.makedirs(dest_po_path)
+                except OSError as e:
+                    current_app.logger.error(e)
+                    sys.exit("Error in creating directory {}".format(os.path.dirname(dest_po_path)))
+
             combined_po.save(dest_po)
             current_app.logger.info(
                 "Saved combined PO file: %s",
                 os.path.relpath(dest_po, current_app.root_path),
             )
+
             combined_po.save_as_mofile(dest_mo)
             current_app.logger.info(
                 "Saved combined MO file: %s",
