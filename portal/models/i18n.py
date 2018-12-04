@@ -20,7 +20,7 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
-from .i18n_utils import BearerAuth, smartling_authenticate, download_zip_file
+from .i18n_utils import BearerAuth, download_zip_file, smartling_authenticate
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum

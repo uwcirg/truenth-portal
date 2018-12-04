@@ -6,13 +6,13 @@ standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
 import io
-import sys
 import os
+import sys
 from zipfile import ZipFile
 
 from flask import current_app
-import requests
 from polib import pofile
+import requests
 
 POT_FILES = (
     'portal/translations/messages.pot',
