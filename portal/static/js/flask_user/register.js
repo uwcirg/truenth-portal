@@ -55,6 +55,9 @@
                     self.checkValidity();
                 }
             });
+            $("#password").on("keyup", function() { 
+                self.checkValidity(); //check field validity
+            });
             $("#email").on("change", function() {
                 $("#erroremail").text("");
             });
