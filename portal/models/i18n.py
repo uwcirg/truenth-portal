@@ -20,7 +20,11 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
-from .i18n_utils import BearerAuth, download_zip_file, smartling_authenticate
+from .i18n_utils import (
+    BearerAuth,
+    download_and_extract_po_file,
+    smartling_authenticate,
+)
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -240,33 +244,6 @@ def smartling_download(state, language=None):
     )
 
 
-def download_and_extract_po_file(language, fname, credentials, uri, state, project_id):
-    if language:
-        response_content = download_po_file(
-            language=language,
-            project_id=project_id,
-            uri=uri,
-            state=state,
-            credentials=credentials,
-        )
-        write_po_file(language, response_content, fname)
-    else:
-        zfp = download_zip_file(
-            uri=uri,
-            project_id=project_id,
-            state=state,
-            credentials=credentials,
-        )
-        for langfile in zfp.namelist():
-            langcode = langfile.split('/')[0].replace('-', '_')
-            po_data = zfp.read(langfile)
-            if not po_data or not langcode:
-                sys.exit('invalid po file for {}'.format(langcode))
-            write_po_file(langcode, po_data, fname)
-    current_app.logger.debug(
-        "{}.po files updated, mo files compiled".format(fname))
-
-
 def download_po_file(language, credentials, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
@@ -288,69 +265,6 @@ def download_po_file(language, credentials, project_id, uri, state):
     current_app.logger.debug("{} po file downloaded "
                              "from smartling".format(language))
     return resp.content
-
-
-def write_po_file(language, po_data, fname):
-    po_dir = os.path.join(
-        current_app.root_path,
-        "translations",
-        language,
-        'LC_MESSAGES',
-        'temp_{}.po'.format(fname),
-    )
-    temp_po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
-
-    # Create directory if necessary
-    try:
-        os.makedirs(po_dir)
-    except OSError:
-        if not os.path.isdir(po_dir):
-            raise
-
-    with open(temp_po_path, "wb") as fout:
-        fout.write(po_data)
-    current_app.logger.debug("{} po file extracted".format(language))
-    merge_po_into_master(temp_po_path, language, fname)
-    os.remove(temp_po_path)
-
-
-def merge_po_into_master(input_po_path, language, dest_po_basename):
-    """
-    Merge PO file into corresponding per-language PO file
-
-    :param input_po_path: input (temp) PO file to merge
-    :param language: language to operate on
-    :param dest_po_basename: destination file basename (without extension) in translations/
-    """
-    master_path = os.path.join(
-        current_app.root_path, "translations", language, 'LC_MESSAGES',
-    )
-
-    mpo_path = os.path.join(master_path, '{}.po'.format(dest_po_basename))
-    incoming_po = pofile(input_po_path)
-    if os.path.isfile(mpo_path):
-        master_po = pofile(mpo_path)
-
-        for entry in incoming_po:
-            if master_po.find(entry.msgid):
-                master_po.find(entry.msgid).msgstr = entry.msgstr
-            else:
-                master_po.append(entry)
-
-        master_po.save(mpo_path)
-        master_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
-        current_app.logger.debug(
-            "merged {s_file} into {d_file}".format(
-                s_file=os.path.relpath(incoming_po.fpath, current_app.root_path),
-                d_file=os.path.relpath(master_po.fpath, current_app.root_path),
-            )
-        )
-    else:
-        incoming_po.save(mpo_path)
-        incoming_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
-        current_app.logger.debug('no existing file; saved {}'.format(mpo_path))
 
 
 @babel.localeselector

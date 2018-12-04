@@ -70,9 +70,98 @@ def download_zip_file(credentials, project_id, uri, state):
         sys.exit("Error downloading file from Smartling")
 
     current_app.logger.debug("zip file downloaded from smartling")
-    # todo: close()/wrap with `with` as necessary
-    fp = io.BytesIO(resp.content)
-    return ZipFile(fp, "r")
+    return resp.content
+
+
+def download_and_extract_po_file(language, fname, credentials, uri, state, project_id):
+    if language:
+        response_content = download_po_file(
+            language=language,
+            project_id=project_id,
+            uri=uri,
+            state=state,
+            credentials=credentials,
+        )
+        write_po_file(language, response_content, fname)
+    else:
+        zip_contents = download_zip_file(
+            uri=uri,
+            project_id=project_id,
+            state=state,
+            credentials=credentials,
+        )
+        with io.BytesIO(zip_contents) as zip_fp, ZipFile(zip_fp, "r") as zfp:
+            for langfile in zfp.namelist():
+                langcode = langfile.split('/')[0].replace('-', '_')
+                po_data = zfp.read(langfile)
+                if not po_data or not langcode:
+                    sys.exit('invalid po file for {}'.format(langcode))
+                write_po_file(langcode, po_data, fname)
+    current_app.logger.debug(
+        "{}.po files updated, mo files compiled".format(fname))
+
+
+def write_po_file(language, po_data, fname):
+    po_dir = os.path.join(
+        current_app.root_path,
+        "translations",
+        language,
+        'LC_MESSAGES',
+        'temp_{}.po'.format(fname),
+    )
+    temp_po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
+
+    # Create directory if necessary
+    try:
+        os.makedirs(po_dir)
+    except OSError:
+        if not os.path.isdir(po_dir):
+            raise
+
+    with open(temp_po_path, "wb") as fout:
+        fout.write(po_data)
+    current_app.logger.debug("{} po file extracted".format(language))
+    merge_po_into_master(temp_po_path, language, fname)
+    os.remove(temp_po_path)
+
+
+def merge_po_into_master(input_po_path, language, dest_po_basename):
+    """
+    Merge PO file into corresponding per-language PO file
+
+    :param input_po_path: input (temp) PO file to merge
+    :param language: language to operate on
+    :param dest_po_basename: destination file basename (without extension) in translations/
+    """
+    master_path = os.path.join(
+        current_app.root_path, "translations", language, 'LC_MESSAGES',
+    )
+
+    mpo_path = os.path.join(master_path, '{}.po'.format(dest_po_basename))
+    incoming_po = pofile(input_po_path)
+    if os.path.isfile(mpo_path):
+        master_po = pofile(mpo_path)
+
+        for entry in incoming_po:
+            if master_po.find(entry.msgid):
+                master_po.find(entry.msgid).msgstr = entry.msgstr
+            else:
+                master_po.append(entry)
+
+        master_po.save(mpo_path)
+        master_po.save_as_mofile(
+            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
+        current_app.logger.debug(
+            "merged {s_file} into {d_file}".format(
+                s_file=os.path.relpath(incoming_po.fpath, current_app.root_path),
+                d_file=os.path.relpath(master_po.fpath, current_app.root_path),
+            )
+        )
+    else:
+        incoming_po.save(mpo_path)
+        incoming_po.save_as_mofile(
+            os.path.join(master_path, '{}.mo'.format(dest_po_basename)))
+        current_app.logger.debug('no existing file; saved {}'.format(mpo_path))
 
 
 def pos_from_zip(zipfile):
@@ -128,14 +217,15 @@ def download_all_translations(state):
                 dest_po_basename,
                 project_id,
             )
-            all_locales_zipfile = download_zip_file(
+            zip_contents = download_zip_file(
                 uri=pot_file_path,
                 project_id=project_id,
                 state=state,
                 credentials=creds,
             )
-            for po_locale_code, po in pos_from_zip(all_locales_zipfile):
-                po_files_to_merge[po_locale_code].append(po)
+            with io.BytesIO(zip_contents) as zip_fp, ZipFile(zip_fp, "r") as locales_zip:
+                for po_locale_code, po in pos_from_zip(locales_zip):
+                    po_files_to_merge[po_locale_code].append(po)
 
         for locale_code, po_files in po_files_to_merge.items():
             current_app.logger.debug(
