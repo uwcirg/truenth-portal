@@ -174,7 +174,9 @@ class BaseConfig(object):
     SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID')
     SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET')
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID')
+    # ePROMs translations will overwrite TNUSA on conflict
     SMARTLING_PROJECT_IDS = os.environ['SMARTLING_PROJECT_IDS'].split(',') \
+        # TrueNTH USA, ePROMs;
         if os.environ.get('SMARTLING_PROJECT_IDS') else ('13f8e2dcf', 'dd112801a')
 
     RECAPTCHA_ENABLED = True
