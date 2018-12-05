@@ -52,13 +52,25 @@ def smartling_authenticate():
     return token
 
 
-def download_zip_file(credentials, project_id, uri, state):
+def download_zip_file(credentials, project_id, uri, state, include_origs='false'):
+    """
+    Download an archive of all translations for a given fileUri
+    :param credentials: dict of credentials necessary for authentication
+    :param project_id: Smartling project id
+    :param uri: Smartling fileUri, a path relative to portal/
+    :param state: state of translations to download (eg published, in-progress)
+    :param include_origs: when the translation is missing,
+        whether or not to include the original string as the translation in PO files
+        ie copy msgid as msgstr
+        See https://help.smartling.com/hc/en-us/articles/360008000733-JSON#return-untranslated-strings-as-empty
+    """
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
         project_id
     )
     resp = requests.get(
         url,
         params={
+            'includeOriginalStrings': include_origs,
             'retrievalType': state,
             'fileUri': uri,
         },
