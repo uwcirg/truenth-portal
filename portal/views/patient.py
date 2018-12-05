@@ -326,11 +326,12 @@ def patient_timeline(patient_id):
             'visit': visit_name(qbd)})
 
     qbstatus = QB_Status(
-        user=User.query.get(patient_id), as_of_date=datetime.now())
+        user=User.query.get(patient_id), as_of_date=datetime.utcnow())
     prev_qbd = qbstatus.prev_qbd
     current = qbstatus.current_qbd()
     next_qbd = qbstatus.next_qbd
     status = {
+        'overall': str(qbstatus.overall_status),
         'previous QBD': prev_qbd.as_json() if prev_qbd else None,
         'current QBD': current.as_json() if current else None,
         'next QBD': next_qbd.as_json() if next_qbd else None,
