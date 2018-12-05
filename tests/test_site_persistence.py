@@ -12,6 +12,7 @@ from datetime import datetime
 import os
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db
@@ -112,8 +113,9 @@ class TestSitePersistence(TestCase):
     def test_app_text(self):
         assert app_text('landing title') == 'Welcome to TrueNTH'
 
+    @pytest.mark.skip(reason="QBs no longer support multiple recurrences")
     def test_questionnaire_banks_recurs(self):
-        # set up a few recurring instances
+        # only one recurrence per qb allowed at this time
         initial_recur = Recur(
             start='{"days": 90}', cycle_length='{"days": 90}',
             termination='{"days": 720}')

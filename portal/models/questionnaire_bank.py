@@ -129,6 +129,14 @@ class QuestionnaireBank(db.Model):
             self.recurs.remove(unwanted)
             db.session.delete(unwanted)
 
+        # enforce inability to handle multiple recurs per QB
+        # If this is ever needed, several tables will need to
+        # retain the recur associated with the QB_id and iteration
+        if len(self.recurs) > 1:
+            raise ValueError(
+                "System cannot handle multiple recurs per QB. "
+                "review definition for QB {}".format(self.name))
+
         def purge_rank_conflicts(questionnaire):
             # if a different q is assigned to the same rank, it'll lead to
             # an integrity error - must remove the stale first
