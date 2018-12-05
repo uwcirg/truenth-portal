@@ -10,7 +10,6 @@ import re
 from subprocess import check_call
 import sys
 import tempfile
-from zipfile import ZipFile
 
 from babel import negotiate_locale
 from flask import current_app, has_request_context, request, session
@@ -21,6 +20,11 @@ from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
+from .i18n_utils import (
+    BearerAuth,
+    download_and_extract_po_file,
+    smartling_authenticate,
+)
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -150,31 +154,14 @@ def fix_references(pot_fpath):
     current_app.logger.debug("messages.pot file references fixed")
 
 
-def smartling_authenticate():
-    url = 'https://api.smartling.com/auth-api/v2/authenticate'
-    headers = {'Content-type': 'application/json'}
-    data = {
-        "userIdentifier": current_app.config.get("SMARTLING_USER_ID"),
-        "userSecret": current_app.config.get("SMARTLING_USER_SECRET")
-    }
-    resp = requests.post(url, json=data, headers=headers)
-    if resp.status_code != 200:
-        sys.exit("could not connect to smartling")
-    resp_json = resp.json()
-    if ('response' in resp_json) and ('data' in resp_json['response']):
-        token = resp_json['response']['data'].get('accessToken')
-    if not token:
-        sys.exit("no smartling access token found")
-    return token
-
-
 def smartling_upload():
     # get relevant filepaths
     config_fname = current_app.config['BABEL_CONFIG_FILENAME']
     translation_fpath = os.path.join(current_app.root_path, "translations")
     messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
     config_fpath = os.path.join(
-        current_app.root_path, "../instance/", config_fname)
+        current_app.root_path, "../instance/", config_fname
+    )
 
     # create new .pot file from code
     check_call((
@@ -193,108 +180,81 @@ def smartling_upload():
     current_app.logger.debug("messages.pot file updated with db strings")
 
     fix_references(messages_pot_fpath)
+    upload_pot_file(
+        fpath=messages_pot_fpath,
+        fname='messages.pot',
+        uri='portal/translations/messages.pot',
+    )
 
-    upload_pot_file(messages_pot_fpath, 'messages.pot',
-                    'portal/translations/messages.pot')
-
-    frontend_pot_fpath = os.path.join(translation_fpath, "js",
-                                      "src", "frontend.pot")
+    frontend_pot_fpath = os.path.join(
+        translation_fpath, "js", "src", "frontend.pot"
+    )
 
     fix_references(frontend_pot_fpath)
-
-    upload_pot_file(frontend_pot_fpath, 'frontend.pot',
-                    'portal/translations/js/src/frontend.pot')
+    upload_pot_file(
+        fpath=frontend_pot_fpath,
+        fname='frontend.pot',
+        uri='portal/translations/js/src/frontend.pot'
+    )
 
 
 def upload_pot_file(fpath, fname, uri):
+    upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
-        # authenticate smartling
-        auth = smartling_authenticate()
+        creds = {'bearer_token': smartling_authenticate()}
         current_app.logger.debug("authenticated in smartling")
-        # upload .pot file to smartling
         with open(fpath, 'rb') as potfile:
-            headers = {'Authorization': 'Bearer {}'.format(auth)}
-            files = {'file': (fname, potfile)}
-            data = {
-                'fileUri': uri,
-                'fileType': 'gettext'
-            }
-            resp = requests.post('https://api.smartling.com'
-                                 '/files-api/v2/projects/{}'
-                                 '/file'.format(project_id),
-                                 data=data, files=files, headers=headers)
+            resp = requests.post(
+                upload_url.format(project_id),
+                data={'fileUri': uri, 'fileType': 'gettext'},
+                files={'file': (fname, potfile)},
+                auth=BearerAuth(**creds)
+            )
             resp.raise_for_status()
         current_app.logger.debug(
             "{} uploaded to smartling project {}".format(fname, project_id)
         )
     else:
-        current_app.logger.warn("missing smartling configuration - file {} "
-                                "not uploaded".format(fname))
+        current_app.logger.warn(
+            "missing smartling config - file {} not uploaded".format(fname)
+        )
 
 
 def smartling_download(state, language=None):
-    translation_fpath = os.path.join(current_app.root_path, "translations")
-    # authenticate smartling
-    auth = smartling_authenticate()
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+
+    creds = {'bearer_token': smartling_authenticate()}
     current_app.logger.debug("authenticated in smartling")
-    # GET file(s) from smartling
-    headers = {'Authorization': 'Bearer {}'.format(auth)}
     download_and_extract_po_file(
         language=language,
         fname='messages',
         uri='portal/translations/messages.pot',
         state=state,
-        headers=headers,
+        credentials=creds,
+        project_id=project_id,
     )
     download_and_extract_po_file(
         language=language,
         fname='frontend',
         uri='portal/translations/js/src/frontend.pot',
         state=state,
-        headers=headers,
+        credentials=creds,
+        project_id=project_id,
     )
 
 
-def download_and_extract_po_file(language, fname, headers, uri, state):
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    if language:
-        response_content = download_po_file(
-            language=language,
-            project_id=project_id,
-            uri=uri,
-            state=state,
-            headers=headers,
-        )
-        extract_po_file(language, response_content, fname)
-    else:
-        zfp = download_zip_file(
-            uri=uri,
-            project_id=project_id,
-            state=state,
-            headers=headers,
-        )
-        for langfile in zfp.namelist():
-            langcode = re.sub('-', '_', langfile.split('/')[0])
-            data = zfp.read(langfile)
-            if not data or not langcode:
-                sys.exit('invalid po file for {}'.format(langcode))
-            extract_po_file(langcode, data, fname)
-    current_app.logger.debug(
-        "{}.po files updated, mo files compiled".format(fname))
-
-
-def download_po_file(language, headers, project_id, uri, state):
+def download_po_file(language, credentials, project_id, uri, state):
     if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
-    language_id = re.sub('_', '-', language)
+    language_id = language.replace('_', '-')
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
         project_id,
         language_id,
     )
     resp = requests.get(
         url,
-        headers=headers,
+        auth=BearerAuth(**credentials),
         params={
             'retrievalType': state,
             'fileUri': uri,
@@ -305,72 +265,6 @@ def download_po_file(language, headers, project_id, uri, state):
     current_app.logger.debug("{} po file downloaded "
                              "from smartling".format(language))
     return resp.content
-
-
-def download_zip_file(headers, project_id, uri, state):
-    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
-        project_id
-    )
-    resp = requests.get(
-        url,
-        headers=headers,
-        params={
-            'retrievalType': state,
-            'fileUri': uri,
-        },
-    )
-    if not resp.content:
-        sys.exit('no file returned')
-    current_app.logger.debug("zip file downloaded from smartling")
-    fp = BytesIO(resp.content)
-    return ZipFile(fp, "r")
-
-
-def extract_po_file(language, data, fname):
-    po_dir = os.path.join(
-        current_app.root_path,
-        "translations",
-        language,
-        'LC_MESSAGES',
-        'temp_{}.po'.format(fname),
-    )
-    po_path = os.path.join(po_dir, 'temp_{}.po'.format(fname))
-
-    # Create directory if necessary
-    try:
-        os.makedirs(po_dir)
-    except OSError:
-        if not os.path.isdir(po_dir):
-            raise
-
-    with open(po_path, "wb") as fout:
-        fout.write(data)
-    current_app.logger.debug("{} po file extracted".format(language))
-    merge_po_into_master(po_path, language, fname)
-    os.remove(po_path)
-
-
-def merge_po_into_master(po_path, language, fname):
-    master_path = os.path.join(current_app.root_path, "translations",
-                               language, 'LC_MESSAGES')
-    mpo_path = os.path.join(master_path, '{}.po'.format(fname))
-    incoming_po = pofile(po_path)
-    if os.path.isfile(mpo_path):
-        master_po = pofile(mpo_path)
-
-        for entry in incoming_po:
-            if master_po.find(entry.msgid):
-                master_po.find(entry.msgid).msgstr = entry.msgstr
-            else:
-                master_po.append(entry)
-
-        master_po.save(mpo_path)
-        master_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(fname)))
-    else:
-        incoming_po.save(mpo_path)
-        incoming_po.save_as_mofile(
-            os.path.join(master_path, '{}.mo'.format(fname)))
 
 
 @babel.localeselector
