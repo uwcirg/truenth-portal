@@ -370,25 +370,29 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
         # If we have at least one result for this (QB, iteration):
         if partial_date:
-            if overdue_date and partial_date < overdue_date:
-                include_overdue = False
-            if partial_date < expired_date:
-                pending_qbts.append(QBT(
-                    at=partial_date, status='in_progress', **kwargs))
-                # Without subsequent results, expired will become partial
-                include_expired = False
-                expired_as_partial = True
-            else:
-                pending_qbts.append(QBT(
-                    at=partial_date, status='partially_completed', **kwargs))
-
             complete_date = user_qnrs.completed_date(
                 qbd.questionnaire_bank.id, qbd.iteration)
+
+            if partial_date != complete_date:
+                if overdue_date and partial_date < overdue_date:
+                    include_overdue = False
+                if partial_date < expired_date:
+                    pending_qbts.append(QBT(
+                        at=partial_date, status='in_progress', **kwargs))
+                    # Without subsequent results, expired will become partial
+                    include_expired = False
+                    expired_as_partial = True
+                else:
+                    pending_qbts.append(QBT(
+                        at=partial_date, status='partially_completed',
+                        **kwargs))
+
             if complete_date:
                 pending_qbts.append(QBT(
                     at=complete_date, status='completed',
                     **kwargs))
                 if complete_date < expired_date:
+                    include_overdue = False
                     include_expired = False
                     expired_as_partial = False
 
