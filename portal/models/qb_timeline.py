@@ -349,6 +349,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
     # As we move forward, capture state at each time point
 
     pending_qbts = []
+    kwargs = {"user_id": user_id}
     for qbd in qb_generator:
         qb_recur_id = qbd.recur.id if qbd.recur else None
         kwargs = {
