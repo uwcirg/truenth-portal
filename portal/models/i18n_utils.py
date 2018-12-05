@@ -54,6 +54,7 @@ def smartling_authenticate():
 
 def download_zip_file(credentials, project_id, uri, state, include_origs='false'):
     """Download an archive of all translations for a given fileUri
+
     :param credentials: credentials necessary for authentication
     :type credentials: dict
     :param project_id: Smartling project id
