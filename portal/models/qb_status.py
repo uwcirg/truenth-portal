@@ -280,14 +280,23 @@ class QB_Status(object):
         in_progress = self.__instruments_by_strategy(
             classification, need_completion)
 
-        def doc_id_lookup(instrument, classification):
+        def doc_id_lookup(instrument):
             """Obtain lookup keys from appropriate internals"""
-            if classification == 'indefinite':
+            # don't have instrument to qb association at this
+            # point, expect it belongs to one of the current!
+            qb_id = None
+            if self._current:
+                qb = self._current.questionnaire_bank
+                if instrument in [q.name for q in qb.questionnaires]:
+                    qb_id = qb.id
+                    iteration = self._current.iteration
+            if not qb_id and self._current_indef:
+                if instrument not in [q.name for q in qb.questionnaires]:
+                    raise ValueError(
+                        "Can't locate qb containing {} for continuation "
+                        "session (doc_id) lookup".format(instrument))
                 qb_id = self._current_indef.questionnaire_bank.id
                 iteration = self._current_indef.iteration
-            else:
-                qb_id = self._current.questionnaire_bank.id
-                iteration = self._current.iteration
 
             return qnr_document_id(
                 subject_id=self.user.id,
@@ -299,16 +308,7 @@ class QB_Status(object):
         # Lookup document id to resume session on correct document
         results = []
         for i in in_progress:
-            if classification == 'indefinite':
-                results.append(doc_id_lookup(i, classification))
-            elif classification is None:
-                results.append(doc_id_lookup(i, classification))
-            elif classification == 'all':
-                # don't immediately know which it belongs to, try both
-                r = doc_id_lookup(i, 'indefinite')
-                if not r:
-                    r = doc_id_lookup(i, None)
-                results.append(r)
+            results.append(doc_id_lookup(i))
         return results
 
     def enrolled_in_classification(self, classification):
