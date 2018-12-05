@@ -53,9 +53,9 @@ def smartling_authenticate():
 
 
 def download_zip_file(credentials, project_id, uri, state, include_origs='false'):
-    """
-    Download an archive of all translations for a given fileUri
-    :param credentials: dict of credentials necessary for authentication
+    """Download an archive of all translations for a given fileUri
+    :param credentials: credentials necessary for authentication
+    :type credentials: dict
     :param project_id: Smartling project id
     :param uri: Smartling fileUri, a path relative to portal/
     :param state: state of translations to download (eg published, in-progress)
@@ -63,6 +63,8 @@ def download_zip_file(credentials, project_id, uri, state, include_origs='false'
         whether or not to include the original string as the translation in PO files
         ie copy msgid as msgstr
         See https://help.smartling.com/hc/en-us/articles/360008000733-JSON#return-untranslated-strings-as-empty
+    :returns: zip file content
+    :rtype: bytestring
     """
     url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/all/file/zip'.format(
         project_id
