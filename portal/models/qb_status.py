@@ -57,6 +57,10 @@ class QB_Status(object):
 
         # w/o a cur, probably hasn't started, set expired and leave
         if not cur_qbd and ordered_qbs[0].relative_start > self.as_of_date:
+            trace(
+                "no current QBD (too early); first qb doesn't start till"
+                " {} vs as_of {}".format(
+                    ordered_qbs[0].relative_start, self.as_of_date))
             self._overall_status = OverallStatus.expired
             self._current = None
             self.next_qbd = ordered_qbs[0]
