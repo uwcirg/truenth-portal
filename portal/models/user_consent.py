@@ -171,7 +171,7 @@ def latest_consent(user, org_id=None, include_suspended=False):
         for consent in user.all_consents:
             if include_suspended and consent.status == 'suspended':
                 return consent
-            if consent.status != 'suspended':
+            if consent.deleted_id is None and consent.status != 'suspended':
                 return consent
 
     return None
