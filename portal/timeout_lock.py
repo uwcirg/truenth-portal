@@ -1,36 +1,60 @@
-from multiprocessing import Lock
+import time
+import redis
 
-from contextlib import contextmanager
+from flask import current_app
+
+
+class LockTimeout(BaseException):
+    """Exception raised when wait for TimeoutLock exceeds timeout"""
+    pass
 
 
 class TimeoutLock(object):
-    """Wrap multiprocessing lock in context manager
+    def __init__(self, key, expires=60, timeout=10):
+        """
+        Distributed locking using Redis SETNX and GETSET.
 
-    Usage:
-        lock = TimeoutLock()
+        Usage::
 
-        with lock.acquire_timeout(3) as result:
-            if result:
-                print('got the lock')
-                # do something ....
-            else:
-                print('timeout: lock not available')
-                # do something else ...
+            with Lock('my_lock'):
+                print "Critical section"
 
-    """
-    def __init__(self):
-        self._lock = Lock()
+        :param expires: Any existing lock older than ``expires`` seconds is
+          considered invalid in order to detect crashed clients. This value
+          must be higher than it takes the critical section to execute.
+        :param timeout: If another client has already obtained the lock, sleep
+          for a maximum of ``timeout`` seconds before giving up. A value of 0
+          means we never wait.
 
-    def acquire(self, blocking=True, timeout=-1):
-        return self._lock.acquire(blocking, timeout)
+        """
 
-    @contextmanager
-    def acquire_timeout(self, timeout):
-        result = self._lock.acquire(timeout=timeout)
-        yield result
-        if result:
-            self._lock.release()
+        self.key = key
+        self.timeout = timeout
+        self.expires = expires
+        self.redis = redis.StrictRedis.from_url(
+            current_app.config['REDIS_URL'])
 
-    def release(self):
-        self._lock.release()
+    def __enter__(self):
+        timeout = self.timeout
+        while timeout >= 0:
+            expires = time.time() + self.expires + 1
 
+            if self.redis.setnx(self.key, expires):
+                # lock acquired; enter critical section
+                return
+
+            current_value = self.redis.get(self.key)
+
+            # Found an expired lock and nobody beat us to replacing it
+            if current_value and float(current_value) < time.time() and \
+                self.redis.getset(self.key, expires) == current_value:
+                    return
+
+            timeout -= 1
+            time.sleep(1)
+
+        raise LockTimeout("Timeout whilst waiting for lock {}".format(
+            self.key))
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.redis.delete(self.key)
