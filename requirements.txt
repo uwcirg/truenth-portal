@@ -46,7 +46,7 @@ imagesize==1.1.0          # via sphinx
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==2.6.0
-kombu==4.2.1              # via celery
+kombu==4.2.2              # via celery
 mako==1.0.7               # via alembic
 markupsafe==1.1.0           # via jinja2, mako
 mock==2.0.0
