@@ -249,7 +249,7 @@ def update_patient_loop(
             update_patients(**kwargs)
 
 
-@celery.task(name="tasks.update_patients_task", soft_time_limit=60)
+@celery.task(name="tasks.update_patients_task")
 def update_patients_task(patient_list, update_cache, queue_messages):
     """Task form - wraps call to testable function `update_patients` """
     update_patients(patient_list, update_cache, queue_messages)
