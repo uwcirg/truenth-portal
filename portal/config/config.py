@@ -83,7 +83,7 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
-    FLUSH_CACHE_ON_SYNC = True
+    FLUSH_CACHE_ON_SYNC = os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true'
 
     CELERY_IMPORTS = ('portal.tasks',)
     CELERYD_MAX_TASKS_PER_CHILD = int(os.environ['CELERYD_MAX_TASKS_PER_CHILD']) \
