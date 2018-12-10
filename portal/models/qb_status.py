@@ -39,10 +39,16 @@ class QB_Status(object):
         # convert query to list of tuples for easier manipulation
         ordered_qbs = [qbt.qbd() for qbt in users_qbs]
         if not ordered_qbs:
-            trace("no qb timeline data for {}".format(self.user))
+            # Look for withdrawn case
+            if QBT.query.filter(QBT.user_id == self.user.id).filter(
+                    QBT.status == OverallStatus.withdrawn).count():
+                self._overall_status = OverallStatus.withdrawn
+                trace("found user withdrawn")
+            else:
+                self._overall_status = OverallStatus.expired
+                trace("no qb timeline data for {}".format(self.user))
             self._enrolled_in_common = False
             self._current = None
-            self._overall_status = OverallStatus.expired
             return
         self._enrolled_in_common = True
 
