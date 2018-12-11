@@ -118,7 +118,8 @@ def overdue_stats_by_org():
     """Generate cacheable stats by org
 
     In order to avoid caching db objects, save organization's (id, name) as
-    the returned dictionary key, value contains list of days overdue counts
+    the returned dictionary key, value contains list of tuples, (number of
+    days overdue and the respective user_id)
 
     """
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
@@ -130,7 +131,7 @@ def overdue_stats_by_org():
         overdue = calculate_days_overdue(user)
         if overdue > 0:
             for org in user.organizations:
-                overdue_stats[(org.id, org.name)].append(overdue)
+                overdue_stats[(org.id, org.name)].append((overdue, user.id))
     return overdue_stats
 
 

@@ -79,16 +79,24 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
             continue
         counts = overdue_stats[(org_id, org_name)]
         org_row = [org_name]
+        source_row = [org_name+'[user_ids]']
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:
-            count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
+            uids = []
+            for days_overdue, user_id in counts:
+                if days_overdue > curr_min and days_overdue <= cd:
+                    uids.append(user_id)
+            count = len([i for i, uid in counts if ((i > curr_min) and (i <= cd))])
             org_row.append(count)
+            source_row.append(uids)
             totals[cd] += count
             row_total += count
             curr_min = cd
         org_row.append(row_total)
         rows.append(org_row)
+        # Uncomment the following row to display user ids behind numbers
+        # rows.append(source_row)
 
     totalrow = [_("TOTAL")]
     row_total = 0

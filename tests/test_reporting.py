@@ -22,7 +22,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 
 
 class TestReporting(TestCase):
@@ -168,7 +168,7 @@ class TestReporting(TestCase):
 
         ostats = self.get_ostats()
         assert len(ostats) == 1
-        assert ostats[(crv.id, crv.name)] == [15]
+        assert ostats[(crv.id, crv.name)] == [(15, TEST_USER_ID)]
 
     def test_overdue_table_html(self):
         org = Organization(name='OrgC', id=101)
@@ -193,9 +193,9 @@ class TestReporting(TestCase):
             db.session.merge, (org, org2, org3, false_org, user))
 
         ostats = {
-            (org3.id, org3.name): [2, 3],
-            (org2.id, org2.name): [1, 5],
-            (org.id, org.name): [1, 8, 9, 11]}
+            (org3.id, org3.name): [(2, 101), (3, 102)],
+            (org2.id, org2.name): [(1, 103), (5, 104)],
+            (org.id, org.name): [(1, 105), (8, 106), (9, 107), (11, 108)]}
         cutoffs = [5, 10]
 
         table1 = generate_overdue_table_html(cutoff_days=cutoffs,
