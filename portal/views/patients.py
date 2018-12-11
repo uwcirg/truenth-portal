@@ -86,7 +86,8 @@ def patients_root():
         patients = patients.union(org_patients)
 
     if user.has_role(ROLE.INTERVENTION_STAFF.value):
-        uis = UserIntervention.query.filter(UserIntervention.user_id == user.id)
+        uis = UserIntervention.query.filter(
+            UserIntervention.user_id == user.id)
         ui_list = [ui.intervention_id for ui in uis]
 
         # Gather up all patients belonging to any of the interventions

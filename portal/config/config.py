@@ -83,7 +83,8 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
-    FLUSH_CACHE_ON_SYNC = os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true'
+    FLUSH_CACHE_ON_SYNC = (
+            os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true')
 
     CELERY_IMPORTS = ('portal.tasks',)
     CELERYD_MAX_TASKS_PER_CHILD = int(
@@ -178,8 +179,10 @@ class BaseConfig(object):
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID')
     # ePROMs translations will overwrite TNUSA on conflict
     # Project ID order: TrueNTH USA, ePROMs
-    SMARTLING_PROJECT_IDS = os.environ['SMARTLING_PROJECT_IDS'].split(',') \
-        if os.environ.get('SMARTLING_PROJECT_IDS') else ('13f8e2dcf', 'dd112801a')
+    SMARTLING_PROJECT_IDS = (
+        os.environ['SMARTLING_PROJECT_IDS'].split(',')
+        if os.environ.get('SMARTLING_PROJECT_IDS')
+        else ('13f8e2dcf', 'dd112801a'))
 
     RECAPTCHA_ENABLED = True
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')

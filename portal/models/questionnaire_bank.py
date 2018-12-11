@@ -284,6 +284,7 @@ class QuestionnaireBank(db.Model):
 
         return start + RelativeDelta(self.overdue)
 
+
 def trigger_date(user, qb=None):
     """Return trigger date for user
 
