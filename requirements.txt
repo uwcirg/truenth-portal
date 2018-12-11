@@ -18,7 +18,7 @@ click==7.0                # via flask
 coverage==4.5.2
 decorator==4.3.0          # via validators
 docutils==0.14            # via sphinx
-dogpile.cache==0.6.8      # via flask-dogpile-cache
+dogpile.cache==0.7.0      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.12.2
 flask-dance[sqla]==1.1.0
