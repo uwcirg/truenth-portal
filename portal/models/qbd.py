@@ -55,13 +55,15 @@ class QBD(object):
         self._questionnaire_bank = qb
 
     def as_json(self):
+        from ..models.questionnaire_bank import visit_name
+
         results = {}
         results['questionnaire_bank'] = (
             self.questionnaire_bank.as_json()
             if self.questionnaire_bank else None)
-        results['recur'] = self.recur.as_json() if self.recur else None
         results['relative_start'] = (
             FHIR_datetime.as_fhir(self.relative_start)
             if self.relative_start else None)
         results['iteration'] = self.iteration
+        results['visit'] = visit_name(self)
         return results
