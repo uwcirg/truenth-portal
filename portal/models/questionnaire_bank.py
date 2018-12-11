@@ -277,6 +277,12 @@ class QuestionnaireBank(db.Model):
 
         return start + RelativeDelta(self.due)
 
+    def calculated_overdue(self, start):
+        """Return calculated overdue given start date, or None if N/A"""
+        if not self.overdue:
+            return None
+
+        return start + RelativeDelta(self.overdue)
 
 def trigger_date(user, qb=None):
     """Return trigger date for user

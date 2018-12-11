@@ -104,6 +104,11 @@ class QB_Status(object):
                 self._completed_date = row.at
             if row.status == OverallStatus.in_progress:
                 self._in_progress_date = row.at
+                # If we didn't already pass the overdue date, obtain now
+                if not self._overdue_date and self._due_date:
+                    self._overdue_date = (
+                        cur_qbd.questionnaire_bank.calculated_overdue(
+                            self._due_date))
             if row.status in (
                     OverallStatus.expired,
                     OverallStatus.partially_completed):
