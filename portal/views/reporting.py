@@ -10,15 +10,18 @@ from datetime import datetime
 from io import StringIO
 from time import strftime
 
-from flask import Blueprint, make_response, render_template, request
+from flask import Blueprint, jsonify, make_response, render_template, request
 from flask_babel import gettext as _
 from flask_user import roles_required
 
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.organization import Organization, OrgTree
+from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
-from ..models.role import ROLE
-from ..models.user import User, current_user
+from ..models.role import Role, ROLE
+from ..models.user import User, UserRoles, current_user
+from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
 
@@ -152,3 +155,96 @@ def generate_numbers():
         filename)
     output.headers['Content-type'] = "text/csv"
     return output
+
+
+@reporting_api.route('/api/report/questionnaire_status')
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@oauth.require_oauth()
+def questionnaire_status():
+    """Return ad hoc JSON listing questionnaire_status
+
+    ---
+    tags:
+      - Report
+      - Questionnaire
+
+    operationId: questionnaire_status
+    parameters:
+      - name: org_id
+        in: path
+        description: Optional TrueNTH organization ID used to limit results
+          to patients belonging to given organization identifier, and
+          given organization's child organizations
+        required: false
+        type: integer
+        format: int64
+      - name: as_of_date
+        in: query
+        description: optional query string param to request status
+          at a different (UTC) point in time.  Defaults to now
+        required: false
+        type: string
+        format: date-time
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns JSON of the available questionnaire bank status for matching
+          set of users
+      400:
+        description: invalid query parameters
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+
+    if request.args.get('as_of_date'):
+        as_of_date = FHIR_datetime.parse(request.args.get('as_of_date'))
+    else:
+        as_of_date = datetime.utcnow()
+
+    # Obtain list of qualifying patients (not marked test)
+    # TODO: refactor this common query need to model and replace
+    # the less efficient similar usage elsewhere...
+    test_user_ids = UserRoles.query.join(Role).filter(
+        UserRoles.role_id == Role.id).filter(
+        Role.name == ROLE.TEST.value).with_entities(UserRoles.user_id)
+    patients = User.query.filter(User.active.is_(True)).join(
+        UserRoles).filter(User.id == UserRoles.user_id).join(
+        Role).filter(Role.name == ROLE.PATIENT.value).filter(
+        ~User.id.in_(test_user_ids))
+
+    # If limited by org - grab org and all it's children, and refine query
+    org_id = request.args.get('org_id')
+    if org_id:
+        limit_orgs = OrgTree().here_and_below_id(organization_id=org_id)
+        patients = patients.join(UserOrganization).filter(
+            User.id == UserOrganization.user_id).filter(
+            UserOrganization.organization_id.in_(limit_orgs))
+
+    results = []
+    for patient in patients:
+        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
+        row = {
+            'user_id': patient.id,
+            'site': patient.organizations.first().name,
+            'status': str(qb_stats.overall_status)}
+
+        consent = latest_consent(user=patient)
+        if consent:
+            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
+
+        study_id = patient.external_study_id
+        if study_id:
+            row['study_id'] = study_id
+
+        current = qb_stats.current_qbd()
+        if current:
+            row['visit'] = visit_name(current)
+        results.append(row)
+
+    return jsonify(status=results)
