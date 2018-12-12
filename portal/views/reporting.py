@@ -25,7 +25,6 @@ from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.fhir import bundle_results
 from ..models.organization import Organization, OrgTree, UserOrganization
-from ..models.overall_status import OverallStatus
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
 from ..models.role import Role, ROLE
