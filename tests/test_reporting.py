@@ -9,10 +9,12 @@ from flask_webtest import SessionScope
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
@@ -20,7 +22,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 
 
 class TestReporting(TestCase):
@@ -138,13 +140,17 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Expired'
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.expired
 
         ostats = self.get_ostats()
         assert len(ostats) == 0
@@ -156,12 +162,13 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Overdue'
+        invalidate_users_QBT(self.test_user.id)
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.overdue
 
         ostats = self.get_ostats()
         assert len(ostats) == 1
-        assert ostats[crv] == [15]
+        assert ostats[(crv.id, crv.name)] == [(15, TEST_USER_ID)]
 
     def test_overdue_table_html(self):
         org = Organization(name='OrgC', id=101)
@@ -185,7 +192,10 @@ class TestReporting(TestCase):
         org, org2, org3, false_org, user = map(
             db.session.merge, (org, org2, org3, false_org, user))
 
-        ostats = {org3: [2, 3], org2: [1, 5], org: [1, 8, 9, 11]}
+        ostats = {
+            (org3.id, org3.name): [(2, 101), (3, 102)],
+            (org2.id, org2.name): [(1, 103), (5, 104)],
+            (org.id, org.name): [(1, 105), (8, 106), (9, 107), (11, 108)]}
         cutoffs = [5, 10]
 
         table1 = generate_overdue_table_html(cutoff_days=cutoffs,

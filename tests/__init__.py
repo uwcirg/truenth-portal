@@ -19,7 +19,6 @@ from sqlalchemy.exc import IntegrityError
 from portal.factories.app import create_app
 from portal.config.config import TestConfig
 from portal.database import db
-from portal.models.assessment_status import invalidate_assessment_status_cache
 from portal.models.audit import Audit
 from portal.models.client import Client
 from portal.models.clinical_constants import add_static_concepts, CC
@@ -33,6 +32,7 @@ from portal.models.organization import Organization, add_static_organization
 from portal.models.organization import OrgTree
 from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
@@ -172,7 +172,7 @@ class TestCase(Base):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_assessment_status_cache(test_user.id)
+        invalidate_users_QBT(test_user.id)
         return test_user
 
     def promote_user(self, user=None, role_name=None):
@@ -341,6 +341,11 @@ class TestCase(Base):
           happening at exact time in the past
 
         """
+        # doesn't make sense to consent w/o an association, add if missing
+        user = User.query.get(user_id)
+        if org_id not in (o.id for o in user.organizations):
+            user.organizations.append(Organization.query.get(org_id))
+
         acceptance_date = calc_date_params(
             backdate=backdate, setdate=setdate)
         consent = UserConsent.query.filter(
@@ -360,7 +365,8 @@ class TestCase(Base):
             db.session.commit()
 
     def bless_with_basics(
-            self, backdate=None, setdate=None, local_metastatic=None):
+            self, backdate=None, setdate=None, local_metastatic=None,
+            make_patient=True):
         """Bless test user with basic requirements for coredata
 
         :param backdate: timedelta value.  Define to mock consents
@@ -373,9 +379,14 @@ class TestCase(Base):
         :param local_metastatic: set to 'localized' or 'metastatic' for
           tests needing those respective orgs assigned to the test user
 
+        :param make_patient: add patient role unless set False
+
         """
         self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
+
+        if make_patient:
+            self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Register with a clinic
         self.shallow_org_tree()

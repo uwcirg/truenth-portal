@@ -10,7 +10,6 @@ import pytest
 import regex
 
 from portal.database import db
-from portal.models.assessment_status import overall_assessment_status
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.communication import (
@@ -21,6 +20,9 @@ from portal.models.communication import (
 from portal.models.communication_request import CommunicationRequest
 from portal.models.identifier import Identifier
 from portal.models.intervention import Intervention
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import NO_EMAIL_PREFIX
@@ -128,9 +130,9 @@ class TestCommunication(TestQuestionnaireSetup):
 
         # with no timezone
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
-        self.bless_with_basics(setdate=dt)
-        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.bless_with_basics(setdate=dt, local_metastatic='localized')
         user = db.session.merge(self.test_user)
+        update_users_QBT(user_id=TEST_USER_ID)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
         assert dd['questionnaire_due_date'] == '10 Jun 2017'
@@ -173,7 +175,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=13), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -193,7 +194,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add', status='in-progress')
         mock_qr(instrument_id='epic26', status='in-progress')
         mock_qr(instrument_id='comorb', status='in-progress')
@@ -211,7 +211,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -228,7 +227,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=22), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query
@@ -245,7 +243,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=22), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.email = NO_EMAIL_PREFIX
         with SessionScope(db):
@@ -264,7 +261,6 @@ class TestCommunication(TestQuestionnaireSetup):
         # and mark all baseline questionnaires as in-progress
         self.bless_with_basics(
             backdate=relativedelta(days=14), local_metastatic='localized')
-        self.promote_user(role_name=ROLE.PATIENT.value)
         mock_qr(instrument_id='eproms_add')
         mock_qr(instrument_id='epic26')
         mock_qr(instrument_id='comorb')
@@ -364,8 +360,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         # Being a day short, shouldn't fire
         update_patient_loop(update_cache=False, queue_messages=True)
@@ -382,8 +378,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         for instrument in symptom_tracker_instruments:
             mock_qr(instrument_id=instrument)
@@ -405,13 +401,15 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user.birthdate = '1969-07-16'
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qstats.enrolled_in_classification('baseline')
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
-        a_s, _ = overall_assessment_status(TEST_USER_ID)
-        assert 'In Progress' == a_s
+        invalidate_users_QBT(TEST_USER_ID)
+        self.test_user = db.session.merge(self.test_user)
+        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert OverallStatus.in_progress == qstats.overall_status
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         assert expected
@@ -430,11 +428,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             status='final', issued=None)
 
         # Confirm test user doesn't qualify for ST QB
-        assert not QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert not qbstatus.enrolled_in_classification('baseline')
 
         # shouldn't generate a message either
-        mock_qr(instrument_id='epic26')
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
         assert not expected
@@ -449,8 +446,8 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        assert QuestionnaireBank.qbs_for_user(
-            self.test_user, 'baseline', as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert qbstatus.enrolled_in_classification('baseline')
 
         # Add fresh procedure
         self.add_procedure('4', 'External beam radiation therapy', ICHOM)

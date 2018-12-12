@@ -83,11 +83,13 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
-    FLUSH_CACHE_ON_SYNC = os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true'
+    FLUSH_CACHE_ON_SYNC = (
+            os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true')
 
     CELERY_IMPORTS = ('portal.tasks',)
-    CELERYD_MAX_TASKS_PER_CHILD = int(os.environ['CELERYD_MAX_TASKS_PER_CHILD']) \
-        if os.environ.get('CELERYD_MAX_TASKS_PER_CHILD') else None
+    CELERYD_MAX_TASKS_PER_CHILD = int(
+        os.environ['CELERYD_MAX_TASKS_PER_CHILD']) if os.environ.get(
+        'CELERYD_MAX_TASKS_PER_CHILD') else None
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
@@ -105,6 +107,7 @@ class BaseConfig(object):
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
     TOKEN_LIFE_IN_DAYS = 30  # Used for emailed URL tokens
+    MULTIPROCESS_LOCK_TIMEOUT = 30  # Lock on QB timeline generation
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
@@ -176,8 +179,10 @@ class BaseConfig(object):
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID')
     # ePROMs translations will overwrite TNUSA on conflict
     # Project ID order: TrueNTH USA, ePROMs
-    SMARTLING_PROJECT_IDS = os.environ['SMARTLING_PROJECT_IDS'].split(',') \
-        if os.environ.get('SMARTLING_PROJECT_IDS') else ('13f8e2dcf', 'dd112801a')
+    SMARTLING_PROJECT_IDS = (
+        os.environ['SMARTLING_PROJECT_IDS'].split(',')
+        if os.environ.get('SMARTLING_PROJECT_IDS')
+        else ('13f8e2dcf', 'dd112801a'))
 
     RECAPTCHA_ENABLED = True
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')

@@ -10,16 +10,17 @@ from ..audit import auditable_event
 from ..dogpile_cache import dogpile_cache
 from ..views.reporting import generate_overdue_table_html
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
-from .assessment_status import AssessmentStatus
 from .clinical_constants import CC
 from .communication import load_template_args
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
+from .overall_status import OverallStatus
 from .procedure_codes import (
     known_treatment_not_started,
     known_treatment_started,
 )
+from .qb_status import QB_Status
 from .role import ROLE
 from .user import User
 
@@ -103,21 +104,24 @@ def get_reporting_stats():
 
 def calculate_days_overdue(user):
     now = datetime.utcnow()
-    a_s = AssessmentStatus(user, as_of_date=now)
-    if a_s.overall_status in ('Completed', 'Expired', 'Partially Completed'):
+    a_s = QB_Status(user, as_of_date=now)
+    if a_s.overall_status in (
+            OverallStatus.completed, OverallStatus.expired,
+            OverallStatus.partially_completed):
         return 0
-    qb = a_s.qb_data.qbd.questionnaire_bank
-    if not qb:
-        return 0
-    trigger_date = qb.trigger_date(user)
-    if not trigger_date:
-        return 0
-    overdue = qb.calculated_overdue(trigger_date, as_of_date=now)
+    overdue = a_s.overdue_date
     return (datetime.utcnow() - overdue).days if overdue else 0
 
 
 @dogpile_cache.region('reporting_cache_region')
 def overdue_stats_by_org():
+    """Generate cacheable stats by org
+
+    In order to avoid caching db objects, save organization's (id, name) as
+    the returned dictionary key, value contains list of tuples, (number of
+    days overdue and the respective user_id)
+
+    """
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
     for user in User.query.filter_by(active=True):
@@ -127,7 +131,7 @@ def overdue_stats_by_org():
         overdue = calculate_days_overdue(user)
         if overdue > 0:
             for org in user.organizations:
-                overdue_stats[org].append(overdue)
+                overdue_stats[(org.id, org.name)].append((overdue, user.id))
     return overdue_stats
 
 

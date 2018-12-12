@@ -34,6 +34,7 @@ from .coding import Coding
 from .identifier import Identifier
 from .intervention import INTERVENTION, Intervention, UserIntervention
 from .organization import Organization, OrganizationIdentifier, OrgTree
+from .overall_status import OverallStatus
 from .procedure_codes import known_treatment_started
 from .role import Role
 
@@ -219,13 +220,13 @@ def allow_if_not_in_intervention(intervention_name):
 
 def update_card_html_on_completion():
     """Update description and card_html depending on state"""
-    from .assessment_status import AssessmentStatus  # avoid cycle
+    from .qb_status import QB_Status  # avoid cycle
 
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
         now = datetime.utcnow()
-        assessment_status = AssessmentStatus(user=user, as_of_date=now)
+        assessment_status = QB_Status(user=user, as_of_date=now)
         current_app.logger.debug("{}".format(assessment_status))
         indefinite_questionnaires = (
             assessment_status.instruments_needing_full_assessment(
@@ -265,21 +266,14 @@ def update_card_html_on_completion():
                     classification='indefinite'))
 
             if assessment_status.overall_status in (
-                    'Due', 'Overdue', 'In Progress'):
+                    OverallStatus.due, OverallStatus.overdue,
+                    OverallStatus.in_progress):
                 greeting = _("Hi, %(full_name)s", full_name=user.display_name)
 
-                qb = assessment_status.qb_data.qbd.questionnaire_bank
-                trigger_date = qb.trigger_date(user)
-                utc_start = qb.calculated_start(
-                    trigger_date, as_of_date=now).relative_start
-                utc_due = qb.calculated_due(
-                    trigger_date, as_of_date=now) or utc_start
-
-                if ((assessment_status.overall_status == 'Overdue') or
-                        (utc_due < datetime.utcnow())):
-                    utc_expired = qb.calculated_expiry(
-                        trigger_date, as_of_date=now) or utc_start
-                    expired_date = localize_datetime(utc_expired, user)
+                if (assessment_status.overall_status == OverallStatus.overdue
+                        or assessment_status.due_date < now):
+                    expired_date = localize_datetime(
+                        assessment_status.expired_date, user)
                     reminder = _(
                         "Please complete your %(assigning_authority)s "
                         "questionnaire as soon as possible. It will expire "
@@ -288,7 +282,8 @@ def update_card_html_on_completion():
                             assessment_status.assigning_authority),
                         expired_date=expired_date)
                 else:
-                    due_date = localize_datetime(utc_due, user)
+                    due_date = localize_datetime(
+                        assessment_status.due_date, user)
                     reminder = _(
                         "Please complete your %(assigning_authority)s "
                         "questionnaire by %(due_date)s.",
@@ -319,7 +314,8 @@ def update_card_html_on_completion():
                       </h4>
                     </div>""".format(greeting=greeting, reminder=reminder)
 
-            if assessment_status.overall_status in ("Completed", "Withdrawn"):
+            if assessment_status.overall_status in (
+                    OverallStatus.completed, OverallStatus.withdrawn):
                 return thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.assigning_authority)
@@ -355,7 +351,7 @@ def update_card_html_on_completion():
                   </div>
                  </div>"""
 
-            if assessment_status.overall_status == "Completed":
+            if assessment_status.overall_status == OverallStatus.completed:
                 header = _("Completed Questionnaires")
                 utc_comp_date = assessment_status.completed_date
                 comp_date = localize_datetime(utc_comp_date, user)
@@ -374,11 +370,12 @@ def update_card_html_on_completion():
         #  match state of users questionnaires (aka assessments)
         ####
         if assessment_status.overall_status in (
-                'Due', 'Overdue', 'In Progress'):
+                OverallStatus.due, OverallStatus.overdue,
+                OverallStatus.in_progress):
 
             link_label = _('Go to questionnaire')
             # User has unfinished baseline assessment work
-            if assessment_status.overall_status == 'In Progress':
+            if assessment_status.overall_status == OverallStatus.in_progress:
                 link_label = _('Continue questionnaire')
 
             link_url = url_for('assessment_engine_api.present_needed')
@@ -436,7 +433,8 @@ def update_card_html_on_completion():
                 message=message, link_url=link_url, link_label=link_label,
                 completed_card=completed_card_html(assessment_status))
 
-        elif assessment_status.overall_status in ("Completed", "Withdrawn"):
+        elif assessment_status.overall_status in (
+                OverallStatus.completed, OverallStatus.withdrawn):
             # User completed both baseline and indefinite
             link_label = _('View previous questionnaire')
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
@@ -464,7 +462,7 @@ def update_card_html_on_completion():
             # User has completed indefinite work, and the baseline
             # is either Expired or Partially Completed
             if assessment_status.overall_status not in (
-                    "Expired", "Partially Completed"):
+                    OverallStatus.expired, OverallStatus.partially_completed):
                 raise ValueError(
                     "Unexpected state {} for {}".format(
                         assessment_status.overall_status, user))

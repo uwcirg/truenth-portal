@@ -15,8 +15,8 @@ from flask_babel import gettext as _
 from flask_user import roles_required
 
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
 from ..models.organization import Organization, OrgTree
+from ..models.qb_status import QB_Status
 from ..models.role import ROLE
 from ..models.user import User, current_user
 
@@ -67,28 +67,36 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     rows = []
     totals = defaultdict(int)
 
-    for org in sorted(overdue_stats, key=lambda x: x.name):
-        if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
+    for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
+        if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
             continue
         user_accessible = False
         for user_org in user.organizations:
-            if ot.at_or_below_ids(user_org.id, [org.id]):
+            if ot.at_or_below_ids(user_org.id, [org_id]):
                 user_accessible = True
                 break
         if not user_accessible:
             continue
-        counts = overdue_stats[org]
-        org_row = [org.name]
+        counts = overdue_stats[(org_id, org_name)]
+        org_row = [org_name]
+        source_row = [org_name+'[user_ids]']
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:
-            count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
+            uids = []
+            for days_overdue, user_id in counts:
+                if days_overdue > curr_min and days_overdue <= cd:
+                    uids.append(user_id)
+            count = len([i for i, uid in counts if ((i > curr_min) and (i <= cd))])
             org_row.append(count)
+            source_row.append(uids)
             totals[cd] += count
             row_total += count
             curr_min = cd
         org_row.append(row_total)
         rows.append(org_row)
+        # Uncomment the following row to display user ids behind numbers
+        # rows.append(source_row)
 
     totalrow = [_("TOTAL")]
     row_total = 0
@@ -102,26 +110,19 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         'site_overdue_table.html', ranges=day_ranges, rows=rows)
 
 
-def overdue(user):
-    now = datetime.utcnow()
-    a_s = AssessmentStatus(user, as_of_date=now)
-    qb = a_s.qb_data.qbd.questionnaire_bank
-    if not qb:
-        return "No QB"
-    trigger_date = qb.trigger_date(user)
-    if not trigger_date:
-        return "No trigger date"
-    overdue = qb.calculated_overdue(trigger_date, as_of_date=now)
-    if not overdue:
-        return "No overdue date"
-    return (now - overdue).days
-
-
 @reporting_api.route('/admin/overdue-numbers')
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
+
+    def overdue(qstats):
+        now = datetime.utcnow()
+        overdue = qstats.overdue_date
+        if not overdue:
+            return "No overdue date"
+        return (now - overdue).days
+
     ot = OrgTree()
     results = StringIO()
     cw = csv.writer(results)
@@ -133,11 +134,11 @@ def generate_numbers():
     for user in User.query.filter_by(active=True):
         if (user.has_role(ROLE.PATIENT.value) and not
                 user.has_role(ROLE.TEST.value)):
-            a_s = AssessmentStatus(user, as_of_date=datetime.utcnow())
+            a_s = QB_Status(user, as_of_date=datetime.utcnow())
             email = (
                 user.email.encode('ascii', 'ignore') if user.email else None)
-            od = overdue(user)
-            qb = a_s.qb_name
+            od = overdue(a_s)
+            qb = a_s.current_qbd().questionnaire_bank.name
             for org in user.organizations:
                 top = ot.find_top_level_orgs([org], first=True)
                 org_name = "{}: {}".format(

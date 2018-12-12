@@ -9,9 +9,9 @@ from ..database import db
 from ..date_tools import RelativeDelta
 from ..system_uri import TRUENTH_CR_NAME
 from ..trace import trace
-from .assessment_status import overall_assessment_status
 from .communication import Communication
 from .identifier import Identifier
+from .overall_status import OverallStatus
 from .reference import Reference
 
 # https://www.hl7.org/fhir/valueset-request-status.html
@@ -226,7 +226,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
             trace('found existing communication for this request')
         return existing
 
-    def unfinished_work(user, questionnaire_bank):
+    def unfinished_work(qstats):
         """Return True if user has oustanding work and valid time remains
 
         Users may have completed all the related questionnaires, or they may
@@ -236,8 +236,9 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         this time
 
         """
-        a_s, _ = overall_assessment_status(user.id)
-        unfinished_work = a_s in ('Due', 'Overdue', 'In Progress')
+        unfinished_work = qstats.overall_status in (
+            OverallStatus.due, OverallStatus.overdue,
+            OverallStatus.in_progress)
         trace('{} unfinished work'.format(
             'found' if unfinished_work else "didn't find"))
         return unfinished_work
@@ -260,17 +261,16 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         return communication
 
     now = datetime.utcnow()
-    trigger_date = questionnaire_bank.trigger_date(user)
-    trace('trigger_date = {}'.format(trigger_date))
-    qbd = questionnaire_bank.calculated_start(trigger_date, as_of_date=now)
-    start = qbd.relative_start
-    if not start:
-        trace("no relative start found, can't continue")
+    from .qb_status import QB_Status
+    qstats = QB_Status(user=user, as_of_date=datetime.utcnow())
+    qbd = qstats.current_qbd()
+    if not qbd:
+        trace("no current QB found, can't continue")
         return
-    trace("computed start {} for this questionnaire_bank".format(
-        start))
-    trace("computed expiry {} for this questionnaire_bank".format(
-        start + RelativeDelta(questionnaire_bank.expired)))
+    trace("computed start {} with expiry {} for QB {} iteration {}".format(
+        qbd.relative_start,
+        qbd.relative_start + RelativeDelta(questionnaire_bank.expired),
+        qbd.questionnaire_bank.name, qbd.iteration))
 
     newly_crafted = []  # holds tuples (notify_date, communication)
     if not len(questionnaire_bank.communication_requests):
@@ -294,10 +294,11 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
             continue
 
         # Confirm reason for message remains
-        if not unfinished_work(user, questionnaire_bank):
+        if not unfinished_work(qstats):
             continue
 
-        notify_date = start + RelativeDelta(request.notify_post_qb_start)
+        notify_date = qbd.relative_start + RelativeDelta(
+            request.notify_post_qb_start)
         if (notify_date < now):
             trace(
                 "notifiy_date {} has passed - add communication".format(

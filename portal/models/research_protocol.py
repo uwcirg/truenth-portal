@@ -41,3 +41,12 @@ class ResearchProtocol(db.Model):
             return
         word_list = self.name.split('_')
         return ' '.join([n.title() for n in word_list])
+
+    @staticmethod
+    def assigned_to(user):
+        """Returns set of all ResearchProtocols assigned to given user"""
+        rps = set()
+        for org in user.organizations:
+            for r in org.rps_w_retired(consider_parents=True):
+                rps.add(r)
+        return rps

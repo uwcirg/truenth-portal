@@ -1,3 +1,4 @@
+from collections import namedtuple
 from html.parser import HTMLParser
 import json
 
@@ -59,6 +60,112 @@ class QuestionnaireResponse(db.Model):
                "{0.status} {0.authored}".format(self)
 
 
+QNR = namedtuple(
+    'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
+
+
+class QNR_results(object):
+    """API for QuestionnaireResponses for a user"""
+
+    def __init__(self, user, qb_id=None, qb_iteration=None):
+        """Optionally include qb_id, qb_iteration and recur to limit"""
+        self.user = user
+        query = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user.id).with_entities(
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.status,
+            QuestionnaireResponse.document[
+                ('questionnaire', 'reference')].label('instrument_id'),
+            QuestionnaireResponse.authored).order_by(
+            QuestionnaireResponse.authored)
+        if qb_id:
+            query = query.filter(
+                QuestionnaireResponse.questionnaire_bank_id == qb_id).filter(
+                QuestionnaireResponse.qb_iteration == qb_iteration)
+        self.qnrs = []
+        for qnr in query:
+            self.qnrs.append(QNR(
+                qb_id=qnr.questionnaire_bank_id,
+                iteration=qnr.qb_iteration,
+                status=qnr.status,
+                instrument=qnr.instrument_id.split('/')[-1],
+                authored=qnr.authored))
+
+    def earliest_result(self, qb_id, iteration):
+        """Returns timestamp of earliest result for given params, or None"""
+        for qnr in self.qnrs:
+            if (qnr.qb_id == qb_id and
+                    qnr.iteration == iteration):
+                return qnr.authored
+
+    def required_qs(self, qb_id):
+        """Return required list (order counts) of Questionnaires for QB"""
+        from .questionnaire_bank import QuestionnaireBank  # avoid import cyc.
+        qb = QuestionnaireBank.query.get(qb_id)
+        return [q.name for q in qb.questionnaires]
+
+    def completed_qs(self, qb_id, iteration):
+        """Return set of completed Questionnaire results for given QB"""
+        return {qnr.instrument for qnr in self.qnrs if
+                qnr.qb_id == qb_id
+                and qnr.iteration == iteration
+                and qnr.status == "completed"}
+
+    def partial_qs(self, qb_id, iteration):
+        """Return set of partial Questionnaire results for given QB"""
+        return {qnr.instrument for qnr in self.qnrs if
+                qnr.qb_id == qb_id
+                and qnr.iteration == iteration
+                and qnr.status == "in-progress"}
+
+    def completed_date(self, qb_id, iteration):
+        """Returns timestamp when named QB was completed, or None"""
+        required = set(self.required_qs(qb_id))
+        have = self.completed_qs(qb_id=qb_id, iteration=iteration)
+        if required - have:
+            # incomplete set
+            return None
+        # Return time when last completed in required came in
+        germane = [qnr for qnr in self.qnrs if
+                   qnr.qb_id == qb_id
+                   and qnr.iteration == iteration
+                   and qnr.status == "completed"]
+        for item in germane:
+            if item.instrument in required:
+                required.remove(item.instrument)
+            if not required:
+                return item.authored
+        raise RuntimeError("should have found authored for all required")
+
+
+class QNR_indef_results(QNR_results):
+    """Specialized for indefinite QB"""
+
+    def __init__(self, user, qb_id):
+        self.user = user
+        query = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user.id).filter(
+            QuestionnaireResponse.questionnaire_bank_id == qb_id
+        ).with_entities(
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.status,
+            QuestionnaireResponse.document[
+                ('questionnaire', 'reference')].label('instrument_id'),
+            QuestionnaireResponse.authored).order_by(
+            QuestionnaireResponse.authored)
+
+        self.qnrs = []
+        for qnr in query:
+            self.qnrs.append(QNR(
+                qb_id=qnr.questionnaire_bank_id,
+                iteration=qnr.qb_iteration,
+                status=qnr.status,
+                instrument=qnr.instrument_id.split('/')[-1],
+                authored=qnr.authored))
+
+
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     """Build a bundle of QuestionnaireResponses
 
@@ -67,7 +174,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
         to list of patients the current_user has permission to see
 
     """
-    from .questionnaire_bank import QuestionnaireBank, visit_name
+    from .qb_timeline import qb_status_visit_name  # avoid cycle
 
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = OrgTree().visible_patients(current_user)
@@ -90,12 +197,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
+        document = questionnaire_response.document.copy()
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
         encounter_fhir = encounter.as_fhir()
-        questionnaire_response.document["encounter"] = encounter_fhir
+        document["encounter"] = encounter_fhir
 
-        questionnaire_response.document["subject"] = {
+        document["subject"] = {
             k: v for k, v in subject.as_fhir().items() if k in patient_fields
         }
 
@@ -108,31 +216,25 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
                 if identifiers:
                     org_ref['identifier'] = identifiers
                 providers.append(org_ref)
-            questionnaire_response.document[
-                "subject"]["careProvider"] = providers
+            document["subject"]["careProvider"] = providers
 
-        # To lookup the time point, obtain the qbd holding both the qb
-        # and iteration to which the document applies
-
-        qbd = QuestionnaireBank.most_current_qb(
-            subject, as_of_date=encounter.start_time)
-        questionnaire_response.document["timepoint"] = visit_name(qbd)
+        _, timepoint = qb_status_visit_name(subject.id, encounter.start_time)
+        document["timepoint"] = timepoint
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
         if patch_dstu2:
-            questionnaire_response.document = {
-                'resource': questionnaire_response.document,
+            document = {
+                'resource': document,
                 # Todo: return URL to individual QuestionnaireResponse resource
                 'fullUrl': url_for(
                     '.assessment',
-                    patient_id=questionnaire_response.subject_id,
+                    patient_id=subject.id,
                     _external=True,
                 ),
             }
 
-        annotated_questionnaire_responses.append(
-            questionnaire_response.document)
+        annotated_questionnaire_responses.append(document)
 
     return bundle_results(elements=annotated_questionnaire_responses)
 

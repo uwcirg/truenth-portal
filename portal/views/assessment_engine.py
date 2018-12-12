@@ -24,15 +24,11 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import (
-    AssessmentStatus,
-    invalidate_assessment_status_cache,
-    overall_assessment_status,
-)
 from ..models.client import validate_origin
 from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.intervention import INTERVENTION
+from ..models.qb_status import QB_Status
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import (
@@ -1309,6 +1305,7 @@ def assessment_add(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
 
     if not hasattr(request, 'json') or not request.json:
         return abort(400, 'Invalid request')
@@ -1365,23 +1362,33 @@ def assessment_add(patient_id):
     qn_ref = request.json.get("questionnaire").get("reference")
     qn_name = qn_ref.split("/")[-1] if qn_ref else None
     qn = Questionnaire.find_by_name(name=qn_name)
-    qbd = QuestionnaireBank.most_current_qb(
-        patient, as_of_date=authored)
-    qb = qbd.questionnaire_bank
+    qbstatus = QB_Status(patient, as_of_date=authored)
+    qbd = qbstatus.current_qbd()
     if (
-        qb and qn and
-        (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+        qbd and qn and (qn.id in [
+        qbq.questionnaire.id for qbq in
+        qbd.questionnaire_bank.questionnaires])
     ):
-        qnr_qb = qb
+        qnr_qb = qbd.questionnaire_bank
+        qb_iteration = qbd.iteration
     # if a valid qb wasn't found, try the indefinite option
-    if not qnr_qb:
-        qbd = QuestionnaireBank.indefinite_qb(patient, as_of_date=authored)
-        qb = qbd.questionnaire_bank
+    else:
+        qbd = qbstatus.current_qbd('indefinite')
         if (
-            qb and qn and
-            (qn.id in [qbq.questionnaire.id for qbq in qb.questionnaires])
+            qbd and qn and (qn.id in [
+            qbq.questionnaire.id for qbq in
+            qbd.questionnaire_bank.questionnaires])
         ):
-            qnr_qb = qb
+            qnr_qb = qbd.questionnaire_bank
+            qb_iteration = qbd.iteration
+
+    if not qnr_qb:
+        current_app.logger.warning(
+            "Received questionnaire_response yet current QBs for patient {}"
+            "don't contain reference to given instrument {}".format(
+                patient_id, qn_name))
+        qnr_qb = None
+        qb_iteration = None
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
@@ -1389,7 +1396,7 @@ def assessment_add(patient_id):
         document=request.json,
         encounter=encounter,
         questionnaire_bank=qnr_qb,
-        qb_iteration=qbd.iteration
+        qb_iteration=qb_iteration
     )
 
     db.session.add(questionnaire_response)
@@ -1399,15 +1406,17 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    invalidate_assessment_status_cache(patient.id)
+    invalidate_users_QBT(patient.id)
     return jsonify(response)
 
 
 @assessment_engine_api.route('/invalidate/<int:user_id>')
 @oauth.require_oauth()
 def invalidate(user_id):
+    from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
+
     user = get_user_or_abort(user_id)
-    invalidate_assessment_status_cache(user_id)
+    invalidate_users_QBT(user_id)
     return jsonify(invalidated=user.as_fhir())
 
 
@@ -1423,6 +1432,8 @@ def present_needed():
     in an `in_progress` state will be treated as if they haven't been started.
 
     """
+    from ..models.qb_status import QB_Status  # avoid cycle
+
     subject_id = request.args.get('subject_id') or current_user().id
     subject = get_user_or_abort(subject_id)
     if subject != current_user():
@@ -1432,7 +1443,7 @@ def present_needed():
         request.args.get('authored'), none_safe=True)
     if not as_of_date:
         as_of_date = datetime.utcnow()
-    assessment_status = AssessmentStatus(subject, as_of_date=as_of_date)
+    assessment_status = QB_Status(subject, as_of_date=as_of_date)
     if assessment_status.overall_status == 'Withdrawn':
         abort(400, 'Withdrawn; no pending work found')
 
@@ -1717,6 +1728,8 @@ def batch_assessment_status():
       - ServiceToken: []
 
     """
+    from ..models.qb_timeline import qb_status_visit_name
+
     acting_user = current_user()
     user_ids = request.args.getlist('user_id')
     if not user_ids:
@@ -1729,11 +1742,11 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
-        assessment_status, _ = overall_assessment_status(user.id)
+        status, _ = qb_status_visit_name(user.id, datetime.utcnow())
         for consent in user.all_consents:
             details.append(
                 {'consent': consent.as_json(),
-                 'assessment_status': assessment_status})
+                 'assessment_status': str(status)})
         results.append({'user_id': user.id, 'consents': details})
 
     return jsonify(status=results)
@@ -1771,6 +1784,8 @@ def patient_assessment_status(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.qb_status import QB_Status
+
     patient = get_user_or_abort(patient_id)
     current_user().check_role(permission='view', other_id=patient_id)
 
@@ -1779,8 +1794,7 @@ def patient_assessment_status(patient_id):
     if trace:
         establish_trace(
             "BEGIN trace for assessment-status on {}".format(patient_id))
-    assessment_status = AssessmentStatus(user=patient, as_of_date=now)
-    assessment_overall_status = assessment_status.overall_status if assessment_status else None
+    assessment_status = QB_Status(user=patient, as_of_date=now)
 
     # indefinite assessments don't affect overall status, but need to
     # be available if unfinished
@@ -1789,18 +1803,19 @@ def patient_assessment_status(patient_id):
             classification='indefinite') +
         assessment_status.instruments_in_progress(classification='indefinite')
     )
-
+    qbd = assessment_status.current_qbd()
+    qb_name = qbd.questionnaire_bank.name if qbd else None
     response = {
-        'assessment_status': assessment_overall_status,
+        'assessment_status': str(assessment_status.overall_status),
         'outstanding_indefinite_work': outstanding_indefinite_work,
-        'questionnaires_ids': assessment_status.instruments_needing_full_assessment(
-            classification='all'
-        ),
+        'questionnaires_ids': (
+            assessment_status.instruments_needing_full_assessment(
+                classification='all')),
         'resume_ids': assessment_status.instruments_in_progress(
             classification='all'),
         'completed_ids': assessment_status.instruments_completed(
-            classfication='all'),
-        'qb_name': assessment_status.qb_name
+            classification='all'),
+        'qb_name': qb_name
     }
 
     if trace:

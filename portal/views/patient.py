@@ -4,6 +4,7 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
+from datetime import datetime
 import json
 
 from flask import Blueprint, abort, jsonify, request
@@ -15,6 +16,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier, UserIdentifier
+from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
@@ -84,9 +86,9 @@ def patient_search():
     responses:
       200:
         description:
-          Returns FHIR patient resource (http://www.hl7.org/fhir/patient.html)
-          in JSON if a match is found.  Otherwise responds with a 404 status
-          code.
+          Returns FHIR patient resource
+          (https://www.hl7.org/fhir/DSTU2/patient.html) in JSON if a match
+          is found.  Otherwise responds with a 404 status code.
       401:
         description:
           if missing valid OAuth token
@@ -289,3 +291,62 @@ def post_patient_dob(patient_id):
         subject_id=patient.id, context='user')
 
     return jsonify(patient.as_fhir(include_empties=False))
+
+
+@patient_api.route('/api/patient/<int:patient_id>/timeline')
+@oauth.require_oauth()
+def patient_timeline(patient_id):
+    from ..date_tools import FHIR_datetime
+    from ..models.qbd import QBD
+    from ..models.qb_status import QB_Status
+    from ..models.questionnaire_bank import visit_name
+    from ..trace import dump_trace, establish_trace
+
+    trace = request.args.get('trace', False)
+    if trace:
+        establish_trace("BEGIN time line lookup for {}".format(patient_id))
+
+    current_user().check_role(permission='view', other_id=patient_id)
+
+    purge = request.args.get('purge', False)
+    try:
+        update_users_QBT(patient_id, invalidate_existing=purge)
+    except ValueError as ve:
+        abort(500, ve.message)
+
+    results = []
+    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(QBT.at):
+        # build qbd for visit name
+        qbd = QBD(
+            relative_start=qbt.at, qb_id=qbt.qb_id,
+            iteration=qbt.qb_iteration, recur_id=qbt.qb_recur_id)
+        results.append({
+            'status': str(qbt.status),
+            'at': FHIR_datetime.as_fhir(qbt.at),
+            'visit': visit_name(qbd)})
+
+    qbstatus = QB_Status(
+        user=User.query.get(patient_id), as_of_date=datetime.utcnow())
+    prev_qbd = qbstatus.prev_qbd
+    current = qbstatus.current_qbd()
+    next_qbd = qbstatus.next_qbd
+    status = {
+        'overall': str(qbstatus.overall_status),
+        'previous QBD': prev_qbd.as_json() if prev_qbd else None,
+        'current QBD': current.as_json() if current else None,
+        'next QBD': next_qbd.as_json() if next_qbd else None,
+    }
+    if current:
+        status['due'] = qbstatus.due_date
+        status['overdue'] = qbstatus.overdue_date
+        status['expired'] = qbstatus.expired_date
+        status['needing-full'] = qbstatus.instruments_needing_full_assessment()
+        status['in-progress'] = qbstatus.instruments_in_progress()
+        status['completed'] = qbstatus.instruments_completed()
+
+    if trace:
+        return jsonify(
+            status=status,
+            timeline=results,
+            trace=dump_trace("END time line lookup"))
+    return jsonify(status=status, timeline=results)

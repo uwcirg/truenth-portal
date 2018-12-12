@@ -52,10 +52,6 @@ from ..models.app_text import (
     app_text,
     get_terms,
 )
-from ..models.assessment_status import (
-    invalidate_assessment_status_cache,
-    overall_assessment_status,
-)
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args
 from ..models.coredata import Coredata
@@ -696,6 +692,7 @@ def patient_invite_email(user_id):
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
+    from ..models.qb_status import QB_Status
     if user_id:
         user = get_user_or_abort(user_id)
     else:
@@ -708,12 +705,17 @@ def patient_reminder_email(user_id):
         else:
             name_key = UserReminderEmail_ATMA.name_key()
         questionnaire_bank_id = None
-        a_s, qbd = overall_assessment_status(user.id)
-        if qbd and qbd.questionnaire_bank:
-            questionnaire_bank_id = qbd.questionnaire_bank.id
+        # Todo: optimize this lookup with a direct query on QB timeline
+        # for dates needed in `load_template_args`
+        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qbd = qstats.current_qbd()
+        if not qbd:
+            return "Not Available", 204
+
         # pass in questionnaire bank id to get at the questionnaire due date
-        args = load_template_args(user=user,
-                                  questionnaire_bank_id=questionnaire_bank_id)
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qbd.qb_id,
+            qb_iteration=qbd.iteration)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
