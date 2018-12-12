@@ -1106,6 +1106,13 @@
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-07-20T05:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14686,
@@ -1186,6 +1193,13 @@
         {
           "timezone": "America/Los_Angeles",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2018-10-18T07:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14626,
