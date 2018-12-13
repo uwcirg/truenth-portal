@@ -17,6 +17,7 @@ from flask_user import roles_required
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.overall_status import OverallStatus
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
 from ..models.role import Role, ROLE
@@ -226,6 +227,7 @@ def questionnaire_status():
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(limit_orgs))
 
+    # Todo: confirm current_user has view on all patients
     results = []
     for patient in patients:
         qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
@@ -243,8 +245,12 @@ def questionnaire_status():
             row['study_id'] = study_id
 
         current = qb_stats.current_qbd()
+        previous = qb_stats.prev_qbd
         if current:
             row['visit'] = visit_name(current)
+        elif previous and qb_stats.overall_status == OverallStatus.expired:
+            # It's the previous visit that expired, not the current
+            row['visit'] = visit_name(previous)
         results.append(row)
 
     return jsonify(status=results)
