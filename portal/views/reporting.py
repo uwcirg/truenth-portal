@@ -231,6 +231,11 @@ def questionnaire_status():
     # Todo: confirm current_user has view on all patients
     results = []
     for patient in patients:
+        if not patient.organizations.first():
+            # Very unlikely we want to include patients w/o at least
+            # one org, skip this patient
+            continue
+
         qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
         row = {
             'user_id': patient.id,
