@@ -91,7 +91,8 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
             for days_overdue, user_id in counts:
                 if days_overdue > curr_min and days_overdue <= cd:
                     uids.append(user_id)
-            count = len([i for i, uid in counts if ((i > curr_min) and (i <= cd))])
+            count = len(
+                [i for i, uid in counts if ((i > curr_min) and (i <= cd))])
             org_row.append(count)
             source_row.append(uids)
             totals[cd] += count
