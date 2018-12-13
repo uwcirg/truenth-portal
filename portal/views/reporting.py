@@ -174,17 +174,17 @@ def questionnaire_status():
     operationId: questionnaire_status
     parameters:
       - name: org_id
-        in: path
-        description: Optional TrueNTH organization ID used to limit results
-          to patients belonging to given organization identifier, and
-          given organization's child organizations
+        in: query
+        description: optional TrueNTH organization ID used to limit results
+          to patients belonging to given organization identifier, and given
+          organization's child organizations
         required: false
         type: integer
         format: int64
       - name: as_of_date
         in: query
-        description: optional query string param to request status
-          at a different (UTC) point in time.  Defaults to now
+        description: optional query string param to request status at a
+          different (UTC) point in time.  Defaults to now
         required: false
         type: string
         format: date-time
