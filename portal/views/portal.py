@@ -5,6 +5,7 @@ from datetime import datetime
 from pprint import pformat
 from urllib.parse import urlencode
 
+from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from flask import (
     Blueprint,
@@ -1072,8 +1073,11 @@ def celery_info():
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
     celery = create_celery(current_app)
-    retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
-    return repr(retval)
+    try:
+        retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
+        return repr(retval)
+    except TimeoutError:
+        return "Operation timed out - most likely the task is not yet complete"
 
 
 @portal.route('/communicate')

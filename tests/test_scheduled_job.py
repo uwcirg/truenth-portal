@@ -151,7 +151,7 @@ class TestScheduledJob(TestCase):
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
 
         assert resp.status_code == 200
-        assert resp.json['message'].split()[-1] == 'Test'
+        assert resp.json['message'].startswith('Task sent to celery')
 
         # test task w/ args + kwargs
         alist = ["arg1", "arg2", "arg3"]
@@ -166,11 +166,5 @@ class TestScheduledJob(TestCase):
 
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
         assert resp.status_code == 200
-
-        msg = resp.json['message'].split(". ")[1].split("|")
-        assert msg[0].split(",") == alist
-        kdict['manual_run'] = True
-        kdict['job_id'] = job.id
-        assert json.loads(msg[1]) == kdict
 
         db.session.close_all()
