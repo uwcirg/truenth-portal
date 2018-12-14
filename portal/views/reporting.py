@@ -10,7 +10,7 @@ from datetime import datetime
 from io import StringIO
 from time import strftime
 
-from flask import Blueprint, jsonify, make_response, render_template, request
+from flask import Blueprint, jsonify, make_response, render_template, request, Response
 from flask_babel import gettext as _
 from flask_user import roles_required
 
@@ -189,6 +189,9 @@ def questionnaire_status():
         required: false
         type: string
         format: date-time
+      - name: format
+        in: query
+        description: expects json or csv, defaults to json if not provided
     produces:
       - application/json
     responses:
@@ -260,4 +263,17 @@ def questionnaire_status():
             row['visit'] = visit_name(previous)
         results.append(row)
 
-    return jsonify(bundle_results(elements=results))
+    if request.args.get('format', 'json').lower() == 'csv':
+        def gen(items):
+            desired_order = ['study_id', 'status', 'visit', 'site', 'consent']
+            yield ','.join(desired_order) + '\n'  # header row
+            for i in items:
+                yield ','.join([i.get(k, "") for k in desired_order]) + '\n'
+
+        return Response(
+            gen(results),
+            mimetype='text/plain',
+            headers={'Content-Disposition': 'attachment;filename=status.csv'}
+        )
+    else:
+        return jsonify(bundle_results(elements=results))
