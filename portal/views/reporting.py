@@ -16,6 +16,7 @@ from flask_user import roles_required
 
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.fhir import bundle_results
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.overall_status import OverallStatus
 from ..models.questionnaire_bank import visit_name
@@ -259,4 +260,4 @@ def questionnaire_status():
             row['visit'] = visit_name(previous)
         results.append(row)
 
-    return jsonify(status=results)
+    return jsonify(bundle_results(elements=results))

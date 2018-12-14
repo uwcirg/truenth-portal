@@ -42,7 +42,7 @@ now = datetime.utcnow()
 
 def mock_qr(
         instrument_id, status='completed', timestamp=None, qb=None,
-        doc_id=None, iteration=None):
+        doc_id=None, iteration=None, user_id=TEST_USER_ID):
     if not doc_id:
         doc_id = ''.join(choice(ascii_letters) for _ in range(10))
     timestamp = timestamp or datetime.utcnow()
@@ -59,19 +59,20 @@ def mock_qr(
             "system": "https://stg-ae.us.truenth.org/eproms-demo"}
     }
 
-    enc = Encounter(status='planned', auth_method='url_authenticated',
-                    user_id=TEST_USER_ID, start_time=timestamp)
+    enc = Encounter(
+        status='planned', auth_method='url_authenticated', user_id=user_id,
+        start_time=timestamp)
     with SessionScope(db):
         db.session.add(enc)
         db.session.commit()
     enc = db.session.merge(enc)
     if not qb:
-        qstats = QB_Status(get_user(TEST_USER_ID), timestamp)
+        qstats = QB_Status(get_user(user_id), timestamp)
         qbd = qstats.current_qbd()
         qb, iteration = qbd.questionnaire_bank, qbd.iteration
 
     qr = QuestionnaireResponse(
-        subject_id=TEST_USER_ID,
+        subject_id=user_id,
         status=status,
         authored=timestamp,
         document=qr_document,
@@ -81,7 +82,7 @@ def mock_qr(
     with SessionScope(db):
         db.session.add(qr)
         db.session.commit()
-    invalidate_users_QBT(user_id=TEST_USER_ID)
+    invalidate_users_QBT(user_id=user_id)
 
 
 localized_instruments = {'eproms_add', 'epic26', 'comorb'}

@@ -23,6 +23,8 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
 from tests import TestCase, TEST_USER_ID
+from tests.test_questionnaire_bank import TestQuestionnaireBank
+from tests.test_assessment_status import mock_qr
 
 
 class TestReporting(TestCase):
@@ -108,7 +110,7 @@ class TestReporting(TestCase):
 
         stats2 = self.get_stats(invalidate=False)
 
-        # shold not have changed, if still using cached values
+        # should not have changed, if still using cached values
         assert len(stats2['encounters']['all']) == 5
 
     def test_overdue_stats(self):
@@ -229,3 +231,75 @@ class TestReporting(TestCase):
         assert not '<td>{}</td>'.format(org.name) in table2
         # false_org should not show up, as it's not in the ostats
         assert not '<td>{}</td>'.format(false_org.name) in table2
+
+
+from tests import associative_backdate
+class TestQBStats(TestQuestionnaireBank):
+
+    def test_empty(self):
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 0
+
+    def test_results(self):
+        from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+
+        # Generate a few patients with differing results
+        org = self.setup_org_qbs()
+        org_name = org.name
+        user2 = self.add_user('user2')
+        user3 = self.add_user('user3')
+        user4 = self.add_user('user4')
+        with SessionScope(db):
+            db.session.add(user2)
+            db.session.add(user3)
+            db.session.add(user4)
+            db.session.commit()
+        user2 = db.session.merge(user2)
+        user3 = db.session.merge(user3)
+        user4 = db.session.merge(user4)
+        user4_id = user4.id
+
+        self.add_user_identifier(
+            user=user2, system=TRUENTH_EXTERNAL_STUDY_SYSTEM,
+            value='study user 2')
+        self.add_user_identifier(
+            user=user3, system=TRUENTH_EXTERNAL_STUDY_SYSTEM,
+            value='study user 3')
+
+        now = datetime.utcnow()
+        back15, nowish = associative_backdate(now, relativedelta(days=15))
+        back45, nowish = associative_backdate(now, relativedelta(days=45))
+        back115, nowish = associative_backdate(now, relativedelta(days=115))
+        self.bless_with_basics(
+            user=user2, setdate=back15, local_metastatic=org_name)
+        self.bless_with_basics(
+            user=user3, setdate=back45, local_metastatic=org_name)
+        self.bless_with_basics(
+            user=user4, setdate=back115, local_metastatic=org_name)
+
+        # submit a mock response for all q's in 3 mo qb
+        # which should result in completed status for user4
+        qb_name = "CRV_recurring_3mo_period v2"
+        threeMo = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+
+        for q in threeMo.questionnaires:
+            q = db.session.merge(q)
+            mock_qr(
+                q.name, qb=threeMo, iteration=0, user_id=user4_id,
+                timestamp=back15)
+
+        self.test_user = db.session.merge(self.test_user)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+        assert response.json['total'] == 3
+
+        expect = {'Due', 'Overdue', 'Completed'}
+        found = set([item['status'] for item in response.json['entry']])
+        assert expect == found
