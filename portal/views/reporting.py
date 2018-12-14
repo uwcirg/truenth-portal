@@ -192,6 +192,8 @@ def questionnaire_status():
       - name: format
         in: query
         description: expects json or csv, defaults to json if not provided
+        required: false
+        type: string
     produces:
       - application/json
     responses:
