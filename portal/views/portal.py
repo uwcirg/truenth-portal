@@ -1079,6 +1079,7 @@ def celery_result(task_id):
     except TimeoutError:
         return "Operation timed out - most likely the task is not yet complete"
 
+
 @portal.route('/communicate')
 @roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
