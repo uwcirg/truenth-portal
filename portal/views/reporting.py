@@ -279,12 +279,19 @@ def questionnaire_status():
                 'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
             yield ','.join(desired_order) + '\n'  # header row
             for i in items:
-                yield ','.join([i.get(k, "") for k in desired_order]) + '\n'
+                yield ','.join(
+                    [str(i.get(k, "")) for k in desired_order]) + '\n'
 
+        base_name = 'status'
+        if org_id:
+            base_name = Organization.query.get(org_id).name.replace(' ', '-')
+        filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
         return Response(
             gen(results),
-            mimetype='text/plain',
-            headers={'Content-Disposition': 'attachment;filename=status.csv'}
+            headers={
+                'Content-Disposition': 'attachment;filename={}'.format(
+                    filename),
+                'Content-type': "text/csv"}
         )
     else:
         return jsonify(bundle_results(elements=results))
