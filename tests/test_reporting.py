@@ -22,7 +22,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase, TEST_USER_ID, associative_backdate
 from tests.test_questionnaire_bank import TestQuestionnaireBank
 from tests.test_assessment_status import mock_qr
 
@@ -233,7 +233,6 @@ class TestReporting(TestCase):
         assert not '<td>{}</td>'.format(false_org.name) in table2
 
 
-from tests import associative_backdate
 class TestQBStats(TestQuestionnaireBank):
 
     def test_empty(self):

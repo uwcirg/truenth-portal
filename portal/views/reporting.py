@@ -10,7 +10,14 @@ from datetime import datetime
 from io import StringIO
 from time import strftime
 
-from flask import Blueprint, jsonify, make_response, render_template, request, Response
+from flask import (
+    Blueprint,
+    Response,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+)
 from flask_babel import gettext as _
 from flask_user import roles_required
 
@@ -165,7 +172,7 @@ def generate_numbers():
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def questionnaire_status():
-    """Return ad hoc JSON listing questionnaire_status
+    """Return ad hoc JSON or CSV listing questionnaire_status
 
     ---
     tags:
@@ -196,6 +203,7 @@ def questionnaire_status():
         type: string
     produces:
       - application/json
+      - text/csv
     responses:
       200:
         description:
@@ -267,7 +275,8 @@ def questionnaire_status():
 
     if request.args.get('format', 'json').lower() == 'csv':
         def gen(items):
-            desired_order = ['study_id', 'status', 'visit', 'site', 'consent']
+            desired_order = [
+                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
             yield ','.join(desired_order) + '\n'  # header row
             for i in items:
                 yield ','.join([i.get(k, "") for k in desired_order]) + '\n'
