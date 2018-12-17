@@ -21,7 +21,7 @@ docutils==0.14            # via sphinx
 dogpile.cache==0.7.1      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.12.2
-flask-dance[sqla]==1.1.0
+flask-dance[sqla]==1.2.0
 git+https://github.com/uwcirg/flask-dogpile-cache.git@0.3.2#egg=flask-dogpile-cache
 flask-login==0.4.1        # via flask-user
 flask-mail==0.9.1         # via flask-user
