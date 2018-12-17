@@ -264,14 +264,21 @@ def questionnaire_status():
         if study_id:
             row['study_id'] = study_id
 
-        current = qb_stats.current_qbd()
-        previous = qb_stats.prev_qbd
-        if current:
-            row['visit'] = visit_name(current)
-        elif previous and qb_stats.overall_status == OverallStatus.expired:
-            # It's the previous visit that expired, not the current
-            row['visit'] = visit_name(previous)
+        # if no current, try previous (as current may be expired)
+        last_viable = qb_stats.current_qbd() or qb_stats.prev_qbd
+        if last_viable:
+            row['visit'] = visit_name(last_viable)
+
         results.append(row)
+
+        # as we require a full history, continue to add rows for each previous
+        # visit available
+        for qbd, status in qb_stats.older_qbds(last_viable):
+            historic = row.copy()
+            historic['status'] = status
+            historic['visit'] = visit_name(qbd)
+            results.append(historic)
+
 
     if request.args.get('format', 'json').lower() == 'csv':
         def gen(items):

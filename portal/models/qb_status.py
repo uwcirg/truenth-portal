@@ -37,8 +37,8 @@ class QB_Status(object):
             QBT.status == OverallStatus.due).order_by(QBT.at.asc())
 
         # convert query to list of tuples for easier manipulation
-        ordered_qbs = [qbt.qbd() for qbt in users_qbs]
-        if not ordered_qbs:
+        self.__ordered_qbs = [qbt.qbd() for qbt in users_qbs]
+        if not self.__ordered_qbs:
             # Look for withdrawn case
             if QBT.query.filter(QBT.user_id == self.user.id).filter(
                     QBT.status == OverallStatus.withdrawn).count():
@@ -54,7 +54,7 @@ class QB_Status(object):
 
         # locate current qb - last found with start <= now
         cur_index, cur_qbd = None, None
-        for i, qbd in zip(range(len(ordered_qbs)), ordered_qbs):
+        for i, qbd in zip(range(len(self.__ordered_qbs)), self.__ordered_qbs):
             if qbd.relative_start <= self.as_of_date:
                 cur_index = i
                 cur_qbd = qbd
@@ -62,23 +62,24 @@ class QB_Status(object):
                 break
 
         # w/o a cur, probably hasn't started, set expired and leave
-        if not cur_qbd and ordered_qbs[0].relative_start > self.as_of_date:
+        if not cur_qbd and (
+                self.__ordered_qbs[0].relative_start > self.as_of_date):
             trace(
                 "no current QBD (too early); first qb doesn't start till"
                 " {} vs as_of {}".format(
-                    ordered_qbs[0].relative_start, self.as_of_date))
+                    self.__ordered_qbs[0].relative_start, self.as_of_date))
             self._overall_status = OverallStatus.expired
             self._current = None
-            self.next_qbd = ordered_qbs[0]
+            self.next_qbd = self.__ordered_qbs[0]
             return
 
         if cur_index > 0:
-            self.prev_qbd = ordered_qbs[cur_index-1]
+            self.prev_qbd = self.__ordered_qbs[cur_index-1]
         else:
             self.prev_qbd = None
 
-        if cur_index < len(ordered_qbs) - 1:
-            self.next_qbd = ordered_qbs[cur_index+1]
+        if cur_index < len(self.__ordered_qbs) - 1:
+            self.next_qbd = self.__ordered_qbs[cur_index+1]
         else:
             self.next_qbd = None
 
@@ -121,6 +122,32 @@ class QB_Status(object):
             self._current = None
         else:
             self._current = cur_qbd
+
+    def older_qbds(self, last_known):
+        """Generator to return QBDs and status prior to last known
+
+        Expected use in reporting scenarios, where full history is needed,
+        this generator will continue to return previous QBDs (from last_known)
+        until exhausted.
+
+        :param last_known: typically a valid QBD for the user, typically the
+          ``current_qbd()`` or possibly the previous.  None safe
+        :returns: (QBD, status) until exhausted, then raises StopIteration
+
+        """
+        if last_known is None:
+            raise StopIteration
+
+        index = self.__ordered_qbs.index(last_known)
+        while index > 0:
+            index -= 1
+            cur_qbd = self.__ordered_qbs[index]
+            status = QBT.query.filter(QBT.user_id == self.user.id).filter(
+                QBT.qb_id == cur_qbd.qb_id).filter(
+                QBT.qb_recur_id == cur_qbd.recur_id).filter(
+                QBT.qb_iteration == cur_qbd.iteration).order_by(
+                QBT.at.desc()).with_entities(QBT.status).first()
+            yield self.__ordered_qbs[index], str(status[0])
 
     def _indef_stats(self):
         """Lookup stats for indefinite case - requires special handling"""
