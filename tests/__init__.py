@@ -175,6 +175,12 @@ class TestCase(Base):
         invalidate_users_QBT(test_user.id)
         return test_user
 
+    def add_user_identifier(self, user=None, system=None, value=None):
+        if not user:
+            user = self.test_user
+        ident = Identifier(system=system, _value=value).add_if_not_found()
+        user.identifiers.append(ident)
+
     def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""
         if not user:
@@ -365,28 +371,29 @@ class TestCase(Base):
             db.session.commit()
 
     def bless_with_basics(
-            self, backdate=None, setdate=None, local_metastatic=None,
-            make_patient=True):
-        """Bless test user with basic requirements for coredata
+            self, user=None, backdate=None, setdate=None,
+            local_metastatic=None, make_patient=True):
+        """Bless user with basic requirements for coredata
 
+        :param user: user to bless, self.test_user by default
         :param backdate: timedelta value.  Define to mock consents
           happening said period in the past.  See
           ``associative_backdate`` for issues with 'months'.
-
         :param setdate: datetime value.  Define to mock consents
           happening at exact time in the past
-
         :param local_metastatic: set to 'localized' or 'metastatic' for
-          tests needing those respective orgs assigned to the test user
-
+          tests needing those respective orgs assigned to the user
         :param make_patient: add patient role unless set False
 
         """
-        self.test_user = db.session.merge(self.test_user)
-        self.test_user.birthdate = datetime.utcnow()
+        if not user:
+            user = self.test_user
+        user = db.session.merge(user)
+        user_id = user.id
+        user.birthdate = datetime.utcnow()
 
         if make_patient:
-            self.promote_user(role_name=ROLE.PATIENT.value)
+            self.promote_user(user=user, role_name=ROLE.PATIENT.value)
 
         # Register with a clinic
         self.shallow_org_tree()
@@ -398,10 +405,10 @@ class TestCase(Base):
             org = Organization.query.filter(
                 Organization.partOf_id.isnot(None)).first()
         assert org
-        self.test_user.organizations.append(org)
+        user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        audit = Audit(user_id=user_id, subject_id=user_id)
         tou = ToU(
             audit=audit, agreement_url='http://not.really.org',
             type='website terms of use')
@@ -412,7 +419,7 @@ class TestCase(Base):
         options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                    SEND_REMINDERS_MASK)
         consent = UserConsent(
-            user_id=TEST_USER_ID, organization_id=parent_org,
+            user_id=user_id, organization_id=parent_org,
             options=options, audit=audit, agreement_url='http://fake.org',
             acceptance_date=calc_date_params(
                 backdate=backdate, setdate=setdate))
@@ -431,6 +438,11 @@ class TestCase(Base):
         org_101 = Organization(id=101, name='101')
         org_102 = Organization(id=102, name='102')
         org_1001 = Organization(id=1001, name='1001', partOf_id=101)
+
+        already_done = Organization.query.get(101)
+        if already_done:
+            return
+
         with SessionScope(db):
             [db.session.add(org) for org in (org_101, org_102, org_1001)]
             db.session.commit()
