@@ -67,10 +67,4 @@ echo "Starting containers..."
 # Capture stderr to check for restarted containers
 # shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
 # allows output to terminal and saving to local variable
-restarted_containers="$(docker-compose up -d web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
-
-# Set celery CPU limit after start
-if echo "$restarted_containers" | grep --ignore-case --quiet 'creating.*celeryworker'; then
-    echo "Applying CPU limit to celery worker..."
-    docker container update --cpus .3 "$(docker-compose ps --quiet celeryworker)"
-fi
+restarted_containers="$(docker-compose up --detach web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
