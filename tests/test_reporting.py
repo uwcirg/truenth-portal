@@ -297,8 +297,9 @@ class TestQBStats(TestQuestionnaireBank):
         self.login()
         response = self.client.get("/api/report/questionnaire_status")
         assert response.status_code == 200
-        assert response.json['total'] == 3
 
-        expect = {'Due', 'Overdue', 'Completed'}
+        # expect baseline for each plus 3 mo for user4
+        assert response.json['total'] == 4
+        expect = {'Due', 'Overdue', 'Completed', 'Expired'}
         found = set([item['status'] for item in response.json['entry']])
         assert expect == found
