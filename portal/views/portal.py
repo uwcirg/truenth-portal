@@ -479,7 +479,12 @@ def challenge_identity(
 
     first_name = form.first_name.data
     last_name = form.last_name.data
-    birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y')
+    try:
+        birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y')
+    except ValueError as ve:
+        current_app.logger.warning(
+            "failed challenge birthdate format, {}".format(ve))
+        birthdate = None
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
