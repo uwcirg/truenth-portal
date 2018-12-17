@@ -1655,7 +1655,7 @@ class User(db.Model, UserMixin):
         # birthdate is trickier - raw delta doesn't make sense.  treat
         # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
-        if (birthdate.year < 1900 or
+        if (birthdate is None or birthdate.year < 1900 or
                 dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
             return 0
         return sum(scores) / len(scores)
