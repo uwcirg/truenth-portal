@@ -76,8 +76,5 @@ CMD \
 
     gunicorn \
         --bind "0.0.0.0:${PORT}" \
-        `# Workaround to gunicorn sync workers bug` \
-        `# https://github.com/benoitc/gunicorn/issues/1194` \
         --timeout 90 \
-        --keep-alive 75 \
     wsgi:application
