@@ -23,7 +23,7 @@ class ResearchProtocol(db.Model):
     def update_from_json(self, data):
         self.name = data['name']
         if 'created_at' in data:
-            self.created_at = data['created_at']
+            self.created_at = FHIR_datetime.parse(data['created_at'])
         return self
 
     def as_json(self):
