@@ -1525,6 +1525,58 @@
         "reference": "api/organization/40001"
       },
       "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40009,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Comprehensive Urology"
+        }
+      ],
+      "name": "Comprehensive Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40010,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Integrated Healthcare Associates (IHA)"
+        }
+      ],
+      "name": "Integrated Healthcare Associates (IHA)",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",
