@@ -26,7 +26,7 @@ class TestLogin(IntegrationTestCase):
         driver.find_element_by_id("tnthUserBtn").click()
         driver.find_element_by_link_text("Log Out of TrueNTH").click()
 
-    @pytest.mark.xfail
+    @pytest.mark.skip(reason="not able to complete consent page")
     def test_consent_after_login(self):
         driver = self.driver
         driver.get(url_for("eproms.home", _external=True))
