@@ -21,7 +21,8 @@ class TestLogin(IntegrationTestCase):
         driver.find_element_by_name("password").clear()
         driver.find_element_by_name("password").send_keys(DEFAULT_PASSWORD)
         driver.find_element_by_xpath(
-            "//input[@class='btn btn-tnth-primary btn-lg' and @value='LOG IN']").click()
+            "//input[@class='btn btn-tnth-primary btn-lg' and @value='LOG IN']"
+        ).click()
         driver.find_element_by_id("tnthUserBtn").click()
         driver.find_element_by_link_text("Log Out of TrueNTH").click()
 
@@ -56,7 +57,7 @@ class TestLogin(IntegrationTestCase):
         driver.find_element_by_id("next").click()
         driver.find_element_by_id("stateSelector").click()
         Select(driver.find_element_by_id("stateSelector")).select_by_visible_text("Washington")
-	driver.find_element_by_xpath("(.//*[normalize-space(text()) and normalize-space(.)='Your clinic of care.'])[1]/following::option[12]").click()
+        driver.find_element_by_xpath("(.//*[normalize-space(text()) and normalize-space(.)='Your clinic of care.'])[1]/following::option[12]").click()
         driver.find_element_by_xpath("(.//*[normalize-space(text()) and normalize-space(.)='UW Medicine (University of Washington)'])[1]/following::label[1]").click()
         driver.find_element_by_id("updateProfile").click()
         driver.find_element_by_id("tnthUserBtn").click()
