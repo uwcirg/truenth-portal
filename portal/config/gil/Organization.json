@@ -1543,10 +1543,10 @@
         {
           "system": "http://us.truenth.org/identity-codes/shortname",
           "use": "secondary",
-          "value": "Comprehensive Urology"
+          "value": "Comprehensive North"
         }
       ],
-      "name": "Comprehensive Urology",
+      "name": "Comprehensive North",
       "partOf": {
         "reference": "api/organization/40001"
       },
