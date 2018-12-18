@@ -333,11 +333,12 @@ class QB_Status(object):
                     qb_id = qb.id
                     iteration = self._current.iteration
             if not qb_id and self._current_indef:
+                qb = self._current_indef.questionnaire_bank
                 if instrument not in [q.name for q in qb.questionnaires]:
                     raise ValueError(
                         "Can't locate qb containing {} for continuation "
                         "session (doc_id) lookup".format(instrument))
-                qb_id = self._current_indef.questionnaire_bank.id
+                qb_id = qb.id
                 iteration = self._current_indef.iteration
 
             return qnr_document_id(
