@@ -1,4 +1,5 @@
 from flask import url_for
+import pytest
 from selenium.webdriver.support.ui import Select
 
 from tests import DEFAULT_PASSWORD, TEST_USERNAME
@@ -24,6 +25,7 @@ class TestLogin(IntegrationTestCase):
         driver.find_element_by_id("tnthUserBtn").click()
         driver.find_element_by_link_text("Log Out of TrueNTH").click()
 
+    @pytest.mark.xfail
     def test_consent_after_login(self):
         driver = self.driver
         driver.get(url_for("eproms.home", _external=True))
