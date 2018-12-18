@@ -589,7 +589,7 @@
                         if ($(this).attr("type") === "text") {
                             $(this).on("keypress", function(e) {
                                 e.stopPropagation();
-                                if (e.keyCode === 13) { //account for hitting enter key updating text field
+                                if (e.keyCode === 13) { //account for hitting enter key when updating text field
                                     $(this).trigger(triggerEvent);
                                     return false;
                                 }
@@ -946,26 +946,25 @@
                     $("#erroremail").html("");
                 });
                 $("#email").on("change", function() {
-                    var o = $(this);
                     setTimeout(function() {
-                        var hasError = $("#emailGroup").hasClass("has-error");
-                        if (!hasError) {
-                            self.demo.data.email = o.val();
-                            $("#erroremail").html("");
-                            $("#email_view").html("<p>" + (o.val()||i18next.t("not provided")) + "</p>"); /*global i18next */
-                        }
+                        self.updateEmailErrorVis();
                     }, 350);
                 });
                 $("#email").on("postEventUpdate", function() {
-                    var o = $(this);
-                    var hasError = $("#emailGroup").hasClass("has-error");
-                    if (!hasError) {
-                        self.demo.data.email = o.val();
-                        $("#erroremail").html("");
-                        $("#email_view").html("<p>" + (o.val()||i18next.t("not provided")) + "</p>"); /*global i18next */
-                        self.postDemoData(o, self.getTelecomData());
+                    if (!self.updateEmailErrorVis()) { //should only update email if there is no validation error
+                        self.postDemoData($(this), self.getTelecomData());
                     }
                 });
+            },
+            updateEmailErrorVis: function() {
+                var hasError = $("#emailGroup").hasClass("has-error");
+                var emailValue = $("#email").val();
+                if (!hasError) {
+                    this.demo.data.email = emailValue;
+                    $("#erroremail").html("");
+                    $("#email_view").html("<p>" + (emailValue||i18next.t("not provided")) + "</p>"); /*global i18next */
+                }
+                return hasError;
             },
             updateTelecomData: function(event) {
                 this.postDemoData($(event.target), this.getTelecomData());
