@@ -947,24 +947,24 @@
                 });
                 $("#email").on("change", function() {
                     setTimeout(function() {
-                        self.updateEmailErrorVis();
+                        self.updateEmailVis();
                     }, 350);
                 });
                 $("#email").on("postEventUpdate", function() {
-                    if (!self.updateEmailErrorVis()) { //should only update email if there is no validation error
+                    if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
             },
-            updateEmailErrorVis: function() {
+            updateEmailVis: function() {
                 var hasError = $("#emailGroup").hasClass("has-error");
                 var emailValue = $("#email").val();
                 if (!hasError) {
                     this.demo.data.email = emailValue;
                     $("#erroremail").html("");
-                    $("#email_view").html("<p>" + (emailValue||i18next.t("not provided")) + "</p>"); /*global i18next */
+                    $("#email_view").html("<p>" + (emailValue||i18next.t("not provided")) + "</p>"); //update email display /*global i18next */
                 }
-                return hasError;
+                return !hasError; //return appropriate indication that value/display has been updated if no error
             },
             updateTelecomData: function(event) {
                 this.postDemoData($(event.target), this.getTelecomData());
