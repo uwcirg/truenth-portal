@@ -586,6 +586,15 @@
                         if (_isTouchDevice()) { /*_isTouchDevice global */
                             triggerEvent = "change"; //account for mobile devices touch events
                         }
+                        if ($(this).attr("type") === "text") {
+                            $(this).on("keypress", function(e) {
+                                e.stopPropagation();
+                                if (e.keyCode === 13) { //account for hitting enter key updating text field
+                                    $(this).trigger(triggerEvent);
+                                    return false;
+                                }
+                            });
+                        }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
                             self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //seems there is a race condition here, make sure not to use cache data here as data is being updated
@@ -932,7 +941,8 @@
                 var self = this;
                 $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
                 $(".btn-send-email").blur();
-                $("#email").on("keyup", function() {
+                $("#email").on("keyup", function(e) {
+                    e.stopPropagation();
                     $("#erroremail").html("");
                 });
                 $("#email").on("change", function() {
@@ -947,7 +957,14 @@
                     }, 350);
                 });
                 $("#email").on("postEventUpdate", function() {
-                    self.postDemoData($(this), self.getTelecomData());
+                    var o = $(this);
+                    var hasError = $("#emailGroup").hasClass("has-error");
+                    if (!hasError) {
+                        self.demo.data.email = o.val();
+                        $("#erroremail").html("");
+                        $("#email_view").html("<p>" + (o.val()||i18next.t("not provided")) + "</p>"); /*global i18next */
+                        self.postDemoData(o, self.getTelecomData());
+                    }
                 });
             },
             updateTelecomData: function(event) {
