@@ -260,21 +260,27 @@ class ModelPersistence(object):
 
         if existing:
             details = StringIO()
+            serialized_existing = getattr(existing, serialize)()
+            # Several differences test false positive prior to the merge,
+            # so merge first to get an accurate delta
+            merged = getattr(existing, update)(complete_form)
             if not dict_match(
-                    complete_form, getattr(existing, serialize)(), details):
+                    getattr(merged, serialize)(),
+                    serialized_existing, details):
                 self._log(
                     "{type} {id} collision on import.  {details}".format(
                         type=self.model.__name__,
                         id=id_description,
                         details=details.getvalue()))
-                merged = getattr(existing, update)(complete_form)
-            else:
-                merged = existing
+                if hasattr(merged, 'invalidation_hook'):
+                    merged.invalidation_hook()
         else:
             self._log("{type} {id} not found - importing".format(
                 type=self.model.__name__,
                 id=id_description))
             db.session.add(new_obj)
+            if hasattr(new_obj, 'invalidation_hook'):
+                new_obj.invalidation_hook()
         return merged or new_obj
 
     def update_sequence(self):
