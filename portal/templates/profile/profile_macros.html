@@ -913,8 +913,10 @@
 {% macro profileTimeZone(person) %}
     <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item">
         <label>Time Zone</label>
+        <!--TODO dynamically generate this list-->
         <select class="form-control" id="profileTimeZone" data-save-container-id="profileTimeZoneGroup" v-model="demo.data.timezone" v-on:change="updateExtensionData">
             <option value="UTC">{{_("Select")}}</option>
+            <option value="Africa/Johannesburg">{{_("Africa/Johannesburg")}}</option>
             <option value="America/Chicago">{{_("America/Chicago")}}</option>
             <option value="America/Denver">{{_("America/Denver")}}</option>
             <option value="America/Los_Angeles">{{_("America/Los Angeles")}}</option>
