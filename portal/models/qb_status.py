@@ -142,11 +142,15 @@ class QB_Status(object):
         while index > 0:
             index -= 1
             cur_qbd = self.__ordered_qbs[index]
+            # We order by at (to get the latest status for a given QB) and
+            # secondly by id, as on rare occasions, the time (`at`) of
+            #  `due` == `completed`, but the row insertion defines priority
             status = QBT.query.filter(QBT.user_id == self.user.id).filter(
                 QBT.qb_id == cur_qbd.qb_id).filter(
                 QBT.qb_recur_id == cur_qbd.recur_id).filter(
                 QBT.qb_iteration == cur_qbd.iteration).order_by(
-                QBT.at.desc()).with_entities(QBT.status).first()
+                QBT.at.desc(), QBT.id.desc()).with_entities(
+                QBT.status).first()
             yield self.__ordered_qbs[index], str(status[0])
 
     def _indef_stats(self):

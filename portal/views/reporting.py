@@ -275,6 +275,7 @@ def questionnaire_status():
         for qbd, status in qb_stats.older_qbds(last_viable):
             historic = row.copy()
             historic['status'] = status
+            historic['qb'] = qbd.questionnaire_bank.name
             historic['visit'] = visit_name(qbd)
             results.append(historic)
 
