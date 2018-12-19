@@ -112,7 +112,7 @@ Export to Python and copy test (you may need to copy imports)
 .. figure:: https://user-images.githubusercontent.com/2764891/48667690-d97f7800-ea90-11e8-9c66-06eb98dc71e7.gif
 
 
-Paste test in test file. In this example I appended to tests/integration_tests/test_login.py. You may need to create a new test file.
+Paste test in test file. In this example I appended to ``tests/integration_tests/test_login.py``. You may need to create a new test file.
 
 .. figure:: https://user-images.githubusercontent.com/2764891/48667698-ee5c0b80-ea90-11e8-8603-df4b547f6b4c.PNG
 
