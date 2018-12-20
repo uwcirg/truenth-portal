@@ -1414,7 +1414,9 @@
       "extension": [
         {
           "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+		{
           "valueCodeableConcept": {
             "url": "http://hl7.org/fhir/valueset/languages",
             "coding": [
