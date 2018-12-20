@@ -1412,9 +1412,8 @@
     },
     {
       "extension": [
-        {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
               {
@@ -1429,6 +1428,10 @@
               }
             ]
           }
+        },
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
       "id": 14701,
@@ -1860,8 +1863,11 @@
       "extension": [
         {
           "timezone": "Africa/Johannesburg",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
-          "valueCodeableConcept": {
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+		},
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
+		  "valueCodeableConcept": {
             "coding": [
               {
                 "code": "en_GB",
