@@ -1412,13 +1412,9 @@
     },
     {
       "extension": [
-        {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
 		{
+          "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
-            "url": "http://hl7.org/fhir/valueset/languages",
             "coding": [
               {
                 "code": "fr_CA",
@@ -1432,6 +1428,10 @@
               }
             ]
           }
+        },
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
       "id": 14701,
