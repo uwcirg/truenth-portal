@@ -20,6 +20,7 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
+from werkzeug.exceptions import Unauthorized
 
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
@@ -241,12 +242,18 @@ def questionnaire_status():
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(limit_orgs))
 
-    # Todo: confirm current_user has view on all patients
+    acting_user = current_user()
     results = []
     for patient in patients:
         if not patient.organizations.first():
             # Very unlikely we want to include patients w/o at least
             # one org, skip this patient
+            continue
+
+        try:
+            acting_user.check_role('edit', other_id=patient.id)
+        except Unauthorized:
+            # simply exclude any patients the user can't view
             continue
 
         qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
@@ -266,6 +273,7 @@ def questionnaire_status():
         # if no current, try previous (as current may be expired)
         last_viable = qb_stats.current_qbd() or qb_stats.prev_qbd
         if last_viable:
+            row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
 
         results.append(row)
