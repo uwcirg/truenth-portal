@@ -243,12 +243,67 @@ class TestQBStats(TestQuestionnaireBank):
         assert response.json['resourceType'] == 'Bundle'
         assert response.json['total'] == 0
 
+    def test_permissions(self):
+        """Shouldn't get results from orgs outside view permissions"""
+
+        # Generate a few patients from different orgs
+        org1_name, org2_name = 'test_org1', 'test_org2'
+        org1 = Organization(name=org1_name)
+        org2 = Organization(name=org2_name)
+        with SessionScope(db):
+            db.session.add(org1)
+            db.session.add(org2)
+            db.session.commit()
+        org1 = db.session.merge(org1)
+        org1_id = org1.id
+        self.setup_org_qbs(org1)
+        org2 = db.session.merge(org2)
+        self.setup_org_qbs(org2)
+
+        user2 = self.add_user('user2')
+        user3 = self.add_user('user3')
+        user4 = self.add_user('user4')
+        with SessionScope(db):
+            db.session.add(user2)
+            db.session.add(user3)
+            db.session.add(user4)
+            db.session.commit()
+        user2 = db.session.merge(user2)
+        user3 = db.session.merge(user3)
+        user4 = db.session.merge(user4)
+
+        now = datetime.utcnow()
+        back15, nowish = associative_backdate(now, relativedelta(days=15))
+        back45, nowish = associative_backdate(now, relativedelta(days=45))
+        back115, nowish = associative_backdate(now, relativedelta(days=115))
+        self.bless_with_basics(
+            user=user2, setdate=back15, local_metastatic=org1_name)
+        self.bless_with_basics(
+            user=user3, setdate=back45, local_metastatic=org1_name)
+        self.bless_with_basics(
+            user=user4, setdate=back115, local_metastatic=org2_name)
+
+        self.test_user = db.session.merge(self.test_user)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+
+        # with zero orgs in common, should see empty result set
+        assert response.json['total'] == 0
+
+        # Add org to staff to see results from matching patiens (2&3)
+        self.consent_with_org(org_id=org1_id)
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+        assert response.json['total'] == 2
+
     def test_results(self):
         from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 
         # Generate a few patients with differing results
         org = self.setup_org_qbs()
-        org_name = org.name
+        org_id, org_name = org.id, org.name
         user2 = self.add_user('user2')
         user3 = self.add_user('user3')
         user4 = self.add_user('user4')
@@ -294,6 +349,7 @@ class TestQBStats(TestQuestionnaireBank):
 
         self.test_user = db.session.merge(self.test_user)
         self.promote_user(role_name=ROLE.STAFF.value)
+        self.consent_with_org(org_id=org_id)
         self.login()
         response = self.client.get("/api/report/questionnaire_status")
         assert response.status_code == 200

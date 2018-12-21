@@ -323,6 +323,7 @@ def patient_timeline(patient_id):
         results.append({
             'status': str(qbt.status),
             'at': FHIR_datetime.as_fhir(qbt.at),
+            'qb': qbd.questionnaire_bank.name,
             'visit': visit_name(qbd)})
 
     qbstatus = QB_Status(

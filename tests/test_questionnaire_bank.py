@@ -16,6 +16,7 @@ from portal.models.organization import (
     OrganizationResearchProtocol,
 )
 from portal.models.overall_status import OverallStatus
+from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
@@ -44,6 +45,16 @@ class TestQuestionnaireBank(TestCase):
         """Create simple test org with RP, return (org, rp, rp_id)"""
         if not org:
             org = Organization(name=org_name)
+
+        # RP may have already been setup - confirm
+        # it's assigned to given org and return
+        existing_rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == rp_name).first()
+        if existing_rp:
+            if existing_rp not in org.research_protocols:
+                org.research_protocols.append(existing_rp)
+            return org, existing_rp, existing_rp.id
+
         rp = ResearchProtocol(name=rp_name)
         with SessionScope(db):
             db.session.add(org)
@@ -90,10 +101,18 @@ class TestQuestionnaireBank(TestCase):
     def setup_org_qbs(
             self, org=None, rp_name='v2', retired_as_of=None,
             include_indef=False):
+        org_name = org.name if org else 'CRV'
         org, rp, rp_id = self.setup_org_n_rp(
-            org=org, org_name='CRV', rp_name=rp_name,
+            org=org, org_name=org_name, rp_name=rp_name,
             retired_as_of=retired_as_of)
-        eortc = self.add_questionnaire(name='eortc_{}'.format(rp_name))
+        # enable re-entrance - if first q exists, probably a second
+        # org is being setup - return as the rest is done
+        q_name = 'eortc_{}'.format(rp_name)
+        for q in Questionnaire.query.all():
+            if q.name == q_name:
+                return
+
+        eortc = self.add_questionnaire(name=q_name)
         epic26 = self.add_questionnaire(name='epic26_{}'.format(rp_name))
         recur3 = Recur(
             start='{"months": 3}', cycle_length='{"months": 6}',
@@ -123,7 +142,7 @@ class TestQuestionnaireBank(TestCase):
             db.session.merge, (org, eortc, epic26, recur3, recur6))
 
         qb_base = QuestionnaireBank(
-            name='CRV Baseline {}'.format(rp_name),
+            name='{} Baseline {}'.format(org_name, rp_name),
             classification='baseline',
             research_protocol_id=rp_id,
             start='{"days": 0}',
@@ -135,7 +154,7 @@ class TestQuestionnaireBank(TestCase):
         qb_base.questionnaires.append(qbq2)
 
         qb_m3 = QuestionnaireBank(
-            name='CRV_recurring_3mo_period {}'.format(rp_name),
+            name='{}_recurring_3mo_period {}'.format(org_name, rp_name),
             classification='recurring',
             research_protocol_id=rp_id,
             start='{"days": 0}',
@@ -148,7 +167,7 @@ class TestQuestionnaireBank(TestCase):
         qb_m3.questionnaires.append(qbq2)
 
         qb_m6 = QuestionnaireBank(
-            name='CRV_recurring_6mo_period {}'.format(rp_name),
+            name='{}_recurring_6mo_period {}'.format(org_name, rp_name),
             classification='recurring',
             research_protocol_id=rp_id,
             start='{"days": 0}',
