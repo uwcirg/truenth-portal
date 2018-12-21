@@ -34,6 +34,22 @@ def test_relative_delta():
         rd = RelativeDelta(json.dumps(d))
 
 
+def test_multiply_rd():
+    d = {'months': 3}
+    rd = RelativeDelta(json.dumps(d), years=1)
+    assert rd.years == 1
+    assert rd.months == 3
+    times3 = 3 * rd
+    assert times3.years == 3
+    assert times3.months == 9
+
+
+def test_rd_param_collision():
+    d = {'months': 3}
+    with pytest.raises(ValueError):
+        RelativeDelta(json.dumps(d), months=4)
+
+
 class TestDateTools(TestCase):
 
     def test_int_date(self):

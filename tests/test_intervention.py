@@ -25,6 +25,9 @@ from portal.models.organization import Organization
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import add_role
+from portal.models.user_consent import UserConsent
+from portal.models.qb_timeline import invalidate_users_QBT
+
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import (
@@ -525,9 +528,11 @@ class TestIntervention(TestCase):
         ae_id = ae.id
 
         # Need a current date, adjusted slightly to test UTC boundary
-        # date rendering
+        # date rendering, one day back so the assessment period will have
+        # started.
         dt = datetime.utcnow().replace(
-            hour=20, minute=0, second=0, microsecond=0)
+            hour=20, minute=0, second=0, microsecond=0) - relativedelta(
+            days=1)
         self.bless_with_basics(setdate=dt)
 
         # generate questionnaire banks and associate user with
@@ -563,6 +568,7 @@ class TestIntervention(TestCase):
 
         user, ae = map(db.session.merge, (self.test_user, ae))
 
+        invalidate_users_QBT(user.id)
         card_html = ae.display_for_user(user).card_html
         assert "Thank you" in card_html
         assert ae.quick_access_check(user)
@@ -589,13 +595,19 @@ class TestIntervention(TestCase):
             now=datetime.utcnow(), backdate=relativedelta(months=3))
         self.bless_with_basics(setdate=backdate)
 
-        # generate questionnaire banks and associate user with
+        # generate questionnaire banks; associate and consent user with
         # localized organization
         mock_questionnairebanks('eproms')
         localized_org = Organization.query.filter_by(name='localized').one()
         self.test_user.organizations.append(localized_org)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=localized_org,
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=backdate)
 
         with SessionScope(db):
+            db.session.add(uc)
             d = {'function': 'update_card_html_on_completion',
                  'kwargs': []}
             strat = AccessStrategy(

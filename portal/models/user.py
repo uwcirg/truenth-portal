@@ -329,8 +329,6 @@ class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     ###
 
-    assessment_status = 'undetermined'
-
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "user {0.id}".format(self)
@@ -940,8 +938,7 @@ class User(db.Model, UserMixin):
     def save_observation(
             self, codeable_concept, value_quantity, audit, status, issued):
         """Helper method for creating new observations"""
-        # avoid cyclical imports
-        from .assessment_status import invalidate_assessment_status_cache
+        from .qb_timeline import invalidate_users_QBT  # avoid cycle
 
         # User may not have persisted concept or value - CYA
         codeable_concept = codeable_concept.add_if_not_found()
@@ -958,7 +955,7 @@ class User(db.Model, UserMixin):
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
-        invalidate_assessment_status_cache(self.id)
+        invalidate_users_QBT(self.id)
         return observation
 
     def clinical_history(self, requestURL=None, patch_dstu2=False):
@@ -1098,7 +1095,7 @@ class User(db.Model, UserMixin):
         for replaced in delete_consents:
             replaced.deleted = Audit(
                 comment="new consent replacing existing",
-                user_id=current_user().id,
+                user_id=acting_user.id,
                 subject_id=self.id, context='consent')
             replaced.status = "deleted"
             db.session.add(replaced)
@@ -1658,7 +1655,7 @@ class User(db.Model, UserMixin):
         # birthdate is trickier - raw delta doesn't make sense.  treat
         # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
-        if (birthdate.year < 1900 or
+        if (birthdate is None or birthdate.year < 1900 or
                 dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
             return 0
         return sum(scores) / len(scores)

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
-from validators import url as url_validation
+from validators import ValidationFailure, url as url_validation
 
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -125,7 +125,7 @@ class UserConsent(db.Model):
         url = data.get('agreement_url')
         try:
             url_validation(url)
-        except:
+        except ValidationFailure:
             raise ValueError("requires a valid agreement_url")
 
         obj = cls(
@@ -144,3 +144,51 @@ class UserConsent(db.Model):
                 setattr(obj, attr, data.get(attr))
 
         return obj
+
+
+def latest_consent(user, org_id=None, include_suspended=False):
+    """Lookup latest consent for user
+
+    :param user: subject of query
+    :param org_id: define to restrict to given org
+    :param include_suspended: set true to stop looking back, even if
+        the consent is marked suspended (aka withdrawn).  By default,
+        suspended consents are ignored, looking back to find the
+        previously valid acceptance date.  NB in a currently suspended
+        state, the previous is marked deleted
+    :returns: the most recent consent based on given criteria, or None
+        if no match is located
+
+    """
+    if org_id:
+        raise NotImplementedError
+
+    if user.valid_consents.count() > 0:
+        # consents are ordered desc(acceptance_date)
+        # ignore suspended unless `include_suspended` is set
+        # include deleted, as in a suspended state, the previous
+        # acceptance will now be marked deleted.
+        for consent in user.all_consents:
+            if include_suspended and consent.status == 'suspended':
+                return consent
+            if consent.deleted_id is None and consent.status != 'suspended':
+                return consent
+
+    return None
+
+
+def consent_withdrawal_dates(user):
+    """Lookup user's most recent consent and withdrawal dates
+
+    :param user: subject of query
+    :returns: (consent_date, withdrawal_date) for user.  Either value
+        may be None if not found.
+
+    """
+    withdrawal_date = None
+    consent = latest_consent(user, include_suspended=True)
+    if consent and consent.status == 'suspended':
+        withdrawal_date = consent.acceptance_date
+        consent = latest_consent(user, include_suspended=False)
+    consent_date = consent.acceptance_date if consent else None
+    return consent_date, withdrawal_date

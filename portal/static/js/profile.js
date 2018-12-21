@@ -586,6 +586,15 @@
                         if (_isTouchDevice()) { /*_isTouchDevice global */
                             triggerEvent = "change"; //account for mobile devices touch events
                         }
+                        if ($(this).attr("type") === "text") {
+                            $(this).on("keypress", function(e) {
+                                e.stopPropagation();
+                                if (e.keyCode === 13) { //account for hitting enter key when updating text field
+                                    $(this).trigger(triggerEvent);
+                                    return false;
+                                }
+                            });
+                        }
                         $(this).on(triggerEvent, function(e) {
                             e.stopPropagation();
                             self.modules.tnthAjax.clearDemoSessionData(self.subjectId); //seems there is a race condition here, make sure not to use cache data here as data is being updated
@@ -932,23 +941,30 @@
                 var self = this;
                 $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
                 $(".btn-send-email").blur();
-                $("#email").on("keyup", function() {
+                $("#email").on("keyup", function(e) {
+                    e.stopPropagation();
                     $("#erroremail").html("");
                 });
                 $("#email").on("change", function() {
-                    var o = $(this);
                     setTimeout(function() {
-                        var hasError = $("#emailGroup").hasClass("has-error");
-                        if (!hasError) {
-                            self.demo.data.email = o.val();
-                            $("#erroremail").html("");
-                            $("#email_view").html("<p>" + (o.val()||i18next.t("not provided")) + "</p>"); /*global i18next */
-                        }
+                        self.updateEmailVis();
                     }, 350);
                 });
                 $("#email").on("postEventUpdate", function() {
-                    self.postDemoData($(this), self.getTelecomData());
+                    if (self.updateEmailVis()) { //should only update email if there is no validation error
+                        self.postDemoData($(this), self.getTelecomData());
+                    }
                 });
+            },
+            updateEmailVis: function() {
+                var hasError = $("#emailGroup").hasClass("has-error");
+                var emailValue = $("#email").val();
+                if (!hasError) {
+                    this.demo.data.email = emailValue;
+                    $("#erroremail").html("");
+                    $("#email_view").html("<p>" + (emailValue||i18next.t("not provided")) + "</p>"); //update email display /*global i18next */
+                }
+                return !hasError; //return appropriate indication that value/display has been updated if no error
             },
             updateTelecomData: function(event) {
                 this.postDemoData($(event.target), this.getTelecomData());
@@ -1490,6 +1506,12 @@
                 var newValue = event.target.value;
                 this.orgsSelector.selectedState = newValue;
             },
+            isAcceptOnNextOrg: function(orgName) {
+                if (!this.settings) {
+                    return false;
+                }
+                return orgName === this.settings.ACCEPT_TERMS_ON_NEXT_ORG;
+            },
             initOrgsStateSelectorSection: function() {
                 var self = this, orgTool = this.getOrgTool(), subjectId = this.subjectId;
                 var stateDict={AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")};
@@ -1599,12 +1621,11 @@
                         return 0;
                     }
                 });
-
                 parentOrgs.forEach(function(item) {
                     var state = orgsList[item.id].state;
                     if ($("#" + state + "_container").length > 0) {
                         var oo = orgsList[item.id];
-                        if (oo.children.length > 0) {
+                        if (!self.isAcceptOnNextOrg(item.name) && oo.children.length > 0) {
                             contentHTML = "<legend orgId='{orgId}'>{translatedOrgName}</legend>";
                             contentHTML += "<input class='tnth-hide' type='checkbox' name='organization' parent_org='true' data-org-name='{orgName}' ";
                             contentHTML += " id='{orgId}_org' value='{orgId}' />";
@@ -1641,6 +1662,9 @@
                 childOrgs.forEach(function(item) {
                     var parentId = (item.partOf.reference).split("/")[2];
                     if (parentId) {
+                        if (self.isAcceptOnNextOrg(orgTool.getOrgName(parentId))) {
+                            return true;
+                        }
                         var parentState = getParentState(parentId, states);
 
                         contentHTML = "<div class='radio'>" +

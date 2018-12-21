@@ -2,8 +2,6 @@
 {% block title %}{{super()}} {{_("Exercise and Diet")}}{% endblock %}
 {% block head %}
 {{super()}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="{{ url_for('.static', filename='js/exercise_diet.js') }}"></script>
 <link rel="stylesheet" type="text/css" href="https://demo-st.us.truenth.org/css/cpro.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/topnav.css') }}">
 <link rel="stylesheet" href="{{ url_for('.static', filename='css/styles.css') }}">
@@ -29,4 +27,9 @@
             </div>
         </div>
     {% endblock %}
+{% endblock %}
+{% block init_scripts %}
+    {{super()}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('.static', filename='js/exercise_diet.js') }}"></script>
 {% endblock %}

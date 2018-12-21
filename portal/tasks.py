@@ -26,12 +26,10 @@ from .database import db
 from .dogpile_cache import dogpile_cache
 from .factories.app import create_app
 from .factories.celery import create_celery
-from .models.assessment_status import (
-    invalidate_assessment_status_cache,
-    overall_assessment_status,
-)
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.qb_status import QB_Status
+from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.questionnaire_bank import QuestionnaireBank
 from .models.reporting import generate_and_send_summaries, get_reporting_stats
 from .models.role import ROLE, Role
@@ -230,9 +228,9 @@ def update_patient_loop(
         User.deleted_id.is_(None),
         UserRoles.role_id == patient_role_id)).with_entities(User.id)
 
-    patients = valid_patients.all()
+    patients = [r[0] for r in valid_patients.all()]
     j = 0
-    batchsize = current_app.config.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+    batchsize = current_app.config['UPDATE_PATIENT_TASK_BATCH_SIZE']
 
     while True:
         sublist = patients[j:j+batchsize]
@@ -249,7 +247,7 @@ def update_patient_loop(
             update_patients(**kwargs)
 
 
-@celery.task(name="tasks.update_patients_task", soft_time_limit=60)
+@celery.task(name="tasks.update_patients_task")
 def update_patients_task(patient_list, update_cache, queue_messages):
     """Task form - wraps call to testable function `update_patients` """
     update_patients(patient_list, update_cache, queue_messages)
@@ -259,16 +257,17 @@ def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
     for user_id in patient_list:
         if update_cache:
-            dogpile_cache.invalidate(overall_assessment_status, user_id)
-            dogpile_cache.refresh(overall_assessment_status, user_id)
+            update_users_QBT(user_id)
         if queue_messages:
             user = User.query.get(user_id)
-            qbd = QuestionnaireBank.most_current_qb(user=user, as_of_date=now)
-            if qbd.questionnaire_bank:
+            qbstatus = QB_Status(user, now)
+            qbd = qbstatus.current_qbd()
+            if qbd:
                 queue_outstanding_messages(
                     user=user,
                     questionnaire_bank=qbd.questionnaire_bank,
                     iteration_count=qbd.iteration)
+
         db.session.commit()
 
 
@@ -323,17 +322,16 @@ def send_user_messages(user, force_update=False):
             user=user, reason=reason))
 
     if force_update:
-        invalidate_assessment_status_cache(user_id=user.id)
-        qbd = QuestionnaireBank.most_current_qb(
-            user=user, as_of_date=datetime.utcnow())
-        if qbd.questionnaire_bank:
+        invalidate_users_QBT(user_id=user.id)
+        qbd = QB_Status(user=user, as_of_date=datetime.utcnow()).current_qbd()
+        if qbd:
             queue_outstanding_messages(
                 user=user,
                 questionnaire_bank=qbd.questionnaire_bank,
                 iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
-        Communication.status == 'preparation').filter(User == user)
+        Communication.status == 'preparation').filter(User.id == user.id)
     for communication in ready:
         communication.generate_and_send()
         db.session.commit()

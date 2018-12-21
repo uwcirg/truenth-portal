@@ -5,6 +5,7 @@ from datetime import datetime
 from pprint import pformat
 from urllib.parse import urlencode
 
+from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from flask import (
     Blueprint,
@@ -39,7 +40,7 @@ from wtforms import (
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..extensions import oauth, user_manager
+from ..extensions import oauth
 from ..factories.celery import create_celery
 from ..models.app_text import (
     AppText,
@@ -51,10 +52,6 @@ from ..models.app_text import (
     VersionedResource,
     app_text,
     get_terms,
-)
-from ..models.assessment_status import (
-    invalidate_assessment_status_cache,
-    overall_assessment_status,
 )
 from ..models.client import validate_origin
 from ..models.communication import Communication, load_template_args
@@ -75,6 +72,7 @@ from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import User, current_user, get_user_or_abort
+from ..models.url_token import BadSignature, SignatureExpired, verify_token
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
 from ..type_tools import check_int
@@ -307,21 +305,17 @@ def access_via_token(token, next_step=None):
         logout(prevent_redirect=True, reason="forced from /access_via_token")
         assert (not current_user())
 
-    def verify_token(valid_seconds):
-        is_valid, has_expired, user_id = (
-            user_manager.token_manager.verify_token(token, valid_seconds))
-        if has_expired:
-            current_app.logger.info("token access failed: "
-                                    "expired token {}".format(token))
-            abort(404, "Access token has expired")
-        if not is_valid:
-            abort(404, "Access token is invalid")
-        return user_id
-
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
-        'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
-    user_id = verify_token(valid_seconds)
+        'TOKEN_LIFE_IN_DAYS') * 24 * 3600
+    try:
+        user_id = verify_token(token, valid_seconds)
+    except SignatureExpired:
+        current_app.logger.info("token access failed: "
+                                "expired token {}".format(token))
+        abort(404, "URL token has expired")
+    except BadSignature:
+        abort(404, "URL token is invalid")
 
     # Valid token - confirm user id looks legit
     user = get_user_or_abort(user_id)
@@ -485,7 +479,12 @@ def challenge_identity(
 
     first_name = form.first_name.data
     last_name = form.last_name.data
-    birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y')
+    try:
+        birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y')
+    except ValueError as ve:
+        current_app.logger.warning(
+            "failed challenge birthdate format, {}".format(ve))
+        birthdate = None
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
@@ -699,6 +698,7 @@ def patient_invite_email(user_id):
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
+    from ..models.qb_status import QB_Status
     if user_id:
         user = get_user_or_abort(user_id)
     else:
@@ -711,12 +711,17 @@ def patient_reminder_email(user_id):
         else:
             name_key = UserReminderEmail_ATMA.name_key()
         questionnaire_bank_id = None
-        a_s, qbd = overall_assessment_status(user.id)
-        if qbd and qbd.questionnaire_bank:
-            questionnaire_bank_id = qbd.questionnaire_bank.id
+        # Todo: optimize this lookup with a direct query on QB timeline
+        # for dates needed in `load_template_args`
+        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qbd = qstats.current_qbd()
+        if not qbd:
+            return "Not Available", 204
+
         # pass in questionnaire bank id to get at the questionnaire due date
-        args = load_template_args(user=user,
-                                  questionnaire_bank_id=questionnaire_bank_id)
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qbd.qb_id,
+            qb_iteration=qbd.iteration)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
@@ -1073,8 +1078,11 @@ def celery_info():
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
     celery = create_celery(current_app)
-    retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
-    return repr(retval)
+    try:
+        retval = AsyncResult(task_id, app=celery).get(timeout=1.0)
+        return repr(retval)
+    except TimeoutError:
+        return "Operation timed out - most likely the task is not yet complete"
 
 
 @portal.route('/communicate')

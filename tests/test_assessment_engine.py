@@ -6,6 +6,7 @@ import json
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
@@ -26,6 +27,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -36,6 +38,7 @@ class TestAssessmentEngine(TestCase):
         response = response.json
         assert response['ok']
         assert response['valid']
+        self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 1
         assert (
             self.test_user.questionnaire_responses[0].encounter.auth_method
@@ -84,11 +87,12 @@ class TestAssessmentEngine(TestCase):
 
         test_user = get_user(TEST_USER_ID)
         test_user.organizations.append(org)
-
+        authored = FHIR_datetime.parse(data['authored'])
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=authored)
 
         with SessionScope(db):
             db.session.add(qb)
@@ -96,8 +100,8 @@ class TestAssessmentEngine(TestCase):
             db.session.add(audit)
             db.session.add(uc)
             db.session.commit()
-        qb = db.session.merge(qb)
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -106,6 +110,7 @@ class TestAssessmentEngine(TestCase):
         )
         assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
+        qb = db.session.merge(qb)
         assert test_user.questionnaire_responses.count() == 1
         assert (
             test_user.questionnaire_responses[0].questionnaire_bank_id
@@ -115,8 +120,8 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
             'example']
-        instrument_id = (completed_qnr['questionnaire']['reference']
-            .split('/')[-1])
+        instrument_id = (completed_qnr['questionnaire']['reference'].split(
+            '/')[-1])
 
         questions = completed_qnr['group']['question']
         incomplete_questions = []
@@ -136,7 +141,6 @@ class TestAssessmentEngine(TestCase):
         self.login()
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.STAFF.value)
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         # Upload incomplete QNR
         in_progress_response = self.client.post(
@@ -169,6 +173,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         qnr = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
 
         # Upload QNR
@@ -199,7 +204,6 @@ class TestAssessmentEngine(TestCase):
         self.login()
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.STAFF.value)
-        self.promote_user(role_name=ROLE.PATIENT.value)
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
@@ -215,8 +219,8 @@ class TestAssessmentEngine(TestCase):
         response = response.json
 
         assert response['total'] == len(response['entry'])
-        assert (response['entry'][0]['questionnaire']['reference']
-            .endswith(instrument_id))
+        assert (response['entry'][0]['questionnaire']['reference'].endswith(
+            instrument_id))
 
     def test_assessments_csv(self):
         swagger_spec = swagger(self.app)
@@ -225,6 +229,7 @@ class TestAssessmentEngine(TestCase):
         instrument_id = example_data['questionnaire']['reference'].split('/')[
             -1]
 
+        self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         upload_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),

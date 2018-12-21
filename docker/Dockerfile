@@ -60,8 +60,9 @@ ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PATH="${PROJECT_DIR}/bin:${PATH}" \
     PERSISTENCE_DIR="${PERSISTENCE_DIR:-gil}" \
+    TIMEOUT="${TIMEOUT:-90}"
 
-EXPOSE="${PORT}"
+EXPOSE "${PORT}"
 
 CMD \
     env && \
@@ -76,8 +77,5 @@ CMD \
 
     gunicorn \
         --bind "0.0.0.0:${PORT}" \
-        `# Workaround to gunicorn sync workers bug` \
-        `# https://github.com/benoitc/gunicorn/issues/1194` \
-        --timeout 90 \
-        --keep-alive 75 \
+        --timeout ${TIMEOUT} \
     wsgi:application

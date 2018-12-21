@@ -9,10 +9,12 @@ from flask_webtest import SessionScope
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.assessment_status import AssessmentStatus
 from portal.models.encounter import Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
+from portal.models.overall_status import OverallStatus
+from portal.models.qb_status import QB_Status
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
@@ -20,7 +22,9 @@ from portal.models.questionnaire_bank import (
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID, associative_backdate
+from tests.test_questionnaire_bank import TestQuestionnaireBank
+from tests.test_assessment_status import mock_qr
 
 
 class TestReporting(TestCase):
@@ -106,7 +110,7 @@ class TestReporting(TestCase):
 
         stats2 = self.get_stats(invalidate=False)
 
-        # shold not have changed, if still using cached values
+        # should not have changed, if still using cached values
         assert len(stats2['encounters']['all']) == 5
 
     def test_overdue_stats(self):
@@ -138,13 +142,17 @@ class TestReporting(TestCase):
             rank=0)
         bank.questionnaires.append(qbq)
 
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Expired'
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.expired
 
         ostats = self.get_ostats()
         assert len(ostats) == 0
@@ -156,12 +164,13 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
-        a_s = AssessmentStatus(self.test_user, as_of_date=datetime.utcnow())
-        assert a_s.overall_status == 'Overdue'
+        invalidate_users_QBT(self.test_user.id)
+        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        assert a_s.overall_status == OverallStatus.overdue
 
         ostats = self.get_ostats()
         assert len(ostats) == 1
-        assert ostats[crv] == [15]
+        assert ostats[(crv.id, crv.name)] == [(15, TEST_USER_ID)]
 
     def test_overdue_table_html(self):
         org = Organization(name='OrgC', id=101)
@@ -185,7 +194,10 @@ class TestReporting(TestCase):
         org, org2, org3, false_org, user = map(
             db.session.merge, (org, org2, org3, false_org, user))
 
-        ostats = {org3: [2, 3], org2: [1, 5], org: [1, 8, 9, 11]}
+        ostats = {
+            (org3.id, org3.name): [(2, 101), (3, 102)],
+            (org2.id, org2.name): [(1, 103), (5, 104)],
+            (org.id, org.name): [(1, 105), (8, 106), (9, 107), (11, 108)]}
         cutoffs = [5, 10]
 
         table1 = generate_overdue_table_html(cutoff_days=cutoffs,
@@ -219,3 +231,131 @@ class TestReporting(TestCase):
         assert not '<td>{}</td>'.format(org.name) in table2
         # false_org should not show up, as it's not in the ostats
         assert not '<td>{}</td>'.format(false_org.name) in table2
+
+
+class TestQBStats(TestQuestionnaireBank):
+
+    def test_empty(self):
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+        assert response.json['resourceType'] == 'Bundle'
+        assert response.json['total'] == 0
+
+    def test_permissions(self):
+        """Shouldn't get results from orgs outside view permissions"""
+
+        # Generate a few patients from different orgs
+        org1_name, org2_name = 'test_org1', 'test_org2'
+        org1 = Organization(name=org1_name)
+        org2 = Organization(name=org2_name)
+        with SessionScope(db):
+            db.session.add(org1)
+            db.session.add(org2)
+            db.session.commit()
+        org1 = db.session.merge(org1)
+        org1_id = org1.id
+        self.setup_org_qbs(org1)
+        org2 = db.session.merge(org2)
+        self.setup_org_qbs(org2)
+
+        user2 = self.add_user('user2')
+        user3 = self.add_user('user3')
+        user4 = self.add_user('user4')
+        with SessionScope(db):
+            db.session.add(user2)
+            db.session.add(user3)
+            db.session.add(user4)
+            db.session.commit()
+        user2 = db.session.merge(user2)
+        user3 = db.session.merge(user3)
+        user4 = db.session.merge(user4)
+
+        now = datetime.utcnow()
+        back15, nowish = associative_backdate(now, relativedelta(days=15))
+        back45, nowish = associative_backdate(now, relativedelta(days=45))
+        back115, nowish = associative_backdate(now, relativedelta(days=115))
+        self.bless_with_basics(
+            user=user2, setdate=back15, local_metastatic=org1_name)
+        self.bless_with_basics(
+            user=user3, setdate=back45, local_metastatic=org1_name)
+        self.bless_with_basics(
+            user=user4, setdate=back115, local_metastatic=org2_name)
+
+        self.test_user = db.session.merge(self.test_user)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+
+        # with zero orgs in common, should see empty result set
+        assert response.json['total'] == 0
+
+        # Add org to staff to see results from matching patiens (2&3)
+        self.consent_with_org(org_id=org1_id)
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+        assert response.json['total'] == 2
+
+    def test_results(self):
+        from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+
+        # Generate a few patients with differing results
+        org = self.setup_org_qbs()
+        org_id, org_name = org.id, org.name
+        user2 = self.add_user('user2')
+        user3 = self.add_user('user3')
+        user4 = self.add_user('user4')
+        with SessionScope(db):
+            db.session.add(user2)
+            db.session.add(user3)
+            db.session.add(user4)
+            db.session.commit()
+        user2 = db.session.merge(user2)
+        user3 = db.session.merge(user3)
+        user4 = db.session.merge(user4)
+        user4_id = user4.id
+
+        self.add_user_identifier(
+            user=user2, system=TRUENTH_EXTERNAL_STUDY_SYSTEM,
+            value='study user 2')
+        self.add_user_identifier(
+            user=user3, system=TRUENTH_EXTERNAL_STUDY_SYSTEM,
+            value='study user 3')
+
+        now = datetime.utcnow()
+        back15, nowish = associative_backdate(now, relativedelta(days=15))
+        back45, nowish = associative_backdate(now, relativedelta(days=45))
+        back115, nowish = associative_backdate(now, relativedelta(days=115))
+        self.bless_with_basics(
+            user=user2, setdate=back15, local_metastatic=org_name)
+        self.bless_with_basics(
+            user=user3, setdate=back45, local_metastatic=org_name)
+        self.bless_with_basics(
+            user=user4, setdate=back115, local_metastatic=org_name)
+
+        # submit a mock response for all q's in 3 mo qb
+        # which should result in completed status for user4
+        qb_name = "CRV_recurring_3mo_period v2"
+        threeMo = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+
+        for q in threeMo.questionnaires:
+            q = db.session.merge(q)
+            mock_qr(
+                q.name, qb=threeMo, iteration=0, user_id=user4_id,
+                timestamp=back15)
+
+        self.test_user = db.session.merge(self.test_user)
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.consent_with_org(org_id=org_id)
+        self.login()
+        response = self.client.get("/api/report/questionnaire_status")
+        assert response.status_code == 200
+
+        # expect baseline for each plus 3 mo for user4
+        assert response.json['total'] == 4
+        expect = {'Due', 'Overdue', 'Completed', 'Expired'}
+        found = set([item['status'] for item in response.json['entry']])
+        assert expect == found

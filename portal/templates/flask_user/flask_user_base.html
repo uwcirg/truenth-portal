@@ -1,17 +1,8 @@
 {% extends "layout.html" %}
-
 {% block main %}
-
-            {% block content %}{% endblock %}
-
+	{% block content %}{% endblock %}
 {% endblock %}
-<script>
-{% block document_ready %}
-	{{super()}}
-	$(document).on("ready", function() {
-		$("input[type='text']").on("blur paste", function() {
-			$(this).val($.trim($(this).val()));
-		});
-	});
-{% endblock %}
-</script>
+{% block additional_scripts -%}
+<script src="{{ url_for('static', filename='js/flask_user/base.js') }}"></script>
+{%- endblock %}
+

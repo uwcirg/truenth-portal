@@ -1412,9 +1412,8 @@
     },
     {
       "extension": [
-        {
-          "timezone": "America/New_York",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone",
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
               {
@@ -1429,6 +1428,10 @@
               }
             ]
           }
+        },
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
       "id": 14701,
@@ -1820,6 +1823,88 @@
       "name": "Southampton",
       "partOf": {
         "reference": "api/organization/30000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Africa/Johannesburg",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 27000,
+      "language": "en_GB",
+      "name": "South Africa (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Johannesburg",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+		},
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
+		  "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "af_ZA",
+                "display": "Afrikaans",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "zu_ZA",
+                "display": "Zulu",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "xh_ZA",
+                "display": "Xhosa",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        }
+      ],
+      "id": 14659,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/PLACEHOLDER",
+          "use": "secondary",
+          "value": "146-59"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Tygerberg Hospital",
+      "partOf": {
+        "reference": "api/organization/27000"
       },
       "resourceType": "Organization"
     }

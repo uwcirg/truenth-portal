@@ -104,17 +104,17 @@ class AppText(db.Model):
 
     @classmethod
     def from_json(cls, data):
+        app_text = cls()
+        return app_text.update_from_json(data)
+
+    def update_from_json(self, data):
         if 'name' not in data:
             raise ValueError("missing required 'name' field")
-        app_text = AppText.query.filter_by(name=data['name']).first()
-        if not app_text:
-            app_text = cls()
-            app_text.name = data['name']
-            app_text.custom_text = data.get('custom_text')
-            db.session.add(app_text)
-        else:
-            app_text.custom_text = data.get('custom_text')
-        return app_text
+        if 'id' in data:
+            self.id = data['id']
+        self.name = data['name']
+        self.custom_text = data.get('custom_text')
+        return self
 
     def as_json(self):
         d = {}

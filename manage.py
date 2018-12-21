@@ -23,6 +23,7 @@ from portal.extensions import db, user_manager
 from portal.factories.app import create_app
 from portal.models.clinical_constants import add_static_concepts
 from portal.models.i18n import smartling_download, smartling_upload
+from portal.models.i18n_utils import download_all_translations
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
@@ -32,6 +33,11 @@ from portal.models.user import (
     flag_test,
     permanently_delete_user,
     validate_email,
+)
+from portal.models.url_token import (
+    BadSignature,
+    SignatureExpired,
+    verify_token,
 )
 from portal.tasks import celery_beat_health_check
 
@@ -241,7 +247,7 @@ def password_reset(email, password, actor):
         "\n\nWARNING!!!\n\n"
         " This will permanently delete the target user and all their related"
         " data.\n"
-        " If you want to contiue,"
+        " If you want to continue,"
         " enter a valid user email as the acting party for our records")
 )
 @app.cli.command()
@@ -249,6 +255,22 @@ def purge_user(email, actor):
     """Purge the given user from the system"""
     # import ipdb; ipdb.set_trace()
     permanently_delete_user(email, actor=actor)
+
+
+@click.argument('token')
+@app.cli.command()
+def token_details(token):
+    valid_seconds = app.config.get(
+        'TOKEN_LIFE_IN_DAYS') * 24 * 3600
+    try:
+        user_id = verify_token(token, valid_seconds)
+    except SignatureExpired:
+        click.echo("EXPIRED token (older than {} seconds)".format(
+            valid_seconds))
+    except BadSignature:
+        click.echo("INVALID token")
+    else:
+        click.echo("Valid token for user_id {}".format(user_id))
 
 
 @app.cli.command()
@@ -290,6 +312,24 @@ def translation_download(language, state):
     click.echo(
         'Downloading {state} translations from Smartling'.format(state=state))
     smartling_download(state=state, language=language)
+
+
+@click.option('--state', '-s', help='Translation state', type=click.Choice([
+    'pseudo',
+    'pending',
+    'published',
+    'contextMatchingInstrumented',
+]))
+@app.cli.command()
+def download_translations(state):
+    default_state = 'pending'
+    if app.config['SYSTEM_TYPE'].lower() == 'production':
+        default_state = 'published'
+    state = state or default_state
+    click.echo(
+        'Downloading {state} translations from every Smartling project'.format(state=state)
+    )
+    download_all_translations(state=state)
 
 
 @click.option(

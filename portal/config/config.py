@@ -83,11 +83,13 @@ class BaseConfig(object):
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
     ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
-    FLUSH_CACHE_ON_SYNC = True
+    FLUSH_CACHE_ON_SYNC = (
+            os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true')
 
     CELERY_IMPORTS = ('portal.tasks',)
-    CELERYD_MAX_TASKS_PER_CHILD = int(os.environ['CELERYD_MAX_TASKS_PER_CHILD']) \
-        if os.environ.get('CELERYD_MAX_TASKS_PER_CHILD') else None
+    CELERYD_MAX_TASKS_PER_CHILD = int(
+        os.environ['CELERYD_MAX_TASKS_PER_CHILD']) if os.environ.get(
+        'CELERYD_MAX_TASKS_PER_CHILD') else None
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
@@ -104,6 +106,8 @@ class BaseConfig(object):
     DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
     PERMANENT_SESSION_LIFETIME = 60 * 60  # defines life of redis session
     SEXUAL_RECOVERY_TIMEOUT = 60 * 60  # SR users get 1 hour
+    TOKEN_LIFE_IN_DAYS = 30  # Used for emailed URL tokens
+    MULTIPROCESS_LOCK_TIMEOUT = 30  # Lock on QB timeline generation
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
@@ -134,7 +138,9 @@ class BaseConfig(object):
 
     SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
-    UPDATE_PATIENT_TASK_BATCH_SIZE = 16
+    UPDATE_PATIENT_TASK_BATCH_SIZE = int(
+        os.environ.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
+    )
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
@@ -171,6 +177,12 @@ class BaseConfig(object):
     SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID')
     SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET')
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID')
+    # ePROMs translations will overwrite TNUSA on conflict
+    # Project ID order: TrueNTH USA, ePROMs
+    SMARTLING_PROJECT_IDS = (
+        os.environ['SMARTLING_PROJECT_IDS'].split(',')
+        if os.environ.get('SMARTLING_PROJECT_IDS')
+        else ('13f8e2dcf', 'dd112801a'))
 
     RECAPTCHA_ENABLED = True
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')
@@ -207,6 +219,7 @@ class BaseConfig(object):
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
         if os.environ.get('MAINTENANCE_WINDOW') else None
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

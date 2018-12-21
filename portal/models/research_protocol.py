@@ -23,7 +23,7 @@ class ResearchProtocol(db.Model):
     def update_from_json(self, data):
         self.name = data['name']
         if 'created_at' in data:
-            self.created_at = data['created_at']
+            self.created_at = FHIR_datetime.parse(data['created_at'])
         return self
 
     def as_json(self):
@@ -41,3 +41,12 @@ class ResearchProtocol(db.Model):
             return
         word_list = self.name.split('_')
         return ' '.join([n.title() for n in word_list])
+
+    @staticmethod
+    def assigned_to(user):
+        """Returns set of all ResearchProtocols assigned to given user"""
+        rps = set()
+        for org in user.organizations:
+            for r in org.rps_w_retired(consider_parents=True):
+                rps.add(r)
+        return rps

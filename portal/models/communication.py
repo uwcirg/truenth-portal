@@ -11,19 +11,20 @@ from flask_babel import force_locale, gettext as _
 import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
 from ..database import db
 from ..date_tools import localize_datetime
-from ..extensions import user_manager
 from ..trace import dump_trace, establish_trace, trace
 from .app_text import MailResource
-from .assessment_status import overall_assessment_status
 from .intervention import INTERVENTION
 from .message import EmailMessage
+from .overall_status import OverallStatus
 from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
 from .user import User
+from .url_token import url_token
 
 # https://www.hl7.org/fhir/valueset-event-status.html
 event_status_types = ENUM(
@@ -52,7 +53,9 @@ def locale_closure(locale_code, fn):
     return function_with_forced_locale
 
 
-def load_template_args(user, questionnaire_bank_id=None):
+# Todo: requires iteration and recur for accurate dates
+def load_template_args(
+        user, questionnaire_bank_id=None, qb_iteration=None):
     """Capture known variable lookup functions and values
 
     To add additional template variable lookup functions, name the
@@ -60,11 +63,13 @@ def load_template_args(user, questionnaire_bank_id=None):
         `_lookup_first_name` -> `first_name`
 
     """
+    from .qb_status import NoCurrentQB
+    from .qb_timeline import QBT  # avoid cycle
 
     def ae_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         auditable_event(
-            "generated access token {} for ae_link".format(
+            "generated URL token {} for ae_link".format(
                 token), user_id=user.id, subject_id=user.id,
             context='authentication')
 
@@ -113,13 +118,13 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_decision_support_via_access_link())
 
     def _lookup_decision_support_via_access_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         url = url_for(
             'portal.access_via_token', token=token,
             next_step='decision_support', _external=True)
         system_user = User.query.filter_by(email='__system__').one()
         auditable_event(
-            "generated access token for user {} to embed in email".format(
+            "generated URL token for user {} to embed in email".format(
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
@@ -176,13 +181,24 @@ def load_template_args(user, questionnaire_bank_id=None):
     def _lookup_questionnaire_due_date():
         if not questionnaire_bank_id:
             return ''
-        qb = QuestionnaireBank.query.get(questionnaire_bank_id)
-        trigger_date = qb.trigger_date(user)
-        now = datetime.utcnow()
-        due = qb.calculated_start(trigger_date, now).relative_start
-        due = qb.calculated_due(trigger_date, now) or due
-        trace("UTC due date: {}".format(due))
-        due_date = localize_datetime(due, user)
+
+        # Lookup due date for matching qb, iteration
+        try:
+            qbt = QBT.query.filter(QBT.user_id == user.id).filter(
+                QBT.qb_id == questionnaire_bank_id).filter(
+                QBT.qb_iteration == qb_iteration).filter(
+                QBT.status == OverallStatus.due).one()
+        except NoResultFound:
+            raise NoCurrentQB("no applicable QB for {}".format(user))
+
+        # Due and start are synonymous in all contexts other than
+        # communicating the "due" date to the user.  Adjust what is
+        # really the start date IFF the qb happens to have a
+        # defined due
+        utc_due = QuestionnaireBank.query.get(qbt.qb_id).calculated_due(
+            qbt.at)
+        trace("UTC due date: {}".format(utc_due))
+        due_date = localize_datetime(utc_due, user)
         tz = user.timezone or 'UTC'
         trace("Localized due date (timezone = {}): {}".format(tz, due_date))
         return due_date
@@ -202,12 +218,12 @@ def load_template_args(user, questionnaire_bank_id=None):
         return make_button(_lookup_verify_account_link(), inline=True)
 
     def _lookup_verify_account_link():
-        token = user_manager.token_manager.generate_token(user.id)
+        token = url_token(user.id)
         url = url_for(
             'portal.access_via_token', token=token, _external=True)
         system_user = User.query.filter_by(email='__system__').one()
         auditable_event(
-            "generated access token for user {} to embed in email".format(
+            "generated URL token for user {} to embed in email".format(
                 user.id),
             user_id=system_user.id, subject_id=user.id,
             context='authentication')
@@ -271,7 +287,9 @@ class Communication(db.Model):
         user = User.query.get(self.user_id)
 
         qb_id = self.communication_request.questionnaire_bank_id
-        args = load_template_args(user=user, questionnaire_bank_id=qb_id)
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qb_id,
+            qb_iteration=self.communication_request.qb_iteration)
         mailresource = MailResource(
             url=self.communication_request.content_url,
             locale_code=user.locale_code,
@@ -295,6 +313,7 @@ class Communication(db.Model):
 
     def generate_and_send(self):
         """Collate message details and send"""
+        from .qb_timeline import qb_status_visit_name
 
         if current_app.config.get('DEBUG_EMAIL', False):
             # hack to restart trace when in loop from celery task
@@ -311,7 +330,9 @@ class Communication(db.Model):
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
 
-        if overall_assessment_status(self.user_id) == 'Withdrawn':
+        qb_status, _ = qb_status_visit_name(
+            user_id=self.user_id, as_of_date=datetime.utcnow())
+        if qb_status == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
             self.status = 'suspended'

@@ -10,15 +10,27 @@ from datetime import datetime
 from io import StringIO
 from time import strftime
 
-from flask import Blueprint, make_response, render_template, request
+from flask import (
+    Blueprint,
+    Response,
+    jsonify,
+    make_response,
+    render_template,
+    request,
+)
 from flask_babel import gettext as _
 from flask_user import roles_required
+from werkzeug.exceptions import Unauthorized
 
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
-from ..models.organization import Organization, OrgTree
-from ..models.role import ROLE
-from ..models.user import User, current_user
+from ..models.fhir import bundle_results
+from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.questionnaire_bank import visit_name
+from ..models.qb_status import QB_Status
+from ..models.role import Role, ROLE
+from ..models.user import User, UserRoles, current_user
+from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
 
@@ -67,28 +79,37 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
     rows = []
     totals = defaultdict(int)
 
-    for org in sorted(overdue_stats, key=lambda x: x.name):
-        if top_org and not ot.at_or_below_ids(top_org.id, [org.id]):
+    for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
+        if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
             continue
         user_accessible = False
         for user_org in user.organizations:
-            if ot.at_or_below_ids(user_org.id, [org.id]):
+            if ot.at_or_below_ids(user_org.id, [org_id]):
                 user_accessible = True
                 break
         if not user_accessible:
             continue
-        counts = overdue_stats[org]
-        org_row = [org.name]
+        counts = overdue_stats[(org_id, org_name)]
+        org_row = [org_name]
+        source_row = [org_name+'[user_ids]']
         curr_min = 0
         row_total = 0
         for cd in cutoff_days:
-            count = len([i for i in counts if ((i > curr_min) and (i <= cd))])
+            uids = []
+            for days_overdue, user_id in counts:
+                if days_overdue > curr_min and days_overdue <= cd:
+                    uids.append(user_id)
+            count = len(
+                [i for i, uid in counts if ((i > curr_min) and (i <= cd))])
             org_row.append(count)
+            source_row.append(uids)
             totals[cd] += count
             row_total += count
             curr_min = cd
         org_row.append(row_total)
         rows.append(org_row)
+        # Uncomment the following row to display user ids behind numbers
+        # rows.append(source_row)
 
     totalrow = [_("TOTAL")]
     row_total = 0
@@ -102,26 +123,19 @@ def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
         'site_overdue_table.html', ranges=day_ranges, rows=rows)
 
 
-def overdue(user):
-    now = datetime.utcnow()
-    a_s = AssessmentStatus(user, as_of_date=now)
-    qb = a_s.qb_data.qbd.questionnaire_bank
-    if not qb:
-        return "No QB"
-    trigger_date = qb.trigger_date(user)
-    if not trigger_date:
-        return "No trigger date"
-    overdue = qb.calculated_overdue(trigger_date, as_of_date=now)
-    if not overdue:
-        return "No overdue date"
-    return (now - overdue).days
-
-
 @reporting_api.route('/admin/overdue-numbers')
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
+
+    def overdue(qstats):
+        now = datetime.utcnow()
+        overdue = qstats.overdue_date
+        if not overdue:
+            return "No overdue date"
+        return (now - overdue).days
+
     ot = OrgTree()
     results = StringIO()
     cw = csv.writer(results)
@@ -133,11 +147,11 @@ def generate_numbers():
     for user in User.query.filter_by(active=True):
         if (user.has_role(ROLE.PATIENT.value) and not
                 user.has_role(ROLE.TEST.value)):
-            a_s = AssessmentStatus(user, as_of_date=datetime.utcnow())
+            a_s = QB_Status(user, as_of_date=datetime.utcnow())
             email = (
                 user.email.encode('ascii', 'ignore') if user.email else None)
-            od = overdue(user)
-            qb = a_s.qb_name
+            od = overdue(a_s)
+            qb = a_s.current_qbd().questionnaire_bank.name
             for org in user.organizations:
                 top = ot.find_top_level_orgs([org], first=True)
                 org_name = "{}: {}".format(
@@ -151,3 +165,147 @@ def generate_numbers():
         filename)
     output.headers['Content-type'] = "text/csv"
     return output
+
+
+@reporting_api.route('/api/report/questionnaire_status')
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@oauth.require_oauth()
+def questionnaire_status():
+    """Return ad hoc JSON or CSV listing questionnaire_status
+
+    ---
+    tags:
+      - Report
+      - Questionnaire
+
+    operationId: questionnaire_status
+    parameters:
+      - name: org_id
+        in: query
+        description: optional TrueNTH organization ID used to limit results
+          to patients belonging to given organization identifier, and given
+          organization's child organizations
+        required: false
+        type: integer
+        format: int64
+      - name: as_of_date
+        in: query
+        description: optional query string param to request status at a
+          different (UTC) point in time.  Defaults to now
+        required: false
+        type: string
+        format: date-time
+      - name: format
+        in: query
+        description: expects json or csv, defaults to json if not provided
+        required: false
+        type: string
+    produces:
+      - application/json
+      - text/csv
+    responses:
+      200:
+        description:
+          Returns JSON of the available questionnaire bank status for matching
+          set of users
+      400:
+        description: invalid query parameters
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+
+    if request.args.get('as_of_date'):
+        as_of_date = FHIR_datetime.parse(request.args.get('as_of_date'))
+    else:
+        as_of_date = datetime.utcnow()
+
+    # Obtain list of qualifying patients (not marked test)
+    # TODO: refactor this common query need to model and replace
+    # the less efficient similar usage elsewhere...
+    test_user_ids = UserRoles.query.join(Role).filter(
+        UserRoles.role_id == Role.id).filter(
+        Role.name == ROLE.TEST.value).with_entities(UserRoles.user_id)
+    patients = User.query.filter(User.active.is_(True)).join(
+        UserRoles).filter(User.id == UserRoles.user_id).join(
+        Role).filter(Role.name == ROLE.PATIENT.value).filter(
+        ~User.id.in_(test_user_ids))
+
+    # If limited by org - grab org and all it's children, and refine query
+    org_id = request.args.get('org_id')
+    if org_id:
+        limit_orgs = OrgTree().here_and_below_id(organization_id=org_id)
+        patients = patients.join(UserOrganization).filter(
+            User.id == UserOrganization.user_id).filter(
+            UserOrganization.organization_id.in_(limit_orgs))
+
+    acting_user = current_user()
+    results = []
+    for patient in patients:
+        if not patient.organizations.first():
+            # Very unlikely we want to include patients w/o at least
+            # one org, skip this patient
+            continue
+
+        try:
+            acting_user.check_role('edit', other_id=patient.id)
+        except Unauthorized:
+            # simply exclude any patients the user can't view
+            continue
+
+        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
+        row = {
+            'user_id': patient.id,
+            'site': patient.organizations.first().name,
+            'status': str(qb_stats.overall_status)}
+
+        consent = latest_consent(user=patient)
+        if consent:
+            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
+
+        study_id = patient.external_study_id
+        if study_id:
+            row['study_id'] = study_id
+
+        # if no current, try previous (as current may be expired)
+        last_viable = qb_stats.current_qbd() or qb_stats.prev_qbd
+        if last_viable:
+            row['qb'] = last_viable.questionnaire_bank.name
+            row['visit'] = visit_name(last_viable)
+
+        results.append(row)
+
+        # as we require a full history, continue to add rows for each previous
+        # visit available
+        for qbd, status in qb_stats.older_qbds(last_viable):
+            historic = row.copy()
+            historic['status'] = status
+            historic['qb'] = qbd.questionnaire_bank.name
+            historic['visit'] = visit_name(qbd)
+            results.append(historic)
+
+    if request.args.get('format', 'json').lower() == 'csv':
+        def gen(items):
+            desired_order = [
+                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
+            yield ','.join(desired_order) + '\n'  # header row
+            for i in items:
+                yield ','.join(
+                    [str(i.get(k, "")) for k in desired_order]) + '\n'
+
+        base_name = 'status'
+        if org_id:
+            base_name = Organization.query.get(org_id).name.replace(' ', '-')
+        filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
+        return Response(
+            gen(results),
+            headers={
+                'Content-Disposition': 'attachment;filename={}'.format(
+                    filename),
+                'Content-type': "text/csv"}
+        )
+    else:
+        return jsonify(bundle_results(elements=results))

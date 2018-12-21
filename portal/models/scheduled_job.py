@@ -3,8 +3,10 @@ from datetime import datetime
 import re
 
 from celery.schedules import crontab
+from flask import current_app, url_for
 
 from ..database import db
+from ..factories.celery import create_celery
 
 
 class ScheduledJob(db.Model):
@@ -85,7 +87,14 @@ class ScheduledJob(db.Model):
             kwargs_in['job_id'] = self.id
             kwargs_in['manual_run'] = True
             try:
-                msg = func(*args_in, **kwargs_in)
+                celery = create_celery(current_app)
+                res = celery.send_task(
+                    "portal.tasks.{}".format(self.task),
+                    args=args_in, kwargs=kwargs_in)
+                result_url = url_for(
+                    'portal.celery_result', task_id=res.task_id)
+                msg = "Task sent to celery; see {} for results".format(
+                    result_url, _external=True)
             except Exception as exc:
                 msg = ("Unexpected exception in task `{}` (job_id={}):"
                        " {}".format(self.task, self.id, exc))

@@ -93,40 +93,6 @@
             <br/><br/>
             <div class="error-message text-muted bg-danger" {%if errorMessage %} style="display:block"{% endif%}>{{errorMessage}}</div>
         </div>
-
     </form>
-
 {% endblock %}
-
-{% block document_ready %}
-$(document).ready(function() {
-
-    var fmBirthDate = "{{form.birthdate.data if form.birthdate.data}}";
-    if (fmBirthDate) {
-        var arrDate = String(fmBirthDate).split("-");
-        $("#month").val(arrDate[0]);
-        $("#date").val(arrDate[1]);
-        $("#year").val(arrDate[2]);
-    };
-
-    $("input[type='text']").on("blur", function() {
-        $(this).val($.trim($(this).val()));
-    });
-
-    /*
-     * display keyboard for numeric fields on mobile devices
-     */
-     __convertToNumericField($("#date, #year"));
-
-    $('#challengeForm').validator().on('submit', function (e) {
-          if (!e.isDefaultPrevented()) {
-                if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
-                    $("#birthdate").val($("#month").val() + "-" + $("#date").val() + "-" + $("#year").val());
-                }
-
-          };
-    });
-
-
-});
-{% endblock %}
+{% block additional_scripts -%}<script src="{{url_for('static', filename='js/IdentityChallenge.js')}}"></script>{%- endblock %}
