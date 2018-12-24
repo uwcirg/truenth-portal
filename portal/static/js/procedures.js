@@ -1,20 +1,50 @@
-(function() { 
+(function() {
     /*global $ i18next tnthAjax tnthDates SYSTEM_IDENTIFIER_ENUM */
-    var procApp = {
+    var ProcApp = {
         subjectId: "",
         currentUserId: "",
         dateFields: ["procDay", "procMonth", "procYear"],
         entries: [],
         initCounts: 0,
-        init: function(subjectId, currentUserId) { //entry method for initializing ProcApp object
-            this.setCurrentUserId(currentUserId);
+        init: function(subjectId) { //entry method for initializing ProcApp object
+            var self = this;
+            this.initUserIds(subjectId, function() {
+                if (!self.subjectId) {
+                    self.setError(i18next.t("Subject id is required"));
+                    return false;
+                }
+                self.getOptions(); //treatment options
+                self.getUserProcedures();
+                self.initFieldExtension();
+                self.initFieldEvents();
+            });
+        },
+        initViaTemplate: function() { //profile and coredata views
+            var self = this;
+            $(document).ready(function() {
+                var profileSubject = $("#profileProcSubjectId");
+                if (!profileSubject.length) {
+                    return;
+                }
+                self.init(profileSubject.val());
+            });
+        },
+        initUserIds: function(subjectId, callback) {
+            callback = callback || function() {};
+            var self = this;
             this.setSubjectId(subjectId);
-            if ($("#profileProcedureContainer").length > 0) {
-                this.getOptions();
-                this.getUserProcedures();
-            }
-            this.initFieldExtension();
-            this.initFieldEvents();
+            tnthAjax.getCurrentUser(function(data) {
+                if (!data || data.error) {
+                    self.setError(i18next.t("error occurred setting current user id"));
+                    callback();
+                    return;
+                }
+                self.setCurrentUserId(data.id);
+                if (!self.subjectId) {
+                    self.setSubjectId(data.id);
+                }
+                callback();
+            });
         },
         setSubjectId: function(id) {
             this.subjectId = id;
@@ -22,7 +52,13 @@
         setCurrentUserId: function(id) {
             this.currentUserId = id;
         },
-        updateTreatmentOptions: function(entries) {
+        setError: function(message) {
+            $("#procDateErrorContainer").html(message||"");
+            if (message) {
+                $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
+            }
+        },
+        setTreatmentOptionsSelector: function(entries) {
             if (!entries) {
                 return;
             }
@@ -35,13 +71,21 @@
                     .replace("{system}", item.system));
             });
             $("#tnthproc").append(optionsList.join(""));
+            sessionStorage.setItem("treatmentOptions", JSON.stringify(entries));
         },
         getOptions: function() {
+            if (!$("#tnthproc").length) {
+                return;
+            }
+            if (sessionStorage.treatmentOptions) {
+                this.setTreatmentOptionsSelector(JSON.parse(sessionStorage.treatmentOptions));
+                return;
+            }
             var self = this, url =  "/patients/treatment-options";
-            if (window.Worker) { 
+            if (window.Worker) {
                 initWorker(url, {cache: true}, function(result) { /*global initWorker */
                     var data = JSON.parse(result);
-                    self.updateTreatmentOptions(data.treatment_options);
+                    self.setTreatmentOptionsSelector(data.treatment_options);
                 });
                 return true;
             }
@@ -50,14 +94,7 @@
                 url: url,
                 cache: true
             }).done(function(data) {
-                if (sessionStorage.treatmentOptions) {
-                    self.updateTreatmentOptions(JSON.parse(sessionStorage.treatmentOptions));
-                    return;
-                }
-                if (data.treatment_options) {
-                    sessionStorage.setItem("treatmentOptions", JSON.stringify(data.treatment_options));
-                    self.updateTreatmentOptions(data.treatment_options);
-                }
+                self.setTreatmentOptionsSelector(data.treatment_options);
             }).fail(function() {});
         },
         getCreatorDisplay: function(creator, defaultDisplay) {
@@ -75,11 +112,13 @@
             return "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
         },
         setNewEntry: function(newEntry, highestId){
-            if (newEntry) { // If newEntry, then add icon to what we just added
-                $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added!") + "</em></small>");
+            if (!newEntry) {
+                return;
             }
+            // If newEntry, then add icon to what we just added
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.descriptionCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>" + i18next.t("Added!") + "</em></small>");
         },
-        setProceduresView: function() {
+        setProcedureRowsView: function() {
             var content = "";
             $("#userProcedures tr[data-id]").each(function() {
                 $(this).find("td").each(function() {
@@ -112,59 +151,10 @@
                     self.setNoDataDisplay();
                     return false;
                 }
-                data.entry.sort(function(a, b) { // sort from newest to oldest
-                    return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
-                });
-                var contentHTML = [], proceduresHtml = "", otherHtml = [];
-                // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
-                var highestId = 0;
-                $.each(data.entry, function(i, val) {
-                    var code = val.resource.code.coding[0].code;
-                    var procID = val.resource.id;
-                    if ([SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE, SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE].indexOf(code) !== -1) {
-                        //for entries marked as other procedure.  These are rendered as hidden fields and can be referenced when these entries are deleted.
-                        otherHtml.push("<input type='hidden' data-id='" + procID + "'  data-code='" + code + "' name='otherProcedures' >");
-                        return true;
-                    }
-                    var displayText = val.resource.code.coding[0].display;
-                    var performedDateTime = val.resource.performedDateTime;
-                    var creatorRef = (val.resource.meta.by.reference).match(/\d+/)[0];  // just the user ID, not eg "api/patient/46";
-                    var creator = self.getCreatorDisplay(creatorRef, val.resource.meta.by.display || creatorRef);
-                    var dateEdited = new Date(val.resource.meta.lastUpdated);
-                    var creationText = i18next.t("(data entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric"
-                    }));
-                    var deleteInvocation = "";
-                    if (String(creatorRef) === String(self.currentUserId)) {
-                        deleteInvocation = self.getDeleteInvocationDisplay();
-                    }
-                    contentHTML.push("<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" +
-                        (tnthDates.formatDateString(performedDateTime)) + "&nbsp;--&nbsp;" + displayText +
-                        "&nbsp;<em>" + creationText +
-                        "</em></td><td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>" +
-                        deleteInvocation + "</td></tr>");
-                    highestId = Math.max(highestId, procID);
-                });
-
-                if (contentHTML) {
-                    proceduresHtml = "<table  class=\"table-responsive\" width=\"100%\" id=\"eventListtnthproc\" cellspacing=\"4\" cellpadding=\"6\">";
-                    proceduresHtml += contentHTML.join("");
-                    proceduresHtml += "</table>";
-                    $("#userProcedures").html(proceduresHtml);
-                    $("#pastTreatmentsContainer").fadeIn();
-                } else {
-                    $("#pastTreatmentsContainer").fadeOut();
-                }
-                $("#userProcedures").append(otherHtml.join("")); //other procedures 
-                self.setNewEntry(newEntry, highestId);
-                $("[data-toggle='popover']").popover({trigger: "click", placement: "top", html: true});
-                self.setProceduresView();
+                self.onDidGetProcedures(data.entry, newEntry);
                 $("#eventListLoad").fadeOut();
             }).fail(function() {
-                $("#procDateErrorContainer").html(i18next.t("error ocurred retrieving user procedures"));
-                $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
+                self.setError(i18next.t("error occurred retrieving user procedures"));
                 $("#eventListLoad").fadeOut();
             });
         },
@@ -192,16 +182,23 @@
                 });
             });
 
+            $("body").on("click", ".data-delete", function() { //new row remove button event at account creation
+                $(this).closest("tr").remove();
+            });
+        },
+        initPopoverEvents: function() {
+            var self = this;
+            $("[data-toggle='popover']").popover({trigger: "click", placement: "top", html: true});
             $("body").on("click", ".cancel-delete", function() { //popover cancel button event
                 $(this).parents("div.popover").prev("a.confirm-delete").trigger("click");
             });
-        
+
             $("body").on("click", ".btn-delete", function() { // popover delete button event - need to attach delete functionality to body b/c section gets reloaded
                 var procId = $(this).parents("tr").attr("data-id");
                 $(this).parents("tr").fadeOut("slow", function() {
                     $(this).remove(); // Remove from list
                     if ($("#eventListtnthproc tr").length === 0) { //If there's no events left, add status msg back in
-                      self.setNoDataDisplay();
+                        self.setNoDataDisplay();
                     }
                 });
                 tnthAjax.deleteProc(procId, false, false, function() { // Post delete to server
@@ -209,6 +206,66 @@
                 });
                 return false;
             });
+        },
+        onDidGetProcedures: function(data, newEntry) {
+            this.populateProcedureRows(data, newEntry);
+            this.setProcedureRowsView();
+            this.setError("");
+        },
+        populateProcedureRows: function(data, newEntry) {
+            data.sort(function(a, b) { // sort from newest to oldest
+                return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
+            });
+            var self = this, contentHTML = [], proceduresHtml = "", otherHtml = [];
+            // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
+            var highestId = 0;
+            $.each(data, function(i, val) {
+                var code = val.resource.code.coding[0].code;
+                var procID = val.resource.id;
+                if ([SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE, SYSTEM_IDENTIFIER_ENUM.NONE_TREATMENT_CODE].indexOf(code) !== -1) {
+                    //for entries marked as other procedure.  These are rendered as hidden fields and can be referenced when these entries are deleted.
+                    otherHtml.push("<input type='hidden' data-id='" + procID + "'  data-code='" + code + "' name='otherProcedures' >");
+                    return true;
+                }
+                var creatorRef = (val.resource.meta.by.reference).match(/\d+/)[0];  // just the user ID, not eg "api/patient/46";
+                var creator = self.getCreatorDisplay(creatorRef, val.resource.meta.by.display || creatorRef);
+                var dateEdited = new Date(val.resource.meta.lastUpdated);
+                var creationText = i18next.t("(data entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                }));
+                var deleteInvocation = "";
+                if (String(creatorRef) === String(self.currentUserId)) {
+                    deleteInvocation = self.getDeleteInvocationDisplay();
+                }
+                contentHTML.push(["<tr data-id='" + procID + "' data-code='" + code + "'>",
+                    "<td width='1%' valign='top' class='list-cell'>&#9679;</td>",
+                    "<td class='col-md-10 col-xs-10 descriptionCell' valign='top'>" +
+                    (tnthDates.formatDateString(val.resource.performedDateTime)) + "&nbsp;--&nbsp;" + val.resource.code.coding[0].display +
+                    "&nbsp;<em>" + creationText +
+                    "</em></td>",
+                    "<td class='col-md-2 col-xs-2 lastCell text-left' valign='top'>" +
+                    deleteInvocation + "</td>",
+                    "</tr>"].join(""));
+                highestId = Math.max(highestId, procID);
+            });
+            if (contentHTML) {
+                proceduresHtml = "<table  class=\"table-responsive\" width=\"100%\" id=\"eventListtnthproc\" cellspacing=\"4\" cellpadding=\"6\">";
+                proceduresHtml += contentHTML.join("");
+                proceduresHtml += "</table>";
+                $("#userProcedures").html(proceduresHtml);
+            }
+            this.setNewEntry(newEntry, highestId);
+            this.initPopoverEvents();
+
+            if ($("#eventListtnthproc tr").length) {
+                $("#pastTreatmentsContainer").fadeIn();
+            } else {
+                $("#pastTreatmentsContainer").fadeOut();
+            }
+
+            $("#userProcedures").append(otherHtml.join("")); //other procedures
         },
         handleOtherProcedures: function() {
             var otherProcElements = $("#userProcedures input[name='otherProcedures']");
@@ -222,7 +279,7 @@
                 }
             });
         },
-        handleAccountCreationRowDisplay: function(procArray) {
+        setAccountCreationRowDisplay: function(procArray) {
             procArray = procArray || {};
             if ($("#pastTreatmentsContainer tr[data-code='" + procArray["code"] + "'][data-performedDateTime='" + procArray["performedDateTime"] + "']").length === 0) {
                 var content = [];
@@ -260,7 +317,7 @@
                         if (isAccountCreation) {
                             procArray["display"] = selectFriendly;
                             procArray["code"] = selectVal;
-                            self.handleAccountCreationRowDisplay(procArray);
+                            self.setAccountCreationRowDisplay(procArray);
                         } else {
                             self.handleOtherProcedures();
                             var procID = [{"code": selectVal, "display": selectFriendly, system: selectSystem}];
@@ -322,18 +379,12 @@
                     return $("#" + fn).val();
                 }).join("/");
                 $("#tnthproc-submit").attr("data-date-read", passedDate);
-                var dateFormatted = tnthDates.swap_mm_dd(passedDate);
-                $("#tnthproc-submit").attr("data-date", dateFormatted);
+                $("#tnthproc-submit").attr("data-date", tnthDates.swap_mm_dd(passedDate));
             } else {
                 $("#tnthproc-submit").attr({"data-date-read": "", "data-date": ""});
             }
             this.checkSubmit("#tnthproc-submit");
         }
     };
-    $(document).ready(function() {
-        var profileCurrentUser = $("#profileProcCurrentUserId"), profileSubject = $("#profileProcSubjectId");
-        if (profileCurrentUser.length && profileSubject.length) { 
-            procApp.init(profileSubject.val(), profileCurrentUser.val());
-        }
-    });
+    ProcApp.initViaTemplate();
 })(); /*eslint wrap-iife: off */
