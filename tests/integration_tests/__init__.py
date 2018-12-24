@@ -28,7 +28,9 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         """Reset all tables before testing."""
 
         if "SAUCE_USERNAME" in os.environ:
-
+            # Configure driver for Sauce Labs
+            # Presumes tunnel setup by Sauce Connect, wrapped by TravisCI Sauce Labs addon
+            # https://docs.travis-ci.com/user/sauce-connect
             platform = {
                 "browserName": "firefox",
                 "platform": "Windows 10",
