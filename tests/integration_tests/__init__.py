@@ -63,10 +63,11 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
             )
 
         else:
-            self.xvfb = xvfbwrapper.Xvfb()
-            self.addCleanup(self.xvfb.stop)
-            self.xvfb.start()
-
+            if "DISPLAY" not in os.environ:
+                # Non-graphical environment; use xvfb
+                self.xvfb = xvfbwrapper.Xvfb()
+                self.addCleanup(self.xvfb.stop)
+                self.xvfb.start()
             self.driver = webdriver.Firefox(timeout=60)
 
         self.addCleanup(self.driver.quit)
