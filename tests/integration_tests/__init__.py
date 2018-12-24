@@ -27,7 +27,7 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
     def setUp(self):
         """Reset all tables before testing."""
 
-        if "SAUCE_USERNAME" in os.environ and "SAUCE_ACCESS_KEY" in os.environ:
+        if "SAUCE_USERNAME" in os.environ:
 
             platform = {
                 "browserName": "firefox",
@@ -126,7 +126,6 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         # Update job result metadata on Sauce Labs, if available
         if (
             "SAUCE_USERNAME" in os.environ and
-            "SAUCE_ACCESS_KEY" in os.environ and
 
             # No exception being handled - test completed successfully
             sys.exc_info() == (None, None, None)
