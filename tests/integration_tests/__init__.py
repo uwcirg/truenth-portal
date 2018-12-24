@@ -29,7 +29,8 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
 
         if "SAUCE_USERNAME" in os.environ:
             # Configure driver for Sauce Labs
-            # Presumes tunnel setup by Sauce Connect, wrapped by TravisCI Sauce Labs addon
+            # Presumes tunnel setup by Sauce Connect
+            # On TravisCI, Sauce Connect tunnel setup by Sauce Labs addon
             # https://docs.travis-ci.com/user/sauce-connect
             platform = {
                 "browserName": "firefox",
