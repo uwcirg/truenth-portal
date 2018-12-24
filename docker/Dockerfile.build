@@ -35,7 +35,12 @@ WORKDIR /root/portal
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
     yes | make-deb && \
-    git checkout debian/rules && \
+    git checkout \
+        debian/artifacts \
+        debian/control \
+        debian/portal.triggers \
+        debian/rules \
+    && \
 
     dpkg-buildpackage --unsigned-source --unsigned-changes && \
     mv /root/portal_* "${ARTIFACT_DIR}" && \
