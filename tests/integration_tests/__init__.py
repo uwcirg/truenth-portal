@@ -7,18 +7,11 @@ import unittest
 
 from flask_testing import LiveServerTestCase
 import pytest
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+import xvfbwrapper
 
-if not pytest.config.getoption("--include-ui-testing"):
-    pytest.skip(
-        "--include-ui-testing is missing, skipping tests",
-        allow_module_level=True,
-    )
-
-from selenium import webdriver  # noqa isort:skip
-import xvfbwrapper  # noqa isort:skip
-
-from .pages import LoginPage  # noqa isort:skip
-from tests import TestCase  # noqa isort:skip
+from tests import TestCase
 
 
 @unittest.skipUnless(
@@ -28,7 +21,7 @@ from tests import TestCase  # noqa isort:skip
     ),
     "Xvfb not installed"
 )
-class TestUI(TestCase, LiveServerTestCase):
+class IntegrationTestCase(TestCase, LiveServerTestCase):
     """Test class for UI integration/workflow testing"""
 
     def setUp(self):
@@ -79,8 +72,53 @@ class TestUI(TestCase, LiveServerTestCase):
         self.addCleanup(self.driver.quit)
 
         self.driver.root_uri = self.get_server_url()
+        self.driver.implicitly_wait(30)
+        self.verificationErrors = []
+        # default explicit wait time; use with Expected Conditions as needed
+        self.wait = WebDriverWait(self.driver, 60)
+        self.accept_next_alert = True
 
-        super(TestUI, self).setUp()
+        super(IntegrationTestCase, self).setUp()
+
+    def is_element_present(self, how, what):
+        """Detects whether or not an element can be found in DOM
+
+        This function was exported from Selenium IDE
+        """
+        try:
+            self.driver.find_element(by=how, value=what)
+        except NoSuchElementException as e:
+            return False
+        return True
+
+    def is_alert_present(self):
+        """Detects whether an alert message is present
+
+        This function was exported from Selenium IDE
+        """
+        try:
+            self.driver.switch_to_alert()
+        except NoAlertPresentException as e:
+            return False
+        return True
+
+    def close_alert_and_get_its_text(self):
+        """Closes an alert, if present, and returns its text
+
+        If an alert is not present a NoAlertPresentException
+        will be thrown.
+        This function was exported from Selenium IDE
+        """
+        try:
+            alert = self.driver.switch_to_alert()
+            alert_text = alert.text
+            if self.accept_next_alert:
+                alert.accept()
+            else:
+                alert.dismiss()
+            return alert_text
+        finally:
+            self.accept_next_alert = True
 
     def tearDown(self):
         """Clean db session, drop all tables."""
@@ -95,20 +133,6 @@ class TestUI(TestCase, LiveServerTestCase):
         ):
             self.driver.execute_script("sauce:job-result=passed")
 
-        super(TestUI, self).tearDown()
+        self.assertEqual([], self.verificationErrors)
 
-    def test_login_page(self):
-        """Ensure login page loads successfully"""
-
-        page = LoginPage(self.driver)
-        page.get("/user/sign-in")
-
-        assert "Uh-oh" not in page.w.find_element_by_tag_name("body").text
-
-    def test_login_form_fb_exists(self):
-        """Ensure Facebook button present on login form"""
-
-        page = LoginPage(self.driver)
-        page.get("/user/sign-in")
-
-        assert page.facebook_button is not None
+        super(IntegrationTestCase, self).tearDown()
