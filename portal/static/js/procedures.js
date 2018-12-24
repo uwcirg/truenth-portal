@@ -285,7 +285,7 @@
                 var content = [];
                 content.push("<tr ");
                 var arrProcAttrs = [];
-                for (var item in procArray) { /*eslint guard-for-in: off */
+                for (var item in procArray) { /*eslint guard-for-in: off, security/detect-object-injection: off */
                     arrProcAttrs.push("data-" + item + "='" + procArray[item] + "'");
                 }
                 content.push(arrProcAttrs.join(" "));
@@ -308,7 +308,7 @@
                         $(this).attr("disabled", true); // First disable button to prevent double-clicks
                         var isAccountCreation = $(this).attr("data-account-create");
                         var subjectId = self.subjectId, selectVal = $(this).attr("data-name"), selectDate = $(this).attr("data-date"), selectSystem = $(this).attr("data-system");
-                        if (selectVal === undefined && selectDate === undefined) {
+                        if (!selectVal || !selectDate) {
                             return false;
                         }
                         var selectFriendly = $("#tnthproc option:selected").text();
