@@ -1,0 +1,4011 @@
+# Translations template for portal.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the portal project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: portal 18.11.14.dev84+g8ebf1d15\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-03 19:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L32
+msgid "Page Not Found."
+msgstr "Ikhasi Alitholakali."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L34
+msgid "Sorry, the page you requested is not found. It may have been moved."
+msgstr "Siyaxolisa, ikhasi obulifuna alitholakali. Kungase kwenzeke lisusiwe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L37
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L39
+msgid "Back To Home"
+msgstr "Buyela Ekhasini Lokuqala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Explore How This Works"
+msgstr "Bheka Ukuthi Lokhu Kusebenza Kanjani"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Explore"
+msgstr "Bheka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Learn About TrueNTH"
+msgstr "Funda Nge TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Learn"
+msgstr "Funda"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L32
+msgid "Internal Server Error"
+msgstr "Iphutha Le-Server Langaphakathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L34
+msgid ""
+"Your request is not processed due to server error(s). If you are still "
+"experiencing problem.  Please use the link below."
+msgstr ""
+"Isicelo sako asimukelwanga ngenxa yamaphutha e-server Uma usalokhu ubhekene "
+"nenkinga.  Sicela usebenzise ilinki engezansi."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/about.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/privacy.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/terms.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L68
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L32
+msgid "Home"
+msgstr "Ikhasi Lasekhaya"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/about.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L69
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L124
+msgid "About TrueNTH"
+msgstr "Mayelana ne TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L8
+msgid "Loading..."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L45
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L44
+msgid ""
+"You are using an outdated browser. Please upgrade your browser to improve "
+"your experience."
+msgstr ""
+"Usebenzisa isiphequluli esiphelelwe yisikhathi. Sicela uthuthukise "
+"isiphequluli sakho ukuze uthole okungcono."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L78
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L106
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L77
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L442
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L619
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L696
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L706
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L735
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L744
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L772
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L45
+msgid "Close"
+msgstr "Vala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L79
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L78
+msgid "TrueNTH"
+msgstr "TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L5
+msgid "Contact TrueNTH"
+msgstr "Xhumana ne TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L7
+msgid "Use this form to get in touch with TrueNTH"
+msgstr "Sebenzisa leli fomu ukuze uxhumane ne TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L27
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L175
+msgid "Name"
+msgstr "Igama"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L16
+msgid "Please enter your name"
+msgstr "Sicela ufake igama lakho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L17
+msgid "Your Name"
+msgstr "Igama Lakho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L21
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L17
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L50
+msgid "Email"
+msgstr "I-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L23
+msgid "Your Email"
+msgstr "I-email Yakho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L24
+msgid "This is not a valid e-mail address, please double-check."
+msgstr "Le email ayisebenzi, sicela uyibhekisise."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L30
+msgid "Enquiry Type"
+msgstr "Uhlobo Lwemibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L35
+msgid "Not sure"
+msgstr "Awuqiniseki"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L18
+msgid "Subject"
+msgstr "Isihloko"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L41
+msgid "What is this about?"
+msgstr "Kumayelana nani lokhu?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L44
+msgid "Text"
+msgstr "Umbhalo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+msgid "Please add a message for TrueNTH"
+msgstr "Sicela ufakele i-TrueNTH umyalezo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+msgid "What is on your mind?"
+msgstr "Yini esengqondweni yakho?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L771
+msgid "Submit"
+msgstr "Thumela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L61
+msgid "Please confirm all fields are filled."
+msgstr "Sicela uqinisekise ukuthi zonke izikhala zigcwalisiwe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L6
+#, python-format
+msgid "%(env)s version - Not for study or clinical use"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L13
+msgid "TrueNTH Logo"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L25
+msgid "log in"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L13
+msgid "Email Address"
+msgstr "Ikheli Le-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L30
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L22
+msgid "Password"
+msgstr "Iphasiwedi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/forgot_password.html#L9
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L22
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L152
+msgid "Having trouble logging in?"
+msgstr "Unenkinga yokungena?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L38
+msgid ""
+"You have been logged out due to inactivity. Please log in again to continue."
+msgstr ""
+"Ukhishiwe ngenxa yokuthatha isikhathi eside ungenzi lutho. Sicela uphinde "
+"ungene ukuze uqhubeke."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L49
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L50
+msgid "TrueNTH Footer Logo"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L15
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L12
+msgid "Welcome to TrueNTH"
+msgstr "Siyakwamula e-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L16
+msgid "Tools for navigating the prostate cancer journey"
+msgstr "Amathulizi okulawula umdlavuza wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L39
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L91
+msgid "Not available"
+msgstr "Ayikho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L57
+msgid "Not Available"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L61
+msgid "Go to link"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/privacy.html#L5
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L42
+msgid "Privacy"
+msgstr "Imfihlo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L138
+msgid "Resources"
+msgstr "Izinsiza"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L9
+msgid "Videos"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L21
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L4
+msgid "Work Instructions"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/terms.html#L5
+msgid "General Terms"
+msgstr "Imigomo Evamile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/website_consent_script.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L45
+msgid "Continue to TrueNTH"
+msgstr "Qhubekela ku-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L180
+msgid "Print"
+msgstr "Printa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L7
+msgid "Back to Resources"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L106
+msgid "Complete Questionnaire"
+msgstr "Gcwalisa Imibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L131
+msgid "TrueNTH P3P"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L169
+msgid "Password Reset"
+msgstr "Ukwenza Iphasiwedi Entsha"
+
+# Intervention: self_management
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L213
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L35
+msgid "Symptom Tracker"
+msgstr "Ukulandelela Izimpawu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L230
+msgid "Verify Account"
+msgstr "Qinisekisa I-akhawunti"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L238
+#, python-format
+msgid "Thank you, %(full_name)s."
+msgstr "Siyabonga, %(full_name)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L239
+#, python-format
+msgid "You've completed the %(registry)s questionnaire."
+msgstr "Usuyigcwalisile imibuzo ye- %(registry)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L242
+msgid "You will be notified when the next questionnaire is ready to complete."
+msgstr "Uzotshelwa uma imibuzo elandelayo isikulungele ukugcwaliswa."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L245
+msgid "Log out"
+msgstr "Phuma"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L271
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L303
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L480
+#, python-format
+msgid "Hi, %(full_name)s"
+msgstr "Sawubona, %(full_name)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L277
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire as soon as "
+"possible. It will expire on %(expired_date)s."
+msgstr ""
+"Sicela ugcwalise imibuzo yakho ye-%(assigning_authority)s ngokushesha. "
+"Izophelelwa isikhathi ngo %(expired_date)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L287
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
+msgstr ""
+"Sicela ugcwalise imibuzo yakho %(assigning_authority)s ngaphambi kuka "
+"%(due_date)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L304
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire at your "
+"convenience."
+msgstr ""
+"Sicela ugcwalise imibuzo yakho ye %(assigning_authority)s ngesikhathi sakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L326
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L355
+msgid "Completed Questionnaires"
+msgstr "Imibuzo Eqediwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L327
+msgid "When you are done, completed questionnaires will be shown here."
+msgstr "Uma usuqedile, imibuzo eqediwe izovezwa la."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L358
+#, python-format
+msgid "View questionnaire completed on %(comp_date)s"
+msgstr "Bheka imibuzo egcwaliswe ngo %(comp_date)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L376
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L410
+msgid "Go to questionnaire"
+msgstr "Iya emibuzweni"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L379
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L408
+msgid "Continue questionnaire"
+msgstr "Qhubeka nemibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L382
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L412
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L441
+msgid "Open Questionnaire"
+msgstr "Imibuzo evuliwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L383
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L413
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire here."
+msgstr "Sicela ugcwalise %(assigning_authority)s iphephambuzo lakho lapha."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L439
+msgid "View previous questionnaire"
+msgstr "Bheka imibuzo eyandulele"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L442
+msgid "No questionnaire is due."
+msgstr "Ayikho imibuzo ephelelwe isikhathi."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L481
+msgid "Questionnaire Expired"
+msgstr "Iphephambuzo Liphelelwe Yisikhathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L482
+msgid ""
+"The assessment is no longer available.\n"
+"A research staff member will contact you for assistance."
+msgstr ""
+"Ukuhlaziya akusekho.\n"
+"Ilungu labasebenzi bocwaningo lizokuthinta ukuze likusize."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/questionnaire_bank.py#L522
+#, python-format
+msgid "Month %(month_total)d"
+msgstr "Inyanga %(month_total)d"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L511
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L517
+msgid "invalid email address"
+msgstr "Ikheli le-imeyili elingafanele"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L526
+msgid "missing required data: "
+msgstr "kunemininingwane edingekayo engekho: "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L12
+msgid "Identity Verification"
+msgstr "Ukuqinisekiswa Komuntu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L18
+msgid ""
+"To ensure your personal details are not shared with others, please enter the"
+" following data for account confirmation."
+msgstr ""
+"Ukuze uqinisekise ukuthi imininingwane yakho ayidluliselwa kwabanye abantu, "
+"sicela ufake idatha elandelayo yokuqinisekisa i-akhawunti."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+msgid "First name is required"
+msgstr "Igama liyadingeka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First Name"
+msgstr "Igama"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+msgid "Last name is required"
+msgstr "Isibongo siyadingeka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last Name"
+msgstr "Isibongo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L253
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L125
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L127
+msgid "Birth Date"
+msgstr "Usuku Lokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L52
+msgid "Day"
+msgstr "Usuku"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L53
+msgid "Day is required"
+msgstr "Kudingeka usuku"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L61
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L63
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L260
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L304
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L132
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L793
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L991
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1101
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1102
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1206
+msgid "Month"
+msgstr "Inyanga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L62
+msgid "Month is required"
+msgstr "Kudingeka inyanga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L261
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L305
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L133
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L794
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L992
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1103
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1207
+msgid "January"
+msgstr "Januwari"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L262
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L306
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L134
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L795
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L993
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1208
+msgid "February"
+msgstr "Febhruwari"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L66
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L263
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L307
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L796
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L994
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1209
+msgid "March"
+msgstr "Mashi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L264
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L308
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L136
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L797
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L995
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1106
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1210
+msgid "April"
+msgstr "Ephreli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L68
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L265
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L309
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L137
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L798
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L996
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1211
+msgid "May"
+msgstr "Meyi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L69
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L266
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L310
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L138
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L799
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L997
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1212
+msgid "June"
+msgstr "Juni"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L70
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L267
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L311
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L139
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L800
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L998
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1213
+msgid "July"
+msgstr "Julayi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L71
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L268
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L312
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L140
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L801
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L999
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1214
+msgid "August"
+msgstr "Agasti"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L72
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L269
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L313
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L141
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L802
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1000
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1215
+msgid "September"
+msgstr "Septhemba"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L73
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L270
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L314
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L142
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L803
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1001
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1112
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1216
+msgid "October"
+msgstr "Okthoba"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L74
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L271
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L315
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L143
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L804
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1002
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1217
+msgid "November"
+msgstr "Novemba"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L75
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L272
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L316
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L144
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L805
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1003
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1114
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1218
+msgid "December"
+msgstr "Disemba"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L84
+msgid "Year"
+msgstr "Unyaka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L85
+msgid "Year is required"
+msgstr "Kudingeka unyaka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L92
+msgid "Confirm Identity"
+msgstr "Qinisekisa Umuntu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L7
+msgid "Thank you for contacting us."
+msgstr "Siyabonga ngokuxhumana nathi."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L9
+msgid "We have sent an email to the team supporting TrueNTH."
+msgstr "Sithumele i-email kuyithimba elisekela i TrueNHT"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L11
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L122
+msgid "TrueNTH Home"
+msgstr "Ikhaya leTrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L6
+msgid "More About You"
+msgstr "Okwengeziwe Mayelana Nawe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L7
+msgid ""
+"The TrueNTH system asks these questions in order to give you information "
+"that best fits"
+msgstr "Isistimu yeTrueNTH ibuza le mibuzo ukuze ikunizeke ulwazi olufanele."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L7
+msgid ""
+"You may\n"
+"    skip any question you prefer not to answer."
+msgstr ""
+"Ungase\n"
+"    weqe noma imuphi umbuzo okhetha ukungawuphenduli."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L259
+msgid "Ethnicity"
+msgstr "Ubuzwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L19
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L263
+msgid "Hispanic or Latino"
+msgstr "Hispanic noma Latino"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L268
+msgid "Not Hispanic or Latino"
+msgstr "Angisiye um-Hispanic noma um-Latin"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L91
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L219
+msgid "Race"
+msgstr "Uhlanga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L223
+msgid "American Indian or Alaska Native"
+msgstr "American Indian noma odabuka e-Alaska"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L228
+msgid "Asian"
+msgstr "Asian"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L233
+msgid "Black or African American"
+msgstr "Black noma African American"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L51
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L238
+msgid "Native Hawaiian or Other Pacific Islander"
+msgstr "Odabuka-Hawai noma e-Pacific Island"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L243
+msgid "White"
+msgstr "Umlungu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L61
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L210
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L248
+msgid "Other"
+msgstr "Okunye"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L70
+msgid "Skip This"
+msgstr "Yeqa lokhu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L78
+msgid "Continue"
+msgstr "Qhubeka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L13
+msgid "Explore How TrueNTH Works"
+msgstr "Bheka Indlela i-TruNTH Esebenza Ngayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L20
+msgid ""
+"A program aimed at improving the lives of men diagnosed and living with "
+"prostate cancer, and their partners, loved ones, and caregivers."
+msgstr ""
+"Uhlelo oluhlose ukuthuthukisa izimpilo zabesilisa abahlonzwe nabaphila "
+"nomdlavuza wendlala, nezophathina babo, abathandekayo babo, nabanakekeli "
+"babo."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L21
+msgid ""
+"Coming soon … discover tools designed to help those affected by prostate "
+"cancer."
+msgstr ""
+"Okuzayo maduzane ... thola amathulizi enzelwe ukusiza labo abanomdlavuza "
+"wendlala."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L29
+msgid "Register Now"
+msgstr "Bhalisa Manje"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L30
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L28
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L39
+msgid "or"
+msgstr "noma"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L31
+msgid "Log In"
+msgstr "Ngena"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L17
+msgid "Tell us a little about yourself."
+msgstr "Sitshele kafushane ngawe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L17
+msgid "your information"
+msgstr "ulwazi lwakho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L26
+msgid "Now it is time to build your prostate cancer profile."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L26
+msgid "your clinical profile"
+msgstr "iphrofayili yakho yezokwelapha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L27
+msgid ""
+"The questions we're asking will help us customize what you see and provide "
+"the best information to help you track and manage your prostate cancer "
+"journey."
+msgstr ""
+"Imibuzo esikubuza yona izosisiza silungise okubonayo futhi sihlinzeke "
+"ngolwazi oluhle kakhulu ukuze kukusize ulandelele futhi ulawule umdlavuza "
+"wakho wendlala."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L30
+msgid "Your clinic of care."
+msgstr "Umtholampilo wakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L30
+msgid "your clinic"
+msgstr "umtholampilo wakho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L39
+msgid "Thank you."
+msgstr "Siyabonga."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L40
+msgid "Click continue to start using TrueNTH"
+msgstr "Chubeza okuthi qhubeka ukuze uqale ukusebenzisa iTrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L44
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L13
+msgid "Next"
+msgstr "Next"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L4
+msgid "Data Saved"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L5
+msgid "Unable to Save Data. System error."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L9
+msgid "saving data..."
+msgstr "ukulondoloza idatha..."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L24
+msgid "terms"
+msgstr "imigomo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L27
+msgid "Terms of Use"
+msgstr "Imigomo Yokusebenzisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L30
+msgid ""
+"Thanks for signing up for TrueNTH. First, please review the terms of use to "
+"access the TrueNTH tools"
+msgstr ""
+"Siyabonga ngokusayinela i-TrueNTH. Okokuqala, sicela uhlole imigomo "
+"yokusebenzisa ukuze ungene emathuluzini e-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L37
+msgid "View TrueNTH Terms"
+msgstr "Bheka imigomo ye-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L40
+#, python-format
+msgid ""
+"\n"
+"                <div class=\"text-warning links-container\">\n"
+"                  By clicking \"NEXT\" you agree to the <a href=\"%(terms_url)s\" target=\"_blank\">Terms</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">Privacy Policy</a>, and <a href=\"\" class=\"terms-url\" target=\"_blank\">General Terms of Use</a> for the TrueNTH USA website.\n"
+"                </div>\n"
+"              "
+msgstr ""
+"\n"
+"                <div class=\"text-warning links-container\">\n"
+"                  Ngokuchofoza u&quot;NEXT&quot; uvumelana<a href=\"%(terms_url)s\" target=\"_blank\">neMigomo</a>,<a href=\"%(privacy_url)s\" target=\"_blank\">iziNqubo-mgomo Zobumfihlo</a>,kanye<a href=\"\" class=\"terms-url\" target=\"_blank\">Nemigomo Evamile Yokusebenzisa</a>ingosi yase-USA yeTrueNTH\n"
+"         </div>\n"
+"              "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L52
+msgid ""
+"By checking this box, I confirm that I have read the information notice "
+"above and consent and agree to the processing of my personal information "
+"(including my health information) on the terms described in this Consent."
+msgstr ""
+"Ngokuphawula leli bhokisi, ngiyaqinisekisa ukuthi ngisifundile isaziso "
+"solwazi esingenhla futhi ngiyavuma ukuba kusetshenziswe imininingwane yami "
+"yomuntu siqu (kuhlanganise nolwazi lwempilo yami) ngokwemigomo echazwe kule "
+"Mvume."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L55
+msgid ""
+"You have previously provided your consent to the website during a visit at "
+"your treating site. If you would like a copy of this please contact your "
+"study contact."
+msgstr ""
+"Esikhathini sangaphambili uye wanikeza imvume yakho kuwebhusayithi "
+"ngesikhathi uvakashele isikhungo sakho sokwelashwa. Uma ungathanda ukuthola "
+"ikhophi yalokhu sicela uxhumane noxhumanisi wakho wocwaningo."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L73
+#, python-format
+msgid ""
+"<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm "
+"that I have read and accept the website <a href=\"%(privacy_url)s\" class"
+"=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class"
+"=\"required-link\">terms</a>.</span>"
+msgstr ""
+"<span class=\"terms-tick-box-text\"> Ngokuphawula leli bhokisi, ngiqinisekisa ukuthi ngiye ngafunda futhi ngamukela<a href=\"%(privacy_url)s\" class=\"required-link\">izinqubo-mgomo zobumfihlo</a> kanye\n"
+"         <a href=\"%(terms_url)s\" class=\"required-link\">nemigomo</a>.</span>"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L103
+msgid "To Continue"
+msgstr "Ukuze Uqhubeke"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L107
+msgid ""
+"You must agree to the terms and conditions by checking the provided "
+"checkbox."
+msgstr ""
+"Kumelwe uvumelane nemigomo nemibandela ngokuphawula amabhokisi abonisiwe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1133
+msgid "OK"
+msgstr "Ok"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L120
+msgid "Website Consent Script - Enter Manually - Paper Form"
+msgstr "I-Script Semvume Yewebhusayithi - Sibhale Ngokoqobo - Sisephepheni"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L121
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L144
+msgid "For Staff Use Only"
+msgstr "Okwabasebenzi Kuphela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L133
+msgid ""
+"By checking this box, I confirm that the patient has read the Website "
+"Consent and consents and agrees to the processing of their personal "
+"information (including their health information) on the terms described in "
+"this Consent and Terms and Conditions and a copy of this consent and "
+"information provided by the patient has been securely stored in accordance "
+"with my local site procedures."
+msgstr ""
+"Ngokuphawula leli bhokisi, ngiyaqinisekisa ukuthi isiguli siyifundile iMvume"
+" Yewebhusayithi futhi siyavuma ukuba kusethsnziswe imininingwane yaso "
+"yomuntu siqu (kuhlanganise nolwazi lwempilo) ngokwemigomo echazwe kule Mvume"
+" kanye Nemigomo Nemibandela nekhophi yale mvume futhi ulwazi oluhlinzekwe "
+"yisiguli lugcinwe ngokuphephile ngokwezinqubo zesikhungo sami."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L143
+msgid "Website Consent Script - Enter Manually - Interview Assisted"
+msgstr "Umbhalo Wemvume Wewebhusayithi - Faka Ngokoqobo - Kusizwa Yimibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L148
+msgid ""
+"We are inviting you to use the TrueNTH website tool because you have agreed "
+"to participate in the [organization] Registry study."
+msgstr ""
+"Sikumema ukuba usebenzise ithuluzi lewebhusayithi ye-TrueNTH ngoba uye "
+"wavuma ukubamba iqhaza ocwaningweni lwe-Registry [yenhlangano]."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L149
+msgid ""
+"The information you provide will be used in a global study and will benefit "
+"patients in the future with better treatment and care options.  Does this "
+"sound like something you’d be willing to participate in?"
+msgstr ""
+"Ulwazi olunikezayo luzosetshenziswa ocwaningweni lomhlaba wonke futhi "
+"luzozuzisa iziguli esikhathini esizayo ngokwelashwa okungcono nezinketho "
+"zokunakekela.  Ingabe lokhu kuzwakala njengokuthile ongathanda ukubamba "
+"iqhaza kukho?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L151
+msgid "If yes, continue to read below text and Consent."
+msgstr "Uma kungu-yebo, qhubeka ufunde umbhalo ongezansi bese unikeza iMvume."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L152
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L165
+msgid "If no, thank them for their time."
+msgstr "Uma isiguli sithi cha, babonge ngesikhathi sabo."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L154
+msgid "Read consent [exactly as written]"
+msgstr "Funda imvume [njengoba ibhaliwe]"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L161
+msgid "Do you have any questions?"
+msgstr "Ingabe unemibuzo?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L162
+msgid ""
+"Do you agree to participate in the TrueNTH website tool and consent to the "
+"processing of your personal information (including your health information) "
+"on the terms I have just read to you?"
+msgstr ""
+"Ingabe uyavuma ukubamba iqhaza kwithuluzi lewebhusayithi ye-TrueNTH futhi "
+"uyavuma ukuba kucutshungulwe ulwazi lwakho lomuntu siqu (kuhlanganise "
+"nolwazi lwakho lwezempilo) ngemigomo engikufundele yona?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L164
+msgid ""
+"If yes, document oral consent below. [NOTE: This consent must absolutely be "
+"read out to them in advance of gathering any personal information. The "
+"patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally "
+"as casual will not be satisfactory.]"
+msgstr ""
+"Uma isiguli sithi yebo, bhala imvume enikezwe ngomlomo ngezansi. [PHAWULA: "
+"Le mvume kufanele ifundelwe bona ngaphambi kokuqoqa noma yiluphi ulwazi "
+"lomuntu siqu. Isiguli kufanele sithi 'yebo, ngiyavuma'; ukuthi 'mmmm', "
+"'yep', 'ok' noma okunye okungacacile njengalokho ngeke kwanele.]"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L172
+msgid "Please print and fill out the form"
+msgstr "Sicela uphrinte bese ugcwalisa ifomu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L181
+msgid "CLOSE"
+msgstr "VALA"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L188
+msgid "View/print website declaration form"
+msgstr "Buka/phrinta ifomu lesimemezelo sewebhusayithi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L204
+msgid ""
+"By checking this box, I confirm that I have read the required information to"
+" the patient and provided the opportunity for the patient to ask questions. "
+"I have addressed the questions to the patient’s satisfaction and have "
+"created an electronic copy of this declaration and have stored this copy. "
+"The patient has provided oral consent to participate in the TrueNTH Global "
+"Registry on the terms set out above."
+msgstr ""
+"Ngokuphawula leli bhokisi, ngiyaqinisekisa ukuthi ngisifundele isiguli "
+"ulwazi oludingekayo futhi nganikeza isiguli ithuba lokubuza imibuzo. "
+"Ngiphendule imibuzo ngendlela eyanelisa isiguli futhi ngenza ikhophi "
+"yyasemshinini yalesi simemezelo futhi ngiyigcinile lekhophi. Isiguli "
+"sinikeze imvume yaso ngomlomo yokubamba iqhaza kuyi-Registry Yomhlaba Wonke "
+"Ye-TrueNTH ngokwemigomo eboniswe ngenhla."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L205
+msgid ""
+"By checking this box, I confirm that I have read and/or gone through "
+"required information to the subject and have completed the required consent "
+"to the use of the TrueNTH website tool and have created an electronic copy "
+"of this declaration and have stored said copy."
+msgstr ""
+"Ngokufaka uqhwishi kuleli bhokisi, ngiyavuma ukuthi ngimufundelile "
+"futhi/noma ngimuchazelile ulwazi oludingekayo umbambiqhaza futhi ngigcwalise"
+" imvume edingekayo yokusebenzisa ithuluzi lewebhusayithi ye-TrueNTH futhi "
+"ngiyenzile ikhophi ye-elekthroniki yalesi simemezelo futhi leyo khophi "
+"ngayigcina."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L207
+msgid ""
+"Subject has given consent previously and you had previously signed and "
+"stored an electronic copy of consent declaration.."
+msgstr ""
+"Umbambiqhaza usinikezile nimvume esikhathini esedlule futhi uye wasayina "
+"futhi wagcina ikhophi yemvume emshinini."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First name"
+msgstr "Igama"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last name"
+msgstr "Isibongo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L236
+msgid "I'm a man who is concerned about prostate cancer for myself"
+msgstr "Ngingowesilisa okhathazeke ngomdlavuza wami wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L241
+msgid ""
+"I'm a caregiver, spouse or partner who wants to learn more about prostate "
+"cancer"
+msgstr ""
+"Ngingumnakekeli, ungumyeni wami noma nginguphathina wakhe ofuna ukwazi "
+"okwengeziwe ngomdlavuza wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L253
+msgid "(optional)"
+msgstr "(uyazikhethela)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L256
+msgid "Birth date"
+msgstr "Usuku lokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L256
+msgid "The birth day field is required and must be valid format"
+msgstr ""
+"Isikhala sosuku lokuzalwa siyadingeka futhi kumelwe sibhalwe ngendlela "
+"enembile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L259
+msgid "Birth month"
+msgstr "Inyanga yokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L259
+msgid "A birth month must be selected"
+msgstr "Inyanga yokuzalwa kumelwe ikhethwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L276
+msgid "The birth year is required and must be in valid format"
+msgstr "Unyaka wokuzalwa uyadingeka futhi kumelwe ubhalwe ngendlela enembile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L288
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L877
+msgid "Have you had a prostate cancer biopsy?"
+msgstr "Wake wakwenza ukuhlolwa kwesicubu komdlavuza wendlala?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L292
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L366
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L388
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L609
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid "Yes"
+msgstr "Yebo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L296
+msgid "Biopsy Date"
+msgstr "Usuku Lwe-biopsy"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L300
+msgid "The biopsy day field is required and must be valid format"
+msgstr ""
+"Isikhala sosuku lwe-biopsy siyadingeka futhi kumelwe lubhalwe ngendlela "
+"enembile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L303
+msgid "A biopsy month must be selected"
+msgstr "Inyanga ye-biopsy kumelwe ikhethwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L320
+msgid "The biopsy year is required and must be in valid format"
+msgstr "Unyaka we-biopsy uyadingeka futhi kumelwe ubhalwe ngendlela enembile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L328
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L393
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L611
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid "No"
+msgstr "Cha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L333
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L354
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L376
+msgid "I don't know"
+msgstr "Angazi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L340
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L878
+msgid "Have you been diagnosed with prostate cancer?"
+msgstr "Uke watholakala unomdlavuza wendlala?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L344
+msgid "Yes (my biopsy was positive)"
+msgstr "Yebo (i-biopsy yami ibi kahle)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L349
+msgid "No (my biopsy was negative)"
+msgstr "Cha (i-biopsy yami ibi yimbi)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L362
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L879
+msgid "Is the prostate cancer only within the prostate?"
+msgstr "Ingabe umdlavuza wendlala uthinte kuphela indlala?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L371
+msgid "No (the cancer is in other parts of my body, too)"
+msgstr "Cha (umdlavuza ukwezinye izingxenye zomzimba wami, futhi)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L384
+msgid "Have you begun prostate cancer treatment?"
+msgstr "Usuqalile ukwelashelwa umdlavuza wendlala?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L407
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L496
+msgid "What is your main clinic for prostate cancer care?"
+msgstr "Yimuphi umtholampilo oyinhloko owelapha umdlavuza wakho wendlala?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L411
+msgid "I'm not receiving care at any of the above clinics"
+msgstr "Angitholi kwelashwa kunoma imiphi imitholampilo eboniswe ngenhla."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L6
+msgid "Email Invite"
+msgstr "Isimemo se-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L5
+msgid "Send a TrueNTH email invite by filling in the form below."
+msgstr ""
+"Thumela i-email yesimemo evela kwaTrueNHT ngokugcwalisa ifomu elingezansi."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L8
+msgid "To (separate multiple addresses with white space)"
+msgstr "Ku (hlukanisa amakheli ngesikhala esimhlophe)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L13
+msgid "Invitation to try TrueNTH"
+msgstr "Isimemo sokuzama iTrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L16
+msgid "Body"
+msgstr "Umzimba"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L17
+msgid "TrueNTH Invitation"
+msgstr "Isimemo Se-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L19
+msgid "Send Invite"
+msgstr "Thumela Isimemo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L8
+msgid "Email Invite Sent"
+msgstr "Isimemo Se-email sithunyelwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L10
+msgid "To"
+msgstr "Iya ku-"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L14
+msgid "Sent"
+msgstr "Ithunyelwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L22
+msgid "Message"
+msgstr "Umyalezo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L33
+msgid "About"
+msgstr "Mayelana"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L34
+msgid "Decision Support"
+msgstr "Ukusekelwa Kwesinqumo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L38
+msgid "Prostate Cancer Facts"
+msgstr "Amaqiniso Ngomdlavuza Wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L41
+msgid "Terms"
+msgstr "Imigomo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L43
+msgid "Contact"
+msgstr "Xhumana"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L46
+msgid "Contact Us"
+msgstr "Xhumana Nathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L47
+msgid "Facebook"
+msgstr "Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L48
+msgid "Twitter"
+msgstr "Twitter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L52
+#, python-format
+msgid ""
+"%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-"
+"profit organization."
+msgstr ""
+"%(year)d Movember Foundation. Wonke amalungelo agodliwe. Inhlangano engenzi "
+"nzuzo ebhalisiwe 501(c)3"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L46
+msgid "dismiss"
+msgstr "Vala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L54
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L112
+msgid "TrueNTH logo"
+msgstr "Ilogo ye-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L115
+msgid "brand logo"
+msgstr "ilogo yenkampani"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L70
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L123
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L4
+msgid "My TrueNTH Profile"
+msgstr "I-phrofayili yami ye TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L84
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L71
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L125
+msgid "Client Applications"
+msgstr "Izicelo Zekhasimende"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L74
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L126
+msgid "Patients"
+msgstr "Iziguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L76
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L127
+msgid "Staff List"
+msgstr "Uhlu Lwabasebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L81
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L78
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L129
+msgid "User Administration"
+msgstr "I-User Administration"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L79
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L130
+msgid "Scheduled Jobs"
+msgstr "Imisebenzi ehleliwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L80
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L131
+msgid "Settings"
+msgstr "Amasethingi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L83
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L133
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L4
+msgid "Reporting Dashboard"
+msgstr "Ukubika iDashboard"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L135
+msgid "Research Data"
+msgstr "Cwaninga Idatha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L91
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L140
+msgid "Log Out of TrueNTH"
+msgstr "Phuma ku TrueNHT"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L95
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L110
+msgid "MENU"
+msgstr "I-MENU"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L96
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L110
+msgid "Profile image"
+msgstr "Isithombe se-phrofayili"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L97
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L101
+msgid "Welcome"
+msgstr "Siyakwamukela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L100
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L121
+msgid "Log In to TrueNTH"
+msgstr "Ngena kuTrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L111
+msgid "Return to TrueNTH home"
+msgstr "Buyela ekhaya le TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L151
+msgid "Your session is about to expire"
+msgstr "Iseshini yakho isizophelelwa isikhathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L153
+msgid ""
+"Your session will expire in approximately {time} seconds due to inactivity."
+msgstr ""
+"Iseshini yakho izophelelwa isikhathi emuzuzwaneni engaba ngu-{time} ngenxa "
+"yokungenzi lutho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L154
+msgid "Log Out"
+msgstr "Phuma"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L154
+msgid "Stay Logged In"
+msgstr "Hlala Ungenile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L8
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L33
+msgid "Usage Statistics"
+msgstr "Amanani Okusebenzisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L11
+msgid "User Statistics"
+msgstr "Amanani omsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L87
+msgid "User Statistics By Role"
+msgstr "Inani Labasebenzisi Ngokwendima"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L17
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L144
+msgid "User Statistics By Intervention"
+msgstr "Inani Labasebenzisi Ngokwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+msgid "User Statistics By Patient Report"
+msgstr "Inani Labasebenzisi Ngokombiko Wesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L211
+msgid "User Statistics By Intervention Access"
+msgstr "Inani Labasebenzisi Ngokungena Kokwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L28
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L245
+msgid "Institution Statistics"
+msgstr "Amanani Ezikhungo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L35
+msgid ""
+"Registrations are collected from the User.registration timestamps of all "
+"Users without the Test Role"
+msgstr ""
+"Ukubhalisa kulandwa ku-User.registration Isigqifizosesikhathi kuwo wonke ama"
+" -user Anendima Yesivivinyo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L36
+msgid ""
+"Logins are collected from the start_time timestamps of Encounters whose "
+"auth_method='password_authenticated'"
+msgstr ""
+"Imininingwane yokungena ithathwa ku-start_time timestamps of Encounters "
+"whose auth_method='password_authenticated'"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L37
+msgid ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions, and represent the number of users associated with that "
+"intervention who have logged in within the given timeframe (whether or not "
+"they accessed the intervention during that login session"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L50
+msgid "Source"
+msgstr "Umthombo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L51
+msgid "Today"
+msgstr "Namuhla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L52
+msgid "This Month"
+msgstr "Kule Nyanga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L53
+msgid "This Year"
+msgstr "Kulonyaka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L54
+msgid "All Time"
+msgstr "Sonke Isikhathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L59
+msgid "Registrations"
+msgstr "Ukubhalisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L66
+msgid "Logins"
+msgstr "Imininingwane Yokungena"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L146
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L179
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L213
+msgid "User stats are collected from all Users without the Test Role"
+msgstr ""
+"Amanani omsebenzisi aqoqwa kubo bonke aBasebenzisi abangenayo iNdima "
+"Yesivivinyo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L90
+msgid ""
+"Role counts are tallied from User.roles (e.g. a User with both the Patient "
+"and Staff Roles, would add 1 to both Roles' counts)"
+msgstr ""
+"Izibalo zezindima zihlanganiswa ku-User.roles (isib. i-User enakho kokubili "
+"iNdima Yesiguli Neyesisebenzi, izonezela u-1 kuzo zombili izibalo zezindima)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L91
+msgid "No Diagnosis"
+msgstr "Akukho Okuhlonziwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L91
+msgid ""
+"Users whose User.observations does not contain any Observations where the "
+"Observation.codeable_concept=CC.BIOPSY and the "
+"Observation.value_quantity.value=True"
+msgstr ""
+"Abasebenzisi abanama-User.observations angenawo ama-Observation lapho "
+"i-Observation.codeable_concept=CC.BIOPSY kanye ne-"
+"Observation.value_quantity.value=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L92
+msgid "Diagnosis, No Treatment"
+msgstr "Ukuhlonzwa, Akukho Ukwelashwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L92
+msgid "Users where known_treatment_not_started(User)=True"
+msgstr "Abasebenzisi lapho i-known_treatment_not_started(User)=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L93
+msgid "Diagnosis and Treatment"
+msgstr "Ukuhlonzwa kanye Nokwelashwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L93
+msgid "Users where known_treatment_started(User)=True"
+msgstr "Abasebenzisi lapho i-known_treatment_started(User)=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid "Metastasis"
+msgstr "Ukusabalala komdlavuza"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid ""
+"Users whose User.observations contains any Observations where the "
+"Observation.codeable_concept=CC.PCaLocalized and the "
+"Observation.value_quantity.value!=True"
+msgstr ""
+"Abasebenzisi abane-User.observations enama-Observations lapho "
+"i-Observation.codeable_concept=CC.PCaLocalized kanye ne-"
+"Observation.value_quantity.value!=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L15
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L107
+msgid "Role"
+msgstr "Indima"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L161
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L195
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L263
+msgid "User Count"
+msgstr "I-akhawunti Yomsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L113
+msgid "Patients - All"
+msgstr "Iziguli - Zonke"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L117
+msgid "Patients - No Diagnosis"
+msgstr "Iziguli - Akukho Okuhlonziwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L121
+msgid "Patients - Diagnosis, No Treatment"
+msgstr "Izigulu - Ukuhlonzwa, Akukho Ukwelashwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L125
+msgid "Patients - Diagnosis and Treatment"
+msgstr "Iziguli - Ukuhlonzwa Nokwelashwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L129
+msgid "Patients - Metastasis"
+msgstr "Iziguli - Ukusabalala Komdlavuza"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L133
+msgid "Partners"
+msgstr "Ophathina"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L137
+msgid "Clinicians"
+msgstr "Odokotela Basemtholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L147
+msgid ""
+"Intervention counts only apply to those interventions that control their "
+"subject list manually (eg Sexual Recovery, Care Plan, Community of "
+"Wellness). They are tallied from User.interventions (e.g. a User with both "
+"the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to "
+"both Interventions' counts)"
+msgstr ""
+"Isibalo sokwenziwayo sisebenza kuphela kulokho okwenziwayo okulawula uhlu "
+"lwababambiqhaza bako ngokoqobo (isib. Ukululama Ngokocansi, Uhlelo "
+"Lokunakekelwa , i-Community of Wellness). Zitholakala ku-User.interventions "
+"(isib. umsebenzisi onakho kokubili okwenziwayo ko 'Hlelo Lokunakekelwa kanye"
+" ne-'Community of Wellness', uzonezela u-1 kukho kokubili okwenziwayo)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L160
+msgid "Intervention"
+msgstr "Okwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L177
+msgid "User Statistics By Patient Reports"
+msgstr "Inani Labasebenzisi Ngokwemibiko Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L180
+msgid ""
+"Completed Reports are tallied for each User that has <i>any number</i> of "
+"PatientReports for that Intervention (e.g. whether a User has 1 or 100 "
+"PatientReports for 'Symptom Tracker', that User only adds 1 to that "
+"Intervention's Completed Reports tally)"
+msgstr ""
+"IMibiko egcwalisiwe ihlanganiselwa uMsebenzisi ngamunye onanoma <i>yiliphi "
+"inani</i> le-PatientReports yalokho okwenziwayo (isib. Kungakhathaliseki "
+"ukuthi uMsebenzisi une-PatientReports e-1 noma angu-100 'Yokulandelela "
+"Izimpawu', lowo Msebenzisi unezela u-1 kuphela kuleyo Ngqikithi Yemibiko "
+"Egcwalisiwe Yokwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L181
+msgid ""
+"Completed Reports are only shown for an Intervention if the report count is "
+"above 0"
+msgstr ""
+"Imibiko Egcwalisiwe ivezwa kuphela koKwenziwayo uma isibalo semibiko "
+"ingaphezu kuka-0"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L194
+msgid "Intervention (Reports)"
+msgstr "Okwenziwayo (Imibiko)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L214
+msgid ""
+"Intervention Access counts reflect the number of users who <i>could</i> "
+"access said intervention, regardless of whether or not they've actually "
+"accessed it."
+msgstr ""
+"Isibalo Sokungena Kokwenziwayo siveza inani labasebenzisi <i>abakwaziyo</i> "
+"ukungena kulokho okwenziwayo, kungathaliseki ukuthi bangenile ngempela yini "
+"noma cha."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L228
+msgid "Intervention (Access)"
+msgstr "Okwenziwayo (Ukungena)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L247
+msgid ""
+"Organization counts are collected from the User.organizations of all Users "
+"without the Test Role"
+msgstr ""
+"Izibalo zezinhlangano zithathwa ku-User.organizations zabo bonke "
+"Abasebenzisi abangenayo iNdima Yesivivinyo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L248
+msgid ""
+"'None of the above' refers to Users who specifically selected the 'None of "
+"the above' organization option"
+msgstr ""
+"Ukuthi 'Akukho kokungenhla' kubhekisela kuBasebenzisi abakhethe ngokucacile "
+"okuthi 'Akukho kokungenhla' okhethweni lwenhlangano"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L249
+msgid ""
+"'Unspecified' refers to Users who have not yet been assigned to <i>any</i> "
+"Organization option (including 'None of the above')"
+msgstr ""
+"Ukuthi 'Akuchaziwe' kubhekisela kuBasebenzisi abangakafakwa kunoma "
+"<i>yiluphi</i> ukhetho lweNhlangano (kuhlanganise nokuthi 'Akukho "
+"okungenhla')"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L262
+msgid "Organization Name"
+msgstr "Igama Lenhlangano"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L6
+msgid "Browser Cookies Disabled"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L9
+msgid ""
+"Our website needs to use cookies to bring you the best, personalized, "
+"browsing experience. Your web browser is currently <b>not</b> allowing "
+"cookies. Help us fix this."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L13
+msgid ""
+"Please enable cookies within your browser settings to continue. To learn how"
+" to allow cookies, check online for your web browser's specific "
+"instructions."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L15
+#, python-format
+msgid ""
+"For more information on how we use cookies, see our <u><a "
+"href=\"%(privacy_url)s\">Privacy Policy</a></u>."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L20
+msgid "Try Again"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L49
+msgid "Browser cookie setting check complete"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L50
+msgid "Export questionnaire data"
+msgstr "Thumela ulwazi lwemibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L17
+msgid "Instrument(s) to export data from:"
+msgstr "Amathuluzi okuthumela ukwaziswa:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L29
+msgid "Data type:"
+msgstr "Uhlobo lwedatha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L33
+msgid "CSV"
+msgstr "CSV"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L37
+msgid "JSON"
+msgstr "JSON"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L44
+msgid "Export"
+msgstr "Thumela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L8
+msgid "Assessment Report Detail"
+msgstr "Umbiko Weninininngane Yokuhlaziya"
+
+# Role: patient
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L9
+msgid "Patient"
+msgstr "Isiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L13
+msgid "Back to Profile"
+msgstr "Buyela Kuphrofayili"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L16
+msgid "Back to Patient Profile"
+msgstr "Buyela Kuphrofayili Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L18
+msgid "Back to User Profile"
+msgstr "Buyela Kuphrofa Yomsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L21
+msgid "Back to Truenth Home"
+msgstr "Buyela Ekhasini Lokuqala Le Truenth"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L49
+msgid "Question"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L49
+msgid "Response"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L8
+msgid "Do you have an Access Code?"
+msgstr "Ingabe unayo Ikhodi Yokungena?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L18
+msgid "I do not have an Access Code"
+msgstr "Anginayo Ikhodi Yokungena"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L19
+msgid "Continue registration without an Access Code"
+msgstr "Qhubeka ubhalise ngaphandle kweKhodi Yokungena"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L52
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L159
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L35
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L20
+msgid "Register"
+msgstr "Bhalisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L2
+msgid "Days Overdue"
+msgstr "Izinsuku Eziphelelwe isikhathi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L5
+msgid "Site"
+msgstr "Ingosi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L7
+msgid " Days"
+msgstr " Izinsuku"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L9
+msgid "Total"
+msgstr "Ingqikithi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L4
+msgid "Admin Tools"
+msgstr "Amathuluzi E-admin"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L5
+msgid "Click on each for details"
+msgstr "Chofoza endaweni ngayinye ukuze uthole imininingwane"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L8
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L365
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L402
+msgid "Communications"
+msgstr "Izinkulumiswano"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L18
+msgid "Select any user to view details or make changes."
+msgstr ""
+"Khetha noma yimuphi umsebenzisi ukuze ubheke imininingwane noma wenze "
+"izinguquko."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L20
+msgid "AdminList_"
+msgstr "AdminList_"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L45
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L39
+msgid "ID"
+msgstr "I-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L49
+msgid "Roles"
+msgstr "Izindima"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L50
+msgid "Sites"
+msgstr "Izikhungo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L51
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L45
+msgid "Deactivate Account"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L52
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L62
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L46
+msgid "activation status"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L14
+msgid "Filter list by site"
+msgstr "Khetha uhlu ngokuya ngezingosi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L22
+msgid "Select All"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L23
+msgid "Clear All"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L29
+msgid "Site filter applied"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L36
+msgid "View deactivated accounts"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L60
+msgid "Deactivate"
+msgstr "Vala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+msgid "Inactive"
+msgstr "Ayisebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+msgid "Reactivate account"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Status"
+msgstr "Isimo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L25
+msgid "User"
+msgstr "Umsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L34
+msgid "Preview"
+msgstr "Buka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L45
+msgid "Communication Detail"
+msgstr "Imininingwane Yokukhulumisana"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L49
+msgid "Recipients:"
+msgstr "Abazoyamukela:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L50
+msgid "Subject:"
+msgstr "Isihloko:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L51
+msgid "Body:"
+msgstr "Umzimba:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L63
+msgid "No communications found."
+msgstr "Ayikho inkulumiswano etholakele."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L111
+msgid "Unable to receive content"
+msgstr "Angikwazi ukwamukela okuqukethwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L5
+msgid "Patient List"
+msgstr "Uhlu Lweziguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L8
+msgid "Create a patient record"
+msgstr "Yenza irekhodi yesigulu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L11
+msgid "Select a patient below to view or update details."
+msgstr "Khetha isiguli ngezansi ukuze ubheke noma ulungise imininigwane"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L14
+msgid "PatientList_"
+msgstr "Uhlu Lweziguli_"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L44
+msgid "TrueNTH ID"
+msgstr "I-ID ye-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L45
+msgid "Username"
+msgstr "I-username"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L49
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L53
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L451
+msgid "Cell"
+msgstr "Iselula"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L50
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L54
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L461
+msgid "Phone (Other)"
+msgstr "Ucingo (Okunye)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L51
+msgid "Reports"
+msgstr "Imibiko"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L53
+msgid "Questionnaire Status"
+msgstr "Isimo Semibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L54
+msgid "Visit"
+msgstr "Vakashela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1025
+msgid "Study ID"
+msgstr "I-ID Yocwaningo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L57
+msgid "(GMT)"
+msgstr "(GMT)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L58
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L43
+msgid "Site(s)"
+msgstr "Ingosi (noma Izingosi)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L80
+msgid "ST"
+msgstr "ST"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L80
+msgid "DS"
+msgstr "DS"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L110
+msgid "Patient Report"
+msgstr "Umbiko Wesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Type"
+msgstr "Uhlobo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Report Name"
+msgstr "Igama Lombiko"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Generated (GMT)"
+msgstr "Yenziwe (GMT)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Downloaded"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L128
+msgid "View All"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L6
+msgid "Staff Administration"
+msgstr "Ukuphatha Abasebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L9
+msgid "Create a staff record"
+msgstr "Yenza irekhodi yabasebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L11
+msgid "Select a user below to view or update details."
+msgstr "Khetha umsebenzisi ngezansi noma ulungise imininingwane."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L15
+msgid "StaffList_"
+msgstr "Uhlu Lwabasebenzi_"
+
+# Role: staff_admin
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L44
+msgid "Staff Admin"
+msgstr "Umqondisi Wezisebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L55
+msgid "Back to"
+msgstr "Buyela ku"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L71
+msgid "Send an Invite"
+msgstr "Thumela Isimemo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L73
+msgid "TrueBLOG"
+msgstr "I-TrueBLOG"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L74
+msgid "Movember.com"
+msgstr "Movember.com"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L116
+msgid "Movember"
+msgstr "I-Movember"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L117
+msgid "Movember Logo"
+msgstr "Ilogo Ye-Movember"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+msgid "Movember logo"
+msgstr "Ilogo ye-Movember"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/change_password.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L11
+msgid "Change password"
+msgstr "Shintsha iphasiwedi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/change_username.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L8
+msgid "Change username"
+msgstr "Shintsha i-username"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/invite.html#L5
+msgid "Invite User"
+msgstr "Mema Umsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L39
+msgid "Login With Facebook"
+msgstr "Ngena Nge-Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L47
+msgid "Login With Google"
+msgstr "Ngena Nge-Google"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L127
+msgid "Sign in"
+msgstr "Ngena"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/manage_emails.html#L5
+msgid "Manage Emails"
+msgstr "Lawula Ama-emails"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L13
+msgid "Email address"
+msgstr "Ikheli le-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L14
+msgid "Email address is required."
+msgstr "Kufuneka ikheli le-email."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L10
+msgid "Oops, the password does not meet the minimum requirements."
+msgstr "Oops, iphasiwedi ayilifinyeleli izinga elibekiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L28
+msgid "Retype Password"
+msgstr "Phinde Ubhale Iphasiwedi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L29
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L11
+msgid "Oops, the two password fields do not match."
+msgstr "Oops, izikhala ezimbili zephasiwedi azifani."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L30
+msgid "Please re-type your password."
+msgstr "Sicela uphinde ubhale iphasiwedi yakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L45
+msgid "Register using:"
+msgstr "Bhalisa usebenzisa:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L50
+msgid "Log In With Facebook"
+msgstr "Ngena Nge Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L57
+msgid "Log In With Google"
+msgstr "Ngena Nge Google"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L62
+msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
+msgstr ""
+"Funda okwengeziwe ngokusebenzisa i-Facebook noma i-Google ukusayinela "
+"i-TrueNTH."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L77
+msgid "Password must have at least:"
+msgstr "Iphasiwedi kumelwe okungenani ibe:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L79
+msgid "Eight characters"
+msgstr "Izinhlamvu eziyisishagalombili"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L80
+msgid "One lowercase letter"
+msgstr "Uhlamvu oluncane olulodwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L81
+msgid "One uppercase letter"
+msgstr "uhlamvu olukhulu olulodwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L82
+msgid "One number"
+msgstr "Inombolo eyodwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L92
+msgid "About Using Google or Facebook for TrueNTH"
+msgstr "Mayelana Nokusebenzisa i-Google noma i-Facebook ukungena ku TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L98
+msgid ""
+"We offer users the ability to create a unique account for TrueNTH or the "
+"option to use their Facebook or Google logins. Choosing to use Facebook or "
+"Google provides a few additional benefits to you:"
+msgstr ""
+"Sinikeza abasebenzisi ikhono lokwakha i-akhawunti ekhethekile ye-TrueNTH "
+"noma inketho yokusebenzisa i-Facebook yabo noma amalungelo okungena ku-"
+"Google. Ukukhetha ukusebenzisa iFacebook noma i-Google kuzokulethela "
+"izinzuzo ezengeziwe ezimbalwa:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L100
+msgid ""
+"A single login - you don't need to remember multiple user names or "
+"passwords. Assuming you have an active login with Facebook or Google, "
+"logging into TrueNTH is as simple as clicking a single button."
+msgstr ""
+"Ungena kanye - awudinge ukukhumbula ama-usernames noma amaphasiwedi "
+"amaningi. Uma ucabanga ukuthi une-akhawunti ku-Facebook noma ku-Google, "
+"ukungena ku-TrueNTH kulula njengokuchofoza inkinobho eyodwa."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L101
+msgid ""
+"TrueNTH can automatically import basic profile information from those "
+"services, simplifying the amount of information you need to enter. This "
+"includes name, email address, birthdate and profile image."
+msgstr ""
+"I-TruNHT ingathumela ngokuzenzekelayo ulwazi lwephrofayili oluyisisekelo "
+"kulawo masevisi, yenze lungbi luningi ulwazi odinga ukulufaka. Lokhu "
+"kuhlanganisa igama, ikheli le email, usuku lokuzalwa kanye nesithombe "
+"sephrofayili."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L102
+msgid ""
+"Information is a one-way street - TrueNTH can pull basic profile information"
+" from Facebook and Google, but never share anything with them. And we NEVER "
+"post or share anything to your accounts."
+msgstr ""
+"Ulwazi luhamba ngomzila owodwa - iTrueNTH ingadonsa ulwazi lwe-phrofayili "
+"ku-Facebook naku-Google, kodwa ayidluliseli lutho kukho. Futhi ASISOZE "
+"safaka noma sadlulisela lutho ku-akhawunti yakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/resend_confirm_email.html#L5
+msgid "Resend Confirmation Email"
+msgstr "Phinde Uthumele I-email Yokuqinisekisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_subject.txt#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L5
+msgid "Reset Password"
+msgstr "Yenza I-phasiwedi Entsha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L9
+msgid ""
+"Password must have at least eight characters with one lowercase letter, one "
+"uppercase letter and one number"
+msgstr ""
+"Iphasiwedi kumelwe okungenani ibe nezinhlamvu eziyisishiyagalombili, ibe "
+"nohlamvu olulodwa olubhalwe ngegama elincane, elilodwa elinegama eliphakeme "
+"kanye nenombolo eyodwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L5
+msgid "User profile"
+msgstr "Iphrofayili yomsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.html#L1
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L1
+#, python-format
+msgid "Hello %(first_name)s %(last_name)s,"
+msgstr "Sawubona %(first_name)s %(last_name)s,"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.html#L5
+msgid ""
+"\n"
+"<p>Thank you,</p>\n"
+"<p>The TrueNTH Team</p>\n"
+msgstr ""
+"\n"
+"<p>Siyabonga,</p> \n"
+"<p>Iqembu le TrueNTH</p>\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L5
+msgid ""
+"\n"
+"Thank you,\n"
+"The TrueNTH Team\n"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_message.html#L4
+#, python-format
+msgid ""
+"\n"
+"<p>We have received your password reset request.</p>\n"
+"\n"
+"<p>If you initiated this request, reset the password with the link below:<br/>\n"
+"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"%(reset_password_link)s\">Reset password</a>.</p>\n"
+"\n"
+"<p>If you did not initiate this password reset, you may safely ignore this email.</p>\n"
+msgstr ""
+"\n"
+"<p>Sisitholile isicelo sakho sokwenza iphasiwedi entsha.</p>\n"
+"\n"
+"<p>Uma kunguwe owenze lesi sicelo, yenza iphasiwedi entsha ngale linki engezansi:<br/>\n"
+"    <a href=\"%(reset_password_link)s\">Yenza iphasiwedi entsha</a>.</p>\n"
+"\n"
+"<p>Uma ungazange wenze lesi sicelo se-password entsha, ungayinaki le email.</p>\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_message.txt#L4
+#, python-format
+msgid ""
+"\n"
+"We have received your password reset request.\n"
+"\n"
+"If you initiated this request, reset the password with the link below:\n"
+"    %(reset_password_link)s\n"
+"\n"
+"If you did not initiate this password reset, you may safely ignore this email.\n"
+"\n"
+msgstr ""
+"\n"
+"Sithole isicelo sakho sokusetha kabusha iphasiwedi.\n"
+"\n"
+"Uma kunguwe owenze lesi sicelo, shintsha iphasiwedi ngale link engezansi:\n"
+"  %(reset_password_link)s\n"
+"\n"
+"Uma kungewena ocele ukushintsha iphasiwedi, vele uyizibe le imeyili.\n"
+"\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L4
+msgid "<p>Your password has been changed.</p>"
+msgstr "<p>I-password yakho ishintshile</p>"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L8
+#, python-format
+msgid ""
+"If you did not initiate this password change, <a "
+"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
+"contact your representative at %(organization_name)s."
+msgstr ""
+"Uma ungazange wenze lesi sicelo sokushintsha iphasiwedi, <a "
+"href=\"%(forgot_password_url)s\">sicela ucindezele la ukuze uyishintshe</a>,"
+" noma uthinte ummeleli wakho %(organization_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L10
+#, python-format
+msgid ""
+"If you did not initiate this password change, <a "
+"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
+"contact your representative at %(app_name)s."
+msgstr ""
+"Uma ungazange wenze lesi sicelo sokushintsha iphasiwedi, <a "
+"href=\"%(forgot_password_url)s\">sicela ucindezele la ukuze uyishintshe</a>,"
+" noma uthinte ummeleli wakho %(app_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L20
+#, python-format
+msgid ""
+"If you did not initiate this password change, please contact your "
+"representative at %(organization_name)s."
+msgstr ""
+"Uma ungazange wenze lesi sicelo sokushintsha iphasiwedi, sicela uthinte "
+"ummeleli wakho ku %(organization_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L18
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L22
+#, python-format
+msgid ""
+"If you did not initiate this password change, please contact your "
+"representative at %(app_name)s."
+msgstr ""
+"Uma ungazange wenze lesi sicelo sokushintsha iphasiwedi, sicela uthinte "
+"ummeleli wakho ku %(app_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L4
+msgid "Your password has been changed."
+msgstr "Iphasiwedi yakho ishintshiwe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L8
+#, python-format
+msgid ""
+"\n"
+"If you did not initiate this password change, please click the link below to reset it, or contact your representative at %(organization_name)s.\n"
+"    %(forgot_password_url)s\n"
+msgstr ""
+"\n"
+"Uma ungazange ucele ukushintsha iphasiwedi, sicela uchofoze i-link engezansi ukuze uyenze kabusha noma uxhumane nommeleli wakho ku %(organization_name)s\n"
+"  %(forgot_password_url)s\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L13
+#, python-format
+msgid ""
+"\n"
+"If you did not initiate this password change, please click the link below to reset it, or contact your representative at %(app_name)s.\n"
+"    %(forgot_password_url)s\n"
+msgstr ""
+"\n"
+"Uma ungazange ucele ukushintsha iphasiwedi, sicela uchofoze i-link engezansi ukuze uyenze kabusha noma uxhumane nommeleli wakho ku %(app_name)s\n"
+"  %(forgot_password_url)s\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_subject.txt#L3
+msgid "Your password has been changed"
+msgstr "Iphasiwedi Yakho Ishintshiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L48
+msgid "My Questionnaires"
+msgstr "Amaphephambuzo Ami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L22
+msgid "My Reports"
+msgstr "Imibiko Yami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L44
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L63
+msgid "My Clinic"
+msgstr "Umtholampilo Wami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L53
+msgid "My Agreement"
+msgstr "Isivumelwano Sami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L78
+msgid "My Roles"
+msgstr "Izindima Zami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L4
+msgid "Patient Profile"
+msgstr "Iphrofayili Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L22
+msgid "Patient Details"
+msgstr "Imininingwane Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L27
+msgid "For kiosk style administration of an assessment"
+msgstr "Kwenzelwe ukuhlowa okufana nokwase-kiosk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L27
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L33
+msgid "Log in as this patient"
+msgstr "Ngena njengesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L37
+msgid ""
+"This is intended for \"kiosk\" style administration of an assessment, "
+"wherein the staff person \"logs in as the patient\", which logs the staff "
+"person out of their session, and automatically logs in this patient without "
+"their needing to enter login credentials. Proceed?"
+msgstr ""
+"Lokhu kuhloselwe ukuhlaziya okufana nokwe-\"kiosk, okungukuthi uma "
+"isisebenzi \"singena njengesiguli\", okuzokhipha isisebenzi kuyiseshini "
+"yayo, bese ngokuzenzekelayo sifaka isiguli ngaphandle kokuthi sifake "
+"imininingwane yaso. Uyaqhubeka?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1134
+msgid "Cancel"
+msgstr "Khansela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L24
+msgid "Clinic"
+msgstr "Umtholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L33
+msgid "Agreement to Share Clinical Information"
+msgstr "Isivumelwano Sokwabelana Ngolwazi Lwasemtholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L692
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L33
+msgid "Consent History"
+msgstr "Umlando Wemvume"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L75
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L48
+msgid "PRO Questionnaires"
+msgstr "Iphephambuzo Le-PRO"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L71
+msgid "Patient Reports"
+msgstr "Imibiko Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L99
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L87
+msgid "User Roles"
+msgstr "Izindimba Zomsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L98
+msgid "Audit Log"
+msgstr "Lungisa Ilogi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L15
+msgid "No email"
+msgstr "Akuna email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L15
+msgid "User does not have email address"
+msgstr "Umsebenzisi akanalo ikheli le-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_base.html#L12
+msgid "TrueNTH Profile"
+msgstr "I-profile ye TruNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L7
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L526
+msgid "Clinics"
+msgstr "Imitholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L17
+msgid "Admin staff"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L31
+msgid "New Patient"
+msgstr "Isigulu Esisha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L13
+msgid "loading section data..."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L14
+msgid "Edit"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L14
+msgid "Edit Button"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L26
+msgid "Updated"
+msgstr "Ilungisiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L26
+msgid "Unable to Update. System error."
+msgstr "Ayilungiseki Iphutha le sistimu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L37
+msgid "My Information"
+msgstr "Ulwazi Lwami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L40
+msgid "Patient Information"
+msgstr "Ulwazi Lwesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L42
+msgid "User Information"
+msgstr "Ulwazi Longenayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L49
+msgid "Date of Birth"
+msgstr "Usuku Lokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L51
+msgid "Study Id"
+msgstr "I-Id Yocwaningo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L52
+msgid "Site Id"
+msgstr "I-Id Yesayithi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L78
+msgid "My Detail"
+msgstr "Imininingwane Yami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L81
+msgid "Patient Detail"
+msgstr "Imininingwane Yesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L83
+msgid "User Detail"
+msgstr "Imininingwane Yomsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L198
+msgid "Gender"
+msgstr "Ubulili"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L108
+msgid "Locale / Time Zone"
+msgstr "Isikhathi Sendawo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L161
+msgid "Language"
+msgstr "Ulimi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L112
+msgid "Time Zone"
+msgstr "Isikhathi Sendawo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L127
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L131
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L149
+msgid "Birth date must be valid and in the required format."
+msgstr "Usuku lokuzalwa kufanele kube olunembile futhi lubhalwe kahle"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L131
+msgid "Birth Month"
+msgstr "Inyanga Yokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L149
+msgid "Birth Year"
+msgstr "Unyaka Wokuzalwa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L164
+msgid "Default"
+msgstr "Uhlelo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First name is required and must not contain invalid characters."
+msgstr "Igama liyadingeka futhi kumelwe libe nezinhlamvu ezinembile."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last name is required and must not contain invalid characters."
+msgstr "Isibongo siyadingeka futhi kumelwe sibe nezinhlamvu ezinembile."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L202
+msgid "Male"
+msgstr "Owesilisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L206
+msgid "Female"
+msgstr "Owesifazane"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L284
+msgid "Registration Status:"
+msgstr "Isimo sokubhalisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L284
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L293
+msgid "not registered"
+msgstr "ayibhaliswanga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L291
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L344
+msgid "registered"
+msgstr "ibhalisiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L296
+msgid "complete"
+msgstr "Kuphelele"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L297
+msgid "incomplete"
+msgstr "Akuphelele"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L298
+msgid "View reports"
+msgstr "Bheka imibiko"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L301
+msgid "Send email to patient"
+msgstr "Thumela i-email esigulini"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L303
+msgid "Select Email..."
+msgstr "Khetha I-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L308
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L351
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L471
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1048
+msgid "Send email"
+msgstr "Thumela i-email"
+
+# AppText: profileSendEmail option invite
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L322
+msgid "TrueNTH Invite"
+msgstr "Isimemo se TrueNTH"
+
+# AppText: profileSendEmail option reminder
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L324
+msgid "TrueNTH Reminder"
+msgstr "Isikhumbuzo se-TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L330
+msgid "P3P Assessment Status:"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L330
+msgid "not available"
+msgstr "ayikho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L331
+msgid "Initial invite to complete P3P assessment"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L332
+msgid "Reminder to complete P3P assessment"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L342
+msgid "Registration status:"
+msgstr "Isimo sokubhalisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L346
+msgid "not yet registered"
+msgstr "ayikabhaliswa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L370
+msgid "Send reset password email to patient"
+msgstr "Thumelela isiguli i-email yokwenza iphasiwedi entsha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L379
+msgid "Send invitation and reminder emails to patient"
+msgstr "Thumela ama-email esimemo kanye nawesikhumbuzo esigulini"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L388
+msgid "Email audit log"
+msgstr "I-log yokuhlolwa kwama-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L407
+msgid "Send registration email to user"
+msgstr "Thumela i-email yokubhalisa kumsebenzisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L416
+msgid "Send reset password email to staff"
+msgstr "Thumela i-email yokwenza iphasiwedi entsha kubasebenzi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L428
+msgid "None available"
+msgstr "Asikho esitholakalayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L436
+msgid "Email Message Content"
+msgstr "Okuqukethwe Umyalezo We-email"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L451
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L461
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L526
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1025
+msgid "Optional"
+msgstr "Uyazikhethela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L452
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L462
+msgid "Phone number must be in numbers."
+msgstr "Inombolo yocingo kufanele ibhalwe kahle"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L487
+msgid "In what state is the patient currently receiving prostate cancer care?"
+msgstr ""
+"Okwamanje isiguli sithola ukwelashwa komdlavuza wendlala kusiphi isifunda?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L489
+msgid "In what state are you currently receiving prostate cancer care?"
+msgstr "Okwamanje uthola ukwelashwa komdlavuza wendlala kusiphi isifunda?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L502
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L533
+msgid "None of the Above"
+msgstr "Akukho Kokungenhla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L505
+msgid "No clinic found in selected state."
+msgstr "Awukho umtholampilo otholakele esifundeni esikhethiwe."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L525
+msgid "Main clinic for prostate cancer care"
+msgstr "Umtholampilo oyinhloko womdlavuza wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L592
+msgid "Consent to share information"
+msgstr "imvume yokwabelana ngolwazi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L604
+#, python-format
+msgid ""
+"\n"
+"                                    I consent to sharing information with <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+msgstr ""
+"\n"
+"                                    Nginikeza imvume yokuba kwabelwane ngolwazi ne <span class=\"consent-clinic-name\">%(org_shortname)s</span>\n"
+"                                "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L653
+msgid "No consent record found"
+msgstr "Ayikho irekhodi yemvume elitholakele"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L686
+msgid "History"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L707
+msgid "Consent Status Editor"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L710
+msgid "Modify the consent status for this user to"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L713
+msgid "Consented / Enrolled"
+msgstr "Unikezile Imvume / Ubhalisile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L720
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Uhoxisiwe - Vala Ukuqoqwa Kwedatha bese Ubika Umlando Wedatha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L721
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Vala Ukuqoqwa Kwedatha futhi Ubike Umlando Wedatha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L728
+msgid "Purged / Removed"
+msgstr "Isuliwe / Isusiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L745
+msgid "Consent Date Editor"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L748
+msgid "Current consent date: "
+msgstr "Usuku lwamanje lokunikeza imvume "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "Modify the consent date"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "GMT 24-hour format"
+msgstr "GMT 24-ngesimiso samahora"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "for this agreement to:"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L789
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L792
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L809
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1098
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1101
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1118
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1202
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1205
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1222
+msgid "Date must be valid and in the required format."
+msgstr "Usuku kumelwe lunembe futhi lubhalwe ngendlela efanele."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L828
+msgid "for"
+msgstr "e"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L829
+msgid "Editable by admins only."
+msgstr "Ingalungiswa abaphathi kuphela."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L850
+msgid "Session History"
+msgstr "Umlando Weseshini"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L850
+msgid "click each row to review report"
+msgstr "chofoza umugqa ngamunye ukuze uhlole umbiko"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Questionnaire Name"
+msgstr "Igama Lephephambuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Last Updated"
+msgstr "Igcine Ukulungiswa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "GMT, Y-M-D"
+msgstr "GMT, Y-M-D"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L872
+msgid "My Prostate Cancer Profile"
+msgstr "Iphrofayili Yami Yomdlavuza Wendlala"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L872
+msgid "Clinical Questions"
+msgstr "Imibuzo Yasemtholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L874
+msgid "Questions asked of the patient at registration"
+msgstr "Imibuzo ebuzwa ngesiguli lapho kubhaliswa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L900
+msgid "Intervention Reports"
+msgstr "Imibuzo Yokwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L905
+msgid "No reports available."
+msgstr "Akunamibiko ekhona"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L917
+msgid "Select"
+msgstr "Khetha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L918
+msgid "America/Chicago"
+msgstr "America/Chicago"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L919
+msgid "America/Denver"
+msgstr "America/Denver"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L920
+msgid "America/Los Angeles"
+msgstr "America/Los Angeles"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L921
+msgid "America/Indianapolis"
+msgstr "America/Indianapolis"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L922
+msgid "America/New York"
+msgstr "America/New York"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L923
+msgid "Australia/Adelaide"
+msgstr "Australia/Adelaide"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L924
+msgid "Australia/Brisbane"
+msgstr "Australia/Brisbane"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L925
+msgid "Australia/Broken_Hill"
+msgstr "Australia/Broken_Hill"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L926
+msgid "Australia/Canberra"
+msgstr "Australia/Canberra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L927
+msgid "Australia/Currie"
+msgstr "Australia/Currie"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L928
+msgid "Australia/Darwin"
+msgstr "Australia/Darwin"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L929
+msgid "Australia/Eucla"
+msgstr "Australia/Eucla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L930
+msgid "Australia/Hobart"
+msgstr "Australia/Hobart"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L931
+msgid "Australia/Lindeman"
+msgstr "Australia/Lindeman"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L932
+msgid "Australia/Lord_Howe"
+msgstr "Australia/Lord_Howe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L933
+msgid "Australia/Melbourne"
+msgstr "Australia/Melbourne"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L934
+msgid "Australia/North"
+msgstr "Australia/North"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L935
+msgid "Australia/Perth"
+msgstr "Australia/Perth"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L936
+msgid "Australia/Queensland"
+msgstr "Australia/Queensland"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L937
+msgid "Australia/South"
+msgstr "Australia/South"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L938
+msgid "Australia/Sydney"
+msgstr "Australia/Sydney"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L939
+msgid "Australia/Tasmania"
+msgstr "Australia/Tasmania"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L940
+msgid "Australia/Victoria"
+msgstr "Australia/Victoria"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L941
+msgid "Australia/West"
+msgstr "Australia/West"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L942
+msgid "Australia/Yancowinna"
+msgstr "Australia/Yancowinna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L943
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L946
+msgid "Europe/Andorra"
+msgstr "Europe/Andorra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L944
+msgid "Europe/Vienna"
+msgstr "Europe/Vienna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L945
+msgid "Europe/Brussels"
+msgstr "Europe/Brussels"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L947
+msgid "Europe/Stockholm"
+msgstr "Europe/Stockholm"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L948
+msgid "Europe/Sofia"
+msgstr "Europe/Sofia"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L949
+msgid "Europe/Zurich"
+msgstr "Europe/Zurich"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L959
+msgid "Deceased Status"
+msgstr "Isimo Sokufa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L962
+msgid "Patient is deceased"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L968
+msgid "no data provided"
+msgstr "Ayikho idatha enikeziwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L972
+msgid "Has the patient passed away?"
+msgstr "Ingabe isiguli sishonile?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid ""
+"By checking this box, the patient's consent status will be updated to "
+"'Withdrawn - Suspend Data Collection'. Do you want to continue?"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L979
+msgid "Deceased Date"
+msgstr "Usuku Lokushona"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1034
+msgid "Site ID"
+msgstr "I-ID Yesikhungo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1044
+msgid "Three ways to complete questionnaire"
+msgstr "Izindlela ezintathu zokugcwalisa iphephambuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1050
+msgid "Invite or remind patient over email to complete their questionnaire"
+msgstr "Mema noma khumbuza isiguli nge-email ukugcwalisa iphephambuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1055
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1057
+msgid "Log in as patient"
+msgstr "Ngena njengesiguli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1056
+msgid ""
+"This logs you out, and logs in the patient without their needing to enter "
+"credentials. This is so the patient can complete their questionnaire on this"
+" device. Ideal for tablet and kiosk computers."
+msgstr ""
+"Lokhu kuzokhipha wena, bese kufaka isiguli ngaphandle kokuthi sifake "
+"imininingwane yaso. Lokhu kwenzelwa ukuthi isiguli sikwazi ukugcwalisa "
+"iphephamibuzo kule divayisi. Kusebenza kahle kuma tablet nakumakhomphyutha "
+"ase-kiosk."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1060
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1064
+msgid "Enter manually"
+msgstr "Gcwalisa ngendlela evamile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1062
+msgid ""
+"Enter questionnaire responses on patient's behalf. Helpful if responses have"
+" been completed on paper."
+msgstr ""
+"Fakela isiguli izimpendulo zemibuzo emshinini Isiza uma izimpendulo zibhalwe"
+" ephepheni."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1070
+msgid "Enter questionnaire manually on patient's behalf"
+msgstr "Fakela isiguli izimpendulo ngendlela evamile"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1077
+msgid "Select the method in which the questionnaire will be completed:"
+msgstr "khetha indlela iphephambuzo elizogcwaliswa ngayo:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1085
+msgid "Interview assisted"
+msgstr "Usizo ezingxoxweni"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1090
+msgid "Paper"
+msgstr "Iphepha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1095
+msgid "Questionnaire completion date"
+msgstr "Usuku lokuqeda ukugcwalisa imibuzo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1098
+msgid "Completion Day"
+msgstr "Usuku Lokuqeda"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1118
+msgid "Completion Year"
+msgstr "Unyaka Oqede Ngawo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1149
+msgid "Interventions"
+msgstr "Okwenziwayo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1151
+msgid "Patient is participating in the following intervention(s): "
+msgstr "Isiguli sizobamba iqhaza kokwenziwayo okulandelayo: "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1155
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1157
+msgid "None"
+msgstr "Lutho"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "My Treatments"
+msgstr "Ukwelashwa Kwami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "Clinical Data"
+msgstr "Idatha Yasemtholampilo"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "(Optional)"
+msgstr "(Uyazikhethela)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1178
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1183
+msgid ""
+"Which of the following prostate cancer management options has the patient "
+"had, if any? If you don&#39;t remember the exact date, please make your best"
+" guess."
+msgstr ""
+"Yokuphi kokulandelayo isiguli esike sakusebenzisa ukuze silawule umdlavuza "
+"wendlala, uma kukhona? Uma ungasalukhumbulu usuku olunembile, qagela "
+"olusondele ngangokunokwenzeka."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1180
+msgid ""
+"Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
+"                            date, please make your best guess."
+msgstr ""
+"Yikuphi kokulandelayo oke wakusebenzisa ukuze ulawule umdlavuza wendlala, "
+"uma kukhona? Uma ungasalukhumbulu usuku⏎ olunembile, qagela olusondele "
+"ngangokunokwenzeka."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1188
+msgid "Select an option"
+msgstr "Khetha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1199
+msgid "Date"
+msgstr "Usuku"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1259
+msgid "Save"
+msgstr "Gcina"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
+msgid "Add"
+msgstr "Faka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1237
+msgid "My History"
+msgstr "Umlando Wami"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1239
+msgid "Past"
+msgstr "Osekwedlule"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1239
+msgid "Management(s)"
+msgstr "Ukulawula"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid ""
+"You have updated your profile. Click the Save button to submit your changes."
+msgstr ""
+"Ulungise iphrofayili yakho. Chofoza inkinombo ethi Save ukuze uthumele "
+"ushintsho lwakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid "Or"
+msgstr "Noma"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid "cancel"
+msgstr "khansela"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1257
+msgid "There is a problem with your profile. Please correct it before saving."
+msgstr ""
+"Kunenkinga ngephrofayili yakho. Sicela uyilungise ngaphambi kokuyigcina."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1257
+msgid ""
+"Make sure all required fields are filled out and all entries are valid."
+msgstr ""
+"Qinisekisa ukuthi zonke izikhala ezidingekayo zigcwalisiwe futhi konke "
+"okufakile kunembile."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1260
+msgid "Profile changes have been saved"
+msgstr "Ushintso lwephrofayili lulondoloziwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L5
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L5
+#, python-format
+msgid "Profile for %(user_email)s"
+msgstr "I-phrofayili ye %(user_email)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L7
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L7
+#, python-format
+msgid "Profile for #%(user_id)s"
+msgstr "Iphrofayili ka #%(user_id)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L2
+msgid "New Staff"
+msgstr "Abasebenzi Abasha"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/assessment_engine.py#L1464
+msgid "All available questionnaires have been completed"
+msgstr "Yonke imibuzo ekhona igcwalisiwe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/extend_flask_user.py#L79
+#, python-format
+msgid ""
+"We see you're having trouble - let us help.                 Your account "
+"will now be locked while we give it a refresh.                 Please try "
+"again in %(time)d minutes.                 If you're still having issues, "
+"please click                 \"Having trouble logging in?\" below."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/patch_flask_user.py#L59
+#, python-format
+msgid ""
+"If the email address '%(email)s' is in the system, a reset password email "
+"will now have been sent to it. Please open that email and follow the "
+"instructions to reset your password."
+msgstr ""
+"Uma ikheli le-imeyili '%(email)s' likusistimu, iphasiwedi eyenziwe kabusha "
+"izobe isithunyelwe. Sicela uvule leyo imeyili futhi ulandele lezo ziqondiso "
+"ukuze wenze kabusha iphasiwedi yakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L91
+msgid ""
+"This application requires Javascript enabled. Please check your browser "
+"settings."
+msgstr ""
+"Le aplikheshini idinga kuvulwe i-javascript. Sicela uhlole amasethingi "
+"ebrawuza yakho."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L497
+msgid "Unable to match identity"
+msgstr "Ayihambelani nomazisi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L499
+msgid "User Not Found"
+msgstr "Umsebenzisi Akatholakali"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L1178
+#, python-format
+msgid "I consent to sharing information with %(org_name)s"
+msgstr "Nginikeza imvume yokwabelana ngokwaziswa ne %(org_name)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/reporting.py#L93
+msgid "TOTAL"
+msgstr "Ingqikithi"
+
+# Organization: University of Washington
+msgid "University of Washington"
+msgstr ""
+
+# Organization: CHU de Quebec - Universite Laval
+msgid "CHU de Quebec - Universite Laval"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+
+# assessment_status: Expired
+msgid "Expired"
+msgstr "iphelelwe isikhathi"
+
+# Organization: University of Chicago
+msgid "University of Chicago"
+msgstr ""
+
+# Intervention: community_of_wellness
+msgid "Community of Wellness"
+msgstr "Umphakathi Wezempilo"
+
+# QuestionnaireBank: IRONMAN_v3_baseline
+msgid "Ironman V3 Baseline"
+msgstr "I-Ironman V3 Baseline"
+
+# Organization: Canada (Region/Country Site)
+msgid "Canada (Region/Country Site)"
+msgstr ""
+
+# Organization: Westmead Hospital
+msgid "Westmead Hospital"
+msgstr ""
+
+# Role: staff
+msgid "Staff"
+msgstr "Izisebenzi"
+
+# Organization: Sidney Kimmel Comprehensive Cancer Center
+msgid "Sidney Kimmel Comprehensive Cancer Center"
+msgstr ""
+
+# Organization: University of Wisconsin
+msgid "University of Wisconsin"
+msgstr ""
+
+# classification_enum: Indefinite
+msgid "Indefinite"
+msgstr "Okungapheli"
+
+# AppText: registration title
+msgid "Register for TrueNTH"
+msgstr "Bhalisa Ku-TrueNTH"
+
+# Role: intervention_staff
+msgid "Intervention Staff"
+msgstr "Ukungenela Kwezisebenzi"
+
+# Organization: AU B Child Site 1
+msgid "AU B Child Site 1"
+msgstr ""
+
+# Organization: BC Cancer Agency
+msgid "BC Cancer Agency"
+msgstr ""
+
+# Organization: Medical Oncology, Division Of Cancer Services, Princess
+# Alexandra Hospital
+msgid ""
+"Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+msgstr ""
+
+# assessment_status: Overdue
+msgid "Overdue"
+msgstr "Kudlulelwe isikhathi"
+
+# Role: analyst
+msgid "Analyst"
+msgstr "Umhlaziyi"
+
+# AppText: About TrueNTH URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+
+# Organization: Australian Urology Associates (AUA)
+msgid "Australian Urology Associates (AUA)"
+msgstr ""
+
+# Organization: Australia Recruiting Site B
+msgid "Australia Recruiting Site B"
+msgstr ""
+
+# Organization: Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
+msgstr ""
+
+# ResearchProtocol: TNGR v1
+msgid "Tngr V1"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
+msgid "Ironman Recurring 6Mo Pattern"
+msgstr "Iphethini ye-Ironman Recurring 6Mo"
+
+# Organization: Princess Alexandra Hospital
+msgid "Princess Alexandra Hospital"
+msgstr ""
+
+# assessment_status: Completed
+msgid "Completed"
+msgstr "Kuphelile"
+
+# Intervention: social_support
+msgid "Social Support Network"
+msgstr "Inethiwekhi Yokusekelwa"
+
+# Organization: Doylestown Health
+msgid "Doylestown Health"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
+msgid "Ironman V3 Recurring Annual Pattern"
+msgstr "Iphethini Yonyaka ye-Ironman V3 Recurring"
+
+# AppText: Initial Consent Terms URL
+# AppText: TrueNTH Global Registry patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+
+# Organization: Thomas Jefferson University
+msgid "Thomas Jefferson University"
+msgstr ""
+
+# AppText: patient invite email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+
+# AppText: patient reminder email TrueNTH Global Registry
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+# AppText: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Bika impilo yakho ku-TrueNTH I-email evela (igama lomtholampilo)"
+
+# QuestionnaireBank: CRV_baseline
+msgid "Crv Baseline"
+msgstr ""
+
+# Organization: Tulane University
+msgid "Tulane University"
+msgstr ""
+
+# Organization: Sweden (Region/Country Site)
+msgid "Sweden (Region/Country Site)"
+msgstr ""
+
+# classification_enum: Baseline
+msgid "Baseline"
+msgstr "Isiqalo"
+
+# Intervention: self_management
+msgid ""
+"<p>Learn about symptoms that are common in men with prostate cancer, and "
+"about ways to manage and improve these symptoms.</p>"
+msgstr ""
+"<p>Funda ngezimpawu ezivamile kubantu besilisa abanomdlavuza wendlala, kanye"
+" nangezindlela zokulawula nokuthuthukisa lezi zimpawu. </p>"
+
+# Role: promote_without_identity_challenge
+msgid "Promote Without Identity Challenge"
+msgstr ""
+
+# Role: content_manager
+msgid "Content Manager"
+msgstr "Isiphathi sokuqukethwe"
+
+# AppText: profileSendEmail reminder email_body
+msgid ""
+"<p>Hello,</p><p>This email was sent to you by (clinic name). This is where "
+"you report on your health along your prostate cancer journey. The "
+"information collected will be used to determine where improvements in "
+"Prostate Cancer Care can be made.</p><p>Login now to complete your "
+"questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and"
+" answer questionnaire now</a></div><p>Click the button above or use the link"
+" below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any"
+" questions or concerns, please contact (clinic name).</p><p><em>&mdash; This"
+" email was sent because you consented to participate in the TrueNTH registry"
+" project</em></p>"
+msgstr ""
+"<p>Sawubona</p><p> Le email ithunyelwe kuwe yi (igama lomtholampilol). Lana "
+"kulapho ubika khona ngesimo sempilo yakho ngomdlavuza wakho wendlala. Ulwazi"
+" oluqoqiwe luzosetshenziselwa ukubheka lapho kudingeka ukuba kwenziwe khona "
+"izintuthuko Ekwelashweni Komdlavuza Wendlala.</p><p>Ngena manje ukuze "
+"ugcwalise imibuzo yakho.</p><div><a class=\"btn\" href=\"{0}\">Qinisekisa "
+"i-akhawunti futhi uphendule imibuzo manje</a></div><p>Cindezela inkinobho "
+"engenhla noma usebenzise i-link engezansi ukuze uvakashele "
+"i-TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Uma unanoma imiphi imibuzo "
+"noma izikhalazo, secela uxhumane ne (igama lomtholampilo).</p><p><em>—Le "
+"email ithunyelwe ngoba unikeze imvume yokubamba iqhaza kuyiphrojekthi ye-"
+"registry ye-TrueNTH</em></p>"
+
+# Organization: Winship Cancer Institute Emory University
+msgid "Winship Cancer Institute Emory University"
+msgstr ""
+
+# Intervention: care_plan
+msgid ""
+"<p>Organization and support for the many details of life as a prostate "
+"cancer survivor</p>"
+msgstr ""
+"<p>Inhlangano nokusekelwa ezicini eziningi zokuphila kubantu abasinde "
+"emdlavuzeni wendlala</p>"
+
+# AppText: IRONMAN organization website consent URL
+# AppText: IRONMAN patient website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+
+# AppText: site summary email TrueNTH Global Registry
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+
+# Organization: Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
+msgstr ""
+
+# Organization: The Alfred
+msgid "The Alfred"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_6mo_pattern
+msgid "Ironman V3 Recurring 6Mo Pattern"
+msgstr "Iphethini ye-Ironman V3 Recurring 6Mo"
+
+# Organization: Baylor College of Medicine
+msgid "Baylor College of Medicine"
+msgstr ""
+
+# Organization: University of California San Diego
+msgid "University of California San Diego"
+msgstr ""
+
+# Intervention: decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr "Ukusekelwa Kwesinqumo Se-WiserCare"
+
+# Intervention: sexual_recovery
+msgid ""
+"<p>Learn strategies for developing a new normal in your sex life after "
+"treatment for prostate cancer.</p>"
+msgstr ""
+"<p>Funda amasu okuba nendlela entsha ezoba evamile ekuphileni kwakho kocansi"
+" ngemva kokwelashelwa umdlavuza wendlala.</p>"
+
+# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
+msgid "Ironman Recurring 3Mo Pattern"
+msgstr "Iphethini ye-Ironman Recurring 3Mo"
+
+# Organization: IRONMAN
+msgid "IRONMAN"
+msgstr ""
+
+# AppText: IRONMAN patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+
+# Organization: Juravinski Cancer Centre
+msgid "Juravinski Cancer Centre"
+msgstr ""
+
+# Organization: Duke Comprehensive Cancer Center
+msgid "Duke Comprehensive Cancer Center"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_baseline
+msgid "Ironman Baseline"
+msgstr "I-Ironman Baseline"
+
+# Organization: Roswell Park Cancer Institute
+msgid "Roswell Park Cancer Institute"
+msgstr ""
+
+# Organization: Genesis Cancer Care Queensland
+msgid "Genesis Cancer Care Queensland"
+msgstr ""
+
+# Organization: Australia (Region/Country Site)
+msgid "Australia (Region/Country Site)"
+msgstr ""
+
+# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
+msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
+msgstr ""
+
+# Organization: Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
+msgstr ""
+
+# AppText: landing sub-title
+msgid " "
+msgstr " "
+
+# Organization: Macquarie University Hospital
+msgid "Macquarie University Hospital"
+msgstr ""
+
+# AppText: IRONMAN staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+
+# Role: service
+msgid "Service"
+msgstr "Isevisi"
+
+# Role: application_developer
+msgid "Application Developer"
+msgstr "Unjiniyela Wohlelo"
+
+# ResearchProtocol: IRONMAN v3
+msgid "Ironman V3"
+msgstr "I-Ironman V3"
+
+# Organization: none of the above
+msgid "none of the above"
+msgstr "Akukho kokungenhla"
+
+# Organization: Skane University Hospital
+msgid "Skane University Hospital"
+msgstr ""
+
+# Intervention: psa_tracker
+msgid "PSA Tracker"
+msgstr ""
+
+# Organization: Eastern Health
+msgid "Eastern Health"
+msgstr ""
+
+# Organization: Oregon Health and Sciences Cancer Center
+msgid "Oregon Health and Sciences Cancer Center"
+msgstr ""
+
+# Organization: Department Of Urology, Princess Alexandra Hospital
+msgid "Department Of Urology, Princess Alexandra Hospital"
+msgstr ""
+
+# Organization: Wesley Urology Clinic
+msgid "Wesley Urology Clinic"
+msgstr ""
+
+# Role: anon
+msgid "Anon"
+msgstr "I-Anon"
+
+# Organization: AU B Child Site 2
+msgid "AU B Child Site 2"
+msgstr ""
+
+# Organization: University of Alabama-Birmingham
+msgid "University of Alabama-Birmingham"
+msgstr ""
+
+# Organization: Redland Hospital
+msgid "Redland Hospital"
+msgstr ""
+
+# AppText: profileSendEmail invite email_body
+msgid ""
+"<p>(greeting),</p><p>This email was sent to you because you are a patient at"
+" (clinic name) and consented to participate in the Prostate Cancer Outcomes "
+"- (parent org) Registry Study.</p><p>This is an invitation to use the "
+"TrueNTH website, where you will report on your health. Your participation "
+"will help us collectively improve the care that men receive during their "
+"prostate cancer journey.</p><p>To complete your first questionnaire, please "
+"first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your"
+" account</a></div><p>You can also access the TrueNTH website with this "
+"link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can "
+"return to TrueNTH any time.</p><p>If you have any queries, please contact "
+"your representative at (clinic name).</p>"
+msgstr ""
+"<p>(Siyabingelela),</p><p>Le email ithunyelwe kuwe ngoba uyisiguli sase "
+"(igama lomtholampilol) futhi unikeze imvume yokubamba iqhaza eMiphumeleni "
+"Yomdlavuza Wendlala - (inhlangano enkulu) Ucwaningo Lwe-Registry.</p><p>Lesi"
+" isimemo sokusebenzisa iwebhusayithi ye-TrueNTH, lapho uzobika khona ngesimo"
+" sempilo yakho. Ukubamba kwakho iqhaza kuzosisiza sonke sithuthukise "
+"ukwelashwa okutholwa abantu besilisa uma benesifo somdlavuza "
+"wendlala.</p><p>Ukuze ugcwalise iphephambuzo lakho lokuqala, sicela uqale "
+"uqinisekise i-akhawunti yakho.</p><div><a class=\"btn\" "
+"href=\"{0}\">Qinisekisa i-akhawunti yakho</a></div><p>Ungangena futhi "
+"kuyiwebhusayithi ye-TrueNTH usebenzisa le linki:<p/><p><a "
+"href=\"{0}\">{0}</a></p><p>Londoloza le email ukuze ukwazi ukubuyela "
+"kuTrueNTH noma nini.</p><p>Uma unemibuzo, sicela uxhumane nommeleli wakho "
+"e-(igama lomtholampilo).</p>"
+
+# Organization: Southampton
+msgid "Southampton"
+msgstr ""
+
+# Organization: University of Michigan
+msgid "University of Michigan"
+msgstr ""
+
+# assessment_status: In Progress
+msgid "In Progress"
+msgstr "Kuyaqhubeka"
+
+# AppText: IRONMAN staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+
+# QuestionnaireBank: IRONMAN_v3_indefinite
+msgid "Ironman V3 Indefinite"
+msgstr "I-Ironman V3 Indefinite"
+
+# Organization: Aria Health
+msgid "Aria Health"
+msgstr ""
+
+# Organization: Australian Prostate Cancer Research Centre
+msgid "Australian Prostate Cancer Research Centre"
+msgstr ""
+
+# ResearchProtocol: IRONMAN v2
+msgid "Ironman V2"
+msgstr "I-Ironman V2"
+
+# Role: write_only
+msgid "Write Only"
+msgstr "Ukubhala kuphela"
+
+# Role: researcher
+msgid "Researcher"
+msgstr "Umcwaningi"
+
+# Organization: Reading Health System
+msgid "Reading Health System"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+
+# Role: access_on_verify
+msgid "Access On Verify"
+msgstr "Ukufinyelela Ekuqinisekiseni"
+
+# AppText: registration prompt
+msgid "Create a password"
+msgstr "Yenza iphasiwedi"
+
+# Organization: University of Virgina (UVA)
+msgid "University of Virgina (UVA)"
+msgstr ""
+
+# AppText: portal registration
+msgid "TrueNTH Registration"
+msgstr "Ukubhalisa Ku-TrueNTH"
+
+# AppText: IRONMAN staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+
+# Organization: University of North Carolina
+msgid "University of North Carolina"
+msgstr ""
+
+# Organization: University of California Los Angeles
+msgid "University of California Los Angeles"
+msgstr ""
+
+# AppText: Cellphone
+msgid "Mobile"
+msgstr "Ucingo Lweselula"
+
+# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern
+# University
+msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
+msgstr ""
+
+# Organization: Queensland University of Technology LDC
+msgid "Queensland University of Technology LDC"
+msgstr ""
+
+# Organization: Queen Elizabeth II Jubilee Hospital
+msgid "Queen Elizabeth II Jubilee Hospital"
+msgstr ""
+
+# Organization: AUA Local Data Center
+msgid "AUA Local Data Center"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff website consent URL
+# AppText: IRONMAN staff website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+
+# Organization: Weill Cornell Medical Center
+msgid "Weill Cornell Medical Center"
+msgstr ""
+
+# Organization: TrueNTH Global
+msgid "TrueNTH Global"
+msgstr "TrueNTH Global"
+
+# Organization: Wayne St. University Karmanos Cancer Institute
+msgid "Wayne St. University Karmanos Cancer Institute"
+msgstr ""
+
+# Role: partner
+msgid "Partner"
+msgstr "Uzakwethu"
+
+# Organization: Gc Urology
+msgid "Gc Urology"
+msgstr ""
+
+# Role: admin
+msgid "Admin"
+msgstr "Umqondisi"
+
+# AppText: TrueNTH Global Registry organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+
+# Intervention: care_plan
+msgid "Care Plan"
+msgstr "Uhlelo Lokunakekelwa"
+
+# Role: test
+msgid "Test"
+msgstr "Isivivinyo"
+
+# AppText: TrueNTH Global Registry website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+
+# Organization: Urology South Brisbane
+msgid "Urology South Brisbane"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid ""
+" <p>Explore your values, your preferences, and the current medical knowledge"
+" to help you discuss your treatment options with your doctors.</p>"
+msgstr ""
+" <p>Bheka imigomo yakho, izinto ozithandayo, nolwazi lwamanje lwezokwelapha "
+"ukuze kukusize uxoxe nodokotela wakho ngokwelashwa okukhethayo.</p>"
+
+# AppText: patient reminder email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgstr ""
+
+# AppText: TrueNTH Global Registry patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+
+# Intervention: sexual_recovery
+msgid "Sexual Recovery"
+msgstr "Ukululama ngokoncansi"
+
+# Organization: University of Illinois at Chicago
+msgid "University of Illinois at Chicago"
+msgstr ""
+
+# Intervention: psa_tracker
+msgid "<p>Remember to update your PSA level.</p>"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+
+# AppText: IRONMAN website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+
+# Organization: TrueNTH Global Registry
+msgid "TrueNTH Global Registry"
+msgstr ""
+
+# classification_enum: Recurring
+msgid "Recurring"
+msgstr "Kuvela ngokuphindaphindiwe"
+
+# Organization: United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_annual_pattern
+msgid "Ironman Recurring Annual Pattern"
+msgstr "Iphethini Yonyaka Evela Kabusha ye-Ironman"
+
+# AppText: consent date label
+msgid "Study Consent Date"
+msgstr "Usuku Locwaningo Lwemvume"
+
+# AppText: TrueNTH Global Registry patient website consent URL
+# AppText: TrueNTH Global Registry organization website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+
+# Intervention: music
+msgid "MUSIC Integration"
+msgstr ""
+
+# AppText: patient invite email TrueNTH Global Registry
+# AppText: patient invite email
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+
+# QuestionnaireBank: IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr "I-Ironman Indefinite"
+
+# AppText: layout title
+msgid "Movember TrueNTH"
+msgstr "I-TrueNTH ye-Movember"
+
+# Intervention: assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+# Organization: Easton Hospital
+msgid "Easton Hospital"
+msgstr ""
+
+# Organization: Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
+msgstr ""
+
+# Intervention: default
+msgid "OTHER: not yet officially supported"
+msgstr "OKUNYE: akukasekelwa ngokomthetho"
+
+# assessment_status: Due
+msgid "Due"
+msgstr "Umnqamulajuqu"
+
+# Organization: Kantonsspitals Chur
+msgid "Kantonsspitals Chur"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid "Decision Support tool"
+msgstr "Ithuluzi Lokusekelwa Kwesinqumo"
+
+# Organization: Memorial Sloan Kettering Cancer Center
+msgid "Memorial Sloan Kettering Cancer Center"
+msgstr ""
+
+# AppText: IRONMAN patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+
+# AppText: landing title
+msgid "Report your health in order to improve prostate cancer care."
+msgstr ""
+
+# AppText: site summary email
+# AppText: site summary email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+
+# Organization: USA (Region/Country Site)
+msgid "USA (Region/Country Site)"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
+msgid "Ironman V3 Recurring 3Mo Pattern"
+msgstr "Iphethini ye-Ironman V3 Recurring 3Mo"
+
+# Organization: Dana-Farber Cancer Institute
+msgid "Dana-Farber Cancer Institute"
+msgstr ""

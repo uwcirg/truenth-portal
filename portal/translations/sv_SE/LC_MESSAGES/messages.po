@@ -1,0 +1,4002 @@
+# Translations template for portal.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the portal project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: portal 18.11.14.dev84+g8ebf1d15\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-03 19:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L32
+msgid "Page Not Found."
+msgstr "Sidan hittades inte."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L34
+msgid "Sorry, the page you requested is not found. It may have been moved."
+msgstr ""
+"Tyvärr, det gick inte att hitta den sida du söker. Den kan ha flyttats."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L37
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L39
+msgid "Back To Home"
+msgstr "Tillbaka till startsidan"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Explore How This Works"
+msgstr "Utforska hur detta fungerar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Explore"
+msgstr "Utforska"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Learn About TrueNTH"
+msgstr "Läs mer om TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/404.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L42
+msgid "Learn"
+msgstr "Läs mer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L32
+msgid "Internal Server Error"
+msgstr "Internt serverfel"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/500.html#L34
+msgid ""
+"Your request is not processed due to server error(s). If you are still "
+"experiencing problem.  Please use the link below."
+msgstr ""
+"Din begäran kunde inte behandlas på grund av serverfel. Använd länken nedan "
+"om  problemet kvarstår."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/about.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/privacy.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/terms.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L68
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L32
+msgid "Home"
+msgstr "Hem"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/about.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L69
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L124
+msgid "About TrueNTH"
+msgstr "Om TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L8
+msgid "Loading..."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L45
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L44
+msgid ""
+"You are using an outdated browser. Please upgrade your browser to improve "
+"your experience."
+msgstr ""
+"Du använder en föråldrad webbläsare. Uppgradera webbläsaren för att "
+"förbättra din upplevelse."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L78
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L106
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L77
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L442
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L619
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L696
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L706
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L735
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L744
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L772
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L45
+msgid "Close"
+msgstr "Stäng"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/base.html#L79
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/layout.html#L78
+msgid "TrueNTH"
+msgstr "TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L5
+msgid "Contact TrueNTH"
+msgstr "Kontakta TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L7
+msgid "Use this form to get in touch with TrueNTH"
+msgstr "Använd detta formulär för att kontakta TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L27
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L175
+msgid "Name"
+msgstr "Namn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L16
+msgid "Please enter your name"
+msgstr "Ange ditt namn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L17
+msgid "Your Name"
+msgstr "Ditt namn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L21
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L48
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L17
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L50
+msgid "Email"
+msgstr "E-post"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L23
+msgid "Your Email"
+msgstr "Din e-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L24
+msgid "This is not a valid e-mail address, please double-check."
+msgstr "Det här är inte en giltig e-postadress. Kontrollera adressen igen."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L30
+msgid "Enquiry Type"
+msgstr "Typ av förfrågan"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L35
+msgid "Not sure"
+msgstr "Osäker"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L18
+msgid "Subject"
+msgstr "Ämne"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L41
+msgid "What is this about?"
+msgstr "Vad handlar detta om?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L44
+msgid "Text"
+msgstr "Text"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+msgid "Please add a message for TrueNTH"
+msgstr "Lägg till ett meddelande till TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+msgid "What is on your mind?"
+msgstr "Vad vill du berätta?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L771
+msgid "Submit"
+msgstr "Skicka"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/contact.html#L61
+msgid "Please confirm all fields are filled."
+msgstr "Kontrollera att alla fält är ifyllda."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L6
+#, python-format
+msgid "%(env)s version - Not for study or clinical use"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L13
+msgid "TrueNTH Logo"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L25
+msgid "log in"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L278
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L279
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L13
+msgid "Email Address"
+msgstr "E-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L30
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L22
+msgid "Password"
+msgstr "Lösenord"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/forgot_password.html#L9
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L22
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L152
+msgid "Having trouble logging in?"
+msgstr "Har du problem med att logga in?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L38
+msgid ""
+"You have been logged out due to inactivity. Please log in again to continue."
+msgstr ""
+"Du har loggats ut på grund av inaktivitet. Logga in igen för att fortsätta."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L49
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/landing.html#L50
+msgid "TrueNTH Footer Logo"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L15
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L12
+msgid "Welcome to TrueNTH"
+msgstr "Välkommen till TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L16
+msgid "Tools for navigating the prostate cancer journey"
+msgstr "Verktyg för att hantera prostatacancervården"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L39
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L91
+msgid "Not available"
+msgstr "Inte tillgänglig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L57
+msgid "Not Available"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/portal.html#L61
+msgid "Go to link"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/privacy.html#L5
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L42
+msgid "Privacy"
+msgstr "Sekretess"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L138
+msgid "Resources"
+msgstr "Resurser"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L9
+msgid "Videos"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/resources.html#L21
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L4
+msgid "Work Instructions"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/terms.html#L5
+msgid "General Terms"
+msgstr "Allmänna villkor"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/website_consent_script.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L45
+msgid "Continue to TrueNTH"
+msgstr "Fortsätt till TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L180
+msgid "Print"
+msgstr "Skriv ut"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/eproms/templates/eproms/work_instruction.html#L7
+msgid "Back to Resources"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L106
+msgid "Complete Questionnaire"
+msgstr "Fyll i frågeformuläret"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L131
+msgid "TrueNTH P3P"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L169
+msgid "Password Reset"
+msgstr "Lösenord återställt"
+
+# Intervention: self_management
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L213
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L35
+msgid "Symptom Tracker"
+msgstr "Symtomdagbok"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/communication.py#L230
+msgid "Verify Account"
+msgstr "Bekräfta konto"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L238
+#, python-format
+msgid "Thank you, %(full_name)s."
+msgstr "Tack, %(full_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L239
+#, python-format
+msgid "You've completed the %(registry)s questionnaire."
+msgstr "Du har fyllt i %(registry)s frågeformuläret."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L242
+msgid "You will be notified when the next questionnaire is ready to complete."
+msgstr "Du får ett meddelande när nästa enkät är redo att fyllas i."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L245
+msgid "Log out"
+msgstr "Logga ut"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L271
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L303
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L480
+#, python-format
+msgid "Hi, %(full_name)s"
+msgstr "Hej, %(full_name)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L277
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire as soon as "
+"possible. It will expire on %(expired_date)s."
+msgstr ""
+"Slutför ditt %(assigning_authority)s frågeformulär så snart som möjligt. Det"
+" löper ut den %(expired_date)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L287
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
+msgstr ""
+"Slutför ditt %(assigning_authority)s frågeformulär senast den %(due_date)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L304
+#, python-format
+msgid ""
+"Please complete your %(assigning_authority)s questionnaire at your "
+"convenience."
+msgstr ""
+"Slutför ditt %(assigning_authority)s frågeformulär när det passar dig."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L326
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L355
+msgid "Completed Questionnaires"
+msgstr "Ifyllda enkäter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L327
+msgid "When you are done, completed questionnaires will be shown here."
+msgstr "När du är färdig kommer de ifyllda enkäterna att visas här."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L358
+#, python-format
+msgid "View questionnaire completed on %(comp_date)s"
+msgstr "Se frågeformuläret som slutfördes den %(comp_date)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L376
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L410
+msgid "Go to questionnaire"
+msgstr "Gå till enkäten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L379
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L408
+msgid "Continue questionnaire"
+msgstr "Fortsätt fylla i enkäten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L382
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L412
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L441
+msgid "Open Questionnaire"
+msgstr "Öppna enkäten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L383
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L413
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire here."
+msgstr "Slutför ditt %(assigning_authority)s frågeformulär här."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L439
+msgid "View previous questionnaire"
+msgstr "Visa föregående enkät"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L442
+msgid "No questionnaire is due."
+msgstr "Ingen enkät att fylla i för närvarande."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L481
+msgid "Questionnaire Expired"
+msgstr "Frågeformuläret har upphört att gälla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/intervention_strategies.py#L482
+msgid ""
+"The assessment is no longer available.\n"
+"A research staff member will contact you for assistance."
+msgstr ""
+"Utvärderingen är inte längre tillgänglig.\n"
+"En person i forskningsteamet kommer att kontakta dig."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/questionnaire_bank.py#L522
+#, python-format
+msgid "Month %(month_total)d"
+msgstr "Månad %(month_total)d"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L511
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L517
+msgid "invalid email address"
+msgstr "Ogiltig e-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/models/user.py#L526
+msgid "missing required data: "
+msgstr "nödvändiga uppgifter saknas: "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L12
+msgid "Identity Verification"
+msgstr "Identitetsverifiering"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L18
+msgid ""
+"To ensure your personal details are not shared with others, please enter the"
+" following data for account confirmation."
+msgstr ""
+"För att säkerställa att dina personuppgifter inte delas med andra ber vi dig"
+" ange följande data för att verifiera ditt konto."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+msgid "First name is required"
+msgstr "Förnamn måste anges"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First Name"
+msgstr "Förnamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+msgid "Last name is required"
+msgstr "Efternamn måste anges"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L47
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L40
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last Name"
+msgstr "Efternamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L253
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L125
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L127
+msgid "Birth Date"
+msgstr "Födelsedatum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L52
+msgid "Day"
+msgstr "Dag"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L53
+msgid "Day is required"
+msgstr "Dag krävs"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L61
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L63
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L260
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L304
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L132
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L793
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L991
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1101
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1102
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1206
+msgid "Month"
+msgstr "Månad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L62
+msgid "Month is required"
+msgstr "Månad krävs"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L261
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L305
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L133
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L794
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L992
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1103
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1207
+msgid "January"
+msgstr "Januari"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L262
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L306
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L134
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L795
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L993
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1104
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1208
+msgid "February"
+msgstr "Februari"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L66
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L263
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L307
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L135
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L796
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L994
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1105
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1209
+msgid "March"
+msgstr "Mars"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L264
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L308
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L136
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L797
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L995
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1106
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1210
+msgid "April"
+msgstr "April"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L68
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L265
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L309
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L137
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L798
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L996
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1107
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1211
+msgid "May"
+msgstr "Maj"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L69
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L266
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L310
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L138
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L799
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L997
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1212
+msgid "June"
+msgstr "Juni"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L70
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L267
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L311
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L139
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L800
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L998
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1213
+msgid "July"
+msgstr "Juli"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L71
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L268
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L312
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L140
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L801
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L999
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1214
+msgid "August"
+msgstr "Augusti"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L72
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L269
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L313
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L141
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L802
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1000
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1215
+msgid "September"
+msgstr "September"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L73
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L270
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L314
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L142
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L803
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1001
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1112
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1216
+msgid "October"
+msgstr "Oktober"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L74
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L271
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L315
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L143
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L804
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1002
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1217
+msgid "November"
+msgstr "November"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L75
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L272
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L316
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L144
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L805
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1003
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1114
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1218
+msgid "December"
+msgstr "December"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L84
+msgid "Year"
+msgstr "År"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L85
+msgid "Year is required"
+msgstr "År krävs"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/challenge_identity.html#L92
+msgid "Confirm Identity"
+msgstr "Bekräfta identitet"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L7
+msgid "Thank you for contacting us."
+msgstr "Tack för att du kontaktar oss."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L9
+msgid "We have sent an email to the team supporting TrueNTH."
+msgstr ""
+"Vi har skickat ett e-postmeddelande till det team som tillhandahåller "
+"support för TrueNTH:s räkning."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/contact_sent.html#L11
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L65
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L122
+msgid "TrueNTH Home"
+msgstr "Startsida TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L6
+msgid "More About You"
+msgstr "Mer om dig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L7
+msgid ""
+"The TrueNTH system asks these questions in order to give you information "
+"that best fits"
+msgstr ""
+"TrueNTH-systemet ställer dessa frågor för att ge dig den information som är "
+"bäst lämpad för dig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L7
+msgid ""
+"You may\n"
+"    skip any question you prefer not to answer."
+msgstr ""
+"Du kan\n"
+" hoppa över de frågor du inte vill svara på."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L90
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L259
+msgid "Ethnicity"
+msgstr "Etnicitet"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L19
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L263
+msgid "Hispanic or Latino"
+msgstr "Spanskättad eller latinamerikansk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L268
+msgid "Not Hispanic or Latino"
+msgstr "Inte latinamerikanskt ursprung"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L32
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L91
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L219
+msgid "Race"
+msgstr "Ras"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L223
+msgid "American Indian or Alaska Native"
+msgstr "Amerikansk ursprungsbefolkning, inklusive Alaska"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L228
+msgid "Asian"
+msgstr "Asiatisk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L46
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L233
+msgid "Black or African American"
+msgstr "Svart eller afroamerikansk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L51
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L238
+msgid "Native Hawaiian or Other Pacific Islander"
+msgstr "Från Hawaii eller andra öar i Stilla havet"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L243
+msgid "White"
+msgstr "Vit"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L61
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L210
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L248
+msgid "Other"
+msgstr "Annat"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L70
+msgid "Skip This"
+msgstr "Hoppa över detta"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/coredata.html#L78
+msgid "Continue"
+msgstr "Fortsätt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L13
+msgid "Explore How TrueNTH Works"
+msgstr "Utforska hur TrueNTH fungerar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L20
+msgid ""
+"A program aimed at improving the lives of men diagnosed and living with "
+"prostate cancer, and their partners, loved ones, and caregivers."
+msgstr ""
+"Ett program som syftar till att förbättra livet för män som diagnostiserats "
+"och lever med prostatacancer samt deras partner, anhöriga och vårdgivare."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L21
+msgid ""
+"Coming soon … discover tools designed to help those affected by prostate "
+"cancer."
+msgstr ""
+"Kommer snart ... verktyg som har utformats för att hjälpa dem som har "
+"drabbats av prostatacancer."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L29
+msgid "Register Now"
+msgstr "Registrera dig nu"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L30
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L28
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L39
+msgid "or"
+msgstr "eller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/explore.html#L31
+msgid "Log In"
+msgstr "logga in"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L17
+msgid "Tell us a little about yourself."
+msgstr "Berätta lite om dig själv."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L17
+msgid "your information"
+msgstr "dina uppgifter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L26
+msgid "Now it is time to build your prostate cancer profile."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L26
+msgid "your clinical profile"
+msgstr "din kliniska profil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L27
+msgid ""
+"The questions we're asking will help us customize what you see and provide "
+"the best information to help you track and manage your prostate cancer "
+"journey."
+msgstr ""
+"De frågor vi ställer hjälper oss att anpassa vad du ser och ger dig den "
+"bästa informationen för att hjälpa dig att följa och hantera din "
+"prostatacancerresa."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L30
+msgid "Your clinic of care."
+msgstr "Din vårdklinik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L30
+msgid "your clinic"
+msgstr "din klinik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L39
+msgid "Thank you."
+msgstr "Tack!"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L40
+msgid "Click continue to start using TrueNTH"
+msgstr "Klicka på \"Fortsätt\" för att börja använda TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries.html#L44
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L13
+msgid "Next"
+msgstr "Nästa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L4
+msgid "Data Saved"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L5
+msgid "Unable to Save Data. System error."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L9
+msgid "saving data..."
+msgstr "sparar uppgifter ..."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L24
+msgid "terms"
+msgstr "villkor"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L27
+msgid "Terms of Use"
+msgstr "Användarvillkor"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L30
+msgid ""
+"Thanks for signing up for TrueNTH. First, please review the terms of use to "
+"access the TrueNTH tools"
+msgstr ""
+"Tack för att du har registrerat dig för TrueNTH. Läs först igenom "
+"användarvillkoren för att få tillgång till TrueNTH:s verktyg"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L37
+msgid "View TrueNTH Terms"
+msgstr "Visa villkoren för TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L40
+#, python-format
+msgid ""
+"\n"
+"                <div class=\"text-warning links-container\">\n"
+"                  By clicking \"NEXT\" you agree to the <a href=\"%(terms_url)s\" target=\"_blank\">Terms</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">Privacy Policy</a>, and <a href=\"\" class=\"terms-url\" target=\"_blank\">General Terms of Use</a> for the TrueNTH USA website.\n"
+"                </div>\n"
+"              "
+msgstr ""
+"\n"
+"                <div class=\"text-warning links-container\"> Genom att klicka på ”NÄSTA” godkänner du <a href=\"%(terms_url)s\" target=\"_blank\">villkoren</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">integritetspolicyn</a> och <a href=\"\" class=\"terms-url\" target=\"_blank\">de allmänna användarvillkoren</a> för TrueNTH USA:s webbplats. </div>\n"
+"              "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L52
+msgid ""
+"By checking this box, I confirm that I have read the information notice "
+"above and consent and agree to the processing of my personal information "
+"(including my health information) on the terms described in this Consent."
+msgstr ""
+"Genom att kryssa för denna ruta, bekräftar jag att jag har läst "
+"informationsmeddelandet ovan och godkänner och samtycker till att mina "
+"personuppgifter (inklusive min hälsoinformation) behandlas enligt de villkor"
+" som beskrivs i detta samtycke."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L55
+msgid ""
+"You have previously provided your consent to the website during a visit at "
+"your treating site. If you would like a copy of this please contact your "
+"study contact."
+msgstr ""
+"Du har tidigare givit ditt samtycke till webbplatsen under ett besök på din "
+"vårdenhet/klinik . Om du vill ha en kopia av detta ber vi dig att vända dig "
+"till din kontaktperson i studien (läkare eller sköterska)."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L73
+#, python-format
+msgid ""
+"<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm "
+"that I have read and accept the website <a href=\"%(privacy_url)s\" class"
+"=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class"
+"=\"required-link\">terms</a>.</span>"
+msgstr ""
+"<span class=\"terms-tick-box-text\"> Genom att markera rutan bekräftar jag "
+"att jag har läst och accepterar webbplatsens <a href=\"%(privacy_url)s\" "
+"class=\"required-link\">integritetspolicy</a> och <a href=\"%(terms_url)s\" "
+"class=\"required-link\">villkor</a>.</span>"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L103
+msgid "To Continue"
+msgstr "För att fortsätta"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L107
+msgid ""
+"You must agree to the terms and conditions by checking the provided "
+"checkbox."
+msgstr "Du måste godkänna villkoren genom att markera kryssrutan."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1133
+msgid "OK"
+msgstr "OK"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L120
+msgid "Website Consent Script - Enter Manually - Paper Form"
+msgstr "Text för samtycke för webbplatsen – Fyll i för hand – Pappersformulär"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L121
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L144
+msgid "For Staff Use Only"
+msgstr "Endast för personalbruk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L133
+msgid ""
+"By checking this box, I confirm that the patient has read the Website "
+"Consent and consents and agrees to the processing of their personal "
+"information (including their health information) on the terms described in "
+"this Consent and Terms and Conditions and a copy of this consent and "
+"information provided by the patient has been securely stored in accordance "
+"with my local site procedures."
+msgstr ""
+"Genom att kryssa för denna ruta, bekräftar jag att patienten har läst "
+"samtycket för webbplatsen och godkänner och samtycker till att personliga "
+"uppgifter (inklusive hälsouppgifter) behandlas i enlighet med samtycket och "
+"tillhörande villkor. En kopia av patientens samtycke och övriga uppgifter "
+"förvaras i enlighet med de lokala reglerna för förvaring."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L143
+msgid "Website Consent Script - Enter Manually - Interview Assisted"
+msgstr ""
+"Text för samtycke för webbplatsen – Fyll i för hand – Assistans vid "
+"intervjun"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L148
+msgid ""
+"We are inviting you to use the TrueNTH website tool because you have agreed "
+"to participate in the [organization] Registry study."
+msgstr ""
+"Vi erbjuder dig att använda TrueNTH:s webbplats frågeformulär eftersom du "
+"har samtyckt till att delta i den registerstudie som [organisation] "
+"genomför."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L149
+msgid ""
+"The information you provide will be used in a global study and will benefit "
+"patients in the future with better treatment and care options.  Does this "
+"sound like something you’d be willing to participate in?"
+msgstr ""
+"De uppgifter du lämnar kommer att användas i en global studie och kommer att"
+" gynna patienter i framtiden genom bättre alternativ för behandling och "
+"vård.  Låter detta som något du skulle vara villig att delta i?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L151
+msgid "If yes, continue to read below text and Consent."
+msgstr "Om ja, fortsätt läsa nedanstående text och text för samtycke."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L152
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L165
+msgid "If no, thank them for their time."
+msgstr "Om nej, tacka honom/henne för att han/hon har tagit sig tid."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L154
+msgid "Read consent [exactly as written]"
+msgstr "Läs text för samtycke [exakt som den är skriven]"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L161
+msgid "Do you have any questions?"
+msgstr "Har du några frågor?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L162
+msgid ""
+"Do you agree to participate in the TrueNTH website tool and consent to the "
+"processing of your personal information (including your health information) "
+"on the terms I have just read to you?"
+msgstr ""
+"Samtycker du till att vara delaktig i TrueNTH:s webbplatsverktyg och att "
+"dina personuppgifter (inklusive din hälsoinformation) behandlas enligt de "
+"villkor som jag har just läst upp för dig?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L164
+msgid ""
+"If yes, document oral consent below. [NOTE: This consent must absolutely be "
+"read out to them in advance of gathering any personal information. The "
+"patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally "
+"as casual will not be satisfactory.]"
+msgstr ""
+"Om ja, dokumentera muntligt samtycke nedan. [OBS! Detta samtycke måste läsas"
+" upp innan eventuella personuppgifter samlas in. Patienten måste säga \"Ja, "
+"jag samtycker\". \"Mmm\", \"japp\", \"ok\" eller liknande är inte "
+"tillräckligt.]"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L172
+msgid "Please print and fill out the form"
+msgstr "Skriv ut och fyll i formuläret"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L181
+msgid "CLOSE"
+msgstr "STÄNG"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L188
+msgid "View/print website declaration form"
+msgstr "Visa/skriv ut intygsblankett för webbplatsen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L204
+msgid ""
+"By checking this box, I confirm that I have read the required information to"
+" the patient and provided the opportunity for the patient to ask questions. "
+"I have addressed the questions to the patient’s satisfaction and have "
+"created an electronic copy of this declaration and have stored this copy. "
+"The patient has provided oral consent to participate in the TrueNTH Global "
+"Registry on the terms set out above."
+msgstr ""
+"Genom att markera denna ruta bekräftar jag att jag har läst upp den "
+"erforderliga informationen för patienten och givit patienten möjlighet att "
+"ställa frågor. Jag har svarat på frågorna till patientens "
+"tillfredsställelse, skapat en elektronisk kopia av denna deklaration och har"
+" lagrat denna kopia. Patienten har lämnat muntligt samtycke till att delta i"
+" TrueNTH:s globala register i enlighet med de villkor som anges ovan."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L205
+msgid ""
+"By checking this box, I confirm that I have read and/or gone through "
+"required information to the subject and have completed the required consent "
+"to the use of the TrueNTH website tool and have created an electronic copy "
+"of this declaration and have stored said copy."
+msgstr ""
+"Genom att markera denna ruta bekräftar jag att jag har läst och/eller gått "
+"igenom nödvändig information om ämnet, fyllt i det erforderliga "
+"samtyckesformuläret för användning av TrueNTH:s webbplatsverktyg och skapat "
+"en elektronisk kopia av denna deklaration, samt arkiverat nämnda kopia."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L207
+msgid ""
+"Subject has given consent previously and you had previously signed and "
+"stored an electronic copy of consent declaration.."
+msgstr ""
+"Personen har gett sitt samtycke tidigare och du har tidigare skrivit under "
+"och lagrat en elektronisk kopia av medgivandeförklaringen ..."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First name"
+msgstr "Förnamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last name"
+msgstr "Efternamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L236
+msgid "I'm a man who is concerned about prostate cancer for myself"
+msgstr "Jag är man och är orolig för prostatacancer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L241
+msgid ""
+"I'm a caregiver, spouse or partner who wants to learn more about prostate "
+"cancer"
+msgstr ""
+"Jag är vårdgivare, maka eller partner och vill lära mig mer om "
+"prostatacancer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L253
+msgid "(optional)"
+msgstr "(valfritt)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L256
+msgid "Birth date"
+msgstr "Födelsedatum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L256
+msgid "The birth day field is required and must be valid format"
+msgstr ""
+"Fältet för födelsedag är obligatoriskt och måste vara i ett giltigt format"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L259
+msgid "Birth month"
+msgstr "Födelsemånad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L259
+msgid "A birth month must be selected"
+msgstr "Födelsemånad måste väljas"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L276
+msgid "The birth year is required and must be in valid format"
+msgstr ""
+"Fältet för födelseår är obligatoriskt och måste vara i ett giltigt format"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L288
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L877
+msgid "Have you had a prostate cancer biopsy?"
+msgstr "Har du genomgått en prostatabiopsi?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L292
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L366
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L388
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L609
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid "Yes"
+msgstr "Ja"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L296
+msgid "Biopsy Date"
+msgstr "Datum för biopsi"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L300
+msgid "The biopsy day field is required and must be valid format"
+msgstr ""
+"Fältet för datum för biopsi är obligatoriskt och måste vara i ett giltigt "
+"format"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L303
+msgid "A biopsy month must be selected"
+msgstr "Månad för biopsi måste väljas"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L320
+msgid "The biopsy year is required and must be in valid format"
+msgstr "År för biopsi är obligatoriskt och måste vara i ett giltigt format"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L328
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L393
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L611
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid "No"
+msgstr "Nej"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L333
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L354
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L376
+msgid "I don't know"
+msgstr "Jag vet inte"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L340
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L878
+msgid "Have you been diagnosed with prostate cancer?"
+msgstr "Har du diagnostiserats med prostatacancer?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L344
+msgid "Yes (my biopsy was positive)"
+msgstr "Ja (min biopsi var positiv)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L349
+msgid "No (my biopsy was negative)"
+msgstr "Nej (min biopsi var negativ)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L362
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L879
+msgid "Is the prostate cancer only within the prostate?"
+msgstr "Är prostatacancern bara i prostatan?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L371
+msgid "No (the cancer is in other parts of my body, too)"
+msgstr "Nej (jag har cancer i andra delar av kroppen också)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L384
+msgid "Have you begun prostate cancer treatment?"
+msgstr "Har du påbörjat din prostatacancerbehandling?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L407
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L496
+msgid "What is your main clinic for prostate cancer care?"
+msgstr "Vilken är din huvudsakliga klinik för prostatacancervård?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/initial_queries_macros.html#L411
+msgid "I'm not receiving care at any of the above clinics"
+msgstr "Jag får inte vård på någon av de ovanstående klinikerna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L4
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L6
+msgid "Email Invite"
+msgstr "E-postinbjudan"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L5
+msgid "Send a TrueNTH email invite by filling in the form below."
+msgstr ""
+"Skicka en inbjudan till TrueNTH via e-post genom att fylla i nedanstående "
+"formulär."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L8
+msgid "To (separate multiple addresses with white space)"
+msgstr "Till (separera flera adresser med blanksteg)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L13
+msgid "Invitation to try TrueNTH"
+msgstr "Inbjudan att prova TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L16
+msgid "Body"
+msgstr "Brödtext"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L17
+msgid "TrueNTH Invitation"
+msgstr "Inbjudan till TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite.html#L19
+msgid "Send Invite"
+msgstr "Skicka inbjudan"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L8
+msgid "Email Invite Sent"
+msgstr "E-postinbjudan skickad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L10
+msgid "To"
+msgstr "Till"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L14
+msgid "Sent"
+msgstr "Skickat"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/invite_sent.html#L22
+msgid "Message"
+msgstr "Meddelande"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L33
+msgid "About"
+msgstr "Om"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L34
+msgid "Decision Support"
+msgstr "Stöd att fatta beslut"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L38
+msgid "Prostate Cancer Facts"
+msgstr "Fakta om prostatacancer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L41
+msgid "Terms"
+msgstr "Villkor"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L43
+msgid "Contact"
+msgstr "Kontakt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L46
+msgid "Contact Us"
+msgstr "Kontakta oss"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L47
+msgid "Facebook"
+msgstr "Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L48
+msgid "Twitter"
+msgstr "Twitter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L110
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_footer.html#L52
+#, python-format
+msgid ""
+"%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-"
+"profit organization."
+msgstr ""
+"%(year)d Movember Foundation. Alla rättigheter förbehålls. En ideell "
+"organisation med 501 (c) 3-status."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L46
+msgid "dismiss"
+msgstr "avvisa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L54
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L112
+msgid "TrueNTH logo"
+msgstr "TrueNTH:s logotyp"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L57
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L115
+msgid "brand logo"
+msgstr "varumärkeslogotyp"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L70
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L67
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L123
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L4
+msgid "My TrueNTH Profile"
+msgstr "Min TrueNTH-profil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L84
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L71
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L125
+msgid "Client Applications"
+msgstr "Klientapplikationer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L74
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L126
+msgid "Patients"
+msgstr "Patienter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L76
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L127
+msgid "Staff List"
+msgstr "Personallista"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L81
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L78
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L129
+msgid "User Administration"
+msgstr "Användaradministration"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L12
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L79
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L130
+msgid "Scheduled Jobs"
+msgstr "Schemalagda jobb"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L80
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L131
+msgid "Settings"
+msgstr "Inställningar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L83
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L133
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L4
+msgid "Reporting Dashboard"
+msgstr "Instrumentpanel för rapportering"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L135
+msgid "Research Data"
+msgstr "Forskningsdata"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L91
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L140
+msgid "Log Out of TrueNTH"
+msgstr "Logga ut från TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L95
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L110
+msgid "MENU"
+msgstr "MENY"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L96
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L110
+msgid "Profile image"
+msgstr "Profilbild"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L97
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L101
+msgid "Welcome"
+msgstr "Välkommen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L100
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L121
+msgid "Log In to TrueNTH"
+msgstr "Logga in på TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L111
+msgid "Return to TrueNTH home"
+msgstr "Återgå till startsida för TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L151
+msgid "Your session is about to expire"
+msgstr "Din session är på väg att löpa ut"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L153
+msgid ""
+"Your session will expire in approximately {time} seconds due to inactivity."
+msgstr ""
+"Din session löper ut om ungefär {time} sekunder på grund av inaktivitet."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L154
+msgid "Log Out"
+msgstr "Logga ut"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/portal_wrapper.html#L154
+msgid "Stay Logged In"
+msgstr "Fortsätt vara inloggad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L8
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L33
+msgid "Usage Statistics"
+msgstr "Användarstatistik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L11
+msgid "User Statistics"
+msgstr "Användarstatistik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L14
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L87
+msgid "User Statistics By Role"
+msgstr "Användarstatistik sorterad efter roller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L17
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L144
+msgid "User Statistics By Intervention"
+msgstr "Användarstatistik sorterad efter intervention"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L20
+msgid "User Statistics By Patient Report"
+msgstr "Användarstatistik sorterad efter patientrapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L211
+msgid "User Statistics By Intervention Access"
+msgstr "Användarstatistik sorterad efter interventionsåtkomst"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L28
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L245
+msgid "Institution Statistics"
+msgstr "Institutionsstatistik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L35
+msgid ""
+"Registrations are collected from the User.registration timestamps of all "
+"Users without the Test Role"
+msgstr ""
+"Registreringar samlas in från tidsstämplar för User.registration för alla "
+"användare som inte har en testroll"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L36
+msgid ""
+"Logins are collected from the start_time timestamps of Encounters whose "
+"auth_method='password_authenticated'"
+msgstr ""
+"Inloggningar samlas in via tidsstämplar från start_time för möten med "
+"auth_method = 'password_authenticated'"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L37
+msgid ""
+"Intervention Logins are filtered based on the login Encounter's User's "
+"User.interventions, and represent the number of users associated with that "
+"intervention who have logged in within the given timeframe (whether or not "
+"they accessed the intervention during that login session"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L50
+msgid "Source"
+msgstr "Källa"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L51
+msgid "Today"
+msgstr "Idag"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L52
+msgid "This Month"
+msgstr "Denna månad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L53
+msgid "This Year"
+msgstr "I år"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L54
+msgid "All Time"
+msgstr "Sedan starten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L59
+msgid "Registrations"
+msgstr "Registreringar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L66
+msgid "Logins"
+msgstr "Inloggningar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L146
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L179
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L213
+msgid "User stats are collected from all Users without the Test Role"
+msgstr ""
+"Användarstatistik samlas in för alla användare som inte har en testroll"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L90
+msgid ""
+"Role counts are tallied from User.roles (e.g. a User with both the Patient "
+"and Staff Roles, would add 1 to both Roles' counts)"
+msgstr ""
+"Rollräknare bygger på User.roles (exempel: en användare med både patient- "
+"och personalroll räknas i båda rollerna)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L91
+msgid "No Diagnosis"
+msgstr "Ingen diagnos"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L91
+msgid ""
+"Users whose User.observations does not contain any Observations where the "
+"Observation.codeable_concept=CC.BIOPSY and the "
+"Observation.value_quantity.value=True"
+msgstr ""
+"Användare vars User.observations inte innehåller några observationer och där"
+" Observation.codeable_concept=CC.BIOPSY och "
+"Observation.value_quantity.value=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L92
+msgid "Diagnosis, No Treatment"
+msgstr "Diagnos, ingen behandling"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L92
+msgid "Users where known_treatment_not_started(User)=True"
+msgstr "Användare där known_treatment_not_started(User)=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L93
+msgid "Diagnosis and Treatment"
+msgstr "Diagnos och behandling"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L93
+msgid "Users where known_treatment_started(User)=True"
+msgstr "Användare där known_treatment_started(User)=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid "Metastasis"
+msgstr "Metastas"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L94
+msgid ""
+"Users whose User.observations contains any Observations where the "
+"Observation.codeable_concept=CC.PCaLocalized and the "
+"Observation.value_quantity.value!=True"
+msgstr ""
+"Användare vars User.observations innehåller Observations där "
+"Observation.codeable_concept=CC.PCaLocalized och "
+"Observation.value_quantity.value!=True"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L15
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L107
+msgid "Role"
+msgstr "Roll"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L108
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L161
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L195
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L229
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L263
+msgid "User Count"
+msgstr "Antal användare"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L113
+msgid "Patients - All"
+msgstr "Patienter – alla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L117
+msgid "Patients - No Diagnosis"
+msgstr "Patienter – ingen diagnos"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L121
+msgid "Patients - Diagnosis, No Treatment"
+msgstr "Patienter – diagnos, ingen behandling"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L125
+msgid "Patients - Diagnosis and Treatment"
+msgstr "Patienter – diagnos och behandling"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L129
+msgid "Patients - Metastasis"
+msgstr "Patienter – metastas"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L133
+msgid "Partners"
+msgstr "Partner"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L137
+msgid "Clinicians"
+msgstr "Kliniker"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L147
+msgid ""
+"Intervention counts only apply to those interventions that control their "
+"subject list manually (eg Sexual Recovery, Care Plan, Community of "
+"Wellness). They are tallied from User.interventions (e.g. a User with both "
+"the 'Care Plan' and 'Community of Wellness' interventions, would add 1 to "
+"both Interventions' counts)"
+msgstr ""
+"Interventioner räknas endast för de interventioner som styr ämneslistan "
+"manuellt (t.ex sexuellt tillfrisknande, vårdplan, hälsogemenskap). De räknas"
+" utifrån User.interventions (t.ex. en användare med interventioner i både "
+"\"Vårdplan\" och \"Hälsogemenskap\" räknas som 1 intervention i vardera "
+"kategorin)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L160
+msgid "Intervention"
+msgstr "Intervention"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L177
+msgid "User Statistics By Patient Reports"
+msgstr "Användarstatistik sorterad efter patientrapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L180
+msgid ""
+"Completed Reports are tallied for each User that has <i>any number</i> of "
+"PatientReports for that Intervention (e.g. whether a User has 1 or 100 "
+"PatientReports for 'Symptom Tracker', that User only adds 1 to that "
+"Intervention's Completed Reports tally)"
+msgstr ""
+"Färdiga rapporter räknas för varje användare <i>oavsett antal </i> "
+"PatientReports för den aktuella interventionen (det är till exempel "
+"irrelevant om en användare har 1 eller 100 PatientReports för "
+"&quot;Symtomdagbok&quot;, antalet genomförda interventioner för denna "
+"användare räknas ändå bara som 1)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L181
+msgid ""
+"Completed Reports are only shown for an Intervention if the report count is "
+"above 0"
+msgstr ""
+"Färdiga rapporter visas endast för en intervention om antalet rapporter är "
+"fler än 0"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L194
+msgid "Intervention (Reports)"
+msgstr "Intervention (rapporter)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L214
+msgid ""
+"Intervention Access counts reflect the number of users who <i>could</i> "
+"access said intervention, regardless of whether or not they've actually "
+"accessed it."
+msgstr ""
+"Interventionsåtkomst anger antalet användare som <i>hade</i>tillgång till "
+"denna intervention, oavsett om de faktiskt använde den eller inte."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L228
+msgid "Intervention (Access)"
+msgstr "Intervention (åtkomst)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L247
+msgid ""
+"Organization counts are collected from the User.organizations of all Users "
+"without the Test Role"
+msgstr ""
+"Antal organisationer räknas utifrån User.organizations för alla användare "
+"som inte har en testroll"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L248
+msgid ""
+"'None of the above' refers to Users who specifically selected the 'None of "
+"the above' organization option"
+msgstr ""
+"\"Inget av ovanstående\" refererar till användare som specifikt har valt "
+"organisationsalternativet \"Inget av ovanstående\""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L249
+msgid ""
+"'Unspecified' refers to Users who have not yet been assigned to <i>any</i> "
+"Organization option (including 'None of the above')"
+msgstr ""
+"&quot;Ospecificerat&quot; refererar till användare som ännu inte har "
+"tilldelats <i>något</i> organisationsalternativ (inklusive &quot;Inget av "
+"ovanstående&quot;)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/reporting_dashboard.html#L262
+msgid "Organization Name"
+msgstr "Organisationens namn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L6
+msgid "Browser Cookies Disabled"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L9
+msgid ""
+"Our website needs to use cookies to bring you the best, personalized, "
+"browsing experience. Your web browser is currently <b>not</b> allowing "
+"cookies. Help us fix this."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L13
+msgid ""
+"Please enable cookies within your browser settings to continue. To learn how"
+" to allow cookies, check online for your web browser's specific "
+"instructions."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L15
+#, python-format
+msgid ""
+"For more information on how we use cookies, see our <u><a "
+"href=\"%(privacy_url)s\">Privacy Policy</a></u>."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L20
+msgid "Try Again"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/require_cookies.html#L49
+msgid "Browser cookie setting check complete"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L50
+msgid "Export questionnaire data"
+msgstr "Exportera enkätdata"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L17
+msgid "Instrument(s) to export data from:"
+msgstr "Instrument som data ska exporteras från:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L29
+msgid "Data type:"
+msgstr "Datatyp:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L33
+msgid "CSV"
+msgstr "CSV"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L37
+msgid "JSON"
+msgstr "JSON"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/research.html#L44
+msgid "Export"
+msgstr "Exportera"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L8
+msgid "Assessment Report Detail"
+msgstr "Utvärderingsdetalj"
+
+# Role: patient
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L9
+msgid "Patient"
+msgstr "Patient"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L13
+msgid "Back to Profile"
+msgstr "Tillbaka till profilen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L16
+msgid "Back to Patient Profile"
+msgstr "Tillbaka till patientprofil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L18
+msgid "Back to User Profile"
+msgstr "Tillbaka till användarprofilen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L21
+msgid "Back to Truenth Home"
+msgstr "Tillbaka till TrueNTH:s startsida"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L49
+msgid "Question"
+msgstr "Fråga"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/sessionReport.html#L49
+msgid "Response"
+msgstr "Svar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L8
+msgid "Do you have an Access Code?"
+msgstr "Har du en åtkomstkod?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L18
+msgid "I do not have an Access Code"
+msgstr "Jag har ingen åtkomstkod"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L19
+msgid "Continue registration without an Access Code"
+msgstr "Fortsätt registreringen utan åtkomstkod"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L52
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L159
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L35
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/shortcut_alias.html#L20
+msgid "Register"
+msgstr "Registrera"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L2
+msgid "Days Overdue"
+msgstr "dagar försenad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L5
+msgid "Site"
+msgstr "Klinik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L7
+msgid " Days"
+msgstr " dagar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/site_overdue_table.html#L9
+msgid "Total"
+msgstr "Totalt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L4
+msgid "Admin Tools"
+msgstr "Admin. verktyg"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L5
+msgid "Click on each for details"
+msgstr "Klicka på vart och ett för detaljer"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L8
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L365
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L402
+msgid "Communications"
+msgstr "Kommunikation"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L18
+msgid "Select any user to view details or make changes."
+msgstr "Markera valfri användare för att visa detaljer eller göra ändringar."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L20
+msgid "AdminList_"
+msgstr "Administrationslista_"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L45
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L39
+msgid "ID"
+msgstr "ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L49
+msgid "Roles"
+msgstr "Roller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L50
+msgid "Sites"
+msgstr "Platser"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L51
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L45
+msgid "Deactivate Account"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin.html#L52
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L62
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L46
+msgid "activation status"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L14
+msgid "Filter list by site"
+msgstr "Filtrera listan efter kliniker"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L22
+msgid "Select All"
+msgstr "Markera alla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L23
+msgid "Clear All"
+msgstr "Rensa alla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L29
+msgid "Site filter applied"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L36
+msgid "View deactivated accounts"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L60
+msgid "Deactivate"
+msgstr "Inaktivera"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/admin_base.html#L41
+msgid "Reactivate account"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L24
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Status"
+msgstr "Status"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L25
+msgid "User"
+msgstr "Användare"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L34
+msgid "Preview"
+msgstr "Förhandsgranska"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L45
+msgid "Communication Detail"
+msgstr "Kommunikationsuppgift"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L49
+msgid "Recipients:"
+msgstr "Mottagare:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L50
+msgid "Subject:"
+msgstr "Ämne:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L51
+msgid "Body:"
+msgstr "Brödtext:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L63
+msgid "No communications found."
+msgstr "Ingen kommunikation hittades."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/communications.html#L111
+msgid "Unable to receive content"
+msgstr "Kan inte ta emot innehåll"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L5
+msgid "Patient List"
+msgstr "Patientlista"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L8
+msgid "Create a patient record"
+msgstr "Skapa en patientjournal"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L11
+msgid "Select a patient below to view or update details."
+msgstr "Välj en patient nedan för att visa eller uppdatera information."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L14
+msgid "PatientList_"
+msgstr "Patientlista_"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L44
+msgid "TrueNTH ID"
+msgstr "TrueNTH-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L45
+msgid "Username"
+msgstr "Användarnamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L49
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L53
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L451
+msgid "Cell"
+msgstr "Cell"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L50
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L54
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L461
+msgid "Phone (Other)"
+msgstr "Telefon (annan)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L51
+msgid "Reports"
+msgstr "Rapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L53
+msgid "Questionnaire Status"
+msgstr "Enkätstatus"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L54
+msgid "Visit"
+msgstr "Besök"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1025
+msgid "Study ID"
+msgstr "Studie-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L57
+msgid "(GMT)"
+msgstr "(GMT)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L58
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L43
+msgid "Site(s)"
+msgstr "Klinik(er)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L80
+msgid "ST"
+msgstr "ST"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L80
+msgid "DS"
+msgstr "DS"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L110
+msgid "Patient Report"
+msgstr "Patientrapport"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Type"
+msgstr "Typ"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Report Name"
+msgstr "Rapportens namn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Generated (GMT)"
+msgstr "Skapad (GMT)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L119
+msgid "Downloaded"
+msgstr "Hämtat"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/patients_by_org.html#L128
+msgid "View All"
+msgstr "Visa alla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L6
+msgid "Staff Administration"
+msgstr "Personaladministration"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L9
+msgid "Create a staff record"
+msgstr "Skapa en personalpost"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L11
+msgid "Select a user below to view or update details."
+msgstr "Välj en användare nedan för att visa eller uppdatera information."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L15
+msgid "StaffList_"
+msgstr "Personallista_"
+
+# Role: staff_admin
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/admin/staff_by_org.html#L44
+msgid "Staff Admin"
+msgstr "Personaladministratör"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L55
+msgid "Back to"
+msgstr "Tillbaka till"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L71
+msgid "Send an Invite"
+msgstr "Skicka en inbjudan"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L73
+msgid "TrueBLOG"
+msgstr "TrueBLOG"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L74
+msgid "Movember.com"
+msgstr "Movember.com"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L116
+msgid "Movember"
+msgstr "Movember"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L117
+msgid "Movember Logo"
+msgstr "Movembers logotyp"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/_macros.html#L113
+msgid "Movember logo"
+msgstr "Movembers logotyp"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/change_password.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L11
+msgid "Change password"
+msgstr "Ändra lösenord"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/change_username.html#L6
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L8
+msgid "Change username"
+msgstr "Ändra användarnamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/invite.html#L5
+msgid "Invite User"
+msgstr "Bjud in användare"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L39
+msgid "Login With Facebook"
+msgstr "Logga in med Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login.html#L47
+msgid "Login With Google"
+msgstr "Logga in med Google"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/login_or_register.html#L127
+msgid "Sign in"
+msgstr "Logga in"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/manage_emails.html#L5
+msgid "Manage Emails"
+msgstr "Hantera e-post"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L13
+msgid "Email address"
+msgstr "E-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L14
+msgid "Email address is required."
+msgstr "E-postadress måste anges."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L23
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L10
+msgid "Oops, the password does not meet the minimum requirements."
+msgstr "Oj då, lösenordet uppfyller inte minimikraven."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L28
+msgid "Retype Password"
+msgstr "Ange lösenordet igen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L29
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L11
+msgid "Oops, the two password fields do not match."
+msgstr "Oj då, de två lösenordsfälten stämmer inte överens."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L30
+msgid "Please re-type your password."
+msgstr "Ange lösenordet igen."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L45
+msgid "Register using:"
+msgstr "Registrera dig med:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L50
+msgid "Log In With Facebook"
+msgstr "Logga in med Facebook"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L57
+msgid "Log In With Google"
+msgstr "Logga in med Google"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L62
+msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
+msgstr ""
+"Läs mer om hur du använder Facebook eller Google för att registrera dig för "
+"TrueNTH."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L77
+msgid "Password must have at least:"
+msgstr "Lösenordet måste innehålla minst:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L79
+msgid "Eight characters"
+msgstr "Åtta tecken"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L80
+msgid "One lowercase letter"
+msgstr "En liten bokstav"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L81
+msgid "One uppercase letter"
+msgstr "En stor bokstav"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L82
+msgid "One number"
+msgstr "En siffra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L92
+msgid "About Using Google or Facebook for TrueNTH"
+msgstr "Om användning av Google eller Facebook för TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L98
+msgid ""
+"We offer users the ability to create a unique account for TrueNTH or the "
+"option to use their Facebook or Google logins. Choosing to use Facebook or "
+"Google provides a few additional benefits to you:"
+msgstr ""
+"Vi erbjuder användare möjligheten att skapa ett unikt konto för TrueNTH "
+"eller alternativet att använda sina Facebook- eller Google-konton. Att välja"
+" att använda Facebook eller Google ger dig några ytterligare fördelar:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L100
+msgid ""
+"A single login - you don't need to remember multiple user names or "
+"passwords. Assuming you have an active login with Facebook or Google, "
+"logging into TrueNTH is as simple as clicking a single button."
+msgstr ""
+"Ett enda konto - du behöver inte lägga ytterligare användarnamn och lösenord"
+" på minnet. Om du har aktiv inloggning med Facebook eller Google behöver du "
+"bara klicka på en knapp för att logga in på TrueNTH."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L101
+msgid ""
+"TrueNTH can automatically import basic profile information from those "
+"services, simplifying the amount of information you need to enter. This "
+"includes name, email address, birthdate and profile image."
+msgstr ""
+"TrueNTH kan automatiskt importera grundläggande profilinformation från dessa"
+" tjänster och på så sätt reducera mängden information du behöver ange. Detta"
+" inkluderar namn, e-postadress, födelsedatum och profilbild."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/register.html#L102
+msgid ""
+"Information is a one-way street - TrueNTH can pull basic profile information"
+" from Facebook and Google, but never share anything with them. And we NEVER "
+"post or share anything to your accounts."
+msgstr ""
+"Informationen går bara i en riktning – TrueNTH kan hämta grundläggande "
+"uppgifter från Facebook och Google, men kan aldrig dela något med dem. Och "
+"vi lägger ALDRIG upp eller delar något till dina konton."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/resend_confirm_email.html#L5
+msgid "Resend Confirmation Email"
+msgstr "Skicka e-postbekräftelse igen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_subject.txt#L3
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L5
+msgid "Reset Password"
+msgstr "Återställ lösenord"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/reset_password.html#L9
+msgid ""
+"Password must have at least eight characters with one lowercase letter, one "
+"uppercase letter and one number"
+msgstr ""
+"Lösenordet måste ha minst åtta tecken med en liten bokstav, en stor bokstav "
+"och en siffra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/user_profile.html#L5
+msgid "User profile"
+msgstr "Användarprofil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.html#L1
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L1
+#, python-format
+msgid "Hello %(first_name)s %(last_name)s,"
+msgstr "Hej %(first_name)s %(last_name)s,"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.html#L5
+msgid ""
+"\n"
+"<p>Thank you,</p>\n"
+"<p>The TrueNTH Team</p>\n"
+msgstr ""
+"\n"
+"<p>Tack,</p>\n"
+"<p>TrueNTH-teamet</p>\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L5
+msgid ""
+"\n"
+"Thank you,\n"
+"The TrueNTH Team\n"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_message.html#L4
+#, python-format
+msgid ""
+"\n"
+"<p>We have received your password reset request.</p>\n"
+"\n"
+"<p>If you initiated this request, reset the password with the link below:<br/>\n"
+"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"%(reset_password_link)s\">Reset password</a>.</p>\n"
+"\n"
+"<p>If you did not initiate this password reset, you may safely ignore this email.</p>\n"
+msgstr ""
+"\n"
+"<p>Vi har fått din begäran om att återställa lösenordet.</p>\n"
+"\n"
+"<p>Om du initierade denna begäran, återställ lösenordet med länken nedan:<br/>\n"
+"    <a href=\"%(reset_password_link)s\">Återställa lösenord</a>.</p>\n"
+"\n"
+"<p>Om du inte initierade återställning av lösenordet kan du ignorera det här e-postmeddelandet.</p>\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_message.txt#L4
+#, python-format
+msgid ""
+"\n"
+"We have received your password reset request.\n"
+"\n"
+"If you initiated this request, reset the password with the link below:\n"
+"    %(reset_password_link)s\n"
+"\n"
+"If you did not initiate this password reset, you may safely ignore this email.\n"
+"\n"
+msgstr ""
+"\n"
+"Vi har tagit emot din begäran om återställning av lösenordet.\n"
+"\n"
+"Om du initierade denna begäran ska du återställa lösenordet med länken nedan:\n"
+"    %(reset_password_link)s\n"
+"\n"
+"Om du inte initierade denna återställning av lösenordet kan du ignorera detta e-postmeddelande.\n"
+"\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L4
+msgid "<p>Your password has been changed.</p>"
+msgstr "<p>Ditt lösenord har ändrats.</p>"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L8
+#, python-format
+msgid ""
+"If you did not initiate this password change, <a "
+"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
+"contact your representative at %(organization_name)s."
+msgstr ""
+"Om du inte initierade denna ändring av lösenordet, <a "
+"href=\"%(forgot_password_url)s\">klicka här för att återställa det</a> eller"
+" kontakta din representant på %(organization_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L10
+#, python-format
+msgid ""
+"If you did not initiate this password change, <a "
+"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
+"contact your representative at %(app_name)s."
+msgstr ""
+"Om du inte initierade denna ändring av lösenordet, <a "
+"href=\"%(forgot_password_url)s\">klicka här för att återställa det</a> eller"
+" kontakta din representant på %(app_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L20
+#, python-format
+msgid ""
+"If you did not initiate this password change, please contact your "
+"representative at %(organization_name)s."
+msgstr ""
+"Om du inte initierade denna ändring av lösenordet, kontakta din representant"
+" på %(organization_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.html#L18
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L22
+#, python-format
+msgid ""
+"If you did not initiate this password change, please contact your "
+"representative at %(app_name)s."
+msgstr ""
+"Om du inte initierade denna ändring av lösenordet, kontakta din representant"
+" på %(app_name)s."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L4
+msgid "Your password has been changed."
+msgstr "Ditt lösenord har ändrats."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L8
+#, python-format
+msgid ""
+"\n"
+"If you did not initiate this password change, please click the link below to reset it, or contact your representative at %(organization_name)s.\n"
+"    %(forgot_password_url)s\n"
+msgstr ""
+"\n"
+"Om du inte initierade denna ändring av lösenordet ska du klicka på länken nedan för att återställa det, eller kontakta din representant på %(organization_name)s.\n"
+"    %(forgot_password_url)s\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_message.txt#L13
+#, python-format
+msgid ""
+"\n"
+"If you did not initiate this password change, please click the link below to reset it, or contact your representative at %(app_name)s.\n"
+"    %(forgot_password_url)s\n"
+msgstr ""
+"\n"
+"Om du inte initierade denna ändring av lösenordet ska du klicka på länken nedan för att återställa det, eller kontakta din representant på %(app_name)s.\n"
+"    %(forgot_password_url)s\n"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/flask_user/emails/eproms_password_changed_subject.txt#L3
+msgid "Your password has been changed"
+msgstr "Ditt lösenord har ändrats"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L13
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L48
+msgid "My Questionnaires"
+msgstr "Mina enkäter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L22
+msgid "My Reports"
+msgstr "Mina rapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L34
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L44
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L63
+msgid "My Clinic"
+msgstr "Min klinik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L53
+msgid "My Agreement"
+msgstr "Mitt avtal"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/my_profile.html#L78
+msgid "My Roles"
+msgstr "Mina roller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L4
+msgid "Patient Profile"
+msgstr "Patientprofil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L22
+msgid "Patient Details"
+msgstr "Patientuppgifter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L27
+msgid "For kiosk style administration of an assessment"
+msgstr "För administrering i kioskstil av en bedömning"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L27
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L33
+msgid "Log in as this patient"
+msgstr "Logga in som denna patient"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L37
+msgid ""
+"This is intended for \"kiosk\" style administration of an assessment, "
+"wherein the staff person \"logs in as the patient\", which logs the staff "
+"person out of their session, and automatically logs in this patient without "
+"their needing to enter login credentials. Proceed?"
+msgstr ""
+"Detta är avsett för en \"kioskliknande\" hantering av en bedömning, där "
+"vårdpersonen ”loggar in som patienten” och då själv blir utloggad och "
+"patienten automatiskt loggas in utan att behöva ange sina "
+"inloggningsuppgifter. Vill du fortsätta?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L42
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1134
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L56
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L16
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L24
+msgid "Clinic"
+msgstr "Klinik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L33
+msgid "Agreement to Share Clinical Information"
+msgstr "Samtycke till att dela kliniska uppgifter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L64
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L692
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L33
+msgid "Consent History"
+msgstr "Medgivandehistorik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L75
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L48
+msgid "PRO Questionnaires"
+msgstr "Enkäter om patientrapporterade resultat"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L86
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L71
+msgid "Patient Reports"
+msgstr "Patientrapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L99
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L26
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L87
+msgid "User Roles"
+msgstr "Användarroller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile.html#L109
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L36
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L98
+msgid "Audit Log"
+msgstr "Granskningslogg"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L15
+msgid "No email"
+msgstr "Ingen e-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/patient_profile_create.html#L15
+msgid "User does not have email address"
+msgstr "Användaren har ingen e-postadress"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_base.html#L12
+msgid "TrueNTH Profile"
+msgstr "TrueNTH-profil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L7
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L526
+msgid "Clinics"
+msgstr "Kliniker"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L17
+msgid "Admin staff"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_create_base.html#L31
+msgid "New Patient"
+msgstr "Ny patient"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L13
+msgid "loading section data..."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L14
+msgid "Edit"
+msgstr "REDIGERA"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L14
+msgid "Edit Button"
+msgstr "Knappen \"Redigera\""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L26
+msgid "Updated"
+msgstr "Uppdaterad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L26
+msgid "Unable to Update. System error."
+msgstr "Det gick inte att uppdatera systemfel."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L37
+msgid "My Information"
+msgstr "Mina uppgifter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L40
+msgid "Patient Information"
+msgstr "Patientuppgifter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L42
+msgid "User Information"
+msgstr "Användarinformation"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L49
+msgid "Date of Birth"
+msgstr "Födelsedatum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L51
+msgid "Study Id"
+msgstr "Studie-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L52
+msgid "Site Id"
+msgstr "Klinik-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L78
+msgid "My Detail"
+msgstr "Min uppgift"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L81
+msgid "Patient Detail"
+msgstr "Patientuppgift"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L83
+msgid "User Detail"
+msgstr "Användarinformation"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L89
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L198
+msgid "Gender"
+msgstr "Kön"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L108
+msgid "Locale / Time Zone"
+msgstr "Plats/tidszon"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L111
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L161
+msgid "Language"
+msgstr "Språk"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L112
+msgid "Time Zone"
+msgstr "Tidszon"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L127
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L131
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L149
+msgid "Birth date must be valid and in the required format."
+msgstr "Födelsedatum måste vara giltigt och i det format som krävs."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L131
+msgid "Birth Month"
+msgstr "Födelsemånad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L149
+msgid "Birth Year"
+msgstr "Födelseår"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L164
+msgid "Default"
+msgstr "Standard"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+msgid "First name is required and must not contain invalid characters."
+msgstr "Förnamn måste anges och får inte innehålla ogiltiga tecken."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+msgid "Last name is required and must not contain invalid characters."
+msgstr "Efternamn måste anges och får inte innehålla ogiltiga tecken."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L202
+msgid "Male"
+msgstr "Man"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L206
+msgid "Female"
+msgstr "Kvinna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L284
+msgid "Registration Status:"
+msgstr "Registreringsstatus:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L284
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L293
+msgid "not registered"
+msgstr "inte registrerad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L291
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L344
+msgid "registered"
+msgstr "registrerad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L296
+msgid "complete"
+msgstr "slutförd"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L297
+msgid "incomplete"
+msgstr "ofullständig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L298
+msgid "View reports"
+msgstr "Visa rapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L301
+msgid "Send email to patient"
+msgstr "Skicka e-post till patienten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L303
+msgid "Select Email..."
+msgstr "Välj e-post ..."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L308
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L351
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L471
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1048
+msgid "Send email"
+msgstr "Skicka e-post"
+
+# AppText: profileSendEmail option invite
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L322
+msgid "TrueNTH Invite"
+msgstr "Inbjudan till TrueNTH"
+
+# AppText: profileSendEmail option reminder
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L324
+msgid "TrueNTH Reminder"
+msgstr "Påminnelse om TrueNTH"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L330
+msgid "P3P Assessment Status:"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L330
+msgid "not available"
+msgstr "Inte tillgänglig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L331
+msgid "Initial invite to complete P3P assessment"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L332
+msgid "Reminder to complete P3P assessment"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L342
+msgid "Registration status:"
+msgstr "Registreringsstatus:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L346
+msgid "not yet registered"
+msgstr "Inte registrerad än"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L370
+msgid "Send reset password email to patient"
+msgstr "Skicka e-postmeddelande för återställning av lösenord till patienten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L379
+msgid "Send invitation and reminder emails to patient"
+msgstr "Skicka e-postinbjudan och påminnelsemeddelande till patienten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L388
+msgid "Email audit log"
+msgstr "Skicka granskningslogg via e-post"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L407
+msgid "Send registration email to user"
+msgstr "Skicka e-post för registrering till användaren"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L416
+msgid "Send reset password email to staff"
+msgstr "Skicka e-postmeddelande för återställning av lösenord till personal"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L428
+msgid "None available"
+msgstr "Ingen tillgänglig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L436
+msgid "Email Message Content"
+msgstr "Innehåll e-postmeddelande"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L451
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L461
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L526
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1025
+msgid "Optional"
+msgstr "Valfritt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L452
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L462
+msgid "Phone number must be in numbers."
+msgstr "Telefonnummer måste anges i siffror."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L487
+msgid "In what state is the patient currently receiving prostate cancer care?"
+msgstr "I vilken stat får patienten prostatacancervård för närvarande?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L489
+msgid "In what state are you currently receiving prostate cancer care?"
+msgstr "I vilken stat får du prostatacancervård för närvarande?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L502
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L533
+msgid "None of the Above"
+msgstr "Inget av ovanstående"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L505
+msgid "No clinic found in selected state."
+msgstr "Ingen klinik hittades i den valda staten."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L525
+msgid "Main clinic for prostate cancer care"
+msgstr "Huvudklinik för prostatacancervård"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L592
+msgid "Consent to share information"
+msgstr "Samtyck till att dela information"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L604
+#, python-format
+msgid ""
+"\n"
+"                                    I consent to sharing information with <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+msgstr ""
+"\n"
+"                                    Jag samtycker till att dela information med <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L653
+msgid "No consent record found"
+msgstr "Inget medgivandedokument hittades"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L686
+msgid "History"
+msgstr "Historik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L707
+msgid "Consent Status Editor"
+msgstr "Redigerare för medgivandestatus"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L710
+msgid "Modify the consent status for this user to"
+msgstr "Ändra medgivandestatus för denna användare till"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L713
+msgid "Consented / Enrolled"
+msgstr "Samtyckte/registrerade sig"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L720
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Återkallad – avbryt datainsamling och rapportera historiska data"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L721
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Avbryt datainsamling och rapportera historiska data"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L728
+msgid "Purged / Removed"
+msgstr "Rensad/borttagen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L745
+msgid "Consent Date Editor"
+msgstr "Redigerare för medgivandedatum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L748
+msgid "Current consent date: "
+msgstr "Aktuellt datum för samtycke: "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "Modify the consent date"
+msgstr "Ändra medgivandedatum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "GMT 24-hour format"
+msgstr "GMT 24-timmarsformat"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L750
+msgid "for this agreement to:"
+msgstr "för detta avtal till:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L789
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L792
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L809
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1098
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1101
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1118
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1202
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1205
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1222
+msgid "Date must be valid and in the required format."
+msgstr "Datum måste vara giltigt och i det format som krävs."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L828
+msgid "for"
+msgstr "för"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L829
+msgid "Editable by admins only."
+msgstr "Kan bara redigeras av administratörer."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L850
+msgid "Session History"
+msgstr "Sessionshistorik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L850
+msgid "click each row to review report"
+msgstr "klicka på varje rad för att granska rapporten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Questionnaire Name"
+msgstr "Enkätnamn"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "Last Updated"
+msgstr "Senast uppdaterad"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L851
+msgid "GMT, Y-M-D"
+msgstr "GMT, Å-M-D"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L872
+msgid "My Prostate Cancer Profile"
+msgstr "Min prostatacancerprofil"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L872
+msgid "Clinical Questions"
+msgstr "Kliniska frågor"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L874
+msgid "Questions asked of the patient at registration"
+msgstr "Frågor som ställdes till patienten vid registreringen"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L900
+msgid "Intervention Reports"
+msgstr "Interventionsrapporter"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L905
+msgid "No reports available."
+msgstr "Inga rapporter tillgängliga."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L917
+msgid "Select"
+msgstr "Välj"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L918
+msgid "America/Chicago"
+msgstr "USA/Chicago"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L919
+msgid "America/Denver"
+msgstr "USA/Denver"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L920
+msgid "America/Los Angeles"
+msgstr "USA/Los Angeles"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L921
+msgid "America/Indianapolis"
+msgstr "USA/Indianapolis"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L922
+msgid "America/New York"
+msgstr "USA/New York"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L923
+msgid "Australia/Adelaide"
+msgstr "Australien/Adelaide"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L924
+msgid "Australia/Brisbane"
+msgstr "Australien/Brisbane"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L925
+msgid "Australia/Broken_Hill"
+msgstr "Australien/Broken_Hill"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L926
+msgid "Australia/Canberra"
+msgstr "Australien/Canberra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L927
+msgid "Australia/Currie"
+msgstr "Australien/Currie"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L928
+msgid "Australia/Darwin"
+msgstr "Australien/Darwin"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L929
+msgid "Australia/Eucla"
+msgstr "Australien/Eucla"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L930
+msgid "Australia/Hobart"
+msgstr "Australien/Hobart"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L931
+msgid "Australia/Lindeman"
+msgstr "Australien/Lindeman"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L932
+msgid "Australia/Lord_Howe"
+msgstr "Australien/Lord_Howe"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L933
+msgid "Australia/Melbourne"
+msgstr "Australien/Melbourne"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L934
+msgid "Australia/North"
+msgstr "Australien/norra delarna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L935
+msgid "Australia/Perth"
+msgstr "Australien/Perth"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L936
+msgid "Australia/Queensland"
+msgstr "Australien/Queensland"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L937
+msgid "Australia/South"
+msgstr "Australien/södra delarna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L938
+msgid "Australia/Sydney"
+msgstr "Australien/Sydney"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L939
+msgid "Australia/Tasmania"
+msgstr "Australien/Tasmanien"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L940
+msgid "Australia/Victoria"
+msgstr "Australien/Victoria"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L941
+msgid "Australia/West"
+msgstr "Australien/västra delarna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L942
+msgid "Australia/Yancowinna"
+msgstr "Australien/Yancowinna"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L943
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L946
+msgid "Europe/Andorra"
+msgstr "Europa/Andorra"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L944
+msgid "Europe/Vienna"
+msgstr "Europa/Wien"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L945
+msgid "Europe/Brussels"
+msgstr "Europa/Bryssel"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L947
+msgid "Europe/Stockholm"
+msgstr "Europa/Stockholm"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L948
+msgid "Europe/Sofia"
+msgstr "Europa/Sofia"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L949
+msgid "Europe/Zurich"
+msgstr "Europa/Zürich"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L959
+msgid "Deceased Status"
+msgstr "Status avliden"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L962
+msgid "Patient is deceased"
+msgstr "Patienten är avliden"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L968
+msgid "no data provided"
+msgstr "inga uppgifter har lämnats"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L972
+msgid "Has the patient passed away?"
+msgstr "Har patienten avlidit?"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L973
+msgid ""
+"By checking this box, the patient's consent status will be updated to "
+"'Withdrawn - Suspend Data Collection'. Do you want to continue?"
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L979
+msgid "Deceased Date"
+msgstr "Avled datum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1034
+msgid "Site ID"
+msgstr "Klinik-ID"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1044
+msgid "Three ways to complete questionnaire"
+msgstr "Tre sätt att fylla i enkäten på"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1050
+msgid "Invite or remind patient over email to complete their questionnaire"
+msgstr "Bjud in eller påminn patienten om att fylla i enkäten via e-post"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1055
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1057
+msgid "Log in as patient"
+msgstr "Logga in som patient"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1056
+msgid ""
+"This logs you out, and logs in the patient without their needing to enter "
+"credentials. This is so the patient can complete their questionnaire on this"
+" device. Ideal for tablet and kiosk computers."
+msgstr ""
+"Du loggas ut och patienten loggas in utan att han/hon behöver ange sina "
+"inloggningsuppgifter. På så sätt kan patienten fylla i sin enkät på denna "
+"enhet. Perfekt för surfplattor och kioskdatorer."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1060
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1064
+msgid "Enter manually"
+msgstr "Ange manuellt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1062
+msgid ""
+"Enter questionnaire responses on patient's behalf. Helpful if responses have"
+" been completed on paper."
+msgstr ""
+"Fyll i svaren på frågorna i enkäten åt kunden. Praktiskt om svaren har "
+"lämnats på papper."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1070
+msgid "Enter questionnaire manually on patient's behalf"
+msgstr "Fyll i enkäten för hand åt patienten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1077
+msgid "Select the method in which the questionnaire will be completed:"
+msgstr "Välj hur enkäten kommer att fyllas i:"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1085
+msgid "Interview assisted"
+msgstr "Bistådd vid intervjun"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1090
+msgid "Paper"
+msgstr "Papper"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1095
+msgid "Questionnaire completion date"
+msgstr "Enkäten slutförd datum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1098
+msgid "Completion Day"
+msgstr "Slutförd datum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1118
+msgid "Completion Year"
+msgstr "Slutförd år"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1149
+msgid "Interventions"
+msgstr "Interventioner"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1151
+msgid "Patient is participating in the following intervention(s): "
+msgstr "Patienten deltar i följande intervention(er): "
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1155
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1157
+msgid "None"
+msgstr "Saknas"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "My Treatments"
+msgstr "Mina behandlingar"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "Clinical Data"
+msgstr "Kliniska data"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1172
+msgid "(Optional)"
+msgstr "(Valfritt)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1178
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1183
+msgid ""
+"Which of the following prostate cancer management options has the patient "
+"had, if any? If you don&#39;t remember the exact date, please make your best"
+" guess."
+msgstr ""
+"Har patienten fått något/några av följande alternativ för behandling av "
+"prostatacancer? Om ja, vilket/vilka? Om du inte minns exakt datum ber vi dig"
+" att ange ett ungefärligt datum."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1180
+msgid ""
+"Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
+"                            date, please make your best guess."
+msgstr ""
+"Har du fått något/några av följande alternativ för behandling av prostatacancer? Om ja, vilket/vilka? Om du inte minns exakt\n"
+" datum ber vi dig att ange ett ungefärligt datum."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1188
+msgid "Select an option"
+msgstr "Välj ett alternativ"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1199
+msgid "Date"
+msgstr "Datum"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1259
+msgid "Save"
+msgstr "Spara"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
+msgid "Add"
+msgstr "Lägg till"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1237
+msgid "My History"
+msgstr "Min historik"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1239
+msgid "Past"
+msgstr "Tidigare"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1239
+msgid "Management(s)"
+msgstr "behandling(ar)"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid ""
+"You have updated your profile. Click the Save button to submit your changes."
+msgstr ""
+"Du har uppdaterat din profil. Klicka på knappen \"Spara\" för att skicka in "
+"dina ändringar."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid "Or"
+msgstr "eller"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1256
+msgid "cancel"
+msgstr "avbryt"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1257
+msgid "There is a problem with your profile. Please correct it before saving."
+msgstr ""
+"Det har uppstått ett problem med din profil. Åtgärda det innan du sparar."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1257
+msgid ""
+"Make sure all required fields are filled out and all entries are valid."
+msgstr ""
+"Kontrollera att alla obligatoriska fält är ifyllda och alla inmatningar är "
+"giltiga."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/profile_macros.html#L1260
+msgid "Profile changes have been saved"
+msgstr "Profiländringar har sparats"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L5
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L5
+#, python-format
+msgid "Profile for %(user_email)s"
+msgstr "Profil för %(user_email)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile.html#L7
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/user_profile.html#L7
+#, python-format
+msgid "Profile for #%(user_id)s"
+msgstr "Profil för #%(user_id)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/templates/profile/staff_profile_create.html#L2
+msgid "New Staff"
+msgstr "Ny personal"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/assessment_engine.py#L1464
+msgid "All available questionnaires have been completed"
+msgstr "Alla tillgängliga frågeformulär har färdigställts"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/extend_flask_user.py#L79
+#, python-format
+msgid ""
+"We see you're having trouble - let us help.                 Your account "
+"will now be locked while we give it a refresh.                 Please try "
+"again in %(time)d minutes.                 If you're still having issues, "
+"please click                 \"Having trouble logging in?\" below."
+msgstr ""
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/patch_flask_user.py#L59
+#, python-format
+msgid ""
+"If the email address '%(email)s' is in the system, a reset password email "
+"will now have been sent to it. Please open that email and follow the "
+"instructions to reset your password."
+msgstr ""
+"Om e-postadressen '%(email)s' finns i systemet har ett e-postmeddelande för "
+"återställning av lösenord nu skickats dit. Öppna e-postmeddelandet och följ "
+"anvisningarna för att återställa ditt lösenord."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L91
+msgid ""
+"This application requires Javascript enabled. Please check your browser "
+"settings."
+msgstr ""
+"Denna app kräver att Javascript är aktiverat. Kontrollera dina "
+"webbläsarinställningar."
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L497
+msgid "Unable to match identity"
+msgstr "Det gick inte att matcha identiteten"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L499
+msgid "User Not Found"
+msgstr "Användare hittades inte"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/portal.py#L1178
+#, python-format
+msgid "I consent to sharing information with %(org_name)s"
+msgstr "Jag samtycker till att dela information med %(org_name)s"
+
+#: https://github.com/uwcirg/true_nth_usa_portal/tree/develop/portal/views/reporting.py#L93
+msgid "TOTAL"
+msgstr "TOTALT"
+
+# Organization: University of Washington
+msgid "University of Washington"
+msgstr ""
+
+# Organization: CHU de Quebec - Universite Laval
+msgid "CHU de Quebec - Universite Laval"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+
+# assessment_status: Expired
+msgid "Expired"
+msgstr "utgången"
+
+# Organization: University of Chicago
+msgid "University of Chicago"
+msgstr ""
+
+# Intervention: community_of_wellness
+msgid "Community of Wellness"
+msgstr "Hälsogemenskap"
+
+# QuestionnaireBank: IRONMAN_v3_baseline
+msgid "Ironman V3 Baseline"
+msgstr "Baseline för Ironman V3"
+
+# Organization: Canada (Region/Country Site)
+msgid "Canada (Region/Country Site)"
+msgstr ""
+
+# Organization: Westmead Hospital
+msgid "Westmead Hospital"
+msgstr ""
+
+# Role: staff
+msgid "Staff"
+msgstr "Personal"
+
+# Organization: Sidney Kimmel Comprehensive Cancer Center
+msgid "Sidney Kimmel Comprehensive Cancer Center"
+msgstr ""
+
+# Organization: University of Wisconsin
+msgid "University of Wisconsin"
+msgstr ""
+
+# classification_enum: Indefinite
+msgid "Indefinite"
+msgstr "Obestämd"
+
+# AppText: registration title
+msgid "Register for TrueNTH"
+msgstr "Registrera dig för TrueNTH"
+
+# Role: intervention_staff
+msgid "Intervention Staff"
+msgstr "Interventionspersonal"
+
+# Organization: AU B Child Site 1
+msgid "AU B Child Site 1"
+msgstr ""
+
+# Organization: BC Cancer Agency
+msgid "BC Cancer Agency"
+msgstr ""
+
+# Organization: Medical Oncology, Division Of Cancer Services, Princess
+# Alexandra Hospital
+msgid ""
+"Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+msgstr ""
+
+# assessment_status: Overdue
+msgid "Overdue"
+msgstr "Försenad"
+
+# Role: analyst
+msgid "Analyst"
+msgstr "Analytiker"
+
+# AppText: About TrueNTH URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+
+# Organization: Australian Urology Associates (AUA)
+msgid "Australian Urology Associates (AUA)"
+msgstr ""
+
+# Organization: Australia Recruiting Site B
+msgid "Australia Recruiting Site B"
+msgstr ""
+
+# Organization: Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
+msgstr ""
+
+# ResearchProtocol: TNGR v1
+msgid "Tngr V1"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
+msgid "Ironman Recurring 6Mo Pattern"
+msgstr "Återkommande 6Mo-mönster för Ironman"
+
+# Organization: Princess Alexandra Hospital
+msgid "Princess Alexandra Hospital"
+msgstr ""
+
+# assessment_status: Completed
+msgid "Completed"
+msgstr "Slutförd"
+
+# Intervention: social_support
+msgid "Social Support Network"
+msgstr "Socialt stödnätverk"
+
+# Organization: Doylestown Health
+msgid "Doylestown Health"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
+msgid "Ironman V3 Recurring Annual Pattern"
+msgstr "Återkommande årligt mönster för Ironman V3"
+
+# AppText: Initial Consent Terms URL
+# AppText: TrueNTH Global Registry patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+
+# Organization: Thomas Jefferson University
+msgid "Thomas Jefferson University"
+msgstr ""
+
+# AppText: patient invite email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195"
+"-b34e-8c0f-c611-d990f9c42f23"
+
+# AppText: patient reminder email TrueNTH Global Registry
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+# AppText: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Rapportera din hälsa på TrueNTH. E-post från (klinikens namn)"
+
+# QuestionnaireBank: CRV_baseline
+msgid "Crv Baseline"
+msgstr ""
+
+# Organization: Tulane University
+msgid "Tulane University"
+msgstr ""
+
+# Organization: Sweden (Region/Country Site)
+msgid "Sweden (Region/Country Site)"
+msgstr "Sverige (Region/Land Plats)"
+
+# classification_enum: Baseline
+msgid "Baseline"
+msgstr "Baseline"
+
+# Intervention: self_management
+msgid ""
+"<p>Learn about symptoms that are common in men with prostate cancer, and "
+"about ways to manage and improve these symptoms.</p>"
+msgstr ""
+"<p>Lär dig mer om symtom som är vanliga hos män med prostatacancer och om "
+"sätt att hantera och förbättra dessa symtom.</p>"
+
+# Role: promote_without_identity_challenge
+msgid "Promote Without Identity Challenge"
+msgstr ""
+
+# Role: content_manager
+msgid "Content Manager"
+msgstr "Innehållsansvarig"
+
+# AppText: profileSendEmail reminder email_body
+msgid ""
+"<p>Hello,</p><p>This email was sent to you by (clinic name). This is where "
+"you report on your health along your prostate cancer journey. The "
+"information collected will be used to determine where improvements in "
+"Prostate Cancer Care can be made.</p><p>Login now to complete your "
+"questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and"
+" answer questionnaire now</a></div><p>Click the button above or use the link"
+" below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any"
+" questions or concerns, please contact (clinic name).</p><p><em>&mdash; This"
+" email was sent because you consented to participate in the TrueNTH registry"
+" project</em></p>"
+msgstr ""
+"<p>Hej!</p><p>Detta e-postmeddelande har skickats till dig av (klinikens "
+"namn). Det är här du rapporterar din hälsa under din prostatacancerresa. Den"
+" insamlade informationen kommer att användas för att avgöra var "
+"förbättringar i prostatacancervården kan göras.</p><p>Logga in nu för att "
+"slutföra din enkät.</p><div><a class=\"btn\" href=\"{0}\">Verifiera ditt "
+"konto och fyll i enkäten nu.</a></div><p>Klicka på knappen ovan eller använd"
+" länken nedan för att gå till TrueNTH:</p><p><a "
+"href=\"{0}\">{0}</a></p><p>Om du har några frågor eller funderingar ber vi "
+"dig att kontakta (klinikens namn). </p><p><em>–Du har fått detta "
+"e-postmeddelande eftersom du har samtyckt till att delta i TrueNTH:s "
+"registerprojekt</em></p>"
+
+# Organization: Winship Cancer Institute Emory University
+msgid "Winship Cancer Institute Emory University"
+msgstr ""
+
+# Intervention: care_plan
+msgid ""
+"<p>Organization and support for the many details of life as a prostate "
+"cancer survivor</p>"
+msgstr ""
+"<p>Organisation och stöd för många aspekter i livet för personer som har "
+"överlevt prostatacancer</p>"
+
+# AppText: IRONMAN organization website consent URL
+# AppText: IRONMAN patient website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+
+# AppText: site summary email TrueNTH Global Registry
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48"
+"-87dc-e92c03a1a0f3"
+
+# Organization: Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
+msgstr ""
+
+# Organization: The Alfred
+msgid "The Alfred"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_6mo_pattern
+msgid "Ironman V3 Recurring 6Mo Pattern"
+msgstr "Återkommande 6Mo-mönster för Ironman V3"
+
+# Organization: Baylor College of Medicine
+msgid "Baylor College of Medicine"
+msgstr ""
+
+# Organization: University of California San Diego
+msgid "University of California San Diego"
+msgstr ""
+
+# Intervention: decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr "Stöd att fatta beslut från WiserCare"
+
+# Intervention: sexual_recovery
+msgid ""
+"<p>Learn strategies for developing a new normal in your sex life after "
+"treatment for prostate cancer.</p>"
+msgstr ""
+"<p>Lär dig strategier för att utveckla en ny norm i ditt sexliv efter "
+"behandling av prostatacancer.</p>"
+
+# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
+msgid "Ironman Recurring 3Mo Pattern"
+msgstr "Återkommande 3Mo-mönster för Ironman"
+
+# Organization: IRONMAN
+msgid "IRONMAN"
+msgstr ""
+
+# AppText: IRONMAN patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+
+# Organization: Juravinski Cancer Centre
+msgid "Juravinski Cancer Centre"
+msgstr ""
+
+# Organization: Duke Comprehensive Cancer Center
+msgid "Duke Comprehensive Cancer Center"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_baseline
+msgid "Ironman Baseline"
+msgstr "Baseline för Ironman"
+
+# Organization: Roswell Park Cancer Institute
+msgid "Roswell Park Cancer Institute"
+msgstr ""
+
+# Organization: Genesis Cancer Care Queensland
+msgid "Genesis Cancer Care Queensland"
+msgstr ""
+
+# Organization: Australia (Region/Country Site)
+msgid "Australia (Region/Country Site)"
+msgstr ""
+
+# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
+msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
+msgstr ""
+
+# Organization: Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
+msgstr ""
+
+# AppText: landing sub-title
+msgid " "
+msgstr " "
+
+# Organization: Macquarie University Hospital
+msgid "Macquarie University Hospital"
+msgstr ""
+
+# AppText: IRONMAN staff registraion email URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748"
+"-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+
+# Role: service
+msgid "Service"
+msgstr "Tjänst"
+
+# Role: application_developer
+msgid "Application Developer"
+msgstr "Programutvecklare"
+
+# ResearchProtocol: IRONMAN v3
+msgid "Ironman V3"
+msgstr "Ironman V3"
+
+# Organization: none of the above
+msgid "none of the above"
+msgstr "Inget av ovanstående"
+
+# Organization: Skane University Hospital
+msgid "Skane University Hospital"
+msgstr ""
+
+# Intervention: psa_tracker
+msgid "PSA Tracker"
+msgstr ""
+
+# Organization: Eastern Health
+msgid "Eastern Health"
+msgstr ""
+
+# Organization: Oregon Health and Sciences Cancer Center
+msgid "Oregon Health and Sciences Cancer Center"
+msgstr ""
+
+# Organization: Department Of Urology, Princess Alexandra Hospital
+msgid "Department Of Urology, Princess Alexandra Hospital"
+msgstr ""
+
+# Organization: Wesley Urology Clinic
+msgid "Wesley Urology Clinic"
+msgstr ""
+
+# Role: anon
+msgid "Anon"
+msgstr "Inom kort"
+
+# Organization: AU B Child Site 2
+msgid "AU B Child Site 2"
+msgstr ""
+
+# Organization: University of Alabama-Birmingham
+msgid "University of Alabama-Birmingham"
+msgstr ""
+
+# Organization: Redland Hospital
+msgid "Redland Hospital"
+msgstr ""
+
+# AppText: profileSendEmail invite email_body
+msgid ""
+"<p>(greeting),</p><p>This email was sent to you because you are a patient at"
+" (clinic name) and consented to participate in the Prostate Cancer Outcomes "
+"- (parent org) Registry Study.</p><p>This is an invitation to use the "
+"TrueNTH website, where you will report on your health. Your participation "
+"will help us collectively improve the care that men receive during their "
+"prostate cancer journey.</p><p>To complete your first questionnaire, please "
+"first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your"
+" account</a></div><p>You can also access the TrueNTH website with this "
+"link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can "
+"return to TrueNTH any time.</p><p>If you have any queries, please contact "
+"your representative at (clinic name).</p>"
+msgstr ""
+"<p>(hälsning)</p><p>Du har fått detta e-postmeddelande eftersom du är "
+"patient vid (klinikens namn) och har samtyckt till att delta i "
+"(huvudorganisations) registerstudie kring "
+"prostatacancerresultat.</p><p>Detta är en inbjudan att använda TrueNTH:s "
+"webbplats där du rapporterar din hälsa. Ditt deltagande kommer att hjälpa "
+"oss att gemensamt förbättra den vård som män får under sin "
+"prostatacancerresa.</p><p>För att slutföra din första enkät ber vi dig att "
+"först verifiera ditt konto.</p><div><a class=\"btn\" href=\"{0}\">Verifiera "
+"ditt konto</a></div><p>Du kan också komma till TrueNTH:s webbplats via denna"
+" länk:<p/><p><a href=\"{0}\">{0}</a></p><p>Spara detta e-postmeddelande så "
+"att du kan komma åt TrueNTH när som helst.</p><p></p> Om du har några frågor"
+" ber vi dig kontakta din representant på (klinikens namn)."
+
+# Organization: Southampton
+msgid "Southampton"
+msgstr ""
+
+# Organization: University of Michigan
+msgid "University of Michigan"
+msgstr ""
+
+# assessment_status: In Progress
+msgid "In Progress"
+msgstr "Pågående"
+
+# AppText: IRONMAN staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950"
+"-0f1c-b6136fb2b5fd&editorUrl=true"
+
+# QuestionnaireBank: IRONMAN_v3_indefinite
+msgid "Ironman V3 Indefinite"
+msgstr "Ironman V3 obestämt"
+
+# Organization: Aria Health
+msgid "Aria Health"
+msgstr ""
+
+# Organization: Australian Prostate Cancer Research Centre
+msgid "Australian Prostate Cancer Research Centre"
+msgstr ""
+
+# ResearchProtocol: IRONMAN v2
+msgid "Ironman V2"
+msgstr "Ironman V2"
+
+# Role: write_only
+msgid "Write Only"
+msgstr "Endast skriva"
+
+# Role: researcher
+msgid "Researcher"
+msgstr "Forskare"
+
+# Organization: Reading Health System
+msgid "Reading Health System"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+
+# Role: access_on_verify
+msgid "Access On Verify"
+msgstr "Åtkomst vid verifiering"
+
+# AppText: registration prompt
+msgid "Create a password"
+msgstr "Skapa ett lösenord"
+
+# Organization: University of Virgina (UVA)
+msgid "University of Virgina (UVA)"
+msgstr ""
+
+# AppText: portal registration
+msgid "TrueNTH Registration"
+msgstr "Registrering till TrueNTH"
+
+# AppText: IRONMAN staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730"
+"-aedf-3d5f460f491f&editorUrl=true"
+
+# Organization: University of North Carolina
+msgid "University of North Carolina"
+msgstr ""
+
+# Organization: University of California Los Angeles
+msgid "University of California Los Angeles"
+msgstr ""
+
+# AppText: Cellphone
+msgid "Mobile"
+msgstr "Mobil"
+
+# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern
+# University
+msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
+msgstr ""
+
+# Organization: Queensland University of Technology LDC
+msgid "Queensland University of Technology LDC"
+msgstr ""
+
+# Organization: Queen Elizabeth II Jubilee Hospital
+msgid "Queen Elizabeth II Jubilee Hospital"
+msgstr ""
+
+# Organization: AUA Local Data Center
+msgid "AUA Local Data Center"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff website consent URL
+# AppText: IRONMAN staff website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+
+# Organization: Weill Cornell Medical Center
+msgid "Weill Cornell Medical Center"
+msgstr ""
+
+# Organization: TrueNTH Global
+msgid "TrueNTH Global"
+msgstr "TrueNTH Global"
+
+# Organization: Wayne St. University Karmanos Cancer Institute
+msgid "Wayne St. University Karmanos Cancer Institute"
+msgstr ""
+
+# Role: partner
+msgid "Partner"
+msgstr "Partner"
+
+# Organization: Gc Urology
+msgid "Gc Urology"
+msgstr ""
+
+# Role: admin
+msgid "Admin"
+msgstr "Admin"
+
+# AppText: TrueNTH Global Registry organization consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016"
+"-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+
+# Intervention: care_plan
+msgid "Care Plan"
+msgstr "Vårdplan"
+
+# Role: test
+msgid "Test"
+msgstr "Test"
+
+# AppText: TrueNTH Global Registry website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+
+# Organization: Urology South Brisbane
+msgid "Urology South Brisbane"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid ""
+" <p>Explore your values, your preferences, and the current medical knowledge"
+" to help you discuss your treatment options with your doctors.</p>"
+msgstr ""
+" <p>Utforska dina värden, preferenser och aktuella medicinska kunskaper för "
+"att hjälpa dig att diskutera dina behandlingsalternativ med din läkare.</p>"
+
+# AppText: patient reminder email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgstr ""
+
+# AppText: TrueNTH Global Registry patient privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid"
+"=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+
+# Intervention: sexual_recovery
+msgid "Sexual Recovery"
+msgstr "Sexuellt tillfrisknande"
+
+# Organization: University of Illinois at Chicago
+msgid "University of Illinois at Chicago"
+msgstr ""
+
+# Intervention: psa_tracker
+msgid "<p>Remember to update your PSA level.</p>"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff privacy URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+
+# AppText: IRONMAN website declaration form URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57"
+"-6e6d-d392fc64c81a&editorUrl=true"
+
+# Organization: TrueNTH Global Registry
+msgid "TrueNTH Global Registry"
+msgstr ""
+
+# classification_enum: Recurring
+msgid "Recurring"
+msgstr "Återkommande"
+
+# Organization: United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_annual_pattern
+msgid "Ironman Recurring Annual Pattern"
+msgstr "Återkommande årligt mönster för Ironman"
+
+# AppText: consent date label
+msgid "Study Consent Date"
+msgstr "Datum för samtycke till att delta i studien"
+
+# AppText: TrueNTH Global Registry patient website consent URL
+# AppText: TrueNTH Global Registry organization website consent URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+
+# Intervention: music
+msgid "MUSIC Integration"
+msgstr ""
+
+# AppText: patient invite email TrueNTH Global Registry
+# AppText: patient invite email
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4"
+"-975b-6f3c-1c6ddfb66c82"
+
+# QuestionnaireBank: IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr "Ironman obestämd"
+
+# AppText: layout title
+msgid "Movember TrueNTH"
+msgstr "Movember TrueNTH"
+
+# Intervention: assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+# Organization: Easton Hospital
+msgid "Easton Hospital"
+msgstr ""
+
+# Organization: Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
+msgstr ""
+
+# Intervention: default
+msgid "OTHER: not yet officially supported"
+msgstr "ÖVRIGT: stöds inte officiellt än"
+
+# assessment_status: Due
+msgid "Due"
+msgstr "Förfaller"
+
+# Organization: Kantonsspitals Chur
+msgid "Kantonsspitals Chur"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid "Decision Support tool"
+msgstr "Verktyg som hjälper dig att fatta beslut"
+
+# Organization: Memorial Sloan Kettering Cancer Center
+msgid "Memorial Sloan Kettering Cancer Center"
+msgstr ""
+
+# AppText: IRONMAN patient terms and conditions URL
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641"
+"-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+
+# AppText: landing title
+msgid "Report your health in order to improve prostate cancer care."
+msgstr ""
+
+# AppText: site summary email
+# AppText: site summary email IRONMAN
+msgid ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+msgstr ""
+"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4"
+"-104f-9fc39213ea04"
+
+# Organization: USA (Region/Country Site)
+msgid "USA (Region/Country Site)"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
+msgid "Ironman V3 Recurring 3Mo Pattern"
+msgstr "Återkommande 3Mo-mönster för Ironman V3"
+
+# Organization: Dana-Farber Cancer Institute
+msgid "Dana-Farber Cancer Institute"
+msgstr ""
