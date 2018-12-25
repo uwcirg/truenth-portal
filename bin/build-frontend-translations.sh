@@ -22,6 +22,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 setup_python_venv() {
+    # Setup a python virtual environment on the given path, if not present
     python_venv_path="$1"
     if [ ! -d "${python_venv_path}" ]; then
         echo "Creating new Python virtual environment..."
@@ -30,6 +31,8 @@ setup_python_venv() {
 }
 
 setup_node_venv() {
+    # Setup a virtual environment for NodeJS on the given path, if not present
+
     python_venv_path="$1"
     # Use existing python virtual environment to install nodeenv module
     . "${python_venv_path}/bin/activate"
