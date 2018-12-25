@@ -39,13 +39,14 @@ setup_node_venv() {
 
     node_venv_path="$2"
     if [ ! -d "${node_venv_path}" ]; then
-        echo "Creating new virtual environment for NodeJS..."
         pip install nodeenv
+        echo "Creating new virtual environment for NodeJS..."
         nodeenv "${node_venv_path}"
     fi
 
     deactivate
 }
+
 python_venv="${repo_root}/env"
 setup_python_venv "${python_venv}"
 
