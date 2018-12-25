@@ -21,6 +21,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
+
 PATH="${PATH}:${repo_root}/bin"
 
 echo "Converting translations from PO to JSON format"
