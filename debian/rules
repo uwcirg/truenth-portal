@@ -9,6 +9,9 @@ distclean:
 	rm -Rf build debian/portal/ env
 
 override_dh_virtualenv:
+	# Build front-end translations (JSON) from gettext files (PO)
+	bin/build-frontend-translations.sh
+
 	# Remove self-referential requirement
 	# Otherwise a .egg-link file is created instead of actually installing portal module in site-packages/
 	sed -i '/-e ./d' requirements.txt
