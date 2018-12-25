@@ -62,10 +62,10 @@ echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
 
 echo "Installing NodeJS dependencies..."
-npm --prefix "${repo_root}/app" install
+npm --prefix "${repo_root}/portal" install
 
-PATH="${PATH}:${repo_root}/app/node_modules/gulp-cli/bin"
-GULPFILE="${repo_root}/app/i18next_gulpfile.js"
+PATH="${PATH}:${repo_root}/portal/node_modules/gulp/bin"
+GULPFILE="${repo_root}/portal/i18next_gulpfile.js"
 
 gulp_task_name="$1"
 echo "Running task $gulp_task_name..."
