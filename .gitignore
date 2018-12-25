@@ -31,9 +31,6 @@ coverage.xml
 .settings
 .tox
 
-# translation files
-portal/translations/
-
 # nodeJS virtual environment and files
 node_env/
 portal/node_modules/
