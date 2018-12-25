@@ -41,7 +41,9 @@ setup_node_venv() {
 
     node_venv_path="$2"
     if [ ! -d "${node_venv_path}" ]; then
+        echo "Installing node_env"
         pip install nodeenv
+
         echo "Creating new virtual environment for NodeJS..."
         nodeenv "${node_venv_path}"
     fi
