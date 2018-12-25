@@ -37,6 +37,7 @@ setup_node_venv() {
 
     python_venv_path="$1"
     # Use existing python virtual environment to install nodeenv module
+    echo "Activating python virtual environment..."
     . "${python_venv_path}/bin/activate"
 
     node_venv_path="$2"
@@ -67,7 +68,7 @@ while getopts "g:h" option; do
 done
 shift $((OPTIND-1))
 
-# Setup environments
+# Setup virtual environments
 python_venv="${repo_root}/env"
 setup_python_venv "${python_venv}"
 
