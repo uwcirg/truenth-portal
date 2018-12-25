@@ -21,21 +21,33 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
-setup_node_venv() {
-    # Use existing python virtual environment to install nodeenv module
-    . "${repo_root}/env/bin/activate"
-    pip install nodeenv
-
-    nodeenv "$node_venv"
-    deactivate
+setup_python_venv() {
+    python_venv_path="$1"
+    if [ ! -d "${python_venv_path}" ]; then
+        echo "Creating new Python virtual environment..."
+        virtualenv "${python_venv_path}"
+    fi
 }
 
-node_venv="${repo_root}/node_env"
+setup_node_venv() {
+    python_venv_path="$1"
+    # Use existing python virtual environment to install nodeenv module
+    . "${python_venv_path}/bin/activate"
 
-if [ ! -d "${node_venv}" ]; then
-    echo "Creating new virtual environment for NodeJS..."
-    setup_node_venv
-fi
+    node_venv_path="$2"
+    if [ ! -d "${node_venv_path}" ]; then
+        echo "Creating new virtual environment for NodeJS..."
+        pip install nodeenv
+        nodeenv "${node_venv_path}"
+    fi
+
+    deactivate
+}
+python_venv="${repo_root}/env"
+setup_python_venv "${python_venv}"
+
+node_venv="${repo_root}/node_env"
+setup_node_venv "${python_venv}" "${node_venv}"
 
 echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
