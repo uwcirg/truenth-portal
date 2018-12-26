@@ -23,7 +23,7 @@ from portal.extensions import db, user_manager
 from portal.factories.app import create_app
 from portal.models.clinical_constants import add_static_concepts
 from portal.models.i18n import smartling_download, smartling_upload
-from portal.models.i18n_utils import download_all_translations
+from portal.models.i18n_utils import compile_pos, download_all_translations
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
@@ -278,6 +278,13 @@ def mark_test():
     """Designate all current users as test users"""
     flag_test()
 
+
+@app.cli.command()
+def compile_mo_files():
+    """Compile PO files to MO files
+    """
+    compile_pos()
+    click.echo("Compiled backend PO files to MO files")
 
 @app.cli.command()
 def translation_upload():
