@@ -260,7 +260,12 @@ def download_all_translations(state):
             dest_po = os.path.join(dest_po_path, '{}.po'.format(dest_po_basename))
             dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
 
+            # disable line-wrapping
             base_po = POFile(wrapwidth=-1)
+
+            # re-use metadata of first PO file
+            # todo: set config common for pybabel extract too
+            base_po.metadata = po_files[0].metadata
             combined_po = msgcat(*po_files, base_po=base_po)
 
             # Create directory if necessary
