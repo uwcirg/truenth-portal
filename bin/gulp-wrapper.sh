@@ -17,7 +17,9 @@ Usage:
     gulp_task_name
           Name of gulp task to run
 
-    Run gulp tasks
+    Gulp task wrapper
+
+    Runs gulp tasks with node_env, creating virtual environments as necessary
 USAGE
 }
 
@@ -78,8 +80,10 @@ shift $((OPTIND-1))
 
 # Setup virtual environments
 setup_python_venv
+
 node_venv="${repo_root}/node_env"
 setup_node_venv "" "$node_venv"
+
 echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
 
