@@ -26,30 +26,36 @@ setup_python_venv() {
     # Setup a python virtual environment on the given path, if not present
     default_python_venv_path="${repo_root}/env"
     python_venv_path="${1:-$default_python_venv_path}"
-    if [ ! -d "${python_venv_path}" ]; then
-        echo "Creating new Python virtual environment: ${python_venv_path}"
-        virtualenv "${python_venv_path}"
+    if [ -d "${python_venv_path}" ]; then
+        # Exit early if python virtual environment exists
+        return
     fi
+
+    echo "Creating new Python virtual environment: ${python_venv_path}"
+    virtualenv "${python_venv_path}"
 }
 
 
 setup_node_venv() {
     # Setup a virtual environment for NodeJS on the given path, if not present
+    default_node_venv_path="${repo_root}/node_env"
+    node_venv_path="${2:-$default_node_venv_path}"
+    if [ -d "${node_venv_path}" ]; then
+        # Exit early if node_env virtual environment exists
+        return
+    fi
+
+    # Use existing python virtual environment to install nodeenv module
     default_python_venv_path="${repo_root}/env"
     python_venv_path="${1:-$default_python_venv_path}"
-    # Use existing python virtual environment to install nodeenv module
     echo "Activating python virtual environment..."
     . "${python_venv_path}/bin/activate"
 
-    default_node_venv_path="${repo_root}/node_env"
-    node_venv_path="${2:-$default_node_venv_path}"
-    if [ ! -d "${node_venv_path}" ]; then
-        echo "Installing node_env"
-        pip install nodeenv
+    echo "Installing node_env"
+    pip install nodeenv
 
-        echo "Creating new virtual environment for NodeJS: ${node_venv_path}"
-        nodeenv "${node_venv_path}"
-    fi
+    echo "Creating new virtual environment for NodeJS: ${node_venv_path}"
+    nodeenv "${node_venv_path}"
 
     deactivate
 }
@@ -81,6 +87,7 @@ echo "Installing NodeJS dependencies..."
 npm --prefix "${repo_root}/portal" install
 
 PATH="${PATH}:${repo_root}/portal/node_modules/gulp/bin"
+
 DEFAULT_GULPFILE="${repo_root}/portal/i18next_gulpfile.js"
 GULPFILE="${GULPFILE:-$DEFAULT_GULPFILE}"
 
