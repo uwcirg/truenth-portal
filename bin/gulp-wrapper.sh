@@ -35,13 +35,14 @@ setup_python_venv() {
 
 setup_node_venv() {
     # Setup a virtual environment for NodeJS on the given path, if not present
-
-    python_venv_path="$1"
+    default_python_venv_path="${repo_root}/env"
+    python_venv_path="${1:-$default_python_venv_path}"
     # Use existing python virtual environment to install nodeenv module
     echo "Activating python virtual environment..."
     . "${python_venv_path}/bin/activate"
 
-    node_venv_path="$2"
+    default_node_venv_path="${repo_root}/node_env"
+    node_venv_path="${2:-$default_node_venv_path}"
     if [ ! -d "${node_venv_path}" ]; then
         echo "Installing node_env"
         pip install nodeenv
@@ -71,11 +72,8 @@ shift $((OPTIND-1))
 
 # Setup virtual environments
 setup_python_venv
-
 node_venv="${repo_root}/node_env"
-setup_node_venv "${python_venv}" "${node_venv}"
-
-
+setup_node_venv "" "$node_venv"
 echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
 
