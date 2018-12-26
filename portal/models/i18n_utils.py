@@ -289,6 +289,7 @@ def compile_pos():
     translations_dir = os.path.join(current_app.root_path, "translations")
 
     for dirpath, _, filenames in os.walk(translations_dir):
+        # only act on backend (flask) translation files
         if 'messages.po' not in filenames:
             continue
 
