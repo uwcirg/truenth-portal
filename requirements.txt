@@ -78,7 +78,7 @@ selenium==3.141.0
 six==1.12.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.2
-sphinx==1.8.2
+sphinx==1.8.3
 sphinxcontrib-websupport==1.1.0  # via sphinx
 sqlalchemy==1.2.15         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.1
