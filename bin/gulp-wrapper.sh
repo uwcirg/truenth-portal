@@ -24,7 +24,8 @@ USAGE
 
 setup_python_venv() {
     # Setup a python virtual environment on the given path, if not present
-    python_venv_path="$1"
+    default_python_venv_path="${repo_root}/env"
+    python_venv_path="${1:-$default_python_venv_path}"
     if [ ! -d "${python_venv_path}" ]; then
         echo "Creating new Python virtual environment..."
         virtualenv "${python_venv_path}"
@@ -69,8 +70,7 @@ done
 shift $((OPTIND-1))
 
 # Setup virtual environments
-python_venv="${repo_root}/env"
-setup_python_venv "${python_venv}"
+setup_python_venv
 
 node_venv="${repo_root}/node_env"
 setup_node_venv "${python_venv}" "${node_venv}"
