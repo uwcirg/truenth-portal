@@ -277,6 +277,7 @@ def download_all_translations(state):
                 os.path.relpath(dest_mo, current_app.root_path),
             )
 
+
 def compile_pos():
     """
     Compile all backend PO files to MO files
