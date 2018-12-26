@@ -11,7 +11,7 @@ import sys
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile
+from polib import pofile, POFile
 import requests
 
 POT_FILES = (
@@ -201,11 +201,17 @@ def pos_from_zip(zipfile):
         yield locale_code, po
 
 
-def msgcat(*po_files):
-    """Concatenate input po_files together, with later files overwriting earlier ones"""
+def msgcat(*po_files, **kwargs):
+    """
+    Concatenate input po_files together, with later files overwriting earlier ones
+
+    :param wrapwidth: the wrap width, disabled with -1
+    :param po_files: PO files to concatenate
+    """
     po_files = list(po_files)
-    base_po = po_files.pop(0)
-    current_app.logger.debug("Combining PO file with %d strings", len(base_po))
+
+    # default to -1, ie no wrapping
+    base_po = POFile(wrapwidth=kwargs.get('wrapwidth', -1))
     for po_file in po_files:
         current_app.logger.debug("Combining PO file with %d strings", len(po_file))
         for entry in po_file:
