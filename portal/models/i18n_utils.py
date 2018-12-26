@@ -206,12 +206,11 @@ def msgcat(*po_files, **kwargs):
     Concatenate input po_files together, with later files overwriting earlier ones
 
     :param wrapwidth: the wrap width, disabled with -1
-    :param po_files: PO files to concatenate
     """
     po_files = list(po_files)
 
-    # default to -1, ie no wrapping
-    base_po = POFile(wrapwidth=kwargs.get('wrapwidth', -1))
+    # use given base_po, or empty
+    base_po = kwargs.get('base_po', POFile())
     for po_file in po_files:
         current_app.logger.debug("Combining PO file with %d strings", len(po_file))
         for entry in po_file:
@@ -261,7 +260,8 @@ def download_all_translations(state):
             dest_po = os.path.join(dest_po_path, '{}.po'.format(dest_po_basename))
             dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
 
-            combined_po = msgcat(*po_files)
+            base_po = POFile(wrapwidth=-1)
+            combined_po = msgcat(*po_files, base_po=base_po)
 
             # Create directory if necessary
             if not os.path.isdir(dest_po_path):
