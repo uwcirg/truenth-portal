@@ -280,7 +280,7 @@ def mark_test():
 
 
 @app.cli.command()
-def compile_mo_files():
+def compile_po_files():
     """Compile PO files to MO files
     """
     compile_pos()
