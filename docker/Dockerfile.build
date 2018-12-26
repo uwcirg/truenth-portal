@@ -15,7 +15,7 @@ RUN \
         libc6-i386 \
         libffi-dev \
         libpq-dev \
-        python-dev \
+        python3-dev \
         python-pip && \
     apt-get clean
 
