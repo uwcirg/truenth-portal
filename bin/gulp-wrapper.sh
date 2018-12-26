@@ -27,7 +27,7 @@ setup_python_venv() {
     default_python_venv_path="${repo_root}/env"
     python_venv_path="${1:-$default_python_venv_path}"
     if [ ! -d "${python_venv_path}" ]; then
-        echo "Creating new Python virtual environment..."
+        echo "Creating new Python virtual environment: ${python_venv_path}"
         virtualenv "${python_venv_path}"
     fi
 }
@@ -47,7 +47,7 @@ setup_node_venv() {
         echo "Installing node_env"
         pip install nodeenv
 
-        echo "Creating new virtual environment for NodeJS..."
+        echo "Creating new virtual environment for NodeJS: ${node_venv_path}"
         nodeenv "${node_venv_path}"
     fi
 
@@ -85,5 +85,5 @@ DEFAULT_GULPFILE="${repo_root}/portal/i18next_gulpfile.js"
 GULPFILE="${GULPFILE:-$DEFAULT_GULPFILE}"
 
 gulp_task_name="$1"
-echo "Running task $gulp_task_name..."
+echo "Running task ${gulp_task_name}..."
 gulp.js --gulpfile "$GULPFILE" "$gulp_task_name"
