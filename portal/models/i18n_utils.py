@@ -205,11 +205,10 @@ def msgcat(*po_files, **kwargs):
     """
     Concatenate input po_files together, with later files overwriting earlier ones
 
-    :param wrapwidth: the wrap width, disabled with -1
     """
     po_files = list(po_files)
 
-    # use given base_po, or empty
+    # use given base_po, or empty PO file
     base_po = kwargs.get('base_po', POFile())
     for po_file in po_files:
         current_app.logger.debug("Combining PO file with %d strings", len(po_file))
