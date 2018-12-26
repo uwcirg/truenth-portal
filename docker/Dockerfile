@@ -10,7 +10,7 @@ RUN \
     apt-get install --yes --no-install-recommends \
         ca-certificates \
         libpq5 \
-        python2.7 \
+        python3 \
         wait-for-it && \
     apt-get clean
 
