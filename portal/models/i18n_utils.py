@@ -202,10 +202,7 @@ def pos_from_zip(zipfile):
 
 
 def msgcat(*po_files, **kwargs):
-    """
-    Concatenate input po_files together, with later files overwriting earlier ones
-
-    """
+    """Concatenate input po_files together, with later files overwriting earlier ones"""
     po_files = list(po_files)
 
     # use given base_po, or empty PO file
