@@ -31,9 +31,6 @@ coverage.xml
 .settings
 .tox
 
-# translation files
-portal/translations/
-
 # compiled (binary) translation files
 *.mo
 

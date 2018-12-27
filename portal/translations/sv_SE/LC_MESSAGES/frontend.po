@@ -1,0 +1,978 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"POT-Creation-Date: 2018-12-03T19:43:42.016Z\n"
+"PO-Revision-Date: 2018-12-03T19:43:42.016Z\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Server error occurred updating data."
+msgstr "Ett serverfel inträffade vid uppdatering av data."
+
+msgid "Invalid user id: %d"
+msgstr "Ogiltigt användar-ID: %d"
+
+msgid "Account created. Redirecting to profile..."
+msgstr "Kontot har skapats.  Omdirigerar till din profil ..."
+
+msgid "[Processing error] "
+msgstr "[Bearbetningsfel] "
+
+msgid "Email is already in use."
+msgstr "Denna e-postadress används redan."
+
+msgid "An organization must be selected."
+msgstr "En organisation måste väljas."
+
+msgid "no data returned"
+msgstr "inga data returnerades"
+
+msgid "Error occurred retrieving clinics data."
+msgstr "Ett fel inträffade vid hämtning av klinikuppgifter."
+
+msgid "No clinics data available."
+msgstr "Inga klinikuppgifter tillgängliga."
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} users"
+msgstr "Visar {pageFrom} till {pageTo} för {totalRows} användare"
+
+msgid "{pageNumber} records per page"
+msgstr "{pageNumber} poster per sida"
+
+msgid "Toggle"
+msgstr "Växla"
+
+msgid "Columns"
+msgstr "Kolumner"
+
+msgid "All rows"
+msgstr "Alla rader"
+
+msgid "Search"
+msgstr "Sök"
+
+msgid "No matching records found"
+msgstr "Inga matchande uppgifter hittades"
+
+msgid "Export data"
+msgstr "Exportera data"
+
+msgid "User Id is required"
+msgstr "Användar-ID krävs"
+
+msgid "Error occurred retrieving roles for user"
+msgstr ""
+
+msgid "Error occurred updating user roles"
+msgstr ""
+
+msgid "Are you sure you want to deactivate this account?"
+msgstr ""
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "Enter Text"
+msgstr "Skriv in text"
+
+msgid "Select"
+msgstr "Välj"
+
+msgid "Error occurred setting user roles"
+msgstr "Ett fel inträffade vid inställning av användarroller"
+
+msgid "Error occurred setting user organizations"
+msgstr "Ett fel inträffade vid inställning av användarorganisationer"
+
+msgid "Error occurred retrieving data from server."
+msgstr "Ett fel inträffade när data hämtades från servern."
+
+msgid "Error occurred retrieving patient report"
+msgstr "Ett fel inträffade vid hämtning av patientrapporten."
+
+msgid "Download"
+msgstr "Ladda ner"
+
+msgid "Patient Reports"
+msgstr "Patientrapporter"
+
+msgid "Patient Report"
+msgstr "Patientrapport"
+
+msgid "No report data found."
+msgstr "Inga rapportdata hittades."
+
+msgid "User id is required."
+msgstr "Användar-ID krävs."
+
+msgid "Inactive"
+msgstr "Inaktiv"
+
+msgid "Deactivate"
+msgstr "Inaktivera"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Ett serverfel inträffade vid hämtning av rapportdata"
+
+msgid "GMT, Y-M-D"
+msgstr "GMT, Å-M-D"
+
+msgid "Unable to load report data"
+msgstr "Det gick inte att ladda upp rapportdata"
+
+msgid "Unable to set session variable for organization modal viewed."
+msgstr "Kan inte ställa in sessionens variabel för visad organisationsmodell."
+
+msgid "Error retrieving demographics information for user."
+msgstr "Ett fel inträffade vid hämtning av demografisk information för användaren."
+
+msgid "Error occurred updating user organization."
+msgstr "Ett fel inträffade när användarorganisationen uppdaterades."
+
+msgid "Error updating organization"
+msgstr "Ett fel inträffade när organisationen uppdaterades"
+
+msgid "My Dashboard"
+msgstr "Min instrumentpanel"
+
+msgid "You have entered an invalid access code.  Please try again"
+msgstr "Du har angivit en ogiltig åtkomstkod.  Försök igen"
+
+msgid "System was unable to process your request."
+msgstr "Systemet kunde inte bearbeta din begäran."
+
+msgid "Edit in Liferay"
+msgstr "Redigera i Liferay"
+
+msgid "You must agree to the terms and conditions by checking the provided checkboxes."
+msgstr "Du måste godkänna villkoren genom att markera kryssrutan."
+
+msgid "Try Again"
+msgstr ""
+
+msgid "Missing information for consent agreement.  Unable to complete request."
+msgstr ""
+
+msgid "No organizations available"
+msgstr "Inga organisationer tillgängliga"
+
+msgid "success"
+msgstr "lyckad"
+
+msgid "Unable to update. System/Server Error."
+msgstr "Det gick inte att uppdatera. System-/serverfel."
+
+msgid "unable to get needed core data"
+msgstr "kan inte hämta erforderliga nyckeldata"
+
+msgid "unable to get required core data"
+msgstr "kan inte hämta erforderliga nyckeldata"
+
+msgid "no data found"
+msgstr "inga data hittades"
+
+msgid "Unable to retrieve portal footer html"
+msgstr "Det gick inte att hämta portalsidfot html"
+
+msgid "No data found"
+msgstr "Inga data hittades"
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr "Ett serverfel inträffade vid hämtning av organisations-/klinikinformation."
+
+msgid "Server error occurred retrieving consent information."
+msgstr "Ett serverfel inträffade vid hämtning av medgivandeinformation."
+
+msgid "User id and parameters are required"
+msgstr "Användar-ID och parametrar krävs"
+
+msgid "Server error occurred setting consent status."
+msgstr "Ett serverfel inträffade vid inställning av medgivandestatus."
+
+msgid "Server error occurred removing consent."
+msgstr "Ett serverfel inträffade vid borttagning av medgivande."
+
+msgid "User id and organization id are required."
+msgstr "Användar-id och organisations-id krävs."
+
+msgid "Error occurred setting suspended consent status."
+msgstr "Ett fel uppstod vid inställning av inställd status för samtycke."
+
+msgid "Server error occurred retrieving demographics information."
+msgstr "Ett serverfel inträffade vid hämtning av demografisk information."
+
+msgid "Server error occurred setting demographics information."
+msgstr "Ett serverfel inträffade vid inställning av demografisk information."
+
+msgid "Server error occurred retrieving locale information."
+msgstr "Ett serverfel inträffade vid hämtning av nationella inställningar."
+
+msgid "User id is required"
+msgstr "Användar-ID krävs"
+
+msgid "Error retrieving data from server"
+msgstr "Ett fel inträffade när data hämtades från servern"
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr "Ett serverfel inträffade när information om ingrepp/behandling sparades."
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr "Ett serverfel inträffade när information om ingrepp/behandling togs bort."
+
+msgid "Server error occurred retrieving roles information."
+msgstr "Ett serverfel inträffade vid hämtning av rollinformation."
+
+msgid "Server error occurred retrieving user role information."
+msgstr "Ett serverfel inträffade vid hämtning av användarrollinformation."
+
+msgid "User Id is required."
+msgstr ""
+
+msgid "Server error occurred setting user role information."
+msgstr "Ett serverfel inträffade vid inställning av användarrollinformation."
+
+msgid "Server error occurred deleting user role."
+msgstr "Ett serverfel inträffade vid borttagning av användarroll."
+
+msgid "Server error occurred retrieving clinical data."
+msgstr "Ett serverfel inträffade vid hämtning av kliniska data."
+
+msgid "Server error occurred updating clinical data."
+msgstr "Ett serverfel inträffade vid uppdatering av kliniska data."
+
+msgid "no url returned"
+msgstr "ingen url returnerades"
+
+msgid "Server error occurred retrieving tou url."
+msgstr "Ett serverfel inträffade vid hämtning av url för användarvillkor."
+
+msgid "Server error"
+msgstr "Serverfel"
+
+msgid "error retrieving instruments list"
+msgstr "ett fel inträffade när instrumentlistan hämtades"
+
+msgid "Server error occurred retrieving tou data."
+msgstr "Ett serverfel inträffade vid hämtning av användarvillkor."
+
+msgid "Server error occurred saving terms of use information."
+msgstr "Ett serverfel inträffade när information om användarvillkor sparades."
+
+msgid "Error occurred retrieving access url."
+msgstr "Ett fel inträffade vid hämtning av åtkomst-url."
+
+msgid "Invite data are required."
+msgstr "Data för inbjudan krävs."
+
+msgid "Error occurred sending password reset request."
+msgstr "Ett fel inträffade när återställning av lösenord skickades."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Ett fel inträffade vid hämtning av utvärderingsstatus."
+
+msgid "Questionnaire response data is required."
+msgstr "Svarsdata för enkäten krävs."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Ett fel inträffade vid hämtning av utvärderingslistan."
+
+msgid "User id and instrument Id are required."
+msgstr "Användar-ID och instrument-ID krävs."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Ett fel inträffade vid hämtning av utvärderingsrapporten."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Ett fel inträffade när den aktuella frågebanken hämtades åt användaren."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Ett fel inträffade vid hämtning av patientrapporten."
+
+msgid "Error occurred setting table preference."
+msgstr "Ett fel inträffade när tabellinställningarna gjordes."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "Ett fel inträffade när granskningsposterna för e-post hämtades."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Ett fel inträffade vid hämtning av granskningsloggen."
+
+msgid "configuration key is required."
+msgstr "konfigurationsnyckel krävs."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Ett fel uppstod när innehåll för konfigurationsnyckeln hämtades."
+
+msgid "Error occurred deactivating user."
+msgstr ""
+
+msgid "Error occurred reactivating user."
+msgstr ""
+
+msgid "configuration variable name is required."
+msgstr ""
+
+msgid "Invalid date. Please try again."
+msgstr "Ogiltigt datum. Försök igen."
+
+msgid "Date must not be in the future. Please try again."
+msgstr "Datumet får inte vara i framtiden. Försök igen."
+
+msgid "Date must not be before 1900. Please try again."
+msgstr "Datumet får inte vara före år 1900. Försök igen."
+
+msgid "Year must be after 1900"
+msgstr "Året måste vara efter 1900"
+
+msgid "The date must not be in the future."
+msgstr "Datumet får inte vara i framtiden."
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Ogiltigt datum. Ange ett giltigt datum."
+
+msgid "Missing value."
+msgstr "Värde saknas."
+
+msgid "Error loading portal wrapper"
+msgstr "Fel vid inläsning av portalram"
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alla rättigheter förbehålls. En registrerad 501(c)3 ideell organisation (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alla rättigheter förbehålls. Movember Foundation är en registrerad välgörenhetsorganisation i Australien ABN 48894537905 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alla rättigheter förbehålls. Movember Foundation är en nyzeeländsk registrerad välgörenhetsorganisation med nummer CC51320 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
+msgstr "© {year} Movember Foundation (Movember Foundation). Alla rättigheter förbehålls."
+
+msgid "Error occurred retrieving notification."
+msgstr "Ett fel uppstod när meddelandet skulle hämtas."
+
+msgid "All fields must be complete."
+msgstr "Alla fält måste fyllas i."
+
+msgid "Please enter a valid date."
+msgstr "Ange ett giltigt datum."
+
+msgid "Please enter a valid month."
+msgstr "Ange en giltig månad."
+
+msgid "Please enter a valid year."
+msgstr "Ange ett giltigt år."
+
+msgid "Error occurred when verifying the uniqueness of email"
+msgstr ""
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr "Denna e-postadress används redan. Ange en annan e-postadress."
+
+msgid "Please remove invalid characters and try again."
+msgstr "Ta bort ogiltiga tecken och försök igen."
+
+msgid "Sorry, this isn't a valid date. Please try again."
+msgstr "Detta är inte ett giltigt datum. Försök igen."
+
+msgid "This isn't a valid e-mail address, please double-check."
+msgstr "Detta är inte en giltig e-postadress. Kontrollera adressen igen."
+
+msgid "You haven't entered any management option yet."
+msgstr "Du inte har angivit något hanteringsalternativ än."
+
+msgid "you"
+msgstr "du"
+
+msgid "Are you sure you want to delete this treatment?"
+msgstr "Är du säker du vill ta bort denna behandling?"
+
+msgid "Delete"
+msgstr "Radera"
+
+msgid "this patient"
+msgstr "denna patient"
+
+msgid "staff member"
+msgstr "anställd"
+
+msgid "(date entered by %actor on %date)"
+msgstr "(data angavs av %actor den %date)"
+
+msgid "Added!"
+msgstr "Tillagt!"
+
+msgid "error ocurred retrieving user procedures"
+msgstr "ett fel uppstod vid hämtning av användarrutiner"
+
+msgid "REMOVE"
+msgstr "TA BORT"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "Behandlingsdata måste vara giltiga och i det format som krävs."
+
+msgid "Alabama"
+msgstr "Alabama"
+
+msgid "Alaska"
+msgstr "Alaska"
+
+msgid "American Samoa"
+msgstr "Amerikanska Samoa"
+
+msgid "Arizona"
+msgstr "Arizona"
+
+msgid "Arkansas"
+msgstr "Arkansas"
+
+msgid "California"
+msgstr "Kalifornien"
+
+msgid "Colorado"
+msgstr "Colorado"
+
+msgid "Connecticut"
+msgstr "Connecticut"
+
+msgid "Delaware"
+msgstr "Delaware"
+
+msgid "District Of Columbia"
+msgstr "District Of Columbia"
+
+msgid "Federated States Of Micronesia"
+msgstr "Mikronesiska federationen"
+
+msgid "Florida"
+msgstr "Florida"
+
+msgid "Georgia"
+msgstr "Georgia"
+
+msgid "Guam"
+msgstr "Guam"
+
+msgid "Hawaii"
+msgstr "Hawaii"
+
+msgid "Idaho"
+msgstr "Idaho"
+
+msgid "Illinois"
+msgstr "Illinois"
+
+msgid "Indiana"
+msgstr "Indiana"
+
+msgid "Iowa"
+msgstr "Iowa"
+
+msgid "Kansas"
+msgstr "Kansas"
+
+msgid "Kentucky"
+msgstr "Kentucky"
+
+msgid "Louisiana"
+msgstr "Louisiana"
+
+msgid "Maine"
+msgstr "Maine"
+
+msgid "Marshall Islands"
+msgstr "Marshallöarna"
+
+msgid "Maryland"
+msgstr "Maryland"
+
+msgid "Massachusetts"
+msgstr "Massachusetts"
+
+msgid "Michigan"
+msgstr "Michigan"
+
+msgid "Minnesota"
+msgstr "Minnesota"
+
+msgid "Mississippi"
+msgstr "Mississippi"
+
+msgid "Missouri"
+msgstr "Missouri"
+
+msgid "Montana"
+msgstr "Montana"
+
+msgid "Nebraska"
+msgstr "Nebraska"
+
+msgid "Nevada"
+msgstr "Nevada"
+
+msgid "New Hampshire"
+msgstr "New Hampshire"
+
+msgid "New Jersey"
+msgstr "New Jersey"
+
+msgid "New Mexico"
+msgstr "New Mexico"
+
+msgid "New York"
+msgstr "New York"
+
+msgid "North Carolina"
+msgstr "North Carolina"
+
+msgid "North Dakota"
+msgstr "North Dakota"
+
+msgid "Northern Mariana Islands"
+msgstr "Nordmarianerna"
+
+msgid "Ohio"
+msgstr "Ohio"
+
+msgid "Oklahoma"
+msgstr "Oklahoma"
+
+msgid "Oregon"
+msgstr "Oregon"
+
+msgid "Palau"
+msgstr "Palau"
+
+msgid "Pennsylvania"
+msgstr "Pennsylvania"
+
+msgid "Puerto Rico"
+msgstr "Puerto Rico"
+
+msgid "Rhode Island"
+msgstr "Rhode Island"
+
+msgid "South Carolina"
+msgstr "South Carolina"
+
+msgid "South Dakota"
+msgstr "South Dakota"
+
+msgid "Tennessee"
+msgstr "Tennessee"
+
+msgid "Texas"
+msgstr "Texas"
+
+msgid "Utah"
+msgstr "Utah"
+
+msgid "Vermont"
+msgstr "Vermont"
+
+msgid "Virgin Islands"
+msgstr "Jungfruöarna"
+
+msgid "Virginia"
+msgstr "Virginia"
+
+msgid "Washington"
+msgstr "Washington"
+
+msgid "West Virginia"
+msgstr "West Virginia"
+
+msgid "Wisconsin"
+msgstr "Wisconsin"
+
+msgid "Wyoming"
+msgstr "Wyoming"
+
+msgid "Organization"
+msgstr "Organisation"
+
+msgid "Consent Status"
+msgstr "Medgivandestatus"
+
+msgid "Agreement"
+msgstr "Avtal"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Registration Date"
+msgstr "Registreringsdatum"
+
+msgid "GMT"
+msgstr "GMT"
+
+msgid "Consent Date"
+msgstr "Medgivandedatum"
+
+msgid "Last Updated"
+msgstr "Senast uppdaterad"
+
+msgid "( GMT, Y-M-D )"
+msgstr "(GMT, Å-M-D)"
+
+msgid "User"
+msgstr "Användare"
+
+msgid "Consented"
+msgstr "Samtyckte"
+
+msgid "Consented / Enrolled"
+msgstr "Samtyckte/registrerade sig"
+
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Återkallad – avbryt datainsamling och rapportera historiska data"
+
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Avbryt datainsamling och rapportera historiska data"
+
+msgid "Purged / Removed"
+msgstr "Rensad/borttagen"
+
+msgid "Replaced"
+msgstr "Ersatt"
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} records"
+msgstr "Visar {pageFrom} till {pageTo} för {totalRows} uppgifter"
+
+msgid "not provided"
+msgstr "har inte angivits"
+
+msgid "Unable to set user settings."
+msgstr "Kan inte upprätta användarinställningar."
+
+msgid "Unable to set current user orgs"
+msgstr "Kan inte upprätta aktuella användarorganisationer"
+
+msgid "DONE"
+msgstr "KLAR"
+
+msgid "EDIT"
+msgstr "REDIGERA"
+
+msgid "No information available"
+msgstr "Ingen information tillgänglig"
+
+msgid "Unable to properly set session storage variable for login-as. "
+msgstr "Det gick inte att ställa in variabeln för lagring av sessionen för att logga in som. "
+
+msgid "Subject id is required"
+msgstr ""
+
+msgid "Invalid field value."
+msgstr ""
+
+msgid "Validation error."
+msgstr ""
+
+msgid "Date (GMT), Y-M-D"
+msgstr "Datum (GMT), Å-M-D"
+
+msgid "Subject"
+msgstr "Ämne"
+
+msgid "Email"
+msgstr "E-post"
+
+msgid "No email log entry found."
+msgstr "Ingen notering om e-postlogg hittades."
+
+msgid "{emailType} email will be sent to {email}"
+msgstr "{emailType}-e-postmeddelande kommer att skickas till {email}"
+
+msgid "Url for email content is unavailable."
+msgstr "Webbadressen för e-postinnehåll är inte tillgänglig."
+
+msgid "Unable to send email. Missing content."
+msgstr "Kan inte skicka e-post. Innehåll saknas."
+
+msgid "failed request to get email invite url"
+msgstr "misslyckad begäran att få url till e-postinbjudan"
+
+msgid "Error occurred while sending invite email."
+msgstr "Ett fel inträffade när e-postinbjudan skickades."
+
+msgid "{emailType} email sent to {emailAddress}"
+msgstr "{emailType}-e-postmeddelande har skickats till {emailAddress}"
+
+msgid "Error occurred retreving email content via API."
+msgstr "Ett fel inträffade vid hämtning av e-postinnehåll via API."
+
+msgid "your clinic"
+msgstr "din klinik"
+
+msgid "Hello, this is an invitation to complete your registration."
+msgstr "Hej, detta är en inbjudan att slutföra din registrering."
+
+msgid "Verify your account to complete registration"
+msgstr "Verifiera ditt konto för att slutföra registreringen"
+
+msgid "Registration invite from {clinicName}"
+msgstr "Inbjudan till registrering från {clinicName}"
+
+msgid "invite email sent to {email}"
+msgstr "E-postinbjudan skickad till {email}"
+
+msgid "Password reset email sent to {email}"
+msgstr "E-postmeddelande för återställning av lösenord har skickats till {email}"
+
+msgid "Unable to send email."
+msgstr "Kan inte skicka e-post."
+
+msgid "Error occurred suspending consent for subject."
+msgstr ""
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Report Name"
+msgstr "Rapportens namn"
+
+msgid "Generated (GMT)"
+msgstr "Skapad (GMT)"
+
+msgid "Document Type"
+msgstr "Dokumenttyp"
+
+msgid "No reports available."
+msgstr "Inga rapporter tillgängliga."
+
+msgid "Problem retrieving reports from server."
+msgstr "Ett fel inträffade när rapporterna hämtades från servern."
+
+msgid "No questionnaire data found."
+msgstr "Inga enkätdata hittades."
+
+msgid "Problem retrieving session data from server."
+msgstr "Ett fel inträffade när sessionsdata hämtades från servern."
+
+msgid "Click to view report"
+msgstr "Klicka för att visa rapport"
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr "Vilken är din huvudsakliga klinik för behandling av prostatacancer"
+
+msgid "Other"
+msgstr "Annat"
+
+msgid "No affiliated clinic"
+msgstr "Ingen ansluten klinik"
+
+msgid "Unable to set default consent agreement"
+msgstr "Det gick inte att ange standardmedgivandeavtalet"
+
+msgid "Consent to share information"
+msgstr "Samtyck till att dela information"
+
+msgid "Close"
+msgstr "Stäng"
+
+msgid "The user does not have a valid assessment link."
+msgstr "Användaren har ingen giltig utvärderingslänk."
+
+msgid "All date fields are required"
+msgstr "Alla datumfält krävs"
+
+msgid "Completion date cannot be before consent date."
+msgstr "Slutförandedatum kan inte vara före medgivandedatum."
+
+msgid "Completion date cannot be in the future."
+msgstr "Slutförandedatum kan inte vara i framtiden."
+
+msgid "Server error occurred checking questionnaire window"
+msgstr ""
+
+msgid "Invalid completion date. Date of completion is outside the days allowed."
+msgstr "Ogiltigt slutförandedatum. Slutförandedatum ligger utanför de tillåtna dagarna."
+
+msgid "All available questionnaires have been completed."
+msgstr "Alla tillgängliga enkäter har slutförts."
+
+msgid "Problem retrieving audit log from server."
+msgstr "Ett fel inträffade när granskningsloggen hämtades från servern."
+
+msgid "No audit log item found."
+msgstr "Ingen granskningspost hittades."
+
+msgid "More..."
+msgstr "Mer ..."
+
+msgid "Less..."
+msgstr "Mindre ..."
+
+msgid "Comment"
+msgstr "Kommentar"
+
+msgid "Date/Time <span class='gmt'>{gmt}</span>"
+msgstr "Datum/tid <span class='gmt'>{gmt}</span>"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "View"
+msgstr "Visa"
+
+msgid "Sharing information with clinics"
+msgstr "Dela information med kliniker"
+
+msgid "expired"
+msgstr "utgången"
+
+msgid "TrueNTH USA"
+msgstr ""
+
+msgid "Agreed to {documentType}"
+msgstr "Samtyckt till {documentType}"
+
+msgid "Agreed to terms"
+msgstr "Godkände villkoren"
+
+msgid "{projectName} Terms of Use"
+msgstr "Användarvillkor {project name}"
+
+msgid "Date must in the valid format."
+msgstr "Datum måste anges i giltigt format."
+
+msgid "Hour must be in valid format, range 0 to 23."
+msgstr "Timmarna måste vara i ett giltigt format, från 0 till 23."
+
+msgid "Minute must be in valid format, range 0 to 59."
+msgstr "Minuterna måste vara i ett giltigt format, från 0 till 59."
+
+msgid "Second must be in valid format, range 0 to 59."
+msgstr "Sekunderna måste vara i ett giltigt format, från 0 till 59."
+
+msgid "You must enter a date/time"
+msgstr "Du måste ange ett datum/en tid"
+
+msgid "Error processing data.  Make sure the date is in the correct format."
+msgstr "Fel vid bearbetning av data.  Kontrollera att dataformatet är korrekt."
+
+msgid "Error occurred retrieving consent list content."
+msgstr "Ett fel uppstod när innehållet i listan med samtycken skulle hämtas."
+
+msgid "No PSA results to display"
+msgstr ""
+
+msgid "Edit"
+msgstr "REDIGERA"
+
+msgid "Save"
+msgstr "Spara"
+
+msgid "Filter"
+msgstr ""
+
+msgid "Result (ng/ml)"
+msgstr ""
+
+msgid "PSA Test Date"
+msgstr ""
+
+msgid "PSA (ng/ml)"
+msgstr ""
+
+msgid "Track Your PSA"
+msgstr ""
+
+msgid "Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood."
+msgstr ""
+
+msgid "ADD NEW PSA RESULT"
+msgstr ""
+
+msgid "Enter a number"
+msgstr "Ange en siffra"
+
+msgid "d M yyyy, example: 1 Jan, 2017"
+msgstr "d M åååå, exempelvis: 1 jan 2017"
+
+msgid "PSA Result History"
+msgstr ""
+
+msgid "History"
+msgstr "Historik"
+
+msgid "Filter By Year"
+msgstr ""
+
+msgid "Filter By Result"
+msgstr ""
+
+msgid "Clear Filters"
+msgstr ""
+
+msgid "Last Received Treatment:"
+msgstr ""
+
+msgid "Treatment Date:"
+msgstr ""
+
+msgid "No treatment received as of today"
+msgstr ""
+
+msgid "Edit PSA Result"
+msgstr ""
+
+msgid "Add PSA Result"
+msgstr ""
+
+msgid "Click to reload the page and try again."
+msgstr ""
+
+msgid "Date must be in the valid format."
+msgstr "Datumet måste ha det giltiga formatet."
+
+msgid "Error occurred retrieving PSA result data"
+msgstr ""
+
+msgid "No result data found"
+msgstr "Inga resultatdata hittades"
+
+msgid "* Maximum of {resultNumber} results since {year}"
+msgstr ""
+
+msgid "No PSA result matching the filtering criteria. Please try again."
+msgstr ""
+
+msgid "Server error occurred adding PSA result."
+msgstr ""
+
+msgid "treatment"
+msgstr ""
+
+msgid "PSA"
+msgstr ""
+
+msgid "Url is required."
+msgstr "Webbadress krävs."
+
+msgid "Error occurred processing request"
+msgstr "Ett fel uppstod vid behandling av förfrågan"
+
+msgid "Hi there."
+msgstr ""
+
+msgid "Thanks for your patience while we upgrade our site."
+msgstr ""
+
+msgid "Please re-type your password."
+msgstr "Ange lösenordet igen."
+
+msgctxt "name}. Proceeding to registration ..."
+msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org"
+msgstr "Tack, din åtkomstkod {shortcut_alias} anger att du befinner dig på {org"
+
+msgctxt "result})."
+msgid "Result must be a number and within valid range (less than {max"
+msgstr ""

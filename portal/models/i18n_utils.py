@@ -11,7 +11,7 @@ import sys
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile
+from polib import pofile, POFile
 import requests
 
 POT_FILES = (
@@ -201,11 +201,12 @@ def pos_from_zip(zipfile):
         yield locale_code, po
 
 
-def msgcat(*po_files):
+def msgcat(*po_files, **kwargs):
     """Concatenate input po_files together, with later files overwriting earlier ones"""
     po_files = list(po_files)
-    base_po = po_files.pop(0)
-    current_app.logger.debug("Combining PO file with %d strings", len(base_po))
+
+    # use given base_po, or empty PO file
+    base_po = kwargs.get('base_po', POFile())
     for po_file in po_files:
         current_app.logger.debug("Combining PO file with %d strings", len(po_file))
         for entry in po_file:
@@ -255,7 +256,13 @@ def download_all_translations(state):
             dest_po = os.path.join(dest_po_path, '{}.po'.format(dest_po_basename))
             dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
 
-            combined_po = msgcat(*po_files)
+            # disable line-wrapping
+            base_po = POFile(wrapwidth=-1)
+
+            # re-use metadata of first PO file
+            # todo: set config common for pybabel extract too
+            base_po.metadata = po_files[0].metadata
+            combined_po = msgcat(*po_files, base_po=base_po)
 
             # Create directory if necessary
             if not os.path.isdir(dest_po_path):
