@@ -279,9 +279,7 @@ def download_all_translations(state):
 
 
 def compile_pos():
-    """
-    Compile all backend PO files to MO files
-    """
+    """Compile all back-end PO files to MO files"""
 
     translations_dir = os.path.join(current_app.root_path, "translations")
     for dirpath, _, filenames in os.walk(translations_dir):

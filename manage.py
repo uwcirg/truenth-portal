@@ -281,8 +281,7 @@ def mark_test():
 
 @app.cli.command()
 def compile_po_files():
-    """Compile PO files to MO files
-    """
+    """Compile PO files to MO files"""
     compile_pos()
     click.echo("Compiled backend PO files to MO files")
 
