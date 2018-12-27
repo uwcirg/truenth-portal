@@ -10,7 +10,7 @@
             var self = this;
             this.initUserIds(subjectId, function() {
                 if (!self.subjectId) {
-                    self.setError(i18next.t("Subject id is required"));
+                    self.setError(i18next.t("Subject id is required")); //display error on UI
                     return false;
                 }
                 self.getOptions(); //treatment options
@@ -109,7 +109,7 @@
             return i18next.t("staff member") + ", <span class='creator'>" + defaultDisplay + "</span>, ";
         },
         getDeleteInvocationDisplay: function() {
-            return "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='" + i18next.t("Are you sure you want to delete this treatment?") + "<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">" + i18next.t("Yes") + "</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">" + i18next.t("No") + "</a>' rel='popover'><i class='fa fa-times'></i> " + i18next.t("Delete") + "</span>";
+            return $("#popoverHolder .popover__link").html();
         },
         setNewEntry: function(newEntry, highestId){
             if (!newEntry) {
@@ -123,14 +123,14 @@
             $("#userProcedures tr[data-id]").each(function() {
                 $(this).find("td").each(function() {
                     if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) {
-                        content += "<div>" + i18next.t($(this).text()) + "</div>";
+                        content += "<div>" + $(this).text() + "</div>"; //display content from database
                     }
                 });
             });
             $("#procedure_view").html(content || ("<p class='text-muted'>" + i18next.t("no data found") + "</p>"));
         },
         setNoDataDisplay: function() {
-            $("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({
+            $("#userProcedures").html("<p id='noEvents'><em>" + i18next.t("You haven't entered any management option yet.") + "</em></p>").animate({
                 opacity: 1
             });
             $("#procedure_view").html("<p class='text-muted'>" + i18next.t("no data found") + "</p>");
@@ -173,11 +173,7 @@
             });
 
             self.dateFields.forEach(function(fn) {
-                var triggerEvent = String($("#" + fn).attr("type")) === "text" ? "keyup" : "change";
-                if (self.isTouchScreen()) {
-                    triggerEvent = "change";
-                }
-                $("#" + fn).on(triggerEvent, function() {
+                $("#" + fn).on("keyup change", function() {
                     self.setDate();
                 });
             });
@@ -188,7 +184,7 @@
         },
         initPopoverEvents: function() {
             var self = this;
-            $("[data-toggle='popover']").popover({trigger: "click", placement: "top", html: true});
+            $("[data-toggle='popover']").popover({trigger: "click", placement: "top", html: true, content: $("#popoverHolder .popover__content").html()});
             $("body").on("click", ".cancel-delete", function() { //popover cancel button event
                 $(this).parents("div.popover").prev("a.confirm-delete").trigger("click");
             });
@@ -210,7 +206,7 @@
         onDidGetProcedures: function(data, newEntry) {
             this.populateProcedureRows(data, newEntry);
             this.setProcedureRowsView();
-            this.setError("");
+            this.setError(!data||data.error?i18next("Error occurred retrieving procedures"): "");
         },
         populateProcedureRows: function(data, newEntry) {
             data.sort(function(a, b) { // sort from newest to oldest

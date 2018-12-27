@@ -1247,6 +1247,16 @@
                                 <table id="pastTreatmentsContainer" class="inner"></table>
                             {% endif %}
                             <div id="procErrorMessage" class="error-message"></div>
+                            <div id="popoverHolder" class="tnth-hide">
+                                <div class="popover__link">
+                                    <a data-toggle="popover" class="btn btn-default btn-xs confirm-delete" data-content="" rel="popover"><i class="fa fa-times"></i> {{_("Delete")}}</a>
+                                </div>
+                                <div class="popover__content">
+                                    <span>{{_("Are you sure you want to delete this treatment?")}}</span>
+                                    <br /><br />
+                                    <a href="javascript:void()" class="btn-delete btn btn-tnth-primary">{{_("Yes")}}</a> &nbsp;&nbsp;&nbsp; <a href="javascript:void()" class="btn cancel-delete">{{_("No")}}</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 {%- endcall%}
