@@ -1,6 +1,6 @@
 (function() {  /*global $, tnthAjax, SYSTEM_IDENTIFIER_ENUM, i18next */
     var CoreDataObj = function() {
-        this.subjectId = 0;
+        this.subjectId = null;
         this.init = function(subjectId) { /* entry point for initiating CoreDataObj */
             var self = this;
             this.setSubjectId(subjectId, function() {
@@ -20,7 +20,7 @@
                 callback({success:1});
                 return;
             }
-            tnthAjax.getCurrentUser(function(data) {
+            tnthAjax.getCurrentUser(function(data) { //this will get session storage current user first before firing off ajax
                 if (!data || data.error) {
                     self.setError(i18next.t("Error occurred retrieving subject ID"));
                     callback({error: true});
@@ -114,7 +114,7 @@
                 try {
                     window.location.replace(self.getReturnAddress());
                 } catch(e) {
-                    self.setError(i18next.t("Error occurred when redirecting to destination url"));
+                    self.setError(i18next.t("Error occurred - unable to reach destination"));
                     //report error if invalid return address is used here
                     tnthAjax.reportError(self.subjectId, self.getAPIUrl(), e.message, true);
                     $(this).attr("disabled", false);
@@ -148,5 +148,8 @@
     $(document).ready(function(){
         (new CoreDataObj()).init();
     });
-})();  /*eslint wrap-iife: off */
+})();
+
+
+
 
