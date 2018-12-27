@@ -105,6 +105,12 @@ To interact with the running database container, started via the ``docker-compos
 
     docker-compose exec db psql --username postgres --dbname portaldb
 
+Redis Purge
+-----------
+In rare situations it's necessary to purge all cached data in the redis store::
+
+    docker-compose exec redis redis-cli flushdb
+
 Account Bootstrapping
 ---------------------
 To bootstrap an admin account after a fresh install, run the below ``flask`` CLI command::
