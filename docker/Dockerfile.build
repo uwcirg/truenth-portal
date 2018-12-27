@@ -18,8 +18,7 @@ RUN \
         python3-dev \
         python-pip \
         python-setuptools \
-        python-setuptools-scm \
-        python-wheel && \
+        python-setuptools-scm && \
     apt-get clean
 
 # Allow repo and branch to be overridden with environment variable
