@@ -16,7 +16,10 @@ RUN \
         libffi-dev \
         libpq-dev \
         python3-dev \
-        python-pip && \
+        python-pip \
+        python-setuptools \
+        python-setuptools-scm \
+        python-wheel && \
     apt-get clean
 
 # Allow repo and branch to be overridden with environment variable
@@ -25,8 +28,6 @@ ENV \
     ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
 
 RUN \
-    pip install --upgrade setuptools && \
-    pip install wheel && \
     pip install make-deb && \
     mkdir --parents "${ARTIFACT_DIR}"
 
