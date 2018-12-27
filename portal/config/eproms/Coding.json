@@ -6055,6 +6055,18 @@
       "system": "http://www.ichom.org/medical-conditions/localized-prostate-cancer/"
     },
     {
+      "code": "af_ZA",
+      "display": "Afrikaans",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "de_CH",
+      "display": "German (Switzerland)",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
       "code": "en_AU",
       "display": "English (Australia)",
       "resourceType": "Coding",
@@ -6073,12 +6085,6 @@
       "system": "urn:ietf:bcp:47"
     },
     {
-      "code": "de_CH",
-      "display": "German (Switzerland)",
-      "resourceType": "Coding",
-      "system": "urn:ietf:bcp:47"
-    },
-    {
       "code": "es_US",
       "display": "Spanish (United States)",
       "resourceType": "Coding",
@@ -6093,6 +6099,18 @@
     {
       "code": "sv_SE",
       "display": "Swedish",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "xh_ZA",
+      "display": "Xhosa",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "zu_ZA",
+      "display": "Zulu",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
     }
