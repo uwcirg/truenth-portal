@@ -27,7 +27,7 @@ ENV \
     ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
 
 RUN \
-    pip install make-deb && \
+    python -m pip install make-deb && \
     mkdir --parents "${ARTIFACT_DIR}"
 
 WORKDIR /root/portal
