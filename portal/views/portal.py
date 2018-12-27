@@ -886,6 +886,7 @@ def config_settings(config_key):
         'LOCALIZED_AFFILIATE_ORG',
         'COPYRIGHT',
         'MAINTENANCE_',
+        'GIL',
     )
     if config_key:
         key = config_key.upper()
