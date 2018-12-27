@@ -34,6 +34,9 @@ coverage.xml
 # translation files
 portal/translations/
 
+# compiled (binary) translation files
+*.mo
+
 # nodeJS virtual environment and files
 node_env/
 portal/node_modules/

@@ -276,3 +276,22 @@ def download_all_translations(state):
                 "Saved combined MO file: %s",
                 os.path.relpath(dest_mo, current_app.root_path),
             )
+
+
+def compile_pos():
+    """Compile all back-end PO files to MO files"""
+
+    translations_dir = os.path.join(current_app.root_path, "translations")
+    for dirpath, _, filenames in os.walk(translations_dir):
+        # only act on backend (flask) translation files
+        if 'messages.po' not in filenames:
+            continue
+
+        po_filepath = os.path.join(dirpath, 'messages.po')
+        mo_filepath = os.path.join(dirpath, 'messages.mo')
+
+        pofile(po_filepath).save_as_mofile(mo_filepath)
+        current_app.logger.debug(
+            "Saved MO file: %s",
+            os.path.relpath(mo_filepath, current_app.root_path),
+        )
