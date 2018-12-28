@@ -33,7 +33,7 @@
         },
         created: function() {
             var self = this;
-            Utility.VueErrorHandling(); /*global VueErrorHandling */
+            Utility.VueErrorHandling(); /*global Utility VueErrorHandling */
             this.registerDependencies();
             this.getOrgTool();
             this.setUserSettings();
