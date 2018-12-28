@@ -313,13 +313,18 @@ class SiteSummaryEmail_ATMA(AppTextModelAdapter):
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
-        TODO: Removing hardcoding of ePROMs org names
 
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('org') in ('TrueNTH Global Registry', 'IRONMAN'):
-            return "site summary email {}".format(kwargs.get('org'))
+        # If there's an org specialized version, use it.
+        if kwargs.get('org'):
+            specialized = "site summary email {}".format(kwargs.get('org'))
+
+        query = AppText.query.filter_by(name=specialized)
+        if query.count() == 1:
+            return specialized
+
         return "site summary email"
 
 
