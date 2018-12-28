@@ -9,6 +9,8 @@ distclean:
 	rm -Rf build debian/portal/ env
 
 override_dh_virtualenv:
+	# lines preceding `dh_virtualenv` occur before venv creation and pip install
+
 	# Build front-end translations (JSON) from gettext files (PO)
 	bin/build-frontend-translations.sh
 
@@ -19,7 +21,9 @@ override_dh_virtualenv:
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 override_dh_builddeb:
-	# Todo: move to more appropriate step
+	# lines preceding `dh_builddeb` occur after venv creation && `pip install`
+	# and before debian package creation
+
 	# Manually fix paths erroneously pointing to build environment
 	find \
 		debian/portal/opt/venvs/portal/lib/ \
