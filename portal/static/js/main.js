@@ -2331,7 +2331,6 @@ __i18next.init({"lng": userSetLang
         //note: display system outage message only after i18next has been instantiated - allowing message to be translated
         Utility.displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
-        //if (PORTAL_NAV_PAGE) {
         Utility.loader(true); /*global loader restoreVis*/
         try {
             Global.initPortalWrapper(PORTAL_NAV_PAGE);
@@ -2339,7 +2338,6 @@ __i18next.init({"lng": userSetLang
             tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
             Utility.restoreVis();
         }
-        //} else { Utility.restoreVis();  }
         if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
         tnthAjax.beforeSend();
         Global.unloadEvent();
