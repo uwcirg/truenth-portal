@@ -1,4 +1,4 @@
-$(document).ready(function() { /*global $ */
+$(document).ready(function() { /*global $ Utility */
     var fmBirthDate = $("#birthdate").val();
     if (fmBirthDate) {
         var arrDate = String(fmBirthDate).split("-");

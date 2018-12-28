@@ -566,7 +566,7 @@
         };
         this.__getLoaderHTML = function(message) {
             return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (message ? "&nbsp;" + message : "") + '</div>';
-        }
+        };
     };
 
     //events associated with elements on the account creation page
