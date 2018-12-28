@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
-{% block main %}
-{% from "flask_user/_macros.html" import back_btn %}
+{% from "flask_user/_macros.html" import footer, back_btn %}
 {% from "profile/profile_macros.html" import profileProcedures %}
-
+{% block main %}
 <h3 class="tnth-headline">{{ _("More About You") }}</h3>
 <p>{{ _("The TrueNTH system asks these questions in order to give you information that best fits") }} <strong>you</strong>. {{ _("You may
     skip any question you prefer not to answer.") }}</p>
@@ -79,12 +78,13 @@
     <div class="error-continue error-message"></div>
     <br/><br/><br/><br/>
 {% endif %}
+<div id="coreDataError" class="error-message"></div>
 <input type="hidden" id="coreDataUserId" value="{{user.id if user}}" />
 <input type="hidden" id="procReturnAddress" value="{{ return_address | safe }}" />
 <input type="hidden" id="procAPIUrl" value="{{url_for('coredata_api.acquire')}}" />
 {% endblock %}
 {% block footer %}
-    <footer id="core_data_footer"></footer>
+    <footer id="core_data_footer">{{footer(user=user)}}</footer>
 {% endblock %}
 {% block additional_scripts %}
     <script src="{{ url_for('static', filename='js/coredata.js') }}"></script>

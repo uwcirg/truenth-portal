@@ -876,16 +876,17 @@ def config_settings(config_key):
     config_prefix_whitelist = (
         'ACCEPT_TERMS_ON_NEXT_ORG',
         'CONSENT',
+        'COPYRIGHT',
+        'GIL',
+        'LOCALIZED_AFFILIATE_ORG',
         'LR_',
-        'REQUIRED_CORE_DATA',
-        'PRE_REGISTERED_ROLES',
-        'SYSTEM',
-        'SHOW_PROFILE_MACROS',
+        'MAINTENANCE_',
         'MEDIDATA_RAVE_FIELDS',
         'MEDIDATA_RAVE_ORG',
-        'LOCALIZED_AFFILIATE_ORG',
-        'COPYRIGHT',
-        'MAINTENANCE_',
+        'REQUIRED_CORE_DATA',
+        'PRE_REGISTERED_ROLES',
+        'SHOW_PROFILE_MACROS',
+        'SYSTEM',
     )
     if config_key:
         key = config_key.upper()
