@@ -467,6 +467,4 @@ UtilityObj.prototype.consolePolyFill = function() {
         }
     }
 };
-var Utility = Object.create(UtilityObj);
-
-
+var Utility = new UtilityObj();
