@@ -16,7 +16,9 @@ $(document).ready(function() { /*global $ */
         $(this).val($.trim($(this).val()));
     });
     //display keyboard for numeric fields on mobile devices
-    __convertToNumericField($("#date, #year")); /*global __convertToNumericField */
+    if (Utility.isTouchDevice()) {
+        Utility.convertToNumericField($("#date, #year")); /*global convertToNumericField */
+    }
 
     $("#challengeForm").validator().on("submit", function (e) {
         if (e.isDefaultPrevented()) {

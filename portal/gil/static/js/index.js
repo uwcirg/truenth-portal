@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    handlePostLogout(); /*global handlePostLogout */
+    Utility.handlePostLogout(); /*global handlePostLogout */
     $("body").attr("class", "page-home");
     if ($("#initLoginModal").val() === "true") {
         $("#modal-login-register").modal("show");

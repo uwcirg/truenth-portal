@@ -1,6 +1,7 @@
 $(document).on("ready", function() {
-    if ($("#email").length && getUrlParameter("email")) { /*global getUrlParameter */
-        $("#email").val(getUrlParameter("email"));
+    var requestEmail =  Utility.getUrlParameter("email");
+    if ($("#email").length && requestEmail) { /*global Utility getUrlParameter */
+        $("#email").val(requestEmail);
     }
     $("input[type='text']").on("blur paste", function() {
         $(this).val($.trim($(this).val()));

@@ -1,4 +1,4 @@
-(function() { /*global $ hasValue disableHeaderFooterLinks __convertToNumericField*/
+(function() { /*global $ Utility disableHeaderFooterLinks */
     var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
         this.__getDependency = function(key) {
             if (key && this.dependencies.hasOwnProperty(key)) {
@@ -171,7 +171,7 @@
     };
 
     FieldsChecker.prototype.inConfig = function(configMatch, dataArray) {
-        if (!hasValue(configMatch)) {
+        if (!configMatch) {
             return false;
         }
         dataArray = dataArray || this.CONFIG_REQUIRED_CORE_DATA;
@@ -291,7 +291,7 @@
     };
 
     FieldsChecker.prototype.setProgressBar = function(sectionId) {
-        if (!hasValue(sectionId)) {
+        if (!sectionId) {
             return;
         }
         if (this.sectionCompleted(sectionId)) {
@@ -403,10 +403,10 @@
                     }
                     $("#termsReminderModal").modal("show");
                 }
-                setTimeout(function() {disableHeaderFooterLinks();}, 1000);
+                setTimeout(function() { Utility.disableHeaderFooterLinks();}, 1000);
             },
             "orgsContainer": function() {
-                if (hasValue(preselectClinic)) {
+                if (preselectClinic) {
                     self.handlePreSelectedClinic();
                     var __modal = self.getConsentModal();
                     if (__modal) {
@@ -444,7 +444,7 @@
 
     FieldsChecker.prototype.getFieldEventType = function(field) {
         var triggerEvent = $(field).attr("data-trigger-event");
-        if (!hasValue(triggerEvent)) {
+        if (!triggerEvent) {
             triggerEvent = ($(field).attr("type") === "text" ? "blur" : "click");
         }
         if ($(field).get(0).nodeName.toLowerCase() === "select") {
@@ -569,7 +569,7 @@
         var hasError = false;
         $("#" + sectionId + " .error-message").each(function() { //check for errors
             if (!hasError) { //short circuit the loop through elements
-                hasError = hasValue($(this).text());
+                hasError = $(this).text() !== "";
             }
 
         });
@@ -699,14 +699,14 @@
         var termsEvent = function() {
             if ($(this).attr("data-agree") === "false") {
                 var types = $(this).attr("data-tou-type");
-                if (hasValue(types)) {
+                if (types) {
                     var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
                     arrTypes.forEach(function(type) {
                         if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
                             return true;
                         }
                         var theTerms = {};
-                        theTerms["agreement_url"] = hasValue(dataUrl) ? dataUrl : $("#termsURL").data().url;
+                        theTerms["agreement_url"] = dataUrl ? dataUrl : $("#termsURL").data().url;
                         theTerms["type"] = type;
                         var org = $("#userOrgs input[name='organization']:checked"),
                             userOrgId = org.val();
@@ -727,7 +727,7 @@
                                 }
                             }).fail(function() {});
                         }
-                        if (hasValue(userOrgId) && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
+                        if (userOrgId && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
                             var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
                             theTerms["organization_id"] = topOrg || userOrgId;
                         }
@@ -749,7 +749,7 @@
                 $(this).attr("data-agree", "true");
 
                 var coreTypes = [], parentCoreType = $(this).attr("data-core-data-type");
-                if (hasValue(parentCoreType)) {
+                if (parentCoreType) {
                     coreTypes.push(parentCoreType);
                 }
                 $(this).closest("label").find("[data-core-data-type]").each(function() {
@@ -817,7 +817,7 @@
                 self.postDemoData($(this));
             });
         });
-        __convertToNumericField($("#date, #year"));
+        $("#date, #year").prop("type", "tel");
     };
 
     FieldsChecker.prototype.rolesGroupEvent = function() {
@@ -955,8 +955,8 @@
                             fc.initFields();
                             fc.onFieldsDidInit();
                             DELAY_LOADING = false;
-                            showMain(); /* global showMain */
-                            hideLoader(true); /* global hideLoader */
+                            Utility.showMain(); /* global showMain */
+                            Utility.hideLoader(true); /* global hideLoader */
                         }, 300);
                         fc.startTime = 0;
                         fc.endTime = 0;

@@ -117,7 +117,12 @@ var __i18next = window.__i18next = (function() {
             options.lng = options.lng.replace("_", "-");
         }
         options.debug = options.debug ? options.debug : (getQueryString.debugi18next ? true : false);
-        var configOptions = extend(defaultOptions, options); /*global extend */
+        var configOptions = defaultOptions;
+        for (var key in options) {
+            if (defaultOptions.hasOwnProperty(key)) {
+                defaultOptions[key] = options[key];
+            }
+        }
         var sessionItemKey = "i18nextData_" + options.language;
         callback = callback || function() {};
         if (typeof i18next === "undefined") { //i18next js libraries raises runtime error in <= IE8 

@@ -1,4 +1,4 @@
-(function () { /*global Vue DELAY_LOADING  hasValue i18next $ */
+(function () { /*global Vue DELAY_LOADING i18next $ */
     DELAY_LOADING = true; //a workaround for hiding of loading indicator upon completion of loading of portal wrapper - loading indicator needs to continue displaying until patients list has finished loading
     $.ajaxSetup({
         contentType: "application/json; charset=utf-8"
@@ -24,7 +24,7 @@
         },
         mounted: function () {
             var self = this;
-            VueErrorHandling(); /* global VueErrorHandling */
+            Utility.VueErrorHandling(); /* global VueErrorHandling */
             this.preConfig(function () {
                 if ($("#adminTable").length > 0) {
                     self.rowLinkEvent();
@@ -229,8 +229,8 @@
                 options.sortName = sortObj.sort_field;
                 options.sortOrder = sortObj.sort_order;
                 options.filterBy = sortObj;
-                options.exportOptions = { /* global  __getExportFileName*/
-                    fileName: __getExportFileName($("#adminTableContainer").attr("data-export-prefix"))
+                options.exportOptions = { /* global  Utility getExportFileName*/
+                    fileName: Utility.getExportFileName($("#adminTableContainer").attr("data-export-prefix"))
                 };
                 $("#adminTable").bootstrapTable(this.getTableConfigOptions(options));
             },
@@ -819,7 +819,7 @@
                 }
                 userId = userId || this.userId;
                 var data = this.getDefaultTablePreference();
-                if (hasValue(sortField) && hasValue(sortOrder)) {
+                if (sortField && sortOrder) {
                     data["sort_field"] = sortField;
                     data["sort_order"] = sortOrder;
                 } else {
@@ -843,7 +843,7 @@
                 //get fields
                 if (Object.keys(__filters).length === 0) {
                     $("#adminTable .filterControl select, #adminTable .filterControl input").each(function () {
-                        if (hasValue($(this).val())) {
+                        if ($(this).val()) {
                             var field = $(this).closest("th").attr("data-field");
                             __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text() : $(this).val();
                         }
@@ -853,7 +853,7 @@
                 var selectedOrgs = "";
                 $("#userOrgs input[name='organization']").each(function () {
                     if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
-                        selectedOrgs += (hasValue(selectedOrgs) ? "," : "") + $(this).val();
+                        selectedOrgs += (selectedOrgs ? "," : "") + $(this).val();
                     }
                 });
                 __filters["orgs_filter_control"] = selectedOrgs;
@@ -891,7 +891,7 @@
                         });
                         documents.forEach(function (item) {
                             var c = item["contributor"];
-                            if (!existingItems[c] && hasValue(c)) { //only draw the most recent, same report won't be displayed
+                            if (!existingItems[c] && c) { //only draw the most recent, same report won't be displayed
                                 if (options.documentDataType && String(options.documentDataType).toLowerCase() !== String(c).toLowerCase()) {
                                     return false;
                                 }
