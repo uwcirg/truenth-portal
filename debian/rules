@@ -35,6 +35,9 @@ override_dh_builddeb:
 				{} \; \
 		-print
 
+	# compile all back-end PO files to MO files
+	$(PWD)/debian/portal/opt/venvs/portal/bin/flask compile-po-files
+
 	dh_builddeb
 
 %:
