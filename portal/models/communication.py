@@ -53,7 +53,6 @@ def locale_closure(locale_code, fn):
     return function_with_forced_locale
 
 
-# Todo: requires iteration and recur for accurate dates
 def load_template_args(
         user, questionnaire_bank_id=None, qb_iteration=None):
     """Capture known variable lookup functions and values
