@@ -144,7 +144,7 @@ gulp.task("portalLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(sourcemaps.write("../../"+mapPath)) /* see documentation, https://www.npmjs.com/package/gulp-sourcemaps, to write external source map files, pass a path relative to the destination */
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PORTAL + ".css.map");
@@ -162,7 +162,7 @@ gulp.task("gilLess", () => {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(sourcemaps.write("../../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(gulp.dest(GILPath + cssPath))
         .on("end", function() {
             replaceStd(GIL + ".css.map");
@@ -179,7 +179,7 @@ gulp.task("topnavLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(TOPNAV + ".css.map");
