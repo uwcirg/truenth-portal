@@ -4,9 +4,9 @@
 # dh-virtualenv options
 # https://dh-virtualenv.readthedocs.io/en/1.0/usage.html
 DH_VIRTUALENV_ARGS = \
-    --preinstall='pip>=8' \
-    --preinstall='setuptools>=12' \
-    --extra-pip-arg='--progress-bar=off'
+	--preinstall='pip>=8' \
+	--preinstall='setuptools>=12' \
+	--extra-pip-arg='--progress-bar=off'
 
 # Directory where venvs for dh-virtualenv packages are built
 VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
@@ -43,9 +43,9 @@ override_dh_builddeb:
 		-print
 
 	# compile all back-end PO files to MO files
-    # run flask from new virtual environment
-    # avoid calling `flask` script directly
-    # import paths are relative to venv *after* .deb installation
+	# run flask from new virtual environment
+	# avoid calling `flask` script directly
+	# import paths are relative to venv *after* .deb installation
 	FLASK_APP='$(VENV_BUILD_DIR)/portal/bin/manage.py' \
 	SECRET_KEY='' \
 	PATH='$(VENV_BUILD_DIR)/portal/bin' \
