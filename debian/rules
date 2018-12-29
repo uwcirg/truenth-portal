@@ -10,7 +10,7 @@ distclean:
 
 override_dh_virtualenv:
 	# Build front-end files
-	bin/build-frontend-translations.sh
+	bin/build-frontend-files.sh
 
 	# Remove self-referential requirement
 	# Otherwise a .egg-link file is created instead of actually installing portal module in site-packages/
