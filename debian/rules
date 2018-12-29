@@ -19,8 +19,8 @@ override_dh_virtualenv:
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 override_dh_builddeb:
-    # Todo: move to more appropriate step
-    # Manually fix paths erroneously pointing to build environment
+	# Todo: move to more appropriate step
+	# Manually fix paths erroneously pointing to build environment
 	find \
 		debian/portal/opt/venvs/portal/lib/ \
 		-name easy-install.pth \
