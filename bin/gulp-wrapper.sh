@@ -88,7 +88,7 @@ echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
 
 echo "Installing NodeJS dependencies..."
-npm --prefix "${repo_root}/portal" install
+npm --prefix "${repo_root}/portal" install --no-progress
 
 PATH="${PATH}:${repo_root}/portal/node_modules/gulp/bin"
 
