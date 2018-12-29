@@ -12,7 +12,7 @@ Usage:
    --help
           Show this help message
 
-    Compile all less files
+    Build all front-end files
 USAGE
 }
 
