@@ -3,9 +3,13 @@
 
 # dh-virtualenv options
 # https://dh-virtualenv.readthedocs.io/en/1.0/usage.html
-DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12' --extra-pip-arg='--progress-bar=off'
+DH_VIRTUALENV_ARGS = \
+    --preinstall='pip>=8' \
+    --preinstall='setuptools>=12' \
+    --extra-pip-arg='--progress-bar=off'
 
-VENV_DIR = '$(PWD)/debian/portal/opt/venvs'
+# Directory where venvs for dh-virtualenv packages are built
+VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
 
 distclean:
 	rm -Rf build debian/portal/ env
@@ -29,19 +33,22 @@ override_dh_builddeb:
 
 	# Manually fix paths erroneously pointing to build environment
 	find \
-		'$(VENV_DIR)/portal/lib/' \
+		'$(VENV_BUILD_DIR)/portal/lib/' \
 		-name easy-install.pth \
 		-exec \
 			sed \
 				--in-place \
-				--expression 's|$(VENV_DIR)/|/opt/venvs/|g' \
+				--expression 's|$(VENV_BUILD_DIR)/|/opt/venvs/|g' \
 				{} \; \
 		-print
 
 	# compile all back-end PO files to MO files
-	FLASK_APP='$(VENV_DIR)/portal/bin/manage.py' \
+    # run flask from new virtual environment
+    # avoid calling `flask` script directly
+    # import paths are relative to venv *after* .deb installation
+	FLASK_APP='$(VENV_BUILD_DIR)/portal/bin/manage.py' \
 	SECRET_KEY='' \
-	PATH='$(VENV_DIR)/portal/bin' \
+	PATH='$(VENV_BUILD_DIR)/portal/bin' \
 		python -m flask compile-po-files
 
 
