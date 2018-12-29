@@ -24,7 +24,7 @@ override_dh_virtualenv:
 
 override_dh_builddeb:
 	# lines preceding `dh_builddeb` occur after venv creation && `pip install`
-	# and before debian package creation
+	# but before debian package creation
 
 	# Manually fix paths erroneously pointing to build environment
 	find \
