@@ -697,77 +697,79 @@
         var __self = this;
         var userId = __self.userId, tnthAjax = this.__getDependency("tnthAjax"), orgTool = this.getOrgTool();
         var termsEvent = function() {
-            if ($(this).attr("data-agree") === "false") {
-                var types = $(this).attr("data-tou-type");
-                if (types) {
-                    var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
-                    arrTypes.forEach(function(type) {
-                        if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
-                            return true;
-                        }
-                        var theTerms = {};
-                        theTerms["agreement_url"] = dataUrl ? dataUrl : $("#termsURL").data().url;
-                        theTerms["type"] = type;
-                        var org = $("#userOrgs input[name='organization']:checked"),
-                            userOrgId = org.val();
-                        /*** if UI for orgs is not present, need to get the user org from backend ***/
-                        if (!userOrgId) {
-                            $.ajax({
-                                type: "GET",
-                                url: "/api/demographics/" + userId,
-                                async: false
-                            }).done(function(data) {
-                                if (data && data.careProvider) {
-                                    (data.careProvider).forEach(function(item) {
-                                        if (!userOrgId) {
-                                            userOrgId = item.reference.split("/").pop();
-                                            return true;
-                                        }
-                                    });
+            if ($(this).attr("data-agree") !== "false") {
+                return;
+            }
+            var types = $(this).attr("data-tou-type");
+            if (!types) {
+                return;
+            }
+            var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
+            arrTypes.forEach(function(type) {
+                if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
+                    return true;
+                }
+                var theTerms = {};
+                theTerms["agreement_url"] = dataUrl ? dataUrl : $("#termsURL").data().url;
+                theTerms["type"] = type;
+                var org = $("#userOrgs input[name='organization']:checked"),
+                    userOrgId = org.val();
+                /*** if UI for orgs is not present, need to get the user org from backend ***/
+                if (!userOrgId) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/demographics/" + userId,
+                        async: false
+                    }).done(function(data) {
+                        if (data && data.careProvider) {
+                            (data.careProvider).forEach(function(item) {
+                                if (!userOrgId) {
+                                    userOrgId = item.reference.split("/").pop();
+                                    return true;
                                 }
-                            }).fail(function() {});
+                            });
                         }
-                        if (userOrgId && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
-                            var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
-                            theTerms["organization_id"] = topOrg || userOrgId;
-                        }
-                        if (!theTerms["agreement_url"]) { //this will display error to user if information is missing - can't check for org id as user might not belong to an org just yet
-                            $("#topTerms .post-tou-error").html(i18next.t("Missing information for consent agreement.  Unable to complete request."));
-                            return;
-                        }
-                        tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
-                    });
+                    }).fail(function() {});
                 }
-                // Update UI
-                if (this.nodeName.toLowerCase() === "label") {
-                    $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
-                } else {
-                    $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+                if (userOrgId && parseInt(userOrgId) !== 0 && !isNaN(parseInt(userOrgId))) {
+                    var topOrg = orgTool.getTopLevelParentOrg(userOrgId);
+                    theTerms["organization_id"] = topOrg || userOrgId;
                 }
-                //adding css rule here so the checkbox won't be hidden on click
-                $(this).attr("current", "true");
-                $(this).attr("data-agree", "true");
+                if (!theTerms["agreement_url"]) { //this will display error to user if information is missing - can't check for org id as user might not belong to an org just yet
+                    $("#topTerms .post-tou-error").html(i18next.t("Missing information for consent agreement.  Unable to complete request."));
+                    return;
+                }
+                tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
+            });
+            // Update UI
+            if (this.nodeName.toLowerCase() === "label") {
+                $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+            } else {
+                $(this).closest("label").find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
+            }
+            //adding css rule here so the checkbox won't be hidden on click
+            $(this).attr("current", "true");
+            $(this).attr("data-agree", "true");
 
-                var coreTypes = [], parentCoreType = $(this).attr("data-core-data-type");
-                if (parentCoreType) {
-                    coreTypes.push(parentCoreType);
+            var coreTypes = [], parentCoreType = $(this).attr("data-core-data-type");
+            if (parentCoreType) {
+                coreTypes.push(parentCoreType);
+            }
+            $(this).closest("label").find("[data-core-data-type]").each(function() {
+                var coreDataType = $(this).attr("data-core-data-type");
+                if($.inArray(coreDataType, coreTypes) === -1) {
+                    coreTypes.push(coreDataType);
                 }
-                $(this).closest("label").find("[data-core-data-type]").each(function() {
-                    var coreDataType = $(this).attr("data-core-data-type");
-                    if($.inArray(coreDataType, coreTypes) === -1) {
-                        coreTypes.push(coreDataType);
+            });
+            if (coreTypes.length > 0) { //need to delete notification for each corresponding coredata terms type once user has agreed
+                coreTypes.forEach(function(type) {
+                    var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
+                    if (notificationEntry.length > 0) {
+                        Global.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id")); /*global Global */
                     }
                 });
-                if (coreTypes.length > 0) { //need to delete notification for each corresponding coredata terms type once user has agreed
-                    coreTypes.forEach(function(type) {
-                        var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
-                        if (notificationEntry.length > 0) {
-                            Global.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id")); /*global Global */
-                        }
-                    });
-                }
-                __self.handlePostEvent(__self.getSectionContainerId($(this)));
             }
+            __self.handlePostEvent(__self.getSectionContainerId($(this)));
         };
         $("#topTerms label.terms-label").each(function() { //account for the fact that some terms items are hidden as child elements to a label
             $(this).on("click", function() {

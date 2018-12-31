@@ -19,6 +19,7 @@
 {{footer(user=user)}}
 {% endblock %}
 {% block additional_scripts %}
-{% if about_tnth_editorUrl %}<script>Utility.appendLREditContainer($("#aboutTruenthContainer"), "{{about_tnth_editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER.value) %}true{% else %}false{%endif%});</script>{% endif %}
+{% if about_tnth_editorUrl %}<script>Utility.appendLREditContainer($("#aboutTruenthContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
+{% endif %}
 {% endblock %}
 

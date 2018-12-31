@@ -10,7 +10,7 @@
 {% endblock %}
 {% block additional_scripts %}
 	{% if editorUrl %}
-		<script>Utility.appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER.value) %}true{% else %}false{%endif%});</script>
+		<script>Utility.appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
 	{% endif %}
 {% endblock %}
 {% block document_ready %}

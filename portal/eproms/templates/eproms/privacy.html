@@ -21,6 +21,6 @@
 {% block additional_scripts %}
 	{% if editorUrl %}
 	<!-- TODO in a separate JS-->
-	<script>Utility.appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER.value) %}true{% else %}false{%endif%});</script>
+	<script>Utility.appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
 	{% endif %}
 {% endblock %}

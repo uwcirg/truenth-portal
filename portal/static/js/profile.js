@@ -385,13 +385,18 @@
                         self.demo.data.birthMonth = datesArray[1];
                         self.demo.data.birthYear = datesArray[0];
 
-                        var m = "", d = "", y = "", displayDeceasedDate = "";
+                        var m = "", d = "", y = "";
                         if (data.deceasedDateTime) {
                             var deceasedDateObj = new Date(data.deceasedDateTime);
                             m = self.pad(deceasedDateObj.getUTCMonth()+1);
                             d = deceasedDateObj.getUTCDate();
-                            y = deceasedDateObj.getUTCFullYear(); /*global pad*/
-                            displayDeceasedDate = self.modules.tnthDates.displayDateString(self.pad(m), self.pad(d), y);
+                            y = deceasedDateObj.getUTCFullYear();
+                            deceasedDateObj = new Date(deceasedDateObj.toUTCString().slice(0, -4));
+                            displayDeceasedDate = deceasedDateObj.toLocaleDateString("en-GB", { //use native date function
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                            });
                         }
                         self.demo.data.displayDeceasedDate = displayDeceasedDate;
                         self.demo.data.deceasedDay = d;

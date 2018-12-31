@@ -49,9 +49,6 @@ UtilityObj.prototype.loader = function(show) {
 UtilityObj.prototype.isDelayLoading = function() { /*global DELAY_LOADING*/
     return (typeof DELAY_LOADING !== "undefined") && DELAY_LOADING;
 };
-UtilityObj.prototype.isTouchDevice = function() {
-    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch);
-};
 UtilityObj.prototype.embedPortalWrapperContent = function(data) {
     if (data && !data.error) {
         $("#mainNav").html(data);
@@ -85,7 +82,7 @@ UtilityObj.prototype.newHttpRequest = function(url, params, callBack) { /* note:
                 callBack(xmlhttp.responseText);
                 self.requestAttempts = 0;
                 return;
-            } 
+            }
             if (self.requestAttempts < 3) {
                 setTimeout(function() {
                     self.newHttpRequest(url, params, callBack);
@@ -197,11 +194,9 @@ UtilityObj.prototype.convertToNumericField = function(field) {
     if (!field) {
         return;
     }
-    if (this.isTouchDevice()) {
-        field.each(function() {
-            $(this).prop("type", "tel");
-        });
-    }
+    field.each(function() {
+        $(this).prop("type", "tel");
+    });
 };
 UtilityObj.prototype.isString = function(obj) {
     return (Object.prototype.toString.call(obj) === "[object String]");
@@ -269,7 +264,7 @@ UtilityObj.prototype.VueErrorHandling = function() {
             }
         }
         self.restoreVis();
-        if (handler) { 
+        if (handler) {
             handler.call(current, err, vm, info);
             return;
         }
@@ -375,6 +370,9 @@ UtilityObj.prototype.displaySystemOutageMessage = function(locale) {
         }
     });
 };
+UtilityObj.prototype.isTouchDevice = function() { //method for identifying mobile devices
+    return true === ("ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch);
+};
 UtilityObj.prototype.setCustomJQueryEvents = function($) {
     if (!$) { return false; }
     var __winHeight = $(window).height();
@@ -438,7 +436,7 @@ UtilityObj.prototype.consolePolyFill = function() {
         // "assert", "clear", "count", "debug", "dir", "dirxml", "error", "group", "groupCollapsed", "groupEnd", "info", "log", "profile", "profileEnd", "time", "timeEnd", "timeStamp", "trace", "warn"
         // Chrome (2012. 10. 04.): https://developers.google.com/web-toolkit/speedtracer/logging-api
         // markTimeline(String)
-        // "markTimeline"    
+        // "markTimeline"
         assert: noop,
         clear: noop,
         trace: noop,

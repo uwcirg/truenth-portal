@@ -891,7 +891,7 @@
                         });
                         documents.forEach(function (item) {
                             var c = item["contributor"];
-                            if (!existingItems[c] && c) { //only draw the most recent, same report won't be displayed
+                            if (c && !existingItems[c]) { //only draw the most recent, same report won't be displayed
                                 if (options.documentDataType && String(options.documentDataType).toLowerCase() !== String(c).toLowerCase()) {
                                     return false;
                                 }
