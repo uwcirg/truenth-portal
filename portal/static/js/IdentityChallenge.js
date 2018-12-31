@@ -1,4 +1,4 @@
-$(document).ready(function() { /*global $ */
+$(document).ready(function() { /*global $ Utility */
     var fmBirthDate = $("#birthdate").val();
     if (fmBirthDate) {
         var arrDate = String(fmBirthDate).split("-");
@@ -16,7 +16,9 @@ $(document).ready(function() { /*global $ */
         $(this).val($.trim($(this).val()));
     });
     //display keyboard for numeric fields on mobile devices
-    __convertToNumericField($("#date, #year")); /*global __convertToNumericField */
+    if (Utility.isTouchDevice()) {
+        Utility.convertToNumericField($("#date, #year")); /*global Utility convertToNumericField */
+    }
 
     $("#challengeForm").validator().on("submit", function (e) {
         if (e.isDefaultPrevented()) {

@@ -12,12 +12,15 @@
 {% block document_ready %}
 	{% if request.args.get("disableLinks", "") %}
 	$("document").ready(function() {
-		setTimeout("disableHeaderFooterLinks();", 1000);
+		setTimeout(function() {
+			Utility.disableHeaderFooterLinks();
+		}, 1000);
 	});
 	{% endif %}
 {% endblock %}
 {% block additional_scripts %}
 	{% if editorUrl %}
-	<script>appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER.value) %}true{% else %}false{%endif%});</script>
+	<!-- TODO in a separate JS-->
+	<script>Utility.appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
 	{% endif %}
 {% endblock %}

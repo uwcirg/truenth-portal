@@ -100,7 +100,7 @@
         dialogElement.style.top = ((window.innerHeight - domRect.height) / 3) + "px";
     };
     CookieMonster.prototype.initModal = function() {
-        if (getUrlParameter("redirect")) { /*global getUrlParameter */
+        if (Utility.getUrlParameter("redirect")) { /*global Utility getUrlParameter */
             return false; //do not init modal if this is coming from a redirect as to privacy page
         }
         var modalElement = document.getElementById(this.modalElementId);
