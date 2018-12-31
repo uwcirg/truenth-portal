@@ -4,6 +4,7 @@
 # dh-virtualenv options
 # https://dh-virtualenv.readthedocs.io/en/1.0/usage.html
 DH_VIRTUALENV_ARGS = \
+	--python='/usr/bin/python2' \
 	--preinstall='pip>=8' \
 	--preinstall='setuptools>=12' \
 	--extra-pip-arg='--progress-bar=off'
