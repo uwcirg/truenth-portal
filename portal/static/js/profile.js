@@ -385,7 +385,7 @@
                         self.demo.data.birthMonth = datesArray[1];
                         self.demo.data.birthYear = datesArray[0];
 
-                        var m = "", d = "", y = "";
+                        var m = "", d = "", y = "", displayDeceasedDate = "";
                         if (data.deceasedDateTime) {
                             var deceasedDateObj = new Date(data.deceasedDateTime);
                             m = self.pad(deceasedDateObj.getUTCMonth()+1);
