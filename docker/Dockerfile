@@ -30,7 +30,6 @@ SHELL ["/bin/bash", "-c"]
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=${PROJECT_DIR}/bin/manage.py \
-    PATH=${PROJECT_DIR}/bin:${PATH} \
     PERSISTENCE_DIR=gil \
     PORT=8008 \
     SERVER_NAME=localhost \
