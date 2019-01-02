@@ -7,7 +7,7 @@ ENV \
 RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
-    apt-get install --yes --no-install-recommends \
+    apt-get install --quiet --yes --no-install-recommends \
         ca-certificates \
         libpq5 \
         python2.7 \
@@ -28,7 +28,7 @@ RUN \
 
 RUN \
     apt-get update && \
-    apt-get install --yes --allow-unauthenticated portal && \
+    apt-get install --quiet --yes --allow-unauthenticated portal && \
     apt-get clean && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
