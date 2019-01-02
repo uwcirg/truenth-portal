@@ -20,8 +20,8 @@ RUN \
 
 # Allow repo and branch to be overridden with environment variable
 ENV \
-    GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
-    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
+    GIT_REPO="https://github.com/uwcirg/true_nth_usa_portal" \
+    ARTIFACT_DIR="/tmp/artifacts"
 
 RUN \
     pip install --upgrade setuptools && \
