@@ -359,7 +359,7 @@ def access_via_token(token, next_step=None):
                 abort(400, "Invalid state - access denied")
 
             # only give such tokens 5 minutes - recheck validity
-            verify_token(valid_seconds=5 * 60)
+            verify_token(token, valid_seconds=5 * 60)
             auditable_event("promoting user without challenge via token, "
                             "pending registration", user_id=user.id,
                             subject_id=user.id, context='account')
