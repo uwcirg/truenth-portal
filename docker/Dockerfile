@@ -5,14 +5,14 @@ ENV \
     DEBIAN_FRONTEND="noninteractive"
 
 RUN \
-    apt-get update && \
-    apt-get dist-upgrade --yes && \
-    apt-get install --quiet --yes --no-install-recommends \
+    apt-get update --quiet && \
+    apt-get dist-upgrade --quiet --quiet && \
+    apt-get install --quiet --quiet --no-install-recommends \
         ca-certificates \
         libpq5 \
         python2.7 \
         wait-for-it && \
-    apt-get clean
+    apt-get clean --quiet
 
 ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
 
