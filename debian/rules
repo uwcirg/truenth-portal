@@ -17,6 +17,9 @@ distclean:
 override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install
 
+	# Build front-end files
+	bin/build-frontend-files.sh
+
 	# Build front-end translations (JSON) from gettext files (PO)
 	bin/build-frontend-translations.sh
 
