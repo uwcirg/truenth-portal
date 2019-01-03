@@ -1,8 +1,8 @@
 FROM debian:stretch
 
 ENV \
-    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}" \
-    DEBIAN_FRONTEND="noninteractive"
+    ARTIFACT_DIR=/tmp/artifacts \
+    DEBIAN_FRONTEND=noninteractive
 
 RUN \
     apt-get update --quiet && \
@@ -39,6 +39,7 @@ ENV \
     PROJECT_DIR="/opt/venvs/portal" \
     RUN_USER="${RUN_USER:-www-data}"
 
+# Todo: move to debian package postinst script
 RUN \
     mkdir --parents \
         "${FILE_UPLOAD_DIR}" \
