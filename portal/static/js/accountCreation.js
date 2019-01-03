@@ -1,5 +1,5 @@
 (function() {
-    var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global hasValue pad __getLoaderHTML $ tnthDates _isTouchDevice*/
+    var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global pad $ tnthDates Utility isTouchDevice*/
         this.attempts = 0;
         this.maxAttempts = 3;
         this.params = null;
@@ -16,7 +16,7 @@
 
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
-            if (!hasValue(parentOrgId)) {
+            if (!parentOrgId) {
                 parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
             }
             return parentOrgId;
@@ -45,7 +45,7 @@
             params.callback = params.callback || function() {};
 
             var self = this;
-            if (!hasValue(params.apiUrl)) {
+            if (!params.apiUrl) {
                 (params.callback).call(self, {"error": "API url is required."});
                 return false;
             }
@@ -127,7 +127,7 @@
             _demoArray["telecom"] = [];
 
             var emailVal = $.trim($("input[name=email]").val());
-            if (hasValue(emailVal)) {
+            if (emailVal) {
                 _demoArray["telecom"].push({ "system": "email", "value": emailVal });
             } else {
                 _demoArray["telecom"].push({ "system": "email", "value": "__no_email__"});
@@ -147,7 +147,7 @@
             }
 
             var studyId = $("#profileStudyId").val();
-            if (hasValue(studyId)) {
+            if (studyId) {
                 var studyIdObj = {
                     system: SYSTEM_IDENTIFIER_ENUM.external_study_id,
                     use: "secondary",
@@ -160,7 +160,7 @@
             }
 
             var siteId = $("#profileSiteId").val();
-            if (hasValue(siteId)) {
+            if (siteId) {
                 var siteIdObj = {
                     system: SYSTEM_IDENTIFIER_ENUM.external_site_id,
                     use: "secondary",
@@ -275,7 +275,7 @@
         this.__handleDisplay = function(responseObj) {
             var err = responseObj && responseObj.error ? responseObj.error: null;
             var self = this;
-            if (!hasValue(err)) {
+            if (!err) {
                 setTimeout(function() { 
                     self.__handleButton();
                     $("#confirmMsg").fadeIn();
@@ -293,7 +293,7 @@
             }
         };
         this.__handleError = function(errorMessage) {
-            if (hasValue(errorMessage)) {
+            if (errorMessage) {
                 $("#serviceErrorMsg").html("<small>" + i18next.t("[Processing error] ") + errorMessage + "</small>").fadeIn();
             }
         };
@@ -334,7 +334,7 @@
 
             /* check all required fields to make sure all fields are filled in */
             $("input[required], select[required]").each(function() {
-                if (!hasValue($(this).val())) {
+                if (!$(this).val()) {
                     //this should display error message associated with empty field
                     if (!silent) {
                         $(this).trigger("focusout");
@@ -504,10 +504,10 @@
                 orgs[consentOrgId] = true;
                 var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val() || $("#stock_consent_url").val();
                 agreement = (agreement||"").replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
-                if (hasValue(agreement)) {
+                if (agreement) {
                     var ct = $("#consentDate").val();
                     var consentItem = {};
-                    if (hasValue(ct)) {
+                    if (ct) {
                         consentItem["acceptance_date"] = ct;
                     }
                     consentItem["organization_id"] = consentOrgId;
@@ -526,14 +526,15 @@
             }
             //default consent date to today's date
             var today = new Date();
-            var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear()); /*global pad*/
+            var pad = function(n) {n = parseInt(n); return (n < 10) ? "0" + n : n;};
+            var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
             var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
             $("#consentDay").val(td);
             $("#consentMonth").val(tm);
             $("#consentYear").val(ty);
             //saving the consent date in GMT - default to today's date
             $("#consentDate").val(tnthDates.getDateWithTimeZone(tnthDates.getDateObj(ty, tm, td, th, tmi, ts)));
-            if (_isTouchDevice()) {
+            if (Utility.isTouchDevice()) {
                 $("#consentDay, #consentYear").each(function() {
                     $(this).attr("type", "tel");
                 });
@@ -563,6 +564,9 @@
                 }
             });
         };
+        this.__getLoaderHTML = function(message) {
+            return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (message ? "&nbsp;" + message : "") + '</div>';
+        };
     };
 
     //events associated with elements on the account creation page
@@ -578,8 +582,8 @@
         aco.getOrgs(aco.populateOrgsByRole);
         aco.handleEditConsentDate();
         $("#createProfileForm .optional-diplay-text").removeClass("tnth-hide");
-        $("#createProfileForm .back-button-container").prepend(__getLoaderHTML());
-        $("#createProfileForm .save-button-container").prepend(__getLoaderHTML());
+        $("#createProfileForm .back-button-container").prepend(aco.__getLoaderHTML());
+        $("#createProfileForm .save-button-container").prepend(aco.__getLoaderHTML());
         $("#createProfileForm .btn-tnth-back").on("click", function(e) {
             e.preventDefault();
             $(this).prev(".loading-message-indicator").show();

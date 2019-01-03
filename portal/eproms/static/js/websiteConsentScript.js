@@ -1,5 +1,5 @@
 (function() {
-    /*global getUrlParameter*/
+    /*global Utility getUrlParameter*/
     var typeInTous = function(data, type, status) {
         var found = false, isActive = String(status) === "active";
         (data.tous).forEach(function(item) {
@@ -39,9 +39,9 @@
             });
         }
     };
-    var patientId = getUrlParameter("subject_id");
-    var entryMethod = getUrlParameter("entry_method");
-    var urlRedirect = getUrlParameter("redirect_url");
+    var patientId = Utility.getUrlParameter("subject_id");
+    var entryMethod = Utility.getUrlParameter("entry_method");
+    var urlRedirect = Utility.getUrlParameter("redirect_url");
     var topOrgName = $("#wcsTopOrganization").attr("data-name");
     var topOrgId = $("#wcsTopOrganization").attr("data-id");
     var tVar = setInterval(function() {

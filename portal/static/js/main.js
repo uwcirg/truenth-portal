@@ -494,8 +494,8 @@ var tnthAjax = {
         callback = callback || function() {};
         params.attempts++;
         fieldHelper.showLoader(targetField);
-        if (params.useWorker && window.Worker && !_isTouchDevice()) { /*global _isTouchDevice()*/
-            initWorker(url, params, function(result) { /*global initWorker*/
+        if (params.useWorker && window.Worker && !Utility.isTouchDevice()) { /*global isTouchDevice()*/
+            Utility.initWorker(url, params, function(result) { /*global initWorker*/
                 var data;
                 try {
                     data = JSON.parse(result);
@@ -1918,7 +1918,7 @@ var tnthDates = {
         if ($("#userSessionLocale").val()) {
             return $("#userSessionLocale").val(); //note this is a template variable whose value is set at the backend.  Note, it will set to EN_US pre-authentication, cannot set sessionStorage here as it will be incorrect
         }
-        if (!checkJQuery()) { /*global checkJQuery */
+        if (!Utility.checkJQuery()) { /*global checkJQuery */
             return false;
         }
         var userSessionLocale = $("#userSessionLocale").val();
@@ -2014,7 +2014,7 @@ var tnthDates = {
     }
 
 };
-/*global tnthAjax OrgTool tnthDates SYSTEM_IDENTIFIER_ENUM embed_page $ */
+/*global tnthAjax OrgTool tnthDates SYSTEM_IDENTIFIER_ENUM Utility $ */
 /*global i18next */
 var Global = {
     "registerModules": function() { //TODO use webpack or requireJS to import modules?
@@ -2032,15 +2032,15 @@ var Global = {
     "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         callback = callback || function() {};
         var self = this;
-        sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
+        Utility.sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
                 tnthAjax.reportError("", PORTAL_NAV_PAGE, data.error || i18next.t("Error loading portal wrapper"), true);
                 $("#mainNavLoadingError").html(i18next.t("Error loading portal wrapper"))
-                restoreVis(); /*global restoreVis */
+                Utility.restoreVis(); /*global restoreVis */
                 callback();
                 return false;
             }
-            embed_page(data);
+            Utility.embedPortalWrapperContent(data);
             setTimeout(function() {
                 $("#tnthNavWrapper .logout").on("click", function(event) {
                     event.stopImmediatePropagation();
@@ -2058,7 +2058,7 @@ var Global = {
         if (LOGIN_AS_PATIENT) {
             tnthDates.clearSessionLocale();
             tnthDates.getUserLocale(); /*global tnthDates */ //need to clear current user locale in session storage when logging in as patient
-            resetBrowserBackHistory(); /*global resetBrowserBackHistory */
+            Utility.resetBrowserBackHistory(); /*global resetBrowserBackHistory */
         }
     },
     "handleLogout": function() {
@@ -2068,7 +2068,7 @@ var Global = {
     "unloadEvent": function() {
         var self = this;
         $(window).on("beforeunload", function() {
-            if (getUrlParameter("logout")) { //taking into consideration that user may type in logout in url
+            if (Utility.getUrlParameter("logout")) { //taking into consideration that user may type in logout in url
                 self.handleLogout();
             }
         });
@@ -2324,21 +2324,20 @@ var userSetLang = tnthDates.getUserLocale();
 Global.registerModules();
 __i18next.init({"lng": userSetLang
 }, function() {
-    if (!checkJQuery()) { alert("JQuery library necessary for this website was not loaded.  Please refresh your browser and try again."); return false; }
+    if (!Utility.checkJQuery()) { alert("JQuery library necessary for this website was not loaded.  Please refresh your browser and try again."); return false; }
     if (typeof i18next === "undefined") { i18next = {t: function(key) { return key; }}; } //fallback for i18next in older browser?
+    Utility.init();
     $(document).ready(function() {
         //note: display system outage message only after i18next has been instantiated - allowing message to be translated
-        displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
+        Utility.displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
         var PORTAL_NAV_PAGE = window.location.protocol + "//" + window.location.host + "/api/portal-wrapper-html/";
-        if (PORTAL_NAV_PAGE) {
-            loader(true); /*global loader restoreVis*/
-            try {
-                Global.initPortalWrapper(PORTAL_NAV_PAGE);
-            } catch(e) {
-                tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
-                restoreVis();
-            }
-        } else { restoreVis();  }
+        Utility.loader(true); /*global loader restoreVis*/
+        try {
+            Global.initPortalWrapper(PORTAL_NAV_PAGE);
+        } catch(e) {
+            tnthAjax.reportError("", PORTAL_NAV_PAGE, i18next.t("Error loading portal wrapper"), true);
+            Utility.restoreVis();
+        }
         if ($("#alertModal").length > 0) {  $("#alertModal").modal("show");}
         tnthAjax.beforeSend();
         Global.unloadEvent();
@@ -2347,3 +2346,4 @@ __i18next.init({"lng": userSetLang
         Global.initValidator();
     });
 });
+

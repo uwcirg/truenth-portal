@@ -46,7 +46,7 @@ imagesize==1.1.0          # via sphinx
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==2.6.0
-kombu==4.2.2              # via celery
+kombu==4.2.2.post1              # via celery
 mako==1.0.7               # via alembic
 markupsafe==1.1.0           # via jinja2, mako
 mock==2.0.0
@@ -87,7 +87,7 @@ typing==3.6.6             # via sphinx
 urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.4               # via amqp
-virtualenv==16.1.0        # via tox
+virtualenv==16.2.0        # via tox
 waitress==1.1.0           # via webtest
 webob==1.8.4              # via webtest
 webtest==2.0.32           # via flask-webtest

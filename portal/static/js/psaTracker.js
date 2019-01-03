@@ -27,7 +27,7 @@
             }
         },
         created: function() {
-            VueErrorHandling(); /*global VueErrorHandling */
+            Utility.VueErrorHandling(); /*global Utility VueErrorHandling */
         },
         data: {
             userId: "",

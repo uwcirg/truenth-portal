@@ -33,7 +33,7 @@
         },
         created: function() {
             var self = this;
-            VueErrorHandling(); /*global VueErrorHandling */
+            Utility.VueErrorHandling(); /*global Utility VueErrorHandling */
             this.registerDependencies();
             this.getOrgTool();
             this.setUserSettings();
@@ -388,10 +388,15 @@
                         var m = "", d = "", y = "", displayDeceasedDate = "";
                         if (data.deceasedDateTime) {
                             var deceasedDateObj = new Date(data.deceasedDateTime);
-                            m = pad(deceasedDateObj.getUTCMonth()+1);
+                            m = self.pad(deceasedDateObj.getUTCMonth()+1);
                             d = deceasedDateObj.getUTCDate();
-                            y = deceasedDateObj.getUTCFullYear(); /*global pad*/
-                            displayDeceasedDate = self.modules.tnthDates.displayDateString(pad(m), pad(d), y);
+                            y = deceasedDateObj.getUTCFullYear();
+                            deceasedDateObj = new Date(deceasedDateObj.toUTCString().slice(0, -4));
+                            displayDeceasedDate = deceasedDateObj.toLocaleDateString("en-GB", { //use native date function
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                            });
                         }
                         self.demo.data.displayDeceasedDate = displayDeceasedDate;
                         self.demo.data.deceasedDay = d;
@@ -583,9 +588,7 @@
                         if ($(this).attr("data-update-on-validated")) {
                             triggerEvent = "blur";
                         }
-                        if (_isTouchDevice()) { /*_isTouchDevice global */
-                            triggerEvent = "change"; //account for mobile devices touch events
-                        }
+                        triggerEvent = triggerEvent + " change";
                         if ($(this).attr("type") === "text") {
                             $(this).on("keypress", function(e) {
                                 e.stopPropagation();
@@ -2358,7 +2361,6 @@
                         if (isValid) {
                             var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
                             var consentDate = $("#manualEntryConsentDate").val();
-                            var pad = function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; };
                             if (errorMsg || !consentDate) {
                                 self.manualEntry.errorMessage = i18next.t("All date fields are required");
                                 return false;
@@ -2810,7 +2812,7 @@
                     }
                     var h = $("#consentDateModal_hour").val()||"00",m = $("#consentDateModal_minute").val()||"00",s = $("#consentDateModal_second").val()||"00";
                     var dt = new Date(ct.val()); //2017-07-06T22:04:50 format
-                    var cDate = dt.getFullYear()+"-"+(dt.getMonth() + 1)+"-"+dt.getDate()+"T"+pad(h)+":"+pad(m)+":"+pad(s);
+                    var cDate = dt.getFullYear()+"-"+(dt.getMonth() + 1)+"-"+dt.getDate()+"T"+__self.pad(h)+":"+__self.pad(m)+":"+__self.pad(s);
                     o.org = ct.attr("data-orgId");
                     o.agreementUrl = ct.attr("data-agreementUrl");
                     o.acceptance_date = cDate;
@@ -2935,6 +2937,7 @@
                 }, 50);
                 this.consent.consentLoading = false;
             },
+            pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },
             __convertToNumericField: function(field) {
                 if (field && ("ontouchstart" in window || (typeof(window.DocumentTouch) !== "undefined" && document instanceof window.DocumentTouch))) {
                     field.each(function() {$(this).prop("type", "tel");});

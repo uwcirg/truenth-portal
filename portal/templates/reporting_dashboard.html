@@ -280,38 +280,38 @@
 {% block table_export_filter_script %}
 {{super()}}
 {% endblock %}
-{% block document_ready %}
+{% block document_ready %} //TODO move this to a separate JS
     /*
      * initiate bootstrapTable for all stats table
      */
     $("#orgStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("OrganizationList_")
+          fileName: Utility.getExportFileName("OrganizationList_")
       }
     });
     $("#usageStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("UsageStatsList_")
+          fileName: Utility.getExportFileName("UsageStatsList_")
       }
     });
     $("#userRoleStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("UserByRoleStatsList_")
+          fileName: Utility.getExportFileName("UserByRoleStatsList_")
       }
     });
     $("#userIntervStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("UserByInterventionStatsList_")
+          fileName: Utility.getExportFileName("UserByInterventionStatsList_")
       }
     });
     $("#userPatientReportStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("UserByPatientReportStatsList_")
+          fileName: Utility.getExportFileName("UserByPatientReportStatsList_")
       }
     });
     $("#userIntervAccessStatsTable").bootstrapTable({
       exportOptions: {
-          fileName: __getExportFileName("UserByInterventionAccessStatsList_")
+          fileName: Utility.getExportFileName("UserByInterventionAccessStatsList_")
       }
     });
 
@@ -325,7 +325,7 @@
                 $("ul.nav li").removeClass("active");
                 $(this).addClass("active");
                 var containerID = $(this).find("a").attr("data-id");
-                if (hasValue(containerID)) {
+                if (containerID) {
                     $(".stats-container").removeClass("active");
                     $("#"+containerID+"_container").addClass("active");
                 };

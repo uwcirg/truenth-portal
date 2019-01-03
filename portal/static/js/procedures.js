@@ -83,7 +83,7 @@
             }
             var self = this, url =  "/patients/treatment-options";
             if (window.Worker) {
-                initWorker(url, {cache: true}, function(result) { /*global initWorker */
+                Utility.initWorker(url, {cache: true}, function(result) { /*global Utility */
                     var data = JSON.parse(result);
                     self.setTreatmentOptionsSelector(data.treatment_options);
                 });
