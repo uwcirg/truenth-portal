@@ -42,10 +42,16 @@ override_dh_builddeb:
 				{} \; \
 		-print
 
+
+	# change directory to something other than the original checkout
+	# `flask` commands will ignore given entrypoint (FLASK_APP) otherwise
+	# Todo: figure out underlying cause
+
 	# compile all back-end PO files to MO files
 	# run flask from new virtual environment
 	# avoid calling `flask` script directly
 	# import paths are relative to venv *after* .deb installation
+	cd / && \
 	FLASK_APP='$(VENV_BUILD_DIR)/portal/bin/manage.py' \
 	SECRET_KEY='' \
 	PATH='$(VENV_BUILD_DIR)/portal/bin' \
