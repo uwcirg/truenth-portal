@@ -17,6 +17,7 @@ RUN \
         python-dev \
         python-pip \
         python-setuptools \
+        python-setuptools-scm \
         python-wheel && \
     apt-get clean
 
