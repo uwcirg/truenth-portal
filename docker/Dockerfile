@@ -27,9 +27,9 @@ RUN \
     fi
 
 RUN \
-    apt-get update && \
-    apt-get install --quiet --yes --allow-unauthenticated portal && \
-    apt-get clean && \
+    apt-get update --quiet && \
+    apt-get install --quiet --quiet --allow-unauthenticated portal && \
+    apt-get clean --quiet && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
