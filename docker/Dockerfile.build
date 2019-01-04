@@ -34,6 +34,7 @@ WORKDIR /root/portal
 # Allow repo and branch to be overridden with environment variable
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
+
     yes | make-deb && \
     git checkout \
         debian/artifacts \
