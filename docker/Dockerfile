@@ -72,11 +72,11 @@ CMD \
         --host="$PGHOST" \
         --port="$PGPORT" \
         --strict \
-    && \
+    -- \
 
-    flask sync && \
+        flask sync && \
 
-    gunicorn \
-        --bind "0.0.0.0:${PORT}" \
-        --timeout ${TIMEOUT} \
-    wsgi:application
+        gunicorn \
+            --bind "0.0.0.0:${PORT}" \
+            --timeout ${TIMEOUT} \
+        wsgi:application
