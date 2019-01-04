@@ -2,7 +2,8 @@ FROM debian:stretch
 
 ENV \
     ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}" \
-    DEBIAN_FRONTEND="noninteractive"
+    DEBIAN_FRONTEND="noninteractive" \
+    LANG="C.UTF-8"
 
 RUN \
     apt-get update && \
