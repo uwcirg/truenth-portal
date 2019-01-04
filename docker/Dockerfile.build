@@ -43,7 +43,7 @@ CMD \
     && \
 
     dpkg-buildpackage --unsigned-source --unsigned-changes && \
-    mv /root/portal_* "${ARTIFACT_DIR}" && \
+    mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
     cd "${ARTIFACT_DIR}" && \
     dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz" && \
