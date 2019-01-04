@@ -1,12 +1,14 @@
 FROM debian:stretch
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV \
+    ARTIFACT_DIR=/tmp/artifacts \
+    DEBIAN_FRONTEND=noninteractive \
+    GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
 RUN \
-    apt-get update && \
-    apt-get install --yes --no-install-recommends apt-utils && \
-    apt-get dist-upgrade --yes && \
-    apt-get install --yes --no-install-recommends \
+    apt-get update --quiet && \
+    apt-get dist-upgrade --quiet --quiet && \
+    apt-get install --quiet --quiet --no-install-recommends \
         build-essential \
         debhelper \
         dh-virtualenv\
@@ -16,24 +18,23 @@ RUN \
         libffi-dev \
         libpq-dev \
         python-dev \
-        python-pip && \
-    apt-get clean
+        python-pip \
+        python-setuptools \
+        python-setuptools-scm \
+        python-wheel && \
+    apt-get clean --quiet
 
-# Allow repo and branch to be overridden with environment variable
-ENV \
-    GIT_REPO="${GIT_REPO:-https://github.com/uwcirg/true_nth_usa_portal}" \
-    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}"
 
 RUN \
-    pip install --upgrade setuptools && \
-    pip install wheel && \
     pip install make-deb && \
     mkdir --parents "${ARTIFACT_DIR}"
 
 WORKDIR /root/portal
 
+# Allow repo and branch to be overridden with environment variable
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
+
     yes | make-deb && \
     git checkout \
         debian/artifacts \
@@ -43,7 +44,7 @@ CMD \
     && \
 
     dpkg-buildpackage --unsigned-source --unsigned-changes && \
-    mv /root/portal_* "${ARTIFACT_DIR}" && \
+    mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
     cd "${ARTIFACT_DIR}" && \
     dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz" && \
