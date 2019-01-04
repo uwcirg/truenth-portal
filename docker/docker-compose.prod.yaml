@@ -1,6 +1,6 @@
 # docker-compose production overrides
 ---
-version: "3.2"
+version: "3.4"
 services:
   web:
     restart: unless-stopped

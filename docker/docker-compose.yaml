@@ -1,5 +1,5 @@
 ---
-version: "3.2"
+version: "3.4"
 services:
   # Base service; for extension only, not for direct use
   base: &service_base
