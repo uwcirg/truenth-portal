@@ -27,8 +27,11 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
     def setUp(self):
         """Reset all tables before testing."""
 
-        if "SAUCE_USERNAME" in os.environ and "SAUCE_ACCESS_KEY" in os.environ:
-
+        if "SAUCE_USERNAME" in os.environ:
+            # Configure driver for Sauce Labs
+            # Presumes tunnel setup by Sauce Connect
+            # On TravisCI, Sauce Connect tunnel setup by Sauce Labs addon
+            # https://docs.travis-ci.com/user/sauce-connect
             platform = {
                 "browserName": "firefox",
                 "platform": "Windows 10",
@@ -63,10 +66,11 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
             )
 
         else:
-            self.xvfb = xvfbwrapper.Xvfb()
-            self.addCleanup(self.xvfb.stop)
-            self.xvfb.start()
-
+            if "DISPLAY" not in os.environ:
+                # Non-graphical environment; use xvfb
+                self.xvfb = xvfbwrapper.Xvfb()
+                self.addCleanup(self.xvfb.stop)
+                self.xvfb.start()
             self.driver = webdriver.Firefox(timeout=60)
 
         self.addCleanup(self.driver.quit)
@@ -126,7 +130,6 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
         # Update job result metadata on Sauce Labs, if available
         if (
             "SAUCE_USERNAME" in os.environ and
-            "SAUCE_ACCESS_KEY" in os.environ and
 
             # No exception being handled - test completed successfully
             sys.exc_info() == (None, None, None)
