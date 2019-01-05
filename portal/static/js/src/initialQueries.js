@@ -768,7 +768,11 @@ import Utility from "./modules/Utility.js";
                 coreTypes.forEach(function(type) {
                     var notificationEntry = $("#notificationBanner [data-name='" + type + "_update']");
                     if (notificationEntry.length > 0) {
-                        Global.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id")); /*global Global */
+                        try {
+                            window.portalModules.Global.deleteNotification($("#notificationUserId").val(), notificationEntry.attr("data-id")); /*global Global */
+                        } catch(e) {
+                            alert(i18next.t("Error occurred deleting notification"));
+                        }
                     }
                 });
             }

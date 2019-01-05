@@ -13,6 +13,7 @@ export default { /*global i18next */ /*initializing functions performed only onc
         if (typeof i18next !== "undefined") {
             window.portalModules.i18next = i18next;
         }
+        window.portalModules.Global = this;
     },
     "checkJQuery": function() {
         if (typeof jQuery === "undefined") {
