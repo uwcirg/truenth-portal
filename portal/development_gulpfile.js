@@ -198,5 +198,5 @@ gulp.task("watchPsaTracker", function() {
     gulp.watch(lessPath + "/" + PSATRACKER + ".less", ["psaTrackerLess"]);
 });
 gulp.task("lessAll", ["epromsLess", "portalLess", "topnavLess", "gilLess", "psaTrackerLess"], function() {
-    console.log("Compiling less files completed.");
+    console.log("Compiling less files completed."); /*eslint no-console: off */
 });

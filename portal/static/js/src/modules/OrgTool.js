@@ -1,6 +1,6 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
-export default (function() {
+export default (function() { /*global i18next */
     var OrgObj = function(orgId, orgName, parentOrg) {
         this.id = orgId;
         this.name = orgName;
@@ -91,7 +91,7 @@ export default (function() {
         if (orgId && orgsList.hasOwnProperty(orgId)) {
             return orgsList[orgId].name;
         }
-        return ""; 
+        return "";
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs=[]) {
         if (leafOrgs.length === 0) { return false; }
@@ -166,7 +166,9 @@ export default (function() {
     };
     OrgTool.prototype.getOrgName = function(orgId){
         var org = this.orgsList[orgId];
-        if (!org) return "";
+        if (!org) {
+            return "";
+        }
         return org.name;
     };
     OrgTool.prototype.populateOrgsList = function(items) {
@@ -254,7 +256,7 @@ export default (function() {
                 }
             });
             return s;
-        }
+        };
         var keys = Object.keys(orgsList), parentOrgsArray = [];
         keys = keys.sort();
         keys.forEach(function(org) { //draw parent orgs first
@@ -286,7 +288,7 @@ export default (function() {
                 if ($("#userOrgs label[id='org-label-" + org + "']").length === 0) {
                     parentDiv.classList.add("parent-org-container", "parent-singleton");
                     parentContent = `<label id="org-label-${org}" class="org-label">
-                        <input class="clinic" type="checkbox" name="organization" parent_org="true" id="${org}_org" state="${parentState}" value="${org}" 
+                        <input class="clinic" type="checkbox" name="organization" parent_org="true" id="${org}_org" state="${parentState}" value="${org}"
                         data-parent-id="${org}"  data-org-name="${parentOrgName}" data-short-name="${orgShortName}" data-parent-name="${parentOrgName}"/><span>${parentOrgName}</span></label></div>`;
                 }
             }
@@ -381,7 +383,7 @@ export default (function() {
     OrgTool.prototype.getChildOrgs = function(orgs, orgList=[]) {
         if (!orgs || (orgs.length === 0)) {
             return orgList;
-        } 
+        }
         var mainOrgsList = this.getOrgsList(), childOrgs = [];
         orgs.forEach(function(org) {
             var o = mainOrgsList[org.id];

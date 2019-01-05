@@ -57,7 +57,7 @@ var Utility = (function() {
         this.requestAttempts++;
         var xmlhttp, self = this;
         callBack = callBack || function() {};
-        if (window.XDomainRequest) {
+        if (window.XDomainRequest) { /*global XDomainRequest */
             xmlhttp = new XDomainRequest();
             xmlhttp.onload = function() {
                 callBack(xmlhttp.responseText);

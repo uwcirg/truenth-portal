@@ -2,7 +2,7 @@ import Utility from "./Utility.js";
 import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
-export default {
+export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
@@ -96,7 +96,7 @@ export default {
         params.page_url = page_url ? page_url : window.location.href;
         params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
         if (window.console) {
-            console.log("Errors occurred.....");
+            console.log("Errors occurred....."); /*eslint no-console: off */
             console.log(params); /*global console*/
         }
         $.ajax({
@@ -304,8 +304,8 @@ export default {
         var consented = this.hasConsent(userId, params.org, status);
         var __url = "/api/user/" + userId + "/consent";
         if (consented && !params.testPatient) {
-        	callback({"error": false});
-        	return;
+            callback({"error": false});
+            return;
         }
         var data = {};
         data.user_id = userId;
@@ -408,7 +408,7 @@ export default {
     },
     hasConsent: function(userId, orgId, filterStatus) {  /****** NOTE - this will return the latest updated consent entry *******/
         if (!userId || !orgId || String(filterStatus) === "default") { return false; }
-        var consentedOrgIds = [], expired = 0, found = false, suspended = false, item = null;
+        var consentedOrgIds = [];
         var __url = "/api/user/" + userId + "/consent", self = this;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
             if (!data || data.error || (data.consent_agreements && data.consent_agreements.length === 0)) {
@@ -813,7 +813,7 @@ export default {
             if (!data || data.error) {
                 $(".post-tou-error").html(i18next.t("Server error occurred saving terms of use information."));
                 callback(data);
-                return
+                return;
             }
             $(".post-tou-error").html("");
             callback(data);
@@ -953,15 +953,11 @@ export default {
         }
         params = params || {};
         this.sendRequest("/api/user/" + userId + "/questionnaire_bank", "GET", userId, {data: {as_of_date: completionDate}, sync: params.sync ? true : false}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
+                return false;
             }
+            callback(data);
         });
     },
     "patientReport": function(userId, params, callback) {
@@ -990,13 +986,11 @@ export default {
         }
         params = params || {};
         this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred setting table preference.")});
-                }
+            if (!data || data.error) {
+                callback({"error": i18next.t("Error occurred setting table preference.")});
+                return false;
             }
+            callback(data);
         });
     },
     "getTablePreference": function(userId, tableName, params={}, callback=(function(){})) {
@@ -1104,7 +1098,6 @@ export default {
     },
     "getConfigurationByKey": function(configVar, params, callback) {
         callback = callback || function() {};
-        var self = this;
         if (!configVar) {
             callback({"error": i18next.t("configuration variable name is required.")});
             return false;
@@ -1113,18 +1106,18 @@ export default {
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             callback(data);
-        } else {
-            this.sendRequest("/api/settings/" + configVar, "GET", null, (params || {}), function(data) {
-                if (data) {
-                    callback(data);
-                    if (data.hasOwnProperty(configVar)) {
-                        sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
-                    }
-                } else {
-                    callback({"error": i18next.t("no data returned")});
-                }
-            });
+            return true;
         }
+        this.sendRequest("/api/settings/" + configVar, "GET", null, (params || {}), function(data) {
+            if (data) {
+                callback(data);
+                if (data.hasOwnProperty(configVar)) {
+                    sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        });
     },
     "getConfiguration": function(userId, params, callback) {
         callback = callback || function() {};

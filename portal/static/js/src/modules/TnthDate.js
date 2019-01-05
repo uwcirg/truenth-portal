@@ -1,4 +1,4 @@
-var tnthDates =  {
+var tnthDates =  { /*global i18next */
     /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
      ** params: month, day and year fields and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field

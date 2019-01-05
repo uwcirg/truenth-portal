@@ -159,10 +159,10 @@ export default { /*global i18next */ /*initializing functions performed only onc
         if (sessionLocale) {
             return sessionLocale;
         }
-        if (!this.checkJQuery()) { 
+        if (!this.checkJQuery()) {
             return false;
         }
-        var locale = "";
+        var locale = "en_us";
         $.ajax({
             type: "GET",
             url: "/api/me",
@@ -191,9 +191,6 @@ export default { /*global i18next */ /*initializing functions performed only onc
                 });
             });
         }).fail(function() {});
-        if (!locale) {
-            locale = "en_us";
-        }
         return locale;
     },
     "getCopyrightYear": function(callback=(function(){})) {
