@@ -2,10 +2,9 @@
 {% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
   {{ back_btn(PORTAL, _('Home')) }}
-
   <h3 class="tnth-headline">{{ _("About TrueNTH") }}</h3>
-
-  <div id="aboutTruenthContainer"><p>{{ about_tnth|safe }}</p></div>
+  <div id="aboutTruenthContainer" class="LREditContainer"><p>{{ about_tnth|safe }}</p></div>
+  <input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }}"/>
   {% if config.metadata.version %}
   <br />
     {% if config.metadata.git_hash %}
@@ -15,11 +14,7 @@
     {% endif %}
   {% endif %}
 {% endblock %}
-{% block footer %}
-{{footer(user=user)}}
-{% endblock %}
-{% block additional_scripts %}
-{% if about_tnth_editorUrl %}<script>Utility.appendLREditContainer($("#aboutTruenthContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
-{% endif %}
-{% endblock %}
+{% block footer -%}
+  {{footer(user=user)}}
+{%- endblock %}
 

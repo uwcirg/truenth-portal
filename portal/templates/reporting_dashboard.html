@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "admin/admin_base.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
     <h3 class="tnth-headline">{{ _("Reporting Dashboard") }}</h3>
@@ -277,72 +277,6 @@
         </div>
     </div>
 {% endblock %}
-{% block table_export_filter_script %}
-{{super()}}
-{% endblock %}
-{% block document_ready %} //TODO move this to a separate JS
-    /*
-     * initiate bootstrapTable for all stats table
-     */
-    $("#orgStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("OrganizationList_")
-      }
-    });
-    $("#usageStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("UsageStatsList_")
-      }
-    });
-    $("#userRoleStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("UserByRoleStatsList_")
-      }
-    });
-    $("#userIntervStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("UserByInterventionStatsList_")
-      }
-    });
-    $("#userPatientReportStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("UserByPatientReportStatsList_")
-      }
-    });
-    $("#userIntervAccessStatsTable").bootstrapTable({
-      exportOptions: {
-          fileName: Utility.getExportFileName("UserByInterventionAccessStatsList_")
-      }
-    });
+{% block table_export_filter_script %}{{super()}}{% endblock %}
+{% block additional_scripts %}{{super()}}<script src="{{ url_for('static', filename='js/dist/reportingDashboard.bundle.js') }}"></script>{% endblock %}
 
-    $("document").ready(function() {
-        /*
-         * the class active will allow content related to the selected tab/item to show
-         * the related item is found based on the data-id attributed attached to each anchor element
-         */
-        $("ul.nav li").each(function() {
-            $(this).on("click",function() {
-                $("ul.nav li").removeClass("active");
-                $(this).addClass("active");
-                var containerID = $(this).find("a").attr("data-id");
-                if (containerID) {
-                    $(".stats-container").removeClass("active");
-                    $("#"+containerID+"_container").addClass("active");
-                };
-            });
-        });
-        /*
-         * add placeholder text for select filter control
-         */
-        (function() {
-             function addFilterPlaceHolders() {
-               $(".stats-table .filterControl select option[value='']").text("Select");
-             }
-             $(".stats-table").on("reset-view.bs.table", function() {
-                addFilterPlaceHolders();
-             });
-             addFilterPlaceHolders();
-        })();
-    })
-
-{% endblock %}

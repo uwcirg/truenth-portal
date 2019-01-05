@@ -3,22 +3,10 @@
 {% block main %}
   {{ back_btn(PORTAL, _('Home')) }}
     <h1 class="tnth-headline">{{ _("General Terms") }}</h1>
-	<div id = "termsConditionsContainer"><p>{{ content|safe }}</p></div>
+	<div id = "termsConditionsContainer" class="LREditContainer"><p>{{ content|safe }}</p></div>
+	<input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }}"/>
 {% endblock %}
-{% block footer %}
-{{footer(user=user)}}
-{% endblock %}
-{% block additional_scripts %}
-	{% if editorUrl %}
-		<script>Utility.appendLREditContainer($("#termsConditionsContainer"), "{{editorUrl}}", {{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }});</script>
-	{% endif %}
-{% endblock %}
-{% block document_ready %}
-	{% if request.args.get("disableLinks", "") %}
-	$("document").ready(function() {
-		setTimeout(function() { //TODO move this to a separate JS
-			Utility.disableHeaderFooterLinks();
-		}, 1000);
-	});
-	{% endif %}
-{% endblock %}
+{% block footer -%}
+	{{footer(user=user)}}
+{%- endblock %}
+

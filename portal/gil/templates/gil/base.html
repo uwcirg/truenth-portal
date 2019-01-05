@@ -329,10 +329,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-xhr-backend/1.4.3/i18nextXHRBackend.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
-    <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/utility.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/i18next-config.js') }}"></script>
-    <script src="{{url_for('static', filename='js/gil.js') }}" defer></script>
+    <script src="{{url_for('static', filename='js/vendor/vendor.js') }}"></script>
+    <script src="{{url_for('static', filename='js/dist/gil.bundle.js') }}" defer></script>
 {% endblock %} <!-- end block footer -->
 {% block document_ready %}
 {% endblock %}

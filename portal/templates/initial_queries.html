@@ -73,7 +73,7 @@
 {% endblock %}
 {% block additional_scripts %}
 <!-- TODO, don't need profile JS if initial queries is own Vue instance -->
-<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
-<script src="{{ url_for('static', filename='js/initialQueries.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dist/profile.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dist/initialQueries.bundle.js') }}"></script>
 {% endblock %}
 

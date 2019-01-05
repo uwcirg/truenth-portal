@@ -1,7 +1,7 @@
 <style type="text/css">.no-fouc {display: none;}</style>
 <script>$("#tnthNavWrapper, .watermark").addClass('no-fouc');</script>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
-<script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
+<script src="{{PORTAL}}{{ url_for('static', filename='js/portal_wrapper/tnth.js') }}"></script>
 {% if config.PIWIK_SITEID %}
 <!-- move this to a different JS file in the future perhaps, but leaving it for now, complicated by injection of server side variables -->
 <script type="text/javascript">
@@ -161,7 +161,7 @@
 <script type="text/javascript">
     (function() {
         var d=document, g=d.createElement("script"), s=d.getElementsByTagName("head")[0];
-        g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/sessionMonitor.js") }}';
+        g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/portal_wrapper/SessionMonitor.js") }}';
         //inserting script in HEAD element
         s.appendChild(g);
         function loadSessionMonitor() {
