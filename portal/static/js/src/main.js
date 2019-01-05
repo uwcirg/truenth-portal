@@ -13,4 +13,3 @@ __i18next.init({"lng": userSetLang
     });
 });
 
-
