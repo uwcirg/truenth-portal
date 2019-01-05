@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 const JsSrcPath = "./static/js/src";
 module.exports = {
-    entry: {
+    entry: { /* files to be transpired and optimized */
         "main": JsSrcPath+"/main.js",
         "gil": JsSrcPath+"/gil.js",
         "account": JsSrcPath+"/accountCreation.js",

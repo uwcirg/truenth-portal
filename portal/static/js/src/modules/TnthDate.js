@@ -300,6 +300,5 @@ var tnthDates =  {
     }
 };
 export default tnthDates;
-export var validateDateInputFields = tnthDates.validateDateInputFields;
-
+export var validateDateInputFields = tnthDates.validateDateInputFields; /* generic validation function for global use */
 
