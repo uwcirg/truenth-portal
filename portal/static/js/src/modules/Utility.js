@@ -350,8 +350,5 @@ var Utility = (function() {
     return new UtilityObj();
 })();
 export default Utility;
-export var getExportFileName = Utility.getExportFileName;
+export var getExportFileName = Utility.getExportFileName; /* expose common functions */
 export var getUrlParameter= Utility.getUrlParameter;
-
-
-
