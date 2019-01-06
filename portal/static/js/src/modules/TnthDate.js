@@ -85,6 +85,9 @@ var tnthDates =  { /*global i18next */
      * @returns number of days
      */
     "getDateDiff": function(startDate, dateToCalc) {
+        if (!startDate) {
+            return 0;
+        }
         var a = startDate.split(/[^0-9]/);
         var dateTime = new Date(a[0], a[1] - 1, a[2]).getTime();
         var d;

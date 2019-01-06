@@ -5,6 +5,7 @@
   "scripts": {
     "develop:js": "webpack --watch --config webpack.development.js",
     "build:js": "webpack --config webpack.production.js",
+    "build": "webpack --config webpack.production.js && gulp --gulpfile development_gulpfile.js lessAll",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Amy",

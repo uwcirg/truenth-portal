@@ -89,16 +89,15 @@ export default { /*global $ */
         }
         this.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
-    "reportError": function(userId, page_url, message, sync) {
+    "reportError": function(userId=0, page_url, message, sync) {
         //params need to contain the following: subject_id: User on which action is being attempted message: Details of the error event page_url: The page requested resulting in the error
         var params = {};
-        params.subject_id = userId ? userId : 0;
-        params.page_url = page_url ? page_url : window.location.href;
+        page_url = page_url || window.location.href;
+        params.subject_id = userId;
+        params.page_url = page_url;
         params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
-        if (window.console) {
-            console.log("Errors occurred....."); /*eslint no-console: off */
-            console.log(params); /*global console*/
-        }
+        console.log("Errors occurred....."); /*eslint no-console: off */
+        console.log(params); /*global console*/
         $.ajax({
             type: "GET",
             url: "/report-error",
@@ -328,8 +327,8 @@ export default { /*global $ */
             }
         });
     },
-    deleteConsent: function(userId, params) {
-        if (!userId || !params) {
+    deleteConsent: function(userId, params={}) {
+        if (!userId) {
             return false;
         }
         var consented = this.getAllValidConsent(userId, params.org);
@@ -341,7 +340,7 @@ export default { /*global $ */
             var inArray = $.grep(arrExcludedOrgIds, function(eOrg) {
                 return String(eOrg) === String(orgId);
             });
-           return !(inArray.length); //filter out org Id(s) that are in the array of org Ids to be excluded;
+            return !(inArray.length); //filter out org Id(s) that are in the array of org Ids to be excluded;
         });
         var self = this;
         arrConsents.forEach(function(orgId) { //delete all consents for the org
@@ -359,44 +358,44 @@ export default { /*global $ */
     },
     withdrawConsent: function(userId, orgId, params, callback) {
         callback = callback || function() {};
+        params = params || {};
         if (!userId || !orgId) {
             callback({"error": i18next.t("User id and organization id are required.")});
             return false;
         }
-        params = params || {};
         var self = this, arrConsent = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, params, function(data) {
-            if (data && data.consent_agreements && data.consent_agreements.length > 0) {
+            if (data && data.consent_agreements && data.consent_agreements.length) {
                 arrConsent = $.grep(data.consent_agreements, function(item) {
-                    var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
+                    var expired = tnthDates.getDateDiff(String(item.expires)); /*global tnthDates */
                     return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && String(item.status) === "suspended";
                 });
             }
-            if (arrConsent.length > 0) { //don't send request if suspended consent already existed
+            if (arrConsent.length) { //don't send request if suspended consent already existed
                 callback({"data": "success"});
                 return false;
             }
             self.sendRequest("/api/user/" + userId + "/consent/withdraw",
-            "POST",
-            userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
-            function(data) {
-                if (data.error) {
-                    callback({"error": i18next.t("Error occurred setting suspended consent status.")});
-                    return false;
-                }
-                callback(data);
-            });
+                "POST",
+                userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
+                function(data) {
+                    if (data.error) {
+                        callback({"error": i18next.t("Error occurred setting suspended consent status.")});
+                        return false;
+                    }
+                    callback(data);
+                });
         });
     },
     getAllValidConsent: function(userId, orgId) {
         if (!userId || !orgId) { return false; }
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
-            if (!data || data.error || !data.consent_agreements || data.consent_agreements.length === 0) {
+            if (!data || data.error || !data.consent_agreements || !data.consent_agreements.length) {
                 return consentedOrgIds;
             }
             consentedOrgIds = $.grep(data.consent_agreements, function(item) {
-                var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
+                var expired = tnthDates.getDateDiff(String(item.expires));
                 return !item.deleted && !(expired > 0) && (String(orgId).toLowerCase() === "all" || String(orgId) === String(item.organization_id));
             });
             consentedOrgIds = (consentedOrgIds).map(function(item) {
@@ -751,41 +750,36 @@ export default { /*global $ */
         this.sendRequest("api/questionnaire_bank", "GET", null, {
             sync: sync
         }, function(data) {
-            if (data) {
-                if (!data.error) {
-                    if (data.entry) {
-                        if ((data.entry).length === 0) {
-                            callback({"error": i18next.t("no data returned")});
-                        } else {
-                            var qList = {};
-                            (data.entry).forEach(function(item) {
-                                if (item.organization) {
-                                    var orgID = (item.organization.reference).split("/")[2];
-                                    if (!qList[orgID]) {
-                                        qList[orgID] = []; //don't assign orgID to object if it was already present
-                                    }
-                                    if (item.questionnaires) {
-                                        (item.questionnaires).forEach(function(q) {
-                                            /*
-                                             * add instrument name to instruments array for the org - will not add if it is already in the array
-                                             * NOTE: inArray returns -1 if the item is NOT in the array
-                                             */
-                                            if ($.inArray(q.questionnaire.display, qList[orgID]) === -1) {
-                                                qList[orgID].push(q.questionnaire.display);
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                            callback(qList);
-                        }
-                    } else {
-                        callback({"error": i18next.t("no data returned")});
-                    }
-                } else {
-                    callback({"error": i18next.t("error retrieving instruments list")});
-                }
+            if (!data || data.error) {
+                callback({"error": i18next.t("error retrieving instruments list")});
+                return;
             }
+            if (!data.entry || !data.entry.length) {
+                callback({"error": i18next.t("no data returned")});
+                return;
+            }
+            var qList = {};
+            (data.entry).forEach(function(item) {
+                if (item.organization) {
+                    var orgID = (item.organization.reference).split("/")[2];
+                    if (!qList[orgID]) {
+                        qList[orgID] = []; //don't assign orgID to object if it was already present
+                    }
+                    if (item.questionnaires) {
+                        (item.questionnaires).forEach(function(q) {
+                            /*
+                             * add instrument name to instruments array for the org - will not add if it is already in the array
+                             * NOTE: inArray returns -1 if the item is NOT in the array
+                             */
+                            if ($.inArray(q.questionnaire.display, qList[orgID]) === -1) {
+                                qList[orgID].push(q.questionnaire.display);
+                            }
+                        });
+                    }
+                }
+            });
+            callback(qList);
+
         });
     },
     "getTerms": function(userId, type, sync, callback, params) {
@@ -795,16 +789,14 @@ export default { /*global $ */
             .replace("{type}", type ? ("/" + type) : "")
             .replace("{all}", (params.hasOwnProperty("all") ? "?all=true" : ""));
         this.sendRequest(url, "GET", userId, {sync: sync}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    $(".get-tou-error").html("");
-                    callback(data);
-                } else {
-                    var errorMessage = i18next.t("Server error occurred retrieving tou data.");
-                    $(".get-tou-error").html(errorMessage);
-                    callback({"error": errorMessage});
-                }
+            if (!data || data.error) {
+                var errorMessage = i18next.t("Server error occurred retrieving tou data.");
+                $(".get-tou-error").html(errorMessage);
+                callback({"error": errorMessage});
+                return;
             }
+            $(".get-tou-error").html("");
+            callback(data);
         });
     },
     "postTermsByUser": function(userId, toSend, callback) {
@@ -952,7 +944,7 @@ export default { /*global $ */
             return false;
         }
         params = params || {};
-        this.sendRequest("/api/user/" + userId + "/questionnaire_bank", "GET", userId, {data: {as_of_date: completionDate}, sync: params.sync ? true : false}, function(data) {
+        this.sendRequest("/api/user/" + userId + "/questionnaire_bank", "GET", userId, {data: {as_of_date: completionDate}, sync: params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
                 return false;
@@ -980,11 +972,11 @@ export default { /*global $ */
     },
     "setTablePreference": function(userId, tableName, params, callback) {
         callback = callback || function() {};
+        params = params || {};
         if (!userId || !tableName) {
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        params = params || {};
         this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred setting table preference.")});
@@ -993,21 +985,19 @@ export default { /*global $ */
             callback(data);
         });
     },
-    "getTablePreference": function(userId, tableName, params={}, callback=(function(){})) {
-        if (!userId || !tableName) {
-            callback({error: "User Id and table name is required for setting preference."});
+    "getTablePreference": function(userId, tableName, params, callback) {
+        params = params || function() {};
+        callback = callback || function(){};
+        if (!userId) {
+            callback({error: "User Id is required for setting preference."});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "GET", userId, {"sync": params.sync}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                } else {
-                    callback({"error": i18next.t("Error occurred setting table preference.")});
-                }
-            } else {
-                callback({"error": i18next.t("no data returned")});
+        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "GET", userId, params, function(data) {
+            if (data && data.error) {
+                callback({"error": i18next.t("Error occurred setting table preference.")});
+                return;
             }
+            callback(data);
         });
     },
     "emailLog": function(userId, params, callback) {
@@ -1109,14 +1099,12 @@ export default { /*global $ */
             return true;
         }
         this.sendRequest("/api/settings/" + configVar, "GET", null, (params || {}), function(data) {
-            if (data) {
-                callback(data);
-                if (data.hasOwnProperty(configVar)) {
-                    sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
-                }
-            } else {
+            if (!data) {
                 callback({"error": i18next.t("no data returned")});
+                return;
             }
+            callback(data);
+            sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
         });
     },
     "getConfiguration": function(userId, params, callback) {
@@ -1125,19 +1113,19 @@ export default { /*global $ */
         if (sessionStorage.getItem(sessionConfigKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionConfigKey));
             callback(data);
-        } else {
-            this.sendRequest("/api/settings", "GET", userId, (params || {}), function(data) {
-                if (data) {
-                    callback(data);
-                    sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
-                } else {
-                    callback({
-                        "error": i18next.t("no data returned")
-                    });
-                }
-            });
-
+            return;
         }
+        this.sendRequest("/api/settings", "GET", userId, (params || {}), function(data) {
+            if (data) {
+                callback(data);
+                sessionStorage.setItem(sessionConfigKey, JSON.stringify(data));
+            } else {
+                callback({
+                    "error": i18next.t("no data returned")
+                });
+            }
+        });
+
     },
     "getEmailReady": function(userId, params, callback) {
         callback = callback || function() {};

@@ -1,5 +1,5 @@
 import Utility from "./Utility.js";
-export default { /*global i18next */ /*initializing functions performed only once on page load */
+export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
         this.setCustomJQueryEvents(this.checkJQuery()?(jQuery||$): null); /*global jQuery*/
@@ -39,7 +39,7 @@ export default { /*global i18next */ /*initializing functions performed only onc
         }
     },
     "onPageDidLoad": function(userSetLang) {
-         //note: display system outage message only after i18next has been instantiated - allowing message to be translated
+        //note: display system outage message only after i18next has been instantiated - allowing message to be translated
         Utility.displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
         this.handlePostLogout();
         this.showAlert();
@@ -92,8 +92,9 @@ export default { /*global i18next */ /*initializing functions performed only onc
             $("#mainNav").html(data);
         }
     },
-    "initPortalWrapper": function(PORTAL_NAV_PAGE, callback=(function(){})) {
+    "initPortalWrapper": function(PORTAL_NAV_PAGE, callback) {
         var self = this;
+        callback = callback || function() {};
         this.showLoader();
         Utility.sendRequest(PORTAL_NAV_PAGE, {cache: false}, function(data) { /*global sendRequest */
             if (!data || data.error) {
@@ -143,9 +144,11 @@ export default { /*global i18next */ /*initializing functions performed only onc
     "appendLREditContainer": function(target, url, show) { /*global i18next */
         if (!url) { return false; }
         if (!target) { return false; }
-        $(target).append(`<div><button class='btn btn-default button--LR'><a href='${url}' target='_blank'>${i18next.t('Edit in Liferay')}</a></button></div>`);
+        $(target).append(`<div><button class="btn btn-default button--LR"><a href="${url}" target="_blank">${i18next.t("Edit in Liferay")}</a></button></div>`);
         if (String(show).toLowerCase() === "true") { $(".button--LR").addClass("data-show");}
-        else $(".button--LR").addClass("tnth-hide");
+        else {
+            $(".button--LR").addClass("tnth-hide");
+        }
     },
     "getUserLocale": function() {
         var sessionKey = this.localeSessionKey;
@@ -194,13 +197,13 @@ export default { /*global i18next */ /*initializing functions performed only onc
         }).fail(function() {});
         return locale;
     },
-    "getCopyrightYear": function(callback=(function(){})) {
-        var copyright_year = new Date().getFullYear();
+    "getCopyrightYear": function(callback) {
+        callback = callback || function() {};
         var configSuffix = "COPYRIGHT_YEAR";
         var stCopyRight = sessionStorage.getItem("config_"+configSuffix);
         if (stCopyRight) {
-           callback({configSuffix : stCopyRight});
-           return;
+            callback({configSuffix : stCopyRight});
+            return;
         }
         Utility.sendRequest("api/settings/"+configSuffix,false, function(data) {
             if (data && data.hasOwnProperty(configSuffix)) {
@@ -230,7 +233,7 @@ export default { /*global i18next */ /*initializing functions performed only onc
             var userLocale = self.getUserLocale(), footerElements = $("#homeFooter .copyright");
             var copyright_year = new Date().getFullYear();
             self.getCopyrightYear(function(data) {
-                if (data && !data.error && data.COPYRIGHT_YEAR) {
+                if (data && data.COPYRIGHT_YEAR) {
                     copyright_year = data.COPYRIGHT_YEAR;
                 }
                 var getContent = (country_code, copyright_year) => {
@@ -245,7 +248,6 @@ export default { /*global i18next */ /*initializing functions performed only onc
                     case "NZ":
                         content = i18next.t(`&copy; ${copyright_year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).`);
                         break;
-                    case "CA":
                     default:
                         content = i18next.t(`&copy; ${copyright_year} Movember Foundation (Movember Foundation). All rights reserved.`);
                     }
@@ -268,8 +270,9 @@ export default { /*global i18next */ /*initializing functions performed only onc
             });
         }, 500);
     },
-    "getNotification": function(callback=function(){}) {
+    "getNotification": function(callback) {
         var userId = $("#notificationUserId").val();
+        callback = callback || function() {};
         if (!userId) {
             callback({"error": i18next.t("User id is required")});
             return false;
@@ -293,21 +296,22 @@ export default { /*global i18next */ /*initializing functions performed only onc
         }
         var self = this;
         this.getNotification(function(data) {
-            if (data.notifications && data.notifications.length > 0) {
-                var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
-                    return parseInt(notification.id) === parseInt(notificationId);
+            if (!data.notifications || !data.notifications.length) {
+                return;
+            }
+            var arrNotification = $.grep(data.notifications, function(notification) { //check if there is notification for this id -dealing with use case where user deletes same notification in a separate open window
+                return parseInt(notification.id) === parseInt(notificationId);
+            });
+            var userId = $("#notificationUserId").val();
+            if (arrNotification.length) { //delete notification only if it exists
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/user/" + userId + "/notification/" + notificationId
+                }).done(function() {
+                    $("#notification_" + notificationId).attr("data-visited", true);
+                    $("#notification_" + notificationId).find("[data-action-required]").removeAttr("data-action-required");
+                    self.setNotificationsDisplay();
                 });
-                var userId = $("#notificationUserId").val();
-                if (arrNotification.length > 0 && userId) { //delete notification only if it exists
-                    $.ajax({
-                        type: "DELETE",
-                        url: "/api/user/" + userId + "/notification/" + notificationId
-                    }).done(function() {
-                        $("#notification_" + notificationId).attr("data-visited", true);
-                        $("#notification_" + notificationId).find("[data-action-required]").removeAttr("data-action-required");
-                        self.setNotificationsDisplay();
-                    });
-                }
             }
         });
     },
@@ -530,8 +534,11 @@ export default { /*global i18next */ /*initializing functions performed only onc
                         return /[<>]/.test(text);
                     };
                     var invalid = containHtmlTags($el.val());
-                    if (invalid) { $("#error" + $el.attr("id")).html("Invalid characters in text."); }
-                    else {$("#error" + $el.attr("id")).html("");}
+                    if (invalid) {
+                        $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                        return false;
+                    }
+                    $("#error" + $el.attr("id")).html("");
                     return !invalid;
                 }
             },

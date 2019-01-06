@@ -1,6 +1,6 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
-export default (function() { /*global i18next */
+export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
         this.id = orgId;
         this.name = orgName;
@@ -93,7 +93,8 @@ export default (function() { /*global i18next */
         }
         return "";
     };
-    OrgTool.prototype.filterOrgs = function(leafOrgs=[]) {
+    OrgTool.prototype.filterOrgs = function(leafOrgs) {
+        leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }
         var self = this;
         $("#fillOrgs input[name='organization']").each(function() {
@@ -232,8 +233,8 @@ export default (function() { /*global i18next */
         var shortName = "";
         if (!orgId) { return shortName; }
         var orgsList = this.getOrgsList();
-        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: null;
-        if (orgItem && orgItem.shortname) {
+        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: {};
+        if (orgItem.shortname) {
             shortName = orgItem.shortname;
         }
         return shortName;
@@ -278,7 +279,7 @@ export default (function() { /*global i18next */
             let orgShortName = parentOrgItem.shortname || parentOrgItem.name;
             let parentState = getState(parentOrgItem);
             let parentOrgName = parentOrgItem.name;
-            if (parentOrgItem.children.length > 0) {
+            if (parentOrgItem.children.length) {
                 if ($("#userOrgs legend[orgId='" + org + "']").length === 0) {
                     parentDiv.classList.add("parent-org-container");
                     parentContent = `<legend orgId="${org}">${parentOrgName}</legend>
@@ -369,9 +370,8 @@ export default (function() { /*global i18next */
         return parentList;
     };
     OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
-        if (!currentOrg) { return false; }
         var ml = this.getOrgsList(), currentOrgItem = ml[currentOrg], self = this;
-        if (!ml || !currentOrgItem) { return false; }
+        if (!currentOrgItem) { return false; }
         if (currentOrgItem.isTopLevel) {
             return currentOrg;
         }
@@ -380,8 +380,9 @@ export default (function() { /*global i18next */
         }
         return currentOrg;
     };
-    OrgTool.prototype.getChildOrgs = function(orgs, orgList=[]) {
-        if (!orgs || (orgs.length === 0)) {
+    OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
+        orgList = orgList || [];
+        if (!orgs || !orgs.length) {
             return orgList;
         }
         var mainOrgsList = this.getOrgsList(), childOrgs = [];
@@ -392,7 +393,7 @@ export default (function() { /*global i18next */
             }
             orgList.push(org.id);
             var c = o.children ? o.children : null;
-            if (c && c.length > 0) {
+            if (c && c.length) {
                 c.forEach(function(i) {
                     childOrgs.push(i);
                 });
@@ -414,8 +415,8 @@ export default (function() { /*global i18next */
         userOrgs = userOrgs || [];
         userOrgs.forEach(function(orgId) {
             here_below_orgs.push(orgId);
-            var co = mainOrgsList[orgId], cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
-            if (cOrgs && cOrgs.length > 0) {
+            var co = mainOrgsList[orgId], cOrgs = self.getChildOrgs((co && co.children ? co.children : []));
+            if (cOrgs.length) {
                 here_below_orgs = here_below_orgs.concat(cOrgs);
             }
         });
