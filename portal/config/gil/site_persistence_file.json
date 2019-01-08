@@ -23,12 +23,6 @@
         "BABEL_CONFIG_FILENAME = 'gil.babel.cfg'\n",
         "SMARTLING_PROJECT_ID='13f8e2dcf'\n",
         "\n",
-        "# Assessment Engine configuration\n",
-        "INSTRUMENTS = [\n",
-        "    'epic26',\n",
-        "    'eq5d',\n",
-        "#    'EuroQOL'\n",
-        "]\n"
       ]
     }
   ],
