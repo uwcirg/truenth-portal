@@ -635,8 +635,8 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "es_MX",
-                "display": "Mexican Spanish",
+                "code": "es_US",
+                "display": "Spanish (United States)",
                 "system": "urn:ietf:bcp:47"
               }
             ]
