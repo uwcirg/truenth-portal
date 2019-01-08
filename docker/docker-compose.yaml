@@ -54,10 +54,8 @@ services:
     <<: *service_base
     command: bash -c '
       env &&
-      wait-for-it --host=redis --port=6379 --strict &&
-      flask set-celery-beat-healthy &&
-
-      wait-for-it --timeout=120 --host="$$PGHOST" --port="$$PGPORT" --strict &&
+      (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
+      wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
       celery beat
         --app portal.celery_worker.celery
         --loglevel debug
