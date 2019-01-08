@@ -29,7 +29,7 @@ from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
 from ..models.role import Role, ROLE
-from ..models.user import User, UserRoles, current_user
+from ..models.user import User, UserRoles, active_patients, current_user
 from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
@@ -196,6 +196,12 @@ def questionnaire_status():
         required: false
         type: string
         format: date-time
+      - name: include_test_role
+        in: query
+        description: optional query string param to add patients with the
+        ``test`` role to the results.  Excluded by default
+        required: false
+        type: string
       - name: format
         in: query
         description: expects json or csv, defaults to json if not provided
@@ -223,24 +229,17 @@ def questionnaire_status():
     else:
         as_of_date = datetime.utcnow()
 
-    # Obtain list of qualifying patients (not marked test)
-    # TODO: refactor this common query need to model and replace
-    # the less efficient similar usage elsewhere...
-    test_user_ids = UserRoles.query.join(Role).filter(
-        UserRoles.role_id == Role.id).filter(
-        Role.name == ROLE.TEST.value).with_entities(UserRoles.user_id)
-    patients = User.query.filter(User.active.is_(True)).join(
-        UserRoles).filter(User.id == UserRoles.user_id).join(
-        Role).filter(Role.name == ROLE.PATIENT.value).filter(
-        ~User.id.in_(test_user_ids))
-
-    # If limited by org - grab org and all it's children, and refine query
+    # If limited by org - grab org and all it's children as required list
     org_id = request.args.get('org_id')
-    if org_id:
-        limit_orgs = OrgTree().here_and_below_id(organization_id=org_id)
-        patients = patients.join(UserOrganization).filter(
-            User.id == UserOrganization.user_id).filter(
-            UserOrganization.organization_id.in_(limit_orgs))
+    require_orgs = (
+        OrgTree().here_and_below_id(organization_id=org_id) if org_id
+        else None)
+
+    # Obtain list of qualifying patients
+    include_test_role = request.args.get('include_test_role', False)
+    patients = active_patients(
+        include_test_role=include_test_role,
+        require_orgs=require_orgs)
 
     acting_user = current_user()
     results = []
@@ -251,7 +250,7 @@ def questionnaire_status():
             continue
 
         try:
-            acting_user.check_role('edit', other_id=patient.id)
+            acting_user.check_role('view', other_id=patient.id)
         except Unauthorized:
             # simply exclude any patients the user can't view
             continue
