@@ -386,5 +386,5 @@ def celery_beat_health_check(**kwargs):
     return rs.setex(
         name='last_celery_beat_ping',
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
-        value=str(datetime.now())
+        value=str(datetime.utcnow()),
     )
