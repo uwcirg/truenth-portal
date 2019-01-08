@@ -625,6 +625,23 @@
     },
     {
       "extension": [
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "es_MX",
+                "display": "Mexican Spanish",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
         {
           "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
