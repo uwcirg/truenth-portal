@@ -44,7 +44,7 @@ from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .observation import Observation, UserObservation
-from .organization import Organization, OrgTree
+from .organization import Organization, OrgTree, UserOrganization
 from .performer import Performer
 from .practitioner import Practitioner
 from .relationship import RELATIONSHIP, Relationship
@@ -1836,6 +1836,38 @@ def get_user_or_abort(uid, allow_deleted=False):
     if not allow_deleted and user.deleted:
         raise Forbidden("deleted user - operation not permitted")
     return user
+
+
+def active_patients(include_test_role=False, require_orgs=None):
+    """Build query for active patients, filtered as specified
+
+    Common query for active (not deleted) patients.
+
+    :param include_test_role: Set true to include users with ``test`` role
+    :param require_orgs: Provide list of organization IDs if patients must
+        also have the respective UserOrganization association (different from
+        consents!)  User required to have at least one, not all orgs in given
+        ``require_orgs`` list.
+    :return: Live SQL Alchemy query, for further filter additions or execution
+
+    """
+    patients_query = User.query.filter(User.active.is_(True)).join(
+        UserRoles).filter(User.id == UserRoles.user_id).join(
+        Role).filter(Role.name == ROLE.PATIENT.value)
+
+    if not include_test_role:
+        test_user_ids = UserRoles.query.join(Role).filter(
+            UserRoles.role_id == Role.id).filter(
+            Role.name == ROLE.TEST.value).with_entities(UserRoles.user_id)
+        patients_query = patients_query.filter(
+            ~User.id.in_(test_user_ids))
+
+    if require_orgs:
+        patients_query = patients_query.join(UserOrganization).filter(
+            User.id == UserOrganization.user_id).filter(
+            UserOrganization.organization_id.in_(require_orgs))
+
+    return patients_query
 
 
 class UserRoles(db.Model):
