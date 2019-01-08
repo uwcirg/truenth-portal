@@ -65,10 +65,10 @@
                     type: "GET",
                     url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId
                 }).done(function(data) {
-                    var sessionAuthoredDate = $("#_report_authored_date").val();
-                    self.errorMessage = "";
-                    if (data.error) {
-                        self.errorMessage = i18next.t("Server Error occurred retrieving report data");
+                	var sessionAuthoredDate = $("#_report_authored_date").val();
+                	self.errorMessage = "";
+                	if (data.error) {
+						self.errorMessage = i18next.t("Server Error occurred retrieving report data");
 						return;
 					}
 					if (!data.entry || !data.entry.length) {
