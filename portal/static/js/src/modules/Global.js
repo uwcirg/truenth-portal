@@ -205,7 +205,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             callback({configSuffix : stCopyRight});
             return;
         }
-        Utility.sendRequest("api/settings/"+configSuffix,false, function(data) {
+        Utility.sendRequest("/api/settings/"+configSuffix,false, function(data) {
             if (data && data.hasOwnProperty(configSuffix)) {
                 sessionStorage.setItem("config_"+configSuffix, data[configSuffix]);
             }
