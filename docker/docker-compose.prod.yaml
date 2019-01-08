@@ -12,7 +12,7 @@ services:
       test: |+
         python -c '
         import os, requests
-        resp=requests.get("https://{}/healthcheck".format(os.environ["SERVER_NAME"]))
+        resp=requests.get("http://{}/healthcheck".format(os.environ["SERVER_NAME"]))
         resp.raise_for_status()
         exit(0 if resp.json()["status"].lower()=="success" else 1)
         '
