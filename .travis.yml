@@ -39,6 +39,8 @@ env:
     - DOCKER_IMAGE_TAG=travis
     - DOCKER_EXTRA_TAGS="$TRAVIS_BUILD_NUMBER"
 
+    - PIP_QUIET=1
+
 matrix:
   include:
     - env: TOXENV=py27
