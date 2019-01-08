@@ -5,8 +5,6 @@
       "results": [
         "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n",
         "DEFAULT_LOCALE = 'en_AU'\n",
-        "MAIL_SENDER_DEFAULT = 'noreply@eproms.truenth.org'\n",
-        "CONTACT_SENDTO_EMAIL = 'contact.eproms@truenth.org'\n",
         "PATIENT_LIST_ADDL_FIELDS = ['status','study_id']\n",
         "PORTAL_STYLESHEET = '/eproms/static/css/eproms.css'\n",
         "STAFF_BULK_DATA_ACCESS = True\n",
