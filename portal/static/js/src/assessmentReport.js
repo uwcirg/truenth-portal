@@ -7,7 +7,3 @@ import AssessmentReport from "./components/AssessmentReport.vue";
         render: h => h(AssessmentReport)
     }).$mount(assessmentContentElementId); 
 })();
-
-
-
-

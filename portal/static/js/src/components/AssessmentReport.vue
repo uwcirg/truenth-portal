@@ -1,33 +1,31 @@
 <template>
 	<div id="assessmentReportContentContainer">
 		<div class="error-message" v-show="errorMessage !== ''">
-			<br/>
-			{{errorMessage}}
-			<br/>
+			<br/>{{errorMessage}}<br/>
 		</div>
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
 					<div id="userSessionReportDetail" cellpadding="2">
-							<table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" v-if="data.length > 0">
-									<caption>
-										<hr/>
-										<span class="profile-item-title">{{caption.title}}</span>
-										<br/>
-										<span class="text-muted smaller-text">{{caption.lastUpdated}}</span>
-										<span class='gmt'>{{caption.timezone}}</span>
-										<hr/>
-									</caption>
-								<THEAD>
-									<TH v-for="(item,index) in tableHeaders" :key="index" v-text="item"></TH>
-								</THEAD>
-								<TBODY>
-										<TR v-for="(item,index) in data" :key="index">
-											<TD v-html="item.q"></TD>
-											<TD v-html="item.a"></TD>
-										</TR>
-								</TBODY>
-							</table>
+						<table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" v-if="data.length > 0">
+							<caption>
+								<hr/>
+								<span class="profile-item-title">{{caption.title}}</span>
+								<br/>
+								<span class="text-muted smaller-text">{{caption.lastUpdated}}</span>
+								<span class='gmt'>{{caption.timezone}}</span>
+								<hr/>
+							</caption>
+							<THEAD>
+								<TH v-for="(item,index) in tableHeaders" :key="index" v-text="item"></TH>
+							</THEAD>
+							<TBODY>
+								<TR v-for="(item,index) in data" :key="index">
+									<TD v-html="item.q"></TD>
+									<TD v-html="item.a"></TD>
+								</TR>
+							</TBODY>
+						</table>
 						<br/>
 					</div>
 				</div>
@@ -129,3 +127,4 @@
         }
 	};
 </script>
+
