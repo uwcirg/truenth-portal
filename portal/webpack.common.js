@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const JsSrcPath = "./static/js/src";
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = {
     entry: { /* files to be transpired and optimized */
         "main": JsSrcPath+"/main.js",
@@ -30,13 +31,18 @@ module.exports = {
                 use: {
                     loader: "babel-loader" /*transpire ES2015+ code to browser readable code*/
                 }
+            },
+            {
+                test: /\.vue$/,
+                use: 'vue-loader'
             }
         ]
     },
     plugins: [
         new webpack.SourceMapDevToolPlugin({ /*create sourcemap for bundled file - for ease of debugging in case of error */
             filename: '../../maps/[file].map',
-        })
+        }),
+        new VueLoaderPlugin()
     ]
 };
 
