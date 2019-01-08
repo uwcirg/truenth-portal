@@ -9,13 +9,7 @@ services:
       # http://docs.gunicorn.org/en/stable/settings.html#workers
       WEB_CONCURRENCY: 4
     healthcheck:
-      test: |+
-        python -c '
-        import os, requests
-        resp=requests.get("http://{}/healthcheck".format(os.environ["SERVER_NAME"]))
-        resp.raise_for_status()
-        exit(0 if resp.json()["status"].lower()=="success" else 1)
-        '
+      test: flask healthcheck
       start_period: 2m
       interval: 5m
       timeout: 1m
