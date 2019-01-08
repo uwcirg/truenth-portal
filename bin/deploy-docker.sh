@@ -41,9 +41,12 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 # Set default docker-compose file if COMPOSE_FILE environment variable not set
 export COMPOSE_FILE="${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}"
 
-# Set env vars in docker-compose file; see env.default
-set -o allexport # export all new env vars by default
-. "${GIT_WORK_TREE}/docker/.env"
+# Bring env vars set in docker/.env into current shell
+if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
+    # export all new env vars by default
+    set -o allexport
+    . "${GIT_WORK_TREE}/docker/.env"
+fi
 
 cd "${GIT_WORK_TREE}/docker"
 
