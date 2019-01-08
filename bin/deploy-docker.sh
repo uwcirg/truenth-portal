@@ -9,19 +9,23 @@ usage() {
     cat << USAGE >&2
 Usage:
     $cmdname [-b] [-h]
-    -h     Show this help message
     -b     Backup current database before attempting update
+    -n     Do not pull docker images prior to starting
+    -h     Show this help message
 USAGE
     exit 1
 }
 
-while getopts "bh" option; do
+while getopts "bhn" option; do
     case "${option}" in
         b)
             BACKUP=true
             ;;
         h)
             usage
+            ;;
+        n)
+            NO_PULL=true
             ;;
         *)
             usage
@@ -64,8 +68,13 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     > "/tmp/${dump_filename}.sql"
 fi
 
-echo "Updating images..."
-docker-compose pull
+docker images
+docker-compose images
+
+if [ -z "$NO_PULL" ]; then
+    echo "Updating images..."
+    docker-compose pull
+fi
 echo "Starting containers..."
 # Capture stderr to check for restarted containers
 # shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
