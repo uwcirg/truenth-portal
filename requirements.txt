@@ -72,7 +72,7 @@ pyyaml==3.13              # via flask-swagger, swagger-spec-validator
 redis==2.10.6
 regex==2018.11.22
 requests-cache==0.4.13
-requests-oauthlib==1.0.0  # via flask-oauthlib
+requests-oauthlib==1.1.0  # via flask-oauthlib
 requests==2.21.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
 selenium==3.141.0
 six==1.12.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
