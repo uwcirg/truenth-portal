@@ -1543,8 +1543,6 @@ def present_assessment(instruments=None):
       - OAuth2AuthzFlow: []
 
     """
-    # Todo: replace with proper models
-    configured_instruments = current_app.config['INSTRUMENTS']
 
     queued_instruments = request.args.getlist('instrument_id')
     resume_instruments = request.args.getlist('resume_instrument_id')
@@ -1562,6 +1560,7 @@ def present_assessment(instruments=None):
         key=lambda x: common_instruments.index(x)
     )
 
+    configured_instruments = Questionnaire.questionnaire_codes()
     if set(common_instruments) - set(configured_instruments):
         abort(
             404,
