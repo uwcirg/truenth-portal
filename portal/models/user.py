@@ -1838,22 +1838,29 @@ def get_user_or_abort(uid, allow_deleted=False):
     return user
 
 
-def active_patients(include_test_role=False, require_orgs=None):
+def active_patients(
+        include_test_role=False, include_deleted=False,
+        require_orgs=None, filter_by_ids=None):
     """Build query for active patients, filtered as specified
 
     Common query for active (not deleted) patients.
 
     :param include_test_role: Set true to include users with ``test`` role
+    :param include_deleted: Set true to include deleted users
     :param require_orgs: Provide list of organization IDs if patients must
         also have the respective UserOrganization association (different from
         consents!)  User required to have at least one, not all orgs in given
         ``require_orgs`` list.
+    :param filter_by_ids: List of user_ids to include in query filter
     :return: Live SQL Alchemy query, for further filter additions or execution
 
     """
-    patients_query = User.query.filter(User.active.is_(True)).join(
+    patients_query = User.query.join(
         UserRoles).filter(User.id == UserRoles.user_id).join(
         Role).filter(Role.name == ROLE.PATIENT.value)
+
+    if not include_deleted:
+        patients_query = patients_query.filter(User.deleted_id.is_(None))
 
     if not include_test_role:
         test_user_ids = UserRoles.query.join(Role).filter(
@@ -1866,6 +1873,9 @@ def active_patients(include_test_role=False, require_orgs=None):
         patients_query = patients_query.join(UserOrganization).filter(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
+
+    if filter_by_ids:
+        patients_query = patients_query.filter(User.id.in_(filter_by_ids))
 
     return patients_query
 
