@@ -25,11 +25,11 @@ from werkzeug.exceptions import Unauthorized
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.fhir import bundle_results
-from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.organization import Organization, OrgTree
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
-from ..models.role import Role, ROLE
-from ..models.user import User, UserRoles, active_patients, current_user
+from ..models.role import ROLE
+from ..models.user import User, active_patients, current_user
 from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
@@ -144,20 +144,18 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
-    for user in User.query.filter_by(active=True):
-        if (user.has_role(ROLE.PATIENT.value) and not
-                user.has_role(ROLE.TEST.value)):
-            a_s = QB_Status(user, as_of_date=datetime.utcnow())
-            email = (
-                user.email.encode('ascii', 'ignore') if user.email else None)
-            od = overdue(a_s)
-            qb = a_s.current_qbd().questionnaire_bank.name
-            for org in user.organizations:
-                top = ot.find_top_level_orgs([org], first=True)
-                org_name = "{}: {}".format(
-                    top.name, org.name) if top else org.name
-                cw.writerow((
-                    user.id, email, qb, a_s.overall_status, od, org_name))
+    for user in active_patients(include_test_role=False):
+        a_s = QB_Status(user, as_of_date=datetime.utcnow())
+        email = (
+            user.email.encode('ascii', 'ignore') if user.email else None)
+        od = overdue(a_s)
+        qb = a_s.current_qbd().questionnaire_bank.name
+        for org in user.organizations:
+            top = ot.find_top_level_orgs([org], first=True)
+            org_name = "{}: {}".format(
+                top.name, org.name) if top else org.name
+            cw.writerow((
+                user.id, email, qb, a_s.overall_status, od, org_name))
 
     filename = 'overdue-numbers-{}.csv'.format(strftime('%Y_%m_%d-%H_%M'))
     output = make_response(results.getvalue())
@@ -199,7 +197,7 @@ def questionnaire_status():
       - name: include_test_role
         in: query
         description: optional query string param to add patients with the
-        ``test`` role to the results.  Excluded by default
+          test role to the results.  Excluded by default
         required: false
         type: string
       - name: format
