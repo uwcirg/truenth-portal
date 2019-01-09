@@ -79,7 +79,7 @@ def patients_root():
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
     patients = active_patients(
         require_orgs=org_restriction(user),
-        include_test_role=not user.has_role(ROLE.ADMIN.value),
+        include_test_role=user.has_role(ROLE.ADMIN.value),
         include_deleted=True,
         filter_by_ids=consented_users)
 
