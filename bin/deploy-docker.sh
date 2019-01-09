@@ -68,13 +68,11 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     > "/tmp/${dump_filename}.sql"
 fi
 
-docker images
-docker-compose images
-
 if [ -z "$NO_PULL" ]; then
     echo "Updating images..."
     docker-compose pull
 fi
+
 echo "Starting containers..."
 # Capture stderr to check for restarted containers
 # shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
