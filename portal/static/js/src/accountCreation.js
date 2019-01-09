@@ -451,6 +451,7 @@ import ProcApp from "./modules/Procedures.js";
             if (visibleOrgs.length === 1) {
                 visibleOrgs.prop("checked", true);
             }
+            this.handleMedidataRave();
         };
         this.populatePatientOrgs = function() {
             if (leafOrgs) { /* global leafOrgs */
@@ -490,6 +491,44 @@ import ProcApp from "./modules/Procedures.js";
                 }
             });
             return arrCommunication;
+        };
+        this.getCurrentUserTopLevelOrgs = function() {
+            var topLevelOrgs = OT.getUserTopLevelParentOrgs(leafOrgs);
+            return topLevelOrgs.map(function(item) {
+                return OT.getOrgName(item);
+            });
+        };
+        this.handleMedidataRave = function() {
+            var self = this;
+            this.__getSettings(function(result) {
+                if (result.data.MEDIDATA_RAVE_ORG && self.getCurrentUserTopLevelOrgs().indexOf(result.data.MEDIDATA_RAVE_ORG) !== -1) {
+                    self.setDisableAccountCreation();
+                }
+            });
+        };
+        this. setDisableAccountCreation = function() {
+            if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
+                $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
+            }
+        };
+        this.initFieldEvents = function() {
+            ["year", "month", "date"].forEach(function(fn) {
+                var field = $("#" + fn), y = $("#year"), m = $("#month"),d = $("#date");
+                field.on("keyup focusout", function() {
+                    if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
+                        $("#birthday").val("");
+                        return false;
+                    }
+                    var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                    if (isValid) {
+                        $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                        $("#errorbirthday").html("");
+                    } else {
+                        $("#birthday").val("");
+                    }
+                });
+            });
+            Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
         };
         this.initButtons = function() {
             var self = this;
@@ -645,6 +684,7 @@ import ProcApp from "./modules/Procedures.js";
         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
         aco.getOrgs(aco.populateOrgsByRole);
         aco.handleEditConsentDate();
+        aco.initFieldEvents();
         aco.initButtons();
         aco.handleNoEmail();
         ProcApp.initViaTemplate();

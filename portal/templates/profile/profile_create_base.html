@@ -58,8 +58,6 @@
     {{footer(user=user)}}
 {% endblock %}
 {% block additional_scripts %}
-    <!--TODO don't need profile.js if this is its own Vue instance -->
-    <script src="{{ url_for('static', filename='js/dist/profile.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dist/account.bundle.js') }}"></script>
 {% endblock additional_scripts %}
 {% block document_ready %} /* information from server, will remove when API is available */

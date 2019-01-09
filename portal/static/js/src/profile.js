@@ -320,7 +320,6 @@ import Utility from "./modules/Utility.js";
                         return false;
                     }
                     $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
-                    self.setDisableAccountCreation(); //disable account creation
                 });
             },
             setDisableEditButtons: function() {
@@ -337,11 +336,6 @@ import Utility from "./modules/Utility.js";
                         $(this).children(".profile-item-edit-btn").css("display", "none");
                     }
                 });
-            },
-            setDisableAccountCreation: function() {
-                if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
-                    $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
-                }
             },
             setDisableFields: function(params) {
                 if (!this.currentUserId || this.isAdmin() || !this.isSubjectPatient()) {
