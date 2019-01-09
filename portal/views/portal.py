@@ -67,6 +67,7 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
+from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
@@ -912,7 +913,11 @@ def research_dashboard():
     Only accessible to those with the Researcher role.
 
     """
-    return render_template('research.html', user=current_user())
+    return render_template(
+        'research.html',
+        user=current_user(),
+        instruments=Questionnaire.questionnaire_codes()
+    )
 
 
 @portal.route('/reporting')
