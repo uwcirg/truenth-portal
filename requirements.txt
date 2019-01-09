@@ -55,7 +55,7 @@ oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
 packaging==18.0           # via sphinx, tox
 page-objects==1.1.0
 passlib==1.7.1            # via flask-user
-pluggy==0.8.0             # via tox
+pluggy==0.8.1             # via tox
 polib==1.1.0
 psycopg2==2.7.6.1
 py==1.7.0                 # via tox
