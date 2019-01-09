@@ -22,7 +22,7 @@
         "STAFF_BULK_DATA_ACCESS=False\n",
         "BABEL_CONFIG_FILENAME = 'gil.babel.cfg'\n",
         "SMARTLING_PROJECT_ID='13f8e2dcf'\n",
-        "\n",
+        "\n"
       ]
     }
   ],
