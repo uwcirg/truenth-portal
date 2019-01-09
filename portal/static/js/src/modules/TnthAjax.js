@@ -89,11 +89,11 @@ export default { /*global $ */
         }
         this.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
-    "reportError": function(userId=0, page_url, message, sync) {
+    "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following: subject_id: User on which action is being attempted message: Details of the error event page_url: The page requested resulting in the error
         var params = {};
         page_url = page_url || window.location.href;
-        params.subject_id = userId;
+        params.subject_id = userId || 0;
         params.page_url = page_url;
         params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
         console.log("Errors occurred....."); /*eslint no-console: off */
@@ -327,10 +327,11 @@ export default { /*global $ */
             }
         });
     },
-    deleteConsent: function(userId, params={}) {
+    deleteConsent: function(userId, params) {
         if (!userId) {
             return false;
         }
+        params = params || {};
         var consented = this.getAllValidConsent(userId, params.org);
         if (!consented) {
             return false;
@@ -665,20 +666,18 @@ export default { /*global $ */
         if (!userId) { return false; }
         var obId = "",_code = "";
         this.sendRequest("/api/patient/" + userId + "/clinical", "GET", userId, {sync: true}, function(data) {
-            if (data) {
-                if (!data.error) {
-                    if (data.entry) {
-                        (data.entry).forEach(function(item) {
-                            if (!obId) {
-                                _code = item.content.code.coding[0].code;
-                                if (String(_code) === String(code)) {
-                                    obId = item.content.id;
-                                }
-                            }
-                        });
+            if (!data || data.error || !data.entry) {
+                return obId;
+            }
+            (data.entry).forEach(function(item) {
+                if (!obId) {
+                    _code = item.content.code.coding[0].code;
+                    if (String(_code) === String(code)) {
+                        obId = item.content.id;
                     }
                 }
-            }
+            });
+
         });
         return obId;
     },

@@ -817,7 +817,10 @@ import Utility from "./modules/Utility.js";
         $("#month, #date, #year").each(function() {
             $(this).on(self.getFieldEventType($(this)), function() {
                 var d = $("#date"), m = $("#month"), y = $("#year");
-                var isValid = validateDateInputFields(m, d, y, "errorbirthday");
+                if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
+                    return false;
+                }
+                var isValid = validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
                 if (!isValid) {
                     return false;
                 }

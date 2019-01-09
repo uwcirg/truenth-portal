@@ -282,12 +282,12 @@ import ProcApp from "./modules/Procedures.js";
             var err = responseObj && responseObj.error ? responseObj.error: null;
             var self = this;
             if (!err) {
-                setTimeout(function() { 
+                setTimeout(function() {
                     self.__handleButton();
                     $("#confirmMsg").fadeIn();
                 }, 800);
-                setTimeout(function() { 
-                    self.__redirect(self.userId); 
+                setTimeout(function() {
+                    self.__redirect(self.userId);
                 }, 1000);
                 setTimeout(function() {
                     $("#confirmMsg").fadeOut();
@@ -431,7 +431,7 @@ import ProcApp from "./modules/Procedures.js";
             OT.populateOrgsList(data.entry);
             OT.populateUI();
 
-            if (!$("#userOrgs input[name='organization']").length) { 
+            if (!$("#userOrgs input[name='organization']").length) {
                 //UI orgs aren't populated for some reason and no indication of error from returned data from ajax call, e.g. related to cached session data
                 $("#userOrgs .get-orgs-error").html(i18next.t("No clinics data available."));
                 return false;
@@ -590,7 +590,11 @@ import ProcApp from "./modules/Procedures.js";
                 var today = new Date();
                 var td = pad(today.getDate()), tm = pad(today.getMonth()+1), ty = pad(today.getFullYear());
                 var th = today.getHours(), tmi = today.getMinutes(), ts = today.getSeconds();
-                var isValid = tnthDates.validateDateInputFields(m, d, y, "errorConsentDate");
+                if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
+                    $("#consentDate").val("");
+                    return false;
+                }
+                var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorConsentDate");
                 if (isValid) {
                     /*
                      * check if date entered is today, if so use today's date/time

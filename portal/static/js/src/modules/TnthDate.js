@@ -3,39 +3,31 @@ var tnthDates =  { /*global i18next */
      ** params: month, day and year fields and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateDateInputFields": function(monthField, dayField, yearField, errorFieldId) {
-        var m = $(monthField).val(), d = $(dayField).val(), y = $(yearField).val();
-        if (m && d && y) {
-            if ($(yearField).get(0).validity.valid && $(monthField).get(0).validity.valid && $(dayField).get(0).validity.valid) {
-                m = parseInt(m);
-                d = parseInt(d);
-                y = parseInt(y);
-                var errorField = $("#" + errorFieldId);
-
-                if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
-                    var today = new Date();
-                    var date = new Date(y, m - 1, d);
-                    if (!(date.getFullYear() === y && (date.getMonth() + 1) === m && date.getDate() === d)) { // Check to see if this is a real date
-                        errorField.html(i18next.t("Invalid date. Please try again.")).show();
-                        return false;
-                    } else if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
-                        errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
-                        return false; //shouldn't be in the future
-                    } else if (y < 1900) {
-                        errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
-                        return false;
-                    }
-                    errorField.html("").hide();
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else {
+    "validateDateInputFields": function(m, d, y, errorFieldId) {
+        if (!m || !d || !y) {
             return false;
         }
+        m = parseInt(m);
+        d = parseInt(d);
+        y = parseInt(y);
+        var errorField = $("#" + errorFieldId);
+        if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+            var today = new Date();
+            var date = new Date(y, m - 1, d);
+            if (!(date.getFullYear() === y && (date.getMonth() + 1) === m && date.getDate() === d)) { // Check to see if this is a real date
+                errorField.html(i18next.t("Invalid date. Please try again.")).show();
+                return false;
+            } else if (date.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0)) {
+                errorField.html(i18next.t("Date must not be in the future. Please try again.")).show();
+                return false; //shouldn't be in the future
+            } else if (y < 1900) {
+                errorField.html(i18next.t("Date must not be before 1900. Please try again.")).show();
+                return false;
+            }
+            errorField.html("").hide();
+            return true;
+        }
+        return false;
     },
     /**
      * Simply swaps: a/b/cdef to b/a/cdef (single & double digit permutations accepted...)
@@ -154,13 +146,14 @@ var tnthDates =  { /*global i18next */
     },
     "formatDateString": function(dateString, format) { //NB For dateString in ISO-8601 format date as returned from server e.g. '2011-06-29T16:52:48'
         if (dateString) {
-            var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
+            /* IOS (8601) date format test */
+            var IOSDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
             var d = new Date(dateString);
             var day, month, year, hours, minutes, seconds, nd;
-            if (!iosDateTest && !isNaN(d) && !this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
+            if (!IOSDateTest && !isNaN(d) && !this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
                 return "";
             }
-            if (iosDateTest.test(dateString)) {
+            if (IOSDateTest.test(dateString)) {
                 //IOS date, no need to convert again to date object, just parse it as is
                 //issue when passing it into Date object, the output date is inconsistent across from browsers
                 var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");

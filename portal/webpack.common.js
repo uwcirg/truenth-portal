@@ -3,9 +3,11 @@ const webpack = require("webpack");
 const JsSrcPath = "./static/js/src";
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = {
-    entry: { /* files to be transpired and optimized */
+    entry: { /* files to be transpiled and optimized */
         "main": JsSrcPath+"/main.js",
         "gil": JsSrcPath+"/gil.js",
+        "gilIndex": JsSrcPath+"/gilIndex.js",
+        "landing": JsSrcPath+"/landing.js",
         "account": JsSrcPath+"/accountCreation.js",
         "admin": JsSrcPath+"/admin.js",
         "CookieMonster": JsSrcPath+"/CookieMonster.js",
@@ -29,7 +31,7 @@ module.exports = {
                 test: /\.js$/,
                 exclude:/(node_modules)/,
                 use: {
-                    loader: "babel-loader" /*transpire ES2015+ code to browser readable code*/
+                    loader: "babel-loader" /*transpile ES2015+ code to browser readable code*/
                 }
             },
             {

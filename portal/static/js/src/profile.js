@@ -941,7 +941,11 @@ import Utility from "./modules/Utility.js";
                 ["year", "month", "date"].forEach(function(fn) {
                     var field = $("#" + fn), y = $("#year"), m = $("#month"),d = $("#date");
                     field.on("keyup focusout", function() {
-                        var isValid = self.modules.tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+                        if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
+                            $("#birthday").val("");
+                            return false;
+                        }
+                        var isValid = self.modules.tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
                         if (isValid) {
                             $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
                             $("#errorbirthday").html("");
@@ -2226,7 +2230,10 @@ import Utility from "./modules/Utility.js";
                         self.__convertToNumericField($("#biopsy_day, #biopsy_year"));
                         $("#biopsy_day, #biopsy_month, #biopsy_year").on("change", function() {
                             var d = $("#biopsy_day"), m = $("#biopsy_month"), y = $("#biopsy_year");
-                            var isValid = self.modules.tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
+                            if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
+                                return false;
+                            }
+                            var isValid = self.modules.tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "biopsyDateError");
                             if (isValid) {
                                 $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
                                 $("#biopsyDateError").text("").hide();

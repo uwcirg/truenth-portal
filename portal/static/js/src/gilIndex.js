@@ -1,5 +1,7 @@
+import Utility from "./modules/Utility.js";
 $(document).ready(function() {
     $("body").attr("class", "page-home");
+    Utility.handlePostLogout(); /*global Utility handlePostLogout */
     if ($("#initLoginModal").val() === "true") {
         $("#modal-login-register").modal("show");
     }
@@ -12,3 +14,4 @@ $(document).ready(function() {
         window.kp_Browser_clearCookies();
     }
 });
+

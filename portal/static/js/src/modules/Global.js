@@ -22,11 +22,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         }
         return true;
     },
-    "handlePostLogout": function() {
-        if (document.querySelector("body.landing")) {
-            Utility.handlePostLogout(); /*global Utility handlePostLogout */
-        }
-    },
     "handleClientInterventionForm": function() {
         if (document.querySelector("#clientAppForm")) {
             $("#confirmDel").popover({
@@ -41,7 +36,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "onPageDidLoad": function(userSetLang) {
         //note: display system outage message only after i18next has been instantiated - allowing message to be translated
         Utility.displaySystemOutageMessage(userSetLang); /*global displaySystemOutageMessage */
-        this.handlePostLogout();
         this.showAlert();
         this.handleNumericFields();
         var LREditElement = document.getElementById("LREditUrl");
@@ -111,7 +105,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
-            }, 150);
+            }, 250);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
             });
@@ -535,7 +529,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     };
                     var invalid = containHtmlTags($el.val());
                     if (invalid) {
-                        $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                        $("#error" + $el.attr("id")).html(i18next.t("Invalid characters in text."));
                         return false;
                     }
                     $("#error" + $el.attr("id")).html("");
