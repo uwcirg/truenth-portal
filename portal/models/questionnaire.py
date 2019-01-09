@@ -141,6 +141,13 @@ class Questionnaire(db.Model):
                 'questionnaire_api.questionnaire_list', _external=True)}
         return bundle_results(elements=objs, links=[link])
 
+    @classmethod
+    def questionnaire_codes(cls):
+        questionnaire_identifiers = Identifier.query.join(QuestionnaireIdentifier).filter(
+            Identifier.system == TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+        )
+        values = {qi.value for qi in questionnaire_identifiers}
+        return values
 
 class QuestionnaireIdentifier(db.Model):
     """link table for questionnaire : n identifiers"""
