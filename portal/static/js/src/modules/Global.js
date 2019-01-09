@@ -105,7 +105,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
-            }, 250);
+            }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
             });

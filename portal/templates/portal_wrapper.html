@@ -2,10 +2,10 @@
 <script>$("#tnthNavWrapper, .watermark").addClass('no-fouc');</script>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/portal_wrapper/tnth.js') }}"></script>
+<script>var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}</script>
 {% if config.PIWIK_SITEID %}
 <!-- move this to a different JS file in the future perhaps, but leaving it for now, complicated by injection of server side variables -->
 <script type="text/javascript">
-    var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
     var _paq = _paq || [];
     {% if config.PIWIK_DOMAINS %}
     _paq.push(["setDomains", {{ config.PIWIK_DOMAINS|safe }}]);

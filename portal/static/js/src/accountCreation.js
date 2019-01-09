@@ -513,15 +513,12 @@ import ProcApp from "./modules/Procedures.js";
         };
         this.initFieldEvents = function() {
             ["year", "month", "date"].forEach(function(fn) {
-                var field = $("#" + fn), y = $("#year"), m = $("#month"),d = $("#date");
+                var field = $("#" + fn);
                 field.on("keyup focusout", function() {
-                    if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
-                        $("#birthday").val("");
-                        return false;
-                    }
-                    var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                    var y = $("#year").val(), m = $("#month").val(),d = $("#date").val();
+                    var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
                     if (isValid) {
-                        $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                        $("#birthday").val(y + "-" + m + "-" + d);
                         $("#errorbirthday").html("");
                     } else {
                         $("#birthday").val("");

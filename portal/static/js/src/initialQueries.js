@@ -816,15 +816,12 @@ import Utility from "./modules/Utility.js";
         var self = this;
         $("#month, #date, #year").each(function() {
             $(this).on(self.getFieldEventType($(this)), function() {
-                var d = $("#date"), m = $("#month"), y = $("#year");
-                if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
-                    return false;
-                }
-                var isValid = validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                var d = $("#date").val(), m = $("#month").val(), y = $("#year").val();
+                var isValid = validateDateInputFields(m, d, y, "errorbirthday");
                 if (!isValid) {
                     return false;
                 }
-                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                $("#birthday").val(y + "-" + m + "-" + d);
                 $("#errorbirthday").text("").hide();
                 self.postDemoData($(this));
             });

@@ -933,12 +933,9 @@ import Utility from "./modules/Utility.js";
             initBirthdaySection: function() {
                 var self = this;
                 ["year", "month", "date"].forEach(function(fn) {
-                    var field = $("#" + fn), y = $("#year"), m = $("#month"),d = $("#date");
+                    let field = $("#" + fn);
+                    let y = $("#year"), m = $("#month"),d = $("#date");
                     field.on("keyup focusout", function() {
-                        if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
-                            $("#birthday").val("");
-                            return false;
-                        }
                         var isValid = self.modules.tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
                         if (isValid) {
                             $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
@@ -1552,8 +1549,8 @@ import Utility from "./modules/Utility.js";
                     return s;
                 };
                 $("#stateSelector").on("change", function() {
-                    let selectedState = $(this).find("option:selected"),
-                        container = $("#" + selectedState.val() + "_container");
+                    let selectedState = $(this).find("option:selected");
+                    let container = $("#" + selectedState.val() + "_container");
                     let defaultPrompt = i18next.t("What is your main clinic for prostate cancer care");
                     $("#userOrgsInfo").hide();
                     if (selectedState.val() !== "") {
@@ -1568,6 +1565,7 @@ import Utility from "./modules/Utility.js";
                                 $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text() + "?").show();
                                 $(".noOrg-container").show();
                                 $("#noOrgs").prop("checked", false);
+                                container.show();
                             } else {
                                 $(".state-container, .clinic-prompt, .noOrg-container").hide();
                                 $("#userOrgsInfo").show();
@@ -2223,13 +2221,10 @@ import Utility from "./modules/Utility.js";
                         });
                         self.__convertToNumericField($("#biopsy_day, #biopsy_year"));
                         $("#biopsy_day, #biopsy_month, #biopsy_year").on("change", function() {
-                            var d = $("#biopsy_day"), m = $("#biopsy_month"), y = $("#biopsy_year");
-                            if (!y.get(0).validity.valid || !m.get(0).validity.valid || !d.get(0).validity.valid) {
-                                return false;
-                            }
-                            var isValid = self.modules.tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "biopsyDateError");
+                            let d = $("#biopsy_day").val(), m = $("#biopsy_month").val(), y = $("#biopsy_year").val();
+                            let isValid = self.modules.tnthDates.validateDateInputFields(m, d, y, "biopsyDateError");
                             if (isValid) {
-                                $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                                $("#biopsyDate").val(y+"-"+m+"-"+d);
                                 $("#biopsyDateError").text("").hide();
                                 $("#biopsy_yes").trigger("click");
                             } else {
