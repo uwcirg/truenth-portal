@@ -24,9 +24,7 @@ fi
 PATH="${PATH}:${repo_root}/bin"
 GULPFILE="${repo_root}/portal/development_gulpfile.js"
 
-echo "Compiling LESS files..."
-nodejs-wrapper.sh gulp.js --gulpfile "${GULPFILE}" epromsLess
-nodejs-wrapper.sh gulp.js --gulpfile "${GULPFILE}" gilLess
-nodejs-wrapper.sh gulp.js --gulpfile "${GULPFILE}" portalLess
-nodejs-wrapper.sh gulp.js --gulpfile "${GULPFILE}" psaTrackerLess
-nodejs-wrapper.sh gulp.js --gulpfile "${GULPFILE}" topnavLess
+
+echo "Building front-end files..."
+nodejs-wrapper.sh \
+    npm --prefix "${repo_root}/portal" run build
