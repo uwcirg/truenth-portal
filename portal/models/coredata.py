@@ -316,7 +316,7 @@ class OrgData(CoredataPoint):
         return False
 
     def hasdata(self, user, **kwargs):
-        return user.organizations.count() > 0
+        return len(user.organizations) > 0
 
 
 class ClinicalData(CoredataPoint):
