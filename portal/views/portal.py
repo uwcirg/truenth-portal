@@ -67,8 +67,8 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
-from ..models.questionnaire import Questionnaire
 from ..models.qb_timeline import invalidate_users_QBT
+from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
