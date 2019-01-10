@@ -35,7 +35,7 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
             platform = {
                 "browserName": "firefox",
                 "platform": "Windows 10",
-                "version": "46.0",
+                "version": "60.0",
             }
             capabilities = {
                 "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
