@@ -1,5 +1,5 @@
 ---
-version: "3.2"
+version: "3.4"
 services:
   # Base service; for extension only, not for direct use
   base: &service_base
@@ -12,6 +12,8 @@ services:
     env_file:
       - portal.env
     environment:
+      SECRET_KEY:
+      SERVER_NAME:
       PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
 
       # cross-service defaults

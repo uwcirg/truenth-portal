@@ -352,4 +352,5 @@ def configure_healthcheck(app):
         path='/healthcheck',
         checkers=HEALTH_CHECKS,
         failed_status=HEALTHCHECK_FAILURE_STATUS_CODE,
+        log_on_failure=False,
     )
