@@ -1,6 +1,7 @@
-import {validateDateInputFields} from "./modules/TnthDate.js";
-import tnthAjax from "./modules/TnthAjax.js";
+import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import OrgTool from "./modules/OrgTool.js";
+import tnthAjax from "./modules/TnthAjax.js";
+import {validateDateInputFields} from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
 (function() { /*global $ Utility disableHeaderFooterLinks */
     var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
@@ -468,7 +469,7 @@ import Utility from "./modules/Utility.js";
                 self.rolesGroupEvent();
 
             },
-            "clinicalContainer": function() { self.patientQEvent(); },
+            "clinicalContainer": function() { ClinicalQuestions.initFieldEvents(self.userId); self.patientQEvent(); },
             "orgsContainer": function() { self.clinicsEvent(); }
         };
         for (var sectionId in this.mainSections) {
