@@ -29,7 +29,7 @@ from ..models.organization import Organization, OrgTree
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
 from ..models.role import ROLE
-from ..models.user import User, active_patients, current_user
+from ..models.user import active_patients, current_user
 from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
