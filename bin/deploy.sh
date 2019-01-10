@@ -93,3 +93,6 @@ fi
 
 echo "Updating package metadata"
 python setup.py egg_info --quiet
+
+PATH="${PATH}:${repo_path}/bin"
+build-frontend-files.sh

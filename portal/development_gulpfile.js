@@ -171,7 +171,7 @@ gulp.task("psaTrackerLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PSATRACKER + ".css.map");

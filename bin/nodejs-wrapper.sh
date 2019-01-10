@@ -6,20 +6,17 @@ repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 usage() {
    cat << USAGE >&2
 Usage:
-   ${cmdname} [-h] [-g gulpfile] [gulp_task_name]
+   ${cmdname} [-h] [-g gulpfile] [nodejs_command]
 
    -h
           Show this help message
 
-   -g
-          Run task from given gulpfile
+    nodejs_command
+          NodeJS command to run
 
-    gulp_task_name
-          Name of gulp task to run
+    NodeJS wrapper
 
-    Gulp task wrapper
-
-    Runs gulp tasks with node_env, creating virtual environments as necessary
+    Runs NodeJS tools with node_env, creating virtual environments as necessary
 USAGE
 }
 
@@ -62,27 +59,17 @@ setup_node_venv() {
     deactivate
 }
 
-# Parse and assign options
-while getopts "g:h" option; do
-    case "${option}" in
-        g)
-            GULPFILE="${OPTARG}"
-            ;;
-        h)
-            usage
-            ;;
-        *)
-            usage
-            ;;
-    esac
-done
-shift $((OPTIND-1))
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    usage
+    exit 0
+fi
 
 # Setup virtual environments
 setup_python_venv
 
 node_venv="${repo_root}/node_env"
 setup_node_venv "" "$node_venv"
+
 
 echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
@@ -92,9 +79,6 @@ npm --prefix "${repo_root}/portal" install --no-progress --quiet
 
 PATH="${PATH}:${repo_root}/portal/node_modules/gulp/bin"
 
-DEFAULT_GULPFILE="${repo_root}/portal/i18next_gulpfile.js"
-GULPFILE="${GULPFILE:-$DEFAULT_GULPFILE}"
-
-gulp_task_name="$1"
-echo "Running task ${gulp_task_name}..."
-gulp.js --gulpfile "$GULPFILE" "$gulp_task_name"
+nodejs_command="$@"
+echo "Running command: '${nodejs_command}'..."
+$nodejs_command
