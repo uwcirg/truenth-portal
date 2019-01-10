@@ -75,7 +75,8 @@ def patients_root():
 
     user = current_user()
     consent_query = UserConsent.query.filter(and_(
-        UserConsent.deleted_id.is_(None), UserConsent.expires > datetime.utcnow()))
+        UserConsent.deleted_id.is_(None),
+        UserConsent.expires > datetime.utcnow()))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
     patients = active_patients(
         require_orgs=org_restriction(user),
