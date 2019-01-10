@@ -14,6 +14,7 @@ export default (function() { /*global i18next $ */
     var OrgTool = function() {
         this.TOP_LEVEL_ORGS = [];
         this.orgsList = {};
+        this.orgsData = [];
         this.initialized = false;
     };
 
@@ -31,6 +32,7 @@ export default (function() { /*global i18next $ */
                 async: false
             }).done(function(data) {
                 if (data && data.entry) {
+                    self.orgsData = data.entry;
                     self.populateOrgsList(data.entry);
                     sessionStorage.setItem("orgsData", JSON.stringify(data.entry));
                     callback(data.entry);
@@ -229,16 +231,6 @@ export default (function() { /*global i18next $ */
         this.orgsList = orgsList;
         return orgsList;
     };
-    OrgTool.prototype.getShortName = function(orgId) {
-        var shortName = "";
-        if (!orgId) { return shortName; }
-        var orgsList = this.getOrgsList();
-        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: {};
-        if (orgItem.shortname) {
-            shortName = orgItem.shortname;
-        }
-        return shortName;
-    };
     OrgTool.prototype.populateUI = function(){
         if (sessionStorage.orgsHTML) {
             $("#fillOrgs").html(sessionStorage.orgsHTML);
@@ -347,6 +339,16 @@ export default (function() { /*global i18next $ */
         if (!container.text()) {
             container.html(i18next.t("No organizations available"));
         }
+    };
+    OrgTool.prototype.getShortName = function(orgId) {
+        var shortName = "";
+        if (!orgId) { return shortName; }
+        var orgsList = this.getOrgsList();
+        var orgItem = orgsList.hasOwnProperty(orgId) ? orgsList[orgId]: {};
+        if (orgItem.shortname) {
+            shortName = orgItem.shortname;
+        }
+        return shortName;
     };
     OrgTool.prototype.getSelectedOrgTopLevelParentOrg = function(){
         return this.getTopLevelParentOrg(this.getSelectedOrg().val());

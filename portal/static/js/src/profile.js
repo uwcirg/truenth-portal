@@ -9,7 +9,7 @@ import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 /*
  * helper Object for initializing profile sections  TODO streamline this more
  */
-(function() {
+export default (function() {
     var ProfileObj = window.ProfileObj = new Vue({ /*global Vue i18next $ */
         el: "#mainDiv",
         components: {
@@ -2801,4 +2801,5 @@ import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 
         }
     });
+    return ProfileObj;
 })();

@@ -3,6 +3,8 @@ import OrgTool from "./modules/OrgTool.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import {validateDateInputFields} from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
+import Profile from "./profile.js";
+
 (function() { /*global $ Utility disableHeaderFooterLinks */
     var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
         this.__getDependency = function(key) {
@@ -136,6 +138,7 @@ import Utility from "./modules/Utility.js";
             sectionObj.config =  $(this).attr("data-config");
             sectionObj.display = $(this).attr("data-display");
         });
+        Profile.initSections();
     };
 
     FieldsChecker.prototype.postDemoData = function(targetField) {
