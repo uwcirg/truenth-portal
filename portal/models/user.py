@@ -275,7 +275,7 @@ class User(db.Model, UserMixin):
     auth_providers = db.relationship('AuthProvider', lazy='dynamic',
                                      cascade='delete')
     _consents = db.relationship(
-        'UserConsent', lazy='dynamic', cascade='delete',
+        'UserConsent', lazy='joined', cascade='delete',
         order_by="desc(UserConsent.acceptance_date)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
@@ -300,7 +300,7 @@ class User(db.Model, UserMixin):
         backref=db.backref('users'))
     organizations = db.relationship(
         'Organization',
-        lazy='dynamic',
+        lazy='joined',
         secondary="user_organizations",
         backref=db.backref('users'))
     procedures = db.relationship('Procedure', lazy='dynamic',
@@ -315,7 +315,7 @@ class User(db.Model, UserMixin):
     documents = db.relationship('UserDocument', lazy='dynamic',
                                 cascade='save-update, delete')
     _identifiers = db.relationship(
-        'Identifier', lazy='dynamic', secondary='user_identifiers')
+        'Identifier', lazy='joined', secondary='user_identifiers')
 
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
                              cascade="save-update, delete")
@@ -384,8 +384,9 @@ class User(db.Model, UserMixin):
     def valid_consents(self):
         """Access to consents that have neither been deleted or expired"""
         now = datetime.utcnow()
-        return self._consents.filter(
-            text("expires>:now and deleted_id is null")).params(now=now)
+        return [
+            c for c in self._consents
+            if c.expires > now and c.deleted_id is None]
 
     @property
     def display_name(self):
@@ -1852,7 +1853,8 @@ def active_patients(
         consents!)  User required to have at least one, not all orgs in given
         ``require_orgs`` list.
     :param filter_by_ids: List of user_ids to include in query filter
-    :return: Live SQL Alchemy query, for further filter additions or execution
+    :return: Live SQLAlchemy ``Query``, for further filter additions or
+     execution
 
     """
     patients_query = User.query.join(
@@ -1863,11 +1865,8 @@ def active_patients(
         patients_query = patients_query.filter(User.deleted_id.is_(None))
 
     if not include_test_role:
-        test_user_ids = UserRoles.query.join(Role).filter(
-            UserRoles.role_id == Role.id).filter(
-            Role.name == ROLE.TEST.value).with_entities(UserRoles.user_id)
         patients_query = patients_query.filter(
-            ~User.id.in_(test_user_ids))
+            ~User.roles.any(Role.name == ROLE.TEST.value))
 
     if require_orgs:
         patients_query = patients_query.join(UserOrganization).filter(
