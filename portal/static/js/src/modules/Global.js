@@ -2,7 +2,7 @@ import Utility from "./Utility.js";
 export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
-        this.setCustomJQueryEvents(this.checkJQuery()?(jQuery||$): null); /*global jQuery*/
+        this.setCustomJQueryEvents(this.checkJQuery()?(jQuery): null); /*global jQuery*/
         this.consolePolyFill();
     },
     "registerModules": function() {
@@ -105,7 +105,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
-            }, 350);
+            }, 0);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
             });
@@ -508,15 +508,19 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
                         var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
                         Utility.sendRequest(url, {max_attempts:1}, function(data) {
+                            
+                            if (data && data.constructor == String) {
+                                data = JSON.parse(data);
+                            }
                             if (data.error) { //note a failed request will be logged
                                 $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
-                                return; //stop proceeding to update email
+                                return false; //stop proceeding to update email
                             }
                             if (data.unique) {
                                 $("#erroremail").html("").parents(".form-group").removeClass("has-error");
                                 update($el);
-                                return;
-                            }
+                                return true;
+                            } 
                             $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                         });
                     }

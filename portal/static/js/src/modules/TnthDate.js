@@ -4,7 +4,7 @@ var tnthDates =  { /*global i18next */
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
     "validateDateInputFields": function(m, d, y, errorFieldId) {
-        if (!m || !d || !y) {
+        if (!m || !d || !/(19|20)\d{2}/.test(y)) { /* prevent premature validation until year has been entered */
             return false;
         }
         m = parseInt(m);
