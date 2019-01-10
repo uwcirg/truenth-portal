@@ -365,9 +365,6 @@ export default (function() {
             if (!d || !/(19|20)\d{2}/.test(y)) {
                 return false;
             }
-            if (!$(yf).get(0).validity.valid || !$(mf).get(0).validity.valid || !$(df).get(0).validity.valid) {
-                return false;
-            }
             if (!tnthDates.validateDateInputFields(mf.val(), df.val(), yf.val(), "procDateErrorContainer")) {
                 deField.text(i18next.t("The procedure date must be valid and in required format.")).addClass(errorClass);
                 return false;
