@@ -39,6 +39,7 @@ class IntegrationTestCase(TestCase, LiveServerTestCase):
             }
             capabilities = {
                 "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
+                "extendedDebugging": "true",
             }
             metadata = {
                 "name": self.id(),
