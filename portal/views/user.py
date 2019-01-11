@@ -809,24 +809,21 @@ def withdraw_consent(user, org_id, acting_user):
         abort(404, "no UserConsent found for user ID {} and org ID {}".format(
             user.id, org_id))
     try:
-        # Make a copy of the found UserConsent via `make_transient`
-        # and setting the id to None, so update_consents can store as new
-        make_transient(uc)
-        uc.id = None
-        uc.status = 'suspended'
-        uc.acceptance_date = datetime.utcnow()  # mark time of suspension
-        uc.send_reminders = False
-        uc.include_in_reports = True
-        uc.staff_editable = (not current_app.config.get('GIL'))
+        suspended = UserConsent(
+            user_id=user.id, organization_id=org_id, status='suspended',
+            acceptance_date=datetime.utcnow(), agreement_url=uc.agreement_url)
+        suspended.send_reminders = False
+        suspended.include_in_reports = True
+        suspended.staff_editable = (not current_app.config.get('GIL'))
         user.update_consents(
-            consent_list=[uc], acting_user=acting_user)
+            consent_list=[suspended], acting_user=acting_user)
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
         invalidate_users_QBT(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
-    return jsonify(uc.as_json())
+    return jsonify(suspended.as_json())
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))

@@ -94,7 +94,9 @@ class TestAudit(TestCase):
         self.promote_user(staff, role_name=ROLE.STAFF.value)
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
+        staff = db.session.merge(staff)
         staff.organizations.append(org)
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(org)
         audit = Audit(
             user_id=TEST_USER_ID, subject_id=TEST_USER_ID,

@@ -539,6 +539,7 @@ class TestIntervention(TestCase):
         # metastatic organization
         mock_questionnairebanks('eproms')
         metastatic_org = Organization.query.filter_by(name='metastatic').one()
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(metastatic_org)
 
         with SessionScope(db):
@@ -599,6 +600,7 @@ class TestIntervention(TestCase):
         # localized organization
         mock_questionnairebanks('eproms')
         localized_org = Organization.query.filter_by(name='localized').one()
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(localized_org)
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
@@ -786,6 +788,7 @@ class TestIntervention(TestCase):
             db.session.add(ucsf)
             db.session.add(uw)
             db.session.commit()
+        user = db.session.merge(user)
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
@@ -876,7 +879,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        assert user.organizations.count() == 0
+        assert len(user.organizations) == 0
         assert ds_p3p.display_for_user(user).access
 
     def test_eproms_p3p_conditions(self):
@@ -898,6 +901,7 @@ class TestIntervention(TestCase):
             db.session.add(ucsf)
             db.session.add(uw)
             db.session.commit()
+        user = db.session.merge(user)
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
@@ -1005,7 +1009,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
-        assert user.organizations.count() == 0
+        assert len(user.organizations) == 0
         assert ds_p3p.display_for_user(user).access
 
         # Finally, add the WRITE_ONLY group and it should disappear
@@ -1029,6 +1033,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.add(uw)
             db.session.commit()
+        user = db.session.merge(user)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
@@ -1099,7 +1104,7 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, sm = map(db.session.merge, (user, sm))
-        assert user.organizations.count() == 0
+        assert len(user.organizations) == 0
         assert sm.display_for_user(user).access
 
         # Finally, remove the PATIENT role and it should disappear
@@ -1229,6 +1234,7 @@ class TestEpromsStrategies(TestCase):
         """Patient w/ Southampton org should get access to self_mgmt"""
         self.promote_user(role_name=ROLE.PATIENT.value)
         southampton = Organization.query.filter_by(name='Southampton').one()
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(southampton)
         self_mgmt = Intervention.query.filter_by(name='self_management').one()
         assert self_mgmt.quick_access_check(self.test_user)

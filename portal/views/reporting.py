@@ -242,7 +242,7 @@ def questionnaire_status():
     acting_user = current_user()
     results = []
     for patient in patients:
-        if not patient.organizations.first():
+        if len(patient.organizations) == 0:
             # Very unlikely we want to include patients w/o at least
             # one org, skip this patient
             continue
@@ -256,7 +256,7 @@ def questionnaire_status():
         qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
         row = {
             'user_id': patient.id,
-            'site': patient.organizations.first().name,
+            'site': patient.organizations[0].name,
             'status': str(qb_stats.overall_status)}
 
         consent = latest_consent(user=patient)
