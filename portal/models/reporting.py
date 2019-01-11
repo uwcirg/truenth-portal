@@ -81,7 +81,7 @@ def get_reporting_stats():
                 if (any(doc.intervention == interv for doc in user.documents)):
                     stats['intervention_reports'][desc] += 1
 
-        if not user.organizations.count():
+        if not user.organizations:
             stats['organizations']['Unspecified'] += 1
         else:
             for org in user.organizations:
