@@ -246,7 +246,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                         default:
                             content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
                         }
-                    console.log("content? ", content)
                     return content;
                 };
                 // todo: properly decouple country/locale
@@ -510,7 +509,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
                         var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
                         Utility.sendRequest(url, {max_attempts:1}, function(data) {
-                            console.log(data);
                             if (data && data.constructor == String) {
                                 data = JSON.parse(data);
                             }
