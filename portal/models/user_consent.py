@@ -163,7 +163,7 @@ def latest_consent(user, org_id=None, include_suspended=False):
     if org_id:
         raise NotImplementedError
 
-    if user.valid_consents.count() > 0:
+    if len(user.valid_consents) > 0:
         # consents are ordered desc(acceptance_date)
         # ignore suspended unless `include_suspended` is set
         # include deleted, as in a suspended state, the previous

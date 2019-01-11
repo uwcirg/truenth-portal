@@ -9,11 +9,16 @@ from sqlalchemy import and_
 from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
-from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.organization import Organization, OrgTree
 from ..models.qb_timeline import qb_status_visit_name
-from ..models.role import ROLE, Role
+from ..models.role import ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import User, UserRoles, current_user, get_user_or_abort
+from ..models.user import (
+    User,
+    active_patients,
+    current_user,
+    get_user_or_abort,
+)
 from ..models.user_consent import UserConsent
 from ..type_tools import check_int
 
@@ -30,60 +35,54 @@ def patients_root():
     the staff's organizations (and any descendant organizations)
 
     """
-    user = current_user()
-    patient_role_id = Role.query.filter(
-        Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()
 
-    # empty patient query list to start, unionize with other relevant lists
-    patients = User.query.filter(User.id == -1)
-    org_list = set()
-    now = datetime.utcnow()
+    def org_restriction(user):
+        """Determine if user (prefs) restrict list of patients by org
+
+        :returns: None if no org restrictions apply, or a list of org_ids
+
+        """
+        org_list = set()
+        if user.has_role(ROLE.STAFF.value):
+            pref_org_list = None
+            # check user table preference for organization filters
+            pref = TablePreference.query.filter_by(
+                table_name='patientList', user_id=user.id).first()
+            if pref and pref.filters:
+                pref_org_list = pref.filters.get('orgs_filter_control')
+
+            # Build list of all organization ids, and their descendants, the
+            # user belongs to
+            ot = OrgTree()
+
+            if pref_org_list:
+                # for preferred filtered orgs
+                pref_org_list = set(pref_org_list.split(","))
+                for orgId in pref_org_list:
+                    check_int(orgId)
+                    if orgId == 0:  # None of the above doesn't count
+                        continue
+                    for org in user.organizations:
+                        if int(orgId) in ot.here_and_below_id(org.id):
+                            org_list.add(orgId)
+                            break
+            else:
+                for org in user.organizations:
+                    if org.id == 0:  # None of the above doesn't count
+                        continue
+                    org_list.update(ot.here_and_below_id(org.id))
+            return list(org_list)
+
+    user = current_user()
     consent_query = UserConsent.query.filter(and_(
         UserConsent.deleted_id.is_(None),
-        UserConsent.expires > now))
+        UserConsent.expires > datetime.utcnow()))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
-
-    if user.has_role(ROLE.STAFF.value):
-        pref_org_list = None
-        # check user table preference for organization filters
-        pref = TablePreference.query.filter_by(table_name='patientList',
-                                               user_id=user.id).first()
-        if pref and pref.filters:
-            pref_org_list = pref.filters.get('orgs_filter_control')
-
-        # Build list of all organization ids, and their descendants, the
-        # user belongs to
-        ot = OrgTree()
-
-        if pref_org_list:
-            # for preferred filtered orgs
-            pref_org_list = set(pref_org_list.split(","))
-            for orgId in pref_org_list:
-                check_int(orgId)
-                if orgId == 0:  # None of the above doesn't count
-                    continue
-                for org in user.organizations:
-                    if int(orgId) in ot.here_and_below_id(org.id):
-                        org_list.add(orgId)
-                        break
-        else:
-            for org in user.organizations:
-                if org.id == 0:  # None of the above doesn't count
-                    continue
-                org_list.update(ot.here_and_below_id(org.id))
-
-        # Gather up all patients belonging to any of the orgs (and their
-        # children) this (staff) user belongs to.
-        org_patients = User.query.join(UserRoles).filter(
-            and_(User.id == UserRoles.user_id,
-                 UserRoles.role_id == patient_role_id,
-                 User.id.in_(consented_users)
-                 )
-            ).join(UserOrganization).filter(
-                and_(UserOrganization.user_id == User.id,
-                     UserOrganization.organization_id != 0,
-                     UserOrganization.organization_id.in_(org_list)))
-        patients = patients.union(org_patients)
+    patients = active_patients(
+        require_orgs=org_restriction(user),
+        include_test_role=user.has_role(ROLE.ADMIN.value),
+        include_deleted=True,
+        filter_by_ids=consented_users)
 
     if user.has_role(ROLE.INTERVENTION_STAFF.value):
         uis = UserIntervention.query.filter(
@@ -92,20 +91,9 @@ def patients_root():
 
         # Gather up all patients belonging to any of the interventions
         # this intervention_staff user belongs to
-        ui_patients = User.query.join(UserRoles).filter(
-            and_(User.id == UserRoles.user_id,
-                 UserRoles.role_id == patient_role_id,
-                 User.id.in_(consented_users))
-        ).join(UserIntervention).filter(and_(
+        patients = patients.join(UserIntervention).filter(and_(
             UserIntervention.user_id == User.id,
             UserIntervention.intervention_id.in_(ui_list)))
-        patients = patients.union(ui_patients)
-
-    # only show test users to admins
-    if not user.has_role(ROLE.ADMIN.value):
-        patients = [
-            patient for patient in patients if not
-            patient.has_role(ROLE.TEST.value)]
 
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
@@ -122,8 +110,7 @@ def patients_root():
         patients = patient_list
 
     return render_template(
-        'admin/patients_by_org.html', patients_list=patients,
-        user=user, org_list=org_list,
+        'admin/patients_by_org.html', patients_list=patients, user=user,
         wide_container="true")
 
 
