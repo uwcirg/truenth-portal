@@ -10,12 +10,12 @@
 const gulp = require("gulp");
 const concat = require("gulp-concat");
 const rename = require("gulp-rename");
-const uglify = require("gulp-uglifyes");
 const sourcemaps = require("gulp-sourcemaps");
 const rootPath = "./";
 const GILPath = rootPath + "/gil/";
 const EPROMSPath = rootPath + "/eproms/";
 const jsPath = rootPath + "static/js";
+const jsSrc = rootPath + "static/js/src";
 const jsDest = rootPath + "static/js/dist";
 const lessPath = rootPath + "static/less";
 const cssPath = rootPath + "static/css";
@@ -34,7 +34,7 @@ const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
 const PSATRACKER = "psaTracker";
-const jsMainFiles = [jsPath + "/i18next-config.js", jsPath + "/utility.js", jsPath + "/main.js"];
+const jsMainFiles = [jsSrc];
 
 // fetch command line arguments
 const arg = (argList => {
@@ -60,28 +60,6 @@ const arg = (argList => {
     return arg;
 
 })(process.argv);
-
-/*
- * NOT currently implemented
- * concat and minify main source files to be consumed in production ??
- * call 'npm run-script build' will build minify script file, if need to 
- */
-gulp.task("main", function() {
-    return gulp.src(jsMainFiles)
-        .pipe(concat("scripts.js"))
-        .pipe(gulp.dest(jsDest))
-        .pipe(rename("scripts.min.js"))
-        .pipe(sourcemaps.init())
-        .pipe(uglify({
-            mangle: false,
-            ecma: 6
-        }))
-        .on("error", function(err) {
-            gutil.log(gutil.colors.red("[Error]"), err.toString());
-        })
-        .pipe(sourcemaps.write("../../maps")) //path relative to the source file, can't use rootPath here
-        .pipe(gulp.dest(jsDest));
-});
 
 //linting JS
 /*
@@ -193,7 +171,7 @@ gulp.task("psaTrackerLess", function() {
         .pipe(less({
             plugins: [cleancss]
         }))
-        .pipe(sourcemaps.write({destPath: mapPath}))
+        .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(gulp.dest(cssPath))
         .on("end", function() {
             replaceStd(PSATRACKER + ".css.map");
@@ -218,4 +196,7 @@ gulp.task("watchTopnav", function() {
 });
 gulp.task("watchPsaTracker", function() {
     gulp.watch(lessPath + "/" + PSATRACKER + ".less", ["psaTrackerLess"]);
+});
+gulp.task("lessAll", ["epromsLess", "portalLess", "topnavLess", "gilLess", "psaTrackerLess"], function() {
+    console.log("Compiling LESS files completed."); /*eslint no-console: off */
 });

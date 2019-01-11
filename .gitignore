@@ -34,6 +34,9 @@ coverage.xml
 # compiled (binary) translation files
 *.mo
 
+# generated CSS files
+portal/*/static/css/*.css
+
 # nodeJS virtual environment and files
 node_env/
 portal/node_modules/

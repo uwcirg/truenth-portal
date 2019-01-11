@@ -4,12 +4,12 @@
 
     <h4>Current Jobs</h4>
     {% if jobs %}
-    <ul>
+    <ul id="scheduledJobsList">
         {% for job in jobs %}
             <li>
                 <div id="job_{{ job.id }}">
-                    <button title="Toggle Job" onclick="toggleJob(event, {{ job.id }})"><i id="activeIcon_{{job.id}}" class="{{'fa fa-toggle-on' if job.active else 'fa fa-toggle-off'}}" /></i></button>
-                    <button title="Run Job" onclick="triggerJob(event, {{ job.id }})"><i class="fa fa-play"></i></button>
+                    <button title="Toggle Job" data-jobid="{{job.id}}" class="btn-toggle-job"><i id="activeIcon_{{job.id}}" class="{{'fa fa-toggle-on' if job.active else 'fa fa-toggle-off'}}" /></i></button>
+                    <button title="Run Job" data-jobid="{{job.id}}" class="btn-run-job"><i class="fa fa-play"></i></button>
                     <b>{{ job.name }}</b>
                     <div id="activeText_{{job.id}}" class="{{'text-info' if job.active else 'text-danger'}}">{{ "Active" if job.active else "Inactive" }}</div>
                     Task: {{ job.task }}
@@ -29,7 +29,6 @@
             </li>
         {% endfor %}
     </ul>
-     <script src="{{ url_for('static', filename='js/scheduledJobs.js') }}"></script>
     {% else %}
     <p>No jobs found.</p>
     {% endif %}
@@ -44,5 +43,6 @@
     {% else %}
     <p>No tasks found.</p>
     {% endif %}
-
 {% endblock %}
+{% block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/scheduledJobs.bundle.js') }}"></script>{% endblock %}
+

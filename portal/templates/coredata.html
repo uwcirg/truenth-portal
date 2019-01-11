@@ -87,6 +87,5 @@
     <footer id="core_data_footer">{{footer(user=user)}}</footer>
 {% endblock %}
 {% block additional_scripts %}
-    <script src="{{ url_for('static', filename='js/coredata.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/procedures.js') }}" async></script>
+    <script src="{{ url_for('static', filename='js/dist/coredata.bundle.js') }}"></script>
 {% endblock %}

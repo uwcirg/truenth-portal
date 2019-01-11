@@ -881,7 +881,7 @@
                 {%- endcall %}
                 {% call editSection() -%}
                     <div id="patientQContainer" data-sections="clinical" data-profile-section-id="clinicalquestions" data-save-container-id="patientQContainer">
-                        {{patientQGroup(person)}}
+                       {{patientQGroup(person)}}
                     </div>
                     {{saveLoaderDiv("patientQContainer")}}
                 {%- endcall %}
@@ -1166,7 +1166,7 @@
     {% set top_org = current_user.first_top_organization() if current_user else False %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %} data-profile-section-id="procedure">
+            <div id="profileProceduresWrapper" class="profile-item-container editable" data-sections="procedure" data-profile-section-id="procedure" data-top-org-id="{{top_org.id if top_org}}" data-top-org-name="{{top_org.name if top_org}}" {% if person and person.id == current_user.id %}data-user-view="true"{% endif %} data-profile-section-id="procedure">
                 <input type="hidden" id="profileProcSubjectId" value="{{person.id if person}}" />
                 <input type="hidden" id="profileProcCurrentUserId" value="{{current_user.id if current_user}}" />
                 {{profileEditButton()}}

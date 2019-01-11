@@ -52,6 +52,7 @@
  * = Colors =
  **/
 @bodyBgColor:      #FFF;
+@mainNavBgColor: #3A4450;
 @baseColor:       #333;
 @linkColor:       #57675B;
 @linkHover:       #576e76;
@@ -1185,6 +1186,7 @@ body.portal .copyright-container * {
 #mainNav {
   height: 71px;
   position: relative;
+  background-color: @mainNavBgColor; 
 }
 #mainNavLoadingError {
   position: absolute;
@@ -3296,13 +3298,12 @@ input.clinic {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000000; /* for browsers that don't support rgba color*/
-  background-color: rgba(0,0,0, 0.15);
+  background-color: @wellColor;
    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
-  filter: alpha(opacity=60);
-  -moz-opacity: 0.6;
-  -khtml-opacity: 0.6;
-  opacity: 0.6;
+  filter: alpha(opacity=100);
+  -moz-opacity: 1;
+  -khtml-opacity: 1;
+  opacity: 1;
 }
 
 #loadingIndicator i,
@@ -3325,7 +3326,7 @@ input.clinic {
 .loading-indicator-placeholder:not(:required):after {
   content: ' ';
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   width: 1em;
   height: 1em;
   margin-top: -0.5em;
