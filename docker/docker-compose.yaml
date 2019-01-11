@@ -12,8 +12,6 @@ services:
     env_file:
       - ${PORTAL_ENV_FILE:-portal.env}
     environment:
-      SECRET_KEY:
-      SERVER_NAME:
       PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
 
       # cross-service defaults
