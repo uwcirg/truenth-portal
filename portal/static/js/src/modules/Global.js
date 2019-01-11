@@ -232,19 +232,21 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 }
                 var getContent = (country_code, copyright_year) => {
                     var content = ""; //need to set this on callback as the call is asynchronous - otherwise the copyright value can be set before config value is returned
-                    switch (String(country_code.toUpperCase())) {
-                    case "US":
-                        content = i18next.t(`&copy; ${copyright_year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).`);
-                        break;
-                    case "AU":
-                        content = i18next.t(`&copy; ${copyright_year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).`);
-                        break;
-                    case "NZ":
-                        content = i18next.t(`&copy; ${copyright_year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).`);
-                        break;
-                    default:
-                        content = i18next.t(`&copy; ${copyright_year} Movember Foundation (Movember Foundation). All rights reserved.`);
-                    }
+                    switch (String(country_code.toUpperCase())) { /* replace year with copyright year after text is translated */
+                        case "US":
+                            content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).").replace("{year}", copyright_year);
+                            break;
+                        case "AU":
+                            content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).").replace("{year}", copyright_year);
+                            break;
+                        case "NZ":
+                            content = i18next.t("&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).").replace("{year}", copyright_year);
+                            break;
+                        case "CA":
+                        default:
+                            content = i18next.t("&copy; {year} Movember Foundation (Movember Foundation). All rights reserved.").replace("{year}", copyright_year);
+                        }
+                    console.log("content? ", content)
                     return content;
                 };
                 // todo: properly decouple country/locale
@@ -508,7 +510,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
                         var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
                         Utility.sendRequest(url, {max_attempts:1}, function(data) {
-                            
+                            console.log(data);
                             if (data && data.constructor == String) {
                                 data = JSON.parse(data);
                             }
@@ -520,7 +522,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                                 $("#erroremail").html("").parents(".form-group").removeClass("has-error");
                                 update($el);
                                 return true;
-                            } 
+                            }
                             $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
                         });
                     }
