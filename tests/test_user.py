@@ -536,7 +536,7 @@ class TestUser(TestCase):
         assert len(new_user.roles) == 1
         assert new_user.locale_code == language
         assert new_user.locale_name == language_name
-        assert new_user.organizations.count() == 2
+        assert len(new_user.organizations) == 2
 
     def test_failed_account_creation_by_staff(self):
         # without the right set of consents & roles, should fail
@@ -819,19 +819,23 @@ class TestUser(TestCase):
 
         staff_top = self.add_user('Staff 102')
         self.promote_user(staff_top, ROLE.STAFF.value)
+        staff_top = db.session.merge(staff_top)
         staff_top.organizations.append(org_102)
 
         staff_leaf = self.add_user('Staff 10031')
         self.promote_user(staff_leaf, ROLE.STAFF.value)
+        staff_leaf = db.session.merge(staff_leaf)
         staff_leaf.organizations.append(org_10031)
 
         staff_mid = self.add_user('Staff 1002')
         self.promote_user(staff_mid, ROLE.STAFF.value)
+        staff_mid = db.session.merge(staff_mid)
         staff_mid.organizations.append(org_1002)
 
         patient_w = self.add_user('patient w')
         patient_w_id = patient_w.id
         self.promote_user(patient_w, ROLE.PATIENT.value)
+        patient_w = db.session.merge(patient_w)
         patient_w.organizations.append(org_10032)
         uc_w = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -841,6 +845,7 @@ class TestUser(TestCase):
         patient_x = self.add_user('patient x')
         patient_x_id = patient_x.id
         self.promote_user(patient_x, ROLE.PATIENT.value)
+        patient_x = db.session.merge(patient_x)
         patient_x.organizations.append(org_10032)
         uc_x = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -850,6 +855,7 @@ class TestUser(TestCase):
         patient_y = self.add_user('patient y')
         patient_y_id = patient_y.id
         self.promote_user(patient_y, ROLE.PATIENT.value)
+        patient_y = db.session.merge(patient_y)
         patient_y.organizations.append(org_102)
         uc_y = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -859,6 +865,7 @@ class TestUser(TestCase):
         patient_z = self.add_user('patient z')
         patient_z_id = patient_z.id
         self.promote_user(patient_z, ROLE.PATIENT.value)
+        patient_z = db.session.merge(patient_z)
         patient_z.organizations.append(org_10031)
         uc_z = UserConsent(
             audit=audit, agreement_url='http://fake.org',
@@ -955,38 +962,41 @@ class TestUser(TestCase):
 
         staff_admin_top = self.add_user('staff_admin 102')
         self.promote_user(staff_admin_top, ROLE.STAFF_ADMIN.value)
+        staff_admin_top = db.session.merge(staff_admin_top)
         staff_admin_top.organizations.append(org_102)
 
         staff_admin_leaf = self.add_user('staff_admin 10031')
         self.promote_user(staff_admin_leaf, ROLE.STAFF_ADMIN.value)
+        staff_admin_leaf = db.session.merge(staff_admin_leaf)
         staff_admin_leaf.organizations.append(org_10031)
 
         staff_admin_mid = self.add_user('staff_admin 1002')
         self.promote_user(staff_admin_mid, ROLE.STAFF_ADMIN.value)
+        staff_admin_mid = db.session.merge(staff_admin_mid)
         staff_admin_mid.organizations.append(org_1002)
 
         staff_w = self.add_user('staff w')
-        staff_w_id = staff_w.id
         self.promote_user(staff_w, ROLE.STAFF.value)
+        staff_w = db.session.merge(staff_w)
         staff_w.organizations.append(org_10032)
 
         staff_x = self.add_user('staff x')
         staff_x_id = staff_x.id
         self.promote_user(staff_x, ROLE.STAFF.value)
+        staff_x = db.session.merge(staff_x)
         staff_x.organizations.append(org_10032)
 
         staff_y = self.add_user('staff y')
         staff_y_id = staff_y.id
         self.promote_user(staff_y, ROLE.STAFF.value)
+        staff_y = db.session.merge(staff_y)
         staff_y.organizations.append(org_102)
 
         staff_z = self.add_user('staff z')
         staff_z_id = staff_z.id
         self.promote_user(staff_z, ROLE.STAFF.value)
+        staff_z = db.session.merge(staff_z)
         staff_z.organizations.append(org_10031)
-
-        staff_x, staff_y, staff_z = map(db.session.merge, (
-            staff_x, staff_y, staff_z))
 
         ###
         # Setup complete - test access
@@ -1155,6 +1165,7 @@ class TestUser(TestCase):
             other.timezone = 'US/Eastern'
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
+            other = db.session.merge(other)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
             deceased_audit = Audit(
@@ -1185,6 +1196,7 @@ class TestUser(TestCase):
             other.gender = 'male'
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
+            self.test_user = db.session.merge(self.test_user)
             self.test_user.organizations.append(orgs[0])
             self.test_user.organizations.append(orgs[1])
             db.session.commit()
@@ -1216,6 +1228,7 @@ class TestUser(TestCase):
             self.promote_user(user=other, role_name=ROLE.ADMIN.value)
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
+            self.test_user = db.session.merge(self.test_user)
             self.test_user.organizations.append(orgs[0])
             self.test_user.organizations.append(orgs[1])
             db.session.commit()

@@ -636,9 +636,10 @@ class User(db.Model, UserMixin):
         values will be joined by ', '
 
         """
-        ext_ids = self._identifiers.filter_by(
-            system=TRUENTH_EXTERNAL_STUDY_SYSTEM)
-        if ext_ids.count():
+        ext_ids = [
+            id for id in self._identifiers if
+            id.system == TRUENTH_EXTERNAL_STUDY_SYSTEM]
+        if ext_ids:
             return ', '.join([ext_id.value for ext_id in ext_ids])
 
     @property
@@ -1341,7 +1342,7 @@ class User(db.Model, UserMixin):
                 ident for ident in self._identifiers
                 if ident.system not in internal_identifier_systems]
 
-            if len(pre_existing) != self._identifiers.count():
+            if len(pre_existing) != len(self._identifiers):
                 raise ValueError(
                     "implicit identifiers snuck in for {}".format(self))
 
