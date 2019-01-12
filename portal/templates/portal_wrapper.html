@@ -19,8 +19,8 @@
         {% elif user.has_role(ROLE.PATIENT.value) %}
             _paq.push(["setCustomDimension", 1, "Patient"]);
         {% endif %}
-        {% if user.organizations.first() %}
-            _paq.push(["setCustomDimension", 2, "{{ user.organizations.first().name }}"]);
+        {% if user.organizations %}
+            _paq.push(["setCustomDimension", 2, "{{ user.organizations[0].name }}"]);
         {% endif %}
     {% endif %}
     _paq.push(['trackPageView']);
