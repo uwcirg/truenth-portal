@@ -583,7 +583,6 @@ class TestOrganization(TestCase):
         self.deepen_org_tree()
         # Make staff with org associations at two levels
         self.promote_user(role_name=ROLE.STAFF.value)
-        self.test_user = db.session.merge(self.test_user)
 
         orgs = Organization.query.filter(Organization.id.in_((101, 102)))
         for o in orgs:

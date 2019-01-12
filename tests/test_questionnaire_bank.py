@@ -503,7 +503,6 @@ class TestQuestionnaireBank(TestCase):
                 rank=rank)
             bank.questionnaires.append(qbq)
 
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv.id, setdate=now)
         self.promote_user(role_name=ROLE.PATIENT.value)
@@ -597,7 +596,6 @@ class TestQuestionnaireBank(TestCase):
                 rank=rank)
             bank.questionnaires.append(qbq)
 
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         with SessionScope(db):
             db.session.add(bank)
@@ -610,8 +608,8 @@ class TestQuestionnaireBank(TestCase):
     def test_visit_baseline(self):
         crv = self.setup_org_qbs()
         self.bless_with_basics(setdate=now)  # pick up a consent, etc.
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
 
         qstats = QB_Status(self.test_user, now)
         qbd = qstats.current_qbd()
@@ -622,8 +620,8 @@ class TestQuestionnaireBank(TestCase):
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=3))
         self.bless_with_basics(setdate=backdate)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
 
         qstats = QB_Status(
             self.test_user, as_of_date=nowish+timedelta(hours=1))
@@ -638,8 +636,8 @@ class TestQuestionnaireBank(TestCase):
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=6))
         self.bless_with_basics(setdate=backdate)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
 
         qstats = QB_Status(
             self.test_user, as_of_date=nowish + timedelta(hours=1))
@@ -654,8 +652,8 @@ class TestQuestionnaireBank(TestCase):
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=9))
         self.bless_with_basics(setdate=backdate)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
 
         qstats = QB_Status(self.test_user, nowish + timedelta(hours=1))
         qbd = qstats.current_qbd()
@@ -666,8 +664,8 @@ class TestQuestionnaireBank(TestCase):
         backdate, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=3))
         self.bless_with_basics(setdate=backdate)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.test_user = db.session.merge(self.test_user)
 
         self.login()
         resp = self.client.get('/api/user/{}/'
@@ -801,7 +799,6 @@ class TestQuestionnaireBank(TestCase):
         org, rp3, rp3_id = self.setup_org_n_rp(org=org, rp_name='v3')
         org_id = org.id
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(org)
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
@@ -862,7 +859,6 @@ class TestQuestionnaireBank(TestCase):
         self.setup_org_qbs(org=org, rp_name='v3')
 
         self.promote_user(role_name=ROLE.PATIENT.value)
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(org)
         audit = Audit(
             user_id=TEST_USER_ID, subject_id=TEST_USER_ID)

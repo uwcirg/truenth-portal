@@ -60,7 +60,7 @@ class QuestionnaireBank(db.Model):
         back_populates='questionnaire_bank',
         order_by="QuestionnaireBankQuestionnaire.rank")
     recurs = db.relationship(
-        Recur, lazy='joined', secondary='questionnaire_bank_recurs')
+        Recur, secondary='questionnaire_bank_recurs')
 
     # QuestionnaireBank is associated with ResearchProtocol XOR Intervention,
     # either of which dictate whether it's given to a User

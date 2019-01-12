@@ -100,7 +100,7 @@ def staff_index():
     """staff view function, intended for staff admin
 
     Present the logged in staff admin the list of staff matching
-    the staff admin's organizations (and any descendant organizations)
+    the staff admin's organizations (and any decendent organizations)
 
     """
     user = current_user()

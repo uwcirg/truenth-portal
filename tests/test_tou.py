@@ -50,7 +50,7 @@ class TestTou(TestCase):
         self.login()
         self.bless_with_basics()
         self.test_user = db.session.merge(self.test_user)
-        org_id = self.test_user.organizations[0].id
+        org_id = self.test_user.organizations.first().id
         data = {'agreement_url': tou_url, 'organization_id': org_id}
         response = self.client.post(
             '/api/tou/accepted',
@@ -151,15 +151,12 @@ class TestTou(TestCase):
         staff = self.add_user('staff')
         staff_id = staff.id
         self.promote_user(staff, 'staff')
-        staff = db.session.merge(staff)
         staff.organizations.append(parent)
         second_user = self.add_user('second@foo.bar')
         second_user_id = second_user.id
         self.promote_user(second_user, 'patient')
-        second_user = db.session.merge(second_user)
         second_user.organizations.append(lonely_leaf)
         self.promote_user(self.test_user, 'patient')
-        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(child)
 
         def gentou(user_id, type):

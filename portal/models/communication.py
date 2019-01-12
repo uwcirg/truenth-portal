@@ -108,8 +108,9 @@ def load_template_args(
                 ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
-        if user.organizations:
-            return _(user.organizations[0].name)
+        org = user.organizations.first()
+        if org:
+            return _(org.name)
         return ""
 
     def _lookup_decision_support_via_access_button():

@@ -44,7 +44,7 @@ from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier
 from .intervention import UserIntervention
 from .observation import Observation, UserObservation
-from .organization import Organization, OrgTree, UserOrganization
+from .organization import Organization, OrgTree
 from .performer import Performer
 from .practitioner import Practitioner
 from .relationship import RELATIONSHIP, Relationship
@@ -275,7 +275,7 @@ class User(db.Model, UserMixin):
     auth_providers = db.relationship('AuthProvider', lazy='dynamic',
                                      cascade='delete')
     _consents = db.relationship(
-        'UserConsent', lazy='joined', cascade='delete',
+        'UserConsent', lazy='dynamic', cascade='delete',
         order_by="desc(UserConsent.acceptance_date)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
@@ -300,7 +300,7 @@ class User(db.Model, UserMixin):
         backref=db.backref('users'))
     organizations = db.relationship(
         'Organization',
-        lazy='joined',
+        lazy='dynamic',
         secondary="user_organizations",
         backref=db.backref('users'))
     procedures = db.relationship('Procedure', lazy='dynamic',
@@ -315,7 +315,7 @@ class User(db.Model, UserMixin):
     documents = db.relationship('UserDocument', lazy='dynamic',
                                 cascade='save-update, delete')
     _identifiers = db.relationship(
-        'Identifier', lazy='joined', secondary='user_identifiers')
+        'Identifier', lazy='dynamic', secondary='user_identifiers')
 
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
                              cascade="save-update, delete")
@@ -384,9 +384,8 @@ class User(db.Model, UserMixin):
     def valid_consents(self):
         """Access to consents that have neither been deleted or expired"""
         now = datetime.utcnow()
-        return [
-            c for c in self._consents
-            if c.expires > now and c.deleted_id is None]
+        return self._consents.filter(
+            text("expires>:now and deleted_id is null")).params(now=now)
 
     @property
     def display_name(self):
@@ -636,10 +635,9 @@ class User(db.Model, UserMixin):
         values will be joined by ', '
 
         """
-        ext_ids = [
-            id for id in self._identifiers if
-            id.system == TRUENTH_EXTERNAL_STUDY_SYSTEM]
-        if ext_ids:
+        ext_ids = self._identifiers.filter_by(
+            system=TRUENTH_EXTERNAL_STUDY_SYSTEM)
+        if ext_ids.count():
             return ', '.join([ext_id.value for ext_id in ext_ids])
 
     @property
@@ -1342,7 +1340,7 @@ class User(db.Model, UserMixin):
                 ident for ident in self._identifiers
                 if ident.system not in internal_identifier_systems]
 
-            if len(pre_existing) != len(self._identifiers):
+            if len(pre_existing) != self._identifiers.count():
                 raise ValueError(
                     "implicit identifiers snuck in for {}".format(self))
 
@@ -1838,46 +1836,6 @@ def get_user_or_abort(uid, allow_deleted=False):
     if not allow_deleted and user.deleted:
         raise Forbidden("deleted user - operation not permitted")
     return user
-
-
-def active_patients(
-        include_test_role=False, include_deleted=False,
-        require_orgs=None, filter_by_ids=None):
-    """Build query for active patients, filtered as specified
-
-    Common query for active (not deleted) patients.
-
-    :param include_test_role: Set true to include users with ``test`` role
-    :param include_deleted: Set true to include deleted users
-    :param require_orgs: Provide list of organization IDs if patients must
-        also have the respective UserOrganization association (different from
-        consents!)  User required to have at least one, not all orgs in given
-        ``require_orgs`` list.
-    :param filter_by_ids: List of user_ids to include in query filter
-    :return: Live SQLAlchemy ``Query``, for further filter additions or
-     execution
-
-    """
-    patients_query = User.query.join(
-        UserRoles).filter(User.id == UserRoles.user_id).join(
-        Role).filter(Role.name == ROLE.PATIENT.value)
-
-    if not include_deleted:
-        patients_query = patients_query.filter(User.deleted_id.is_(None))
-
-    if not include_test_role:
-        patients_query = patients_query.filter(
-            ~User.roles.any(Role.name == ROLE.TEST.value))
-
-    if require_orgs:
-        patients_query = patients_query.join(UserOrganization).filter(
-            User.id == UserOrganization.user_id).filter(
-            UserOrganization.organization_id.in_(require_orgs))
-
-    if filter_by_ids:
-        patients_query = patients_query.filter(User.id.in_(filter_by_ids))
-
-    return patients_query
 
 
 class UserRoles(db.Model):
