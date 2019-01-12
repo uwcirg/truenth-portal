@@ -67,7 +67,6 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
-from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
@@ -845,7 +844,7 @@ def settings():
                     QuestionnaireResponse.id == qnr.id
                 ).update({"document": document})
             db.session.commit()
-            invalidate_users_QBT(patient.id)
+            invalidate_assessment_status_cache(patient.id)
         except ValueError as e:
             trace("Invalid date format {}".format(form.timestamp.data))
             trace("ERROR: {}".format(e))

@@ -389,9 +389,8 @@ class TestCase(Base):
 
         """
         if not user:
-            user = db.session.merge(self.test_user)
-        else:
-            user = db.session.merge(user)
+            user = self.test_user
+        user = db.session.merge(user)
         user_id = user.id
         user.birthdate = datetime.utcnow()
 
@@ -408,7 +407,6 @@ class TestCase(Base):
             org = Organization.query.filter(
                 Organization.partOf_id.isnot(None)).first()
         assert org
-        user = db.session.merge(user)
         user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent

@@ -121,7 +121,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id, org1.id
         assert consent.staff_editable
@@ -142,7 +142,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert consent.acceptance_date == parser.parse(acceptance_date)
@@ -163,7 +163,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert (
@@ -181,7 +181,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         second_user = db.session.merge(second_user)
-        assert len(second_user.valid_consents) == 1
+        assert second_user.valid_consents.count() == 1
         consent = second_user.valid_consents[0]
         assert first_user_acceptance_date != consent.acceptance_date
 
@@ -215,7 +215,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert consent.staff_editable
@@ -232,7 +232,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         consent = self.test_user.valid_consents[0]
         assert consent.organization_id == org1.id
         assert not consent.staff_editable
@@ -263,7 +263,7 @@ class TestUserConsent(TestCase):
             db.session.add(uc2)
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 2
+        assert self.test_user.valid_consents.count() == 2
         self.login()
 
         response = self.client.delete(
@@ -272,7 +272,7 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
         assert self.test_user.valid_consents[0].organization_id == org2_id
 
         # We no longer omit deleted consent rows, but rather, include
@@ -299,7 +299,7 @@ class TestUserConsent(TestCase):
             db.session.add(uc)
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        assert len(self.test_user.valid_consents) == 1
+        assert self.test_user.valid_consents.count() == 1
 
         data = {'organization_id': org_id}
         self.login()
