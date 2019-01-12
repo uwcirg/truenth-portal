@@ -46,10 +46,10 @@ class TestQbTimeline(TestQuestionnaireBank):
     def test_full_list(self):
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
-        user = db.session.merge(self.test_user)
 
-        gen = ordered_qbs(user=user)
+        gen = ordered_qbs(user=self.test_user)
 
         # expect each in order despite overlapping nature
         expect_baseline = next(gen)
@@ -87,8 +87,8 @@ class TestQbTimeline(TestQuestionnaireBank):
         # Basic w/o any QNR submission should generate all default QBTs
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
-        self.test_user.organizations.append(crv)
         self.test_user = db.session.merge(self.test_user)
+        self.test_user.organizations.append(crv)
         update_users_QBT(TEST_USER_ID)
         # expect (due, overdue, expired) for each QB (8)
         assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
@@ -100,6 +100,7 @@ class TestQbTimeline(TestQuestionnaireBank):
     def test_partial_input(self):
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
         # submit a mock response for 3 month QB
@@ -129,6 +130,7 @@ class TestQbTimeline(TestQuestionnaireBank):
     def test_partial_post_overdue_input(self):
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
         # submit a mock response for 3 month QB after overdue
@@ -158,6 +160,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         # Basic w/ one complete QB
         crv = self.setup_org_qbs()
         self.bless_with_basics()  # pick up a consent, etc.
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
         # submit a mock response for all q's in 3 mo qb

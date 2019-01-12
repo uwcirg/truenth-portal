@@ -152,7 +152,7 @@ class TestDemographics(TestCase):
         assert user.last_name == family
         assert ['2162-6'] == [c.code for c in user.ethnicities]
         assert ['1096-7'] == [c.code for c in user.races]
-        assert user.organizations.count() == 2
+        assert len(user.organizations) == 2
         assert user.organizations[0].name == org_name
         assert user.organizations[1].name == org2_name
         assert user.practitioner_id == pract_id
@@ -308,6 +308,7 @@ class TestDemographics(TestCase):
         org_id, org_name = org.id, org.name
 
         # associate test org with test user
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(org)
         with SessionScope(db):
             db.session.add(self.test_user)
@@ -325,7 +326,7 @@ class TestDemographics(TestCase):
 
         assert response.status_code == 200
         user = db.session.merge(self.test_user)
-        assert user.organizations.count() == 1
+        assert len(user.organizations) == 1
         assert user.organizations[0].name == org_name
 
     def test_demographics_delete_ref(self):
@@ -346,6 +347,7 @@ class TestDemographics(TestCase):
         org_id = org.id
 
         # associate test orgs 2 and 3 with test user
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(org3)
         self.test_user.organizations.append(org2)
         with SessionScope(db):
@@ -366,7 +368,7 @@ class TestDemographics(TestCase):
         user = db.session.merge(self.test_user)
 
         # confirm only the one sent via API is intact.
-        assert user.organizations.count() == 1
+        assert len(user.organizations) == 1
         assert user.organizations[0].name == 'test org'
 
     def test_demographics_identifier_ref(self):
@@ -404,7 +406,7 @@ class TestDemographics(TestCase):
 
         assert response.status_code == 200
         user, pract = map(db.session.merge, (self.test_user, pract))
-        assert user.organizations.count() == 1
+        assert len(user.organizations) == 1
         assert user.organizations[0].name == org_name
         assert user.practitioner_id == pract.id
 
@@ -415,7 +417,7 @@ class TestDemographics(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         top = OrgTree().find(
-            self.test_user.organizations.first().id).top_level()
+            self.test_user.organizations[0].id).top_level()
 
         # Attempt to add the top-level org should raise
         self.login()

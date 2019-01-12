@@ -162,6 +162,7 @@ class TestCoredata(TestCase):
 
         self.config_as(
             system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(music_org)
         self.promote_user(role_name=ROLE.PATIENT.value)
 
