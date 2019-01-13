@@ -85,10 +85,7 @@ def postgresql_available():
         db.engine.execute(text('SELECT 1'))
         return True, 'PostgreSQL is available.'
     except Exception as e:
-        current_app.logger.error(
-            'sql alchemy not connected to postgreSQL. Error: {}'.format(e)
-        )
-        return False, 'PostgreSQL is not available.'
+        return False, 'sql alchemy not connected to postgreSQL. Error: {}'.format(e)
 
 
 def redis_available():
@@ -101,10 +98,7 @@ def redis_available():
         rs.ping()
         return True, 'Redis is available.'
     except Exception as e:
-        current_app.logger.error(
-            'Unable to connect to redis. Error {}'.format(e)
-        )
-        return False, 'Redis is not available.'
+        return False, 'Unable to connect to redis. Error {}'.format(e)
 
 
 # The checks that determine the health
