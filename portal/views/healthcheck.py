@@ -26,8 +26,12 @@ def celery_beat_ping():
     )
     return 'PONG'
 
+##############################
+# Healthcheck functions below
+##############################
 
-def is_celery_available():
+
+def celery_available():
     """Determines whether celery is available"""
     x = 1
     y = 1
@@ -37,25 +41,9 @@ def is_celery_available():
         celery_test_response = celery_test(x, y)
         task_id = celery_test_response.json['task_id']
         result = celery_result(task_id)
-        return int(result) == (x + y)
+        return int(result) == (x + y), 'Celery is available.'
     except Exception as e:
-        current_app.logger.error(
-            'failed to get result of celery_test. Error: {}'.format(e)
-        )
-        return False
-
-
-##############################
-# Healthcheck functions below
-##############################
-
-def celery_available():
-    """Checkes whether celery is available"""
-    celery_available = is_celery_available()
-    if celery_available:
-        return True, 'Celery is available.'
-    else:
-        return False, 'Celery is not available.'
+        return False, 'failed to get result of celery_test. Error: {}'.format(e)
 
 
 def celery_beat_available():
