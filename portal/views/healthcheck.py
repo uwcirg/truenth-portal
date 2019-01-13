@@ -46,11 +46,11 @@ def celery_available():
         try:
             result = AsyncResult(task_id, app=celery).get(timeout=5.0)
         except TimeoutError:
-            return False, "Operation timed out - most likely the task is not yet complete"
+            return False, 'task timed out'
 
         return int(result) == (x + y), 'Celery is available.'
     except Exception as e:
-        return False, 'failed to get result of celery_test. Error: {}'.format(e)
+        return False, 'failed to get celery test result. Error: {}'.format(e)
 
 
 def celery_beat_available():
@@ -73,14 +73,14 @@ def celery_beat_available():
 
 def postgresql_available():
     """Determines whether postgresql is available"""
-    # Execute a simple SQL Alchemy query.
+    # Execute a simple SQLAlchemy query.
     # If it succeeds we assume postgresql is available.
     # If it fails we assume psotgresql is not available.
     try:
         db.engine.execute(text('SELECT 1'))
         return True, 'PostgreSQL is available.'
     except Exception as e:
-        return False, 'sql alchemy not connected to postgreSQL. Error: {}'.format(e)
+        return False, 'failed to connect to postgreSQL. Error: {}'.format(e)
 
 
 def redis_available():
