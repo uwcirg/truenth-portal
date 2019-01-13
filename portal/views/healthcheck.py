@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, current_app
+from celery.result import AsyncResult
 import redis
 from sqlalchemy import text
 
@@ -37,10 +38,16 @@ def celery_available():
     y = 1
     result = 0
     try:
-        from portal import celery_test, celery_result
+        from portal import celery_test
+
         celery_test_response = celery_test(x, y)
         task_id = celery_test_response.json['task_id']
-        result = celery_result(task_id)
+
+        try:
+            result = AsyncResult(task_id, app=celery).get(timeout=5.0)
+        except TimeoutError:
+            return False, "Operation timed out - most likely the task is not yet complete"
+
         return int(result) == (x + y), 'Celery is available.'
     except Exception as e:
         return False, 'failed to get result of celery_test. Error: {}'.format(e)
