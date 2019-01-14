@@ -1,11 +1,13 @@
 from datetime import datetime
 
 from flask import Blueprint, current_app
+from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 import redis
 from sqlalchemy import text
 
 from ..database import db
+from ..factories.celery import create_celery
 
 HEALTHCHECK_FAILURE_STATUS_CODE = 200
 
@@ -36,9 +38,10 @@ def celery_available():
     """Determines whether celery is available"""
     x = 1
     y = 1
-    result = 0
+    celery = create_celery(current_app)
+
     try:
-        from portal import celery_test
+        from .portal import celery_test
 
         celery_test_response = celery_test(x, y)
         task_id = celery_test_response.json['task_id']
