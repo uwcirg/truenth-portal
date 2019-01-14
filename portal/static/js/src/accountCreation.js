@@ -12,6 +12,7 @@ import ProcApp from "./modules/Procedures.js";
         this.params = null;
         this.roles = roles;
         this.userId = "None created";
+        this.settings = null;
         this.dependencies = dependencies||{};
         this.treatmentIntervalVar = null;
         this.CONSENT_WITH_TOP_LEVEL_ORG = false;
@@ -207,7 +208,15 @@ import ProcApp from "./modules/Procedures.js";
         };
         this.__getSettings = function(callback) {
             callback = callback || function() {};
+            if (this.settings) {
+                callback(this.settings);
+                return;
+            }
+            var self = this;
             this.__request({"apiUrl": "/api/settings", "requestType": "GET", "callback": function(result) { //check config
+                if (result && result.data) {
+                    self.settings = result; /* assign value to settings for use internally within the account creation object */
+                }
                 callback(result);
             }});
         };

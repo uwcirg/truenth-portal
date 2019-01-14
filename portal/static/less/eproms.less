@@ -889,8 +889,7 @@ select:not([multiple]) {
     transition: max-height .35s;
   }
   /* :checked */
-  label.tab-label.active ~ .tab-content,
-  input.tab-input:checked ~ .tab-content {
+  label.tab-label.active ~ .tab-content {
     max-height: 27em;
     margin: 1em auto;
     padding: 0.5em;
@@ -913,7 +912,7 @@ select:not([multiple]) {
   input.tab-input + label.tab-label::after {
     content: "\25BC";
   }
-  input.tab-input:checked + label.tab-label::after {
+  label.tab-label.active::after {
     transform: rotateX(180deg);
   }
 }

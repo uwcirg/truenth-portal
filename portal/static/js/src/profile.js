@@ -1299,6 +1299,11 @@ export default (function() {
                         if (!data.error) {
                             $("#profileEmailMessage").text(i18next.t("invite email sent to {email}").replace("{email}", email));
                             $("#btnProfileSendEmail").attr("disabled", true);
+                            self.modules.tnthAjax.emailLog(self.subjectId, {useWorker: true}, function(data) { //reload email audit log
+                                setTimeout(function() {
+                                    self.getEmailLog(self.subjectId, data);
+                                }, 100);
+                            });
                         } else {
                             if (data.error) {
                                 $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
@@ -1310,10 +1315,11 @@ export default (function() {
                 });
             },
             initCommunicationSection: function() {
-                $("#communicationsContainer .tab-label").on("click", function() {
-                    $("#communicationsContainer .tab-label").removeClass("active");
-                    $(this).addClass("active");
+                $("#communicationsContainer .tab-label").on("click", function(e) {
+                    e.stopPropagation();
+                    $(this).toggleClass("active");
                 });
+                $("#communicationsContainer .tab-label").first().addClass("active");
                 $("#emailBodyModal").modal({"show": false});
                 var subjectId = this.subjectId, self = this;
                 this.modules.tnthAjax.emailLog(subjectId, {useWorker: true}, function(data) {
@@ -1604,7 +1610,7 @@ export default (function() {
                     });
                 });
 
-                
+
 
                 /*
                  * If an organization is a top level org and has child orgs, we render legend for it.  This will prevent the organization from being selected by the user.
@@ -1691,8 +1697,8 @@ export default (function() {
                 var selectOptions = $("#stateSelector option");
                 if (selectOptions.length > 0) {
                     var selectSortedOptions = $("#stateSelector").sortOptions();
-                    if (selectSortedOptions && selectSortedOptions.length > 0) {
-                        $("#stateSelector").empty().append(selectOptions)
+                    if (selectSortedOptions && selectSortedOptions.length > 0) { //sorting the select options
+                        $("#stateSelector").empty().append(selectSortedOptions)
                         .append(`<option value="none">${i18next.t("Other")}</option>`)
                         .prepend(`<option value="" selected>${i18next.t("Select")}</option>`)
                         .val("");
