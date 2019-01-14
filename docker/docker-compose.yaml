@@ -12,8 +12,6 @@ services:
     env_file:
       - ${PORTAL_ENV_FILE:-portal.env}
     environment:
-      PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
-
       # cross-service defaults
       PGDATABASE: ${PGDATABASE:-portaldb}
       PGHOST: ${PGHOST:-db}
