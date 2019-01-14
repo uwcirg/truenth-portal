@@ -36,6 +36,7 @@ coverage.xml
 
 # generated CSS files
 portal/*/static/css/*.css
+portal/static/css/*.css
 
 # nodeJS virtual environment and files
 node_env/
