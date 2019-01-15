@@ -228,6 +228,10 @@ var tnthDates =  { /*global i18next */
             return "";
         }
     },
+    "localeSessionKey": "currentUserLocale",
+    "clearSessionLocale": function() {
+        sessionStorage.removeItem(this.localeSessionKey);
+    },
     "convertToLocalTime": function(dateString) {
         var convertedDate = "";
         if (dateString) { //assuming dateString is UTC date/time
