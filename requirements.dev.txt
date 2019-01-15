@@ -22,4 +22,5 @@ virtualenv==16.2.0        # via tox
 waitress==1.1.0           # via webtest
 webob==1.8.5              # via webtest
 webtest==2.0.32           # via flask-webtest
+xvfbwrapper==0.2.9
 --editable .
