@@ -207,9 +207,9 @@ import ProcApp from "./modules/Procedures.js";
         };
         this.__getSettings = function(callback) {
             callback = callback || function() {};
-            this.__request({"apiUrl": "/api/settings", "requestType": "GET", "callback": function(result) { //check config
-                callback(result);
-            }});
+            tnthAjax.getConfiguration("account", "", function(result) { /* this will return configuration from sessionStorage if it is stored */
+                callback({data:result});
+            });
         };
         this.__setPcaLocalized = function(callback) {
             callback = callback || function() {};

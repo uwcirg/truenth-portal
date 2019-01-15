@@ -409,6 +409,13 @@
                                     {{profileStaffRegistrationEmail(person)}}
                                 </div>
                             </div>
+                            <div class="tab">
+                                <input id="tab-six" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                                <label id="lbEmailLog" for="tab-six" class="tab-label">{{_("Email audit log")}}</label>
+                                <div class="tab-content">
+                                    {{profileEmailLog(person)}}
+                                </div>
+                            </div>
                         </div>
                     {%- else -%}
                         <div class="flex">

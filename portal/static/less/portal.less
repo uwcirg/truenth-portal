@@ -411,8 +411,7 @@ a.btn {
     transition: max-height .35s;
   }
   /* :checked */
-  label.tab-label.active ~ .tab-content,
-  input.tab-input:checked ~ .tab-content {
+  label.tab-label.active ~ .tab-content {
     max-height: 120em;
     margin: 1em auto;
     padding: 0.5em;
@@ -435,7 +434,7 @@ a.btn {
   input.tab-input + label.tab-label::after {
     content: "\25BC";
   }
-  input.tab-input:checked + label.tab-label::after {
+  label.tab-label.active::after {
     transform: rotateX(180deg);
   }
 }
