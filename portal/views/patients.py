@@ -1,7 +1,14 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 from datetime import datetime
 
-from flask import Blueprint, abort, current_app, jsonify, render_template
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_babel import gettext as _
 from flask_user import roles_required
 from sqlalchemy import and_
@@ -30,6 +37,10 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 @oauth.require_oauth()
 def patients_root():
     """patients view function, intended for staff
+
+    :param reset_cache: (as query parameter).  If present, the cached
+     as_of_date key used in assessment status lookup will be reset to
+     current (forcing a refresh)
 
     Present the logged in staff the list of patients matching
     the staff's organizations (and any descendant organizations)
@@ -72,6 +83,9 @@ def patients_root():
                         continue
                     org_list.update(ot.here_and_below_id(org.id))
             return list(org_list)
+
+    if request.args.get('reset_cache'):
+        QB_StatusCacheKey().update(datetime.utcnow())
 
     user = current_user()
     consent_query = UserConsent.query.filter(and_(
