@@ -1,10 +1,13 @@
 from datetime import datetime, MAXYEAR
-from sqlalchemy.types import Enum as SQLA_Enum
-
+from dateutil.relativedelta import relativedelta
 from flask import current_app
+from sqlalchemy.types import Enum as SQLA_Enum
+import redis
+from werkzeug.exceptions import BadRequest
 
 from ..database import db
-from ..date_tools import RelativeDelta
+from ..date_tools import FHIR_datetime, RelativeDelta
+from ..dogpile_cache import dogpile_cache
 from ..timeout_lock import TimeoutLock
 from ..trace import trace
 from .overall_status import OverallStatus
@@ -439,6 +442,59 @@ def update_users_QBT(user_id, invalidate_existing=False):
         db.session.commit()
 
 
+class QB_StatusCacheKey(object):
+    redis = None
+    region_name = 'assessment_cache_region'
+    key = "{}_as_of_date".format(__name__)
+
+    def __init__(self):
+        """init
+
+        Establish redis connection and lookup configured max duration for key
+
+        """
+        # Lookup the configured expiration of the matching cache
+        # container ("DOGPILE_CACHE_REGIONS" -> "assessment_cache_region")
+        if self.redis is None:
+            self.redis = redis.StrictRedis.from_url(
+                current_app.config['REDIS_URL'])
+        regions = current_app.config['DOGPILE_CACHE_REGIONS']
+        for region_name, duration in regions:
+            if region_name == self.region_name:
+                self.valid_duration = relativedelta(seconds=duration)
+        if not self.valid_duration:
+            raise RuntimeError("unable to locate configured cache timeout")
+
+    def current(self):
+        """Returns current as_of_date value
+
+        If a valid datetime value is found to be within the max configured
+        duration, return it.  Otherwise, store utcnow (for subsequent use)
+        and return that.
+
+        :returns: a valid (UTC) datetime, either the current cached value or
+          a new, if the old has expired or was not found.
+
+        """
+        now = datetime.utcnow()
+        value = self.redis.get(self.key)
+        try:
+            value = FHIR_datetime.parse(value)
+            if value + self.valid_duration > now:
+                return value
+        except BadRequest:
+            if value is not None:
+                current_app.logger.warning(
+                    "Can't parse as datetime {}".format(value))
+            value = now
+        self.redis.set(self.key, value.isoformat())
+        return value
+
+    def update(self, value):
+        """Updates the cache key to given value"""
+        return self.redis.getset(self.key, value)
+
+@dogpile_cache.region('assessment_cache_region')
 def qb_status_visit_name(user_id, as_of_date):
     """Return (status, visit name) for current QB for user as of given date
 

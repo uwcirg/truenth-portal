@@ -10,7 +10,7 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree
-from ..models.qb_timeline import qb_status_visit_name
+from ..models.qb_timeline import qb_status_visit_name, QB_StatusCacheKey
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import (
@@ -97,13 +97,13 @@ def patients_root():
 
     # get assessment status only if it is needed as specified by config
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        now = datetime.utcnow()
+        cached_as_of_key = QB_StatusCacheKey().current()
         patient_list = []
         for patient in patients:
             if patient.deleted:
                 patient_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(patient.id, now)
+            a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
             patient_list.append(patient)
