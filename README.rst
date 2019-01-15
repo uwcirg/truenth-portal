@@ -110,6 +110,12 @@ correct libraries are installed:
 
     pip install --requirement requirements.txt
 
+To install additional dependencies necessary for development, also run ``pip`` as below:
+
+.. code:: bash
+
+    pip install --requirement requirements.dev.txt
+
 COMMAND LINE INTERFACE
 ----------------------
 
