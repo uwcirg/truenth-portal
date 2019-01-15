@@ -1,10 +1,13 @@
 from datetime import datetime
 
 from flask import Blueprint, current_app
+from celery.exceptions import TimeoutError
+from celery.result import AsyncResult
 import redis
 from sqlalchemy import text
 
 from ..database import db
+from ..factories.celery import create_celery
 
 HEALTHCHECK_FAILURE_STATUS_CODE = 200
 
@@ -26,36 +29,31 @@ def celery_beat_ping():
     )
     return 'PONG'
 
-
-def is_celery_available():
-    """Determines whether celery is available"""
-    x = 1
-    y = 1
-    result = 0
-    try:
-        from portal import celery_test, celery_result
-        celery_test_response = celery_test(x, y)
-        task_id = celery_test_response.json['task_id']
-        result = celery_result(task_id)
-        return int(result) == (x + y)
-    except Exception as e:
-        current_app.logger.error(
-            'failed to get result of celery_test. Error: {}'.format(e)
-        )
-        return False
-
-
 ##############################
 # Healthcheck functions below
 ##############################
 
+
 def celery_available():
-    """Checkes whether celery is available"""
-    celery_available = is_celery_available()
-    if celery_available:
-        return True, 'Celery is available.'
-    else:
-        return False, 'Celery is not available.'
+    """Determines whether celery is available"""
+    x = 1
+    y = 1
+    celery = create_celery(current_app)
+
+    try:
+        from .portal import celery_test
+
+        celery_test_response = celery_test(x, y)
+        task_id = celery_test_response.json['task_id']
+
+        try:
+            result = AsyncResult(task_id, app=celery).get(timeout=5.0)
+        except TimeoutError:
+            return False, 'task timed out'
+
+        return int(result) == (x + y), 'Celery is available.'
+    except Exception as e:
+        return False, 'failed to get celery test result. Error: {}'.format(e)
 
 
 def celery_beat_available():
@@ -78,17 +76,14 @@ def celery_beat_available():
 
 def postgresql_available():
     """Determines whether postgresql is available"""
-    # Execute a simple SQL Alchemy query.
+    # Execute a simple SQLAlchemy query.
     # If it succeeds we assume postgresql is available.
     # If it fails we assume psotgresql is not available.
     try:
         db.engine.execute(text('SELECT 1'))
         return True, 'PostgreSQL is available.'
     except Exception as e:
-        current_app.logger.error(
-            'sql alchemy not connected to postgreSQL. Error: {}'.format(e)
-        )
-        return False, 'PostgreSQL is not available.'
+        return False, 'failed to connect to postgreSQL. Error: {}'.format(e)
 
 
 def redis_available():
@@ -101,10 +96,7 @@ def redis_available():
         rs.ping()
         return True, 'Redis is available.'
     except Exception as e:
-        current_app.logger.error(
-            'Unable to connect to redis. Error {}'.format(e)
-        )
-        return False, 'Redis is not available.'
+        return False, 'Unable to connect to redis. Error {}'.format(e)
 
 
 # The checks that determine the health
