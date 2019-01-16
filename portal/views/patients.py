@@ -1,7 +1,14 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 from datetime import datetime
 
-from flask import Blueprint, abort, current_app, jsonify, render_template
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_babel import gettext as _
 from flask_user import roles_required
 from sqlalchemy import and_
@@ -10,7 +17,7 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree
-from ..models.qb_timeline import qb_status_visit_name
+from ..models.qb_timeline import qb_status_visit_name, QB_StatusCacheKey
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import (
@@ -25,11 +32,15 @@ from ..type_tools import check_int
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-@patients.route('/')
+@patients.route('/', methods=('GET', 'POST'))
 @roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patients_root():
     """patients view function, intended for staff
+
+    :param reset_cache: (as query parameter).  If present, the cached
+     as_of_date key used in assessment status lookup will be reset to
+     current (forcing a refresh)
 
     Present the logged in staff the list of patients matching
     the staff's organizations (and any descendant organizations)
@@ -73,6 +84,9 @@ def patients_root():
                     org_list.update(ot.here_and_below_id(org.id))
             return list(org_list)
 
+    if request.form.get('reset_cache'):
+        QB_StatusCacheKey().update(datetime.utcnow())
+
     user = current_user()
     consent_query = UserConsent.query.filter(and_(
         UserConsent.deleted_id.is_(None),
@@ -96,14 +110,17 @@ def patients_root():
             UserIntervention.intervention_id.in_(ui_list)))
 
     # get assessment status only if it is needed as specified by config
+    qb_status_cache_age = 0
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        now = datetime.utcnow()
+        status_cache_key = QB_StatusCacheKey()
+        cached_as_of_key = status_cache_key.current()
+        qb_status_cache_age = status_cache_key.minutes_old()
         patient_list = []
         for patient in patients:
             if patient.deleted:
                 patient_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(patient.id, now)
+            a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
             patient_list.append(patient)
@@ -111,7 +128,7 @@ def patients_root():
 
     return render_template(
         'admin/patients_by_org.html', patients_list=patients, user=user,
-        wide_container="true")
+        qb_status_cache_age=qb_status_cache_age, wide_container="true")
 
 
 @patients.route('/patient-profile-create')

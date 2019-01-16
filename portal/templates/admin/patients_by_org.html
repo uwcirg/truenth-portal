@@ -10,6 +10,16 @@
       {%- endif -%}
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
+    {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+      <div>
+        <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_root')}}">
+          <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
+          <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
+          <div class="description text-warning">{{_('Note: these records are cached for performance reasons, so they are approximately %(age)d minutes old. Click the "REBUILD CACHE" button to see the current data.', age=qb_status_cache_age)}}</div>
+          <button type="submit" class="button btn btn-default">{{_("Rebuild Cache")}}</button>
+        </form>
+      </div>
+    {% endif %}
     {% set account_deactivation_enabled = user.has_role(ROLE.STAFF_ADMIN.value) and config.ALLOW_PATIENT_ACCOUNT_DEACTIVATION %}
     <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
