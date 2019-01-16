@@ -412,7 +412,7 @@ class Test_QB_StatusCacheKey(TestCase):
         hourback = datetime.utcnow() - relativedelta(hours=1)
         cache_key = QB_StatusCacheKey()
         cache_key.update(hourback)
-        assert hourback == cache_key.current().replace(microsecond=0)
+        assert hourback.replace(microsecond=0) == cache_key.current()
 
     def test_age(self):
         hourback = datetime.utcnow() - relativedelta(hours=1)
