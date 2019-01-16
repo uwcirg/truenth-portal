@@ -328,8 +328,7 @@ class Communication(db.Model):
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
 
-        qb_status, _ = qb_status_visit_name(
-            user_id=self.user_id, as_of_date=datetime.utcnow())
+        qb_status, _ = qb_status_visit_name(self.user_id, datetime.utcnow())
         if qb_status == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
