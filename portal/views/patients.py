@@ -32,7 +32,7 @@ from ..type_tools import check_int
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-@patients.route('/')
+@patients.route('/', methods=('GET', 'POST'))
 @roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patients_root():
@@ -110,8 +110,11 @@ def patients_root():
             UserIntervention.intervention_id.in_(ui_list)))
 
     # get assessment status only if it is needed as specified by config
+    qb_status_cache_age = 0
     if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        cached_as_of_key = QB_StatusCacheKey().current()
+        status_cache_key = QB_StatusCacheKey()
+        cached_as_of_key = status_cache_key.current()
+        qb_status_cache_age = status_cache_key.minutes_old()
         patient_list = []
         for patient in patients:
             if patient.deleted:
@@ -125,7 +128,7 @@ def patients_root():
 
     return render_template(
         'admin/patients_by_org.html', patients_list=patients, user=user,
-        wide_container="true")
+        qb_status_cache_age=qb_status_cache_age, wide_container="true")
 
 
 @patients.route('/patient-profile-create')
