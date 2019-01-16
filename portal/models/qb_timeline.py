@@ -465,6 +465,19 @@ class QB_StatusCacheKey(object):
         if not self.valid_duration:
             raise RuntimeError("unable to locate configured cache timeout")
 
+    def minutes_old(self):
+        """Return human friendly string for age of cache key
+
+        Looks up the age of self.key WRT utcnow, and return the approximate
+        minute value.
+
+        :returns: approximate number of minutes since renewal of cache key
+
+        """
+        now = datetime.utcnow()
+        delta = relativedelta(now, self.current())
+        return delta.hours * 60 + delta.minutes
+
     def current(self):
         """Returns current as_of_date value
 
@@ -486,13 +499,21 @@ class QB_StatusCacheKey(object):
             if value is not None:
                 current_app.logger.warning(
                     "Can't parse as datetime {}".format(value))
-            value = now
-        self.redis.set(self.key, value.isoformat())
-        return value
+        return self.update(now)
 
     def update(self, value):
         """Updates the cache key to given value"""
-        return self.redis.getset(self.key, value)
+        if not isinstance(value, datetime):
+            raise ValueError('expected datetime for key value')
+        now = datetime.utcnow()
+        if value + self.valid_duration < now:
+            raise ValueError('expect valid datetime - {} too old'.format(
+                value))
+        if value > now:
+            raise ValueError('future dates not acceptable keys')
+
+        return self.redis.getset(self.key, FHIR_datetime.as_fhir(value))
+
 
 @dogpile_cache.region('assessment_cache_region')
 def qb_status_visit_name(user_id, as_of_date):

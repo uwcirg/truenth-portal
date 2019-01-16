@@ -4,9 +4,11 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
+from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.qb_timeline import (
+    QB_StatusCacheKey,
     QBT,
     ordered_qbs,
     second_null_safe_datetime,
@@ -15,7 +17,7 @@ from portal.models.qb_timeline import (
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.views.user import withdraw_consent
 from portal.models.overall_status import OverallStatus
-from tests import associative_backdate, TEST_USER_ID
+from tests import TEST_USER_ID, associative_backdate, TestCase
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
 
@@ -396,3 +398,26 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         with pytest.raises(StopIteration):
             next(gen)
+
+
+class Test_QB_StatusCacheKey(TestCase):
+
+    now = datetime.utcnow()
+
+    def test_current(self):
+        cache_key = QB_StatusCacheKey()
+        cur_val = cache_key.current()
+        assert cur_val
+        assert relativedelta(self.now - cur_val).seconds < 5
+
+    def test_update(self):
+        hourback = self.now - relativedelta(hours=1)
+        cache_key = QB_StatusCacheKey()
+        cache_key.update(hourback)
+        assert hourback == cache_key.current()
+
+    def test_age(self):
+        hourback = self.now - relativedelta(hours=1)
+        cache_key = QB_StatusCacheKey()
+        cache_key.update(hourback)
+        assert cache_key.minutes_old() == 60
