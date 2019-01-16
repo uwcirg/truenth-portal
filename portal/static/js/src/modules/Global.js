@@ -365,7 +365,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "setCustomJQueryEvents": function($) {
         if (!$) { return false; }
         var __winHeight = $(window).height();
-        $.fn.isOnScreen = function() {
+        jQuery.fn.isOnScreen = function() {
             var viewport = {};
             viewport.top = $(window).scrollTop();
             viewport.bottom = viewport.top + __winHeight;
@@ -374,7 +374,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             bounds.bottom = bounds.top + this.outerHeight();
             return ((bounds.top <= viewport.bottom) && (bounds.bottom >= viewport.top));
         };
-        $.fn.sortOptions = function() {
+        jQuery.fn.sortOptions = function() {
             var selectOptions = $(this).find("option");
             selectOptions.sort(function(a, b) {
                 if (a.text > b.text) {
