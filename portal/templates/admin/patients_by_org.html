@@ -103,10 +103,12 @@
       </table>
       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
         <div>
-          <hr/>
-          <div class="text-warning">Note: these records are cached for performance reasons, so they may be an hour old.<br/>Click the button below to rebuild the cache with the current data.</div>
-          <br/>
-          <a href="/patients/?reset_cache=True" class="btn btn-tnth-primary">{{_("Reset Cache")}}</a>
+          <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_root')}}">
+            <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
+            <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
+            <div class="description text-warning">{{_('Note: these records are cached for performance reasons, so they are approximately %(age)d minutes old. Click the "REBUILD CACHE" button to see the current data.', age=qb_status_cache_age)}}</div>
+            <button type="submit" class="button btn btn-tnth-primary">{{_("Rebuild Cache")}}</button>
+          </form>
         </div>
       {% endif %}
       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
