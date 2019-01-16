@@ -84,7 +84,7 @@ def patients_root():
                     org_list.update(ot.here_and_below_id(org.id))
             return list(org_list)
 
-    if request.args.get('reset_cache'):
+    if request.form.get('reset_cache'):
         QB_StatusCacheKey().update(datetime.utcnow())
 
     user = current_user()
