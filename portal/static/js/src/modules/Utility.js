@@ -239,12 +239,12 @@ var Utility = (function() {
         var self = this;
         Vue.config.errorHandler = function (err, vm, info)  {
             var handler, current = vm;
-            if (vm.$options.errorHandler) {
+            if (vm && vm.$options && vm.$options.errorHandler) {
                 handler = vm.$options.errorHandler;
             } else {
-                while (!handler && current.$parent) {
+                while (!handler && current && current.$parent) {
                     current = current.$parent;
-                    handler = current.$options.errorHandler;
+                    handler = current.$options ? current.$options.errorHandler : null;
                 }
             }
             self.restoreVis();

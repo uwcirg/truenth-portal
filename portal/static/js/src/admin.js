@@ -260,13 +260,6 @@ import OrgTool from "./modules/OrgTool.js";
                     self.resetRowVisByActivationStatus();
                     self.setRowItemEvent();
                 });
-                $("#adminTable").on("page-change.bs.table", function () {
-                    if (!$("#patientList .tnth-headline").isOnScreen()) { /*global isOnScreen */
-                        $("html, body").animate({
-                            scrollTop: $(".fixed-table-toolbar").offset().top
-                        }, 2000);
-                    }
-                });
                 $(window).bind("scroll mousedown mousewheel keyup", function () {
                     if ($("html, body").is(":animated")) {
                         $("html, body").stop(true, true);
