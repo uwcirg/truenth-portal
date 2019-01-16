@@ -512,7 +512,9 @@ class QB_StatusCacheKey(object):
         if value > now:
             raise ValueError('future dates not acceptable keys')
 
-        return self.redis.getset(self.key, FHIR_datetime.as_fhir(value))
+        stringform = FHIR_datetime.as_fhir(value)
+        self.redis.set(self.key, stringform)
+        return stringform
 
 
 @dogpile_cache.region('assessment_cache_region')
