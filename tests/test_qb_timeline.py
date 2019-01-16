@@ -402,22 +402,20 @@ class TestQbTimeline(TestQuestionnaireBank):
 
 class Test_QB_StatusCacheKey(TestCase):
 
-    now = datetime.utcnow()
-
     def test_current(self):
         cache_key = QB_StatusCacheKey()
         cur_val = cache_key.current()
         assert cur_val
-        assert relativedelta(self.now - cur_val).seconds < 5
+        assert relativedelta(datetime.utcnow() - cur_val).seconds < 5
 
     def test_update(self):
-        hourback = self.now - relativedelta(hours=1)
+        hourback = datetime.utcnow() - relativedelta(hours=1)
         cache_key = QB_StatusCacheKey()
         cache_key.update(hourback)
         assert hourback == cache_key.current()
 
     def test_age(self):
-        hourback = self.now - relativedelta(hours=1)
+        hourback = datetime.utcnow() - relativedelta(hours=1)
         cache_key = QB_StatusCacheKey()
         cache_key.update(hourback)
         assert cache_key.minutes_old() == 60
