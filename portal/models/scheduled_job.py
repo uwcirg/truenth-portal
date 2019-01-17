@@ -1,5 +1,6 @@
 """Scheduled Job module"""
 from datetime import datetime
+from random import randint
 import re
 
 from celery.schedules import crontab
@@ -32,10 +33,14 @@ class ScheduledJob(db.Model):
     @schedule.setter
     def schedule(self, sc):
         # schedule must match cron schedule pattern * * * * *
-        format = r'([\*\d,-\/]+)\s([\*\d,-\/]+)\s([\*\d,-\/]+)' \
+        # with the option of using an 'r' in the minutes column
+        # to request random minute generation
+        format = r'([\*\d,-\/,r]+)\s([\*\d,-\/]+)\s([\*\d,-\/]+)' \
                  r'\s([\*\d,-\/]+)\s([\*\d,-\/]+)$'
         if not sc or not re.match(format, sc):
             raise Exception("schedule must be in valid cron format")
+        if sc.startswith('r'):
+            sc = str(randint(0, 59)) + sc[1:]
         self._schedule = sc
 
     @classmethod

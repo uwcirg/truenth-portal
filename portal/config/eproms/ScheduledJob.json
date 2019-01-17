@@ -10,7 +10,7 @@
       },
       "name": "IRONMAN site summary email",
       "resourceType": "ScheduledJob",
-      "schedule": "0 20 * * 0",
+      "schedule": "r 20 * * 0",
       "task": "send_questionnaire_summary"
     },
     {
@@ -20,7 +20,7 @@
       "kwargs": null,
       "name": "Prepare ready communications",
       "resourceType": "ScheduledJob",
-      "schedule": "35 */2 * * *",
+      "schedule": "r */2 * * *",
       "task": "prepare_communications"
     },
     {
@@ -30,7 +30,7 @@
       "kwargs": null,
       "name": "Send ready communications",
       "resourceType": "ScheduledJob",
-      "schedule": "55 */2 * * *",
+      "schedule": "r */2 * * *",
       "task": "send_queued_communications"
     },
     {
@@ -43,7 +43,7 @@
       },
       "name": "TNGR site summary email",
       "resourceType": "ScheduledJob",
-      "schedule": "0 21 * * 0",
+      "schedule": "r 21 * * 0",
       "task": "send_questionnaire_summary"
     },
     {
@@ -53,7 +53,7 @@
       "kwargs": null,
       "name": "Update assessment status cache",
       "resourceType": "ScheduledJob",
-      "schedule": "5 */2 * * *",
+      "schedule": "r */2 * * *",
       "task": "cache_assessment_status"
     },
     {
@@ -64,7 +64,7 @@
       "name": "Update reporting stats cache",
       "resourceType": "ScheduledJob",
       "comment": "UTC times, desire 9 am & pm PTC",
-      "schedule": "0 4,16 * * *",
+      "schedule": "r 4,16 * * *",
       "task": "cache_reporting_stats"
     },
     {
@@ -79,7 +79,7 @@
       "active": true,
       "name": "Service Token Watchdog",
       "resourceType": "ScheduledJob",
-      "schedule": "30 2 * * *",
+      "schedule": "r 2 * * *",
       "task": "token_watchdog"
     },
     {
