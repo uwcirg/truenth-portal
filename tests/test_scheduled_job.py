@@ -31,6 +31,15 @@ class TestScheduledJob(TestCase):
         with pytest.raises(Exception):
             sj.schedule = invalid_schedule
 
+    def test_random_schedule(self):
+        schedule = "r * * * *"
+        sj = ScheduledJob(
+            name="rando", task="test", schedule=schedule, active=True)
+        sjc = sj.crontab_schedule()
+        assert len(sjc.minute) == 1
+        assert sjc.minute.pop() in range(0, 59)
+        assert len(sjc.hour) == 24
+
     def test_job_upsert(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
         self.login()
