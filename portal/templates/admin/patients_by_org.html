@@ -20,6 +20,7 @@
               <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
               <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
               <button type="submit" class="button btn btn-tnth-primary">{{_("Refresh Patient List")}}</button>
+              <span class="smaller-text byline-text">{{_("Last updated %(minudo)d minutes ago", minudo=qb_status_cache_age)}}</span>
             </form>
           </div>
         {% endif %}
