@@ -43,6 +43,8 @@ from portal.models.user_consent import STAFF_EDITABLE_MASK
 from portal.models.user_consent import INCLUDE_IN_REPORTS_MASK
 from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
+DEFAULT_PASSWORD = 'fakePa$$'
+
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
 FIRST_NAME = '✓'
@@ -157,7 +159,7 @@ class TestCase(Base):
 
     def add_user(
             self, username, first_name="", last_name="", image_url=None,
-            password='fakePa$$', email=None):
+            password=DEFAULT_PASSWORD, email=None):
         """Create a user and add to test db, and return it"""
         # Hash the password
         password = self.app.user_manager.hash_password(password)
@@ -387,8 +389,9 @@ class TestCase(Base):
 
         """
         if not user:
-            user = self.test_user
-        user = db.session.merge(user)
+            user = db.session.merge(self.test_user)
+        else:
+            user = db.session.merge(user)
         user_id = user.id
         user.birthdate = datetime.utcnow()
 
@@ -405,6 +408,7 @@ class TestCase(Base):
             org = Organization.query.filter(
                 Organization.partOf_id.isnot(None)).first()
         assert org
+        user = db.session.merge(user)
         user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent

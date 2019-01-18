@@ -1599,7 +1599,7 @@
       "id": 14702,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-55"
         }
@@ -1913,7 +1913,7 @@
       "id": 14659,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-59"
         }

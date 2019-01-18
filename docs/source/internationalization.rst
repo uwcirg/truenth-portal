@@ -40,7 +40,7 @@ Updating PO files
 -----------------
 To update the PO files with the latest translations from Smartling, run the following command::
 
-   $ FLASK_APP=manage.py flask translation-download
+   $ FLASK_APP=manage.py flask download-translations
 
 Initializing Translation Files
 ==============================

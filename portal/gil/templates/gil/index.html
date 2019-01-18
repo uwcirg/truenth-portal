@@ -1,6 +1,6 @@
 {% extends "gil/base.html" %}
 {% block title %}{{super()}} Home{% endblock %}
-{% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
+{% block head %} {{super()}} <script src="{{url_for('static', filename='js/vendor/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
     <div id="systemMaintenanceContainer" class="sys-maintenance"></div>
     <main class="main" data-section="home">
@@ -131,5 +131,5 @@
     </main>
   {% endblock %}
   {% block document_ready %}
-  <script src="{{url_for('.static', filename='js/index.js')}}"></script>
+  <script src="{{url_for('static', filename='js/dist/gilIndex.bundle.js')}}"></script>
   {% endblock %}

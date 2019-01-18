@@ -49,6 +49,7 @@
  * = Colors =
  **/
 @bodyBgColor:      #FFF;
+@mainNavBgColor: #3A4450;
 @baseColor:       #333;
 @linkColor:       #4d4e50;
 @linkHover:       #576e76;
@@ -410,8 +411,7 @@ a.btn {
     transition: max-height .35s;
   }
   /* :checked */
-  label.tab-label.active ~ .tab-content,
-  input.tab-input:checked ~ .tab-content {
+  label.tab-label.active ~ .tab-content {
     max-height: 120em;
     margin: 1em auto;
     padding: 0.5em;
@@ -434,7 +434,7 @@ a.btn {
   input.tab-input + label.tab-label::after {
     content: "\25BC";
   }
-  input.tab-input:checked + label.tab-label::after {
+  label.tab-label.active::after {
     transform: rotateX(180deg);
   }
 }
@@ -602,6 +602,7 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
   position: relative;
+  background-color: @mainNavBgColor;
 }
 #mainNavLoadingError {
   position: absolute;
@@ -2600,13 +2601,12 @@ div.noOrg-container {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #FFFF; /* for browsers that don't support rgba color*/
-  background-color: rgba(0,0,0, 0.15);
-   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
-  filter: alpha(opacity=60);
-  -moz-opacity: 0.6;
-  -khtml-opacity: 0.6;
-  opacity: 0.6;
+  background-color: #FFFFFF; /* for browsers that don't support rgba color*/
+   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  -moz-opacity: 1;
+  -khtml-opacity: 1;
+  opacity: 1;
 }
 
 /* :not(:required) hides these rules from IE9 and below */
@@ -2624,7 +2624,7 @@ div.noOrg-container {
 .loading-indicator-placeholder:not(:required):after {
   content: ' ';
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   width: 1em;
   height: 1em;
   margin-top: -0.5em;

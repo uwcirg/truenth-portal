@@ -31,8 +31,12 @@ coverage.xml
 .settings
 .tox
 
-# translation files
-portal/translations/
+# compiled (binary) translation files
+*.mo
+
+# generated CSS files
+portal/*/static/css/*.css
+portal/static/css/*.css
 
 # nodeJS virtual environment and files
 node_env/

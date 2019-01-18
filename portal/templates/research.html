@@ -17,7 +17,7 @@
                   <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
                   <div id="patientsInstrumentListWrapper">
                     <div id="patientsInstrumentList" class="profile-radio-list">
-                      {% for instrument_code in config["INSTRUMENTS"] | sort() %}
+                      {% for instrument_code in instruments | sort() %}
                       <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}" v-on:click="setInstruments">{{ instrument_code | replace("_", " ") | upper }}</label>
                       </div>
                       {% endfor %}
@@ -52,7 +52,7 @@
 </div>
 {% endblock %}
 {% block additional_scripts %}
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dist/admin.bundle.js') }}"></script>
 {% endblock %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block footer %}

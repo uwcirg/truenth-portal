@@ -67,6 +67,8 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
+from ..models.qb_timeline import invalidate_users_QBT
+from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
@@ -843,7 +845,7 @@ def settings():
                     QuestionnaireResponse.id == qnr.id
                 ).update({"document": document})
             db.session.commit()
-            invalidate_assessment_status_cache(patient.id)
+            invalidate_users_QBT(patient.id)
         except ValueError as e:
             trace("Invalid date format {}".format(form.timestamp.data))
             trace("ERROR: {}".format(e))
@@ -876,16 +878,17 @@ def config_settings(config_key):
     config_prefix_whitelist = (
         'ACCEPT_TERMS_ON_NEXT_ORG',
         'CONSENT',
+        'COPYRIGHT',
+        'GIL',
+        'LOCALIZED_AFFILIATE_ORG',
         'LR_',
-        'REQUIRED_CORE_DATA',
-        'PRE_REGISTERED_ROLES',
-        'SYSTEM',
-        'SHOW_PROFILE_MACROS',
+        'MAINTENANCE_',
         'MEDIDATA_RAVE_FIELDS',
         'MEDIDATA_RAVE_ORG',
-        'LOCALIZED_AFFILIATE_ORG',
-        'COPYRIGHT',
-        'MAINTENANCE_',
+        'REQUIRED_CORE_DATA',
+        'PRE_REGISTERED_ROLES',
+        'SHOW_PROFILE_MACROS',
+        'SYSTEM',
     )
     if config_key:
         key = config_key.upper()
@@ -911,7 +914,11 @@ def research_dashboard():
     Only accessible to those with the Researcher role.
 
     """
-    return render_template('research.html', user=current_user())
+    return render_template(
+        'research.html',
+        user=current_user(),
+        instruments=Questionnaire.questionnaire_codes()
+    )
 
 
 @portal.route('/reporting')

@@ -1,6 +1,6 @@
 """User API view functions"""
 from datetime import datetime
-
+from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
     abort,
@@ -14,7 +14,6 @@ from flask import (
 )
 from flask_user import roles_required
 from sqlalchemy import and_, func
-from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
@@ -31,7 +30,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
-from ..models.qb_timeline import invalidate_users_QBT
+from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
@@ -283,6 +282,11 @@ def account():
                 username=user.username, user_id=user.id,
                 acting_user=acting_user)
             abort(400, "Inaccessible user created - review consent and roles")
+
+    # Force a renewal of the visit / qb_status cache so the new user has
+    # accurate info.  Pad by a second to get around microsecond floor problems
+    now = datetime.utcnow() + relativedelta(seconds=1)
+    QB_StatusCacheKey().update(now)
     return jsonify(user_id=user.id)
 
 
@@ -809,24 +813,21 @@ def withdraw_consent(user, org_id, acting_user):
         abort(404, "no UserConsent found for user ID {} and org ID {}".format(
             user.id, org_id))
     try:
-        # Make a copy of the found UserConsent via `make_transient`
-        # and setting the id to None, so update_consents can store as new
-        make_transient(uc)
-        uc.id = None
-        uc.status = 'suspended'
-        uc.acceptance_date = datetime.utcnow()  # mark time of suspension
-        uc.send_reminders = False
-        uc.include_in_reports = True
-        uc.staff_editable = (not current_app.config.get('GIL'))
+        suspended = UserConsent(
+            user_id=user.id, organization_id=org_id, status='suspended',
+            acceptance_date=datetime.utcnow(), agreement_url=uc.agreement_url)
+        suspended.send_reminders = False
+        suspended.include_in_reports = True
+        suspended.staff_editable = (not current_app.config.get('GIL'))
         user.update_consents(
-            consent_list=[uc], acting_user=acting_user)
+            consent_list=[suspended], acting_user=acting_user)
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
         invalidate_users_QBT(user_id=user.id)
     except ValueError as e:
         abort(400, str(e))
 
-    return jsonify(uc.as_json())
+    return jsonify(suspended.as_json())
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))

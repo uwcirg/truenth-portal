@@ -702,6 +702,7 @@ class TestQB_Status(TestQuestionnaireSetup):
 
     def test_none_org(self):
         # check users w/ none of the above org
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(Organization.query.get(0))
         self.login()
         self.bless_with_basics(

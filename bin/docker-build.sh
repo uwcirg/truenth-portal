@@ -33,7 +33,8 @@ cp \
     "${root_path}/docker/portal.env.default" \
     "${root_path}/docker/portal.env"
 
-export COMPOSE_FILE="${COMPOSE_FILE:-${root_path}/docker/docker-compose.yaml:${root_path}/docker/docker-compose.build.yaml}"
+default_compose_file="${root_path}/docker/docker-compose.yaml:${root_path}/docker/docker-compose.build.yaml"
+export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
 
 # Build debian package from current repo and branch

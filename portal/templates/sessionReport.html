@@ -20,55 +20,18 @@
 			{% endif %}
 			&nbsp;&nbsp;<a href="/" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Truenth Home') }}" class="btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
 		</span>
-
 	</div>
-	<div class="error-message" v-show="errorMessage !== ''">
-		<br/>
-		{% raw %}{{errorMessage}}{% endraw %}
-		<br/>
-	</div>
-	<div class="container">
-		<div class="row">
-		    <div class="col-md-12">
-		    	<div id="userSessionReportDetail" cellpadding="2">
-			        <input type="hidden" id="_report_user_id" value="{{user.id if user}}" />
-			        <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
-			        <input type="hidden" id="_report_instrument_id" value="{{instrument_id}}" />
-			        	<table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" v-if="data.length > 0">
-			        		{% raw %}
-				        		<caption>
-				        			<hr/>
-				        			<span class="profile-item-title">{{caption.title}}</span>
-				        			<br/>
-				        			<span class="text-muted smaller-text">{{caption.lastUpdated}}</span>
-				        			<span class='gmt'>{{caption.timezone}}</span>
-				        			<hr/>
-				        		</caption>
-			        		{% endraw %}
-			        		<THEAD>
-			        			<TH>{{_("Question")}}</TH><TH>{{_("Response")}}</TH>
-			        		</THEAD>
-			        		<TBODY>
-			        			{% raw %}
-				        			<TR v-for="item in data">
-				        				<TD v-html="item.q"></TD>
-				        				<TD v-html="item.a"></TD>
-				        			</TR>
-				        		{% endraw %}
-			        		</TBODY>
-				        </table>
-			        <br/>
-			    </div>
-		    </div>
-		</div>
-	</div>
+	<input type="hidden" id="_report_user_id" value="{{user.id if user}}" />
+	<input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
+	<input type="hidden" id="_report_instrument_id" value="{{instrument_id}}" />
+	<div id="assessmentReportContentContainer"></div>
 </div>
 {% endblock %}
 {% block footer %}
 {{footer(user=current_user)}}
 {% endblock %}
 {% block additional_scripts %}
-<script src="{{ url_for('static', filename='js/assessmentReport.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dist/assessmentReport.bundle.js') }}"></script>
 {% endblock %}
 
 

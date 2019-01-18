@@ -53,7 +53,6 @@ def locale_closure(locale_code, fn):
     return function_with_forced_locale
 
 
-# Todo: requires iteration and recur for accurate dates
 def load_template_args(
         user, questionnaire_bank_id=None, qb_iteration=None):
     """Capture known variable lookup functions and values
@@ -109,9 +108,8 @@ def load_template_args(
                 ae_link=ae_link(), label=label))
 
     def _lookup_clinic_name():
-        org = user.organizations.first()
-        if org:
-            return _(org.name)
+        if user.organizations:
+            return _(user.organizations[0].name)
         return ""
 
     def _lookup_decision_support_via_access_button():
@@ -330,8 +328,7 @@ class Communication(db.Model):
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
 
-        qb_status, _ = qb_status_visit_name(
-            user_id=self.user_id, as_of_date=datetime.utcnow())
+        qb_status, _ = qb_status_visit_name(self.user_id, datetime.utcnow())
         if qb_status == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))

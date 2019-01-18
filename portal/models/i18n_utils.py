@@ -11,7 +11,7 @@ import sys
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile
+from polib import pofile, POFile
 import requests
 
 POT_FILES = (
@@ -201,11 +201,12 @@ def pos_from_zip(zipfile):
         yield locale_code, po
 
 
-def msgcat(*po_files):
+def msgcat(*po_files, **kwargs):
     """Concatenate input po_files together, with later files overwriting earlier ones"""
     po_files = list(po_files)
-    base_po = po_files.pop(0)
-    current_app.logger.debug("Combining PO file with %d strings", len(base_po))
+
+    # use given base_po, or empty PO file
+    base_po = kwargs.get('base_po', POFile())
     for po_file in po_files:
         current_app.logger.debug("Combining PO file with %d strings", len(po_file))
         for entry in po_file:
@@ -255,7 +256,13 @@ def download_all_translations(state):
             dest_po = os.path.join(dest_po_path, '{}.po'.format(dest_po_basename))
             dest_mo = os.path.join(dest_po_path, '{}.mo'.format(dest_po_basename))
 
-            combined_po = msgcat(*po_files)
+            # disable line-wrapping
+            base_po = POFile(wrapwidth=-1)
+
+            # re-use metadata of first PO file
+            # todo: set config common for pybabel extract too
+            base_po.metadata = po_files[0].metadata
+            combined_po = msgcat(*po_files, base_po=base_po)
 
             # Create directory if necessary
             if not os.path.isdir(dest_po_path):
@@ -276,3 +283,22 @@ def download_all_translations(state):
                 "Saved combined MO file: %s",
                 os.path.relpath(dest_mo, current_app.root_path),
             )
+
+
+def compile_pos():
+    """Compile all back-end PO files to MO files"""
+
+    translations_dir = os.path.join(current_app.root_path, "translations")
+    for dirpath, _, filenames in os.walk(translations_dir):
+        # only act on backend (flask) translation files
+        if 'messages.po' not in filenames:
+            continue
+
+        po_filepath = os.path.join(dirpath, 'messages.po')
+        mo_filepath = os.path.join(dirpath, 'messages.mo')
+
+        pofile(po_filepath).save_as_mofile(mo_filepath)
+        current_app.logger.debug(
+            "Saved MO file: %s",
+            os.path.relpath(mo_filepath, current_app.root_path),
+        )

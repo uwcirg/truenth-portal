@@ -54,6 +54,8 @@ class TestReporting(TestCase):
         interv1.public_access = False
         interv2.public_access = True
 
+        user1, user2, user3 = map(
+            db.session.merge, (user1, user2, user3))
         with SessionScope(db):
             db.session.add(org)
             db.session.add(interv1)
@@ -146,6 +148,7 @@ class TestReporting(TestCase):
             db.session.add(bank)
             db.session.commit()
 
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id)
         self.test_user = db.session.merge(self.test_user)

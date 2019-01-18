@@ -1,18 +1,19 @@
 FROM debian:stretch
 
 ENV \
-    ARTIFACT_DIR="${ARTIFACT_DIR:-/tmp/artifacts}" \
-    DEBIAN_FRONTEND="noninteractive"
+    ARTIFACT_DIR=/tmp/artifacts \
+    DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
 
 RUN \
-    apt-get update && \
-    apt-get dist-upgrade --yes && \
-    apt-get install --yes --no-install-recommends \
+    apt-get update --quiet && \
+    apt-get dist-upgrade --quiet --quiet && \
+    apt-get install --quiet --quiet --no-install-recommends \
         ca-certificates \
         libpq5 \
         python2.7 \
         wait-for-it && \
-    apt-get clean
+    apt-get clean --quiet
 
 ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
 
@@ -27,9 +28,9 @@ RUN \
     fi
 
 RUN \
-    apt-get update && \
-    apt-get install --yes --allow-unauthenticated portal && \
-    apt-get clean && \
+    apt-get update --quiet && \
+    apt-get install --quiet --quiet --allow-unauthenticated portal && \
+    apt-get clean --quiet && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
@@ -39,6 +40,7 @@ ENV \
     PROJECT_DIR="/opt/venvs/portal" \
     RUN_USER="${RUN_USER:-www-data}"
 
+# Todo: move to debian package postinst script
 RUN \
     mkdir --parents \
         "${FILE_UPLOAD_DIR}" \
@@ -71,11 +73,11 @@ CMD \
         --host="$PGHOST" \
         --port="$PGPORT" \
         --strict \
-    && \
+    -- \
 
-    flask sync && \
+        flask sync && \
 
-    gunicorn \
-        --bind "0.0.0.0:${PORT}" \
-        --timeout ${TIMEOUT} \
-    wsgi:application
+        gunicorn \
+            --bind "0.0.0.0:${PORT}" \
+            --timeout ${TIMEOUT} \
+        wsgi:application

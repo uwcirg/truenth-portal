@@ -17,6 +17,7 @@ from traceback import format_exc
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
 from flask import current_app, url_for
+import redis
 import requests
 from requests import Request, Session
 from requests.exceptions import RequestException
@@ -380,6 +381,10 @@ def token_watchdog(**kwargs):
 @scheduled_task
 def celery_beat_health_check(**kwargs):
     """Pings the celery beat health check API for monitoring"""
-    return requests.get(
-        url_for('healthcheck.celery_beat_ping', _external=True)
-    ).text
+
+    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+    return rs.setex(
+        name='last_celery_beat_ping',
+        time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
+        value=str(datetime.utcnow()),
+    )

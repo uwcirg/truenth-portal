@@ -1,5 +1,5 @@
 ---
-version: "3.2"
+version: "3.4"
 services:
   # Base service; for extension only, not for direct use
   base: &service_base
@@ -10,10 +10,8 @@ services:
       args:
         - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     env_file:
-      - portal.env
+      - ${PORTAL_ENV_FILE:-portal.env}
     environment:
-      PERSISTENCE_DIR: ${PERSISTENCE_DIR:-gil}
-
       # cross-service defaults
       PGDATABASE: ${PGDATABASE:-portaldb}
       PGHOST: ${PGHOST:-db}
@@ -54,8 +52,8 @@ services:
     <<: *service_base
     command: bash -c '
       env &&
+      (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
       wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
-      flask set-celery-beat-healthy &&
       celery beat
         --app portal.celery_worker.celery
         --loglevel debug

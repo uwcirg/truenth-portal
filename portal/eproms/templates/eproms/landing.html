@@ -53,6 +53,6 @@
 {% block flash_messages %}{{super()}}{% endblock %}<!-- Note previous body block replaces inherited content, need to call flash message block to show flash message-->
 {% endblock %}
 {% block footer %}<!--empty-->{% endblock %}
-{% block additional_scripts %}<script src="{{ url_for('.static', filename='js/landing.js') }}"></script>{% endblock %}
+{% block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/landing.bundle.js') }}"></script>{% endblock %}
 
 

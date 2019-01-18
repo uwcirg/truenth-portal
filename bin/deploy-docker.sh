@@ -9,19 +9,23 @@ usage() {
     cat << USAGE >&2
 Usage:
     $cmdname [-b] [-h]
-    -h     Show this help message
     -b     Backup current database before attempting update
+    -n     Do not pull docker images prior to starting
+    -h     Show this help message
 USAGE
     exit 1
 }
 
-while getopts "bh" option; do
+while getopts "bhn" option; do
     case "${option}" in
         b)
             BACKUP=true
             ;;
         h)
             usage
+            ;;
+        n)
+            NO_PULL=true
             ;;
         *)
             usage
@@ -41,9 +45,12 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 # Set default docker-compose file if COMPOSE_FILE environment variable not set
 export COMPOSE_FILE="${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}"
 
-# Set env vars in docker-compose file; see env.default
-set -o allexport # export all new env vars by default
-. "${GIT_WORK_TREE}/docker/.env"
+# Bring env vars set in docker/.env into current shell
+if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
+    # export all new env vars by default
+    set -o allexport
+    . "${GIT_WORK_TREE}/docker/.env"
+fi
 
 cd "${GIT_WORK_TREE}/docker"
 
@@ -61,8 +68,11 @@ if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     > "/tmp/${dump_filename}.sql"
 fi
 
-echo "Updating images..."
-docker-compose pull
+if [ -z "$NO_PULL" ]; then
+    echo "Updating images..."
+    docker-compose pull
+fi
+
 echo "Starting containers..."
 # Capture stderr to check for restarted containers
 # shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d

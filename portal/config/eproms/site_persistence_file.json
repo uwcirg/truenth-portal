@@ -5,8 +5,6 @@
       "results": [
         "## SITE-PERSISTENCE Managed: File managed with site_persistence - don't edit.\n",
         "DEFAULT_LOCALE = 'en_AU'\n",
-        "MAIL_SENDER_DEFAULT = 'noreply@eproms.truenth.org'\n",
-        "CONTACT_SENDTO_EMAIL = 'contact.eproms@truenth.org'\n",
         "PATIENT_LIST_ADDL_FIELDS = ['status','study_id']\n",
         "PORTAL_STYLESHEET = '/eproms/static/css/eproms.css'\n",
         "STAFF_BULK_DATA_ACCESS = True\n",
@@ -39,20 +37,6 @@
         "   ('176307007', 'http://snomed.info/sct'),\n",
         "   ('438778003', 'http://snomed.info/sct'),\n",
         "   ('999999999', 'http://snomed.info/sct')\n",
-        "]\n",
-        "\n",
-        "# Assessment Engine configuration\n",
-        "INSTRUMENTS = [\n",
-        "    'epic23',\n",
-        "    'epic26',\n",
-        "    'eproms_add',\n",
-        "    'prems',\n",
-        "    'irondemog',\n",
-        "    'irondemog_v3',\n",
-        "    'ironmisc',\n",
-        "    'factfpsi',\n",
-        "    'eortc',\n",
-        "    'comorb',\n",
         "]\n"
       ]
     }

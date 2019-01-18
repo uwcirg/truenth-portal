@@ -60,7 +60,7 @@ class QuestionnaireBank(db.Model):
         back_populates='questionnaire_bank',
         order_by="QuestionnaireBankQuestionnaire.rank")
     recurs = db.relationship(
-        Recur, secondary='questionnaire_bank_recurs')
+        Recur, lazy='joined', secondary='questionnaire_bank_recurs')
 
     # QuestionnaireBank is associated with ResearchProtocol XOR Intervention,
     # either of which dictate whether it's given to a User
@@ -249,22 +249,26 @@ class QuestionnaireBank(db.Model):
 
         :param trigger_date: initial trigger utc time value
 
-        Todo update comment...
-        Returns QBD containing the calculated start date in UTC
-        for the QB, the QB's recurrence, and the iteration count.  Generally
-        trigger date plus the QB.start.  For recurring, the iteration count may
-        be non zero if it takes multiple iterations to reach the active cycle.
+        Given a self.classification of ``baseline`` or ``indefinite``, return
+        a QBD with the ``relative_start`` value defining the calculated start
+        in UTC, for this QB.
+
+        NB, a recurring QB requires more information, such as the iteration,
+        and will therefore raise a ``ValueError``.
 
         :return: QBD (datetime of the questionnaire's start date,
-            iteration_count, recurrence, and self QB field);
-            QBD(None, None, None, self) if N/A
+            iteration_count, recurrence, and self QB field)
 
         """
         if self.classification not in ('baseline', 'indefinite'):
-            raise RuntimeError("unexpected classification")
+            raise ValueError("unsupported classification {}".format(
+                self.classification))
 
-        return QBD(relative_start=(trigger_date + RelativeDelta(self.start)),
-                   iteration=None, recur=None, questionnaire_bank=self)
+        # As this is restricted to baseline and indefinite - iteration and
+        # recur are always None
+        return QBD(
+            relative_start=(trigger_date + RelativeDelta(self.start)),
+            iteration=None, recur=None, questionnaire_bank=self)
 
     def calculated_expiry(self, start):
         """Return calculated expired date (UTC) for QB or None"""

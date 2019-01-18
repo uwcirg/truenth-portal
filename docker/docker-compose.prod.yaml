@@ -1,6 +1,6 @@
 # docker-compose production overrides
 ---
-version: "3.2"
+version: "3.4"
 services:
   web:
     restart: unless-stopped
@@ -8,6 +8,12 @@ services:
       # Number of worker processes for handling requests
       # http://docs.gunicorn.org/en/stable/settings.html#workers
       WEB_CONCURRENCY: 4
+    healthcheck:
+      test: flask healthcheck
+      start_period: 2m
+      interval: 5m
+      timeout: 1m
+      retries: 5
 
   celeryworker:
     restart: unless-stopped

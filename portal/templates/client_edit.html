@@ -20,7 +20,7 @@
     {% endif %}
     </p>
 
-    <form action="/client/{{ client.client_id }}" method="post">
+    <form id="clientAppForm" action="/client/{{ client.client_id }}" method="post">
         {{ form.hidden_tag() }}
 
         {{ render_field(form.application_role, tabindex=5) }}
@@ -99,6 +99,6 @@
 
     <br /><br />
 {% endblock %}
-{% block additional_scripts %}<script src="{{ url_for('static', filename='js/clientIntervention.js') }}"></script>{% endblock %}
+
 
 
