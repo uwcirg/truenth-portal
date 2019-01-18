@@ -1,6 +1,6 @@
 """User API view functions"""
 from datetime import datetime
-
+from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
     abort,
@@ -14,7 +14,6 @@ from flask import (
 )
 from flask_user import roles_required
 from sqlalchemy import and_, func
-from sqlalchemy.orm import make_transient
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
@@ -31,7 +30,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
-from ..models.qb_timeline import invalidate_users_QBT
+from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
@@ -283,6 +282,11 @@ def account():
                 username=user.username, user_id=user.id,
                 acting_user=acting_user)
             abort(400, "Inaccessible user created - review consent and roles")
+
+    # Force a renewal of the visit / qb_status cache so the new user has
+    # accurate info.  Pad by a second to get around microsecond floor problems
+    now = datetime.utcnow() + relativedelta(seconds=1)
+    QB_StatusCacheKey().update(now)
     return jsonify(user_id=user.id)
 
 

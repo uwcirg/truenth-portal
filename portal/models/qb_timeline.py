@@ -509,7 +509,7 @@ class QB_StatusCacheKey(object):
         if value + self.valid_duration < now:
             raise ValueError('expect valid datetime - {} too old'.format(
                 value))
-        if value > now:
+        if value > now + relativedelta(seconds=5):
             raise ValueError('future dates not acceptable keys')
 
         stringform = FHIR_datetime.as_fhir(value)
