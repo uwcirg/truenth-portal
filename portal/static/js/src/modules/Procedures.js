@@ -189,7 +189,8 @@ export default (function() {
         initPopoverEvents: function() {
             var self = this;
             $("[data-toggle='popover']").popover({trigger: "click", placement: "top", html: true, content: $("#popoverHolder .popover__content").html()});
-            $("body").on("click", ".cancel-delete", function() { //popover cancel button event
+            $("body").on("click", ".cancel-delete", function(e) { //popover cancel button event
+                e.stopImmediatePropagation();
                 $(this).parents("div.popover").prev("a.confirm-delete").trigger("click");
             });
 
