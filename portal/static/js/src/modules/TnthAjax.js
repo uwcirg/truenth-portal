@@ -48,7 +48,7 @@ export default { /*global $ */
         }
         if (!params.cache) {
             params.headers = {
-                "cache-control": "no-cache",
+                "cache-control": "no-cache, must-revalidate, private",
                 "expires": "-1",
                 "pragma": "no-cache"
             };
@@ -181,7 +181,7 @@ export default { /*global $ */
             return false;
         }
         var __url = "/api/coredata/user/" + userId + "/still_needed" + (entry_method ? "?entry_method=" + (entry_method).replace(/\_/g, " ") : "");
-        this.sendRequest(__url, "GET", userId, {sync: sync,cache: true}, function(data) {
+        this.sendRequest(__url, "GET", userId, {sync: sync}, function(data) {
             if (!data) {
                 callback({"error": i18next.t("no data returned")});
                 return false;
