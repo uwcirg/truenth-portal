@@ -1844,7 +1844,10 @@ div.footer-wrapper.right-panel {
     }
   }
   div.orglist-selector {
-    display: inline-block;
+    display: block;
+    @media (min-width:768px) {
+      display: inline-block;
+    }
     max-width: 100%;
     legend {
       letter-spacing: 1px;
@@ -1996,13 +1999,16 @@ div.footer-wrapper.right-panel {
       .button {
         font-size: @mediumText;
       }
+      .byline-text {
+        display: block;
+      }
     }
   }
   @media (min-width: 480px) {
     #cacheResetContainer {
       #cacheResetForm {
         margin: 0 0.25em;
-        padding: 0.65em .25em;
+        padding: 0.65em .25em .15em;
       }
     }
   }
@@ -2010,6 +2016,15 @@ div.footer-wrapper.right-panel {
     #patientList {
       #adminTableToolbar {
         padding: 0;
+      }
+    }
+    #cacheResetContainer {
+      #cacheResetForm {
+        .byline-text {
+          display: inline-block;
+          position: relative;
+          top: 1.15em;
+        }
       }
     }
   }
@@ -4317,6 +4332,12 @@ div.timezone-warning.text-warning {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+  .admin-table {
+    div.pull-right,
+    div.columns-right {
+      top: 0.75em;
+    }
   }
 }
 @media (min-width: 992px) {
