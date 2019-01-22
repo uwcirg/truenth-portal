@@ -5,7 +5,7 @@
   {% if config.STAFF_BULK_DATA_ACCESS %}
     <div id="researchContentContainer"></div>
   {% else %}
-    <span class="muted">{{_("Content to be determined")}}</span>
+    <span class="muted">Content to be determined</span>
   {% endif %}
 {% endblock %}
 {%- block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/research.bundle.js') }}"></script>{% endblock -%}

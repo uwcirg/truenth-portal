@@ -156,27 +156,37 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 return `/api/report/questionnaire_status?format=${dataType}`;
             },
             initExportReportDataSelector: function() {
-                if (!$("#adminTable").attr("data-report-export")) {
-                    return false;
-                }
                 let self = this;
-                let html = `<div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="<span class='text-info'>${i18next.t('Export request submitted')}</span><br/><span class='text-warning'>${i18next.t('Note: due to the size of result data, this may take a while.')}</span>" class="export-report-data btn-group"><button class="btn btn-tnth-primary dropdown-toggle" title="${i18next.t('Export report data')}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-export icon-share"></i> <span class="caret"></span></button><ul class="dropdown-menu data-types" role="menu"><li data-type="csv" title="${this.getExportReportUrl('csv')}"><a>${i18next.t("CSV")}</a></li><li data-type="json" title="${this.getExportReportUrl('json')}"><a>${i18next.t("JSON")}</a></li></ul></div>`;
-                const DELAY_INTERVAL = 150;
-                $("#adminTableContainer .fixed-table-toolbar .columns-right").append(html);
-                $("#exportReportContainer .data-types li").on("click", function(e) {
-                    e.stopPropagation();
-                    let dataType = $(this).attr("data-type");
-                    setTimeout(function() {
-                        window.location.assign(this.getExportReportUrl(dataType));
-                    }.bind(self), 0);
-                    setTimeout(function() {
-                        $("#exportReportContainer").removeClass("open").popover("show");
-                    }, DELAY_INTERVAL);
-                    setTimeout(function() {
-                        $("#exportReportContainer").popover("hide");
-                    }, DELAY_INTERVAL*50);
+                tnthAjax.getConfiguration(this.userId, false, function(data) {
+                    if (!data || data.error || !data.PATIENT_LIST_ADDL_FIELDS) {
+                        return false;
+                    }
+                    if (data.PATIENT_LIST_ADDL_FIELDS.indexOf("status") === -1) {
+                        return false;
+                    }
+                    //let html = `<div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="<span class='text-info'>${i18next.t('Export request submitted')}</span><br/><span class='text-warning'>${i18next.t('Note: due to the size of result data, this may take a while.')}</span>" class="export-report-data btn-group"><button class="btn btn-tnth-primary dropdown-toggle" title="${i18next.t('Export report data')}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-export icon-share"></i> <span class="caret"></span></button><ul class="dropdown-menu data-types" role="menu"><li data-type="csv" title="${self.getExportReportUrl('csv')}"><a>${i18next.t("CSV")}</a></li><li data-type="json" title="${self.getExportReportUrl('json')}"><a>${i18next.t("JSON")}</a></li></ul></div>`;
+                    let html = $("#exportReportPopoverWrapper").html();
+                    const DELAY_INTERVAL = 150;
+                    $("#adminTableContainer .fixed-table-toolbar .columns-right").append(html);
+                    $("#exportReportContainer").attr("data-content", $("#exportReportPopoverContent").html());
+                    $("#exportReportContainer .data-types li").each(function() {
+                        $(this).attr("title", self.getExportReportUrl($(this).attr("data-type")));
+                    });
+                    $("#exportReportContainer .data-types li").on("click", function(e) {
+                        e.stopPropagation();
+                        let dataType = $(this).attr("data-type");
+                        setTimeout(function() {
+                            window.location.assign(this.getExportReportUrl(dataType));
+                        }.bind(self), 0);
+                        setTimeout(function() {
+                            $("#exportReportContainer").removeClass("open").popover("show");
+                        }, DELAY_INTERVAL);
+                        setTimeout(function() {
+                            $("#exportReportContainer").popover("hide");
+                        }, DELAY_INTERVAL*50);
+                    });
+                    $("#adminTableContainer .columns-right .export button").attr("title", i18next.t("Export patient list"));
                 });
-                $("#adminTableContainer .columns-right .export button").attr("title", i18next.t("Export patient list"));
             },
             onCurrentUserInit: function() {
                 if (this.userOrgs.length === 0) {

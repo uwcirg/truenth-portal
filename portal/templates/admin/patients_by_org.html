@@ -35,7 +35,6 @@
              data-toggle="table"
              data-search="true"
              data-pagination="true"
-             {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}data-report-export="true"{% endif %}
              data-page-size="10"
              data-page-list="[10, 20, 30]"
              data-toolbar="#adminTableToolbar"
@@ -151,6 +150,13 @@
       {% endif %}
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
+  <div id="exportReportPopoverWrapper" class="tnth-hide">
+    <div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="">
+      <button class="btn btn-tnth-primary dropdown-toggle" title="{{_('Export report data')}}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-export icon-share"></i> <span class="caret"></span></button>
+      <ul class="dropdown-menu data-types" role="menu"><li data-type="csv"><a>{{_("CSV")}}</a></li><li data-type="json"><a>{{_("JSON")}}</a></li></ul>
+    </div>
+    <div id="exportReportPopoverContent" class="tnth-hide"><span class='text-info'>{{_("Export request submitted")}}</span><br/><span class='text-warning'>{{_("Note: due to the size of result data, this may take a while.")}}</span></div>
+  </div>
 </div>
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}

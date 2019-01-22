@@ -885,6 +885,7 @@ def config_settings(config_key):
         'MAINTENANCE_',
         'MEDIDATA_RAVE_FIELDS',
         'MEDIDATA_RAVE_ORG',
+        'PATIENT_LIST_ADDL_FIELDS',
         'REQUIRED_CORE_DATA',
         'PRE_REGISTERED_ROLES',
         'SHOW_PROFILE_MACROS',
