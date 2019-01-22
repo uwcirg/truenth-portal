@@ -757,28 +757,24 @@ export default { /*global $ */
                 callback({"error": i18next.t("no data returned")});
                 return;
             }
-            var qList = {};
+            var qList = [];
             (data.entry).forEach(function(item) {
-                if (item.organization) {
-                    var orgID = (item.organization.reference).split("/")[2];
-                    if (!qList[orgID]) {
-                        qList[orgID] = []; //don't assign orgID to object if it was already present
-                    }
-                    if (item.questionnaires) {
-                        (item.questionnaires).forEach(function(q) {
-                            /*
-                             * add instrument name to instruments array for the org - will not add if it is already in the array
-                             * NOTE: inArray returns -1 if the item is NOT in the array
-                             */
-                            if ($.inArray(q.questionnaire.display, qList[orgID]) === -1) {
-                                qList[orgID].push(q.questionnaire.display);
-                            }
-                        });
-                    }
+                if (!item.resource || !item.resource.questionnaires) {
+                    return true;
                 }
+                (item.resource.questionnaires).forEach(function(q) {
+                    /*
+                        * add instrument name to instruments array
+                        * NOTE: inArray returns -1 if the item is NOT in the array
+                        */
+                    let reference = q.questionnaire.reference.split("=")[1];
+                    console.log("ref? ", reference)
+                    if (reference === SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM && $.inArray(q.questionnaire.display, qList) === -1) {
+                        qList.push(q.questionnaire.display);
+                    }
+                });
             });
             callback(qList);
-
         });
     },
     "getTerms": function(userId, type, sync, callback, params) {

@@ -12,15 +12,17 @@ export default (function() { /*global i18next $ */
     };
 
     var OrgTool = function() {
+        this.containerElementId = "fillOrgs";
         this.TOP_LEVEL_ORGS = [];
         this.orgsList = {};
         this.orgsData = [];
         this.initialized = false;
     };
 
-    OrgTool.prototype.init = function(callback) {
+    OrgTool.prototype.init = function(callback, orgsElementsContainerId) {
         var self = this;
         callback = callback || function() {};
+        this.setContainerElementId(orgsElementsContainerId);
         if (sessionStorage.orgsData) {
             var orgsData = JSON.parse(sessionStorage.orgsData);
             self.populateOrgsList(orgsData);
@@ -43,6 +45,14 @@ export default (function() { /*global i18next $ */
             });
         }
     };
+    OrgTool.prototype.setContainerElementId = function(id) {
+        if (id) {
+            this.containerElementId = id;
+        }
+    };
+    OrgTool.prototype.getContainerElementId = function() {
+        return this.containerElementId;
+    };
     OrgTool.prototype.onLoaded = function(userId, doPopulateUI) {
         if (userId) { this.setUserId(userId); }
         if (doPopulateUI) { this.populateUI(); }
@@ -52,10 +62,10 @@ export default (function() { /*global i18next $ */
         $("#clinics").attr("loaded", true);
     };
     OrgTool.prototype.setUserId = function(userId) {
-        $("#fillOrgs").attr("userId", userId);
+        $("#" + this.containerElementId).attr("userId", userId);
     };
     OrgTool.prototype.getUserId = function() {
-        return $("#fillOrgs").attr("userId");
+        return $("#" + this.containerElementId).attr("userId");
     };
     OrgTool.prototype.inArray = function(n, array){
         if (!n || !array || !Array.isArray(array)) { return false; }
@@ -99,7 +109,7 @@ export default (function() { /*global i18next $ */
         leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }
         var self = this;
-        $("#fillOrgs input[name='organization']").each(function() {
+        $("#" + this.containerElementId + " input[name='organization']").each(function() {
             if (!self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
                 if (self.orgsList[$(this).val()]) {
@@ -116,7 +126,7 @@ export default (function() { /*global i18next $ */
         var topList = self.getTopLevelOrgs();
         topList.forEach(function(orgId) {
             var allChildrenHidden = true;
-            $("#fillOrgs .org-container[data-parent-id='" + orgId + "']").each(function() {
+            $("#" + self.containerElementId + " .org-container[data-parent-id='" + orgId + "']").each(function() {
                 var subOrgs = $(this).find(".org-container");
                 if (subOrgs.length > 0) {
                     var allSubOrgsHidden = true;
@@ -149,7 +159,7 @@ export default (function() { /*global i18next $ */
                 }
             });
             if (allChildrenHidden) {
-                $("#fillOrgs").find("legend[orgid='" + orgId + "']").hide();
+                $("#"+self.getContainerElementId()).find("legend[orgid='" + orgId + "']").hide();
             }
         });
     };
@@ -233,10 +243,10 @@ export default (function() { /*global i18next $ */
     };
     OrgTool.prototype.populateUI = function(){
         if (sessionStorage.orgsHTML) {
-            $("#fillOrgs").html(sessionStorage.orgsHTML);
+            $("#" + this.getContainerElementId()).html(sessionStorage.orgsHTML);
             return true;
         }
-        var self = this, container = $("#fillOrgs"), orgsList = this.orgsList, parentContent = "";
+        var self = this, container = $("#"+this.getContainerElementId()), orgsList = this.orgsList, parentContent = "";
         var getState = (item) => {
             if (!item.identifier) {
                 return "";
@@ -303,7 +313,7 @@ export default (function() { /*global i18next $ */
                     var state = getState(orgsList[_parentOrgId]);
                     var topLevelOrgId = self.getTopLevelParentOrg(item.id);
 
-                    if ($("#fillOrgs input[name='organization'][value='" + item.id + "']").length > 0) {
+                    if ($("#" + self.getContainerElementId() + " input[name='organization'][value='" + item.id + "']").length > 0) {
                         return true;
                     }
                     var attrObj = {dataAttributes:(' data-parent-id="' + topLevelOrgId + '"  data-parent-name="' + orgsList[topLevelOrgId].name + '" '), containerClass: "", textClass: ""};
