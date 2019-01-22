@@ -1,7 +1,7 @@
 import tnthAjax from "../modules/TnthAjax.js";
 import OrgTool from "../modules/OrgTool.js";
 /*
- * reusable Vue mixin component for retrieving current user
+ * reusable Vue mixin component for retrieving current user information, e.g. organizations, roles
  * used by Vue instances as component or non-Vue instances as object
  */
 var CurrentUser = { /* global $ i18next */

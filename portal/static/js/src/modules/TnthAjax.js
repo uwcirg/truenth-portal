@@ -768,7 +768,6 @@ export default { /*global $ */
                         * NOTE: inArray returns -1 if the item is NOT in the array
                         */
                     let reference = q.questionnaire.reference.split("=")[1];
-                    console.log("ref? ", reference)
                     if (reference === SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM && $.inArray(q.questionnaire.display, qList) === -1) {
                         qList.push(q.questionnaire.display);
                     }

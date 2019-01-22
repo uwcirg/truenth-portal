@@ -60,12 +60,12 @@
                     {
                         id: "csv_dataType",
                         value: "csv",
-                        label: "CSV"
+                        label: i18next.t("CSV")
                     },
                     {
                         id: "json_dataType",
                         value: "json",
-                        label: "JSON"
+                        label: i18next.t("JSON")
                     }
                 ],
                 instruments: {
@@ -147,3 +147,4 @@
         }
     }
 </script>
+
