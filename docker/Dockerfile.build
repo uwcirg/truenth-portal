@@ -15,7 +15,6 @@ RUN \
         fakeroot \
         git \
         libc6-i386 \
-        libffi-dev \
         libpq-dev \
         python-dev \
         python-pip \

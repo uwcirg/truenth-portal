@@ -1,6 +1,6 @@
 # Do not install binary wheels for certain packages
 # See https://github.com/spotify/dh-virtualenv/issues/150
---no-binary billiard,cffi,psycopg2
+--no-binary psycopg2
 
 alembic==1.0.6            # via flask-migrate
 amqp==2.4.0               # via kombu
