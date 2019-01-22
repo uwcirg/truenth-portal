@@ -12,9 +12,7 @@ RUN \
         build-essential \
         debhelper \
         dh-virtualenv\
-        fakeroot \
         git \
-        libc6-i386 \
         libpq-dev \
         python-dev \
         python-pip \
