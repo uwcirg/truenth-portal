@@ -46,7 +46,7 @@ markupsafe==1.1.0           # via jinja2, mako
 oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
 passlib==1.7.1            # via flask-user
 polib==1.1.0
-psycopg2==2.7.6.1
+psycopg2==2.7.7
 pycparser==2.19           # via cffi
 pycryptodome==3.7.3       # via flask-user
 python-dateutil==2.7.5
