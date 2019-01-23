@@ -89,7 +89,7 @@
                 var self = this;
                 tnthAjax.getInstrumentsList(false, function (data) {
                     if (!data || !data.length) {
-                        document.querySelector("#instrumentsExportErrorMessage").innerText = i18next.t("Unable to retrieving instruments list.");
+                        document.querySelector("#instrumentsExportErrorMessage").innerText = data.error;
                         document.querySelector("#patientsInstrumentList").classList.add("ready");
                         return false;
                     }
