@@ -42,7 +42,7 @@
 </template>
 <script>
     import tnthAjax from "../modules/TnthAjax.js";
-    export default {
+    export default { /*global i18next */
         props: {
             instrumentsList: {
                 type: Array,
@@ -119,6 +119,12 @@
                         self.instruments.selected = "";
                     }
                 });
+                $("#dataDownloadModal").on("show.bs.modal", function () {
+                    self.instruments.selected = "";
+                    self.instruments.dataType = "csv";
+                    $("#patientsInstrumentList").addClass("ready");
+                    $(this).find("[name='instrument']").prop("checked", false);
+                });
             },
             setDataType: function (event) {
                 this.instruments.showMessage = false;
@@ -129,21 +135,7 @@
             },
             hasInstrumentsSelection: function () {
                 return this.instruments.selected !== "" && this.instruments.dataType !== "";
-            },
-            handleDownloadModal: function () {
-                if ($("#dataDownloadModal").length === 0) {
-                    return false;
-                }
-                var self = this;
-                this.getInstrumentList(function() {
-                    $("#dataDownloadModal").on("shown.bs.modal", function () { //populate instruments list based on user's parent org
-                        self.instruments.selected = "";
-                        self.instruments.dataType = "csv";
-                        $("#patientsInstrumentList").addClass("ready");
-                        $(this).find("[name='instrument']").prop("checked", false);
-                    });
-                });
-            },
+            }
         }
-    }
+    };
 </script>

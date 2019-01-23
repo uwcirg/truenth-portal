@@ -7,5 +7,5 @@
     import ExportInstruments from "./ExportInstruments.vue";
     export default {
         components: {ExportInstruments}
-    }
+    };
 </script>

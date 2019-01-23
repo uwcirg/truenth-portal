@@ -158,7 +158,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
             initExportReportDataSelector: function() {
                 let self = this;
                 tnthAjax.getConfiguration(this.userId, false, function(data) {
-                    if (!data || data.error || !data.PATIENT_LIST_ADDL_FIELDS) {
+                    if (!data || !data.PATIENT_LIST_ADDL_FIELDS) {
                         return false;
                     }
                     if (data.PATIENT_LIST_ADDL_FIELDS.indexOf("status") === -1) {
