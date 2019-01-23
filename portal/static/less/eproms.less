@@ -89,6 +89,7 @@
 @alertColor: hsla(1, 44%, 46%, 0.95);
 @HRColor: #eeeeee;
 @landingInputBorderColor: #AFB8C2;
+@reportContentBorderColor: #ececec;
 
 
 /**
@@ -784,7 +785,7 @@ body.landing {
     display: block;
     width: 100%;
     max-width: 100%;
-    border-top: 1px solid #eee;
+    border-top: 1px solid @HRColor;
     left: 0;
     right: 0;
     padding: 0 2em 1em;
@@ -836,7 +837,7 @@ body.landing {
    color:    @placeHolderColor;
 }
 select:not([multiple]) {
-  border: 1px solid #bdb9b9;
+  border: 1px solid @btnDefaultBorderColor;
   overflow: hidden;
   background-image: none;
 }
@@ -1019,7 +1020,7 @@ select:not([multiple]) {
 }
 #iqFooterWrapper {
   display: none;
-  border-top: solid 1px #eee;
+  border-top: solid 1px @HRColor;
   margin-top: 2em;
 }
 #mainHolder {
@@ -1185,7 +1186,7 @@ body.portal .copyright-container * {
 #mainNav {
   height: 71px;
   position: relative;
-  background-color: @mainNavBgColor; 
+  background-color: @mainNavBgColor;
 }
 #mainNavLoadingError {
   position: absolute;
@@ -1696,9 +1697,49 @@ div.footer-wrapper.right-panel {
     top: 0.2em;
   }
 }
+#exportReportContainer {
+  display: inline-block;
+  button {
+    min-width: 65px;
+    margin-left: 12px;
+    border-radius: 0;
+    min-height: 3.13em;
+  }
+}
+#adminTableContainer {
+  position: relative;
+  &:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    opacity: 1;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: hsla(0, 0%, 100%, 0.7);
+    transition: opacity 0.5s ease-in;
+  }
+  &.active:before {
+    opacity: 0;
+    z-index: -1;
+  }
+}
+#adminTableContainer:before {
+  content: " ";
+  display: block;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: hsla(0, 0%, 100%, 0.7);
+}
 #adminTable {
   min-height: 280px;
-  transition: all 0.5s ease-in;
+  transition: opacity 0.5s ease-in;
   .check-role-container {
     position: relative;
     .loading-indicator {
@@ -1985,7 +2026,8 @@ div.footer-wrapper.right-panel {
 }
 #patientList {
   #adminTableToolbar {
-    padding: 0 0.25em;
+    border: 1px solid #f5f4f4;
+    padding: 4px 8px 6px;
   }
   #cacheResetContainer {
     display: inline-block;
@@ -2004,14 +2046,6 @@ div.footer-wrapper.right-panel {
       }
     }
   }
-  @media (min-width: 480px) {
-    #cacheResetContainer {
-      #cacheResetForm {
-        margin: 0 0.25em;
-        padding: 0.65em .25em .15em;
-      }
-    }
-  }
   @media (min-width: 768px) {
     #patientList {
       #adminTableToolbar {
@@ -2020,10 +2054,11 @@ div.footer-wrapper.right-panel {
     }
     #cacheResetContainer {
       #cacheResetForm {
+        margin: 0 0.25em;
+        padding: 0.65em .25em .15em;
         .byline-text {
           display: inline-block;
           position: relative;
-          top: 1.15em;
         }
       }
     }
@@ -2041,7 +2076,7 @@ div.footer-wrapper.right-panel {
     padding: 0.5em 1em;
     line-height: 1.2;
     vertical-align: middle;
-    border: 1px dotted #eee;
+    border: 1px dotted @HRColor;
     .text {
       color: @btnDefaultColor;
       font-weight: normal;
@@ -2082,7 +2117,7 @@ div.footer-wrapper.right-panel {
   padding: .5em 1em;
   line-height: 1.4;
   vertical-align: middle;
-  border: 1px dotted #eee;
+  border: 1px dotted @HRColor;
   .text {
     color: @sectionTitleColor;
     font-weight: normal;
@@ -2114,7 +2149,7 @@ div.footer-wrapper.right-panel {
     word-wrap: break-word;
   }
   #staffListOptions {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid @HRColor;
     padding-bottom: 4px;
   }
   div.or {
@@ -2142,7 +2177,7 @@ div.footer-wrapper.right-panel {
 }
 #patientListOptions {
   margin-bottom: 1.5em;
-  border-bottom: solid 1px #eee;
+  border-bottom: solid 1px @HRColor;
   padding: 0.5em 0;
 }
 #patientListOptions.disabled {
@@ -2749,7 +2784,7 @@ body.portal .copyright-container  {
     font-size: 0.85em;
     padding: 0.5em 0.8em;
     color: #777;
-    border: 1px solid #bdb9b9;
+    border: 1px solid @btnDefaultBorderColor;
     position: relative;
   }
 }
@@ -4207,7 +4242,7 @@ div.timezone-warning.text-warning {
   }
 
   #adminTableToolbar {
-     div.indent {
+    div.indent {
       padding: 0;
     }
     div.orglist-selector {
@@ -4333,10 +4368,16 @@ div.timezone-warning.text-warning {
   .tnth-splash-bottom-link {
     font-size: 24px;
   }
-  .admin-table {
-    div.pull-right,
-    div.columns-right {
-      top: 0.75em;
+  #patientList {
+    .admin-table {
+      /*
+      div.pull-right,
+      div.columns-right {
+        top: 0.75em;
+      }*/
+      div.pull-right.search {
+        top: 0;
+      }
     }
   }
 }
@@ -4508,6 +4549,11 @@ div.timezone-warning.text-warning {
       width: 650px;
     }
   }
+  .admin-table {
+    div.pull-right {
+      top: -2px;
+    }
+  }
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -4579,6 +4625,14 @@ div.timezone-warning.text-warning {
   #profileProcedureContainer {
      .button-container {
       margin-top: 2em;
+    }
+  }
+  #patientList {
+    .admin-table {
+      div.pull-right,
+      div.pull-right.search {
+        top: 1.2em;
+      }
     }
   }
 }
