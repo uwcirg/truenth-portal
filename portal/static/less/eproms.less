@@ -12,7 +12,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 @baseFontSize:    16px;
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
@@ -1708,6 +1707,27 @@ div.footer-wrapper.right-panel {
 }
 #adminTableContainer {
   position: relative;
+  .fixed-table-loading {
+    background-color: hsla(0, 0%, 100%, 0.7);
+    display: block !important;
+    max-height: 2500px;
+    overflow: hidden;
+    -webkit-transition: max-height 550ms ease 150ms;
+    transition: max-height 550ms ease 150ms;
+  }
+  .fht-cell {
+    visibility: hidden;
+    -webkit-transition: visibility 650ms ease 1s;
+    transition: visibility 650ms ease 1s;
+  }
+  &.active {
+    .fixed-table-loading {
+      max-height: 0;
+    }
+    .fht-cell {
+      visibility: visible;
+    }
+  }
   &:before {
     content: " ";
     display: block;
@@ -1740,6 +1760,7 @@ div.footer-wrapper.right-panel {
 #adminTable {
   min-height: 280px;
   transition: opacity 0.5s ease-in;
+  border: 1px solid darken(@HRColor, 2%);
   .check-role-container {
     position: relative;
     .loading-indicator {
@@ -1859,6 +1880,9 @@ div.footer-wrapper.right-panel {
 }
 
 #adminTableToolbar {
+  button {
+    background-image: linear-gradient(to bottom, #FFF, #ececec 90%);
+  }
   .orgs-filter-warning {
     display: inline-block;
     margin: 0 8px;
@@ -1984,9 +2008,6 @@ div.footer-wrapper.right-panel {
 
 #staffList {
   .fixed-table-toolbar {
-    .bs-bars {
-      width: 72%
-    }
     #adminTableToolbar {
       float: right;
     }
@@ -2077,6 +2098,8 @@ div.footer-wrapper.right-panel {
     line-height: 1.2;
     vertical-align: middle;
     border: 1px dotted @HRColor;
+    font-size: @smallText;
+    opacity: 0.8;
     .text {
       color: @btnDefaultColor;
       font-weight: normal;
@@ -4368,18 +4391,6 @@ div.timezone-warning.text-warning {
   .tnth-splash-bottom-link {
     font-size: 24px;
   }
-  #patientList {
-    .admin-table {
-      /*
-      div.pull-right,
-      div.columns-right {
-        top: 0.75em;
-      }*/
-      div.pull-right.search {
-        top: 0;
-      }
-    }
-  }
 }
 @media (min-width: 992px) {
   #mainNav {
@@ -4549,9 +4560,11 @@ div.timezone-warning.text-warning {
       width: 650px;
     }
   }
-  .admin-table {
-    div.pull-right {
-      top: -2px;
+  #patientList {
+    .admin-table {
+      div.pull-right.search {
+        top: 0;
+      }
     }
   }
 }

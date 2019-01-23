@@ -1022,6 +1022,59 @@ div.pull-right {
   }
 }
 
+#adminTableContainer {
+  position: relative;
+  .fixed-table-loading {
+    background-color: hsla(0, 0%, 100%, 0.7);
+    display: block !important;
+    max-height: 2500px;
+    overflow: hidden;
+    -webkit-transition: max-height 550ms ease 150ms;
+    transition: max-height 550ms ease 150ms;
+  }
+  .fht-cell {
+    visibility: hidden;
+    -webkit-transition: visibility 650ms ease 1s;
+    transition: visibility 650ms ease 1s;
+  }
+  &.active {
+    .fixed-table-loading {
+      max-height: 0;
+    }
+    .fht-cell {
+      visibility: visible;
+    }
+  }
+  &:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    opacity: 1;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: hsla(0, 0%, 100%, 0.7);
+    transition: opacity 0.5s ease-in;
+  }
+  &.active:before {
+    opacity: 0;
+    z-index: -1;
+  }
+}
+#adminTableContainer:before {
+  content: " ";
+  display: block;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: hsla(0, 0%, 100%, 0.7);
+}
+
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -1182,6 +1235,8 @@ div.pull-right {
   padding: .5em 1em;
   line-height: 1.4;
   vertical-align: middle;
+  font-size: @smallText;
+  opacity: 0.8;
   border: 1px dotted #eee;
   .text {
     color: @sectionTitleColor;
@@ -1308,9 +1363,6 @@ div.pull-right {
 
 #staffList {
   .fixed-table-toolbar {
-    .bs-bars {
-      width: 72%
-    }
     #adminTableToolbar {
       float: right;
     }
