@@ -28,7 +28,6 @@ import CurrentUser from "./mixins/CurrentUser.js";
         },
         mounted: function () {
             var self = this;
-            this.setContainerVis();
             Utility.VueErrorHandling(); /* global VueErrorHandling */
             this.preConfig(function () {
                 if ($("#adminTable").length > 0) {
@@ -48,8 +47,9 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.handleDownloadModal();
                 }
                 setTimeout(function () {
+                    self.setContainerVis();
                     self.fadeLoader();
-                }, 350);
+                }, 0);
             });
         },
         mixins: [CurrentUser],
