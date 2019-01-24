@@ -25,11 +25,12 @@ var CurrentUser = { /* global $ i18next */
                     callback({error: true});
                     return false;
                 }
-                self.setUserRoles();
-                self.setUserOrgs(self.getUserId());
-                self.initOrgsList(function() {
-                    callback();
-                }, doPopulateOrgsUI, orgElementsContainerId);
+                self.setUserRoles(function() { /* set user roles */
+                    self.setUserOrgs(self.getUserId());
+                    self.initOrgsList(function() { /* set user orgs */
+                        callback();
+                    }, doPopulateOrgsUI, orgElementsContainerId);
+                });
             });
         },
         getUserId: function() {
@@ -59,6 +60,10 @@ var CurrentUser = { /* global $ i18next */
         },
         setUserRoles: function (callback) {
             callback = callback || function () {};
+            if (this.userRoles.length) {
+                callback();
+                return;
+            }
             var self = this;
             tnthAjax.getRoles(this.userId, function (data) {
                 if (!data || data.error) {
@@ -70,7 +75,7 @@ var CurrentUser = { /* global $ i18next */
                 self.userRoles = data.roles.map(function (item) {
                     return item.name;
                 });
-                self.setAdminUser = self.setAdminUser();
+                self.setAdminUser();
                 callback();
             });
         },
