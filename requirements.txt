@@ -14,7 +14,7 @@ cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.2
-decorator==4.3.0          # via validators
+decorator==4.3.2          # via validators
 dogpile.cache==0.7.1      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.12.2
