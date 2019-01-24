@@ -88,13 +88,15 @@ def patients_root():
         QB_StatusCacheKey().update(datetime.utcnow())
 
     user = current_user()
+    # Not including test accounts by default, unless requested
+    include_test_roles = request.form.get('include_test_roles') 
     consent_query = UserConsent.query.filter(and_(
         UserConsent.deleted_id.is_(None),
         UserConsent.expires > datetime.utcnow()))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
     patients = active_patients(
         require_orgs=org_restriction(user),
-        include_test_role=user.has_role(ROLE.ADMIN.value),
+        include_test_role=include_test_roles,
         include_deleted=True,
         filter_by_ids=consented_users)
 
@@ -128,7 +130,8 @@ def patients_root():
 
     return render_template(
         'admin/patients_by_org.html', patients_list=patients, user=user,
-        qb_status_cache_age=qb_status_cache_age, wide_container="true")
+        qb_status_cache_age=qb_status_cache_age, wide_container="true",
+        include_test_roles=include_test_roles)
 
 
 @patients.route('/patient-profile-create')

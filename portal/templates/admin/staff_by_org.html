@@ -33,6 +33,7 @@
                data-id-field="id"
                {% if allowReactivate %}data-allow-reactivate="true"{% endif %}
                >
+              {{testUsersCheckbox(postUrl=url_for('.staff_index'))}}
             <thead>
             <tr>
                 <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
@@ -48,7 +49,7 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in staff_list %}
-              <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%}>
+              <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if user.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}>  <!-- setting css class for test patient rows, allow distinction from others -->
                   <td>{{user.id}}</td>
                   <td>
                     {% if user.deleted %}

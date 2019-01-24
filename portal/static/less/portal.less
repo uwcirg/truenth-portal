@@ -83,6 +83,7 @@
 @disabledColor: #b6c4d0;
 @dividerColor: #e0e0e0;
 @HRColor:#eee;
+@warningColor: #8a6d3b;
 @inputHeight: 2.4em;
 @disabledOpacity: 0.6;
 
@@ -1024,6 +1025,15 @@ div.pull-right {
 
 #adminTableContainer {
   position: relative;
+  caption {
+    font-weight: normal;
+    padding: 12px 12px 8px;
+    border-bottom: 2px solid @HRColor;
+    label {
+      font-weight: normal;
+      letter-spacing: 0.05rem;
+    }
+  }
   .fixed-table-loading {
     background-color: hsla(0, 0%, 100%, 0.7);
     display: block !important;
@@ -1032,17 +1042,19 @@ div.pull-right {
     -webkit-transition: max-height 550ms ease 150ms;
     transition: max-height 550ms ease 150ms;
   }
-  .fht-cell {
-    visibility: hidden;
-    -webkit-transition: visibility 650ms ease 1s;
-    transition: visibility 650ms ease 1s;
+  .fht-cell,
+  .filterControl {
+    opacity: 0;
+    -webkit-transition: opacity 650ms ease 500ms;
+    transition: opacity 650ms ease 500ms;
   }
   &.active {
     .fixed-table-loading {
       max-height: 0;
     }
-    .fht-cell {
-      visibility: visible;
+    .fht-cell,
+    .filterControl {
+      opacity: 1;
     }
   }
   &:before {
@@ -1095,6 +1107,9 @@ div.pull-right {
 
   div.card-view {
     display: flex;
+  }
+  tr[data-test-role] {
+    color: @warningColor;
   }
   tr[data-uniqueid]:hover {
     background-color: @rowHoverBgColor;
@@ -2688,6 +2703,18 @@ div.noOrg-container {
   border-radius: 0.5em;
   -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
   box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+}
+
+body.vis-on-callback { /* allow page-specific presentation of content after loading */
+  #loadingIndicator,
+  .loading-indicator-placeholder {
+    visibility: visible !important;
+    display: block !important;
+  }
+  #mainHolder,
+  #mainNav {
+    opacity: 0 !important;
+  }
 }
 
 /* Animation */
