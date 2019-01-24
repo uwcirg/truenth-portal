@@ -504,7 +504,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 return OT.getOrgName(item);
             });
         };
-        this.handleMedidataRave = function(orgs, noDisable) {
+        this.handleMedidataRave = function(orgs, noDisable) { /* due to MedidataRave Integration, IRONMAN patient accounts, in particular, are created externally, instead of via the portal, hence, editing is disabled */
             if (noDisable) {
                 return false;
             }
