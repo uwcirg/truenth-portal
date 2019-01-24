@@ -89,7 +89,7 @@ def patients_root():
 
     user = current_user()
     # Not including test accounts by default, unless requested
-    include_test_roles = request.form.get('include_test_roles') 
+    include_test_roles = request.form.get('include_test_roles')
     consent_query = UserConsent.query.filter(and_(
         UserConsent.deleted_id.is_(None),
         UserConsent.expires > datetime.utcnow()))
