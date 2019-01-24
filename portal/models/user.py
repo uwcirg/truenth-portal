@@ -7,6 +7,7 @@ standard_library.install_aliases()  # noqa: E402
 from cgi import escape
 from datetime import datetime, timedelta
 from io import StringIO
+import re
 import time
 
 from dateutil import parser
@@ -16,7 +17,6 @@ from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
-import regex
 from sqlalchemy import UniqueConstraint, and_, func, or_, text
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -461,7 +461,7 @@ class User(db.Model, UserMixin):
                 return None
 
             if self._email.startswith(DELETED_PREFIX[:10]):
-                match = regex.match(DELETED_REGEX, self._email)
+                match = re.match(DELETED_REGEX, self._email)
                 if not match:
                     raise ValueError(
                         "Apparently deleted user's email doesn't fit "
