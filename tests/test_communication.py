@@ -3,11 +3,11 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
+import re
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import pytest
-import regex
 
 from portal.database import db
 from portal.models.audit import Audit
@@ -337,7 +337,7 @@ class TestCommunication(TestQuestionnaireSetup):
         dd = load_template_args(user=user)
 
         # expecting a URL of form <host>/access/token/decision_support
-        match = regex.match(
+        match = re.match(
             r'<a href=(.*)/access/(.*)/decision_support(.*)',
             dd['decision_support_via_access_link'])
         assert match
