@@ -59,7 +59,6 @@ var ValidatorObj = { /*global  $ i18next */
         return !invalid;
     },
     initValidator: function() {
-        if (typeof $.fn.validator === "undefined") { return false; }
         const VALIDATION_EVENTS = "change";
         let self = this;
         /*
