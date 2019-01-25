@@ -98,7 +98,7 @@ def staff_profile(user_id):
         consent_agreements=consent_agreements)
 
 
-@staff.route('/staff', methods=('GET', 'POST'))
+@staff.route('/staff')
 @roles_required(ROLE.STAFF_ADMIN.value)
 @oauth.require_oauth()
 def staff_index():
@@ -153,7 +153,7 @@ def staff_index():
         and_(UserOrganization.user_id == User.id,
              UserOrganization.organization_id.in_(org_list)))
 
-    include_test_roles = request.form.get('include_test_roles')
+    include_test_roles = request.args.get('include_test_roles')
     # not including test accounts by default, unless requested
     if not include_test_roles:
         org_staff = org_staff.filter(

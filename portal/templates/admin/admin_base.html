@@ -42,8 +42,7 @@
 {%- endmacro %}
 {%- macro testUsersCheckbox(postUrl) -%}
 	<caption id="frmTestUsersContainer" class="tnth-hide">
-		<form id="frmTestUsers" method="POST" action="{{postUrl}}">
-			<input id="frmTestUsers_csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
+		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
 			<label class="text-normal text-warning">
 				<input type="checkbox" name="include_test_roles" id="include_test_roles" value="True" {%if include_test_roles %}checked{% endif %}/>
 				{{_("include test accounts")}}
