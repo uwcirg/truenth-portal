@@ -52,7 +52,7 @@ var CurrentUser = { /* global $ i18next */
         },
         getUserRoles: function (callback) {
             callback = callback || function () {};
-            if (this.userRoles.length > 0) {
+            if (this.userRoles && this.userRoles.length) {
                 callback(this.userRoles);
                 return;
             }
@@ -60,7 +60,7 @@ var CurrentUser = { /* global $ i18next */
         },
         setUserRoles: function (callback) {
             callback = callback || function () {};
-            if (this.userRoles.length) {
+            if (this.userRoles && this.userRoles.length) {
                 callback();
                 return;
             }
