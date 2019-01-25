@@ -959,50 +959,10 @@ export default (function() {
             initEmailSection: function() {
                 var self = this;
                 $("#email").attr("data-update-on-validated", "true").attr("data-user-id", self.subjectId);
-                $("#email").removeAttr("data-customemail");
                 $(".btn-send-email").blur();
                 $("#email").on("keyup", function(e) {
                     e.stopPropagation();
                     $("#erroremail").html("");
-                });
-                $("#email").on("change", function() { /* attach email validation/change event to the field directly instead of relying on custom bootstrap validator*/
-                    //TODO figure out why custom validator isn't working consistently in IE, bootstrap issue?
-                    //see validator function in Global js module
-
-                    let $el = $(this);
-                    let emailVal = $.trim($el.val());
-                    if (emailVal === "") {
-                        if (!$el.attr("data-optional")) {
-                            return false;
-                        }
-                        $el.trigger("postEventUpdate"); //if email address is optional, update it as is
-                        return true;
-                    }
-                    var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    var addUserId = ""; // Add user_id to api call (used on patient_profile page so that staff can edit)
-                    if ($el.attr("data-user-id")) {
-                        addUserId = "&user_id=" + $el.attr("data-user-id");
-                    }
-                    if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-                        var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
-                        Utility.sendRequest(url, {max_attempts:1}, function(data) {
-                            if (data && data.constructor == String) {
-                                data = JSON.parse(data);
-                            }
-                            if (data.error) { //note a failed request will be logged
-                                $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
-                                return false; //stop proceeding to update email
-                            }
-                            if (data.unique) {
-                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                $el.trigger("postEventUpdate");
-                                return true;
-                            }
-                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                        });
-                    }
-                    return emailReg.test(emailVal);
-
                 });
                 $("#email").on("postEventUpdate", function() {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
