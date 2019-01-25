@@ -80,5 +80,3 @@ export default ValidatorObj;
 export var emailValidation = ValidatorObj.emailValidation;
 export var htmltagsValidation = ValidatorObj.htmltagsValidation;
 export var birthdayValidation = ValidatorObj.birthdayValidation;
-
-
