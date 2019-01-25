@@ -81,11 +81,13 @@
 @footerWhiteThemeColor: #F5F5F5;
 @orBackgroundColor: #888a8c;
 @labelColor: #777;
+@mutedColor: #777;
 @inputHeight: 2.5em;
 @wellColor: #F7F7F7;
 @notificationBgColor: #EB1939;
 @notificationLinkHoverBgColor: #CC112D;
 @alertColor: hsla(1, 44%, 46%, 0.95);
+@warningColor: #8a6d3b;
 @HRColor: #eeeeee;
 @landingInputBorderColor: #AFB8C2;
 @reportContentBorderColor: #ececec;
@@ -1667,7 +1669,9 @@ div.footer-wrapper.right-panel {
 
 .admin-table {
    .search .form-control {
-     height: 3em !important;
+    height: 3em !important;
+    width: 150px;
+    max-width: 100%;
   }
   &.smaller-text {
     .search .form-control {
@@ -1681,6 +1685,7 @@ div.footer-wrapper.right-panel {
     width: 100%;
     max-width: 100%;
     padding: 0 0.2em 0.2em;
+    margin-left: 0;
     button {
       padding: 0.73em !important;
     }
@@ -1699,14 +1704,26 @@ div.footer-wrapper.right-panel {
 #exportReportContainer {
   display: inline-block;
   button {
-    min-width: 65px;
-    margin-left: 12px;
+    min-width: 60px;
+    margin-left: 6px;
     border-radius: 0;
-    min-height: 3.13em;
+    min-height: 3.15em;
   }
 }
 #adminTableContainer {
   position: relative;
+  opacity: 0;
+  -webkit-transition: opacity 600ms ease;
+  transition: opacity 600ms ease;
+  caption {
+    font-weight: normal;
+    padding: 12px 12px 8px;
+    border-bottom: 1px solid @HRColor;
+    label {
+      font-weight: normal;
+      letter-spacing: 0.05rem;
+    }
+  }
   .fixed-table-loading {
     background-color: hsla(0, 0%, 100%, 0.7);
     display: block !important;
@@ -1715,17 +1732,20 @@ div.footer-wrapper.right-panel {
     -webkit-transition: max-height 550ms ease 150ms;
     transition: max-height 550ms ease 150ms;
   }
-  .fht-cell {
-    visibility: hidden;
-    -webkit-transition: visibility 650ms ease 1s;
-    transition: visibility 650ms ease 1s;
+  .fht-cell,
+  .filterControl {
+    opacity: 0;
+    -webkit-transition: opacity 650ms ease 500ms;
+    transition: opacity 650ms ease 500ms;
   }
   &.active {
+    opacity: 1;
     .fixed-table-loading {
       max-height: 0;
     }
-    .fht-cell {
-      visibility: visible;
+    .fht-cell,
+    .filterControl {
+      opacity: 1;
     }
   }
   &:before {
@@ -1801,6 +1821,9 @@ div.footer-wrapper.right-panel {
    background-color: #ececea;
    color: @linkHover;
    cursor: pointer;
+  }
+  tr[data-test-role] {
+    color: @warningColor;
   }
   TH {
     background-image: -moz-linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
@@ -2046,9 +2069,13 @@ div.footer-wrapper.right-panel {
   }
 }
 #patientList {
+  position: relative;
   #adminTableToolbar {
     border: 1px solid #f5f4f4;
     padding: 4px 8px 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
   }
   #cacheResetContainer {
     display: inline-block;
@@ -2075,8 +2102,8 @@ div.footer-wrapper.right-panel {
     }
     #cacheResetContainer {
       #cacheResetForm {
-        margin: 0 0.25em;
-        padding: 0.65em .25em .15em;
+        margin: 0;
+        padding: 0.25em .25em .15em;
         .byline-text {
           display: inline-block;
           position: relative;
@@ -3378,7 +3405,7 @@ input.clinic {
 
 /*.loading-indicator {*/
 #loadingIndicator,
-.loading-indicator-placeholder{
+.loading-indicator-placeholder {
   /*display: none;*/
   position: fixed;
   top: 0;
@@ -3393,6 +3420,17 @@ input.clinic {
   color: #444;
   margin: auto;
   background: transparent;
+}
+body.vis-on-callback { /* allow page-specific presentation of content after loading */
+  #loadingIndicator,
+  .loading-indicator-placeholder {
+    visibility: visible !important;
+    display: block !important;
+  }
+  #mainHolder,
+  #mainNav {
+    opacity: 0 !important;
+  }
 }
 #loadingIndicator:before,
 .loading-indicator-placeholder:before {
@@ -4560,13 +4598,6 @@ div.timezone-warning.text-warning {
       width: 650px;
     }
   }
-  #patientList {
-    .admin-table {
-      div.pull-right.search {
-        top: 0;
-      }
-    }
-  }
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -4644,7 +4675,7 @@ div.timezone-warning.text-warning {
     .admin-table {
       div.pull-right,
       div.pull-right.search {
-        top: 1.2em;
+        top: 0.75em;
       }
     }
   }

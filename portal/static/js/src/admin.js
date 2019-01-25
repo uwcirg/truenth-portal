@@ -12,6 +12,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
         el: "#adminTableContainer",
         errorCaptured: function (Error, Component, info) {
             console.error("Error: ", Error, " Component: ", Component, " Message: ", info); /* console global */
+            this.setContainerVis();
             return false;
         },
         errorHandler: function (err, vm) {
@@ -22,6 +23,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
             }
             console.warn("Admin Vue instance threw an error: ", vm, this);
             console.error("Error thrown: ", err);
+            this.setContainerVis();
         },
         created: function () {
             this.injectDependencies();
@@ -31,25 +33,21 @@ import CurrentUser from "./mixins/CurrentUser.js";
             Utility.VueErrorHandling(); /* global VueErrorHandling */
             this.preConfig(function () {
                 if ($("#adminTable").length > 0) {
+                    self.setLoaderContent();
                     self.rowLinkEvent();
                     self.setColumnSelections();
                     self.initExportReportDataSelector();
                     self.setTableFilters(self.userId); //set user's preference for filter(s)
                     self.initTableEvents();
-                    self.initOrgsSelector();
-                    self.handleDisableFields();
+                    self.handleCurrentUser();
                     self.handleDeletedUsersVis();
                     self.setRowItemEvent();
                     self.handleAffiliatedUIVis();
                     self.addFilterPlaceHolders();
                 } else {
-                    self.initOrgsSelector();
+                    self.handleCurrentUser();
                     self.handleDownloadModal();
                 }
-                setTimeout(function () {
-                    self.setContainerVis();
-                    self.fadeLoader();
-                }, 0);
             });
         },
         mixins: [CurrentUser],
@@ -129,8 +127,12 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     throw Error("Dependency " + key + " not found."); //throw error ? should be visible in console
                 }
             },
+            setLoaderContent: function() {
+                $("#adminTableContainer .fixed-table-loading").html("");
+            },
             setContainerVis: function() {
                 $("#adminTableContainer").addClass("active");
+                this.fadeLoader();
             },
             showMain: function () {
                 $("#mainHolder").css({
@@ -142,10 +144,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     "opacity": 1
                 });
             },
-            initOrgsSelector: function() {
-                if (!this.hasOrgsSelector()) {
-                    return false;
-                }
+            handleCurrentUser: function() {
                 var self = this;
                 this.initCurrentUser(function() {
                     self.onCurrentUserInit();
@@ -191,8 +190,12 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 if (this.userOrgs.length === 0) {
                     $("#createUserLink").attr("disabled", true);
                 }
-                this.initOrgsFilter();
-                this.initOrgsEvent();
+                this.handleDisableFields();
+                if (this.hasOrgsSelector()) {
+                    this.initOrgsFilter();
+                    this.initOrgsEvent();
+                }
+                this.initRoleBasedEvent();
                 this.fadeLoader();
             },
             setOrgsMenuHeight: function (padding) {
@@ -218,14 +221,12 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 });
             },
             fadeLoader: function () {
-                DELAY_LOADING = false;
                 var self = this;
+                self.showMain();
                 setTimeout(function () {
-                    self.showMain();
-                }, 250);
-                setTimeout(function () {
+                    $("body").removeClass("vis-on-callback");
                     $("#loadingIndicator").fadeOut();
-                }, 300);
+                }, 150);
             },
             showLoader: function () {
                 $("#loadingIndicator").show();
@@ -294,8 +295,19 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 }
                 return $.extend({}, this.tableConfig, options);
             },
+            initRoleBasedEvent: function() {
+                if (this.isAdminUser()) { /* turn on test account toggle checkbox if admin user */
+                    $("#frmTestUsersContainer").removeClass("tnth-hide");
+                    $("#include_test_roles").on("click", function() {
+                        $("#frmTestUsers").submit();
+                    });
+                }
+            },
             initTableEvents: function () {
                 var self = this;
+                $("#adminTable").on("post-body.bs.table", function() {
+                    self.setContainerVis();
+                });
                 $("#adminTable").on("reset-view.bs.table", function () {
                     self.addFilterPlaceHolders();
                     self.resetRowVisByActivationStatus();
@@ -475,7 +487,6 @@ import CurrentUser from "./mixins/CurrentUser.js";
                         return false;
                     }
                     self.setCreateAccountVis(true);
-                    self.checkAdmin();
                 });
             },
             setCreateAccountVis: function (hide) {
@@ -486,15 +497,10 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 }
                 createAccountElements.css("display", "block");
             },
-            checkAdmin: function () {
-                var self = this;
-                this.getUserRoles(function () {
-                    if (self.isAdmin) {
-                        self.setCreateAccountVis(); //allow admin user to create account
-                    }
-                });
-            },
             handleDisableFields: function () {
+                if (this.isAdminUser()) {
+                    return false;
+                }
                 this.handleMedidataRave(); //a function specifically created to handle MedidataRave related stuff
                 //can do other things related to disabling fields here if need be
             },

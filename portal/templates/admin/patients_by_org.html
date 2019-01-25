@@ -1,5 +1,6 @@
 {% extends "admin/admin_base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
+{%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
   <div id="patientList">
     <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
@@ -47,6 +48,7 @@
              data-show-export="true"
              data-export-data-type="all"
              >
+            {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
@@ -74,7 +76,7 @@
           </thead>
           <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%}>
+                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
