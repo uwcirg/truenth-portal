@@ -51,7 +51,7 @@
  * = Colors =
  **/
 @bodyBgColor:      #FFF;
-@mainNavBgColor: #3A4450;
+@mainNavBgColor: linear-gradient(to right, #6B7581, #38424E, #6B7581, #353F4B);
 @baseColor:       #333;
 @linkColor:       #57675B;
 @linkHover:       #576e76;
@@ -1018,6 +1018,9 @@ select:not([multiple]) {
 #tnthNavWrapper {
   z-index: 20;
   position: relative;
+  visibility: hidden;
+  -webkit-transition: visibility 350ms ease;
+  transition: visibility 350ms ease;
 }
 #iqFooterWrapper {
   display: none;
@@ -1187,7 +1190,10 @@ body.portal .copyright-container * {
 #mainNav {
   height: 71px;
   position: relative;
-  background-color: @mainNavBgColor;
+  background-image: @mainNavBgColor;
+  background-image: url('../../.././static/img/header_background_xs.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 #mainNavLoadingError {
   position: absolute;
