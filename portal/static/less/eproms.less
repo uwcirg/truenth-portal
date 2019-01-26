@@ -51,6 +51,7 @@
  * = Colors =
  **/
 @bodyBgColor:      #FFF;
+@mainNavMobileBgColor: #353F4B;
 @mainNavBgColor: linear-gradient(to right, #6B7581, #38424E, #6B7581, #353F4B);
 @baseColor:       #333;
 @linkColor:       #57675B;
@@ -1190,10 +1191,14 @@ body.portal .copyright-container * {
 #mainNav {
   height: 71px;
   position: relative;
-  background-image: @mainNavBgColor;
-  background-image: url('../../.././static/img/header_background_xs.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-color: @mainNavMobileBgColor;
+  background-image: none;
+  @media (min-width: 992px) {
+    background-color: @mainNavBgColor;
+    background-image: url('../../.././static/img/header_background_xs.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
 }
 #mainNavLoadingError {
   position: absolute;
