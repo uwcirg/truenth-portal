@@ -5,6 +5,7 @@ ENV \
     DEBIAN_FRONTEND=noninteractive \
     GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
+# Todo: use `mk-build-deps` to install dependencies from `Build-Depends` section of debian/control
 RUN \
     apt-get update --quiet && \
     apt-get dist-upgrade --quiet --quiet && \
@@ -12,10 +13,7 @@ RUN \
         build-essential \
         debhelper \
         dh-virtualenv\
-        fakeroot \
         git \
-        libc6-i386 \
-        libffi-dev \
         libpq-dev \
         python-dev \
         python-pip \

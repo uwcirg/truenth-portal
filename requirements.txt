@@ -1,6 +1,11 @@
-# Do not install binary wheels for certain packages
-# See https://github.com/spotify/dh-virtualenv/issues/150
---no-binary billiard,cffi,psycopg2
+# Do not install binary wheels for psycopg2
+# docs suggest building from source every time for prod
+# http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
+# Todo: investigate using binary in python-psycopg2 debian package
+--no-binary psycopg2
+
+# for other binary wheel issues see:
+# https://dh-virtualenv.readthedocs.io/en/latest/howtos.html#handling-binary-wheels
 
 alembic==1.0.7            # via flask-migrate
 amqp==2.4.0               # via kombu
