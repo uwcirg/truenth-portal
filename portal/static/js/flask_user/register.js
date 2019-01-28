@@ -60,6 +60,7 @@
             });
             $("#email").on("change", function() {
                 $("#erroremail").text("");
+                $(this).closest(".form-group").removeClass("has-error");
             });
 
         };
