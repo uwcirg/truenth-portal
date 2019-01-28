@@ -65,7 +65,7 @@ requests-cache==0.4.13
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
 requests==2.21.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
 six==1.12.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
-sqlalchemy==1.2.16         # via alembic, flask-sqlalchemy
+sqlalchemy==1.2.17         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.3
 urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
