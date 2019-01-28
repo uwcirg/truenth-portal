@@ -110,6 +110,19 @@ class TestUser(TestCase):
         results = response.json
         assert results['unique'] is True
 
+    def test_unique_hidden_email(self):
+        # hidden emails, such as masked invited user create collisions
+        email = 'fake@email.com'
+        fake_user = self.add_user(username=email)
+        fake_user.mask_email()
+
+        self.login()
+        request = '/api/unique_email?email={}'.format(urllib.parse.quote(
+            email))
+        response = self.client.get(request)
+        assert response.status_code == 200
+        assert response.json['unique'] is False
+
     def test_unique_email_when_more_than_one_match_exists(self):
         self.login()
 
