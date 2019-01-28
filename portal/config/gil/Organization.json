@@ -1252,7 +1252,7 @@
         {
           "system": "http://us.truenth.org/identity-codes/decision-support-group",
           "use": "secondary",
-          "value": "wisercare"
+          "value": "p3p"
         },
         {
           "system": "http://us.truenth.org/identity-codes/practice-region",
