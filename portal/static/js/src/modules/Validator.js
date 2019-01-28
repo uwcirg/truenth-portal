@@ -2,9 +2,8 @@ import Utility from "./Utility.js";
 import tnthDates from "./TnthDate.js";
 
 var ValidatorObj = { /*global  $ i18next */
-    "birthdayValidation": function() {
-        var m = parseInt($("#month").val()), d = parseInt($("#date").val()), y = parseInt($("#year").val());
-        return  tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
+    "birthdayValidation": function(m, d, y, errorFieldId) {
+        return  tnthDates.validateDateInputFields(m, d, y, errorFieldId);
     },
     "emailValidation": function($el) {
         var emailVal = $.trim($el.val());
@@ -59,13 +58,13 @@ var ValidatorObj = { /*global  $ i18next */
         return !invalid;
     },
     initValidator: function() {
-        const VALIDATION_EVENTS = "change";
+        const VALIDATION_EVENTS = "keyup change";
         let self = this;
         /*
          * init validation event for fields with custom validation attribute
          */
         $("form.to-validate[data-toggle=validator] [data-birthday]").attr("novalidate", true).on(VALIDATION_EVENTS,function() {
-            return self.birthdayValidation($(this));
+            return self.birthdayValidation($("#month").val(), $("#date").val(), $("#year").val(), "errorbirthday"); /* applied to month, day and year fields of birthday group elements */
         });
         $("form.to-validate[data-toggle=validator] [data-customemail]").attr("novalidate", true).on(VALIDATION_EVENTS, function() {
             return self.emailValidation($(this));

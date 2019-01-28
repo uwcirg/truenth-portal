@@ -522,19 +522,6 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
         this.initFieldEvents = function() {
-            ["year", "month", "date"].forEach(function(fn) {
-                var field = $("#" + fn);
-                field.on("keyup focusout", function() {
-                    var y = $("#year").val(), m = $("#month").val(),d = $("#date").val();
-                    var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
-                    if (isValid) {
-                        $("#birthday").val(y + "-" + m + "-" + d);
-                        $("#errorbirthday").html("");
-                    } else {
-                        $("#birthday").val("");
-                    }
-                });
-            });
             Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
         };
         this.initButtons = function() {
