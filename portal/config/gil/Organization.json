@@ -1247,6 +1247,12 @@
       "resourceType": "Organization"
     },
     {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
       "id": 1502,
       "identifier": [
         {
