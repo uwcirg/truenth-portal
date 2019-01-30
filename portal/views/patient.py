@@ -315,7 +315,11 @@ def patient_timeline(patient_id):
         abort(500, ve.message)
 
     results = []
-    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(QBT.at):
+    # We order by at (to get the latest status for a given QB) and
+    # secondly by id, as on rare occasions, the time (`at`) of
+    #  `due` == `completed`, but the row insertion defines priority
+    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(
+            QBT.at, QBT.id):
         # build qbd for visit name
         qbd = QBD(
             relative_start=qbt.at, qb_id=qbt.qb_id,

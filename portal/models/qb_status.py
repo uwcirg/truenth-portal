@@ -87,10 +87,14 @@ class QB_Status(object):
 
     def _status_from_current(self, cur_qbd):
         """Obtain status from QB timeline given current QBD"""
+        # We order by at (to get the latest status for a given QB) and
+        # secondly by id, as on rare occasions, the time (`at`) of
+        #  `due` == `completed`, but the row insertion defines priority
         cur_rows = QBT.query.filter(QBT.user_id == self.user.id).filter(
             QBT.qb_id == cur_qbd.qb_id).filter(
             QBT.qb_recur_id == cur_qbd.recur_id).filter(
-            QBT.qb_iteration == cur_qbd.iteration).order_by(QBT.at)
+            QBT.qb_iteration == cur_qbd.iteration).order_by(
+            QBT.at, QBT.id)
 
         # whip through ordered rows picking up available status
         for row in cur_rows:
