@@ -138,7 +138,6 @@ import Consent from "./modules/Consent.js";
             sectionObj.config =  $(this).attr("data-config");
             sectionObj.display = $(this).attr("data-display");
         });
-        //Profile.initSections();
     };
 
     FieldsChecker.prototype.postDemoData = function(targetField) {
