@@ -2087,7 +2087,9 @@ export default (function() {
                 var self = this;
                 Consent.initConsentDateFieldEvents();
                 $("#consentDateModal").on("updated", function() {
-                    self.reloadConsentList($("#consentDateModal_date").attr("data-userId"));
+                    setTimeout(function() {
+                        self.reloadConsentList($("#consentDateModal_date").attr("data-userId"));
+                    }, 150);
                 });
             },
             showConsentHistory: function() {
@@ -2188,7 +2190,7 @@ export default (function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
                     }
-                }, 50);
+                }, 150);
                 this.consent.consentLoading = false;
             },
             pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },

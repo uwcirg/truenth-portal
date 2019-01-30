@@ -33,7 +33,6 @@ export default { /*global i18next datepicker $*/
                 } else {
                     $("#"+orgId+"_consentAgreementMessage").html("");
                     setTimeout(function() { modalElements.modal("hide"); __self.removeObsoleteConsent(userId); }, 250);
-                    //setTimeout(function() { __self.reloadConsentList(userId);}, 500);
                 }
                 $("#" + orgId + "_loader.loading-message-indicator").hide();
                 closeButtons.attr("disabled", false);
@@ -69,10 +68,7 @@ export default { /*global i18next datepicker $*/
             });
             $(this).on("show.bs.modal", function() {
                 var checkedOrg = $("#userOrgs input[name='organization']:checked");
-                var shortName = checkedOrg.attr("data-short-name") || checkedOrg.attr("data-org-name");
-                if (!shortName) {
-                    shortName = orgTool.getShortName(checkedOrg.val());
-                }
+                var shortName = checkedOrg.attr("data-short-name") || checkedOrg.attr("data-org-name") || orgTool.getShortName(checkedOrg.val());
                 if (shortName) {
                     $(this).find(".consent-clinic-name").text(i18next.t(shortName));
                 }
@@ -125,6 +121,23 @@ export default { /*global i18next datepicker $*/
             });
         });
     },
+    validateConsentDateFields: function(d, h, m, s) {
+        var errorMessage = "";
+        var isValid = tnthDates.isValidDefaultDateFormat(d);
+        if (d && !isValid) {
+            errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Date must in the valid format.");
+        }
+        if (h && !(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) { //validate hour [0]0
+            errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Hour must be in valid format, range 0 to 23.");
+        }
+        if (m && !(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
+            errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Minute must be in valid format, range 0 to 59.");
+        }
+        if (s && !(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
+            errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Second must be in valid format, range 0 to 59.");
+        }
+        return errorMessage;
+    },
     initConsentDateFieldEvents: function() {
         $("#consentDateModal").on("shown.bs.modal", function(e) {
             $(this).find(".consent-date").focus();
@@ -159,29 +172,19 @@ export default { /*global i18next datepicker $*/
         $("#consentDateModal .consent-hour, #consentDateModal .consent-minute, #consentDateModal .consent-second").each(function() {
             Utility.convertToNumericField($(this));
         });
+        var self = this;
         $("#consentDateModal .consent-date, #consentDateModal .consent-hour, #consentDateModal .consent-minute, #consentDateModal .consent-second").each(function() {
             $(this).on("change", function() {
-                var d = $("#consentDateModal_date"), h = $("#consentDateModal_hour").val(), m = $("#consentDateModal_minute").val(), s = $("#consentDateModal_second").val();
-                var errorMessage = "";
-                var isValid = tnthDates.isValidDefaultDateFormat(d.val());
-                if (d.val() && !isValid) {
-                    errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Date must in the valid format.");
-                    d.datepicker("hide");
-                }
-                if (h && !(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) { //validate hour [0]0
-                    errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Hour must be in valid format, range 0 to 23.");
-                }
-                if (m && !(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
-                    errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Minute must be in valid format, range 0 to 59.");
-                }
-                if (s && !(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
-                    errorMessage += (errorMessage ? "<br/>" : "") + i18next.t("Second must be in valid format, range 0 to 59.");
+                var d = $("#consentDateModal_date").val(), h = $("#consentDateModal_hour").val(), m = $("#consentDateModal_minute").val(), s = $("#consentDateModal_second").val();
+                var errorMessage = self.validateConsentDateFields(d, h, m, s);
+                if (errorMessage) {
+                    $("#consentDateModal_date").datepicker("hide");
                 }
                 $("#consentDateModalError").html(errorMessage);
             });
         });
 
-        $("#consentDateModal .btn-submit").on("click", function() {
+        $("#consentDateModal .btn-submit").off("click").on("click", function() {
             var ct = $("#consentDateModal_date"), o = CONSENT_ENUM[ct.attr("data-status")];
             if (!ct.val()) {
                 $("#consentDateModalError").text(i18next.t("You must enter a date/time"));
@@ -189,8 +192,12 @@ export default { /*global i18next datepicker $*/
             }
             var h = $("#consentDateModal_hour").val(),m = $("#consentDateModal_minute").val(),s = $("#consentDateModal_second").val();
             var dt = new Date(ct.val()); //2017-07-06T22:04:50 format
-            var pad = function(n) { if (!n) { return "00"; } n = parseInt(n); return (n < 10) ? "0" + n : n; };
-            var cDate = dt.getFullYear()+"-"+(dt.getMonth() + 1)+"-"+dt.getDate()+"T"+pad(h)+":"+pad(m)+":"+pad(s);
+            var int = function(n) {
+                if (!n) return 0;
+                return parseInt(n);
+            }
+            var cDate = dt.setHours(int(h), int(m), int(s));
+            cDate = tnthDates.formatDateString(cDate, "system");
             o.org = ct.attr("data-orgId");
             o.agreementUrl = ct.attr("data-agreementUrl");
             o.acceptance_date = cDate;

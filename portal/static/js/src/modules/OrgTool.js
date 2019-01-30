@@ -560,22 +560,22 @@ export default (function() { /*global i18next $ */
                 if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                     if (tnthAjax.hasConsent(userId, parentOrg)) {
                         self.updateOrgs(userId, $("#clinics"), true);
-                    } else {
-                        var __modal = Consent.getConsentModal(parentOrg);
-                        if (__modal && __modal.length > 0) {
-                            setTimeout(function() { __modal.modal("show"); }, 50);
-                        } else {
-                            self.updateOrgs(userId, $("#clinics"), true);
-                            setTimeout(function() { Consent.setDefaultConsent(userId, parentOrg);}, 500);
-                        }
+                        return;
                     }
-                } else {
-                    self.updateOrgs(userId, $("#clinics"),true);
-                    var thisElement = $(this);
-                    setTimeout(function() {
-                        Consent.setConsentBySelectedOrg(userId, thisElement, isConsentWithTopLevelOrg);
-                    }, 500);
+                    var __modal = Consent.getConsentModal(parentOrg);
+                    if (__modal && __modal.length > 0) {
+                        setTimeout(function() { __modal.modal("show"); }, 50);
+                        return;
+                    }
+                    self.updateOrgs(userId, $("#clinics"), true);
+                    setTimeout(function() { Consent.setDefaultConsent(userId, parentOrg);}, 500);
+                    return;
                 }
+                self.updateOrgs(userId, $("#clinics"),true);
+                var thisElement = $(this);
+                setTimeout(function() {
+                    Consent.setConsentBySelectedOrg(userId, thisElement, isConsentWithTopLevelOrg);
+                }, 500);
             });
         });
     };
@@ -583,8 +583,8 @@ export default (function() { /*global i18next $ */
         callback = callback || function() {};
         if (!data || ! data.careProvider) { callback(); return false;}
         for (var i = 0; i < data.careProvider.length; i++) {
-            var val = data.careProvider[i];
-            var orgID = val.reference.split("/").pop();
+            let careProvider = data.careProvider[i];
+            let orgID = careProvider.reference.split("/").pop();
             if (parseInt(orgID) === 0) {
                 $("#userOrgs #noOrgs").prop("checked", true);
                 if ($("#stateSelector").length > 0) {

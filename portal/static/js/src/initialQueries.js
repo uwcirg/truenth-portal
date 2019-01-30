@@ -906,10 +906,21 @@ import Consent from "./modules/Consent.js";
         }
     };
 
+    FieldsChecker.prototype.getConfiguration = function(userId, params, callback) {
+        callback = callback || function() {};
+        tnthAjax.getConfiguration(userId, params, callback);
+    };
+
+    FieldsChecker.prototype.getOrgsStateSelector = function(userId, parentOrgsToDraw, callback) {
+        callback = callback || function() {};
+        var orgTool = this.getOrgTool();
+        orgTool.populateOrgsStateSelector(self.userId, parentOrgsToDraw, callback);
+    };
+
     FieldsChecker.prototype.clinicsEvent = function() {
         var self = this, orgTool = this.getOrgTool();
-        tnthAjax.getConfiguration(this.userId, false, function(data) {
-            orgTool.populateOrgsStateSelector(self.userId, [data.ACCEPT_TERMS_ON_NEXT_ORG], function() {
+        this.getConfiguration(this.userId, false, function(data) {
+            self.getOrgsStateSelector(self.userId, [data.ACCEPT_TERMS_ON_NEXT_ORG], function() {
                 orgTool.handleOrgsEvent(self.userId, data.CONSENT_WITH_TOP_LEVEL_ORG);
                 Consent.initFieldEvents(self.userId);
                 $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
