@@ -34,14 +34,13 @@ CMD \
     git clone --verbose "${GIT_REPO}" . && \
 
     yes | make-deb && \
-    git checkout \
-        debian/artifacts \
-        debian/control \
-        debian/portal.triggers \
-        debian/rules \
-    && \
+    git update-index --skip-worktree debian/changelog && \
+    git checkout -- . && \
 
-    dpkg-buildpackage --unsigned-source --unsigned-changes && \
+    dpkg-buildpackage \
+        --unsigned-source \
+        --unsigned-changes \
+    && \
     mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
     cd "${ARTIFACT_DIR}" && \
