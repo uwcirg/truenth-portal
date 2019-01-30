@@ -187,9 +187,9 @@ export default { /*global i18next datepicker $*/
                 $("#consentDateModalError").text(i18next.t("You must enter a date/time"));
                 return false;
             }
-            var h = $("#consentDateModal_hour").val()||"00",m = $("#consentDateModal_minute").val()||"00",s = $("#consentDateModal_second").val()||"00";
+            var h = $("#consentDateModal_hour").val(),m = $("#consentDateModal_minute").val(),s = $("#consentDateModal_second").val();
             var dt = new Date(ct.val()); //2017-07-06T22:04:50 format
-            var pad = function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; };
+            var pad = function(n) { if (!n) { return "00"; } n = parseInt(n); return (n < 10) ? "0" + n : n; };
             var cDate = dt.getFullYear()+"-"+(dt.getMonth() + 1)+"-"+dt.getDate()+"T"+pad(h)+":"+pad(m)+":"+pad(s);
             o.org = ct.attr("data-orgId");
             o.agreementUrl = ct.attr("data-agreementUrl");
@@ -216,17 +216,12 @@ export default { /*global i18next datepicker $*/
     },
     getConsentModal: function(parentOrg) {
         var orgTool = this.getOrgTool();
-        parentOrg = parentOrg || orgTool.getElementParentOrg(orgTool.getSelectedOrg());
         if (!parentOrg) { return false; }
         var __modal = $("#" + parentOrg + "_consentModal");
         if (__modal.length) {
             return __modal;
-        } 
-        var __defaultModal = this.getDefaultModal(orgTool.getSelectedOrg());
-        if (__defaultModal && __defaultModal.length > 0) {
-            return __defaultModal;
         }
-        return false;
+        return this.getDefaultModal(orgTool.getSelectedOrg());
     },
     getConsentOrgShortName: function(orgItem, el) {
         return (orgItem && orgItem.shortname) ? orgItem.shortname : ($(el).attr("data-parent-name") || $(el).closest("label").text());
@@ -251,7 +246,7 @@ export default { /*global i18next datepicker $*/
         orgModalElement.html(tempHTML);
         orgModalElement.attr("id", orgModalId);
         $("#defaultConsentContainer").append(orgModalElement);
-        return orgElement;
+        return $("#"+orgModalId);
     },
     getDefaultAgreementUrl: function(orgId) {
         var stockConsentUrl = $("#stock_consent_url").val(), agreementUrl = "", orgElement = $("#" + orgId + "_org");
@@ -288,42 +283,50 @@ export default { /*global i18next datepicker $*/
         });
         tnthAjax.deleteConsent(userId, {org: "all", exclude: co.join(",")}); //exclude currently selected orgs
     },
+    setConsentByOrgElement: function(userId, el, isConsentWithTopLevelOrg) {
+        var self = this, OT = this.getOrgTool(), parentOrg = OT.getElementParentOrg(el), orgId = $(el).val();
+        var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+        if (String(agreementUrl) !== "") {
+            var params = CONSENT_ENUM.consented;
+            params.org = isConsentWithTopLevelOrg ? parentOrg : orgId;
+            params.agreementUrl = agreementUrl;
+            setTimeout(function() {
+                tnthAjax.setConsent(userId, params, "all", true, function() {
+                    self.removeObsoleteConsent(userId);
+                });
+            }, 350);
+            return;
+        }
+        self.setDefaultConsent(userId, parentOrg);
+    },
+    removeConsentByOrgElement: function(userId, el, isConsentWithTopLevelOrg) {
+        var OT = this.getOrgTool();
+        var parentOrg = OT.getElementParentOrg(el), orgId = $(el).val();
+        if (isConsentWithTopLevelOrg) {
+            var childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
+            if ($("#fillOrgs").attr("patient_view")) {
+                childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
+            }
+            var allUnchecked = !childOrgs.is(":checked");
+            if (allUnchecked) {
+                setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": parentOrg});}, 350);
+            }
+            return;
+        }
+        setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
+    },
     setConsentBySelectedOrg: function(userId, obj, isConsentWithTopLevelOrg, callback) {
         callback = callback || function() {};
-        var self = this, OT = this.getOrgTool();
+        var self = this;
         $(obj).each(function() {
-            var parentOrg = OT.getElementParentOrg(this), orgId = $(this).val();
             if ($(this).prop("checked")) {
                 if ($(this).attr("id") !== "noOrgs") {
-                    var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                    if (String(agreementUrl) !== "") {
-                        var params = CONSENT_ENUM.consented;
-                        params.org = isConsentWithTopLevelOrg ? parentOrg : orgId;
-                        params.agreementUrl = agreementUrl;
-                        setTimeout(function() {
-                            tnthAjax.setConsent(userId, params, "all", true, function() {
-                                self.removeObsoleteConsent(userId);
-                            });
-                        }, 350);
-                    } else {
-                        self.setDefaultConsent(userId, parentOrg);
-                    }
+                    self.setConsentByOrgElement(userId, this, isConsentWithTopLevelOrg);
                 } else { //remove all valid consent if no org is selected
                     setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": "all"});}, 350);
                 }
             } else {
-                if (isConsentWithTopLevelOrg) {
-                    var childOrgs = $("#userOrgs input[data-parent-id='" + parentOrg + "']");
-                    if ($("#fillOrgs").attr("patient_view")) {
-                        childOrgs = $("#userOrgs div.org-container[data-parent-id='" + parentOrg + "']").find("input[name='organization']");
-                    }
-                    var allUnchecked = !childOrgs.is(":checked");
-                    if (allUnchecked) {
-                        setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": parentOrg});}, 350);
-                    }
-                } else {
-                    setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
-                }
+                self.removeConsentByOrgElement(userId, this, isConsentWithTopLevelOrg);
             }
         });
         setTimeout(function() {

@@ -412,7 +412,6 @@ export default (function() { /*global i18next $ */
             (item.identifier).forEach(function(region) {
                 if (String(region.system) === String(SYSTEM_IDENTIFIER_ENUM.practice_region) && region.value) {
                     __state = (region.value).split(":")[1];
-                    __state = (region.value).split(":")[1];
                     if (!states.hasOwnProperty(__state)) {
                         states[__state] = [item.id];
                         $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
