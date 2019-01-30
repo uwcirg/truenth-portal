@@ -140,11 +140,8 @@ def mock_eproms_questionnairebanks():
     three_q_recur = Recur(
         start='{"months": 3}', cycle_length='{"months": 6}',
         termination='{"months": 24}')
-    four_q_recur1 = Recur(
+    four_q_recur = Recur(
         start='{"months": 6}', cycle_length='{"years": 1}',
-        termination='{"months": 21}')
-    four_q_recur2 = Recur(
-        start='{"months": 30}', cycle_length='{"years": 1}',
         termination='{"months": 33}')
     six_q_recur = Recur(
         start='{"years": 1}', cycle_length='{"years": 1}',
@@ -162,15 +159,13 @@ def mock_eproms_questionnairebanks():
         db.session.add(localized_org)
         db.session.add(metastatic_org)
         db.session.add(three_q_recur)
-        db.session.add(four_q_recur1)
-        db.session.add(four_q_recur2)
+        db.session.add(four_q_recur)
         db.session.add(six_q_recur)
         db.session.commit()
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
     three_q_recur = db.session.merge(three_q_recur)
-    four_q_recur1 = db.session.merge(four_q_recur1)
-    four_q_recur2 = db.session.merge(four_q_recur2)
+    four_q_recur = db.session.merge(four_q_recur)
     six_q_recur = db.session.merge(six_q_recur)
 
     # Localized baseline
@@ -230,7 +225,7 @@ def mock_eproms_questionnairebanks():
         name='metastatic_recurring4',
         classification='recurring',
         research_protocol_id=metapro_id,
-        recurs=[four_q_recur1, four_q_recur2],
+        recurs=[four_q_recur],
         start='{"days": 0}',
         overdue='{"days": 30}',
         expired='{"months": 3}')
