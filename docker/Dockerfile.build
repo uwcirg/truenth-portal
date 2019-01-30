@@ -32,14 +32,14 @@ WORKDIR /root/portal
 # Allow repo and branch to be overridden with environment variable
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
+
+    yes | make-deb && \
+    git update-index --skip-worktree debian/changelog && \
+    git checkout -- . && \
+
     dpkg-buildpackage \
         --unsigned-source \
         --unsigned-changes \
-        --hook-init=' \
-            yes | make-deb && \
-            git update-index --skip-worktree debian/changelog && \
-            git checkout -- . \
-        ' \
     && \
     mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
