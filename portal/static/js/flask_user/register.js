@@ -44,6 +44,9 @@
                 });
                 $(this).on("keyup", function(e) {
                     e.preventDefault();
+                    if ($(this).val()) {
+                        $(this).closest(".form-group").removeClass("has-error");
+                    }
                     setTimeout(function() { self.checkValidity(e.keyCode === 13); } , 350);
                 });
             });
@@ -60,7 +63,6 @@
             });
             $("#email").on("change", function() {
                 $("#erroremail").text("");
-                $(this).closest(".form-group").removeClass("has-error");
             });
 
         };
