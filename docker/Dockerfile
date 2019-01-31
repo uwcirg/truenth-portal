@@ -39,8 +39,6 @@ ENV \
 EXPOSE "${PORT}"
 
 CMD \
-    env && \
-
     wait-for-it \
         --host="$PGHOST" \
         --port="$PGPORT" \
