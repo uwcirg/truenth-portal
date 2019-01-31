@@ -1719,6 +1719,10 @@ div.footer-wrapper.right-panel {
     margin-left: 6px;
     border-radius: 0;
     min-height: 3.15em;
+    cursor: pointer;
+  }
+  .dropdown-menu {
+    top: 94%;
   }
 }
 #adminTableContainer {
@@ -1742,6 +1746,9 @@ div.footer-wrapper.right-panel {
     overflow: hidden;
     -webkit-transition: max-height 550ms ease 150ms;
     transition: max-height 550ms ease 150ms;
+  }
+  .fixed-table-container {
+    border: 1px solid darken(@HRColor, 5%);
   }
   .fht-cell,
   .filterControl {
@@ -1829,9 +1836,11 @@ div.footer-wrapper.right-panel {
     }
   }
   tr[data-uniqueid]:hover {
-   background-color: #ececea;
-   color: @linkHover;
+   background-color: @HRColor;
    cursor: pointer;
+   td {
+    cursor: pointer;
+   }
   }
   tr[data-test-role] {
     color: @warningColor;
@@ -1946,6 +1955,7 @@ div.footer-wrapper.right-panel {
     display: block;
     @media (min-width:768px) {
       display: inline-block;
+      top: 1px;
     }
     max-width: 100%;
     legend {
@@ -2087,6 +2097,10 @@ div.footer-wrapper.right-panel {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    flex-direction: column;
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
   }
   #cacheResetContainer {
     display: inline-block;
@@ -2098,7 +2112,7 @@ div.footer-wrapper.right-panel {
         margin-bottom: 1em;
       }
       .button {
-        font-size: @mediumText;
+        font-size: @mediumText * 0.999;
       }
       .byline-text {
         display: block;
