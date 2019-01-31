@@ -1,7 +1,8 @@
 {
   "presets": [
     ["@babel/env", {
-      "modules": false
+      "modules": false,
+      "useBuiltIns": "usage",
     }]
   ],
   "plugins": ["syntax-dynamic-import"]
