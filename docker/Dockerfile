@@ -8,7 +8,7 @@ ENV \
 # Install locally from $ARTIFACT_DIR by default
 ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
 
-RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth.list
+RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
 COPY debian/artifacts "${ARTIFACT_DIR}"
 
