@@ -1,12 +1,16 @@
 """Identifier API"""
 from flask import Blueprint, abort, jsonify, request
+from werkzeug.exceptions import Conflict
 
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
-from ..models.identifier import Identifier
+from ..models.identifier import (
+    Identifier,
+    UserIdentifier,
+    parse_identifier_params,
+)
 from ..models.user import current_user, get_user_or_abort
-from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
 from .crossdomain import crossdomain
 
 identifier_api = Blueprint('identifier_api', __name__)
@@ -126,25 +130,76 @@ def add_identifier(user_id):
     if not request.json or 'identifier' not in request.json:
         abort(400, "Requires identifier list")
 
-    # Prevent edits to internal identifiers
-    restricted_systems = (TRUENTH_ID, TRUENTH_USERNAME)
-    allowed = [
-        i for i in request.json.get('identifier')
-        if i.get('system') not in restricted_systems]
-    if len(allowed) != len(request.json.get('identifier')):
-        abort(409, "Edits to restricted system not allowed")
-
-    for item in allowed:
-        ident = Identifier.from_fhir(item).add_if_not_found()
-        if ident in user.identifiers:
-            abort(
-                409,
-                "POST restricted to identifiers not already assigned to user")
+    for i in request.json.get('identifier'):
+        identifier = Identifier.from_fhir(i).add_if_not_found()
+        user.add_identifier(identifier)
         auditable_event(
-            message='Added {}'.format(ident),
+            message='Added {}'.format(identifier),
             user_id=current_user().id, subject_id=user.id, context='user')
-        user._identifiers.append(ident)
     db.session.commit()
 
     # Return current identifiers after change
     return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
+
+
+@identifier_api.route('/api/user/<int:user_id>/unique')
+@crossdomain()
+def unique_user_identifier(user_id):
+    """Confirm a given identifier is unique (if it uses a controlled system)
+
+    Requires query string identifier pattern:
+        ?identifier=<system>|<value>
+
+    For upfront validation of user identifiers, determine if the given
+    identifier is unique - i.e. not already assigned to another user.
+
+    If it is assigned, but belongs to the given user_id it will still
+    be considered unique.
+
+    If it is assigned, but belongs to a deleted user, it will still be
+    considered unique.
+
+    Returns json unique=True or unique=False
+    ---
+    tags:
+      - User
+    operationId: unique_user_identifier
+    produces:
+      - application/json
+    parameters:
+      - name: identifier_parameters
+        in: query
+        description:
+            Identifier parameter, URL-encode the `system` and `value`
+            using '|' (pipe) delimiter, i.e.
+            `api/user/<user_id>/unique?identifier=http://fake.org/id|12a7`
+        required: true
+        type: string
+    responses:
+      200:
+        description:
+          Returns JSON describing unique=True or unique=False
+        schema:
+          id: unique_result
+          required:
+            - unique
+          properties:
+            unique:
+              type: boolean
+              description: result of unique check
+      400:
+        description: if email param is poorly defined
+      401:
+        description: if missing valid OAuth token
+    security:
+      - ServiceToken: []
+
+    """
+    user = get_user_or_abort(user_id)
+    system, value = parse_identifier_params(request.args.get('identifier'))
+    identifier = Identifier(system=system, value=value).add_if_not_found()
+    try:
+        result = UserIdentifier.check_unique(user, identifier)
+    except Conflict:
+        result = False
+    return jsonify(unique=result)

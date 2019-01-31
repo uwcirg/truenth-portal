@@ -15,7 +15,11 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.fhir import bundle_results
-from ..models.identifier import Identifier, UserIdentifier
+from ..models.identifier import (
+    Identifier,
+    UserIdentifier,
+    parse_identifier_params,
+)
 from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.reference import Reference
 from ..models.role import ROLE
@@ -102,19 +106,6 @@ def patient_search():
     """
     if not request.args.items():
         abort(400, "missing search criteria")
-
-    def parse_identifier_params(v):
-        # Supporting pipe delimiter and legacy dict parameters
-        if '|' in v:
-            system, value = v.split('|')
-        else:
-            try:
-                ident_dict = json.loads(v)
-                system = ident_dict.get('system')
-                value = ident_dict.get('value')
-            except ValueError:
-                abort(400, "Ill formed identifier parameter")
-        return system, value
 
     query = User.query.filter(User.deleted_id.is_(None))
     for k, v in request.args.items():
