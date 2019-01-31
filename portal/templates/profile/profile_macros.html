@@ -58,8 +58,8 @@
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {{profileEmail(person)}}
-                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileStudyID(current_user)}} {% endif %}
-                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileSiteID(current_user)}} {% endif %}
+                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileStudyID(person)}} {% endif %}
+                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileSiteID(person)}} {% endif %}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 {% endcall %}
@@ -1029,19 +1029,19 @@
         </div>
     </div>
 {%- endmacro %}
-{% macro profileStudyID(current_user) -%}
-    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
+{% macro profileStudyID(user) -%}
+    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="identifier">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text optional-display-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('study_id')" v-on:change="updateIdentifierData"/>
+        <input type="text" id="profileStudyId" data-identifier="true" data-systemtype="external_study_id" data-userid="{{user.id if user}}" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('study_id')"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
         {{saveLoaderDiv("profileStudyIDContainer")}}
     </div>
 {%- endmacro %}
-{% macro profileSiteID(current_user) -%}
+{% macro profileSiteID(user) -%}
     <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
         <label id="profileSiteID" class="text-muted">{{_("Site ID")}}</label>
-        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT.value) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileSiteId" v-model.lazy="demo.data.siteId" v-on:change="updateIdentifierData"/>
+        <input type="text" id="profileSiteId" aria-labelledby="profileSiteID" data-systemtype="external_site_id" data-identifier="true" data-userid="{{user.id if user}}" class="form-control" data-htmltags="true" data-error-field="errorprofileSiteId" v-model.lazy="demo.data.siteId"/>
         <div class="help-block with-errors"></div>
         {{saveLoaderDiv("profileSiteIDContainer")}}
         <div id="errorprofileSiteId" class="error-message"></div>

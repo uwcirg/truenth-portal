@@ -735,6 +735,9 @@ export default (function() {
                 case "altphone":
                     this.initAltPhoneSection();
                     break;
+                case "identifier":
+                    this.initIdentifierSection();
+                    break;
                 case "orgsstateselector":
                     this.initOrgsStateSelectorSection();
                     this.initConsentSection();
@@ -1007,8 +1010,14 @@ export default (function() {
                 this.modules.tnthDates.clearSessionLocale();
                 setTimeout(function() {window.location.reload(true);}, 1000);
             },
-            updateIdentifierData: function(event) {
-                this.postDemoData($(event.target), this.getIdentifierData());
+            updateIdentifierData: function(target) {
+                this.postDemoData($(target), this.getIdentifierData());
+            },
+            initIdentifierSection: function() {
+                var self = this;
+                $("#profileStudyId, #profileSiteId").on("update", function() {
+                    self.updateIdentifierData(this);
+                });
             },
             getAccessUrl: function() {
                 var url = "";
