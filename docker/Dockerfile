@@ -17,12 +17,6 @@ RUN \
         echo deb "${debian_repo}" stable main > /etc/apt/sources.list.d/truenth.list; \
     fi
 
-RUN \
-    apt-get update --quiet && \
-    apt-get install --quiet --quiet --allow-unauthenticated portal && \
-    apt-get clean --quiet && \
-    rm --force --recursive --verbose "${ARTIFACT_DIR}"
-
 ENV \
     BASH_ENV="/etc/profile.d/remap_envvars.sh" \
     FILE_UPLOAD_DIR="${FILE_UPLOAD_DIR:-/var/lib/portal/uploads}" \
@@ -30,18 +24,11 @@ ENV \
     PROJECT_DIR="/opt/venvs/portal" \
     RUN_USER="${RUN_USER:-www-data}"
 
-# Todo: move to debian package postinst script
 RUN \
-    mkdir --parents \
-        "${FILE_UPLOAD_DIR}" \
-        "${PERSISTENCE_EXCLUSIONS_DIR}" \
-        "${PROJECT_DIR}/var/portal-instance/" && \
-    chown "$RUN_USER:$RUN_USER" \
-        "${FILE_UPLOAD_DIR}" \
-        "${PERSISTENCE_EXCLUSIONS_DIR}" \
-        "${PROJECT_DIR}/var/portal-instance/" && \
-    echo 'eval $("${PROJECT_DIR}/bin/remap_envvars.py")' > /etc/profile.d/remap_envvars.sh
-
+    apt-get update --quiet && \
+    apt-get install --quiet --quiet --allow-unauthenticated portal && \
+    apt-get clean --quiet && \
+    rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 USER "${RUN_USER}"
 SHELL ["/bin/bash", "-c"]
