@@ -5,17 +5,12 @@ ENV \
     DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8
 
-ARG debian_repo="https://uwcirg.jfrog.io/uwcirg/portal-deb"
+# Install locally from $ARTIFACT_DIR by default
+ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
+
+RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth.list
 
 COPY debian/artifacts "${ARTIFACT_DIR}"
-
-# Only add local repository if packages available in artifacts/
-RUN \
-    if [ -n "$(ls ${ARTIFACT_DIR})" ]; then \
-        echo "deb file:${ARTIFACT_DIR}" ./ > /etc/apt/sources.list.d/truenth.local.list; \
-    else \
-        echo deb "${debian_repo}" stable main > /etc/apt/sources.list.d/truenth.list; \
-    fi
 
 ENV \
     BASH_ENV="/etc/profile.d/remap_envvars.sh" \
