@@ -13,7 +13,6 @@ RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth.list
 COPY debian/artifacts "${ARTIFACT_DIR}"
 
 ENV \
-    BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FILE_UPLOAD_DIR=/var/lib/portal/uploads \
     PERSISTENCE_EXCLUSIONS_DIR=/var/tmp/exclusions \
     PROJECT_DIR=/opt/venvs/portal \
@@ -29,11 +28,12 @@ USER "${RUN_USER}"
 SHELL ["/bin/bash", "-c"]
 
 ENV \
-    SERVER_NAME=localhost \
-    PORT=8008 \
+    BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=${PROJECT_DIR}/bin/manage.py \
     PATH=${PROJECT_DIR}/bin:${PATH} \
     PERSISTENCE_DIR=gil \
+    PORT=8008 \
+    SERVER_NAME=localhost \
     TIMEOUT=90
 
 EXPOSE "${PORT}"
