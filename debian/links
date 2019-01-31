@@ -1,4 +1,4 @@
-# package.links file - lists symlinks to create after package install
+# links file - lists symlinks to create after package install
 # https://www.debian.org/doc/manuals/maint-guide/dother.en.html#links
 # https://dh-virtualenv.readthedocs.io/en/latest/howtos.html#making-executables-available
 
