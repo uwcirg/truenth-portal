@@ -167,6 +167,12 @@ def unique_user_identifier(user_id):
     produces:
       - application/json
     parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
       - name: identifier_parameters
         in: query
         description:
