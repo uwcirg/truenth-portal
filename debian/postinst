@@ -52,4 +52,5 @@ chown --verbose "$RUN_USER:$RUN_USER" \
     "${PERSISTENCE_EXCLUSIONS_DIR}" \
     "${PROJECT_DIR}/var/portal-instance/"
 
+echo "Adding remap_envvars.py wrapper to run at start..."
 echo 'echo Remapping env vars...; eval $("${PROJECT_DIR}/bin/remap_envvars.py")' > /etc/profile.d/remap_envvars.sh
