@@ -8,7 +8,6 @@ ENV \
 # Todo: use `mk-build-deps` to install dependencies from `Build-Depends` section of debian/control
 RUN \
     apt-get update --quiet && \
-    apt-get dist-upgrade --quiet --quiet && \
     apt-get install --quiet --quiet --no-install-recommends \
         build-essential \
         debhelper \
