@@ -22,6 +22,7 @@ from flask_babel import gettext as _
 from flask_user import roles_required
 from werkzeug.exceptions import Unauthorized
 
+from ..audit import auditable_event
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.fhir import bundle_results
@@ -297,6 +298,9 @@ def questionnaire_status():
         if org_id:
             base_name = Organization.query.get(org_id).name.replace(' ', '-')
         filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
+        auditable_event("generated questionnaire status listing in csv",
+                    user_id=acting_user.id, subject_id=acting_user.id,
+                    context='other')
         return Response(
             gen(results),
             headers={
@@ -305,4 +309,7 @@ def questionnaire_status():
                 'Content-type': "text/csv"}
         )
     else:
+        auditable_event("generated questionnaire status listing in json",
+                    user_id=acting_user.id, subject_id=acting_user.id,
+                    context='other')
         return jsonify(bundle_results(elements=results))
