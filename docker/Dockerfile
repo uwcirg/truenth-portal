@@ -25,7 +25,6 @@ RUN \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 USER "${RUN_USER}"
-SHELL ["/bin/bash", "-c"]
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
@@ -39,8 +38,8 @@ EXPOSE "${PORT}"
 
 CMD \
     wait-for-it \
-        --host="$PGHOST" \
-        --port="$PGPORT" \
+        --host="${PGHOST}" \
+        --port="${PGPORT:-5432}" \
         --strict \
     -- \
 
