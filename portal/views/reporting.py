@@ -299,8 +299,8 @@ def questionnaire_status():
             base_name = Organization.query.get(org_id).name.replace(' ', '-')
         filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
         auditable_event("generated questionnaire status listing in csv",
-                    user_id=acting_user.id, subject_id=acting_user.id,
-                    context='other')
+                        user_id=acting_user.id, subject_id=acting_user.id,
+                        context='other')
         return Response(
             gen(results),
             headers={
@@ -310,6 +310,6 @@ def questionnaire_status():
         )
     else:
         auditable_event("generated questionnaire status listing in json",
-                    user_id=acting_user.id, subject_id=acting_user.id,
-                    context='other')
+                        user_id=acting_user.id, subject_id=acting_user.id,
+                        context='other')
         return jsonify(bundle_results(elements=results))
