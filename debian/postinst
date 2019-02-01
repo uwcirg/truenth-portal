@@ -55,7 +55,7 @@ chown --verbose "$RUN_USER:$RUN_USER" \
 echo "Adding remap_envvars.py wrapper to run at start..."
 cat > /etc/profile.d/remap_envvars.sh << 'SCRIPT_CONTENTS'
 #!/bin/sh -e
-echo Remapping env vars...
+echo Remapping database URL to postgresql standard env vars...
 eval $(remap_envvars.py)
 
 SCRIPT_CONTENTS
