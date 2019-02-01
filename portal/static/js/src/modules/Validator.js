@@ -1,5 +1,6 @@
 import Utility from "./Utility.js";
 import tnthDates from "./TnthDate.js";
+import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 
 var ValidatorObj = { /*global  $ i18next */
     "birthdayValidation": function(m, d, y, errorFieldId) {
@@ -57,6 +58,30 @@ var ValidatorObj = { /*global  $ i18next */
         $("#error" + $el.attr("id")).html("");
         return !invalid;
     },
+    identifierValidation: function($el) {
+        if (!$el.val()) {
+            return;
+        }
+        let systemtype = $el.attr("data-systemtype");
+        let system = SYSTEM_IDENTIFIER_ENUM.hasOwnProperty(systemtype) ? SYSTEM_IDENTIFIER_ENUM[systemtype]: "";
+        let userId = $el.attr("data-userid");
+        let identifierValue = $el.val();
+        let url = `/api/user/${userId}/unique?identifier=${system}|${identifierValue}`;
+        Utility.sendRequest(url, {max_attempts:1}, function(data) {
+            if (data && data.constructor === String) {
+                data = JSON.parse(data);
+            }
+            if (!data.unique) {
+                $el.closest(".form-group").find(".error-message").text(i18next.t("Identifier value must be unique"));
+                return false;
+            }
+            $el.trigger("update");
+            $el.closest(".form-group").find(".error-message").text("");
+            return true;
+        });
+        return true;
+
+    },
     initValidator: function() {
         const VALIDATION_EVENTS = "keyup change";
         let self = this;
@@ -71,6 +96,9 @@ var ValidatorObj = { /*global  $ i18next */
         });
         $("form.to-validate[data-toggle=validator] [data-htmltags]").attr("novalidate", true).on(VALIDATION_EVENTS, function() {
             return self.htmltagsValidation($(this));
+        });
+        $("form.to-validate[data-toggle=validator] [data-identifier]").attr("novalidate", true).on("change", function() {
+            return self.identifierValidation($(this));
         });
     }
 };
