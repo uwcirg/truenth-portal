@@ -11,7 +11,7 @@ alembic==1.0.7            # via flask-migrate
 amqp==2.4.1               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
-billiard==3.5.0.5         # via celery
+billiard==3.6.0.0         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
 certifi==2018.11.29        # via requests
