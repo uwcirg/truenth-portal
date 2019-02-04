@@ -30,8 +30,7 @@ ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=${PROJECT_DIR}/bin/manage.py \
     GUNICORN_CMD_ARGS='--timeout 90' \
-    PORT=8008 \
-    SERVER_NAME=localhost
+    PORT=8008
 
 EXPOSE "${PORT}"
 
