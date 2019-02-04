@@ -29,9 +29,9 @@ USER "${RUN_USER}"
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=${PROJECT_DIR}/bin/manage.py \
+    GUNICORN_CMD_ARGS='--timeout 90' \
     PORT=8008 \
-    SERVER_NAME=localhost \
-    TIMEOUT=90
+    SERVER_NAME=localhost
 
 EXPOSE "${PORT}"
 
@@ -46,5 +46,4 @@ CMD \
 
         gunicorn \
             --bind "0.0.0.0:${PORT}" \
-            --timeout ${TIMEOUT} \
         wsgi:application
