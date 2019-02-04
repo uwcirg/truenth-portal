@@ -1768,6 +1768,12 @@ def patient_assessment_status(patient_id):
         required: true
         type: integer
         format: int64
+      - name: as_of_date
+        in: query
+        description: Optional UTC datetime for times other than ``utcnow``
+        required: false
+        type: string
+        format: date-time
     produces:
       - application/json
     responses:
@@ -1788,12 +1794,14 @@ def patient_assessment_status(patient_id):
     patient = get_user_or_abort(patient_id)
     current_user().check_role(permission='view', other_id=patient_id)
 
-    now = datetime.utcnow()
+    date = request.args.get('as_of_date')
+    # allow date and time info to be available
+    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
     trace = request.args.get('trace', False)
     if trace:
         establish_trace(
             "BEGIN trace for assessment-status on {}".format(patient_id))
-    assessment_status = QB_Status(user=patient, as_of_date=now)
+    assessment_status = QB_Status(user=patient, as_of_date=date)
 
     # indefinite assessments don't affect overall status, but need to
     # be available if unfinished
