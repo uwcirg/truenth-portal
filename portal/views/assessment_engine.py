@@ -1795,8 +1795,8 @@ def patient_assessment_status(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
 
     date = request.args.get('as_of_date')
-    # allow date and time info to be available
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()
+
     trace = request.args.get('trace', False)
     if trace:
         establish_trace(
