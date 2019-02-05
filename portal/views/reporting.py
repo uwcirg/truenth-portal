@@ -292,10 +292,12 @@ def questionnaire_status():
             for i in items:
                 yield ','.join(
                     [str(i.get(k, "")) for k in desired_order]) + '\n'
-
-        base_name = 'status'
+        # default file base title
+        base_name = 'Questionnaire-Timeline-Data'
         if org_id:
-            base_name = Organization.query.get(org_id).name.replace(' ', '-')
+            base_name = '{}-{}'.format(
+                base_name,
+                Organization.query.get(org_id).name.replace(' ', '-'))
         filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
         return Response(
             gen(results),
