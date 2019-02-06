@@ -226,7 +226,7 @@ class DefaultConfig(BaseConfig):
     DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
     SQLALCHEMY_ECHO = False
 
-    # project/product config
+    # project/product config; use TrueNTH USA (gil) by default
     PERSISTENCE_DIR = os.environ.get('PERSISTENCE_DIR', 'gil')
 
     # General Information Layer- unauthenticated fact-sheets
