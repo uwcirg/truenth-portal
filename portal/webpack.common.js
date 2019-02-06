@@ -13,8 +13,8 @@ module.exports = {
         "research": JsSrcPath+"/research.js",
         "CookieMonster": JsSrcPath+"/CookieMonster.js",
         "profile": [
-            "core-js/modules/es6.promise", /* babel is not aware that dynamic import, import() relies on Promise internally by webpack, need to add this manually:  https://babeljs.io/docs/en/babel-plugin-syntax-dynamic-import/#installation */
-            "core-js/modules/es6.array.iterator",
+            "core-js/modules/es6.promise.js", /* babel is not aware that dynamic import, import() relies on Promise internally by webpack, need to add this manually:  https://babeljs.io/docs/en/babel-plugin-syntax-dynamic-import/#installation */
+            "core-js/modules/es6.array.iterator.js",
             JsSrcPath+"/profile.js"
         ],
         "initialQueries": JsSrcPath+"/initialQueries.js",
@@ -38,10 +38,7 @@ module.exports = {
                 test: /\.js$/,
                 exclude:/(node_modules)/,
                 use: {
-                    loader: "babel-loader" /*transpile ES2015+ code to browser readable code*/,
-                    options: {
-                        plugins: ["@babel/plugin-syntax-dynamic-import"]
-                    }
+                    loader: "babel-loader" /*transpile ES2015+ code to browser readable code*/
                 }
             },
             {
