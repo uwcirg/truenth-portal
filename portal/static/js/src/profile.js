@@ -2,10 +2,16 @@ import tnthAjax from "./modules/TnthAjax.js";
 import tnthDates from "./modules/TnthDate.js";
 import OrgTool from "./modules/OrgTool.js";
 import SYSTEM_IDENTIFIER_ENUM from "./modules/SYSTEM_IDENTIFIER_ENUM.js";
-import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
-import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+const getProcApp = async function () { /* dynamically loading Procedures module */
+    const ProcApp = await import (/* webpackChunkName: "ProcApp" */ "./modules/Procedures.js");
+    return ProcApp;
+};
+const getClinicalQuestions = async function() { /* dynamically loading Clinical Questions module */
+    const ClinicalQuestions = await import(/* webpackChunkName: "ClinicalQuestions" */ "./modules/ClinicalQuestions.js");
+    return ClinicalQuestions;
+};
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -1641,13 +1647,15 @@ export default (function() {
             initClinicalQuestionsSection: function() {
                 if (!this.subjectId) { return false; }
                 var self = this;
-                ClinicalQuestions.update(this.subjectId, function() {
-                    self.onBeforeInitClinicalQuestionsSection();
-                    ClinicalQuestions.initFieldEvents(self.subjectId);
+                getClinicalQuestions().then(({default: ClinicalQuestions}) => {
+                    ClinicalQuestions.update(this.subjectId, function() {
+                        self.onBeforeInitClinicalQuestionsSection();
+                        ClinicalQuestions.initFieldEvents(self.subjectId);
+                    });
                 });
             },
             initProcedureSection: function() {
-                ProcApp.initViaTemplate();
+                getProcApp().then(({default: ProcApp}) => ProcApp.initViaTemplate());
             },
             manualEntryModalVis: function(hide) {
                 if (hide) {
