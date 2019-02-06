@@ -5,6 +5,15 @@
       "useBuiltIns": "usage",
     }]
   ],
-  "plugins": ["syntax-dynamic-import"]
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-transform-regenerator",
+    "@babel/plugin-transform-runtime",
+      [{
+        "corejs": true,
+        "helpers": true,
+        "regenerator": true
+      }]
+  ]
 }
 
