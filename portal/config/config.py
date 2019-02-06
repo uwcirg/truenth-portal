@@ -226,6 +226,12 @@ class DefaultConfig(BaseConfig):
     DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
     SQLALCHEMY_ECHO = False
 
+    # project/product config
+    PERSISTENCE_DIR = os.environ.get('PERSISTENCE_DIR', 'gil')
+
+    # General Information Layer- unauthenticated fact-sheets
+    GIL = os.environ.get('GIL')
+
 
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
