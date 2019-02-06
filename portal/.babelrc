@@ -8,12 +8,12 @@
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-transform-regenerator",
-    "@babel/plugin-transform-runtime",
-      [{
-        "corejs": true,
+    ["@babel/plugin-transform-runtime",
+     {
         "helpers": true,
         "regenerator": true
-      }]
+     }
+    ]
   ]
 }
 
