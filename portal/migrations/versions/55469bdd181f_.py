@@ -6,12 +6,14 @@ Create Date: 2019-02-04 13:36:04.709868
 
 """
 from portal.database import db
+from portal.models.audit import Audit
 from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import QBT, invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.research_protocol import ResearchProtocol
-from portal.models.user import User, active_patients
+from portal.models.role import ROLE, Role
+from portal.models.user import User, UserRoles, active_patients
 from portal.models.overall_status import OverallStatus
 
 # revision identifiers, used by Alembic.
@@ -24,23 +26,38 @@ def qb_pairs_by_rp():
 
     Issue only applies to IRONMAN RPs - ignore others
     """
-    rp2_id = ResearchProtocol.query.filter_by(name='IRONMAN v2').one().id
-    rp3_id = ResearchProtocol.query.filter_by(name='IRONMAN v3').one().id
+    rp2 = ResearchProtocol.query.filter_by(name='IRONMAN v2').first()
+    rp3 = ResearchProtocol.query.filter_by(name='IRONMAN v3').first()
+    if rp2 is None:
+        return dict()
 
     qb_map = dict()  # keyed by the RP2 QB ID
-    for qb in QuestionnaireBank.query.filter_by(research_protocol_id=rp2_id):
+    for qb in QuestionnaireBank.query.filter_by(research_protocol_id=rp2.id):
         rp3_name = "IRONMAN_v3" + qb.name[len('IRONMAN'):]
         rp3_qb = QuestionnaireBank.query.filter_by(name=rp3_name).one()
-        assert (rp3_qb.research_protocol_id == rp3_id)
+        assert (rp3_qb.research_protocol_id == rp3.id)
         qb_map[qb.id] = rp3_qb.id
     return qb_map
+
+
+def admin_id():
+    """Look up an admin ID"""
+    admin = User.query.filter_by(email='bob25mary@gmail.com').first()
+    admin = admin or User.query.join(UserRoles).join(Role).filter(
+        Role.id == UserRoles.role_id).filter(
+        UserRoles.user_id == User.id).filter(
+        Role.name == ROLE.ADMIN.value).first()
+    return admin.id
 
 
 def upgrade():
     # Tricky task to locate the errors.  One time expensive process,
     # loop through patients identifying problems.
 
+    admin = admin_id()
     qb_map = qb_pairs_by_rp()
+    if not qb_map:
+        return  # nothing to do on systems w/o RP changes
     fix_map = dict()
 
     for patient in active_patients(include_test_role=True).order_by(User.id):
@@ -60,11 +77,13 @@ def upgrade():
                 QBT.at.desc(), QBT.id.desc()).first()
 
             if qnr.questionnaire_bank_id is None:
-                print ("user_id {} authored {} {} with NO qb_id set".format(
-                    patient.id,
-                    as_of_date,
-                    qnr.document['questionnaire']['reference']))
+                print(
+                    "qnr {} user_id {} authored {} {}"
+                    " with NO qb_id set".format(
+                        qnr.id, patient.id, as_of_date,
+                        qnr.document['questionnaire']['reference']))
                 continue
+
             if qbt and qbt.status != OverallStatus.withdrawn:
                 recorded_qb = QuestionnaireBank.query.get(
                     qnr.questionnaire_bank_id)
@@ -90,21 +109,30 @@ def upgrade():
 
                     else:
                         print(
-                            "PROBLEM: recorded qb_id {}, "
+                            "qnr {} PROBLEM: recorded qb_id {}, "
                             "expected {} doesn't match replacement {} "
                             "for user_id {}".format(
-                                recorded_qb.id, expected_qb.id,
+                                qnr.id, recorded_qb.id, expected_qb.id,
                                 replacement, patient.id))
 
-        for qnr_id, qb_id in fix_map.items():
-            qnr = QuestionnaireResponse.query.get(qnr_id)
-            qnr.questionnaire_bank_id = qb_id
+    for qnr_id, qb_id in fix_map.items():
+        qnr = QuestionnaireResponse.query.get(qnr_id)
+        comment = (
+            "Migration correct qnr.id {} questionnaire_bank_id"
+            " from {} to {}".format(
+                qnr.id, qnr.questionnaire_bank_id, qb_id))
+        audit = Audit(
+            user_id=admin, subject_id=qnr.subject_id,
+            context='assessment', comment=comment)
+        db.session.add(audit)
+        qnr.questionnaire_bank_id = qb_id
 
-            # clear out cached qb_timeline data for user as it
-            # needs to be recalculated given the change
-            invalidate_users_QBT(qnr.subject_id)
+        # clear out cached qb_timeline data for user as it
+        # needs to be recalculated given the change
+        invalidate_users_QBT(qnr.subject_id)
 
-        db.session.commit()
+    db.session.commit()
+
 
 def downgrade():
     # not restoring that mess.  idempotent to run again
