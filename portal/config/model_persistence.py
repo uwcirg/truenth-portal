@@ -54,7 +54,7 @@ class ModelPersistence(object):
         scope = self.model.__name__ if self.model else 'site_persistence_file'
 
         # product level config file - use presence of env var or config setting
-        persistence_dir = os.environ.get('PERSISTENCE_DIR')
+        persistence_dir = current_app.config.get("PERSISTENCE_DIR")
         gil = current_app.config.get("GIL")
 
         # prefer env var

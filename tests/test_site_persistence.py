@@ -37,8 +37,8 @@ class TestSitePersistence(TestCase):
 
     def setUp(self):
         super(TestSitePersistence, self).setUp()
-        if os.environ.get('PERSISTENCE_DIR'):
-            self.fail("unset environment var PERSISTENCE_DIR for test")
+        if self.app.config.get('PERSISTENCE_DIR'):
+            self.fail("unset config var PERSISTENCE_DIR for test")
         # Tests currently expect 'gil' version of persistence
         self.app.config['GIL'] = True
         SitePersistence(target_dir=None).import_(keep_unmentioned=False)
@@ -187,8 +187,8 @@ class TestEpromsSitePersistence(TestCase):
 
     def setUp(self):
         super(TestEpromsSitePersistence, self).setUp()
-        if os.environ.get('PERSISTENCE_DIR'):
-            self.fail("unset environment var PERSISTENCE_DIR for test")
+        if self.app.config.get('PERSISTENCE_DIR'):
+            self.fail("unset config var PERSISTENCE_DIR for test")
         # Tests currently expect 'gil' version of persistence
         self.app.config['GIL'] = False
         SitePersistence(target_dir=None).import_(keep_unmentioned=False)
