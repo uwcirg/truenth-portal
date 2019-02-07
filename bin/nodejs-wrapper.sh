@@ -74,10 +74,6 @@ setup_node_venv "" "$node_venv"
 echo "Activating NodeJS virtual environment..."
 . "${node_venv}/bin/activate"
 
-#removing unused packages not listed in the dependencies list in package.json - this is useful because some package(s) can be removed
-echo "Pruning unused packages..." 
-npm --prefix "${repo_root}/portal" prune --production=false
-
 echo "Installing NodeJS dependencies..."
 npm --prefix "${repo_root}/portal" install --no-progress --quiet
 
