@@ -9,7 +9,8 @@ from portal.database import db
 from portal.models.audit import Audit
 from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import QBT, invalidate_users_QBT
-from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.qbd import QBD
+from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE, Role
@@ -100,7 +101,10 @@ def upgrade():
                     if replacement == expected_qb.id:
                         # retain the change request, as altering it inline
                         # interrupts the iteration
-                        fix_map[qnr.id] = expected_qb.id
+                        patched_qbd = QBD(
+                            relative_start=qbd.relative_start, iteration=qbd.iteration,
+                            recur=qbd.recur, qb_id=replacement)
+                        fix_map[qnr.id] = (expected_qb.id, visit_name(patched_qbd))
                         print(
                             "qnr {} replacing incorrect qb_id {} with {} "
                             "for user {}".format(
@@ -115,12 +119,13 @@ def upgrade():
                                 qnr.id, recorded_qb.id, expected_qb.id,
                                 replacement, patient.id))
 
-    for qnr_id, qb_id in fix_map.items():
+    for qnr_id, row in fix_map.items():
+        qb_id, visit = row
         qnr = QuestionnaireResponse.query.get(qnr_id)
         comment = (
-            "Migration correct qnr.id {} questionnaire_bank_id"
+            "Migration correct qnr.id {} ({}) questionnaire_bank_id"
             " from {} to {}".format(
-                qnr.id, qnr.questionnaire_bank_id, qb_id))
+                qnr.id, visit, qnr.questionnaire_bank_id, qb_id))
         audit = Audit(
             user_id=admin, subject_id=qnr.subject_id,
             context='assessment', comment=comment)
