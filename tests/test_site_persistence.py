@@ -38,7 +38,7 @@ class TestSitePersistence(TestCase):
     def setUp(self):
         super(TestSitePersistence, self).setUp()
         # Tests currently expect 'gil' version of persistence
-        self.app.config['GIL'] = True
+        self.app.config['PERSISTENCE_DIR'] = 'gil'
         SitePersistence(target_dir=None).import_(keep_unmentioned=False)
 
     def tearDown(self):
@@ -185,8 +185,8 @@ class TestEpromsSitePersistence(TestCase):
 
     def setUp(self):
         super(TestEpromsSitePersistence, self).setUp()
-        # Tests currently expect 'gil' version of persistence
-        self.app.config['GIL'] = False
+        # Tests currently expect 'eproms' version of persistence
+        self.app.config['PERSISTENCE_DIR'] = 'eproms'
         SitePersistence(target_dir=None).import_(keep_unmentioned=False)
 
     def testOrgs(self):
