@@ -16,7 +16,7 @@
             });
             $("input[type='submit']").addClass("disabled");
         };
-        this.checkValidity = function(submit) {
+        this.checkValidity = function() {
             var allowed = true;
             ["#email", "#password", "#retype_password"].forEach(function(fieldId) {
                 if (!$(fieldId).val()) {
@@ -31,15 +31,11 @@
             } else {
                 $("input[type='submit']").addClass("disabled");
             }
-            if (!submit) {
-                return;
-            }
-            $("input[type='submit']").trigger("click");
         };
         this.initFieldEvents = function() {
             var self = this;
             $("input.input-field").each(function() {
-                $(this).on("blur, change", function() {
+                $(this).on("change", function() {
                     setTimeout(function() { self.checkValidity(); }, 350);
                 });
                 $(this).on("keyup", function(e) {
@@ -47,7 +43,7 @@
                     if ($(this).val()) {
                         $(this).closest(".form-group").removeClass("has-error");
                     }
-                    setTimeout(function() { self.checkValidity(e.keyCode === 13); } , 350);
+                    setTimeout(function() { self.checkValidity(); } , 350);
                 });
             });
             $("#retype_password").on("keyup change", function() {
@@ -58,7 +54,7 @@
                     self.checkValidity();
                 }
             });
-            $("#password").on("keyup", function() { 
+            $("#password").on("keyup", function() {
                 self.checkValidity(); //check field validity
             });
             $("#email").on("change", function() {
