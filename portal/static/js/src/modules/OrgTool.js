@@ -44,7 +44,8 @@ export default (function() { /*global i18next $ */
                 }
             }).fail(function(xhr) {
                 callback({"error": xhr.responseText});
-                tnthAjax.sendError(xhr, "/api/organization");
+                //logging error
+                tnthAjax.reportError("n/a", "/api/organization", "Error occurred initializing UI organizations " + (xhr && xhr.responseText  ? xhr.responseText : "Server response not available"));
             });
         }
     };
