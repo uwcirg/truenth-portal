@@ -1449,18 +1449,69 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14701,
       "identifier": [
         {
-          "system": "http://pcctc.org/PLACEHOLDER",
+          "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "147-01-PLACEHOLDER"
+          "value": "146-65"
         }
       ],
       "language": "fr_CA",
       "name": "CHU de Quebec - Universite Laval",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+		{
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "fr_CA",
+                "display": "Canadian French",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14666,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-66"
+        }
+      ],
+      "language": "fr_CA",
+      "name": "Centre Hospitalier de l'Université de Montréal",
       "partOf": {
         "reference": "api/organization/23000"
       },

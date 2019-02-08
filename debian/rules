@@ -11,8 +11,6 @@ DH_VIRTUALENV_ARGS = \
 # Directory where venvs for dh-virtualenv packages are built
 VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
 
-distclean:
-	rm -Rf build debian/portal/ env
 
 override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install

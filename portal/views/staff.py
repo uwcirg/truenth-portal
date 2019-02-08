@@ -1,4 +1,9 @@
-from flask import Blueprint, jsonify, render_template
+from flask import (
+    Blueprint,
+    jsonify,
+    render_template,
+    request,
+)
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -147,12 +152,15 @@ def staff_index():
     ).join(UserOrganization).filter(
         and_(UserOrganization.user_id == User.id,
              UserOrganization.organization_id.in_(org_list)))
+
+    include_test_roles = request.args.get('include_test_roles')
+    # not including test accounts by default, unless requested
+    if not include_test_roles:
+        org_staff = org_staff.filter(
+            ~User.roles.any(Role.name == ROLE.TEST.value))
+
     staff_list = staff_list.union(org_staff).all()
-
-    # only show test users to admins
-    if not user.has_role(ROLE.ADMIN.value):
-        staff_list = [s for s in staff_list if not s.has_role(ROLE.TEST.value)]
-
     return render_template(
         'admin/staff_by_org.html', staff_list=staff_list,
-        user=user, wide_container="true")
+        user=user, wide_container="true",
+        include_test_roles=include_test_roles)

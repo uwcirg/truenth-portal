@@ -35,6 +35,7 @@ from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.user import (
+    INVITE_PREFIX,
     User,
     UserRelationship,
     current_user,
@@ -1547,6 +1548,12 @@ def unique_email():
         result = match.one()
         if user_id != result.id:
             return jsonify(unique=False)
+
+    # Look out for "masked" emails, as they'll create collisions down the road
+    masked = INVITE_PREFIX + email
+    match = User.query.filter(func.lower(User.email) == masked.lower())
+    if match.count():
+        return jsonify(unique=False)
     return jsonify(unique=True)
 
 

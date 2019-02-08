@@ -14,6 +14,6 @@ export default {
     SNOMED_SYS_URL: "http://snomed.info/sct",
     CLINICAL_SYS_URL: "http://us.truenth.org/clinical-codes",
     CANCER_TREATMENT_CODE: "118877007",
-    NONE_TREATMENT_CODE: "999"
+    NONE_TREATMENT_CODE: "999",
+    TRUENTH_QUESTIONNAIRE_CODE_SYSTEM: "http://us.truenth.org/questionnaire"
 };
-

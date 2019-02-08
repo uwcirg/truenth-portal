@@ -1,13 +1,17 @@
 """Identifier Model Module"""
 from builtins import str
+import json
 
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+from werkzeug.exceptions import BadRequest, Conflict
 
 from ..database import db
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 
 identifier_use = ENUM('usual', 'official', 'temp', 'secondary',
                       name='id_use', create_type=False)
+UNIQUE_IDENTIFIER_SYSTEMS = {TRUENTH_EXTERNAL_STUDY_SYSTEM}
 
 
 class Identifier(db.Model):
@@ -109,3 +113,63 @@ class UserIdentifier(db.Model):
     def __str__(self):
         return ("user_identifier {} for {}".format(
             self.identifier, self.user))
+
+    @staticmethod
+    def check_unique(user, identifier):
+        """Raises 409 if given identifier should be unique but is in use
+
+        UserIdentifiers are not all unique - depends on the system, namely
+        if the system is part of ``UNIQUE_IDENTIFIER_SYSTEMS``.  For
+        example, the region system identifiers are often shared with many
+        users.  Others are treated as unique, such as study-id, and therefore
+        raise exceptions if already in use (that is, when the given identifier
+        is already associated with a user other than the named parameter).
+
+        :param identifier: identifier to check, or ignore if system isn't
+          treated as unique
+        :param user: intended recipient
+
+        :raises: UniqueConstraint if identifier's system is in
+          UNIQUE_IDENTIFIER_SYSTEMS and the identifier is assigned
+          to another, not deleted, user.
+        :returns: True - exception thrown if unique "constraint" broken.
+
+        """
+        from .user import User
+
+        if identifier.system in UNIQUE_IDENTIFIER_SYSTEMS:
+            existing = UserIdentifier.query.join(User).filter(
+                UserIdentifier.identifier_id == identifier.id).filter(
+                UserIdentifier.user_id != user.id).filter(
+                User.deleted_id.is_(None))
+            if existing.count():
+                raise Conflict(
+                    "Unique {} already in use; can't assign to {}".format(
+                        identifier, user))
+        return True
+
+
+def parse_identifier_params(arg):
+    """Parse identifier parameter from given arg
+
+    Supports FHIR pipe delimited system|value or legacy FHIR JSON named
+    parameters {'system', 'value'}
+
+    :param arg: argument string, may be serialized JSON or pipe delimited
+    :raises: BadRequest if unable to parse valid system, value
+    :returns: (system, value) tuple
+
+    """
+    if arg is None:
+        raise BadRequest("Missing required identifier parameter")
+
+    if '|' in arg:
+        system, value = arg.split('|')
+    else:
+        try:
+            ident_dict = json.loads(arg)
+            system = ident_dict.get('system')
+            value = ident_dict.get('value')
+        except ValueError:
+            raise BadRequest("Ill formed identifier parameter")
+    return system, value

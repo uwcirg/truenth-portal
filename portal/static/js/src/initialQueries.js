@@ -3,7 +3,7 @@ import OrgTool from "./modules/OrgTool.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import {validateDateInputFields} from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
-import Profile from "./profile.js";
+import Consent from "./modules/Consent.js";
 
 (function() { /*global $ Utility disableHeaderFooterLinks */
     var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
@@ -138,7 +138,6 @@ import Profile from "./profile.js";
             sectionObj.config =  $(this).attr("data-config");
             sectionObj.display = $(this).attr("data-display");
         });
-        Profile.initSections();
     };
 
     FieldsChecker.prototype.postDemoData = function(targetField) {
@@ -907,34 +906,51 @@ import Profile from "./profile.js";
         }
     };
 
-    FieldsChecker.prototype.clinicsEvent = function() {
-        var self = this;
-        $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
-            if ($(this).prop("checked")) {
-                var parentOrg = $(this).attr("data-parent-id"), m = $("#consentContainer .modal, #defaultConsentContainer .modal");
-                var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0);
-                if (requiringConsentViaModal) { //do nothing
-                    return true;
-                }
-                self.handlePostEvent(self.getSectionContainerId($(this)));
+    FieldsChecker.prototype.getConfiguration = function(userId, params, callback) {
+        callback = callback || function() {};
+        tnthAjax.getConfiguration(userId, params, callback);
+    };
 
-            }
-        });
-        $("#stateSelector").on("change", function() {
-            if (!$(this).val()) {
-                return;
-            }
-            self.scrollTo($("#clinics .state-selector-container.selector-show"));
-        });
-        /*** event for consent popups **/
-        $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
-            $(this).on("hidden.bs.modal", function() {
-                if ($(this).find("input[name='toConsent']:checked").length > 0) {
-                    $("#userOrgs input[name='organization']").each(function() {
-                        $(this).removeAttr("data-require-validate");
+    FieldsChecker.prototype.getOrgsStateSelector = function(userId, parentOrgsToDraw, callback) {
+        callback = callback || function() {};
+        var orgTool = this.getOrgTool();
+        orgTool.populateOrgsStateSelector(self.userId, parentOrgsToDraw, callback);
+    };
+
+    FieldsChecker.prototype.clinicsEvent = function() {
+        var self = this, orgTool = this.getOrgTool();
+        this.getConfiguration(this.userId, false, function(data) {
+            self.getOrgsStateSelector(self.userId, [data.ACCEPT_TERMS_ON_NEXT_ORG], function() {
+                orgTool.handleOrgsEvent(self.userId, data.CONSENT_WITH_TOP_LEVEL_ORG);
+                Consent.initFieldEvents(self.userId);
+                $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
+                    if ($(this).prop("checked")) {
+                        var parentOrg = $(this).attr("data-parent-id"), m = $("#consentContainer .modal, #defaultConsentContainer .modal");
+                        var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0);
+                        if (requiringConsentViaModal) { //do nothing
+                            return true;
+                        }
+                        self.handlePostEvent(self.getSectionContainerId($(this)));
+        
+                    }
+                });
+                $("#stateSelector").on("change", function() {
+                    if (!$(this).val()) {
+                        return;
+                    }
+                    self.scrollTo($("#clinics .state-selector-container.selector-show"));
+                });
+                /*** event for consent popups **/
+                $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
+                    $(this).on("hidden.bs.modal", function() {
+                        if ($(this).find("input[name='toConsent']:checked").length > 0) {
+                            $("#userOrgs input[name='organization']").each(function() {
+                                $(this).removeAttr("data-require-validate");
+                            });
+                            self.handlePostEvent(self.getSectionContainerId($(this)));
+                        }
                     });
-                    self.handlePostEvent(self.getSectionContainerId($(this)));
-                }
+                });
             });
         });
     };
@@ -979,3 +995,4 @@ import Profile from "./profile.js";
         }
     });
 })();
+

@@ -7,8 +7,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-      args:
-        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     env_file:
       - ${PORTAL_ENV_FILE:-portal.env}
     environment:

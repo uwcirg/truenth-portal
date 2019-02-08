@@ -1,4 +1,5 @@
 import Utility from "./Utility.js";
+import Validator from "./Validator.js";
 export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
@@ -460,93 +461,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         }
     },
     "initValidator": function() {
-        if (typeof $.fn.validator === "undefined") { return false; }
-        $("form.to-validate").validator({ // To validate a form, add class to <form> and validate by ID.
-            custom: {
-                birthday: function() {
-                    var m = parseInt($("#month").val()), d = parseInt($("#date").val()), y = parseInt($("#year").val());
-                    var goodDate = true, errorMsg = "";
-                    // If NaN then the values haven't been entered yet, so we, validate as true until other fields are entered
-                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                        $("#errorbirthday").html(i18next.t("All fields must be complete.")).hide();
-                        goodDate = false;
-                    } else if (isNaN(d)) {
-                        errorMsg = i18next.t("Please enter a valid date.");
-                    } else if (isNaN(m)) {
-                        errorMsg += (errorMsg ? "<br/>" : "") + i18next.t("Please enter a valid month.");
-                    } else if (isNaN(y)) {
-                        errorMsg += (errorMsg ? "<br/>" : "") + i18next.t("Please enter a valid year.");
-                    }
-                    if (errorMsg) {
-                        $("#errorbirthday").html(errorMsg).show();
-                        $("#birthday").val("");
-                        goodDate = false;
-                    }
-                    if (goodDate) {
-                        $("#errorbirthday").html("").hide();
-                    }
-                    return goodDate;
-                },
-                customemail: function($el) {
-                    var emailVal = $.trim($el.val());
-                    var update = function($el) {
-                        if ($el.attr("data-update-on-validated") === "true" && $el.attr("data-user-id")) {
-                            $el.trigger("postEventUpdate");
-                        }
-                    };
-                    if (emailVal === "") {
-                        if (!$el.attr("data-optional")) {
-                            return false;
-                        }
-                        update($el); //if email address is optional, update it as is
-                        return true;
-                    }
-                    var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    var addUserId = ""; // Add user_id to api call (used on patient_profile page so that staff can edit)
-                    if ($el.attr("data-user-id")) {
-                        addUserId = "&user_id=" + $el.attr("data-user-id");
-                    }
-                    if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-                        var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
-                        Utility.sendRequest(url, {max_attempts:1}, function(data) {
-                            if (data && data.constructor == String) {
-                                data = JSON.parse(data);
-                            }
-                            if (data.error) { //note a failed request will be logged
-                                $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
-                                return false; //stop proceeding to update email
-                            }
-                            if (data.unique) {
-                                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                                update($el);
-                                return true;
-                            }
-                            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                        });
-                    }
-                    return emailReg.test(emailVal);
-                },
-                htmltags: function($el) {
-                    var containHtmlTags = function(text) {
-                        if (!(text)) {return false;}
-                        return /[<>]/.test(text);
-                    };
-                    var invalid = containHtmlTags($el.val());
-                    if (invalid) {
-                        $("#error" + $el.attr("id")).html(i18next.t("Invalid characters in text."));
-                        return false;
-                    }
-                    $("#error" + $el.attr("id")).html("");
-                    return !invalid;
-                }
-            },
-            errors: {
-                htmltags: i18next.t("Please remove invalid characters and try again."),
-                birthday: i18next.t("Sorry, this isn't a valid date. Please try again."),
-                customemail: i18next.t("This isn't a valid e-mail address, please double-check.")
-            },
-            disable: false
-        }).off("input.bs.validator change.bs.validator"); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+        Validator.initValidator();
     }
 };
 

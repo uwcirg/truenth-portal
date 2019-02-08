@@ -1,0 +1,12 @@
+# links file - lists symlinks to create after package install
+# https://www.debian.org/doc/manuals/maint-guide/dother.en.html#links
+# https://dh-virtualenv.readthedocs.io/en/latest/howtos.html#making-executables-available
+
+opt/venvs/portal/bin/flask usr/bin/flask
+opt/venvs/portal/bin/celery usr/bin/celery
+opt/venvs/portal/bin/gunicorn usr/bin/gunicorn
+
+# helpful for installing dependencies directly into virtual environment
+opt/venvs/portal/bin/pip usr/bin/pip
+# opt/venvs/portal/bin/python usr/bin/python
+opt/venvs/portal/bin/remap_envvars.py usr/bin/remap_envvars.py

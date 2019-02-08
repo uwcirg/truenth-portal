@@ -40,4 +40,14 @@
 {% macro deletedUserCell(user, allowReactivate=False) -%}
 	<td class="text-center deleted-button-cell">{%if not user.deleted %}<button id="btnDeleted{{user.id}}" data-user-id="{{user.id}}" type="button" class="btn btn-default btn-delete-user"><em>{{_("Deactivate")}}</em></button>{%else%}<span class="text-display">{{_("Inactive")}}</span>{% if allowReactivate %}<i data-user-id="{{user.id}}" class="fa fa-undo reactivate-icon" aria-hidden="true" title="{{_('Reactivate account')}}"></i>{%endif%}{%endif%}</td>
 {%- endmacro %}
+{%- macro testUsersCheckbox(postUrl) -%}
+	<caption id="frmTestUsersContainer" class="tnth-hide">
+		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
+			<label class="text-normal text-warning">
+				<input type="checkbox" name="include_test_roles" id="include_test_roles" value="True" {%if include_test_roles %}checked{% endif %}/>
+				{{_("include test accounts")}}
+			</label>
+		</form>
+	</caption>
+{%- endmacro -%}
 

@@ -1,5 +1,6 @@
 {% extends "admin/admin_base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
+{%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
   <div id="patientList">
     <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
@@ -11,7 +12,7 @@
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     {% set account_deactivation_enabled = user.has_role(ROLE.STAFF_ADMIN.value) and config.ALLOW_PATIENT_ACCOUNT_DEACTIVATION %}
-    <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
+   <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
         {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
@@ -19,8 +20,8 @@
             <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_root')}}">
               <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
               <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
-              <button type="submit" class="button btn btn-tnth-primary">{{_("Refresh Patient List")}}</button>
-              <span class="smaller-text byline-text">{{_("Last updated %(minutes)d minutes ago", minutes=qb_status_cache_age)}}</span> <!-- qb_status_cache_age should be calculated via view-->
+              <button type="submit" class="button btn btn-default">{{_("Refresh Patient List")}} <span class="glyphicon glyphicon-refresh text-muted" arial-hidden="true"></span></button>
+              <span class="smaller-text byline-text text-muted">{{_("Last updated %(minutes)d minutes ago", minutes=qb_status_cache_age)}}</span> <!-- qb_status_cache_age should be calculated via view-->
             </form>
           </div>
         {% endif %}
@@ -47,6 +48,7 @@
              data-show-export="true"
              data-export-data-type="all"
              >
+            {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
@@ -74,7 +76,7 @@
           </thead>
           <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%}>
+                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
@@ -150,6 +152,14 @@
       {% endif %}
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
+  <div id="exportReportPopoverWrapper" class="tnth-hide">
+    <div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="">
+      <button class="btn btn-tnth-primary dropdown-toggle" title="{{_('Export report data')}}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-export icon-share"></i> <span class="caret"></span></button>
+      <ul class="dropdown-menu data-types" role="menu"><li data-type="csv"><a>{{_("CSV")}}</a></li><li data-type="json"><a>{{_("JSON")}}</a></li></ul>
+    </div>
+    <div id="exportReportPopoverContent" class="tnth-hide"><span class='text-info'>{{_("Export request submitted")}}</span><br/><span class='text-warning'>{{_("Note: due to the size of result data, this may take a while.")}}</span></div>
+  </div>
 </div>
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}
+

@@ -4,6 +4,7 @@ import tnthAjax from "./modules/TnthAjax.js";
 import SYSTEM_IDENTIFIER_ENUM from "./modules/SYSTEM_IDENTIFIER_ENUM.js";
 import OrgTool from "./modules/OrgTool.js";
 import ProcApp from "./modules/Procedures.js";
+import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
 (function() {
     var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global $ tnthDates Utility*/
@@ -451,7 +452,6 @@ import ProcApp from "./modules/Procedures.js";
             if (visibleOrgs.length === 1) {
                 visibleOrgs.prop("checked", true);
             }
-            this.handleMedidataRave();
         };
         this.populatePatientOrgs = function() {
             if (leafOrgs) { /* global leafOrgs */
@@ -492,16 +492,26 @@ import ProcApp from "./modules/Procedures.js";
             });
             return arrCommunication;
         };
+        this.handleCurrentUser = function() {
+            let self = this;
+            CurrentUserObj.initCurrentUser(function() {
+                self.handleMedidataRave(CurrentUserObj.topLevelOrgs, CurrentUserObj.isAdminUser());
+            });
+        };
         this.getCurrentUserTopLevelOrgs = function() {
             var topLevelOrgs = OT.getUserTopLevelParentOrgs(leafOrgs);
             return topLevelOrgs.map(function(item) {
                 return OT.getOrgName(item);
             });
         };
-        this.handleMedidataRave = function() {
+        this.handleMedidataRave = function(orgs, noDisable) { /* due to MedidataRave Integration, IRONMAN patient accounts, in particular, are created externally, instead of via the portal, hence, editing is disabled */
+            if (noDisable) {
+                return false;
+            }
             var self = this;
+            orgs = orgs || this.getCurrentUserTopLevelOrgs();
             this.__getSettings(function(result) {
-                if (result.data.MEDIDATA_RAVE_ORG && self.getCurrentUserTopLevelOrgs().indexOf(result.data.MEDIDATA_RAVE_ORG) !== -1) {
+                if (result.data.MEDIDATA_RAVE_ORG && orgs.indexOf(result.data.MEDIDATA_RAVE_ORG) !== -1) {
                     self.setDisableAccountCreation();
                 }
             });
@@ -512,19 +522,6 @@ import ProcApp from "./modules/Procedures.js";
             }
         };
         this.initFieldEvents = function() {
-            ["year", "month", "date"].forEach(function(fn) {
-                var field = $("#" + fn);
-                field.on("keyup focusout", function() {
-                    var y = $("#year").val(), m = $("#month").val(),d = $("#date").val();
-                    var isValid = tnthDates.validateDateInputFields(m, d, y, "errorbirthday");
-                    if (isValid) {
-                        $("#birthday").val(y + "-" + m + "-" + d);
-                        $("#errorbirthday").html("");
-                    } else {
-                        $("#birthday").val("");
-                    }
-                });
-            });
             Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
         };
         this.initButtons = function() {
@@ -679,6 +676,7 @@ import ProcApp from "./modules/Procedures.js";
         /* global i18next, tnthAjax, OrgTool, orgList, leafOrgs, SYSTEM_IDENTIFIER_ENUM */
         var aco = new AccountCreationObj(roles, {"i18next": i18next, "orgList": orgList, "leafOrgs": leafOrgs});
         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+        aco.handleCurrentUser();
         aco.getOrgs(aco.populateOrgsByRole);
         aco.handleEditConsentDate();
         aco.initFieldEvents();

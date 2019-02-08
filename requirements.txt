@@ -1,11 +1,16 @@
-# Do not install binary wheels for certain packages
-# See https://github.com/spotify/dh-virtualenv/issues/150
---no-binary billiard,cffi,psycopg2
+# Do not install binary wheels for psycopg2
+# docs suggest building from source every time for prod
+# http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
+# Todo: investigate using binary in python-psycopg2 debian package
+--no-binary psycopg2
 
-alembic==1.0.6            # via flask-migrate
-amqp==2.4.0               # via kombu
+# for other binary wheel issues see:
+# https://dh-virtualenv.readthedocs.io/en/latest/howtos.html#handling-binary-wheels
+
+alembic==1.0.7            # via flask-migrate
+amqp==2.4.1               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
-bcrypt==3.1.5             # via flask-user
+bcrypt==3.1.6             # via flask-user
 billiard==3.5.0.5         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
@@ -14,7 +19,7 @@ cffi==1.11.5              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.2
-decorator==4.3.0          # via validators
+decorator==4.3.2          # via validators
 dogpile.cache==0.7.1      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.12.2
@@ -46,23 +51,22 @@ markupsafe==1.1.0           # via jinja2, mako
 oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
 passlib==1.7.1            # via flask-user
 polib==1.1.0
-psycopg2==2.7.6.1
+psycopg2==2.7.7
 pycparser==2.19           # via cffi
-pycryptodome==3.7.2       # via flask-user
+pycryptodome==3.7.3       # via flask-user
 python-dateutil==2.7.5
-python-editor==1.0.3      # via alembic
+python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2018.9              # via babel, celery
 pyyaml==3.13              # via flask-swagger, swagger-spec-validator
-redis==2.10.6
-regex==2018.11.22
+redis==3.1.0
 requests-cache==0.4.13
-requests-oauthlib==1.1.0  # via flask-oauthlib
+requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
 requests==2.21.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
 six==1.12.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
-sqlalchemy==1.2.16         # via alembic, flask-sqlalchemy
-swagger-spec-validator==2.4.2
+sqlalchemy==1.2.17         # via alembic, flask-sqlalchemy
+swagger-spec-validator==2.4.3
 urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.2.0               # via amqp

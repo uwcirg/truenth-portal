@@ -10,6 +10,7 @@ module.exports = {
         "landing": JsSrcPath+"/landing.js",
         "account": JsSrcPath+"/accountCreation.js",
         "admin": JsSrcPath+"/admin.js",
+        "research": JsSrcPath+"/research.js",
         "CookieMonster": JsSrcPath+"/CookieMonster.js",
         "profile": JsSrcPath+"/profile.js",
         "initialQueries": JsSrcPath+"/initialQueries.js",

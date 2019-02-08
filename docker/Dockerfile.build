@@ -5,17 +5,14 @@ ENV \
     DEBIAN_FRONTEND=noninteractive \
     GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
+# Todo: use `mk-build-deps` to install dependencies from `Build-Depends` section of debian/control
 RUN \
     apt-get update --quiet && \
-    apt-get dist-upgrade --quiet --quiet && \
     apt-get install --quiet --quiet --no-install-recommends \
         build-essential \
         debhelper \
         dh-virtualenv\
-        fakeroot \
         git \
-        libc6-i386 \
-        libffi-dev \
         libpq-dev \
         python-dev \
         python-pip \
@@ -36,14 +33,13 @@ CMD \
     git clone --verbose "${GIT_REPO}" . && \
 
     yes | make-deb && \
-    git checkout \
-        debian/artifacts \
-        debian/control \
-        debian/portal.triggers \
-        debian/rules \
-    && \
+    git update-index --skip-worktree debian/changelog && \
+    git checkout -- . && \
 
-    dpkg-buildpackage --unsigned-source --unsigned-changes && \
+    dpkg-buildpackage \
+        --unsigned-source \
+        --unsigned-changes \
+    && \
     mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
     cd "${ARTIFACT_DIR}" && \

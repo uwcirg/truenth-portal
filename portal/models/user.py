@@ -7,21 +7,21 @@ standard_library.install_aliases()  # noqa: E402
 from cgi import escape
 from datetime import datetime, timedelta
 from io import StringIO
+import re
 import time
 
 from dateutil import parser
-from flask import abort, current_app
+from flask import abort, current_app, request, session
 from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
 from past.builtins import basestring
-import regex
-from sqlalchemy import UniqueConstraint, and_, func, or_, text
+from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from . import reference
 from ..database import db
@@ -41,7 +41,7 @@ from .coding import Coding
 from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
 from .fhir import bundle_results, v_or_first, v_or_n
-from .identifier import Identifier
+from .identifier import Identifier, UserIdentifier
 from .intervention import UserIntervention
 from .observation import Observation, UserObservation
 from .organization import Organization, OrgTree, UserOrganization
@@ -461,7 +461,7 @@ class User(db.Model, UserMixin):
                 return None
 
             if self._email.startswith(DELETED_PREFIX[:10]):
-                match = regex.match(DELETED_REGEX, self._email)
+                match = re.match(DELETED_REGEX, self._email)
                 if not match:
                     raise ValueError(
                         "Apparently deleted user's email doesn't fit "
@@ -581,6 +581,21 @@ class User(db.Model, UserMixin):
                 self._email = prefix + self._email
         else:
             self._email = prefix
+
+    def add_identifier(self, identifier):
+        if identifier.system in internal_identifier_systems:
+            raise Conflict(
+                "edits to identifiers with system {} not allowed".format(
+                    identifier.system))
+        if identifier in self._identifiers:
+            raise Conflict("{} already assigned to {}".format(
+                identifier, self))
+
+        # Check (if applicable) that the identifier isn't already
+        # assigned to another user
+        UserIdentifier.check_unique(self, identifier)
+
+        self._identifiers.append(identifier)
 
     def implicit_identifiers(self):
         """Generate and return the implicit identifiers
@@ -1365,7 +1380,7 @@ class User(db.Model, UserMixin):
                 if new_id in pre_existing:
                     pre_existing.remove(new_id)
                 else:
-                    self._identifiers.append(new_id)
+                    self.add_identifier(new_id)
 
             # remove any pre existing that were not mentioned
             for unmentioned in pre_existing:
@@ -1782,8 +1797,6 @@ def current_user():
 
     returns current user object, or None if not logged in (local or remote)
     """
-    from flask import request, session
-
     uid = None
     if session and ('id' in session):
         # Locally logged in

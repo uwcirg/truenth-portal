@@ -3,12 +3,12 @@ from __future__ import unicode_literals  # isort:skip
 
 from collections import MutableMapping
 from datetime import datetime
+import re
 from smtplib import SMTPRecipientsRefused
 from string import Formatter
 
 from flask import current_app, url_for
 from flask_babel import force_locale, gettext as _
-import regex
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm.exc import NoResultFound
@@ -78,7 +78,7 @@ def load_template_args(
 
     def make_button(text, inline=False):
         if inline:
-            match = regex.search(r'href=([^>]+)>([^<]*)', text)
+            match = re.search(r'href=([^>]+)>([^<]*)', text)
             if not match:
                 raise ValueError("Can't make button w/o matching href pattern")
 

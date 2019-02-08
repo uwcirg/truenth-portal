@@ -1,9 +1,10 @@
 """Test identifiers"""
 from __future__ import unicode_literals  # isort:skip
 
-import json
-
 from flask_webtest import SessionScope
+import json
+import pytest
+from werkzeug.exceptions import Conflict
 
 from portal.extensions import db
 from portal.models.identifier import Identifier
@@ -39,6 +40,55 @@ class TestIdentifier(TestCase):
         assert len(response.json['identifier']) == expected
         user = User.query.get(TEST_USER_ID)
         assert len(user.identifiers) == expected
+
+    def test_unique(self):
+        """Try adding a non-unique identifier, expect exception"""
+        constrained = Identifier(
+            system='http://us.truenth.org/identity-codes/external-study-id',
+            value='unique-one')
+        with SessionScope(db):
+            db.session.add(constrained)
+        second_user = self.add_user('second')
+        constrained = db.session.merge(constrained)
+        second_user.add_identifier(constrained)
+
+        user = db.session.merge(self.test_user)
+        with pytest.raises(Conflict):
+            user.add_identifier(constrained)
+
+    def test_unique_api(self):
+        constrained = Identifier(
+            system='http://us.truenth.org/identity-codes/external-study-id',
+            value='unique-one')
+        with SessionScope(db):
+            db.session.add(constrained)
+        second_user = self.add_user('second')
+        constrained = db.session.merge(constrained)
+        second_user.add_identifier(constrained)
+
+        self.login()
+        response = self.client.get(
+            '/api/user/{}/unique'.format(TEST_USER_ID),
+            query_string={'identifier': '|'.join((
+                constrained.system, constrained.value))})
+        assert response.status_code == 200
+        assert response.json['unique'] is False
+
+    def test_unique_deleted(self):
+        """Try adding a non-unique identifier from deleted user"""
+        constrained = Identifier(
+            system='http://us.truenth.org/identity-codes/external-study-id',
+            value='unique-one')
+        with SessionScope(db):
+            db.session.add(constrained)
+        second_user = self.add_user('second')
+        constrained = db.session.merge(constrained)
+        second_user.add_identifier(constrained)
+        second_user.delete_user(acting_user=self.test_user)
+
+        user = db.session.merge(self.test_user)
+        user.add_identifier(constrained)
+        assert constrained in user.identifiers
 
     def test_unicode_value(self):
         ex = Identifier(system='http://nonsense.com', value='ascii')
