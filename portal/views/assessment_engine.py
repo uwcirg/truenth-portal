@@ -29,8 +29,8 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.intervention import INTERVENTION
 from ..models.qb_status import QB_Status
+from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
-from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import (
     QuestionnaireResponse,
     aggregate_responses,
@@ -1774,6 +1774,12 @@ def patient_assessment_status(patient_id):
         required: false
         type: string
         format: date-time
+      - name: purge
+        in: query
+        description: Optional trigger to purge any cached data for given
+          user before (re)calculating assessment status
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -1801,6 +1807,10 @@ def patient_assessment_status(patient_id):
     if trace:
         establish_trace(
             "BEGIN trace for assessment-status on {}".format(patient_id))
+
+    purge = request.args.get('purge', False)
+    if purge == 'True':
+        invalidate_users_QBT(patient_id)
     assessment_status = QB_Status(user=patient, as_of_date=date)
 
     # indefinite assessments don't affect overall status, but need to
