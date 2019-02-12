@@ -24,7 +24,9 @@ module.exports = {
     },
     output: {
         filename: "[name].bundle.js",
-        path: path.resolve(__dirname, 'static/js/dist')
+        chunkFilename: "[name].bundle.js",
+        path: path.resolve(__dirname, 'static/js/dist'),
+        publicPath: "/static/js/dist/"  /* where the bundled files are updated, relative to root - specify this to make sure chunks (including the dynamically generated ones) are being generated in the correct directory */
     },
     module: {
         rules: [
