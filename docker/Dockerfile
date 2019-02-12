@@ -3,7 +3,8 @@ FROM debian:stretch
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
     DEBIAN_FRONTEND=noninteractive \
-    LANG=C.UTF-8
+    LANG=C.UTF-8 \
+    RUN_USER=www-data
 
 # Install locally from $ARTIFACT_DIR by default
 ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
@@ -22,8 +23,7 @@ ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=/opt/venvs/portal/bin/manage.py \
     GUNICORN_CMD_ARGS='--timeout 90' \
-    PORT=8008 \
-    RUN_USER=www-data
+    PORT=8008
 
 USER "${RUN_USER}"
 
