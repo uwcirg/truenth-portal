@@ -29,7 +29,6 @@ USER "${RUN_USER}"
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
     FLASK_APP=${PROJECT_DIR}/bin/manage.py \
-    PERSISTENCE_DIR=gil \
     PORT=8008 \
     SERVER_NAME=localhost \
     TIMEOUT=90
