@@ -931,7 +931,7 @@ import Consent from "./modules/Consent.js";
                             return true;
                         }
                         self.handlePostEvent(self.getSectionContainerId($(this)));
-        
+
                     }
                 });
                 $("#stateSelector").on("change", function() {
@@ -984,8 +984,8 @@ import Consent from "./modules/Consent.js";
                             fc.initFields();
                             fc.onFieldsDidInit();
                             Utility.showMain(); /* global showMain */
-                            Utility.hideLoader(true); /* global hideLoader */
-                        }, 300);
+                            Utility.hideLoaderOncallback(50);
+                        }, 250);
                         fc.startTime = 0;
                         fc.endTime = 0;
                         clearInterval(fc.intervalId);

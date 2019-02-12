@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
+{%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-
 {% from "initial_queries_macros.html" import tou, sectionContent, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 {% from "profile/profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
