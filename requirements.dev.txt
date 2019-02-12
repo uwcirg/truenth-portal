@@ -21,6 +21,6 @@ typing==3.6.6             # via sphinx
 virtualenv==16.4.0        # via tox
 waitress==1.2.1           # via webtest
 webob==1.8.5              # via webtest
-webtest==2.0.32           # via flask-webtest
+webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9
 --editable .
