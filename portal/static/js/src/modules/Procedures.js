@@ -324,7 +324,13 @@ export default (function() {
                             var procID = [{"code": selectVal, "display": selectFriendly, system: selectSystem}];
                             procArray["subject"] = {"reference": "Patient/" + subjectId};
                             procArray["code"] = { "coding": procID};
-                            tnthAjax.postProc(subjectId, procArray);
+                            $(".update-subscriber").trigger("pre-update");
+                            tnthAjax.postProc(subjectId, procArray,"", function(data) {
+                                if (data && data.error) {
+                                    $("#procErrorMessage").html(data.error);
+                                }
+                                $(".update-subscriber").trigger("post-update");
+                            });
                             $("#eventListLoad").show();
                             setTimeout(function() { // Set a delay before getting updated list. Mostly to give user sense of progress/make it more obvious when the updated list loads
                                 self.getUserProcedures(true);
