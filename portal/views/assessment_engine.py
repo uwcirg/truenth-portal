@@ -1,5 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
+import json
 
 from flask import (
     Blueprint,
@@ -27,10 +28,10 @@ from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.encounter import EC
 from ..models.fhir import bundle_results
+from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
 from ..models.qb_status import QB_Status
 from ..models.questionnaire import Questionnaire
-from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import (
     QuestionnaireResponse,
     aggregate_responses,
@@ -847,14 +848,20 @@ def assessment_update(patient_id):
             'valid': True,
         })
 
-    # Todo: enforce identifier uniqueness at initial submission
+    try:
+        identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
+    except (TypeError, KeyError):
+        abort(400, "Ill formed or missing 'identifier', see FHIR spec")
     try:
         existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["identifier"]
-            == updated_qnr["identifier"]
-        ).one()
-    # except NoResultException:
+            QuestionnaireResponse.document['identifier']['system']
+            == json.dumps(identifier.system)).filter(
+            QuestionnaireResponse.document['identifier']['value']
+            == json.dumps(identifier.value)).one()
     except NoResultFound:
+        current_app.logger.warning(
+            "attempted update on QuestionnaireResponse with unknown "
+            "identifier {}".format(identifier))
         abort(404, "existing QuestionnaireResponse not found")
     else:
         response.update({'message': 'previous questionnaire response found'})
@@ -882,6 +889,12 @@ def assessment_add(patient_id):
 
     Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
     resource type.
+
+    NB, updates are only possible on QuestionnaireResponses for which a well defined
+    ``identifer`` is included.  If included, this value must be distinct over
+    (``system``, ``value``).  A duplicate submission will result in a ``409: conflict``
+    response, and refusal to retain the submission.
+
     ---
     operationId: addQuestionnaireResponse
     tags:
@@ -1086,6 +1099,7 @@ def assessment_add(patient_id):
               value: '119.0'
               use: official
               label: cPRO survey session ID
+              system: 'https://ae.us.truenth.org/eproms'
             subject:
               display: patient demographics
               reference: https://stg.us.truenth.org/api/demographics/10015
@@ -1344,6 +1358,24 @@ def assessment_add(patient_id):
             'reference': e.schema,
         }
         return jsonify(response)
+
+    if 'identifier' in request.json:
+        # Confirm it's unique, or raise 409
+        try:
+            identifier = Identifier.from_fhir(request.json['identifier'])
+        except (TypeError, KeyError):
+            abort(400, "Ill formed 'identifier', see FHIR spec")
+
+        existing_qnr = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.document['identifier']['system']
+            == json.dumps(identifier.system)).filter(
+            QuestionnaireResponse.document['identifier']['value']
+            == json.dumps(identifier.value)).first()
+        if existing_qnr:
+            msg = ("QuestionnaireResponse with matching {} already exists; "
+                   "must be unique over (system, value)".format(identifier))
+            current_app.logger.warning(msg)
+            abort(409, msg)
 
     response.update({
         'ok': True,
