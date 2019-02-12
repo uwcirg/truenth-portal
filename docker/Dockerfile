@@ -3,7 +3,8 @@ FROM debian:stretch
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
     DEBIAN_FRONTEND=noninteractive \
-    LANG=C.UTF-8
+    LANG=C.UTF-8 \
+    RUN_USER=www-data
 
 # Install locally from $ARTIFACT_DIR by default
 ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
@@ -11,11 +12,6 @@ ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
 RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
 COPY debian/artifacts "${ARTIFACT_DIR}"
-
-ENV \
-    FILE_UPLOAD_DIR=/var/lib/portal/uploads \
-    PERSISTENCE_EXCLUSIONS_DIR=/var/tmp/exclusions \
-    RUN_USER=www-data
 
 RUN \
     apt-get update --quiet && \

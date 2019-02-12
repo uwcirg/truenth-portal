@@ -1,0 +1,6 @@
+# init default file
+# https://www.debian.org/doc/manuals/maint-guide/dother.en.html#initd
+# use as defaults to postinst script
+
+FILE_UPLOAD_DIR=/var/lib/portal/uploads
+PERSISTENCE_EXCLUSIONS_DIR=/var/tmp/exclusions
