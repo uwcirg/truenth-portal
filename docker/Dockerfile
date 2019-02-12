@@ -15,7 +15,6 @@ COPY debian/artifacts "${ARTIFACT_DIR}"
 ENV \
     FILE_UPLOAD_DIR=/var/lib/portal/uploads \
     PERSISTENCE_EXCLUSIONS_DIR=/var/tmp/exclusions \
-    PROJECT_DIR=/opt/venvs/portal \
     RUN_USER=www-data
 
 RUN \
@@ -28,7 +27,7 @@ USER "${RUN_USER}"
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
-    FLASK_APP=${PROJECT_DIR}/bin/manage.py \
+    FLASK_APP=/opt/venvs/portal/bin/manage.py \
     GUNICORN_CMD_ARGS='--timeout 90' \
     PORT=8008
 
