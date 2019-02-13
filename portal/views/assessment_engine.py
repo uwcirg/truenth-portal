@@ -1369,7 +1369,7 @@ def assessment_add(patient_id):
         try:
             identifier = Identifier.from_fhir(request.json['identifier'])
         except ValueError as e:
-            abort(400, e.message)
+            abort(400, str(e))
 
         existing_qnr = QuestionnaireResponse.by_identifier(identifier)
         if len(existing_qnr):
