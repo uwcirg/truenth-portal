@@ -110,7 +110,6 @@ class TestAssessmentEngine(TestCase):
             data=json.dumps(data),
         )
         assert response.status_code == 400
-        print response.get_data(as_text=True)
 
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
