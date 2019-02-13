@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "flask_user/flask_user_base.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
 
@@ -89,10 +89,12 @@
                 </div>
             </div>
             <hr/>
-            <button type="submit" class="btn btn-tnth-primary">{{ _("Confirm Identity") }}</button>
+            <div class="form___submit_container">
+                <button type="submit" class="btn btn-tnth-primary">{{ _("Confirm Identity") }}</button>
+            </div>
             <br/><br/>
             <div class="error-message text-muted bg-danger" {%if errorMessage %} style="display:block"{% endif%}>{{errorMessage}}</div>
         </div>
     </form>
 {% endblock %}
-{% block additional_scripts -%}<script src="{{url_for('static', filename='js/flask_user/IdentityChallenge.js')}}"></script>{%- endblock %}
+{% block additional_scripts -%}{{super()}}<script src="{{url_for('static', filename='js/flask_user/IdentityChallenge.js')}}"></script>{%- endblock %}
