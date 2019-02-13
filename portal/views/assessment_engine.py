@@ -1809,7 +1809,7 @@ def patient_assessment_status(patient_id):
             "BEGIN trace for assessment-status on {}".format(patient_id))
 
     purge = request.args.get('purge', False)
-    if purge == 'True':
+    if purge.lower() == 'true':
         invalidate_users_QBT(patient_id)
     assessment_status = QB_Status(user=patient, as_of_date=date)
 
