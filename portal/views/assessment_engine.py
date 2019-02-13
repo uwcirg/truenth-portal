@@ -865,6 +865,7 @@ def assessment_update(patient_id):
         abort(409, msg)
     else:
         response.update({'message': 'previous questionnaire response found'})
+        existing_qnr = existing_qnr[0]
 
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
@@ -929,7 +930,11 @@ def assessment_add(patient_id):
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.status
               description:
-                  The lifecycle status of the questionnaire response as a whole
+                The lifecycle status of the questionnaire response as a
+                whole.  If submitting a QuestionnaireResponse with status
+                "in-progress", the ``identifier`` must also be well
+                defined.  Without it, there's no way to reference it
+                for updates.
               type: string
               enum:
                 - in-progress
@@ -1360,6 +1365,7 @@ def assessment_add(patient_id):
         }
         return jsonify(response)
 
+    identifier = None
     if 'identifier' in request.json:
         # Confirm it's unique, or raise 409
         try:
@@ -1373,6 +1379,12 @@ def assessment_add(patient_id):
                    "must be unique over (system, value)".format(identifier))
             current_app.logger.warning(msg)
             abort(409, msg)
+
+    if request.json.get('status') == 'in-progress' and not identifier:
+        msg = "Status {} received without the required identifier".format(
+            request.json.get('status'))
+        current_app.logger.warning(msg)
+        abort(400, msg)
 
     response.update({
         'ok': True,

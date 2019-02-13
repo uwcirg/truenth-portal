@@ -48,6 +48,19 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
+    def test_invalid_status(self):
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+        data.pop('identifier')
+        data['status'] = 'in-progress'
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 400
+        print response.get_data(as_text=True)
+
     def test_duplicate_identifier(self):
         swagger_spec = swagger(self.app)
         identifier = Identifier(system='https://unique.org', value='abc123')
