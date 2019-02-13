@@ -1,8 +1,6 @@
 """Unit test module for Assessment Engine API"""
 from __future__ import unicode_literals  # isort:skip
 
-import json
-
 from flask_swagger import swagger
 from flask_webtest import SessionScope
 
@@ -31,10 +29,7 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
         response = response.json
         assert response['ok']
@@ -50,10 +45,7 @@ class TestAssessmentEngine(TestCase):
 
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
     def test_duplicate_identifier(self):
@@ -65,20 +57,14 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
 
         # Submit a second, with the same identifier, expect error
         data2 = swagger_spec['definitions']['QuestionnaireResponse']['example']
         data2['identifier'] = identifier.as_fhir()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data2),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data2)
         assert response.status_code == 409
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 1
@@ -88,10 +74,7 @@ class TestAssessmentEngine(TestCase):
         identifier.value = 'do-over'
         data3['identifier'] = identifier.as_fhir()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data3),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data3)
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 2
@@ -105,10 +88,7 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
     def test_submit_assessment_for_qb(self):
@@ -160,10 +140,7 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
         test_user = get_user(TEST_USER_ID)
         qb = db.session.merge(qb)
@@ -201,25 +178,19 @@ class TestAssessmentEngine(TestCase):
         # Upload incomplete QNR
         in_progress_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(in_progress_qnr),
-        )
+            json=in_progress_qnr)
         assert in_progress_response.status_code == 200
 
         # Update incomplete QNR
         update_qnr_response = self.client.put(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(completed_qnr),
-        )
+            json=completed_qnr)
         assert update_qnr_response.status_code == 200
         assert update_qnr_response.json['ok']
         assert update_qnr_response.json['valid']
 
         updated_qnr_response = self.client.get(
-            '/api/patient/assessment?instrument_id={}'.format(instrument_id),
-            content_type='application/json',
-        )
+            '/api/patient/assessment?instrument_id={}'.format(instrument_id))
         assert update_qnr_response.status_code == 200
         assert (
             updated_qnr_response.json['entry'][0]['group']
@@ -234,20 +205,14 @@ class TestAssessmentEngine(TestCase):
 
         # Upload QNR
         qnr_response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(qnr),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=qnr)
         assert qnr_response.status_code == 200
 
         qnr['identifier']['system'] = 'foo'
 
         # Attempt to update different QNR; should fail
         update_qnr_response = self.client.put(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(qnr),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=qnr)
         assert update_qnr_response.status_code == 404
 
     def test_assessments_bundle(self):
@@ -263,15 +228,11 @@ class TestAssessmentEngine(TestCase):
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(example_data),
-        )
+            json=example_data)
         assert upload.status_code == 200
 
         response = self.client.get(
-            '/api/patient/assessment?instrument_id={}'.format(instrument_id),
-            content_type='application/json',
-        )
+            '/api/patient/assessment?instrument_id={}'.format(instrument_id))
         response = response.json
 
         assert response['total'] == len(response['entry'])
@@ -289,9 +250,7 @@ class TestAssessmentEngine(TestCase):
         self.login()
         upload_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(example_data),
-        )
+            json=example_data)
         assert upload_response.status_code == 200
 
         download_response = self.client.get(
