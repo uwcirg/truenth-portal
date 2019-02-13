@@ -1,6 +1,5 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-import json
 
 from flask import (
     Blueprint,
