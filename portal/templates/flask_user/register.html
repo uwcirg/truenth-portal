@@ -31,9 +31,9 @@
                 {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
                 <br/>
-
-                {{ render_submit_field(form.submit, _("Register"), tabindex=280) }}
-
+                <div class="form___submit_container">
+                    {{ render_submit_field(form.submit, _("Register"), tabindex=280) }}
+                </div>
                 <br/><br/><br/>
                 <div class="divider"></div>
                 <div class="or">{{_('or')}}</div>
