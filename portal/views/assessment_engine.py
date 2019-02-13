@@ -29,8 +29,8 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.intervention import INTERVENTION
 from ..models.qb_status import QB_Status
+from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
-from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import (
     QuestionnaireResponse,
     aggregate_responses,
@@ -42,16 +42,15 @@ from ..trace import dump_trace, establish_trace
 from ..type_tools import check_int
 from .crossdomain import crossdomain
 
-assessment_engine_api = Blueprint('assessment_engine_api', __name__,
-                                  url_prefix='/api')
+assessment_engine_api = Blueprint('assessment_engine_api', __name__)
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment',
+    '/api/patient/<int:patient_id>/assessment',
     defaults={'instrument_id': None},
 )
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment/<string:instrument_id>'
+    '/api/patient/<int:patient_id>/assessment/<string:instrument_id>'
 )
 @crossdomain()
 @oauth.require_oauth()
@@ -639,7 +638,7 @@ def assessment(patient_id, instrument_id):
     return jsonify(bundle_results(elements=documents, links=[link]))
 
 
-@assessment_engine_api.route('/patient/assessment')
+@assessment_engine_api.route('/api/patient/assessment')
 @crossdomain()
 @roles_required(
     [ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.RESEARCHER.value])
@@ -767,7 +766,7 @@ def get_assessments():
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment',
+    '/api/patient/<int:patient_id>/assessment',
     methods=('PUT',),
 )
 @crossdomain()
@@ -874,7 +873,7 @@ def assessment_update(patient_id):
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment', methods=('POST',))
+    '/api/patient/<int:patient_id>/assessment', methods=('POST',))
 @crossdomain()
 @oauth.require_oauth()
 def assessment_add(patient_id):
@@ -1410,7 +1409,7 @@ def assessment_add(patient_id):
     return jsonify(response)
 
 
-@assessment_engine_api.route('/invalidate/<int:user_id>')
+@assessment_engine_api.route('/api/invalidate/<int:user_id>')
 @oauth.require_oauth()
 def invalidate(user_id):
     from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
@@ -1420,7 +1419,7 @@ def invalidate(user_id):
     return jsonify(invalidated=user.as_fhir())
 
 
-@assessment_engine_api.route('/present-needed')
+@assessment_engine_api.route('/api/present-needed')
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
 def present_needed():
@@ -1469,7 +1468,7 @@ def present_needed():
     return redirect(url, code=302)
 
 
-@assessment_engine_api.route('/present-assessment')
+@assessment_engine_api.route('/api/present-assessment')
 @crossdomain()
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.PATIENT.value])
 @oauth.require_oauth()
@@ -1599,7 +1598,7 @@ def present_assessment(instruments=None):
     return redirect(assessment_url, code=303)
 
 
-@assessment_engine_api.route('/present-assessment/<instrument_id>')
+@assessment_engine_api.route('/api/present-assessment/<instrument_id>')
 @oauth.require_oauth()
 def deprecated_present_assessment(instrument_id):
     current_app.logger.warning(
@@ -1611,7 +1610,7 @@ def deprecated_present_assessment(instrument_id):
     return present_assessment(instruments=[instrument_id])
 
 
-@assessment_engine_api.route('/complete-assessment')
+@assessment_engine_api.route('/api/complete-assessment')
 @crossdomain()
 @oauth.require_oauth()
 def complete_assessment():
@@ -1665,7 +1664,7 @@ def complete_assessment():
     return redirect(next_url, code=303)
 
 
-@assessment_engine_api.route('/consent-assessment-status')
+@assessment_engine_api.route('/api/consent-assessment-status')
 @crossdomain()
 @oauth.require_oauth()
 def batch_assessment_status():
@@ -1751,7 +1750,8 @@ def batch_assessment_status():
     return jsonify(status=results)
 
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment-status')
+@assessment_engine_api.route(
+    '/api/patient/<int:patient_id>/assessment-status')
 @crossdomain()
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
@@ -1774,6 +1774,12 @@ def patient_assessment_status(patient_id):
         required: false
         type: string
         format: date-time
+      - name: purge
+        in: query
+        description: Optional trigger to purge any cached data for given
+          user before (re)calculating assessment status
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -1801,6 +1807,10 @@ def patient_assessment_status(patient_id):
     if trace:
         establish_trace(
             "BEGIN trace for assessment-status on {}".format(patient_id))
+
+    purge = request.args.get('purge', False)
+    if purge.lower() == 'true':
+        invalidate_users_QBT(patient_id)
     assessment_status = QB_Status(user=patient, as_of_date=date)
 
     # indefinite assessments don't affect overall status, but need to
