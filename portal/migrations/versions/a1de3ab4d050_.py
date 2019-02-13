@@ -43,7 +43,8 @@ def diff_docs(doc1, doc2):
         answers2 = doc2['group']
         for a1, a2 in zip(answers1, answers2):
             assert a1.keys() == a2.keys()
-            assert a1['answer']['valueCoding']['code'] == a2['answer']['valueCoding']['code']
+            assert (a1['answer']['valueCoding']['code'] ==
+                    a2['answer']['valueCoding']['code'])
             if (a1['answer']['valueCoding']['extension']['valueDecimal'] !=
                     a2['answer']['valueCoding']['extension']['valueDecimal']):
                 print("  Question: {} valueDecimal: {} VERSUS {}".format(

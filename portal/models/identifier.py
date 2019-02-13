@@ -40,10 +40,10 @@ class Identifier(db.Model):
 
     @classmethod
     def from_fhir(cls, data):
-        if not all((data.get('system'), data.get('value'))):
+        if not data or not all((data.get('system'), data.get('value'))):
             raise ValueError(
-                "Ill formed identifier; requires both 'system' and 'value' "
-                "to unambiguously define resource")
+                "Ill formed 'identifier'; requires both 'system' and "
+                "'value' to unambiguously define resource")
 
         instance = cls()
         # if we aren't given a 'use', call it 'usual'

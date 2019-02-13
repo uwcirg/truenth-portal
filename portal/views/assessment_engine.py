@@ -852,17 +852,17 @@ def assessment_update(patient_id):
         identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
     except ValueError as e:
         abort(400, e.message)
-    try:
-        existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document['identifier']['system']
-            == json.dumps(identifier.system)).filter(
-            QuestionnaireResponse.document['identifier']['value']
-            == json.dumps(identifier.value)).one()
-    except NoResultFound:
+    existing_qnr = QuestionnaireResponse.by_identifier(identifier)
+    if not existing_qnr:
         current_app.logger.warning(
             "attempted update on QuestionnaireResponse with unknown "
             "identifier {}".format(identifier))
         abort(404, "existing QuestionnaireResponse not found")
+    if len(existing_qnr) > 1:
+        msg = ("can't update; multiple QuestionnaireResponses found with "
+               "identifier {}".format(identifier))
+        current_app.logger.warning(msg)
+        abort(409, msg)
     else:
         response.update({'message': 'previous questionnaire response found'})
 
@@ -887,13 +887,14 @@ def assessment_update(patient_id):
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
 
-    Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
-    resource type.
+    Submit a minimal FHIR doc in JSON format including the
+    'QuestionnaireResponse' resource type.
 
-    NB, updates are only possible on QuestionnaireResponses for which a well defined
-    ``identifer`` is included.  If included, this value must be distinct over
-    (``system``, ``value``).  A duplicate submission will result in a ``409: conflict``
-    response, and refusal to retain the submission.
+    NB, updates are only possible on QuestionnaireResponses for which a
+    well defined ``identifer`` is included.  If included, this value must
+    be distinct over (``system``, ``value``).  A duplicate submission will
+    result in a ``409: conflict`` response, and refusal to retain the
+    submission.
 
     ---
     operationId: addQuestionnaireResponse
