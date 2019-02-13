@@ -59,6 +59,25 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
                "{0.status} {0.authored}".format(self)
 
+    @staticmethod
+    def by_identifier(identifier):
+        """Query for QuestionnaireResponse(s) with given identifier"""
+        if not any((identifier.system, identifier.value)):
+            raise ValueError("Can't look up null identifier")
+
+        if identifier.system is None:  # FHIR allows null system
+            found = QuestionnaireResponse.query.filter(
+                QuestionnaireResponse.document['identifier']['system'].is_(
+                    None)).filter(
+                QuestionnaireResponse.document['identifier']['value']
+                == json.dumps(identifier.value))
+        else:
+            found = QuestionnaireResponse.query.filter(
+                QuestionnaireResponse.document['identifier']['system']
+                == json.dumps(identifier.system)).filter(
+                QuestionnaireResponse.document['identifier']['value']
+                == json.dumps(identifier.value))
+        return found.order_by(QuestionnaireResponse.id.desc()).all()
 
 QNR = namedtuple(
     'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])

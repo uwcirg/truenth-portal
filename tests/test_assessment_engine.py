@@ -96,6 +96,22 @@ class TestAssessmentEngine(TestCase):
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 2
 
+    def test_invalid_identifier(self):
+        swagger_spec = swagger(self.app)
+        identifier = Identifier(system=None, value='abc-123')
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+        data['identifier'] = identifier.as_fhir()
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data),
+        )
+        assert response.status_code == 400
+        print response.get_data(as_text=True)
+
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']

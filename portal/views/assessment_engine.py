@@ -850,8 +850,8 @@ def assessment_update(patient_id):
 
     try:
         identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
-    except (TypeError, KeyError):
-        abort(400, "Ill formed or missing 'identifier', see FHIR spec")
+    except ValueError as e:
+        abort(400, e.message)
     try:
         existing_qnr = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.document['identifier']['system']
@@ -1363,15 +1363,11 @@ def assessment_add(patient_id):
         # Confirm it's unique, or raise 409
         try:
             identifier = Identifier.from_fhir(request.json['identifier'])
-        except (TypeError, KeyError):
-            abort(400, "Ill formed 'identifier', see FHIR spec")
+        except ValueError as e:
+            abort(400, e.message)
 
-        existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document['identifier']['system']
-            == json.dumps(identifier.system)).filter(
-            QuestionnaireResponse.document['identifier']['value']
-            == json.dumps(identifier.value)).first()
-        if existing_qnr:
+        existing_qnr = QuestionnaireResponse.by_identifier(identifier)
+        if len(existing_qnr):
             msg = ("QuestionnaireResponse with matching {} already exists; "
                    "must be unique over (system, value)".format(identifier))
             current_app.logger.warning(msg)
