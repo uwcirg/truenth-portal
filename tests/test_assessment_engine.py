@@ -112,20 +112,14 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
 
         # Submit a second, with the same identifier, expect error
         data2 = swagger_spec['definitions']['QuestionnaireResponse']['example']
         data2['identifier'] = identifier.as_fhir()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data2),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data2)
         assert response.status_code == 409
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 1
@@ -135,10 +129,7 @@ class TestAssessmentEngine(TestCase):
         identifier.value = 'do-over'
         data3['identifier'] = identifier.as_fhir()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data3),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data3)
         assert response.status_code == 200
         self.test_user = db.session.merge(self.test_user)
         assert self.test_user.questionnaire_responses.count() == 2
@@ -152,10 +143,7 @@ class TestAssessmentEngine(TestCase):
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
         response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID),
-            content_type='application/json',
-            data=json.dumps(data),
-        )
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
     def test_submit_assessment_for_qb(self):
