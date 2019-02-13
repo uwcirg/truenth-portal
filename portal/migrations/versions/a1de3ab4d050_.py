@@ -12,8 +12,7 @@ from portal.dict_tools import dict_compare
 from portal.models.audit import Audit
 from portal.models.identifier import Identifier
 from portal.models.questionnaire_response import QuestionnaireResponse
-from portal.models.role import Role, ROLE
-from portal.models.user import User, UserRoles
+from portal.models.user import User
 
 # revision identifiers, used by Alembic.
 revision = 'a1de3ab4d050'
@@ -21,18 +20,13 @@ down_revision = '55469bdd181f'
 
 
 def admin_id():
-    """Look up an admin ID"""
-    admin = User.query.filter_by(email='bob25mary@gmail.com').first()
-    admin = admin or User.query.join(UserRoles).join(Role).filter(
-        Role.id == UserRoles.role_id).filter(
-        UserRoles.user_id == User.id).filter(
-        Role.name == ROLE.ADMIN.value).first()
-    return admin.id
+    sys = User.query.filter_by(email='__system__').first()
+    return sys.id
 
 
 def diff_docs(doc1, doc2):
     """Print details of two differing QNR documents"""
-    added, removed, modified, same = dict_compare(doc1, doc2)
+    added, removed, modified, _ = dict_compare(doc1, doc2)
     assert not added
     assert not removed
     assert not set(modified) - set(['authored', 'group'])

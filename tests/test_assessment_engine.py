@@ -244,7 +244,8 @@ class TestAssessmentEngine(TestCase):
         assert upload.status_code == 200
 
         response = self.client.get(
-            '/api/patient/assessment?instrument_id={}'.format(instrument_id))
+            '/api/patient/assessment',
+            query_string={'instrument_id': instrument_id})
         response = response.json
 
         assert response['total'] == len(response['entry'])

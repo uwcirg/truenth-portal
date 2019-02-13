@@ -1,6 +1,5 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-import json
 
 from flask import (
     Blueprint,
@@ -863,10 +862,9 @@ def assessment_update(patient_id):
                "identifier {}".format(identifier))
         current_app.logger.warning(msg)
         abort(409, msg)
-    else:
-        response.update({'message': 'previous questionnaire response found'})
-        existing_qnr = existing_qnr[0]
 
+    response.update({'message': 'previous questionnaire response found'})
+    existing_qnr = existing_qnr[0]
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
