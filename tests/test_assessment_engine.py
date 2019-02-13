@@ -59,7 +59,6 @@ class TestAssessmentEngine(TestCase):
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
-        print response.get_data(as_text=True)
 
     def test_duplicate_identifier(self):
         swagger_spec = swagger(self.app)
