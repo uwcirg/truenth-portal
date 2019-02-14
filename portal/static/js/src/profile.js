@@ -1563,6 +1563,9 @@ export default (function() {
                 var self = this, orgTool = this.getOrgTool();
                 orgTool.handleOrgsEvent(this.subjectId, this.isConsentWithTopLevelOrg());
                 $("#clinics").on("updated", function() {
+                    self.setDemoData("", function(){
+                        self.setView().setContent($("#userOrgs_view"), self.getOrgsDisplay());
+                    }); 
                     self.reloadConsentList(self.subjectId);
                     self.handlePcaLocalized();
                     if ($("#locale").length > 0) {
