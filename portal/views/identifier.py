@@ -106,7 +106,34 @@ def add_identifier(user_id):
       - in: body
         name: body
         schema:
-          $ref: "#/definitions/nested_roles"
+          id: Identifier
+          description:
+            An identifier - identifies some entity uniquely and unambiguously
+          required:
+            - system
+            - value
+          properties:
+            label:
+              description: Optional label to include
+              type: string
+            system:
+              description:
+                Establishes the namespace for the value - that is, a URL that
+                describes a set values that are unique
+              type: string
+            use:
+              description: The purpose of this identifier
+              type: string
+              enum:
+                - usual
+                - official
+                - temp
+                - secondary
+            value:
+              description:
+                The portion of the identifier typically relevant to the user
+                and which is unique within the context of the system
+              type: string
     responses:
       200:
         description:
