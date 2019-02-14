@@ -3,7 +3,8 @@ FROM debian:stretch
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
     DEBIAN_FRONTEND=noninteractive \
-    LANG=C.UTF-8
+    LANG=C.UTF-8 \
+    RUN_USER=www-data
 
 # Install locally from $ARTIFACT_DIR by default
 ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
@@ -12,26 +13,19 @@ RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
 COPY debian/artifacts "${ARTIFACT_DIR}"
 
-ENV \
-    FILE_UPLOAD_DIR=/var/lib/portal/uploads \
-    PERSISTENCE_EXCLUSIONS_DIR=/var/tmp/exclusions \
-    PROJECT_DIR=/opt/venvs/portal \
-    RUN_USER=www-data
-
 RUN \
     apt-get update --quiet && \
     apt-get install --quiet --quiet --allow-unauthenticated portal && \
     apt-get clean --quiet && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
-USER "${RUN_USER}"
-
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
-    FLASK_APP=${PROJECT_DIR}/bin/manage.py \
-    PORT=8008 \
-    SERVER_NAME=localhost \
-    TIMEOUT=90
+    FLASK_APP=/opt/venvs/portal/bin/manage.py \
+    GUNICORN_CMD_ARGS='--timeout 90' \
+    PORT=8008
+
+USER "${RUN_USER}"
 
 EXPOSE "${PORT}"
 
@@ -46,5 +40,4 @@ CMD \
 
         gunicorn \
             --bind "0.0.0.0:${PORT}" \
-            --timeout ${TIMEOUT} \
         wsgi:application

@@ -5,26 +5,16 @@ ENV \
     DEBIAN_FRONTEND=noninteractive \
     GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
-# Todo: use `mk-build-deps` to install dependencies from `Build-Depends` section of debian/control
+RUN \
+    mkdir --parents "${ARTIFACT_DIR}"
+
 RUN \
     apt-get update --quiet && \
     apt-get install --quiet --quiet --no-install-recommends \
-        build-essential \
-        debhelper \
-        dh-virtualenv\
-        git \
-        libpq-dev \
-        python-dev \
-        python-pip \
-        python-setuptools \
-        python-setuptools-scm \
-        python-wheel && \
+        devscripts \
+        equivs \
+        git && \
     apt-get clean --quiet
-
-
-RUN \
-    pip install make-deb && \
-    mkdir --parents "${ARTIFACT_DIR}"
 
 WORKDIR /root/portal
 
@@ -32,6 +22,11 @@ WORKDIR /root/portal
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
 
+    mk-build-deps debian/control \
+        --install \
+        --tool "apt-get --quiet --quiet --no-install-recommends" && \
+
+    pip install make-deb && \
     yes | make-deb && \
     git update-index --skip-worktree debian/changelog && \
     git checkout -- . && \

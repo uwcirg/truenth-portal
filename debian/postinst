@@ -32,7 +32,8 @@ case "$1" in
     ;;
 esac
 
-
+echo "Loading debian package-specific defaults..."
+. "/etc/default/${PACKAGE_NAME}"
 PROJECT_DIR="${PROJECT_DIR:-$venv_install_dir}"
 
 : "${FILE_UPLOAD_DIR?Need to set FILE_UPLOAD_DIR}"
