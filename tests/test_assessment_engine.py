@@ -1,5 +1,9 @@
 """Unit test module for Assessment Engine API"""
 from __future__ import unicode_literals  # isort:skip
+import json
+import jsonschema
+import pytest
+import os
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
@@ -13,6 +17,7 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
 )
+from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
@@ -21,6 +26,18 @@ from tests import TEST_USER_ID, TestCase
 
 
 class TestAssessmentEngine(TestCase):
+
+    def test_qnr_validation(self):
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+        QuestionnaireResponse.validate_document(data)
+
+    def test_qnr_invalidation(self):
+        with open(os.path.join(os.path.dirname(
+                __file__), 'bad_qnr.json'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+        with pytest.raises(jsonschema.ValidationError):
+            QuestionnaireResponse.validate_document(data)
 
     def test_submit_assessment(self):
         swagger_spec = swagger(self.app)
@@ -59,6 +76,22 @@ class TestAssessmentEngine(TestCase):
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
+
+    @pytest.skip("not ready")
+    def test_invalid_format(self):
+        with open(os.path.join(os.path.dirname(
+                __file__), 'bad_qnr.json'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 200
+
+        # Confirm accessing the user's assessments doesn't raise
+        updated_qnr_response = self.client.get(
+            '/api/patient/{}/assessment/epic26'.format(TEST_USER_ID))
+        assert updated_qnr_response.status_code == 200
 
     def test_duplicate_identifier(self):
         swagger_spec = swagger(self.app)
