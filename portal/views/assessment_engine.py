@@ -27,6 +27,7 @@ from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.encounter import EC
 from ..models.fhir import bundle_results
+from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
 from ..models.qb_status import QB_Status
 from ..models.qb_timeline import invalidate_users_QBT
@@ -846,18 +847,24 @@ def assessment_update(patient_id):
             'valid': True,
         })
 
-    # Todo: enforce identifier uniqueness at initial submission
     try:
-        existing_qnr = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["identifier"]
-            == updated_qnr["identifier"]
-        ).one()
-    # except NoResultException:
-    except NoResultFound:
+        identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
+    except ValueError as e:
+        abort(400, e.message)
+    existing_qnr = QuestionnaireResponse.by_identifier(identifier)
+    if not existing_qnr:
+        current_app.logger.warning(
+            "attempted update on QuestionnaireResponse with unknown "
+            "identifier {}".format(identifier))
         abort(404, "existing QuestionnaireResponse not found")
-    else:
-        response.update({'message': 'previous questionnaire response found'})
+    if len(existing_qnr) > 1:
+        msg = ("can't update; multiple QuestionnaireResponses found with "
+               "identifier {}".format(identifier))
+        current_app.logger.warning(msg)
+        abort(409, msg)
 
+    response.update({'message': 'previous questionnaire response found'})
+    existing_qnr = existing_qnr[0]
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
@@ -879,8 +886,15 @@ def assessment_update(patient_id):
 def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
 
-    Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
-    resource type.
+    Submit a minimal FHIR doc in JSON format including the
+    'QuestionnaireResponse' resource type.
+
+    NB, updates are only possible on QuestionnaireResponses for which a
+    well defined ``identifer`` is included.  If included, this value must
+    be distinct over (``system``, ``value``).  A duplicate submission will
+    result in a ``409: conflict`` response, and refusal to retain the
+    submission.
+
     ---
     operationId: addQuestionnaireResponse
     tags:
@@ -914,7 +928,11 @@ def assessment_add(patient_id):
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.status
               description:
-                  The lifecycle status of the questionnaire response as a whole
+                The lifecycle status of the questionnaire response as a
+                whole.  If submitting a QuestionnaireResponse with status
+                "in-progress", the ``identifier`` must also be well
+                defined.  Without it, there's no way to reference it
+                for updates.
               type: string
               enum:
                 - in-progress
@@ -1085,6 +1103,7 @@ def assessment_add(patient_id):
               value: '119.0'
               use: official
               label: cPRO survey session ID
+              system: 'https://ae.us.truenth.org/eproms'
             subject:
               display: patient demographics
               reference: https://stg.us.truenth.org/api/demographics/10015
@@ -1343,6 +1362,27 @@ def assessment_add(patient_id):
             'reference': e.schema,
         }
         return jsonify(response)
+
+    identifier = None
+    if 'identifier' in request.json:
+        # Confirm it's unique, or raise 409
+        try:
+            identifier = Identifier.from_fhir(request.json['identifier'])
+        except ValueError as e:
+            abort(400, str(e))
+
+        existing_qnr = QuestionnaireResponse.by_identifier(identifier)
+        if len(existing_qnr):
+            msg = ("QuestionnaireResponse with matching {} already exists; "
+                   "must be unique over (system, value)".format(identifier))
+            current_app.logger.warning(msg)
+            abort(409, msg)
+
+    if request.json.get('status') == 'in-progress' and not identifier:
+        msg = "Status {} received without the required identifier".format(
+            request.json.get('status'))
+        current_app.logger.warning(msg)
+        abort(400, msg)
 
     response.update({
         'ok': True,
