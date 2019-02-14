@@ -26,8 +26,10 @@ CMD \
         --install \
         --tool "apt-get --quiet --quiet --no-install-recommends" && \
 
-    pip install make-deb && \
-    yes | make-deb && \
+    debchange "$(git log -1 --pretty=%B)" \
+        --maintmaint \
+        --version "$(python setup.py --version)" \
+    && \
     git update-index --skip-worktree debian/changelog && \
     git checkout -- . && \
 
