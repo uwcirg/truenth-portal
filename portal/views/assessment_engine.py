@@ -1,5 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
+import jsonschema
 
 from flask import (
     Blueprint,
@@ -14,11 +15,8 @@ from flask import (
     url_for,
 )
 from flask_babel import gettext as _
-from flask_swagger import swagger
 from flask_user import roles_required
-import jsonschema
 import requests
-from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
 from ..database import db
@@ -812,17 +810,6 @@ def assessment_update(patient_id):
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    swag = swagger(current_app)
-
-    draft4_schema = {
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'definitions': swag['definitions'],
-    }
-
-    validation_schema = 'QuestionnaireResponse'
-    # Copy desired schema (to validate against) to outermost dict
-    draft4_schema.update(swag['definitions'][validation_schema])
 
     response = {
         'ok': False,
@@ -833,7 +820,7 @@ def assessment_update(patient_id):
     updated_qnr = request.json
 
     try:
-        jsonschema.validate(updated_qnr, draft4_schema)
+        QuestionnaireResponse.validate_document(updated_qnr)
     except jsonschema.ValidationError as e:
         return jsonify({
             'ok': False,
@@ -917,13 +904,32 @@ def assessment_add(patient_id):
         name: body
         schema:
           id: QuestionnaireResponse
-          description:
-            A patient's responses to a questionnaire (a set of instruments,
-            some standardized, some not), and metadata about the presentation
-            and context of the assessment session (date, etc).
           required:
+            - resourceType
             - status
+          additionalProperties: false
           properties:
+            identifier:
+              description:
+                A business identifier assigned to a particular completed
+                (or partially completed) questionnaire.
+              $ref: "#/definitions/Identifier"
+            questionnaire:
+              description:
+                The Questionnaire that defines and organizes the questions
+                for which answers are being provided.
+              additionalProperties: false
+              properties:
+                display:
+                  description: Name of Questionnaire
+                  type: string
+                reference:
+                  description: URI uniquely defining the Questionnaire
+                  type: string
+            resourceType:
+              description:
+                defines FHIR resource type, must be QuestionnaireResponse
+              type: string
             status:
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.status
@@ -942,6 +948,7 @@ def assessment_add(patient_id):
                 id: Reference
                 type: object
                 description: A reference from one resource to another
+                additionalProperties: false
                 properties:
                   reference:
                     type: string
@@ -967,6 +974,7 @@ def assessment_add(patient_id):
                 description:
                   A group of related questions or sub-groups. May only
                   contain either questions or groups
+                additionalProperties: false
                 properties:
                   group:
                     $ref: "#/definitions/group"
@@ -990,6 +998,7 @@ def assessment_add(patient_id):
                     items:
                       description: An individual question and related attributes
                       type: object
+                      additionalProperties: false
                       properties:
                         text:
                           type: string
@@ -1334,27 +1343,14 @@ def assessment_add(patient_id):
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    swag = swagger(current_app)
-
-    draft4_schema = {
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'definitions': swag['definitions'],
-    }
-
-    validation_schema = 'QuestionnaireResponse'
-    # Copy desired schema (to validate against) to outermost dict
-    draft4_schema.update(swag['definitions'][validation_schema])
-
     response = {
         'ok': False,
-        'message': 'error saving questionnaire reponse',
+        'message': 'error saving questionnaire response',
         'valid': False,
     }
 
     try:
-        jsonschema.validate(request.json, draft4_schema)
-
+        QuestionnaireResponse.validate_document(request.json)
     except jsonschema.ValidationError as e:
         response = {
             'ok': False,
