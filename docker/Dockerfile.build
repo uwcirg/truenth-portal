@@ -33,8 +33,5 @@ CMD \
         --unsigned-source \
         --unsigned-changes \
     && \
-    mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
 
-    cd "${ARTIFACT_DIR}" && \
-    dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz" && \
-    chown --verbose nobody:nogroup "${ARTIFACT_DIR}/"*
+    debian/post-build.sh
