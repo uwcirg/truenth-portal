@@ -27,12 +27,7 @@ CMD \
         --remove \
         --tool "apt-get --quiet --quiet --no-install-recommends" && \
 
-    debchange "$(git log -1 --pretty=%B)" \
-        --maintmaint \
-        --version "$(python setup.py --version)" \
-    && \
-    git update-index --skip-worktree debian/changelog && \
-    git checkout -- . && \
+    debian/pre-build.sh && \
 
     dpkg-buildpackage \
         --unsigned-source \
