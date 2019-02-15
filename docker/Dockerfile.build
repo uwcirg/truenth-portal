@@ -18,7 +18,7 @@ RUN \
 
 WORKDIR /root/portal
 
-# Allow repo and branch to be overridden with environment variable
+# Checkout repo, install build dependencies, generate changelog and build package
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
 
