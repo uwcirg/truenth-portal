@@ -29,6 +29,5 @@ CMD \
     debian/pre-build.sh && \
     dpkg-buildpackage \
         --unsigned-source \
-        --unsigned-changes \
-    && \
+        --unsigned-changes && \
     debian/post-build.sh

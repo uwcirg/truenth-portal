@@ -26,9 +26,8 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 
-echo "Moving built debian package file..."
+echo "Moving debian package file from working directory to artifact directory..."
 mv --verbose "${root_path}"/../portal_*.deb "${ARTIFACT_DIR}"
-
 
 echo "Building package list for local repo..."
 cd "${ARTIFACT_DIR}"
