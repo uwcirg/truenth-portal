@@ -6,9 +6,6 @@ ENV \
     GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
 RUN \
-    mkdir --parents "${ARTIFACT_DIR}"
-
-RUN \
     apt-get update --quiet && \
     apt-get install --quiet --quiet --no-install-recommends \
         devscripts \

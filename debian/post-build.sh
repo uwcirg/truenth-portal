@@ -25,6 +25,10 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 
+if [ ! -d "${ARTIFACT_DIR}" ]; then
+    echo "Creating artifact directory..."
+    mkdir --parents "${ARTIFACT_DIR}"
+fi
 
 echo "Moving debian package file from working directory to artifact directory..."
 mv --verbose "${root_path}"/../portal_*.deb "${ARTIFACT_DIR}"
