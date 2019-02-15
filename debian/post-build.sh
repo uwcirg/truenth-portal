@@ -28,6 +28,9 @@ fi
 echo "Moving built debian package file..."
 mv --verbose "${root_path}"/../portal_*.deb "${ARTIFACT_DIR}"
 
+
+echo "Building package list for local repo..."
 cd "${ARTIFACT_DIR}"
 dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz"
+
 chown --verbose nobody:nogroup "${ARTIFACT_DIR}/"*

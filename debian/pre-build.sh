@@ -37,5 +37,5 @@ debchange "$(git log -1 --pretty=%B)" \
     --maintmaint \
     --newversion "$version"
 
-# remove local changes to prevent "dirty" version numbers (indicating local changes)
+# ignore updates to changelog to prevent "dirty" version numbers (indicating local changes)
 git update-index --skip-worktree debian/changelog

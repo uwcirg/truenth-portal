@@ -28,10 +28,8 @@ CMD \
         --tool "apt-get --quiet --quiet --no-install-recommends" && \
 
     debian/pre-build.sh && \
-
     dpkg-buildpackage \
         --unsigned-source \
         --unsigned-changes \
     && \
-
     debian/post-build.sh
