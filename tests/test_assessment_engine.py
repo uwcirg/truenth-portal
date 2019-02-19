@@ -77,7 +77,7 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
-    @pytest.skip("not ready")
+    @pytest.mark.skip("not ready")
     def test_invalid_format(self):
         with open(os.path.join(os.path.dirname(
                 __file__), 'bad_qnr.json'), 'r') as fhir_data:
