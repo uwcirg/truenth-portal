@@ -886,6 +886,254 @@ def assessment_add(patient_id):
     operationId: addQuestionnaireResponse
     tags:
       - Assessment Engine
+    definitions:
+      - schema:
+          id: Question
+          description: An individual question and related attributes
+          externalDocs:
+            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
+          additionalProperties: false
+          properties:
+            text:
+              type: string
+              description: Question text
+            answer:
+              type: array
+              description:
+                The respondent's answer(s) to the question
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
+              items:
+                $ref: "#/definitions/Answer"
+      - schema:
+          id: Answer
+          description:
+            An individual answer to a question and related attributes.
+            May only contain a single value[x] attribute
+          externalDocs:
+            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
+          additionalProperties: false
+          properties:
+            valueBoolean:
+              type: boolean
+              description: Boolean value answer to a question
+            valueDecimal:
+              type: number
+              description: Decimal value answer to a question
+            valueInteger:
+              type: integer
+              description: Integer value answer to a question
+            valueDate:
+              type: string
+              format: date
+              description: Date value answer to a question
+            valueDateTime:
+              type: string
+              format: date-time
+              description: Datetime value answer to a question
+            valueInstant:
+              type: string
+              format: date-time
+              description: Instant value answer to a question
+            valueTime:
+              type: string
+              description: Time value answer to a question
+            valueString:
+              type: string
+              description: String value answer to a question
+            valueUri:
+              type: string
+              description: URI value answer to a question
+            valueAttachment:
+              $ref: "#/definitions/ValueAttachment"
+              description: Attachment value answer to a question
+            valueCoding:
+              description:
+                Coding value answer to a question, may include score as
+                FHIR extension
+              $ref: "#/definitions/ValueCoding"
+            valueQuantity:
+              description: Quantity value answer to a question
+              $ref: "#/definitions/Quantity"
+            valueReference:
+              description: Reference value answer to a question
+              $ref: "#/definitions/Reference"
+            group:
+              description: Nested questionnaire group
+              $ref: "#/definitions/Group"
+      - schema:
+          id: Group
+          description:
+            A structured set of questions and their answers. The
+            questions are ordered and grouped into coherent subsets,
+            corresponding to the structure of the grouping of the
+            questionnaire being responded to.
+          additionalProperties: false
+          properties:
+            id:
+              description:
+                Unique id for the element within a resource (for internal
+                references). This may be any string value that does not
+                contain spaces.
+              type: string
+            linkId:
+              description:
+                The item from the Questionnaire that corresponds to this item
+                in the QuestionnaireResponse resource.
+              type: string
+            definition:
+              description:
+                A reference to an ElementDefinition that provides the
+                details for the item.
+              type: string
+            text:
+              description:
+                Text that is displayed above the contents of the group or as
+                the text of the question being answered.
+              type: string
+            answer:
+              description: The respondent\u0027s answer(s) to the question.
+              items:
+                $ref: "#/definitions/Answer"
+              type: array
+            group:
+              description:
+                Questions or sub-groups nested beneath a question or group.
+              items:
+                $ref: "#/definitions/Group"
+              type: array
+      - schema:
+          id: Quantity
+          description:
+            A measured amount (or an amount that can potentially be measured).
+            Note that measured amounts include amounts that are not precisely
+            quantified, including amounts involving arbitrary units and
+            floating currencies.
+          additionalProperties: false
+          properties:
+            id:
+              description:
+                Unique id for the element within a resource (for internal
+                references). This may be any string value that does not
+                contain spaces.
+              type: string
+            value:
+              description:
+                The value of the measured amount. The value includes an implicit
+                precision in the presentation of the value.
+              type: number
+            comparator:
+              description:
+                How the value should be understood and represented - whether
+                the actual value is greater or less than the stated value due
+                to measurement issues; e.g. if the comparator is \"\u003c\" ,
+                then the real value is \u003c stated value.
+              enum:
+                - "\u003c"
+                - "\u003c\u003d"
+                - "\u003e\u003d"
+                - "\u003e"
+            unit:
+              description: A human-readable form of the unit.
+              type: string
+            system:
+              description:
+                The identification of the system that provides the coded form
+                of the unit.
+              type: string
+            code:
+              description:
+                A computer processable form of the unit in some unit
+                representation system.
+              type: string
+      - schema:
+          id: Reference
+          description: link to an internal or external resource
+          additionalProperties: false
+          properties:
+            reference:
+              description: Relative, internal or absolute URL reference
+              type: string
+            display:
+              description: Text alternative for the resource
+              type: string
+      - schema:
+          id: ValueAttachment
+          description: For referring to data content defined in other formats
+          additionalProperties: false
+          properties:
+            contentType:
+              description:
+                Identifies the type of the data in the attachment and allows
+                a method to be chosen to interpret or render the data.
+                Includes mime type parameters such as charset where appropriate.
+              type: string
+            language:
+              description:
+                The human language of the content. The value can be any valid
+                value according to BCP 47.
+              type: string
+            data:
+              description:
+                The actual data of the attachment - a sequence of bytes,
+                base64 encoded.
+              type: binary
+            url:
+              description: A location where the data can be accessed.
+              type: string
+            size:
+              description:
+                The number of bytes of data that make up this attachment
+                (before base64 encoding, if that is done).
+              type: int
+            hash:
+              description:
+                The calculated hash of the data using SHA-1.
+                Represented using base64.
+              type: binary
+            title:
+              description:
+                A label or set of text to display in place of the data.
+              type: string
+            creation:
+              description: The date that the attachment was first created.
+              type: string
+              format: date-time
+      - schema:
+          id: ValueCoding
+          additionalProperties: false
+          properties:
+            system:
+              description: Identity of the terminology system
+              type: string
+              format: uri
+            version:
+              description: Version of the system - if relevant
+              type: string
+            code:
+              description: Symbol in syntax defined by the system
+              type: string
+            display:
+              description: Representation defined by the system
+              type: string
+            userSelected:
+              description: If this coding was chosen directly by the user
+              type: boolean
+            extension:
+              description:
+                Extension - Numerical value associated with the code
+              $ref: "#/definitions/ValueDecimalExtension"
+      - schema:
+          id: ValueDecimalExtension
+          additionalProperties: false
+          properties:
+            url:
+              description: Hardcoded reference to extension
+              type: string
+              format: uri
+            valueDecimal:
+              description: Numeric score value
+              type: number
     produces:
       - application/json
     parameters:
@@ -944,21 +1192,16 @@ def assessment_add(patient_id):
                 - in-progress
                 - completed
             subject:
-              schema:
-                id: Reference
-                type: object
-                description: A reference from one resource to another
-                additionalProperties: false
-                properties:
-                  reference:
-                    type: string
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.reference
-                  display:
-                    type: string
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.display
+              description:
+                The subject of the questionnaire response.  This could be
+                a patient, organization, practitioner, device, etc.  This
+                is who/what the answers apply to, but is not necessarily
+                the source of information.
+              $ref: "#/definitions/Reference"
             author:
+              description:
+                Person who received the answers to the questions in the
+                QuestionnaireResponse and recorded them in the system.
               $ref: "#/definitions/Reference"
             authored:
               externalDocs:
@@ -969,141 +1212,12 @@ def assessment_add(patient_id):
             source:
               $ref: "#/definitions/Reference"
             group:
-              schema:
-                id: group
-                description:
-                  A group of related questions or sub-groups. May only
-                  contain either questions or groups
-                additionalProperties: false
-                properties:
-                  group:
-                    $ref: "#/definitions/group"
-                  title:
-                    type: string
-                    description: Group name
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.title
-                  text:
-                    type: string
-                    description: Additional text for this group
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.text
-                  question:
-                    description:
-                      Set of questions within this group. The order of
-                      questions within the group is relevant.
-                    type: array
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
-                    items:
-                      description: An individual question and related attributes
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        text:
-                          type: string
-                          description: Question text
-                        answer:
-                          type: array
-                          description:
-                            The respondent's answer(s) to the question
-                          externalDocs:
-                            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
-                          items:
-                            description:
-                              An individual answer to a question and related
-                              attributes. May only contain a single `value[x]`
-                              attribute
-                            type: object
-                            externalDocs:
-                              url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
-                            properties:
-                              valueBoolean:
-                                type: boolean
-                                description: Boolean value answer to a question
-                              valueDecimal:
-                                type: number
-                                description: Decimal value answer to a question
-                              valueInteger:
-                                type: integer
-                                description: Integer value answer to a question
-                              valueDate:
-                                type: string
-                                format: date
-                                description: Date value answer to a question
-                              valueDateTime:
-                                type: string
-                                format: date-time
-                                description: Datetime value answer to a question
-                              valueInstant:
-                                type: string
-                                format: date-time
-                                description: Instant value answer to a question
-                              valueTime:
-                                type: string
-                                description: Time value answer to a question
-                              valueString:
-                                type: string
-                                description: String value answer to a question
-                              valueUri:
-                                type: string
-                                description: URI value answer to a question
-                              valueAttachment:
-                                type: object
-                                description:
-                                  Attachment value answer to a question
-                              valueCoding:
-                                type: object
-                                description:
-                                  Coding value answer to a question, may
-                                  include score as FHIR extension
-                                properties:
-                                  system:
-                                    description:
-                                      Identity of the terminology system
-                                    type: string
-                                    format: uri
-                                  version:
-                                    description:
-                                      Version of the system - if relevant
-                                    type: string
-                                  code:
-                                    description:
-                                      Symbol in syntax defined by the system
-                                    type: string
-                                  display:
-                                    description:
-                                      Representation defined by the system
-                                    type: string
-                                  userSelected:
-                                    description:
-                                      If this coding was chosen directly by
-                                      the user
-                                    type: boolean
-                                  extension:
-                                    description:
-                                      Extension - Numerical value associated
-                                      with the code
-                                    type: object
-                                    properties:
-                                      url:
-                                        description:
-                                          Hardcoded reference to extension
-                                        type: string
-                                        format: uri
-                                      valueDecimal:
-                                        description: Numeric score value
-                                        type: number
-                              valueQuantity:
-                                type: object
-                                description:
-                                  Quantity value answer to a question
-                              valueReference:
-                                type: object
-                                description:
-                                  Reference value answer to a question
-                              group:
-                                $ref: "#/definitions/group"
+              description:
+                A group or question item from the original questionnaire for
+                which answers are provided.
+              items:
+                $ref: "#/definitions/Group"
+              type: array
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
