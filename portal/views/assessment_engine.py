@@ -895,14 +895,17 @@ def assessment_add(patient_id):
           additionalProperties: false
           properties:
             text:
-              type: string
               description: Question text
+              type: string
+            linkId:
+              description: Corresponding question within Questionnaire
+              type: string
             answer:
-              type: array
               description:
                 The respondent's answer(s) to the question
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
+              type: array
               items:
                 $ref: "#/definitions/Answer"
       - schema:
@@ -915,38 +918,38 @@ def assessment_add(patient_id):
           additionalProperties: false
           properties:
             valueBoolean:
-              type: boolean
               description: Boolean value answer to a question
+              type: boolean
             valueDecimal:
-              type: number
               description: Decimal value answer to a question
+              type: number
             valueInteger:
-              type: integer
               description: Integer value answer to a question
+              type: integer
             valueDate:
+              description: Date value answer to a question
               type: string
               format: date
-              description: Date value answer to a question
             valueDateTime:
-              type: string
-              format: date-time
               description: Datetime value answer to a question
-            valueInstant:
               type: string
               format: date-time
+            valueInstant:
               description: Instant value answer to a question
+              type: string
+              format: date-time
             valueTime:
-              type: string
               description: Time value answer to a question
+              type: string
             valueString:
-              type: string
               description: String value answer to a question
-            valueUri:
               type: string
+            valueUri:
               description: URI value answer to a question
+              type: string
             valueAttachment:
-              $ref: "#/definitions/ValueAttachment"
               description: Attachment value answer to a question
+              $ref: "#/definitions/ValueAttachment"
             valueCoding:
               description:
                 Coding value answer to a question, may include score as
@@ -970,31 +973,23 @@ def assessment_add(patient_id):
             questionnaire being responded to.
           additionalProperties: false
           properties:
-            id:
-              description:
-                Unique id for the element within a resource (for internal
-                references). This may be any string value that does not
-                contain spaces.
-              type: string
             linkId:
               description:
                 The item from the Questionnaire that corresponds to this item
                 in the QuestionnaireResponse resource.
               type: string
-            definition:
-              description:
-                A reference to an ElementDefinition that provides the
-                details for the item.
+            title:
+              description: Name for this group
               type: string
             text:
               description:
                 Text that is displayed above the contents of the group or as
                 the text of the question being answered.
               type: string
-            answer:
-              description: The respondent\u0027s answer(s) to the question.
+            question:
+              description: Questions in this group.
               items:
-                $ref: "#/definitions/Answer"
+                $ref: "#/definitions/Question"
               type: array
             group:
               description:
@@ -1217,9 +1212,7 @@ def assessment_add(patient_id):
               description:
                 A group or question item from the original questionnaire for
                 which answers are provided.
-              items:
-                $ref: "#/definitions/Group"
-              type: array
+              $ref: "#/definitions/Group"
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
