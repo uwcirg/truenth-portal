@@ -1085,7 +1085,7 @@ def assessment_add(patient_id):
               description:
                 The number of bytes of data that make up this attachment
                 (before base64 encoding, if that is done).
-              type: int
+              type: integer
             hash:
               description:
                 The calculated hash of the data using SHA-1.
