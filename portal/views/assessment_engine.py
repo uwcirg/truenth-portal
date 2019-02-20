@@ -97,20 +97,20 @@ def assessment(patient_id, instrument_id):
             - type
           properties:
             type:
-                description:
-                  Indicates the purpose of this bundle- how it was
-                  intended to be used.
-                type: string
-                enum:
-                  - document
-                  - message
-                  - transaction
-                  - transaction-response
-                  - batch
-                  - batch-response
-                  - history
-                  - searchset
-                  - collection
+              description:
+                Indicates the purpose of this bundle- how it was
+                intended to be used.
+              type: string
+              enum:
+                - document
+                - message
+                - transaction
+                - transaction-response
+                - batch
+                - batch-response
+                - history
+                - searchset
+                - collection
             link:
               description:
                 A series of links that provide context to this bundle.
@@ -123,11 +123,11 @@ def assessment(patient_id, instrument_id):
                   url:
                     description: The reference details for the link.
             total:
-                description:
-                  If a set of search matches, this is the total number of
-                  matches for the search (as opposed to the number of
-                  results in this bundle).
-                type: integer
+              description:
+                If a set of search matches, this is the total number of
+                matches for the search (as opposed to the number of
+                results in this bundle).
+              type: integer
             entry:
               type: array
               items:
@@ -1077,7 +1077,8 @@ def assessment_add(patient_id):
               description:
                 The actual data of the attachment - a sequence of bytes,
                 base64 encoded.
-              type: binary
+              type: string
+              format: byte
             url:
               description: A location where the data can be accessed.
               type: string
@@ -1090,7 +1091,8 @@ def assessment_add(patient_id):
               description:
                 The calculated hash of the data using SHA-1.
                 Represented using base64.
-              type: binary
+              type: string
+              format: byte
             title:
               description:
                 A label or set of text to display in place of the data.
