@@ -109,6 +109,7 @@ def add_identifier(user_id):
           id: Identifier
           description:
             An identifier - identifies some entity uniquely and unambiguously
+          type: object
           required:
             - system
             - value
