@@ -80,7 +80,7 @@
     "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
   },
   "authored": "2019-02-13T00:00:00.000Z",
-  "resourceType": "questionnaireResponse",
+  "resourceType": "QuestionnaireResponse",
   "questionnaire": {
     "display": "EPIC 26 Short Form",
     "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
