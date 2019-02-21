@@ -77,7 +77,6 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
 
-    @pytest.mark.skip("not ready")
     def test_invalid_format(self):
         with open(os.path.join(os.path.dirname(
                 __file__), 'bad_qnr.json'), 'r') as fhir_data:
@@ -86,7 +85,7 @@ class TestAssessmentEngine(TestCase):
         self.login()
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
-        assert response.status_code == 200
+        assert response.status_code == 400
 
         # Confirm accessing the user's assessments doesn't raise
         updated_qnr_response = self.client.get(
