@@ -805,7 +805,11 @@ def assessment_update(patient_id):
     """
 
     if not hasattr(request, 'json') or not request.json:
-        abort(400, 'Invalid request')
+        return jsonify(message='Invalid request - requires JSON'), 400
+
+    if request.json.get('resourceType') != 'QuestionnaireResponse':
+        return jsonify(
+            message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -826,7 +830,7 @@ def assessment_update(patient_id):
             'ok': False,
             'message': e.message,
             'reference': e.schema,
-        })
+        }), 400
     else:
         response.update({
             'ok': True,
@@ -837,18 +841,21 @@ def assessment_update(patient_id):
     try:
         identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
     except ValueError as e:
-        abort(400, e.message)
+        response['message'] = e.message
+        return jsonify(response), 400
     existing_qnr = QuestionnaireResponse.by_identifier(identifier)
     if not existing_qnr:
         current_app.logger.warning(
             "attempted update on QuestionnaireResponse with unknown "
             "identifier {}".format(identifier))
-        abort(404, "existing QuestionnaireResponse not found")
+        response['message'] = "existing QuestionnaireResponse not found"
+        return jsonify(response), 404
     if len(existing_qnr) > 1:
         msg = ("can't update; multiple QuestionnaireResponses found with "
                "identifier {}".format(identifier))
         current_app.logger.warning(msg)
-        abort(409, msg)
+        response['message'] = msg
+        return jsonify(msg), 409
 
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr[0]
@@ -1461,10 +1468,11 @@ def assessment_add(patient_id):
     from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
 
     if not hasattr(request, 'json') or not request.json:
-        return abort(400, 'Invalid request')
+        return jsonify(message='Invalid request - requires JSON'), 400
 
-    if "questionnaire" not in request.json:
-        abort(400, "Requires `questionnaire` element")
+    if request.json.get('resourceType') != 'QuestionnaireResponse':
+        return jsonify(
+            message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
@@ -1491,20 +1499,23 @@ def assessment_add(patient_id):
         try:
             identifier = Identifier.from_fhir(request.json['identifier'])
         except ValueError as e:
-            abort(400, str(e))
+            response['message'] = str(e)
+            return jsonify(response), 400
 
         existing_qnr = QuestionnaireResponse.by_identifier(identifier)
         if len(existing_qnr):
             msg = ("QuestionnaireResponse with matching {} already exists; "
                    "must be unique over (system, value)".format(identifier))
             current_app.logger.warning(msg)
-            abort(409, msg)
+            response['message'] = msg
+            return jsonify(response), 409
 
     if request.json.get('status') == 'in-progress' and not identifier:
         msg = "Status {} received without the required identifier".format(
             request.json.get('status'))
         current_app.logger.warning(msg)
-        abort(400, msg)
+        response['message'] = msg
+        return jsonify(response), 400
 
     response.update({
         'ok': True,
