@@ -35,6 +35,7 @@ def validate_closure():
     validation_schema = 'QuestionnaireResponse'
     # Copy desired schema (to validate against) to outermost dict
     draft4_schema.update(swag['definitions'][validation_schema])
+
     def validate(document, display_stack=False):
         try:
             jsonschema.validate(document, draft4_schema)
@@ -79,7 +80,7 @@ def correct_invalid_document(qnr_id, validate_fn, sys_id):
 
         # correct string version of numbers
         if 'valueCoding' in the_answer and 'extension' in the_answer[
-            'valueCoding']:
+                'valueCoding']:
             the_answer['valueCoding']['extension']['valueDecimal'] = int(
                 the_answer['valueCoding']['extension']['valueDecimal'])
 
