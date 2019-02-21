@@ -890,6 +890,7 @@ def assessment_add(patient_id):
       - schema:
           id: Question
           description: An individual question and related attributes
+          type: object
           externalDocs:
             url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
           additionalProperties: false
@@ -913,6 +914,7 @@ def assessment_add(patient_id):
           description:
             An individual answer to a question and related attributes.
             May only contain a single value[x] attribute
+          type: object
           externalDocs:
             url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
           additionalProperties: false
@@ -971,6 +973,7 @@ def assessment_add(patient_id):
             questions are ordered and grouped into coherent subsets,
             corresponding to the structure of the grouping of the
             questionnaire being responded to.
+          type: object
           additionalProperties: false
           properties:
             linkId:
@@ -1004,6 +1007,7 @@ def assessment_add(patient_id):
             Note that measured amounts include amounts that are not precisely
             quantified, including amounts involving arbitrary units and
             floating currencies.
+          type: object
           additionalProperties: false
           properties:
             id:
@@ -1023,6 +1027,7 @@ def assessment_add(patient_id):
                 the actual value is greater or less than the stated value due
                 to measurement issues; e.g. if the comparator is \"\u003c\" ,
                 then the real value is \u003c stated value.
+              type: string
               enum:
                 - "\u003c"
                 - "\u003c\u003d"
@@ -1042,113 +1047,19 @@ def assessment_add(patient_id):
                 representation system.
               type: string
       - schema:
-          id: Reference
-          description: link to an internal or external resource
+          id: Questionnaire
+          type: object
           additionalProperties: false
           properties:
+            display:
+              description: Name of Questionnaire
+              type: string
             reference:
-              description: Relative, internal or absolute URL reference
-              type: string
-            display:
-              description: Text alternative for the resource
+              description: URI uniquely defining the Questionnaire
               type: string
       - schema:
-          id: ValueAttachment
-          description: For referring to data content defined in other formats
-          additionalProperties: false
-          properties:
-            contentType:
-              description:
-                Identifies the type of the data in the attachment and allows
-                a method to be chosen to interpret or render the data.
-                Includes mime type parameters such as charset where appropriate.
-              type: string
-            language:
-              description:
-                The human language of the content. The value can be any valid
-                value according to BCP 47.
-              type: string
-            data:
-              description:
-                The actual data of the attachment - a sequence of bytes,
-                base64 encoded.
-              type: string
-              format: byte
-            url:
-              description: A location where the data can be accessed.
-              type: string
-            size:
-              description:
-                The number of bytes of data that make up this attachment
-                (before base64 encoding, if that is done).
-              type: integer
-            hash:
-              description:
-                The calculated hash of the data using SHA-1.
-                Represented using base64.
-              type: string
-              format: byte
-            title:
-              description:
-                A label or set of text to display in place of the data.
-              type: string
-            creation:
-              description: The date that the attachment was first created.
-              type: string
-              format: date-time
-      - schema:
-          id: ValueCoding
-          additionalProperties: false
-          properties:
-            system:
-              description: Identity of the terminology system
-              type: string
-              format: uri
-            version:
-              description: Version of the system - if relevant
-              type: string
-            code:
-              description: Symbol in syntax defined by the system
-              type: string
-            display:
-              description: Representation defined by the system
-              type: string
-            userSelected:
-              description: If this coding was chosen directly by the user
-              type: boolean
-            extension:
-              description:
-                Extension - Numerical value associated with the code
-              $ref: "#/definitions/ValueDecimalExtension"
-      - schema:
-          id: ValueDecimalExtension
-          additionalProperties: false
-          properties:
-            url:
-              description: Hardcoded reference to extension
-              type: string
-              format: uri
-            valueDecimal:
-              description: Numeric score value
-              type: number
-    produces:
-      - application/json
-    parameters:
-      - name: patient_id
-        in: path
-        description: TrueNTH patient ID
-        required: true
-        type: integer
-        format: int64
-      - name: entry_method
-        in: query
-        description: Entry method such as `paper` if known
-        required: false
-        type: string
-      - in: body
-        name: body
-        schema:
           id: QuestionnaireResponse
+          type: object
           required:
             - resourceType
             - status
@@ -1163,14 +1074,7 @@ def assessment_add(patient_id):
               description:
                 The Questionnaire that defines and organizes the questions
                 for which answers are being provided.
-              additionalProperties: false
-              properties:
-                display:
-                  description: Name of Questionnaire
-                  type: string
-                reference:
-                  description: URI uniquely defining the Questionnaire
-                  type: string
+              $ref: "#/definitions/Questionnaire"
             resourceType:
               description:
                 defines FHIR resource type, must be QuestionnaireResponse
@@ -1212,6 +1116,7 @@ def assessment_add(patient_id):
               description:
                 A group or question item from the original questionnaire for
                 which answers are provided.
+              type: object
               $ref: "#/definitions/Group"
           example:
             resourceType: QuestionnaireResponse
@@ -1432,6 +1337,118 @@ def assessment_add(patient_id):
             questionnaire:
               display: EPIC 26 Short Form
               reference: https://stg.us.truenth.org/api/questionnaires/epic26
+      - schema:
+          id: Reference
+          description: link to an internal or external resource
+          type: object
+          additionalProperties: false
+          properties:
+            reference:
+              description: Relative, internal or absolute URL reference
+              type: string
+            display:
+              description: Text alternative for the resource
+              type: string
+      - schema:
+          id: ValueAttachment
+          description: For referring to data content defined in other formats
+          type: object
+          additionalProperties: false
+          properties:
+            contentType:
+              description:
+                Identifies the type of the data in the attachment and allows
+                a method to be chosen to interpret or render the data.
+                Includes mime type parameters such as charset where appropriate.
+              type: string
+            language:
+              description:
+                The human language of the content. The value can be any valid
+                value according to BCP 47.
+              type: string
+            data:
+              description:
+                The actual data of the attachment - a sequence of bytes,
+                base64 encoded.
+              type: string
+              format: byte
+            url:
+              description: A location where the data can be accessed.
+              type: string
+            size:
+              description:
+                The number of bytes of data that make up this attachment
+                (before base64 encoding, if that is done).
+              type: integer
+            hash:
+              description:
+                The calculated hash of the data using SHA-1.
+                Represented using base64.
+              type: string
+              format: byte
+            title:
+              description:
+                A label or set of text to display in place of the data.
+              type: string
+            creation:
+              description: The date that the attachment was first created.
+              type: string
+              format: date-time
+      - schema:
+          id: ValueCoding
+          type: object
+          additionalProperties: false
+          properties:
+            system:
+              description: Identity of the terminology system
+              type: string
+              format: uri
+            version:
+              description: Version of the system - if relevant
+              type: string
+            code:
+              description: Symbol in syntax defined by the system
+              type: string
+            display:
+              description: Representation defined by the system
+              type: string
+            userSelected:
+              description: If this coding was chosen directly by the user
+              type: boolean
+            extension:
+              description:
+                Extension - Numerical value associated with the code
+              $ref: "#/definitions/ValueDecimalExtension"
+      - schema:
+          id: ValueDecimalExtension
+          type: object
+          additionalProperties: false
+          properties:
+            url:
+              description: Hardcoded reference to extension
+              type: string
+              format: uri
+            valueDecimal:
+              description: Numeric score value
+              type: number
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - name: entry_method
+        in: query
+        description: Entry method such as `paper` if known
+        required: false
+        type: string
+      - in: body
+        name: body
+        schema:
+          $ref: "#/definitions/QuestionnaireResponse"
     responses:
       401:
         description:
@@ -1466,7 +1483,7 @@ def assessment_add(patient_id):
             'message': e.message,
             'reference': e.schema,
         }
-        return jsonify(response)
+        return jsonify(response), 400
 
     identifier = None
     if 'identifier' in request.json:
