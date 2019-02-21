@@ -15,7 +15,7 @@ billiard==3.6.0.0         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
 certifi==2018.11.29        # via requests
-cffi==1.11.5              # via bcrypt
+cffi==1.12.1              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.2
