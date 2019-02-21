@@ -1025,8 +1025,8 @@ def assessment_add(patient_id):
               type: string
             value:
               description:
-                The value of the measured amount. The value includes an implicit
-                precision in the presentation of the value.
+                The value of the measured amount. The value includes an
+                implicit precision in the presentation of the value.
               type: number
             comparator:
               description:
@@ -1366,7 +1366,8 @@ def assessment_add(patient_id):
               description:
                 Identifies the type of the data in the attachment and allows
                 a method to be chosen to interpret or render the data.
-                Includes mime type parameters such as charset where appropriate.
+                Includes mime type parameters such as charset where
+                appropriate.
               type: string
             language:
               description:
