@@ -72,34 +72,34 @@
         <div class="modal fade" id="addPSAModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" v-bind:aria-label="closeText"><span aria-hidden="true">&times;</span></button>
-                    <div class="modal-header-title" v-html="getAddModalTitle()"></div>
-                </div>
-                <div class="modal-body">
-                    <div class="body-content">
-                        <div class="psaTrackerModalLoader" v-bind:class="{ 'tnth-hide': !modalLoading }"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-                        <table id="psaTrackerAddTable" v-bind:class="{ 'tnth-hide': modalLoading }">
-                            <tr>
-                                <td class="field-label" v-html="fields.resultLabel"></td>
-                                <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder"/></td>
-                            </tr>
-                            <tr>
-                                <td class="field-label" v-html="fields.dateLabel"></td>
-                                <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder"/></td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <div class="error-message text-center" v-html="addErrorMessage"></div>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" v-bind:aria-label="closeText"><span aria-hidden="true">&times;</span></button>
+                        <div class="modal-header-title" v-html="getAddModalTitle()"></div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <div v-bind:class="{'tnth-hide':!savingInProgress}"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-                    <div v-bind:class="{'tnth-hide': savingInProgress}">
-                        <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!isValidData()" v-html="saveText"></button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal" v-html="closeText"></button>
+                    <div class="modal-body">
+                        <div class="body-content">
+                            <div class="psaTrackerModalLoader" v-bind:class="{ 'tnth-hide': !modalLoading }"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                            <table id="psaTrackerAddTable" v-bind:class="{ 'tnth-hide': modalLoading }">
+                                <tr>
+                                    <td class="field-label" v-html="fields.resultLabel"></td>
+                                    <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="field-label" v-html="fields.dateLabel"></td>
+                                    <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder" /></td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <div class="error-message text-center" v-html="addErrorMessage"></div>
+                        </div>
                     </div>
-                </div>
+                    <div class="modal-footer">
+                        <div v-bind:class="{'tnth-hide':!savingInProgress}"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <div v-bind:class="{'tnth-hide': savingInProgress}">
+                            <button type="button" class="btn btn-default" v-on:click="onAdd()" v-bind:disabled="!isValidData()" v-html="saveText"></button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" v-html="closeText"></button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,7 +126,7 @@
         <svg width="300" height="200">
             <defs>
                 <path id="arrow" d="M2,2 L10,6 L2,10 L6,6 L2,2" class="marker" transform="rotate(90)" stroke-width="4"></path>
-                <rect id="marker" width="4" height="4" stroke-width="1" class="marker"/>
+                <rect id="marker" width="4" height="4" stroke-width="1" class="marker"></rect>
             </defs>
         </svg>
     </main>
