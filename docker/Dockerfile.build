@@ -6,37 +6,25 @@ ENV \
     GIT_REPO=https://github.com/uwcirg/true_nth_usa_portal
 
 RUN \
-    mkdir --parents "${ARTIFACT_DIR}"
-
-RUN \
     apt-get update --quiet && \
     apt-get install --quiet --quiet --no-install-recommends \
         devscripts \
         equivs \
-        git && \
-    apt-get clean --quiet
+        git
 
 WORKDIR /root/portal
 
-# Allow repo and branch to be overridden with environment variable
+# Checkout repo, install build dependencies, generate changelog and build package
 CMD \
     git clone --verbose "${GIT_REPO}" . && \
 
     mk-build-deps debian/control \
         --install \
+        --remove \
         --tool "apt-get --quiet --quiet --no-install-recommends" && \
 
-    pip install make-deb && \
-    yes | make-deb && \
-    git update-index --skip-worktree debian/changelog && \
-    git checkout -- . && \
-
+    debian/pre-build.sh && \
     dpkg-buildpackage \
         --unsigned-source \
-        --unsigned-changes \
-    && \
-    mv /root/portal_*.deb "${ARTIFACT_DIR}" && \
-
-    cd "${ARTIFACT_DIR}" && \
-    dpkg-scanpackages . | gzip > "${ARTIFACT_DIR}/Packages.gz" && \
-    chown --verbose nobody:nogroup "${ARTIFACT_DIR}/"*
+        --unsigned-changes && \
+    debian/post-build.sh

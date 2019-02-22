@@ -37,6 +37,9 @@ default_compose_file="${root_path}/docker/docker-compose.yaml:${root_path}/docke
 export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
 
+# Build docker image that generates debian package from current repo and branch
+docker-compose build builder
+
 # Build debian package from current repo and branch
 docker-compose run builder
 
