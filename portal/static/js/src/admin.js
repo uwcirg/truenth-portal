@@ -46,7 +46,6 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.addFilterPlaceHolders();
                 } else {
                     self.handleCurrentUser();
-                    self.handleDownloadModal();
                 }
             });
         },
