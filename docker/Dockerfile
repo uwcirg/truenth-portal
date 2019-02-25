@@ -16,7 +16,6 @@ COPY debian/artifacts "${ARTIFACT_DIR}"
 RUN \
     apt-get update --quiet && \
     apt-get install --quiet --quiet --allow-unauthenticated portal && \
-    apt-get clean --quiet && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
