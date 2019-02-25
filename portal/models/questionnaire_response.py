@@ -1,8 +1,10 @@
 from collections import namedtuple
 from html.parser import HTMLParser
 import json
+import jsonschema
 
 from flask import current_app, url_for
+from flask_swagger import swagger
 from past.builtins import basestring
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -78,6 +80,23 @@ class QuestionnaireResponse(db.Model):
                 QuestionnaireResponse.document['identifier']['value']
                 == json.dumps(identifier.value))
         return found.order_by(QuestionnaireResponse.id.desc()).all()
+
+    @staticmethod
+    def validate_document(document):
+        """Validate given JSON document against our swagger schema"""
+        swag = swagger(current_app)
+
+        draft4_schema = {
+            '$schema': 'http://json-schema.org/draft-04/schema#',
+            'type': 'object',
+            'definitions': swag['definitions'],
+        }
+
+        validation_schema = 'QuestionnaireResponse'
+        # Copy desired schema (to validate against) to outermost dict
+        draft4_schema.update(swag['definitions'][validation_schema])
+        jsonschema.validate(document, draft4_schema)
+
 
 QNR = namedtuple(
     'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])

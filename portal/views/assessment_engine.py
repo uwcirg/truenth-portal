@@ -1,5 +1,6 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
+import jsonschema
 
 from flask import (
     Blueprint,
@@ -14,11 +15,8 @@ from flask import (
     url_for,
 )
 from flask_babel import gettext as _
-from flask_swagger import swagger
 from flask_user import roles_required
-import jsonschema
 import requests
-from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
 from ..database import db
@@ -99,20 +97,20 @@ def assessment(patient_id, instrument_id):
             - type
           properties:
             type:
-                description:
-                  Indicates the purpose of this bundle- how it was
-                  intended to be used.
-                type: string
-                enum:
-                  - document
-                  - message
-                  - transaction
-                  - transaction-response
-                  - batch
-                  - batch-response
-                  - history
-                  - searchset
-                  - collection
+              description:
+                Indicates the purpose of this bundle- how it was
+                intended to be used.
+              type: string
+              enum:
+                - document
+                - message
+                - transaction
+                - transaction-response
+                - batch
+                - batch-response
+                - history
+                - searchset
+                - collection
             link:
               description:
                 A series of links that provide context to this bundle.
@@ -125,11 +123,11 @@ def assessment(patient_id, instrument_id):
                   url:
                     description: The reference details for the link.
             total:
-                description:
-                  If a set of search matches, this is the total number of
-                  matches for the search (as opposed to the number of
-                  results in this bundle).
-                type: integer
+              description:
+                If a set of search matches, this is the total number of
+                matches for the search (as opposed to the number of
+                results in this bundle).
+              type: integer
             entry:
               type: array
               items:
@@ -807,22 +805,15 @@ def assessment_update(patient_id):
     """
 
     if not hasattr(request, 'json') or not request.json:
-        abort(400, 'Invalid request')
+        return jsonify(message='Invalid request - requires JSON'), 400
+
+    if request.json.get('resourceType') != 'QuestionnaireResponse':
+        return jsonify(
+            message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    swag = swagger(current_app)
-
-    draft4_schema = {
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'definitions': swag['definitions'],
-    }
-
-    validation_schema = 'QuestionnaireResponse'
-    # Copy desired schema (to validate against) to outermost dict
-    draft4_schema.update(swag['definitions'][validation_schema])
 
     response = {
         'ok': False,
@@ -833,13 +824,13 @@ def assessment_update(patient_id):
     updated_qnr = request.json
 
     try:
-        jsonschema.validate(updated_qnr, draft4_schema)
+        QuestionnaireResponse.validate_document(updated_qnr)
     except jsonschema.ValidationError as e:
         return jsonify({
             'ok': False,
             'message': e.message,
             'reference': e.schema,
-        })
+        }), 400
     else:
         response.update({
             'ok': True,
@@ -850,18 +841,21 @@ def assessment_update(patient_id):
     try:
         identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
     except ValueError as e:
-        abort(400, e.message)
+        response['message'] = e.message
+        return jsonify(response), 400
     existing_qnr = QuestionnaireResponse.by_identifier(identifier)
     if not existing_qnr:
         current_app.logger.warning(
             "attempted update on QuestionnaireResponse with unknown "
             "identifier {}".format(identifier))
-        abort(404, "existing QuestionnaireResponse not found")
+        response['message'] = "existing QuestionnaireResponse not found"
+        return jsonify(response), 404
     if len(existing_qnr) > 1:
         msg = ("can't update; multiple QuestionnaireResponses found with "
                "identifier {}".format(identifier))
         current_app.logger.warning(msg)
-        abort(409, msg)
+        response['message'] = msg
+        return jsonify(msg), 409
 
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr[0]
@@ -899,31 +893,199 @@ def assessment_add(patient_id):
     operationId: addQuestionnaireResponse
     tags:
       - Assessment Engine
-    produces:
-      - application/json
-    parameters:
-      - name: patient_id
-        in: path
-        description: TrueNTH patient ID
-        required: true
-        type: integer
-        format: int64
-      - name: entry_method
-        in: query
-        description: Entry method such as `paper` if known
-        required: false
-        type: string
-      - in: body
-        name: body
-        schema:
-          id: QuestionnaireResponse
-          description:
-            A patient's responses to a questionnaire (a set of instruments,
-            some standardized, some not), and metadata about the presentation
-            and context of the assessment session (date, etc).
-          required:
-            - status
+    definitions:
+      - schema:
+          id: Question
+          description: An individual question and related attributes
+          type: object
+          externalDocs:
+            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
+          additionalProperties: false
           properties:
+            text:
+              description: Question text
+              type: string
+            linkId:
+              description: Corresponding question within Questionnaire
+              type: string
+            answer:
+              description:
+                The respondent's answer(s) to the question
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
+              type: array
+              items:
+                $ref: "#/definitions/Answer"
+      - schema:
+          id: Answer
+          description:
+            An individual answer to a question and related attributes.
+            May only contain a single value[x] attribute
+          type: object
+          externalDocs:
+            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
+          additionalProperties: false
+          properties:
+            valueBoolean:
+              description: Boolean value answer to a question
+              type: boolean
+            valueDecimal:
+              description: Decimal value answer to a question
+              type: number
+            valueInteger:
+              description: Integer value answer to a question
+              type: integer
+            valueDate:
+              description: Date value answer to a question
+              type: string
+              format: date
+            valueDateTime:
+              description: Datetime value answer to a question
+              type: string
+              format: date-time
+            valueInstant:
+              description: Instant value answer to a question
+              type: string
+              format: date-time
+            valueTime:
+              description: Time value answer to a question
+              type: string
+            valueString:
+              description: String value answer to a question
+              type: string
+            valueUri:
+              description: URI value answer to a question
+              type: string
+            valueAttachment:
+              description: Attachment value answer to a question
+              $ref: "#/definitions/ValueAttachment"
+            valueCoding:
+              description:
+                Coding value answer to a question, may include score as
+                FHIR extension
+              $ref: "#/definitions/ValueCoding"
+            valueQuantity:
+              description: Quantity value answer to a question
+              $ref: "#/definitions/Quantity"
+            valueReference:
+              description: Reference value answer to a question
+              $ref: "#/definitions/Reference"
+            group:
+              description: Nested questionnaire group
+              $ref: "#/definitions/Group"
+      - schema:
+          id: Group
+          description:
+            A structured set of questions and their answers. The
+            questions are ordered and grouped into coherent subsets,
+            corresponding to the structure of the grouping of the
+            questionnaire being responded to.
+          type: object
+          additionalProperties: false
+          properties:
+            linkId:
+              description:
+                The item from the Questionnaire that corresponds to this item
+                in the QuestionnaireResponse resource.
+              type: string
+            title:
+              description: Name for this group
+              type: string
+            text:
+              description:
+                Text that is displayed above the contents of the group or as
+                the text of the question being answered.
+              type: string
+            question:
+              description: Questions in this group.
+              items:
+                $ref: "#/definitions/Question"
+              type: array
+            group:
+              description:
+                Questions or sub-groups nested beneath a question or group.
+              items:
+                $ref: "#/definitions/Group"
+              type: array
+      - schema:
+          id: Quantity
+          description:
+            A measured amount (or an amount that can potentially be measured).
+            Note that measured amounts include amounts that are not precisely
+            quantified, including amounts involving arbitrary units and
+            floating currencies.
+          type: object
+          additionalProperties: false
+          properties:
+            id:
+              description:
+                Unique id for the element within a resource (for internal
+                references). This may be any string value that does not
+                contain spaces.
+              type: string
+            value:
+              description:
+                The value of the measured amount. The value includes an
+                implicit precision in the presentation of the value.
+              type: number
+            comparator:
+              description:
+                How the value should be understood and represented - whether
+                the actual value is greater or less than the stated value due
+                to measurement issues; e.g. if the comparator is \"\u003c\" ,
+                then the real value is \u003c stated value.
+              type: string
+              enum:
+                - "\u003c"
+                - "\u003c\u003d"
+                - "\u003e\u003d"
+                - "\u003e"
+            unit:
+              description: A human-readable form of the unit.
+              type: string
+            system:
+              description:
+                The identification of the system that provides the coded form
+                of the unit.
+              type: string
+            code:
+              description:
+                A computer processable form of the unit in some unit
+                representation system.
+              type: string
+      - schema:
+          id: Questionnaire
+          type: object
+          additionalProperties: false
+          properties:
+            display:
+              description: Name of Questionnaire
+              type: string
+            reference:
+              description: URI uniquely defining the Questionnaire
+              type: string
+      - schema:
+          id: QuestionnaireResponse
+          type: object
+          required:
+            - resourceType
+            - status
+          additionalProperties: false
+          properties:
+            identifier:
+              description:
+                A business identifier assigned to a particular completed
+                (or partially completed) questionnaire.
+              $ref: "#/definitions/Identifier"
+            questionnaire:
+              description:
+                The Questionnaire that defines and organizes the questions
+                for which answers are being provided.
+              $ref: "#/definitions/Questionnaire"
+            resourceType:
+              description:
+                defines FHIR resource type, must be QuestionnaireResponse
+              type: string
             status:
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.status
@@ -938,20 +1100,16 @@ def assessment_add(patient_id):
                 - in-progress
                 - completed
             subject:
-              schema:
-                id: Reference
-                type: object
-                description: A reference from one resource to another
-                properties:
-                  reference:
-                    type: string
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.reference
-                  display:
-                    type: string
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.display
+              description:
+                The subject of the questionnaire response.  This could be
+                a patient, organization, practitioner, device, etc.  This
+                is who/what the answers apply to, but is not necessarily
+                the source of information.
+              $ref: "#/definitions/Reference"
             author:
+              description:
+                Person who received the answers to the questions in the
+                QuestionnaireResponse and recorded them in the system.
               $ref: "#/definitions/Reference"
             authored:
               externalDocs:
@@ -962,139 +1120,11 @@ def assessment_add(patient_id):
             source:
               $ref: "#/definitions/Reference"
             group:
-              schema:
-                id: group
-                description:
-                  A group of related questions or sub-groups. May only
-                  contain either questions or groups
-                properties:
-                  group:
-                    $ref: "#/definitions/group"
-                  title:
-                    type: string
-                    description: Group name
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.title
-                  text:
-                    type: string
-                    description: Additional text for this group
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.text
-                  question:
-                    description:
-                      Set of questions within this group. The order of
-                      questions within the group is relevant.
-                    type: array
-                    externalDocs:
-                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
-                    items:
-                      description: An individual question and related attributes
-                      type: object
-                      properties:
-                        text:
-                          type: string
-                          description: Question text
-                        answer:
-                          type: array
-                          description:
-                            The respondent's answer(s) to the question
-                          externalDocs:
-                            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
-                          items:
-                            description:
-                              An individual answer to a question and related
-                              attributes. May only contain a single `value[x]`
-                              attribute
-                            type: object
-                            externalDocs:
-                              url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
-                            properties:
-                              valueBoolean:
-                                type: boolean
-                                description: Boolean value answer to a question
-                              valueDecimal:
-                                type: number
-                                description: Decimal value answer to a question
-                              valueInteger:
-                                type: integer
-                                description: Integer value answer to a question
-                              valueDate:
-                                type: string
-                                format: date
-                                description: Date value answer to a question
-                              valueDateTime:
-                                type: string
-                                format: date-time
-                                description: Datetime value answer to a question
-                              valueInstant:
-                                type: string
-                                format: date-time
-                                description: Instant value answer to a question
-                              valueTime:
-                                type: string
-                                description: Time value answer to a question
-                              valueString:
-                                type: string
-                                description: String value answer to a question
-                              valueUri:
-                                type: string
-                                description: URI value answer to a question
-                              valueAttachment:
-                                type: object
-                                description:
-                                  Attachment value answer to a question
-                              valueCoding:
-                                type: object
-                                description:
-                                  Coding value answer to a question, may
-                                  include score as FHIR extension
-                                properties:
-                                  system:
-                                    description:
-                                      Identity of the terminology system
-                                    type: string
-                                    format: uri
-                                  version:
-                                    description:
-                                      Version of the system - if relevant
-                                    type: string
-                                  code:
-                                    description:
-                                      Symbol in syntax defined by the system
-                                    type: string
-                                  display:
-                                    description:
-                                      Representation defined by the system
-                                    type: string
-                                  userSelected:
-                                    description:
-                                      If this coding was chosen directly by
-                                      the user
-                                    type: boolean
-                                  extension:
-                                    description:
-                                      Extension - Numerical value associated
-                                      with the code
-                                    type: object
-                                    properties:
-                                      url:
-                                        description:
-                                          Hardcoded reference to extension
-                                        type: string
-                                        format: uri
-                                      valueDecimal:
-                                        description: Numeric score value
-                                        type: number
-                              valueQuantity:
-                                type: object
-                                description:
-                                  Quantity value answer to a question
-                              valueReference:
-                                type: object
-                                description:
-                                  Reference value answer to a question
-                              group:
-                                $ref: "#/definitions/group"
+              description:
+                A group or question item from the original questionnaire for
+                which answers are provided.
+              type: object
+              $ref: "#/definitions/Group"
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
@@ -1314,6 +1344,119 @@ def assessment_add(patient_id):
             questionnaire:
               display: EPIC 26 Short Form
               reference: https://stg.us.truenth.org/api/questionnaires/epic26
+      - schema:
+          id: Reference
+          description: link to an internal or external resource
+          type: object
+          additionalProperties: false
+          properties:
+            reference:
+              description: Relative, internal or absolute URL reference
+              type: string
+            display:
+              description: Text alternative for the resource
+              type: string
+      - schema:
+          id: ValueAttachment
+          description: For referring to data content defined in other formats
+          type: object
+          additionalProperties: false
+          properties:
+            contentType:
+              description:
+                Identifies the type of the data in the attachment and allows
+                a method to be chosen to interpret or render the data.
+                Includes mime type parameters such as charset where
+                appropriate.
+              type: string
+            language:
+              description:
+                The human language of the content. The value can be any valid
+                value according to BCP 47.
+              type: string
+            data:
+              description:
+                The actual data of the attachment - a sequence of bytes,
+                base64 encoded.
+              type: string
+              format: byte
+            url:
+              description: A location where the data can be accessed.
+              type: string
+            size:
+              description:
+                The number of bytes of data that make up this attachment
+                (before base64 encoding, if that is done).
+              type: integer
+            hash:
+              description:
+                The calculated hash of the data using SHA-1.
+                Represented using base64.
+              type: string
+              format: byte
+            title:
+              description:
+                A label or set of text to display in place of the data.
+              type: string
+            creation:
+              description: The date that the attachment was first created.
+              type: string
+              format: date-time
+      - schema:
+          id: ValueCoding
+          type: object
+          additionalProperties: false
+          properties:
+            system:
+              description: Identity of the terminology system
+              type: string
+              format: uri
+            version:
+              description: Version of the system - if relevant
+              type: string
+            code:
+              description: Symbol in syntax defined by the system
+              type: string
+            display:
+              description: Representation defined by the system
+              type: string
+            userSelected:
+              description: If this coding was chosen directly by the user
+              type: boolean
+            extension:
+              description:
+                Extension - Numerical value associated with the code
+              $ref: "#/definitions/ValueDecimalExtension"
+      - schema:
+          id: ValueDecimalExtension
+          type: object
+          additionalProperties: false
+          properties:
+            url:
+              description: Hardcoded reference to extension
+              type: string
+              format: uri
+            valueDecimal:
+              description: Numeric score value
+              type: number
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - name: entry_method
+        in: query
+        description: Entry method such as `paper` if known
+        required: false
+        type: string
+      - in: body
+        name: body
+        schema:
+          $ref: "#/definitions/QuestionnaireResponse"
     responses:
       401:
         description:
@@ -1326,42 +1469,30 @@ def assessment_add(patient_id):
     from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
 
     if not hasattr(request, 'json') or not request.json:
-        return abort(400, 'Invalid request')
+        return jsonify(message='Invalid request - requires JSON'), 400
 
-    if "questionnaire" not in request.json:
-        abort(400, "Requires `questionnaire` element")
+    if request.json.get('resourceType') != 'QuestionnaireResponse':
+        return jsonify(
+            message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user_or_abort(patient_id)
-    swag = swagger(current_app)
-
-    draft4_schema = {
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'definitions': swag['definitions'],
-    }
-
-    validation_schema = 'QuestionnaireResponse'
-    # Copy desired schema (to validate against) to outermost dict
-    draft4_schema.update(swag['definitions'][validation_schema])
-
     response = {
         'ok': False,
-        'message': 'error saving questionnaire reponse',
+        'message': 'error saving questionnaire response',
         'valid': False,
     }
 
     try:
-        jsonschema.validate(request.json, draft4_schema)
-
+        QuestionnaireResponse.validate_document(request.json)
     except jsonschema.ValidationError as e:
         response = {
             'ok': False,
             'message': e.message,
             'reference': e.schema,
         }
-        return jsonify(response)
+        return jsonify(response), 400
 
     identifier = None
     if 'identifier' in request.json:
@@ -1369,20 +1500,23 @@ def assessment_add(patient_id):
         try:
             identifier = Identifier.from_fhir(request.json['identifier'])
         except ValueError as e:
-            abort(400, str(e))
+            response['message'] = str(e)
+            return jsonify(response), 400
 
         existing_qnr = QuestionnaireResponse.by_identifier(identifier)
         if len(existing_qnr):
             msg = ("QuestionnaireResponse with matching {} already exists; "
                    "must be unique over (system, value)".format(identifier))
             current_app.logger.warning(msg)
-            abort(409, msg)
+            response['message'] = msg
+            return jsonify(response), 409
 
     if request.json.get('status') == 'in-progress' and not identifier:
         msg = "Status {} received without the required identifier".format(
             request.json.get('status'))
         current_app.logger.warning(msg)
-        abort(400, msg)
+        response['message'] = msg
+        return jsonify(response), 400
 
     response.update({
         'ok': True,
