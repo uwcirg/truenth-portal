@@ -249,14 +249,6 @@
       "resourceType": "Organization"
     },
     {
-      "extension": [
-        {
-          "research_protocols": [
-            {"name": "IRONMAN v2"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
-        }
-      ],
       "id": 20000,
       "identifier": [
         {
@@ -578,12 +570,6 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-            {"name": "IRONMAN v2"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22000,
@@ -674,6 +660,13 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2019-03-03T00:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 22120,
@@ -1410,6 +1403,13 @@
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v2", "retired_as_of": "2019-03-03T00:00:00Z"},
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14696,
@@ -1859,12 +1859,6 @@
         {
           "timezone": "Europe/London",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-            {"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 26000,
@@ -1967,12 +1961,6 @@
         {
           "timezone": "Africa/Johannesburg",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-            {"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 27000,
@@ -1988,6 +1976,12 @@
         {
           "timezone": "Africa/Johannesburg",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
 		},
 		{
           "url": "http://hl7.org/fhir/valueset/languages",
