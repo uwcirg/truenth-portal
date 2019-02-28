@@ -16,7 +16,7 @@
         "USER_FORGOT_PASSWORD_EMAIL_TEMPLATE = 'flask_user/emails/truenth_forgot_password'\n",
         "CONSENT_EDIT_PERMISSIBLE_ROLES=['patient', 'admin']\n",
         "CONSENT_WITH_TOP_LEVEL_ORG=True\n",
-        "REQUIRED_CORE_DATA=['name', 'dob', 'role', 'org', 'clinical', 'localized', 'race', 'ethnicity', 'indigenous', 'privacy_policy', 'website_terms_of_use']\n",
+        "REQUIRED_CORE_DATA=['name', 'dob', 'role', 'org', 'clinical', 'localized', 'treatment', 'race', 'ethnicity', 'indigenous', 'privacy_policy', 'website_terms_of_use']\n",
         "TRUENTH_LINK_URL='https://us.movember.com/'\n",
         "MOVEMER_LINK_URL='https://us.movember.com/'\n",
         "STAFF_BULK_DATA_ACCESS=False\n",

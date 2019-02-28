@@ -18,6 +18,7 @@ from .audit import Audit
 from .clinical_constants import CC
 from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
+from .procedure_codes import known_treatment_started, known_treatment_not_started
 from .role import ROLE
 from .tou import ToU
 
@@ -336,8 +337,22 @@ class ClinicalData(CoredataPoint):
         for obs in user.observations:
             if obs.codeable_concept in required:
                 required[obs.codeable_concept] = True
+
         return all(required.values())
 
+class TreatmentData(CoredataPoint):
+
+    def required(self, user, **kwargs):
+        if SR_user(user):
+            return False
+        return user.has_role(ROLE.PATIENT.value)
+
+    def optional(self, user, **kwargs):
+        return False
+
+    def hasdata(self, user, **kwargs):
+        #procedures known to have start or not started by the user
+        return known_treatment_not_started(user) or known_treatment_started(user)
 
 class LocalizedData(CoredataPoint):
 
@@ -451,7 +466,7 @@ def configure_coredata(app):
     config_datapoints = app.config.get(
         'REQUIRED_CORE_DATA', [
             'name', 'dob', 'role', 'org', 'clinical', 'localized',
-            'race', 'ethnicity', 'indigenous',
+            'treatment', 'race', 'ethnicity', 'indigenous',
             'website_terms_of_use', 'subject_website_consent',
             'stored_website_consent_form', 'privacy_policy',
         ])
