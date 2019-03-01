@@ -369,6 +369,45 @@ a.btn {
     margin-top: 0.5%;
   }
 }
+.form___submit_container {
+  position: relative;
+  .icon {
+    position: absolute;
+    left: 45%;
+    top: 25%;
+    visibility: hidden;
+    z-index: -1;
+    -o-transition: visibility 150ms ease;
+    -webkit-transition: visibility 150ms ease;
+    transition: visibility 150ms ease;
+  }
+  .btn {
+    -o-transition: visibility 150ms ease;
+    -webkit-transition: visibility 150ms ease;
+    transition: visibility 150ms ease;
+  }
+  &.active:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background: #FFF;
+    opacity: @disabledOpacity;
+    z-index: 1;
+  }
+  &.active {
+    .icon {
+      visibility: visible;
+      z-index: 2;
+    }
+    .btn {
+      visibility: hidden;
+    }
+  }
+}
 /* Accordion styles */
 .tabs-container {
   .tab {

@@ -1,6 +1,6 @@
-portal (VERSION) unstable; urgency=low
+portal (16.12.5) unstable; urgency=low
 
-  * Changelog line
+  * First git tag
 
 
- -- CIRG, University of Washington <truenth-dev@uw.edu>  TIMESTAMP
+ -- CIRG, University of Washington <truenth-dev@uw.edu>  Mon, 5 Dec 2016 11:24:29 +0700

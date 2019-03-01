@@ -1,8 +1,10 @@
 from collections import namedtuple
 from html.parser import HTMLParser
 import json
+import jsonschema
 
 from flask import current_app, url_for
+from flask_swagger import swagger
 from past.builtins import basestring
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -58,6 +60,42 @@ class QuestionnaireResponse(db.Model):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
                "{0.status} {0.authored}".format(self)
+
+    @staticmethod
+    def by_identifier(identifier):
+        """Query for QuestionnaireResponse(s) with given identifier"""
+        if not any((identifier.system, identifier.value)):
+            raise ValueError("Can't look up null identifier")
+
+        if identifier.system is None:  # FHIR allows null system
+            found = QuestionnaireResponse.query.filter(
+                QuestionnaireResponse.document['identifier']['system'].is_(
+                    None)).filter(
+                QuestionnaireResponse.document['identifier']['value']
+                == json.dumps(identifier.value))
+        else:
+            found = QuestionnaireResponse.query.filter(
+                QuestionnaireResponse.document['identifier']['system']
+                == json.dumps(identifier.system)).filter(
+                QuestionnaireResponse.document['identifier']['value']
+                == json.dumps(identifier.value))
+        return found.order_by(QuestionnaireResponse.id.desc()).all()
+
+    @staticmethod
+    def validate_document(document):
+        """Validate given JSON document against our swagger schema"""
+        swag = swagger(current_app)
+
+        draft4_schema = {
+            '$schema': 'http://json-schema.org/draft-04/schema#',
+            'type': 'object',
+            'definitions': swag['definitions'],
+        }
+
+        validation_schema = 'QuestionnaireResponse'
+        # Copy desired schema (to validate against) to outermost dict
+        draft4_schema.update(swag['definitions'][validation_schema])
+        jsonschema.validate(document, draft4_schema)
 
 
 QNR = namedtuple(

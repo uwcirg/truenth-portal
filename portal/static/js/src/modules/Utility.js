@@ -15,11 +15,13 @@ var Utility = (function() {
             "opacity": 1
         });
     };
-    UtilityObj.prototype.hideLoader = function(delay, time) {
-        if (delay) {
-            $("#loadingIndicator").hide();
-            return;
-        }
+    UtilityObj.prototype.hideLoaderOncallback = function(time) {
+        setTimeout(function() {
+            $("#loadingIndicator").fadeOut();
+            $("body").removeClass("vis-on-callback");
+        }, time || 200);
+    };
+    UtilityObj.prototype.hideLoader = function(time) {
         setTimeout(function() {
             $("#loadingIndicator").fadeOut();
         }, time || 200);
@@ -40,7 +42,7 @@ var Utility = (function() {
             setTimeout(function() {
                 self.showMain();
             }, 100);
-            this.hideLoader(true, 350);
+            this.hideLoader(350);
         }
     };
     UtilityObj.prototype.isDelayLoading = function() { /*global DELAY_LOADING*/

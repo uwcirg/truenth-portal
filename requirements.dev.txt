@@ -7,20 +7,21 @@ imagesize==1.1.0          # via sphinx
 mock==2.0.0
 packaging==19.0           # via sphinx, tox
 page-objects==1.1.0
-pluggy==0.8.1             # via tox
-py==1.7.0                 # via tox
+pluggy==0.9.0             # via tox
+py==1.8.0                 # via tox
 pygments==2.3.1           # via sphinx
 pyparsing==2.3.1          # via packaging
+pytest==4.3.0
 selenium==3.141.0
 snowballstemmer==1.2.1    # via sphinx
-sphinx-rtd-theme==0.4.2
+sphinx-rtd-theme==0.4.3
 sphinx==1.8.4
 sphinxcontrib-websupport==1.1.0  # via sphinx
 tox==3.7.0
 typing==3.6.6             # via sphinx
-virtualenv==16.3.0        # via tox
+virtualenv==16.4.1        # via tox
 waitress==1.2.1           # via webtest
 webob==1.8.5              # via webtest
-webtest==2.0.32           # via flask-webtest
+webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9
 --editable .

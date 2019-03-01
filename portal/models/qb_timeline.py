@@ -93,7 +93,7 @@ def ordered_intervention_qbs(user, trigger_date):
     """Generator to yield ordered qbs by intervention"""
     baselines = qbs_by_intervention(user, 'baseline')
     if not baselines:
-        raise StopIteration
+        return
     if len(baselines) > 1:
         raise RuntimeError(
             "{} has {} baselines by intervention (expected ONE)".format(
@@ -229,7 +229,7 @@ def ordered_qbs(user, classification=None):
     _, withdrawal_date = consent_withdrawal_dates(user)
     if not td:
         trace("no trigger date therefore nothing from ordered_qbds()")
-        raise StopIteration
+        return
 
     # Zero to one RP makes things significantly easier - otherwise
     # swap in a strategy that can work with the change.
@@ -269,9 +269,15 @@ def ordered_qbs(user, classification=None):
 
         while True:
             # Advance both qb generators in sync while both RPs are defined
-            current_qbd = next(current_qbds)
+            try:
+                current_qbd = next(current_qbds)
+            except StopIteration:
+                return
             if next_rp_qbds:
-                next_rp_qbd = next(next_rp_qbds)
+                try:
+                    next_rp_qbd = next(next_rp_qbds)
+                except StopIteration:
+                    return
             users_start = calc_and_adjust_start(
                 user=user, qbd=current_qbd, initial_trigger=td)
             users_expiration = calc_and_adjust_expired(
@@ -311,7 +317,10 @@ def ordered_qbs(user, classification=None):
             iqbds = ordered_intervention_qbs(user, trigger_date=td)
 
         while True:
-            qbd = next(iqbds)
+            try:
+                qbd = next(iqbds)
+            except StopIteration:
+                return
             users_start = calc_and_adjust_start(
                 user=user, qbd=qbd, initial_trigger=td)
 

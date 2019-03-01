@@ -42,11 +42,9 @@ class ModelPersistence(object):
     def persistence_filename(self):
         """Returns the configured persistence file
 
-        Using the first value found, looks for an environment variable named
-        `PERSISTENCE_DIR`, which should define a path relative to the `portal/config`
-        directory such as `eproms`.  If no such environment variable is found, use
-        the presence of the `GIL` config setting - if set use `gil`,
-        else `eproms`.
+        Looks for a config variable named `PERSISTENCE_DIR`,
+        which should define a path relative to the `portal/config`
+        directory such as `eproms`.
 
         :returns: full path to persistence file
 
@@ -54,12 +52,7 @@ class ModelPersistence(object):
         scope = self.model.__name__ if self.model else 'site_persistence_file'
 
         # product level config file - use presence of env var or config setting
-        persistence_dir = os.environ.get('PERSISTENCE_DIR')
-        gil = current_app.config.get("GIL")
-
-        # prefer env var
-        if not persistence_dir:
-            persistence_dir = 'gil' if gil else 'eproms'
+        persistence_dir = current_app.config.get("PERSISTENCE_DIR")
 
         filename = os.path.join(
             os.path.dirname(__file__), persistence_dir, '{scope}.json'.format(

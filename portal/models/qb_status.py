@@ -136,11 +136,11 @@ class QB_Status(object):
 
         :param last_known: typically a valid QBD for the user, typically the
           ``current_qbd()`` or possibly the previous.  None safe
-        :returns: (QBD, status) until exhausted, then raises StopIteration
+        :returns: (QBD, status) until exhausted
 
         """
         if last_known is None:
-            raise StopIteration
+            return
 
         index = self.__ordered_qbs.index(last_known)
         while index > 0:

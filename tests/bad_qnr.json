@@ -1,0 +1,88 @@
+{
+  "group": [
+    {
+      "answer": {
+        "system": "https://truenth-test.cirg.washington.edu/api/codings/assessment",
+        "valueCoding": {
+          "code": "epic26.8.1",
+          "extension": {
+            "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+            "valueDecimal": "3"
+          }
+        }
+      },
+      "linkId": "epic26.8"
+    },
+    {
+      "answer": {
+        "system": "https://truenth-test.cirg.washington.edu/api/codings/assessment",
+        "valueCoding": {
+          "code": "epic26.8.2",
+          "extension": {
+            "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+            "valueDecimal": "1"
+          }
+        }
+      },
+      "linkId": "epic26.8"
+    },
+    {
+      "answer": {
+        "system": "https://truenth-test.cirg.washington.edu/api/codings/assessment",
+        "valueCoding": {
+          "code": "epic26.9.1",
+          "extension": {
+            "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+            "valueDecimal": "1"
+          }
+        }
+      },
+      "linkId": "epic26.9"
+    },
+    {
+      "answer": {
+        "system": "https://truenth-test.cirg.washington.edu/api/codings/assessment",
+        "valueCoding": {
+          "code": "epic26.10.1",
+          "extension": {
+            "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+            "valueDecimal": "1"
+          }
+        }
+      },
+      "linkId": "epic26.10"
+    },
+    {
+      "answer": {
+        "system": "https://truenth-test.cirg.washington.edu/api/codings/assessment",
+        "valueCoding": {
+          "code": "epic26.12.1",
+          "extension": {
+            "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+            "valueDecimal": "1"
+          }
+        }
+      },
+      "linkId": "epic26.12"
+    }
+  ],
+  "author": {
+    "display": "EPIC 26 Short Form",
+    "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
+  },
+  "source": {
+    "display": "EPIC 26 Short Form",
+    "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
+  },
+  "status": "completed",
+  "subject": {
+    "display": "EPIC 26 Short Form",
+    "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
+  },
+  "authored": "2019-02-13T00:00:00.000Z",
+  "resourceType": "QuestionnaireResponse",
+  "questionnaire": {
+    "display": "EPIC 26 Short Form",
+    "reference": "https://truenth-test.cirg.washington.edu/api/questionnaires/epic26"
+  }
+}

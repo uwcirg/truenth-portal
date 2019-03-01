@@ -162,9 +162,9 @@ class BaseConfig(object):
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = os.environ.get('FILE_UPLOAD_DIR', 'uploads')
 
-    LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://stg-lr7.us.truenth.org')
-    LR_GROUP = os.environ.get('LR_GROUP', 20145)
-    LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 35564)
+    LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://cms-stage.us.truenth.org')
+    LR_GROUP = os.environ.get('LR_GROUP', 20129)
+    LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 34666)
 
     SYSTEM_TYPE = os.environ.get('SYSTEM_TYPE', 'development')
 
@@ -225,6 +225,12 @@ class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
     SQLALCHEMY_ECHO = False
+
+    # project/product config; use TrueNTH USA (gil) by default
+    PERSISTENCE_DIR = os.environ.get('PERSISTENCE_DIR', 'gil')
+
+    # General Information Layer- unauthenticated fact-sheets
+    GIL = os.environ.get('GIL')
 
 
 class TestConfig(BaseConfig):

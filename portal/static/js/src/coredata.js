@@ -110,7 +110,7 @@ import Procedure from "./modules/Procedures.js";
         this.initContinueButtonEvent = function() {
             // Class for both "done" and "skip" buttons
             var self = this;
-            $(".continue-btn").on("click", function(event){
+            $(".continue-btn.update-subscriber").on("click", function(event){
                 event.preventDefault();
                 $(this).attr("disabled", true);
                 $(".loading-indicator").show();
@@ -124,6 +124,12 @@ import Procedure from "./modules/Procedures.js";
                     $(".loading-indicator").hide();
                     $(".error-continue").text(e.message);
                 }
+            })
+            .on("pre-update", function() {
+                $(this).attr("disabled", true);
+            })
+            .on("post-update", function() {
+                $(this).attr("disabled", false);
             });
         };
         this.initFieldEvents = function() {

@@ -11,11 +11,11 @@ alembic==1.0.7            # via flask-migrate
 amqp==2.4.1               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
-billiard==3.5.0.5         # via celery
+billiard==3.6.0.0         # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.2.1
 certifi==2018.11.29        # via requests
-cffi==1.11.5              # via bcrypt
+cffi==1.12.1              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.2
@@ -45,7 +45,7 @@ idna==2.8                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==2.6.0
-kombu==4.2.2.post1              # via celery
+kombu==4.3.0              # via celery
 mako==1.0.7               # via alembic
 markupsafe==1.1.0           # via jinja2, mako
 oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
@@ -54,18 +54,18 @@ polib==1.1.0
 psycopg2==2.7.7
 pycparser==2.19           # via cffi
 pycryptodome==3.7.3       # via flask-user
-python-dateutil==2.7.5
+python-dateutil==2.8.0
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2018.9              # via babel, celery
 pyyaml==3.13              # via flask-swagger, swagger-spec-validator
-redis==3.1.0
+redis==3.2.0
 requests-cache==0.4.13
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
 requests==2.21.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
 six==1.12.0               # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
-sqlalchemy==1.2.17         # via alembic, flask-sqlalchemy
+sqlalchemy==1.2.18         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.3
 urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
