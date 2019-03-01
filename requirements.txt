@@ -44,7 +44,7 @@ healthcheck==1.3.3
 idna==2.8                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
-jsonschema==3.0.0
+jsonschema==3.0.1
 kombu==4.3.0              # via celery
 mako==1.0.7               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
