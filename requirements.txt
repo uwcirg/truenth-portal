@@ -8,7 +8,7 @@
 # https://dh-virtualenv.readthedocs.io/en/latest/howtos.html#handling-binary-wheels
 
 alembic==1.0.7            # via flask-migrate
-amqp==2.4.1               # via kombu
+amqp==2.4.2               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
 billiard==3.6.0.0         # via celery
