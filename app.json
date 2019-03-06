@@ -2,9 +2,9 @@
   "name": "TrueNTH USA Portal",
   "description": "Movember TrueNTH USA Shared Services",
   "keywords": ["CIRG","fhir"],
-  "website": "https://github.com/uwcirg/true_nth_usa_portal",
-  "repository": "https://github.com/uwcirg/true_nth_usa_portal",
-  "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
+  "website": "https://github.com/uwcirg/truenth-portal",
+  "repository": "https://github.com/uwcirg/truenth-portal",
+  "logo": "https://github.com/uwcirg/truenth-portal/raw/develop/portal/static/img/logo.png",
   "success_url": "/about",
   "env": {
     "SERVER_NAME": {

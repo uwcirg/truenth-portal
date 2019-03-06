@@ -154,7 +154,7 @@
   {% block version %}
     {% if config.metadata.version %}
       {% if config.metadata.git_hash %}
-        <div id="repoVersion" class="pull-right text-muted">{{_("TrueNTH Version")}}: <a target="_blank" href="https://github.com/uwcirg/true_nth_usa_portal/commit/{{ config.metadata.git_hash }}" >{{ config.metadata.version }}</a></div>
+        <div id="repoVersion" class="pull-right text-muted">{{_("TrueNTH Version")}}: <a target="_blank" href="https://github.com/uwcirg/truenth-portal/commit/{{ config.metadata.git_hash }}" >{{ config.metadata.version }}</a></div>
       {% else %}
         <div id="repoVersion" class="pull-right text-muted">{{_("TrueNTH Version")}}: {{ config.metadata.version }}</div>
       {% endif %}

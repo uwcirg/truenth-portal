@@ -61,7 +61,7 @@ To build a Debian package from the current branch of your local repo::
 If you would like to create a package from a remote repository you can override the local repo as follows below::
 
     # Override default with environment variable
-    export GIT_REPO='https://github.com/USERNAME/true_nth_usa_portal'
+    export GIT_REPO='https://github.com/USERNAME/truenth-portal'
 
     # Build the package from the above repo
     docker-compose -f docker-compose.build.yaml run builder
