@@ -351,7 +351,7 @@ class TreatmentData(CoredataPoint):
         return False
 
     def hasdata(self, user, **kwargs):
-        #procedures known to have start or not started by the user
+        #procedure known to have started or not started by the user
         return known_treatment_not_started(user) or known_treatment_started(user)
 
 class LocalizedData(CoredataPoint):
