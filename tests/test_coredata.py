@@ -67,6 +67,7 @@ class TestCoredata(TestCase):
 
         self.login()
         self.add_required_clinical_data()
+        # related to whether patient has received treatment question
         self.add_procedure(code='118877007', display='Procedure on prostate')
         with SessionScope(db):
             db.session.commit()
