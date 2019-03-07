@@ -18,7 +18,10 @@ from .audit import Audit
 from .clinical_constants import CC
 from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
-from .procedure_codes import known_treatment_started, known_treatment_not_started
+from .procedure_codes import (
+    known_treatment_started,
+    known_treatment_not_started
+)
 from .role import ROLE
 from .tou import ToU
 
@@ -340,6 +343,7 @@ class ClinicalData(CoredataPoint):
 
         return all(required.values())
 
+
 class TreatmentData(CoredataPoint):
 
     def required(self, user, **kwargs):
@@ -351,8 +355,9 @@ class TreatmentData(CoredataPoint):
         return False
 
     def hasdata(self, user, **kwargs):
-        #procedure known to have started or not started by the user
-        return known_treatment_not_started(user) or known_treatment_started(user)
+        # procedure known to have started or not started by the user
+        return known_treatment_not_started(user) or \
+               known_treatment_started(user)
 
 class LocalizedData(CoredataPoint):
 
