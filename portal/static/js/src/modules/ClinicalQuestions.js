@@ -116,7 +116,9 @@ export default { /*global $ i18next */
                     tnthAjax.postClinical(userId, toCall, "false", thisItem.attr("data-status"), targetField);
                     tnthAjax.postClinical(userId, "pca_diag", "false", "", targetField);
                     tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
-                    tnthAjax.deleteTreatment(userId);
+                    tnthAjax.deleteTreatment(userId, "", function() {
+                        tnthAjax.postTreatment(userId, false, "", $("#patientQ")); //should post no treatment started
+                    });
                 }, 50);
 
             }
@@ -158,7 +160,9 @@ export default { /*global $ i18next */
                 });
                 setTimeout(function() {
                     tnthAjax.postClinical(userId, "pca_localized", "false", "", targetField);
-                    tnthAjax.deleteTreatment(userId);
+                    tnthAjax.deleteTreatment(userId, "", function() {
+                        tnthAjax.postTreatment(userId, false, "", $("#patientQ")); //should post no treatment started
+                    });
                 }, 50);
             }
         });
