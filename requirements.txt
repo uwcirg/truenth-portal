@@ -48,7 +48,7 @@ jsonschema==3.0.1
 kombu==4.4.0              # via celery
 mako==1.0.7               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
-oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
+oauthlib==2.1.0
 passlib==1.7.1            # via flask-user
 polib==1.1.0
 psycopg2==2.7.7
@@ -72,16 +72,3 @@ validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.2.0               # via amqp
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf
-
-###
-## Comments too large for inline above
-#
-# oauthlib: Version 2.0.0 broke intervention login, when an intervention cookie
-#           bearer token reference a different user.
-#           To test (in single browser):
-#             - login to SS
-#             - obtain OAuth bearer token from SS on intervention
-#             - return to SS & logout (don't handle logout event from
-#               intervention, i.e. keep cookie)
-#             - login to SS as different user
-#             - try to access intervention and boom.
