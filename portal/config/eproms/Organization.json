@@ -2053,6 +2053,61 @@
         "reference": "api/organization/27000"
       },
       "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "pt_BR",
+                "display": "Portuguese (Brazil)",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "America/Sao_Paulo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 28000,
+      "language": "pt_BR",
+      "name": "Brazil (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/Sao_Paulo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14663,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-63"
+        }
+      ],
+      "language": "pt_BR",
+      "name": "Centro de Pesquisa em Oncologia",
+      "partOf": {
+        "reference": "api/organization/28000"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",
