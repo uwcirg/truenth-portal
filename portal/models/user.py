@@ -1855,7 +1855,8 @@ def get_user_or_abort(uid, allow_deleted=False):
 
 def active_patients(
         include_test_role=False, include_deleted=False,
-        require_orgs=None, filter_by_ids=None):
+        require_orgs=None, require_interventions=None,
+        disallow_interventions=None, filter_by_ids=None):
     """Build query for active patients, filtered as specified
 
     Common query for active (not deleted) patients.
@@ -1864,8 +1865,15 @@ def active_patients(
     :param include_deleted: Set true to include deleted users
     :param require_orgs: Provide list of organization IDs if patients must
         also have the respective UserOrganization association (different from
-        consents!)  User required to have at least one, not all orgs in given
-        ``require_orgs`` list.
+        consents!)  Patients required to have at least one, not all orgs in
+        given ``require_orgs`` list.
+    :param require_interventions: Provide list of intervention IDs if patients
+        must also have the respective UserIntervention association.  Patients
+        required to have at least one, not all interventions in given
+        ``require_interventions`` list.
+    :param disallow_interventions: Provide list of intervention IDs to
+        exclude associated patients, such as the randomized control
+        trial interventions.
     :param filter_by_ids: List of user_ids to include in query filter
     :return: Live SQLAlchemy ``Query``, for further filter additions or
      execution
@@ -1886,6 +1894,18 @@ def active_patients(
         patients_query = patients_query.join(UserOrganization).filter(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
+
+    if require_interventions:
+        patients_query = patients_query.join(UserIntervention).filter(
+            User.id == UserIntervention.user_id).filter(
+            UserIntervention.intervention_id.in_(require_interventions))
+
+    if disallow_interventions:
+        disallow_patient_ids = UserIntervention.query.filter(
+            UserIntervention.intervention_id.in_(disallow_interventions)
+        ).with_entities(UserIntervention.user_id).all()
+        patients_query = patients_query.filter(User.id.notin_(
+            disallow_patient_ids))
 
     if filter_by_ids:
         patients_query = patients_query.filter(User.id.in_(filter_by_ids))
