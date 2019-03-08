@@ -106,6 +106,20 @@ class Intervention(db.Model):
 
         return d
 
+    @staticmethod
+    def rct_ids():
+        """returns list of RCT (randomized control trial) intervention ids"""
+        names = current_app.config.get('RCT_INTERVENTIONS')
+        if not names:
+            return None
+        ids = [i.id for i in Intervention.query.filter(
+            Intervention.name.in_(names))]
+        if len(ids) != len(names):
+            raise ValueError(
+                "can't locate all interventions named in config "
+                "'RCT_INTERVENTIONS': {}".format(names))
+        return ids
+
     @classmethod
     def from_json(cls, data):
         intervention = cls()

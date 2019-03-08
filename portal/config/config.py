@@ -121,6 +121,7 @@ class BaseConfig(object):
     PRE_REGISTERED_ROLES = [
         'access_on_verify', 'write_only', 'promote_without_identity_challenge']
     PROJECT = "portal"
+    RCT_INTERVENTIONS = ['care_plan', 'community_of_wellness', 'sexual_recovery']
     REPORTING_IDENTIFIER_SYSTEMS = []
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']

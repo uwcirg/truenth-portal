@@ -36,16 +36,24 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 @roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patients_root():
-    """patients view function, intended for staff
+    """creates patients list dependent on user role
 
     :param reset_cache: (as query parameter).  If present, the cached
      as_of_date key used in assessment status lookup will be reset to
      current (forcing a refresh)
 
-    Present the logged in staff the list of patients matching
-    the staff's organizations (and any descendant organizations)
+    The returned list of patients depends on the users role:
+      admin users: all non-deleted patients
+      intervention-staff: all patients with common user_intervention
+      staff: all patients with common consented organizations
+
+    NB: a single user with both staff and intervention-staff is not
+    expected and will raise a 400: Bad Request
 
     """
+    broken_role_situation = (
+        "Patients list for staff and intervention-staff are mutually"
+        " exclusive - user shouldn't have both roles")
 
     def org_restriction(user):
         """Determine if user (prefs) restrict list of patients by org
@@ -53,8 +61,13 @@ def patients_root():
         :returns: None if no org restrictions apply, or a list of org_ids
 
         """
+        if user.has_role(ROLE.ADMIN.value):
+            return None  # no restrictions
+
         org_list = set()
         if user.has_role(ROLE.STAFF.value):
+            if user.has_role(ROLE.INTERVENTION_STAFF.value):
+                abort(400, broken_role_situation)
             pref_org_list = None
             # check user table preference for organization filters
             pref = TablePreference.query.filter_by(
@@ -84,6 +97,34 @@ def patients_root():
                     org_list.update(ot.here_and_below_id(org.id))
             return list(org_list)
 
+    def intervention_restrictions(user):
+        """returns tuple of lists for interventions: (disallow, require)
+
+        Users may not have access to some interventions (such as randomized
+        control trials).  In such a case, the first of the tuple items
+        will name intervention ids which should not be included.
+
+        Other users get access to all patients with one or more
+        interventions.  In this case, a list of interventions for which
+        the user should be granted access is in the second position.
+
+        """
+        if user.has_role(ROLE.ADMIN.value):
+            return None, None  # no restrictions
+
+        disallowed, required = None, None
+        if user.has_role(ROLE.STAFF.value):
+            if user.has_role(ROLE.INTERVENTION_STAFF.value):
+                abort(400, broken_role_situation)
+            # staff users aren't to see patients from RCT interventions
+            disallowed = Intervention.rct_ids()
+        if user.has_role(ROLE.INTERVENTION_STAFF.value):
+            # Look up associated interventions
+            uis = UserIntervention.query.filter(
+                UserIntervention.user_id == user.id)
+            required = [ui.intervention_id for ui in uis]
+        return disallowed, required
+
     if request.form.get('reset_cache'):
         QB_StatusCacheKey().update(datetime.utcnow())
 
@@ -94,22 +135,14 @@ def patients_root():
         UserConsent.deleted_id.is_(None),
         UserConsent.expires > datetime.utcnow()))
     consented_users = [u.user_id for u in consent_query if u.staff_editable]
+    disallowed_iv_ids, required_iv_ids = intervention_restrictions(user)
     patients = active_patients(
         require_orgs=org_restriction(user),
         include_test_role=include_test_roles,
         include_deleted=True,
+        require_interventions=required_iv_ids,
+        disallow_interventions=disallowed_iv_ids,
         filter_by_ids=consented_users)
-
-    if user.has_role(ROLE.INTERVENTION_STAFF.value):
-        uis = UserIntervention.query.filter(
-            UserIntervention.user_id == user.id)
-        ui_list = [ui.intervention_id for ui in uis]
-
-        # Gather up all patients belonging to any of the interventions
-        # this intervention_staff user belongs to
-        patients = patients.join(UserIntervention).filter(and_(
-            UserIntervention.user_id == User.id,
-            UserIntervention.intervention_id.in_(ui_list)))
 
     # get assessment status only if it is needed as specified by config
     qb_status_cache_age = 0
