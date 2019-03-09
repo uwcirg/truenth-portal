@@ -33,7 +33,7 @@ flask-recaptcha==0.4.2
 flask-session==0.3.1
 flask-sqlalchemy==2.3.2
 flask-swagger==0.2.13
-git+https://github.com/uwcirg/Flask-User.git@v0.6.21.2#egg=flask-user==0.6.21.2 # pyup: <0.7 # pin until 1.0 is ready for prod
+git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-wtf==0.14.2         # via flask-user
 flask==1.0.2
 functools32==3.2.3.post2;python_version < '3'
