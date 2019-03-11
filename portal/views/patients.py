@@ -122,6 +122,9 @@ def patients_root():
             # Look up associated interventions
             uis = UserIntervention.query.filter(
                 UserIntervention.user_id == user.id)
+            # need to check if the user is associated with any intervention at all
+            if uis.count() == 0:
+                abort(400, "User is not associated with any intervention.")
             required = [ui.intervention_id for ui in uis]
         return disallowed, required
 
