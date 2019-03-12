@@ -508,12 +508,14 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 return this.currentTablePreference &&
                     this.currentTablePreference.filters &&
                     this.currentTablePreference.filters.orgs_filter_control &&
+                    (typeof this.currentTablePreference.filters.orgs_filter_control === 
+                        "object") &&
                     this.currentTablePreference.filters.orgs_filter_control.length;
             },
             initOrgsFilter: function () {
                 var orgFields = $("#userOrgs input[name='organization']");
                 var fi = this.currentTablePreference ? this.currentTablePreference.filters : {};
-                var fa = fi && fi.orgs_filter_control ? fi.orgs_filter_control.split(",") : null;
+                var fa = this.siteFilterApplied() ? fi.orgs_filter_control : [];
                 orgFields.each(function () {
                     $(this).prop("checked", false);
                     if (!fa) {
@@ -746,10 +748,10 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     });
                 }
                 //get selected orgs from the filter list by site control
-                var selectedOrgs = "";
+                var selectedOrgs = [];
                 $("#userOrgs input[name='organization']").each(function () {
                     if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
-                        selectedOrgs += (selectedOrgs ? "," : "") + $(this).val();
+                        selectedOrgs.push($(this).val());
                     }
                 });
                 __filters["orgs_filter_control"] = selectedOrgs;

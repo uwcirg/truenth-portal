@@ -111,7 +111,7 @@
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       {%- if user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.INTERVENTION_STAFF.value) -%}
-                        <td>{% for intervention in patient.interventions | sort(attribute='name') %}{{intervention.name | replace('_', ' ')}}<br/>{% endfor %}</td>
+                        <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
                       {%- endif -%}
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
                       <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->

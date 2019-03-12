@@ -81,7 +81,7 @@ def patients_root():
 
             if pref_org_list:
                 # for preferred filtered orgs
-                pref_org_list = set(pref_org_list.split(","))
+                pref_org_list = set(pref_org_list)
                 for orgId in pref_org_list:
                     check_int(orgId)
                     if orgId == 0:  # None of the above doesn't count
