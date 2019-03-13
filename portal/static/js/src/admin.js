@@ -751,7 +751,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 var selectedOrgs = [];
                 $("#userOrgs input[name='organization']").each(function () {
                     if ($(this).is(":checked") && ($(this).css("display") !== "none")) {
-                        selectedOrgs.push($(this).val());
+                        selectedOrgs.push(parseInt($(this).val()));
                     }
                 });
                 __filters["orgs_filter_control"] = selectedOrgs;

@@ -61,19 +61,22 @@ def patients_root():
         :returns: None if no org restrictions apply, or a list of org_ids
 
         """
+        pref_org_list = None
+        # check user table preference for organization filters
+        pref = TablePreference.query.filter_by(
+            table_name='patientList', user_id=user.id).first()
+        if pref and pref.filters:
+            pref_org_list = pref.filters.get('orgs_filter_control')
+
         if user.has_role(ROLE.ADMIN.value):
-            return None  # no restrictions
+            # admins can view patients from *any* org
+            # apply only the user's org filter if found
+            return pref_org_list
 
         org_list = set()
         if user.has_role(ROLE.STAFF.value):
             if user.has_role(ROLE.INTERVENTION_STAFF.value):
                 abort(400, broken_role_situation)
-            pref_org_list = None
-            # check user table preference for organization filters
-            pref = TablePreference.query.filter_by(
-                table_name='patientList', user_id=user.id).first()
-            if pref and pref.filters:
-                pref_org_list = pref.filters.get('orgs_filter_control')
 
             # Build list of all organization ids, and their descendants, the
             # user belongs to
@@ -83,11 +86,10 @@ def patients_root():
                 # for preferred filtered orgs
                 pref_org_list = set(pref_org_list)
                 for orgId in pref_org_list:
-                    check_int(orgId)
                     if orgId == 0:  # None of the above doesn't count
                         continue
                     for org in user.organizations:
-                        if int(orgId) in ot.here_and_below_id(org.id):
+                        if orgId in ot.here_and_below_id(org.id):
                             org_list.add(orgId)
                             break
             else:
