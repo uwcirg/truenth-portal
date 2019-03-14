@@ -68,6 +68,9 @@
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
+                  {%- if user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.INTERVENTION_STAFF.value) -%}
+                    <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th>
+                  {%- endif -%}
                   {% if account_deactivation_enabled %}
                     <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
                   {% endif %}
@@ -107,6 +110,9 @@
                       {%-endif-%}
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
+                      {%- if user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.INTERVENTION_STAFF.value) -%}
+                        <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
+                      {%- endif -%}
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
                       <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
                   </tr>
