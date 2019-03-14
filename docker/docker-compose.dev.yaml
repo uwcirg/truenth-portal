@@ -1,0 +1,12 @@
+# docker-compose development overrides
+---
+version: "3.4"
+services:
+  web:
+    environment:
+      FLASK_DEBUG: 1
+    command: sh -c '
+     flask run
+        --port ${PORT}
+        --host 0.0.0.0
+     '
