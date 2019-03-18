@@ -163,16 +163,16 @@ def latest_consent(user, org_id=None, include_suspended=False):
     if org_id:
         raise NotImplementedError
 
-    if len(user.valid_consents) > 0:
-        # consents are ordered desc(acceptance_date)
-        # ignore suspended unless `include_suspended` is set
-        # include deleted, as in a suspended state, the previous
-        # acceptance will now be marked deleted.
-        for consent in user.all_consents:
-            if include_suspended and consent.status == 'suspended':
-                return consent
-            if consent.deleted_id is None and consent.status != 'suspended':
-                return consent
+    # consents are ordered desc(acceptance_date)
+    # ignore suspended unless `include_suspended` is set
+    # include deleted, as in a suspended state, the previous
+    # acceptance will now be marked deleted.
+    for consent in user.all_consents:
+        if include_suspended and consent.status == 'suspended':
+            return consent
+        if not include_suspended and consent.status == 'suspended':
+            continue
+        return consent
 
     return None
 
