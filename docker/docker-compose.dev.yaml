@@ -1,12 +1,19 @@
 # docker-compose development overrides
+# mount code checkout into container and use development server for auto-reloading
 ---
 version: "3.4"
 services:
   web:
     environment:
       FLASK_DEBUG: 1
+      FLASK_APP: /mnt/code/manage.py
     command: sh -c '
      flask run
         --port ${PORT}
         --host 0.0.0.0
      '
+    volumes:
+      - source: ../
+        target: /mnt/code
+        type: bind
+        read_only: true
