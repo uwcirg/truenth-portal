@@ -6,11 +6,11 @@ ENV \
     GIT_REPO=https://github.com/uwcirg/truenth-portal
 
 RUN \
-    apt-get update --quiet && \
+    apt-get update --quiet > /dev/null && \
     apt-get install --quiet --quiet --no-install-recommends \
         devscripts \
         equivs \
-        git
+        git | grep --regexp packages --regexp "Setting up" --after-context 1
 
 WORKDIR /root/portal
 
