@@ -10,7 +10,7 @@ RUN \
     apt-get install --quiet --quiet --no-install-recommends \
         devscripts \
         equivs \
-        git | grep --regexp packages --regexp "Setting up" --after-context 1
+        git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
 
 WORKDIR /root/portal
 
