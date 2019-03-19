@@ -18,15 +18,13 @@ services:
   celeryworker:
     restart: unless-stopped
     # Set lower CPU priority to prevent blocking web service
-    # remove `nice` prefix of `celery worker` command if necessary on first deploy
     cap_add:
       - SYS_NICE
-    command: sh -c '
-      env &&
-      nice celery worker
-        --app portal.celery_worker.celery
-        --loglevel debug
-      '
+    command:
+      nice
+          celery worker
+            --app portal.celery_worker.celery
+            --loglevel debug
 
   celerybeat:
     restart: unless-stopped

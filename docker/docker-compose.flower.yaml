@@ -9,7 +9,6 @@ services:
       context: https://github.com/mher/flower.git#v0.9.2
     entrypoint: /bin/sh
     command: -c '
-      env &&
       flower
         --address=0.0.0.0
         --broker="$$REDIS_URL"
