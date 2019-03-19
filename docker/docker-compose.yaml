@@ -1,22 +1,22 @@
 ---
 version: "3.4"
-services:
-  # Base service; for extension only, not for direct use
-  base: &service_base
-    image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    env_file:
-      - ${PORTAL_ENV_FILE:-portal.env}
-    environment:
-      # cross-service defaults
-      PGDATABASE: ${PGDATABASE:-portaldb}
-      PGHOST: ${PGHOST:-db}
-      PGPASSWORD: ${PGPASSWORD:-""}
-      PGUSER: ${PGUSER:-postgres}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+# Base service; for extension only, not for direct use
+x-service-base: &service_base
+  image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  env_file:
+    - ${PORTAL_ENV_FILE:-portal.env}
+  environment:
+    # cross-service defaults
+    PGDATABASE: ${PGDATABASE:-portaldb}
+    PGHOST: ${PGHOST:-db}
+    PGPASSWORD: ${PGPASSWORD:-""}
+    PGUSER: ${PGUSER:-postgres}
+    REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
 
+services:
   web:
     <<: *service_base
     ports:
