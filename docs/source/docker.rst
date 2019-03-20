@@ -124,6 +124,20 @@ To bootstrap an admin account after a fresh install, run the below ``flask`` CLI
 Advanced Configuration
 ======================
 
+Development
+-----------
+If you would like to use docker to work on the portal, you can configure ``docker-compose`` to use the development overrides as follows::
+
+    # Set COMPOSE_FILE in the current shell
+    export COMPOSE_FILE=docker-compose.yaml:docker-compose.dev.yaml
+    # or add to .env to preserve the change between shell sessions
+
+    docker-compose up web
+
+This will mount your checkout into a docker container and use the flask development server instead of the production default (gunicorn).
+
+Environment Variables
+---------------------
 Environment variables defined in the ``portal.env`` environment file are only passed to the underlying containers. However, some environment variables are used for configuration specific to docker-compose.
 
 An
