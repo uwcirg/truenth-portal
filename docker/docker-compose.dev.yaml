@@ -9,7 +9,7 @@ services:
       FLASK_APP: /mnt/code/manage.py
     command: sh -c '
      flask run
-        --port ${PORT}
+        --port $${PORT}
         --host 0.0.0.0
      '
     volumes:
