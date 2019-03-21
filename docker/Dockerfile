@@ -14,7 +14,7 @@ RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 COPY debian/artifacts "${ARTIFACT_DIR}"
 
 RUN \
-    apt-get update --quiet && \
+    apt-get update --quiet > /dev/null && \
     apt-get install --quiet --quiet --allow-unauthenticated portal && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 

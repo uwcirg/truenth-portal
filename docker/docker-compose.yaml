@@ -1,22 +1,22 @@
 ---
 version: "3.4"
-services:
-  # Base service; for extension only, not for direct use
-  base: &service_base
-    image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    env_file:
-      - ${PORTAL_ENV_FILE:-portal.env}
-    environment:
-      # cross-service defaults
-      PGDATABASE: ${PGDATABASE:-portaldb}
-      PGHOST: ${PGHOST:-db}
-      PGPASSWORD: ${PGPASSWORD:-""}
-      PGUSER: ${PGUSER:-postgres}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+# Base service; for extension only, not for direct use
+x-service-base: &service_base
+  image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  env_file:
+    - ${PORTAL_ENV_FILE:-portal.env}
+  environment:
+    # cross-service defaults
+    PGDATABASE: ${PGDATABASE:-portaldb}
+    PGHOST: ${PGHOST:-db}
+    PGPASSWORD: ${PGPASSWORD:-""}
+    PGUSER: ${PGUSER:-postgres}
+    REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
 
+services:
   web:
     <<: *service_base
     ports:
@@ -37,26 +37,23 @@ services:
 
   celeryworker:
     <<: *service_base
-    command: bash -c '
-      env &&
+    command:
       celery worker
         --app portal.celery_worker.celery
         --loglevel debug
-      '
     depends_on:
       - redis
 
   celerybeat:
     <<: *service_base
     command: bash -c '
-      env &&
       (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
-      wait-for-it --timeout=120 --host=web --port="$$PORT" --strict &&
-      celery beat
-        --app portal.celery_worker.celery
-        --loglevel debug
-        --schedule /tmp/celerybeat-schedule.db
-        --pidfile /tmp/celerybeat.pid
+      wait-for-it --timeout=120 --host=web --port="$$PORT" --strict --
+        celery beat
+          --app portal.celery_worker.celery
+          --loglevel debug
+          --schedule /tmp/celerybeat-schedule.db
+          --pidfile /tmp/celerybeat.pid
       '
     depends_on:
       - celeryworker
