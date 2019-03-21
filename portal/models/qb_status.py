@@ -36,14 +36,18 @@ class QB_Status(object):
         users_qbs = QBT.query.filter(QBT.user_id == self.user.id).filter(
             QBT.status == OverallStatus.due).order_by(QBT.at.asc())
 
+        # Obtain withdrawal date if applicable
+        withdrawn = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.status == OverallStatus.withdrawn).first()
+        self._withdrawal_date = withdrawn.at if withdrawn else None
+
         # convert query to list of tuples for easier manipulation
         self.__ordered_qbs = [qbt.qbd() for qbt in users_qbs]
         if not self.__ordered_qbs:
-            # Look for withdrawn case
-            if QBT.query.filter(QBT.user_id == self.user.id).filter(
-                    QBT.status == OverallStatus.withdrawn).count():
+            # May have withdrawn prior to first qb
+            if self._withdrawal_date:
                 self._overall_status = OverallStatus.withdrawn
-                trace("found user withdrawn")
+                trace("found user withdrawn; no valid qbs")
             else:
                 self._overall_status = OverallStatus.expired
                 trace("no qb timeline data for {}".format(self.user))
@@ -52,7 +56,7 @@ class QB_Status(object):
             return
         self._enrolled_in_common = True
 
-        # locate current qb - last found with start <= now
+        # locate current qb - last found with start <= self.as_of_date
         cur_index, cur_qbd = None, None
         for i, qbd in zip(range(len(self.__ordered_qbs)), self.__ordered_qbs):
             if qbd.relative_start <= self.as_of_date:
@@ -64,13 +68,17 @@ class QB_Status(object):
         # w/o a cur, probably hasn't started, set expired and leave
         if not cur_qbd and (
                 self.__ordered_qbs[0].relative_start > self.as_of_date):
-            trace(
-                "no current QBD (too early); first qb doesn't start till"
-                " {} vs as_of {}".format(
-                    self.__ordered_qbs[0].relative_start, self.as_of_date))
-            self._overall_status = OverallStatus.expired
+            if self.withdrawn_by(self.as_of_date):
+                trace("user withdrawn prior to first qb start")
+                self._overall_status = OverallStatus.withdrawn
+            else:
+                trace(
+                    "no current QBD (too early); first qb doesn't start till"
+                    " {} vs as_of {}".format(
+                        self.__ordered_qbs[0].relative_start, self.as_of_date))
+                self._overall_status = OverallStatus.expired
+                self.next_qbd = self.__ordered_qbs[0]
             self._current = None
-            self.next_qbd = self.__ordered_qbs[0]
             return
 
         if cur_index > 0:
@@ -126,6 +134,13 @@ class QB_Status(object):
             self._current = None
         else:
             self._current = cur_qbd
+
+        # Withdrawn sanity check
+        if self.withdrawn_by(self.as_of_date) and (
+                self.overall_status != OverallStatus.withdrawn):
+            raise RuntimeError(
+                "Unexpected state {}, should be withdrawn".format(
+                    self.overall_status))
 
     def older_qbds(self, last_known):
         """Generator to return QBDs and status prior to last known
@@ -232,6 +247,9 @@ class QB_Status(object):
         :return: QBD for best match, on None
 
         """
+        if self.withdrawn_by(self.as_of_date):
+            # User effectively withdrawn, no current
+            return None
         if classification == 'indefinite':
             return self._current_indef
         if self._current:
@@ -375,3 +393,7 @@ class QB_Status(object):
             return self._enrolled_in_common
         else:
             return self._enrolled_in_common and self._current_indef
+
+    def withdrawn_by(self, timepoint):
+        """Returns true if user had withdrawn by given timepoint"""
+        return self._withdrawal_date and self._withdrawal_date <= timepoint
