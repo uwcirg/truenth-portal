@@ -422,24 +422,21 @@ def smartling_upload():
 def upload_pot_file(fpath, fname, uri):
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
-        creds = {'bearer_token': smartling_authenticate()}
-        current_app.logger.debug("authenticated in smartling")
-        with open(fpath, 'rb') as potfile:
-            resp = requests.post(
-                upload_url.format(project_id),
-                data={'fileUri': uri, 'fileType': 'gettext'},
-                files={'file': (fname, potfile)},
-                auth=BearerAuth(**creds)
-            )
-            resp.raise_for_status()
-        current_app.logger.debug(
-            "{} uploaded to smartling project {}".format(fname, project_id)
+
+    creds = {'bearer_token': smartling_authenticate()}
+    current_app.logger.debug("authenticated in Smartling")
+    with open(fpath, 'rb') as potfile:
+        resp = requests.post(
+            upload_url.format(project_id),
+            data={'fileUri': uri, 'fileType': 'gettext'},
+            files={'file': (fname, potfile)},
+            auth=BearerAuth(**creds),
         )
-    else:
-        current_app.logger.warn(
-            "missing smartling config - file {} not uploaded".format(fname)
-        )
+        resp.raise_for_status()
+
+    current_app.logger.debug(
+        "{} uploaded to Smartling project {}".format(fname, project_id)
+    )
 
 
 def smartling_download(state, language=None):
