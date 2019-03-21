@@ -22,9 +22,9 @@ services:
       - SYS_NICE
     command:
       nice
-          celery worker
-            --app portal.celery_worker.celery
-            --loglevel debug
+        celery worker
+          --app portal.celery_worker.celery
+          --loglevel debug
 
   celerybeat:
     restart: unless-stopped

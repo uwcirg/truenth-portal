@@ -49,11 +49,11 @@ services:
     command: bash -c '
       (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
       wait-for-it --timeout=120 --host=web --port="$$PORT" --strict --
-          celery beat
-            --app portal.celery_worker.celery
-            --loglevel debug
-            --schedule /tmp/celerybeat-schedule.db
-            --pidfile /tmp/celerybeat.pid
+        celery beat
+          --app portal.celery_worker.celery
+          --loglevel debug
+          --schedule /tmp/celerybeat-schedule.db
+          --pidfile /tmp/celerybeat.pid
       '
     depends_on:
       - celeryworker
