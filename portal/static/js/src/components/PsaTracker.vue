@@ -198,7 +198,9 @@
                 filterText: i18next.t("Filter"),
                 yLegendText: i18next.t("Result (ng/ml)"),
                 xLegendText: i18next.t("PSA Test Date"),
+                MIN_RESULT: 0.1,
                 MAX_RESULT: 10000,
+                MAX_RANGE_STEP: 9,
                 treatmentEditUrl: "profile#profileProceduresWrapper",
                 newItem: {
                     id: "",
@@ -291,6 +293,7 @@
                 this.getData(true);
                 this.getProcedure();
                 setTimeout(function() {
+                    self.checkTreatmentCoreData();
                     self.initElementsEvents();
                 }, 300);
             },
@@ -450,6 +453,16 @@
                     this.newItem.id = existingItem[0].id;
                 }
                 this.postData();
+            },
+            checkTreatmentCoreData: function() {
+                tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA",false, function(data) {
+                    if (!data || !data.REQUIRED_CORE_DATA) {
+                        return;
+                    }
+                    if (data.REQUIRED_CORE_DATA.indexOf("treatment") === -1) {
+                        $("#psaTrackerTreatmentContainer").hide(); //do not allow edit of treatment date if it is not a required core data, because, it is only editable in profile for Truenth where treatment is required
+                    }
+                });
             },
             getProcedure: function() {
                 var self = this;
@@ -658,7 +671,8 @@
                 return Math.pow(10, base);
             },
             getRange: function getRange(size, startAt, step) {
-                var arr = []; size=size||10; startAt=startAt||0; step = step||1;
+                var arr = []; size=size||MAX_RANGE_STEP; startAt=startAt||0; step = step||1;
+                size = size > MAX_RANGE_STEP ? MAX_RANGE_STEP : size; //need to cap the gridline within maximum allowable range
                 for (var index=startAt; index < size; index++) {
                     arr.push(step*index);
                 }
@@ -716,11 +730,13 @@
 
                 var timeFormat = d3.time.format(TIME_FORMAT);
                 var parseDate = timeFormat.parse; // Parse the date / time func
-                var data = self.items;
+                const data = JSON.parse(JSON.stringify(self.items));  //need to make a deep copy, otherwise references to original array are kept
+                var minResult = self.MIN_RESULT;
 
                 data.forEach(function(d) {
                     d.graph_date = parseDate(d.date);
-                    d.result = isNaN(d.result) ? 0.1 : +d.result;
+                    d.display = d.result;
+                    d.result = isNaN(d.result) || d.result < minResult ? minResult : +d.result;
                 });
 
                 var minDate = d3.min(data, function(d) {
@@ -747,7 +763,7 @@
                 var maxResultInLog = self.getNearestPow10(maxResult);
 
                 x.domain(xDomain);
-                y.domain([0.1, maxResultInLog]); //scale to the closest power of 10 based on the maximum result
+                y.domain([minResult, maxResultInLog]); //scale to the closest power of 10 based on the maximum result
                 // Define the axes
                 var xAxis = d3.svg.axis()
                     .scale(x)
@@ -946,7 +962,7 @@
                     .attr("letter-spacing", "2px")
                     .attr("fill", "#656F76")
                     .text(function(d) {
-                        return d.result;
+                        return d.display;
                     });
 
                 // Add caption
