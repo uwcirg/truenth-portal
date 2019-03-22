@@ -91,7 +91,7 @@ class TestPortal(TestCase):
 
         self.bless_with_basics()
         self.login()
-        self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.INTERVENTION_STAFF.value)
 
         # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field

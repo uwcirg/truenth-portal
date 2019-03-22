@@ -26,7 +26,7 @@ class TestCoredata(TestCase):
         if system == TRUENTH:
             self.app.config['REQUIRED_CORE_DATA'] = [
                 'name', 'dob', 'role', 'org', 'clinical', 'localized',
-                'race', 'ethnicity', 'indigenous',
+                'treatment', 'race', 'ethnicity', 'indigenous',
                 'website_terms_of_use'
             ]
         elif system == EPROMS:
@@ -67,6 +67,8 @@ class TestCoredata(TestCase):
 
         self.login()
         self.add_required_clinical_data()
+        # related to whether patient has received treatment question
+        self.add_procedure(code='118877007', display='Procedure on prostate')
         with SessionScope(db):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
@@ -88,6 +90,7 @@ class TestCoredata(TestCase):
         assert 'dob' in needed
         assert 'website_terms_of_use' in needed
         assert 'clinical' in needed
+        assert 'treatment' in needed
         assert 'org' in needed
 
         # needed should match required (minus 'name', 'role')

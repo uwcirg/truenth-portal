@@ -23,7 +23,7 @@
       <div class="get-demo-error error-message"></div>
       <div class="put-demo-error error-message"></div>
     {%- endcall %}
-    {% call sectionContent(sectionId="clinicalContainer", title=_('Now it is time to build your prostate cancer profile.'), display=_("your clinical profile"), config="clinical,localized") -%}
+    {% call sectionContent(sectionId="clinicalContainer", title=_('Now it is time to build your prostate cancer profile.'), display=_("your clinical profile"), config="clinical,localized,treatment") -%}
       <p class="subtitle">{{_("The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.")}}</p>
       {{patientQGroup(user)}}
     {%- endcall %}

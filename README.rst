@@ -28,7 +28,7 @@ Clone the Project
 
 .. code:: bash
 
-    $ git clone https://github.com/uwcirg/true_nth_usa_portal.git $PROJECT_HOME
+    $ git clone https://github.com/uwcirg/truenth-portal.git $PROJECT_HOME
 
 Create a Virtual Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -110,7 +110,7 @@ correct libraries are installed:
 
     pip install --requirement requirements.txt
 
-To install additional dependencies necessary for development, also run ``pip`` as below:
+To install additional dependencies necessary for development, replace the named requirements file:
 
 .. code:: bash
 
@@ -352,7 +352,7 @@ This project includes integration with the `TravisCI continuous
 integration
 platform <https://docs.travis-ci.com/user/languages/python/>`__. The
 full test suite (every Tox virtual environment) is `automatically
-run <https://travis-ci.org/uwcirg/true_nth_usa_portal>`__ for the last
+run <https://travis-ci.org/uwcirg/truenth-portal>`__ for the last
 commit pushed to any branch, and for all pull requests. Results are
 reported as passing with a ✔ and failing with a ✖.
 

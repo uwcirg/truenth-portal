@@ -531,17 +531,24 @@ export default { /*global $ */
         procArray.performedDateTime = treatmentDate ? treatmentDate : "";
         this.postProc(userId, procArray, targetField);
     },
-    deleteTreatment: function(userId, targetField) {
+    deleteTreatment: function(userId, targetField, callback) {
         var self = this;
+        callback = callback || function() {};
         this.sendRequest("/api/patient/" + userId + "/procedure", "GET", userId, {sync: true}, function(data) {
-            if (!data || data.error) { return false; }
+            if (!data || data.error) { 
+                callback();
+                return false;
+            }
             var treatmentData = self.hasTreatment(data);
-            if (!treatmentData) { return false; }
+            if (!treatmentData) {
+                callback();
+                return false; 
+            }
             if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
-                self.deleteProc(treatmentData.id, targetField, true);
+                self.deleteProc(treatmentData.id, targetField, true, callback);
                 return true;
             }
-            self.deleteProc(treatmentData.id, targetField, true);
+            self.deleteProc(treatmentData.id, targetField, true, callback);
         });
     },
     "getProc": function(userId, newEntry, callback) {
@@ -567,13 +574,15 @@ export default { /*global $ */
             callback(data);
         });
     },
-    "deleteProc": function(procedureId, targetField, sync) {
+    "deleteProc": function(procedureId, targetField, sync, callback) {
+        callback = callback || function() {};
         this.sendRequest("/api/procedure/" + procedureId, "DELETE", null, {sync: sync,targetField: targetField}, function(data) {
             if (!data.error) {
                 $(".del-procs-error").html("");
             } else {
                 $(".del-procs-error").html(i18next.t("Server error occurred removing procedure/treatment information."));
             }
+            callback();
         });
     },
     "getRoleList": function(params, callback) {

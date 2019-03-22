@@ -19,7 +19,7 @@ To initialize on a debian system, install the git-flow package::
 
 Return to the root of your TrueNTH Shared Services checkout and initialize::
 
-    cd ~/true_nth_usa_portal
+    cd ~/truenth-portal
     git-flow init
 
 You should be able to accept all the defaults (caveat: in some cases "Branch name for production releases: []" won't have a default; in that case, use "master").  The results are written to the nested `.git/config` file, such as::
@@ -54,7 +54,7 @@ Pull Request
 ============
 
 To bring the feature into the main develop branch, head over to
-`github <https://github.com/uwcirg/true_nth_usa_portal>`_ and trigger
+`github <https://github.com/uwcirg/truenth-portal>`_ and trigger
 a **pull request**.
 
 Rebase

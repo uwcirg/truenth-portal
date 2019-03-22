@@ -1749,6 +1749,34 @@
     {
       "extension": [
         {
+          "timezone": "Europe/Stockholm",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14669,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-69"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Örebro University Hospital",
+      "partOf": {
+        "reference": "api/organization/24000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
@@ -2106,6 +2134,34 @@
       "name": "Centro de Pesquisa em Oncologia",
       "partOf": {
         "reference": "api/organization/28000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146999,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-999"
+        }
+      ],
+      "language": "en_US",
+      "name": "Test Site",
+      "partOf": {
+        "reference": "api/organization/22000"
       },
       "resourceType": "Organization"
     }
