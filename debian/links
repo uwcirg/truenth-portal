@@ -5,6 +5,7 @@
 opt/venvs/portal/bin/flask usr/bin/flask
 opt/venvs/portal/bin/celery usr/bin/celery
 opt/venvs/portal/bin/gunicorn usr/bin/gunicorn
+opt/venvs/portal/bin/pybabel usr/bin/pybabel
 
 # helpful for installing dependencies directly into virtual environment
 opt/venvs/portal/bin/pip usr/bin/pip
