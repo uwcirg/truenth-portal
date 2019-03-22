@@ -18,11 +18,12 @@ from portal.models.role import Role, ROLE
 revision = '0b4e7a8a7e64'
 down_revision = '1d84237ed07c'
 
+
 def purge_suspended_patients_qbs():
-    suspended = User.query.join(UserRoles).join(
-        Role).join(UserConsent).filter(sa.and_(
-        Role.id == UserRoles.role_id, UserRoles.user_id == User.id,
-        Role.name == ROLE.PATIENT.value)).filter(
+    suspended = User.query.join(UserRoles).join(Role).join(
+        UserConsent).filter(sa.and_(
+            Role.id == UserRoles.role_id, UserRoles.user_id == User.id,
+            Role.name == ROLE.PATIENT.value)).filter(
         UserConsent.status == 'suspended').with_entities(User.id)
     qbts = QBT.query.filter(QBT.user_id.in_(suspended))
     qbts.delete(synchronize_session=False)
