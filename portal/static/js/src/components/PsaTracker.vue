@@ -455,7 +455,7 @@
                 this.postData();
             },
             checkTreatmentCoreData: function() {
-                tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA",false, function(data) {
+                tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", false, function(data) {
                     if (!data || !data.REQUIRED_CORE_DATA) {
                         return;
                     }
