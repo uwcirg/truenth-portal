@@ -20,6 +20,9 @@ from ..models.identifier import (
     UserIdentifier,
     parse_identifier_params,
 )
+from ..models.overall_status import OverallStatus
+from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.reference import Reference
 from ..models.role import ROLE
@@ -315,11 +318,31 @@ def patient_timeline(patient_id):
         qbd = QBD(
             relative_start=qbt.at, qb_id=qbt.qb_id,
             iteration=qbt.qb_iteration, recur_id=qbt.qb_recur_id)
-        results.append({
-            'status': str(qbt.status),
-            'at': FHIR_datetime.as_fhir(qbt.at),
-            'qb': qbd.questionnaire_bank.name,
-            'visit': visit_name(qbd)})
+        if qbt.status == OverallStatus.withdrawn:
+            results.append({
+                'status': str(qbt.status),
+                'at': FHIR_datetime.as_fhir(qbt.at)})
+        else:
+            results.append({
+                'status': str(qbt.status),
+                'at': FHIR_datetime.as_fhir(qbt.at),
+                'qb (id, iteration)': "{} ({}, {})".format(
+                    qbd.questionnaire_bank.name, qbd.qb_id, qbd.iteration),
+                'visit': visit_name(qbd)})
+
+    qb_names = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
+
+    qnrs = QuestionnaireResponse.query.filter(
+        QuestionnaireResponse.subject_id == patient_id).order_by(
+        QuestionnaireResponse.authored)
+    posted = [{
+        'at, qb, iteration, status, name': "{}, {}, {}, {}, {}".format(
+            qnr.authored,
+            qb_names[qnr.questionnaire_bank_id],
+            qnr.qb_iteration,
+            qnr.status,
+            qnr.document['questionnaire']['reference'].split('/')[-1])
+        } for qnr in qnrs]
 
     qbstatus = QB_Status(
         user=User.query.get(patient_id), as_of_date=datetime.utcnow())
@@ -343,6 +366,7 @@ def patient_timeline(patient_id):
     if trace:
         return jsonify(
             status=status,
+            posted=posted,
             timeline=results,
             trace=dump_trace("END time line lookup"))
-    return jsonify(status=status, timeline=results)
+    return jsonify(status=status, posted=posted, timeline=results)

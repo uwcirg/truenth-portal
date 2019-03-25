@@ -4,7 +4,6 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
-from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.qb_timeline import (
@@ -190,13 +189,13 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
         assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
 
-    @pytest.mark.skip("can't have both ways - once withdrawn lose trigger")
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
         crv = self.setup_org_qbs()
         crv_id = crv.id
         # consent 17 months in past
         backdate = datetime.utcnow() - relativedelta(months=17)
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id, setdate=backdate)
 
