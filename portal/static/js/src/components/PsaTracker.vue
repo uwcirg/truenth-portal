@@ -671,6 +671,7 @@
                 return Math.pow(10, base);
             },
             getRange: function getRange(size, startAt, step) {
+                var MAX_RANGE_STEP = this.MAX_RANGE_STEP;
                 var arr = []; size=size||MAX_RANGE_STEP; startAt=startAt||0; step = step||1;
                 size = size > MAX_RANGE_STEP ? MAX_RANGE_STEP : size; //need to cap the gridline within maximum allowable range
                 for (var index=startAt; index < size; index++) {
