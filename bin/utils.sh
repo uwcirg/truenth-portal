@@ -38,7 +38,7 @@ get_docker_tags() {
     GIT_BRANCH="$(echo $GIT_BRANCH | tr / _)"
     GIT_TAG="${GIT_TAG:-$(git describe --tags --exact-match 2>/dev/null || true)}"
     GIT_HASH="${GIT_HASH:-$(git rev-parse HEAD)}"
-    GIT_SHORT_HASH="$(echo $GIT_HASH | cut --characters 1-7)"
+    GIT_SHORT_HASH="${GIT_SHORT_HASH:-$(git rev-parse --short HEAD)}"
 
     DOCKER_TAGS=$(cat << BLOCK
 $GIT_BRANCH
