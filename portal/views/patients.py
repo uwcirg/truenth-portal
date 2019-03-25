@@ -178,7 +178,7 @@ def patients_root():
     return render_template(
         'admin/patients_by_org.html', patients_list=patients, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
-        include_test_roles=include_test_roles)
+        include_test_role=include_test_role)
 
 
 @patients.route('/patient-profile-create')
