@@ -7,6 +7,7 @@ standard_library.install_aliases()  # noqa: E402
 from collections import defaultdict
 import io
 import os
+from subprocess import check_call
 import sys
 from zipfile import ZipFile
 

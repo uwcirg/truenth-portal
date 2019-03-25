@@ -7,7 +7,6 @@ from collections import defaultdict
 from io import BytesIO
 import os
 import re
-from subprocess import check_call
 import sys
 import tempfile
 
