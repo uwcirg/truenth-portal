@@ -11,6 +11,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
+from .intervention import Intervention
 from .message import EmailMessage
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
@@ -323,11 +324,18 @@ def token_janitor():
                     user_id))
         sponsor_email = User.query.filter(
             User.id == sponsor).with_entities(User.email).one()[0]
-        subject = 'WARNING: Service Token Expiration'
+        intervention_subtext = ''
+        intervention = Intervention.query.filter(
+            Intervention.client_id == client_id).first()
+        if intervention:
+            intervention_subtext = " for {} ({})".format(
+                intervention.name, intervention.description)
+        subject = 'WARNING: Service Token Expiration' + intervention_subtext
         body = (
-            "The service token in use at {app} expires {expires}.  "
-            "Please renew at {client_url}".format(
+            "The service token in use at {app}{intervention_subtext} expires "
+            "{expires}.  Please renew at {client_url}".format(
                 app=current_app.config.get('USER_APP_NAME'),
+                intervention_subtext=intervention_subtext,
                 expires=expires,
                 client_url=url_for(
                     'client.client_edit', client_id=client_id, _external=True)))
