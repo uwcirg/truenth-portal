@@ -7,8 +7,10 @@ standard_library.install_aliases()  # noqa: E402
 from collections import defaultdict
 import io
 import os
+import re
 from subprocess import check_call
 import sys
+import tempfile
 from zipfile import ZipFile
 
 from flask import current_app
@@ -369,8 +371,8 @@ def fix_references(pot_fpath):
     ) as tmpfile:
         for line in infile:
             tmpfile.write(
-                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url,
-                               line))
+                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line)
+            )
 
     os.rename(tmpfile.name, pot_fpath)
     current_app.logger.debug("messages.pot file references fixed")
