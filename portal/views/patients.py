@@ -136,7 +136,7 @@ def patients_root():
 
     user = current_user()
     # Not including test accounts by default, unless requested
-    include_test_roles = request.args.get('include_test_roles')
+    include_test_role = request.args.get('include_test_role')
 
     # If there are org restrictions, we also require consent
     require_orgs = org_restriction(user)
