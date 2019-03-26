@@ -27,8 +27,8 @@ RUN \
 
 # Generate changelog and build package
 CMD \
-    debian/pre-build.sh && \
     dpkg-buildpackage \
         --unsigned-source \
-        --unsigned-changes && \
-    debian/post-build.sh
+        --unsigned-changes \
+        --hook-init=debian/pre-build.sh \
+        --hook-done=debian/post-build.sh
