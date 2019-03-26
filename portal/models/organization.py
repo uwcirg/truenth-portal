@@ -941,8 +941,8 @@ class OrgTree(object):
                 results.add(o.id)
         return results
 
-    def visible_patients(self, staff_user):
-        """Returns patient IDs for whom the current staff_user can view
+    def visible_orgs(self, staff_user):
+        """Returns organization IDs for whom the current staff_user can view
 
         Staff users can view all patients at or below their own org
         level.
@@ -952,33 +952,16 @@ class OrgTree(object):
         search.
 
         """
-        from .user import User, UserRoles  # local to avoid cycle
-        from .user_consent import UserConsent
-
         if not (
                 staff_user.has_role(ROLE.STAFF.value) or
                 staff_user.has_role(ROLE.STAFF_ADMIN.value)):
-            raise Unauthorized("visible_patients() exclusive to staff use")
+            raise Unauthorized("visible_orgs() exclusive to staff use")
 
         staff_user_orgs = set()
         for org in (o for o in staff_user.organizations if o.id != 0):
             staff_user_orgs.update(self.here_and_below_id(org.id))
 
-        if not staff_user_orgs:
-            return []
-
-        patient_role_id = Role.query.filter_by(
-            name=ROLE.PATIENT.value).one().id
-        now = datetime.utcnow()
-        query = db.session.query(User.id).join(
-            UserRoles).join(UserConsent).join(UserOrganization).filter(
-            User.deleted_id.is_(None),
-            UserRoles.role_id == patient_role_id,
-            UserConsent.deleted_id.is_(None),
-            UserConsent.expires > now,
-            UserOrganization.organization_id.in_(staff_user_orgs))
-
-        return [u[0] for u in query]  # flaten return tuples to list of ids
+        return list(staff_user_orgs)
 
 
 def add_static_organization():

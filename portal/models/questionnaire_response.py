@@ -15,6 +15,7 @@ from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from .fhir import bundle_results
 from .organization import OrgTree
 from .reference import Reference
+from .user import active_patients
 
 
 class QuestionnaireResponse(db.Model):
@@ -215,7 +216,9 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
     # Gather up the patient IDs for whom current user has 'view' permission
-    user_ids = OrgTree().visible_patients(current_user)
+    visible_orgs = OrgTree().visible_orgs(current_user)
+    user_ids = active_patients(
+        require_orgs=visible_orgs, include_test_role=False)
 
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(
