@@ -5,3 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.build
+    volumes:
+      - source: ../debian/artifacts
+        target: /tmp/artifacts
+        type: bind
