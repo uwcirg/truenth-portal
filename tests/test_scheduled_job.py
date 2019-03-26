@@ -37,7 +37,7 @@ class TestScheduledJob(TestCase):
             name="rando", task="test", schedule=schedule, active=True)
         sjc = sj.crontab_schedule()
         assert len(sjc.minute) == 1
-        assert sjc.minute.pop() in range(0, 59)
+        assert sjc.minute.pop() in range(0, 60)
         assert len(sjc.hour) == 24
 
     def test_job_upsert(self):
