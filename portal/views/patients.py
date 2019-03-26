@@ -152,7 +152,7 @@ def patients_root():
 
     patients = active_patients(
         require_orgs=require_orgs,
-        include_test_role=include_test_roles,
+        include_test_role=include_test_role,
         include_deleted=True,
         require_interventions=required_iv_ids,
         disallow_interventions=disallowed_iv_ids,
