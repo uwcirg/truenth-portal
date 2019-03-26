@@ -15,9 +15,8 @@ Usage:
           Show this help message
 
     Docker build helper script
+    Build a docker image from the HEAD commit of the current git checkout
 
-    Optional overrides:
-        "\${GIT_REPO}" - URL of git repository to build from (defaults to current repo)
 USAGE
    exit 1
 }
