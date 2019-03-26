@@ -466,25 +466,47 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 $("#adminTable .filterControl input").attr("placeholder", i18next.t("Enter Text"));
                 $("#adminTable .filterControl select option[value='']").text(i18next.t("Select"));
             },
-            handleMedidataRave: function (params) {
-                if (!$("#adminTableContainer").hasClass("patient-view")) { //check if this is a patients list
+            isPatientsList: function() {
+                return $("#adminTableContainer").hasClass("patient-view");//check if this is a patients list
+            },
+            setCreateAccountVisByTopOrgSetting: function(setting_name, params) {
+                if (!setting_name) {
                     return false;
                 }
-                var self = this,
-                    tnthAjax = this.getDependency("tnthAjax");
+                var self = this, tnthAjax = this.getDependency("tnthAjax");
                 params = params || {};
                 tnthAjax.sendRequest("/api/settings", "GET", this.userId, params, function (data) {
-                    if (!data || data.error || !data.MEDIDATA_RAVE_ORG) {
+                    if (!data || data.error || !data[setting_name]) {
                         return false;
                     }
+                    var nonMatch = $.grep(self.topLevelOrgs, function (org) {
+                        return data[setting_name] !== org;
+                    });
+                    //has top org affiliation other than matched org setting
+                    if (nonMatch.length) { 
+                        return false;
+                    }
+                    //has top org affiliation with matched org setting
                     var match = $.grep(self.topLevelOrgs, function (org) {
-                        return data.MEDIDATA_RAVE_ORG === org;
+                        return data[setting_name] === org;
                     });
                     if (match.length === 0) {
                         return false;
                     }
                     self.setCreateAccountVis(true);
                 });
+            },
+            handleMedidataRave: function (params) {
+                if (!this.isPatientsList()) { //check if this is a patients list
+                    return false;
+                }
+                this.setCreateAccountVisByTopOrgSetting("MEDIDATA_RAVE_ORG", params);
+            },
+            handleMusic: function(params) {
+                if (!this.isPatientsList()) { //check if this is a patients list
+                    return false;
+                }
+                this.setCreateAccountVisByTopOrgSetting("ACCEPT_TERMS_ON_NEXT_ORG", params);
             },
             setCreateAccountVis: function (hide) {
                 var createAccountElements = $("#patientListOptions .or, #createUserLink");
@@ -498,7 +520,10 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 if (this.isAdminUser()) {
                     return false;
                 }
-                this.handleMedidataRave(); //a function specifically created to handle MedidataRave related stuff
+                //a function specifically created to handle MedidataRave related stuff
+                this.handleMedidataRave();
+                //a function call to check MUSIC related stuff
+                this.handleMusic();
                 //can do other things related to disabling fields here if need be
             },
             hasOrgsSelector: function() {
