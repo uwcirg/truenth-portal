@@ -469,6 +469,12 @@ import CurrentUser from "./mixins/CurrentUser.js";
             isPatientsList: function() {
                 return $("#adminTableContainer").hasClass("patient-view");//check if this is a patients list
             },
+            /*
+             * a function dedicated to hide account creation button based on org name from setting
+             * @params
+             * setting_name String, generally a configuration/setting variable name whose values corresponds to an org name of interest e.g. MedidataRave_Org
+             * params Object, passed to ajax call to get configuration settings
+             */
             setCreateAccountVisByTopOrgSetting: function(setting_name, params) {
                 if (!setting_name) {
                     return false;
@@ -496,16 +502,24 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.setCreateAccountVis(true);
                 });
             },
+            /*
+             * a function specifically created to handle MedidataRave-related UI events/changes
+             */
             handleMedidataRave: function (params) {
                 if (!this.isPatientsList()) { //check if this is a patients list
                     return false;
                 }
-                this.setCreateAccountVisByTopOrgSetting("MEDIDATA_RAVE_ORG", params);
+                //hide account creation button based on MEDIDATA RAVE ORG setting
+                this.setCreateAccountVisByTopOrgSetting("MEDIDATA_RAVE_ORG", params); 
             },
+            /*
+             * a function dedicated to handle MUSIC-related UI events/changes
+             */
             handleMusic: function(params) {
                 if (!this.isPatientsList()) { //check if this is a patients list
                     return false;
                 }
+                //hide account creation button based on ACCEPT TERMS ON NEXT ORG setting (MUSIC)
                 this.setCreateAccountVisByTopOrgSetting("ACCEPT_TERMS_ON_NEXT_ORG", params);
             },
             setCreateAccountVis: function (hide) {
@@ -520,9 +534,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 if (this.isAdminUser()) {
                     return false;
                 }
-                //a function specifically created to handle MedidataRave related stuff
                 this.handleMedidataRave();
-                //a function call to check MUSIC related stuff
                 this.handleMusic();
                 //can do other things related to disabling fields here if need be
             },
