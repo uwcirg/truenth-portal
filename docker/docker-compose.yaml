@@ -6,6 +6,7 @@ x-service-base: &service_base
   build:
     context: ..
     dockerfile: docker/Dockerfile
+    target: production
   env_file:
     - ${PORTAL_ENV_FILE:-portal.env}
   environment:

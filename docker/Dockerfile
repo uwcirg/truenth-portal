@@ -35,7 +35,7 @@ RUN \
 
 # --------------------------------------
 
-FROM debian:stretch
+FROM debian:stretch as production
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
