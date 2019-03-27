@@ -14,7 +14,7 @@ RUN \
         git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
         # only print package names, versions
 
-WORKDIR /root/portal
+WORKDIR "$HOME/portal"
 
 # Copy repo into image
 COPY . .
