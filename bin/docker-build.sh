@@ -32,15 +32,13 @@ cp \
     "${root_path}/docker/portal.env.default" \
     "${root_path}/docker/portal.env"
 
-default_compose_file="${root_path}/docker/docker-compose.yaml:${root_path}/docker/docker-compose.build.yaml"
+default_compose_file="${root_path}/docker/docker-compose.yaml"
 export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
 
 # Build docker image that generates debian package from current repo and branch
-docker-compose build builder
 
 # Build debian package from current repo and branch
-docker-compose run builder
 
 # Build portal docker image from debian package
 docker-compose build web
