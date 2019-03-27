@@ -61,6 +61,10 @@ To build a Shared Services docker image from the current branch of your local re
     # Build debian package from current local branch
     bin/docker-build.sh
 
+After the image is built, it can be started in the same way as any downloaded image::
+
+    docker-compose up web
+
 Advanced Usage
 ==============
 
