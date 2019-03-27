@@ -15,7 +15,7 @@ Usage:
           Show this help message
 
     Docker build helper script
-    Build a docker image from the HEAD commit of the current git checkout
+    Build a docker image from the current git checkout
 
 USAGE
    exit 1
