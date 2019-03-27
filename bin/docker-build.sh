@@ -32,8 +32,23 @@ cp \
     "${root_path}/docker/portal.env.default" \
     "${root_path}/docker/portal.env"
 
+# Use .gitignore as .dockerignore during build only
+# not worth the effort to maintain both, for now
+copy_output="$(
+    cp \
+        --no-clobber \
+        --verbose \
+        "${root_path}/.gitignore" \
+        "${root_path}/.dockerignore"
+)"
+
 default_compose_file="${root_path}/docker/docker-compose.yaml"
 export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
 echo "Building portal docker image..."
 docker-compose build web
+
+if echo "$copy_output" | grep --quiet "\->"; then
+    echo "Deleting generated .dockerignore..."
+    rm "${root_path}/.dockerignore"
+fi
