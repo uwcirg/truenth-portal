@@ -945,7 +945,7 @@ def org_restriction_by_role(user, requested_orgs):
 
     :param requested_orgs: List of organization IDs the user has selected
         for inclusion in filtering, may be None.  If defined, the return
-        list will be the intersection of the pref_org_list and the list of
+        list will be the intersection of the requested_orgs and the list of
         organizations the user's role gives them the right to view.
 
     :returns: None if no org restrictions apply, or a list of org_ids

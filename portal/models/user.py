@@ -41,7 +41,7 @@ from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
 from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier, UserIdentifier
-from .intervention import intervention_restrictions, UserIntervention
+from .intervention import UserIntervention, intervention_restrictions
 from .observation import Observation, UserObservation
 from .organization import (
     Organization,
@@ -1908,7 +1908,8 @@ def patients_query(
         consent_query = UserConsent.query.filter(and_(
             UserConsent.deleted_id.is_(None),
             UserConsent.expires > datetime.utcnow()))
-        consented_users = [u.user_id for u in consent_query if u.staff_editable]
+        consented_users = [
+            u.user_id for u in consent_query if u.staff_editable]
 
     if require_interventions:
         query = query.join(UserIntervention).filter(
