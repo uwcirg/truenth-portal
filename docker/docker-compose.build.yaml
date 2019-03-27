@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.build
     environment:
-      - GIT_REPO=${GIT_REPO:-/mnt/git_repo}
+      GIT_REPO: /mnt/git_repo
     volumes:
       - source: ../debian/artifacts
         target: /tmp/artifacts

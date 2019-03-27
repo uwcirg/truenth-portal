@@ -13,7 +13,7 @@ RUN \
         devscripts \
         equivs \
         git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
-        # only print package names, versions
+        # only print package names and versions
 
 WORKDIR /root/portal
 
