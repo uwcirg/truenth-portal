@@ -20,6 +20,7 @@ import requests
 from .i18n import get_db_strings, get_static_strings
 
 POT_FILES = (
+    'portal/translations/flask_user.pot',
     'portal/translations/messages.pot',
     'portal/translations/js/src/frontend.pot',
 )
