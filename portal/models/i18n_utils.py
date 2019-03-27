@@ -379,12 +379,16 @@ def fix_references(pot_fpath):
 
 
 def smartling_upload():
-    # get relevant filepaths
-    config_fname = current_app.config['BABEL_CONFIG_FILENAME']
-    translation_fpath = os.path.join(current_app.root_path, "translations")
-    messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
+    """Extract and upload strings to Smartling"""
+    messages_pot_fpath = os.path.join(
+        current_app.root_path,
+        'translations',
+        'messages.pot',
+    )
     config_fpath = os.path.join(
-        current_app.root_path, "../instance/", config_fname
+        current_app.root_path,
+        "../instance/",
+        current_app.config['BABEL_CONFIG_FILENAME'],
     )
 
     # create new .pot file from code
