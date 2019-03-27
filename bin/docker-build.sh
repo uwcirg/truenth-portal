@@ -35,10 +35,5 @@ cp \
 default_compose_file="${root_path}/docker/docker-compose.yaml"
 export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
-
-# Build docker image that generates debian package from current repo and branch
-
-# Build debian package from current repo and branch
-
-# Build portal docker image from debian package
+echo "Building portal docker image..."
 docker-compose build web
