@@ -11,11 +11,11 @@ x-service-base: &service_base
     - ${PORTAL_ENV_FILE:-portal.env}
   environment:
     # cross-service defaults
-    PGDATABASE: ${PGDATABASE:-portaldb}
-    PGHOST: ${PGHOST:-db}
-    PGPASSWORD: ${PGPASSWORD:-""}
-    PGUSER: ${PGUSER:-postgres}
-    REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+    PGDATABASE: portaldb
+    PGHOST: db
+    PGPASSWORD: ""
+    PGUSER: postgres
+    REDIS_URL: redis://redis:6379/0
 
 services:
   web:

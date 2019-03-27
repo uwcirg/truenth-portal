@@ -926,7 +926,7 @@
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
                         tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
-                        tooltipContainer.html("<b>" + i18next.t("PSA") + "</b> " + d.result + "<br/><span class='small-text'>" + d.date + "</span>")
+                        tooltipContainer.html("<b>" + i18next.t("PSA") + "</b> " + d.display + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
                             .style("left", (d3.event.pageX - TOOLTIP_WIDTH/2) + "px")

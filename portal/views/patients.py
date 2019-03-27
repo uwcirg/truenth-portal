@@ -68,9 +68,10 @@ def patients_root():
         if pref and pref.filters:
             pref_org_list = pref.filters.get('orgs_filter_control')
 
-        if user.has_role(ROLE.ADMIN.value):
-            # admins can view patients from *any* org
-            # apply only the user's org filter if found
+        if (user.has_role(ROLE.ADMIN.value) or
+                user.has_role(ROLE.INTERVENTION_STAFF.value)):
+            # admins and intervention_staff aren't generally restricted by
+            # organization - only apply a restriction if they've set a filter
             return pref_org_list
 
         org_list = set()
@@ -136,13 +137,21 @@ def patients_root():
     user = current_user()
     # Not including test accounts by default, unless requested
     include_test_roles = request.args.get('include_test_roles')
-    consent_query = UserConsent.query.filter(and_(
-        UserConsent.deleted_id.is_(None),
-        UserConsent.expires > datetime.utcnow()))
-    consented_users = [u.user_id for u in consent_query if u.staff_editable]
+
+    # If there are org restrictions, we also require consent
+    require_orgs = org_restriction(user)
+    consented_users = None
+    if require_orgs:
+        consent_query = UserConsent.query.filter(and_(
+            UserConsent.deleted_id.is_(None),
+            UserConsent.expires > datetime.utcnow()))
+        consented_users = [u.user_id for u in consent_query if u.staff_editable]
+
+    # Restrict by intervention or remove RCT user ids as applicable
     disallowed_iv_ids, required_iv_ids = intervention_restrictions(user)
+
     patients = active_patients(
-        require_orgs=org_restriction(user),
+        require_orgs=require_orgs,
         include_test_role=include_test_roles,
         include_deleted=True,
         require_interventions=required_iv_ids,

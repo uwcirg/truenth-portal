@@ -1,0 +1,17 @@
+---
+version: "3.4"
+services:
+  builder:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.build
+    environment:
+      GIT_REPO: /mnt/git_repo
+    volumes:
+      - source: ../debian/artifacts
+        target: /tmp/artifacts
+        type: bind
+      - source: ..
+        target: "${GIT_REPO:-/mnt/git_repo}"
+        type: bind
+        read_only: true

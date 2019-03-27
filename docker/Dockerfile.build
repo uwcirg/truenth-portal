@@ -1,0 +1,33 @@
+FROM debian:stretch
+
+ENV \
+    ARTIFACT_DIR=/tmp/artifacts \
+    DEBIAN_FRONTEND=noninteractive \
+    GIT_REPO=https://github.com/uwcirg/truenth-portal
+
+# Install tools for reading build-time dependencies; see `Build-Depends`
+# Squelch superfluous output; apt-get has poor verbosity control
+RUN \
+    apt-get update --quiet > /dev/null && \
+    apt-get install --quiet --quiet --no-install-recommends \
+        devscripts \
+        equivs \
+        git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
+        # only print package names and versions
+
+WORKDIR /root/portal
+
+# Checkout repo, install build dependencies, generate changelog and build package
+CMD \
+    git clone --verbose "${GIT_REPO}" . && \
+
+    mk-build-deps debian/control \
+        --install \
+        --remove \
+        --tool "apt-get --quiet --quiet --no-install-recommends" && \
+
+    debian/pre-build.sh && \
+    dpkg-buildpackage \
+        --unsigned-source \
+        --unsigned-changes && \
+    debian/post-build.sh
