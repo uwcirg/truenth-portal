@@ -403,23 +403,14 @@ def smartling_upload():
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
 
-    fix_references(messages_pot_fpath)
-    upload_pot_file(
-        fpath=messages_pot_fpath,
-        fname='messages.pot',
-        uri='portal/translations/messages.pot',
-    )
+    for pot_file_path in POT_FILES:
+        fix_references(pot_file_path)
 
-    frontend_pot_fpath = os.path.join(
-        translation_fpath, "js", "src", "frontend.pot"
-    )
-
-    fix_references(frontend_pot_fpath)
-    upload_pot_file(
-        fpath=frontend_pot_fpath,
-        fname='frontend.pot',
-        uri='portal/translations/js/src/frontend.pot'
-    )
+        upload_pot_file(
+            fpath=pot_file_path,
+            fname=os.path.basename(pot_file_path),
+            uri=pot_file_path,
+        )
 
 
 def upload_pot_file(fpath, fname, uri):
