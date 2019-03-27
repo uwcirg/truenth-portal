@@ -48,7 +48,7 @@ ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
 
 RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
-COPY debian/artifacts "${ARTIFACT_DIR}"
+COPY --from=builder "${ARTIFACT_DIR}" "${ARTIFACT_DIR}"
 
 RUN \
     apt-get update --quiet > /dev/null && \
