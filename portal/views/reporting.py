@@ -29,7 +29,7 @@ from ..models.organization import Organization, OrgTree
 from ..models.questionnaire_bank import visit_name
 from ..models.qb_status import QB_Status
 from ..models.role import ROLE
-from ..models.user import active_patients, current_user
+from ..models.user import current_user, patients_query
 from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
@@ -144,7 +144,8 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
-    for user in active_patients(include_test_role=False):
+    for user in patients_query(
+            acting_user=current_user(), include_test_role=False):
         a_s = QB_Status(user, as_of_date=datetime.utcnow())
         email = (
             user.email.encode('ascii', 'ignore') if user.email else None)
@@ -227,19 +228,19 @@ def questionnaire_status():
     else:
         as_of_date = datetime.utcnow()
 
-    # If limited by org - grab org and all it's children as required list
+    # If limited by org - grab org and all it's children as filter list
     org_id = request.args.get('org_id')
-    require_orgs = (
+    requested_orgs = (
         OrgTree().here_and_below_id(organization_id=org_id) if org_id
         else None)
 
     # Obtain list of qualifying patients
-    include_test_role = request.args.get('include_test_role', False)
-    patients = active_patients(
-        include_test_role=include_test_role,
-        require_orgs=require_orgs)
-
     acting_user = current_user()
+    include_test_role = request.args.get('include_test_role', False)
+    patients = patients_query(
+        acting_user=acting_user,
+        include_test_role=include_test_role,
+        requested_orgs=requested_orgs)
     results = []
     for patient in patients:
         if len(patient.organizations) == 0:

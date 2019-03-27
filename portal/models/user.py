@@ -23,7 +23,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
-from . import reference
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
 from ..dict_tools import dict_match, strip_empties
@@ -42,11 +41,17 @@ from .encounter import Encounter
 from .extension import CCExtension, TimezoneExtension
 from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier, UserIdentifier
-from .intervention import UserIntervention
+from .intervention import intervention_restrictions, UserIntervention
 from .observation import Observation, UserObservation
-from .organization import Organization, OrgTree, UserOrganization
+from .organization import (
+    Organization,
+    OrgTree,
+    UserOrganization,
+    org_restriction_by_role,
+)
 from .performer import Performer
 from .practitioner import Practitioner
+from .reference import Reference
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
 from .telecom import ContactPoint, Telecom
@@ -1019,7 +1024,7 @@ class User(db.Model, UserMixin):
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
             for o in self.organizations:
-                orgs.append(reference.Reference.organization(o.id).as_fhir())
+                orgs.append(Reference.organization(o.id).as_fhir())
             return orgs
 
         def deceased():
@@ -1063,7 +1068,7 @@ class User(db.Model, UserMixin):
         d['extension'] = extensions
         d['careProvider'] = careProviders()
         if self.practitioner_id:
-            d['careProvider'].append(reference.Reference.practitioner(
+            d['careProvider'].append(Reference.practitioner(
                 self.practitioner_id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
@@ -1390,7 +1395,7 @@ class User(db.Model, UserMixin):
             """Update user fields based on careProvider Reference types"""
             org_list = []
             for cp in fhir.get('careProvider'):
-                parsed = reference.Reference.parse(cp)
+                parsed = Reference.parse(cp)
                 if isinstance(parsed, Organization):
                     org_list.append(parsed)
                 elif isinstance(parsed, Practitioner):
@@ -1853,50 +1858,60 @@ def get_user_or_abort(uid, allow_deleted=False):
     return user
 
 
-def active_patients(
+def patients_query(
+        acting_user,
         include_test_role=False, include_deleted=False,
-        require_orgs=None, require_interventions=None,
-        disallow_interventions=None, filter_by_ids=None):
-    """Build query for active patients, filtered as specified
+        requested_orgs=None, filter_by_ids=None):
+    """Return query for patients, filtered as specified
 
-    Common query for active (not deleted) patients.
+    Build live SQLAlchemy query for patients, to which the acting_user has
+    view permission.
 
+    RCT restrictions implicitly applied, namely, those that have RCT
+    intervention access will see the respective RCT patients, and those
+    without shall have the RCT patients removed from the resulting list.
+
+    :param acting_user: User behind the request for whom roles define
+      some criteria
     :param include_test_role: Set true to include users with ``test`` role
     :param include_deleted: Set true to include deleted users
-    :param require_orgs: Provide list of organization IDs if patients must
-        also have the respective UserOrganization association (different from
-        consents!)  Patients required to have at least one, not all orgs in
-        given ``require_orgs`` list.
-    :param require_interventions: Provide list of intervention IDs if patients
-        must also have the respective UserIntervention association.  Patients
-        required to have at least one, not all interventions in given
-        ``require_interventions`` list.
-    :param disallow_interventions: Provide list of intervention IDs to
-        exclude associated patients, such as the randomized control
-        trial interventions.
-    :param filter_by_ids: List of user_ids to include in query filter
+    :param requested_orgs: Set if user requests a limited list of org IDs
     :return: Live SQLAlchemy ``Query``, for further filter additions or
      execution
 
     """
-    patients_query = User.query.join(
+    from .user_consent import UserConsent  # avoid cycle
+    disallow_interventions, require_interventions = (
+        intervention_restrictions(acting_user))
+
+    query = User.query.join(
         UserRoles).filter(User.id == UserRoles.user_id).join(
         Role).filter(Role.name == ROLE.PATIENT.value)
 
     if not include_deleted:
-        patients_query = patients_query.filter(User.deleted_id.is_(None))
+        query = query.filter(User.deleted_id.is_(None))
 
     if not include_test_role:
-        patients_query = patients_query.filter(
+        query = query.filter(
             ~User.roles.any(Role.name == ROLE.TEST.value))
 
+    require_orgs = org_restriction_by_role(
+        user=acting_user, requested_orgs=requested_orgs)
+
+    # If there are org restrictions, we also require consent
+    consented_users = None
     if require_orgs:
-        patients_query = patients_query.join(UserOrganization).filter(
+        query = query.join(UserOrganization).filter(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
 
+        consent_query = UserConsent.query.filter(and_(
+            UserConsent.deleted_id.is_(None),
+            UserConsent.expires > datetime.utcnow()))
+        consented_users = [u.user_id for u in consent_query if u.staff_editable]
+
     if require_interventions:
-        patients_query = patients_query.join(UserIntervention).filter(
+        query = query.join(UserIntervention).filter(
             User.id == UserIntervention.user_id).filter(
             UserIntervention.intervention_id.in_(require_interventions))
 
@@ -1904,13 +1919,15 @@ def active_patients(
         disallow_patient_ids = UserIntervention.query.filter(
             UserIntervention.intervention_id.in_(disallow_interventions)
         ).with_entities(UserIntervention.user_id).all()
-        patients_query = patients_query.filter(User.id.notin_(
+        query = query.filter(User.id.notin_(
             disallow_patient_ids))
 
+    if consented_users:
+        query = query.filter(User.id.in_(consented_users))
     if filter_by_ids:
-        patients_query = patients_query.filter(User.id.in_(filter_by_ids))
+        query = query.filter(User.id.in_(filter_by_ids))
 
-    return patients_query
+    return query
 
 
 class UserRoles(db.Model):

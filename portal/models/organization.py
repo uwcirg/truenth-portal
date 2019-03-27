@@ -3,14 +3,12 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
-from datetime import datetime
-
-from flask import abort, current_app, url_for
+from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from . import address
 from ..database import db
@@ -565,11 +563,11 @@ class ResearchProtocolExtension(CCExtension):
         for rp in rps:
             name = rp.get('name')
             if not name:
-                abort(400, "ResearchProtocol requires well defined name")
+                raise BadRequest(
+                    "ResearchProtocol requires well defined name")
             existing = ResearchProtocol.query.filter_by(name=name).first()
             if not existing:
-                abort(
-                    404,
+                raise NotFound(
                     "ResearchProtocol with name {} not found".format(name))
             if existing not in self.organization.research_protocols:
                 # Add the intermediary table type to include the
@@ -941,27 +939,51 @@ class OrgTree(object):
                 results.add(o.id)
         return results
 
-    def visible_orgs(self, staff_user):
-        """Returns organization IDs for whom the current staff_user can view
 
-        Staff users can view all patients at or below their own org
-        level.
+def org_restriction_by_role(user, requested_orgs):
+    """Return list of organizations user can and wants to see
 
-        NB - no patients should ever have a consent on file with the special
-        organization 'none of the above' - said organization is ignored in the
-        search.
+    :param requested_orgs: List of organization IDs the user has selected
+        for inclusion in filtering, may be None.  If defined, the return
+        list will be the intersection of the pref_org_list and the list of
+        organizations the user's role gives them the right to view.
 
-        """
-        if not (
-                staff_user.has_role(ROLE.STAFF.value) or
-                staff_user.has_role(ROLE.STAFF_ADMIN.value)):
-            raise Unauthorized("visible_orgs() exclusive to staff use")
+    :returns: None if no org restrictions apply, or a list of org_ids
 
-        staff_user_orgs = set()
-        for org in (o for o in staff_user.organizations if o.id != 0):
-            staff_user_orgs.update(self.here_and_below_id(org.id))
+    """
+    if (user.has_role(ROLE.ADMIN.value) or
+            user.has_role(ROLE.INTERVENTION_STAFF.value)):
+        # admins and intervention_staff aren't generally restricted by
+        # organization - only apply a restriction if they've set a filter
+        return requested_orgs
 
-        return list(staff_user_orgs)
+    org_list = set()
+    if user.has_role(ROLE.STAFF.value):
+        if user.has_role(ROLE.INTERVENTION_STAFF.value):
+            raise BadRequest(
+                "Patients list for staff and intervention-staff are"
+                " mutually exclusive - user shouldn't have both roles")
+
+        # Build list of all organization ids, and their descendants, the
+        # user belongs to
+        ot = OrgTree()
+
+        if requested_orgs:
+            # for preferred filtered orgs
+            requested_orgs = set(requested_orgs)
+            for orgId in requested_orgs:
+                if orgId == 0:  # None of the above doesn't count
+                    continue
+                for org in user.organizations:
+                    if orgId in ot.here_and_below_id(org.id):
+                        org_list.add(orgId)
+                        break
+        else:
+            for org in user.organizations:
+                if org.id == 0:  # None of the above doesn't count
+                    continue
+                org_list.update(ot.here_and_below_id(org.id))
+        return list(org_list)
 
 
 def add_static_organization():

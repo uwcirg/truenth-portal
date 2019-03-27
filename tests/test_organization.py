@@ -23,6 +23,7 @@ from portal.models.organization import (
     OrganizationResearchProtocol,
     OrgTree,
     ResearchProtocolExtension,
+    org_restriction_by_role,
 )
 from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
@@ -621,7 +622,7 @@ class TestOrganization(TestCase):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.test_user = db.session.merge(self.test_user)
 
-        org_list = OrgTree().visible_orgs(self.test_user)
+        org_list = org_restriction_by_role(self.test_user, None)
         assert len(org_list) == 0
 
     def test_user_org_get(self):
