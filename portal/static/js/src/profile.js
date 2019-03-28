@@ -1804,13 +1804,14 @@ export default (function() {
                     });
                 });
 
-                self.modules.tnthAjax.assessmentStatus(subjectId, function(data) {
-                    if (!data.error && (data.assessment_status).toUpperCase() === "COMPLETED" &&
-                        parseInt(data.outstanding_indefinite_work) === 0) {
-                        $("#assessmentLink").attr("disabled", true);
-                        $("#enterManualInfoContainer").text(i18next.t("All available questionnaires have been completed."));
-                    }
-                });
+                /* disabling this to accomodate entry of survey responses on paper */
+                // self.modules.tnthAjax.assessmentStatus(subjectId, function(data) {
+                //     if (!data.error && (data.assessment_status).toUpperCase() === "COMPLETED" &&
+                //         parseInt(data.outstanding_indefinite_work) === 0) {
+                //         $("#assessmentLink").attr("disabled", true);
+                //         $("#enterManualInfoContainer").text(i18next.t("All available questionnaires have been completed."));
+                //     }
+                // });
             },
             updateRolesData: function(event) {
                 var roles = $("#rolesGroup input:checkbox:checked").map(function() {
