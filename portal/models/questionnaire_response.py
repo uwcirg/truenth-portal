@@ -13,8 +13,8 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from .fhir import bundle_results
-from .organization import OrgTree
 from .reference import Reference
+from .user import User, patients_query
 
 
 class QuestionnaireResponse(db.Model):
@@ -215,7 +215,8 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
     # Gather up the patient IDs for whom current user has 'view' permission
-    user_ids = OrgTree().visible_patients(current_user)
+    user_ids = patients_query(
+        current_user, include_test_role=False).with_entities(User.id)
 
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(

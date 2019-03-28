@@ -295,7 +295,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
             initRoleBasedEvent: function() {
                 if (this.isAdminUser()) { /* turn on test account toggle checkbox if admin user */
                     $("#frmTestUsersContainer").removeClass("tnth-hide");
-                    $("#include_test_roles").on("click", function() {
+                    $("#include_test_role").on("click", function() {
                         $("#frmTestUsers").submit();
                     });
                 }

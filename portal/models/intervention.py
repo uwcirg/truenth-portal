@@ -3,10 +3,12 @@ from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.exceptions import BadRequest
 
 from ..database import db
 from ..dict_tools import strip_empties
 from .lazy import query_by_name
+from .role import ROLE
 
 LOGOUT_EVENT = 0b001
 USER_DOC_EVENT = 0b010
@@ -294,6 +296,47 @@ class UserIntervention(db.Model):
             cls.intervention_id == intervention_id,
             cls.access == 'granted'))
         return q.count() > 0
+
+
+def intervention_restrictions(user):
+    """returns tuple of lists for interventions: (disallow, require)
+
+    Users may not have access to some interventions (such as randomized
+    control trials).  In such a case, the first of the tuple items
+    will name intervention ids which should not be included.
+
+    Other users get access to all patients with one or more
+    interventions.  In this case, a list of interventions for which
+    the user should be granted access is in the second position.
+
+    :returns disallow, require::
+      disallow: list of intervention IDs to exclude associated patients,
+        such as the randomized control trial interventions.
+      require: list of intervention IDs if patients must also have the
+        respective UserIntervention association.
+
+    """
+    if user.has_role(ROLE.ADMIN.value):
+        return None, None  # no restrictions
+
+    disallowed, required = None, None
+    if user.has_role(ROLE.STAFF.value):
+        if user.has_role(ROLE.INTERVENTION_STAFF.value):
+            raise BadRequest(
+                "Patients list for staff and intervention-staff are "
+                "mutually exclusive - user shouldn't have both roles")
+
+        # staff users aren't to see patients from RCT interventions
+        disallowed = Intervention.rct_ids()
+    if user.has_role(ROLE.INTERVENTION_STAFF.value):
+        # Look up associated interventions
+        uis = UserIntervention.query.filter(
+            UserIntervention.user_id == user.id)
+        # check if the user is associated with any intervention at all
+        if uis.count() == 0:
+            raise BadRequest("User is not associated with any intervention.")
+        required = [ui.intervention_id for ui in uis]
+    return disallowed, required
 
 
 STATIC_INTERVENTIONS = {
