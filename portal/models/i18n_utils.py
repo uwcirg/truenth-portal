@@ -313,11 +313,9 @@ def compile_pos():
 
 
 def upsert_to_template_file():
-    db_translatables = {}
-    db_translatables.update(get_db_strings())
+    db_translatables = get_db_strings()
     if not db_translatables:
-        current_app.logger.warn("no DB strings extracted")
-        return
+        sys.exit("no DB strings extracted")
 
     db_translatables.update(get_static_strings())
 
@@ -352,7 +350,7 @@ def upsert_to_template_file():
             potfile.truncate(0)
             potfile.seek(0)
             potfile.writelines(potlines)
-    except:
+    except IOError, OSError:
         exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
         sys.exit(
             "Could not write to translation file!\n ->%s" % (exceptionValue))
