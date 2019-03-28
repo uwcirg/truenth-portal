@@ -8,14 +8,9 @@
  * run gulp --gulpfile i18next_gulpfile.js [task name]  will run individual task
  * NB:  should NOT run this in Production environment, the resulting modules in node_modules/ folder from running `npm install` should never be checked in
  */
-var gulp = require("gulp");
-var source = require("vinyl-source-stream");
-var request = require("request");
-var merge = require("merge2");
-var buffer = require("gulp-buffer");
+var {series, src, dest} = require("gulp");
 var del = require("del");
 var scanner = require("i18next-scanner");
-var concatPo = require("gulp-concat-po");
 var merge_json = require("gulp-merge-json");
 var using = require("gulp-using");
 const path = require("path");
@@ -55,7 +50,7 @@ function save(target) {
  * i18next scanner helper function
  */
 function i18nextScanner(files, outputFileName) {
-  return gulp.src(files)
+  return src(files)
                .pipe(scanner({
                     keySeparator: "|",
                     nsSeparator: "|",
@@ -76,7 +71,7 @@ function i18nextScanner(files, outputFileName) {
                         suffix: "}"
                     }
                 }))
-              .pipe(gulp.dest("translations/js"));
+              .pipe(dest("translations/js"));
 };
 
 /*
@@ -89,94 +84,127 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
      * write corresponding json file from source po file
      */
     try {
-      console.log("source file, " + messageFilePath + ", found for locale: ", locale);
+      console.log("source file, " + messageFilePath + ", found for locale: ", locale, " outputFileName:", outputFileName);
       i18nextConv.gettextToI18next(locale, fs.readFileSync(messageFilePath), false)
       .then(save(outputFileName));
     } catch(e) {
       console.log("Error occurred writing json from po file: ", messageFilePath);
     };
-  };
+  }
 };
+
+/*
+ * clean eproms source json file
+ */
+const cleanEpromsSrc = function(callback) {
+  console.log("delete EPROM source JSON file...");
+  del([translationSourceDir + epromsNameSpace + ".json"]);
+  callback();
+};
+exports.cleanEpromsSrc = series(cleanEpromsSrc);
+/*
+ * clean Truenth source json file
+ */
+const cleanTruenthSrc = function(callback) {
+  console.log("Delete Truenth source JSON file...");
+  del([translationSourceDir + truenthNameSpace + ".json"]);
+  callback();
+};
+exports.cleanTruenthSrc = series(cleanTruenthSrc);
+/*
+ * clean common source file
+ */
+const cleanSrc = function(callback) {
+  console.log("Deleting json files in source directory...");
+  del([translationSourceDir + nameSpace + ".json"]);
+  callback();
+};
+exports.cleanSrc = series(cleanSrc);
+
+/*
+ * clean all generated destination json files
+ */
+const cleanDest = function(callback) {
+  console.log("deleting json files in destination directory...");
+  del([translationDestinationDir + "*/*.json"]);
+  callback();
+};
+exports.cleanDest = series(cleanDest);
 
 /*
  * extracting text from common js/html files into json file
  */
-gulp.task("i18next-extraction", ["clean-src"], function() {
-  console.log("extracting text and generate json file ...");
-  return i18nextScanner(["static/**/*.{js,html}", "templates/*.html"], "./src/" + nameSpace + ".json");
-});
+const i18nextExtraction = function(callback) {
+  console.log("Extracting i18next strings from JS and HTML template files...");
+  i18nextScanner(["static/**/*.{js,html}", "templates/*.html"], "./src/" + nameSpace + ".json");
+  callback();
+}
+exports.i18nextExtraction = series(cleanSrc, i18nextExtraction);
 
 
 /*
  * extracting text from  Eproms html files into json file
  */
-gulp.task("i18next-extraction-eproms", ["clean-eproms-src"], function() {
-  console.log("extracting text and generate json file ...");
-  return i18nextScanner(["eproms/templates/eproms/*.html"], "./src/" + epromsNameSpace + ".json");
-});
+const i18nextExtractionEproms = function(callback) {
+  console.log("Extracting i18next strings and generate EPROMS source json file ...");
+  i18nextScanner(["eproms/templates/eproms/*.html"], "./src/" + epromsNameSpace + ".json");
+  callback();
+};
+exports.i18nextExtractionEproms = series(cleanEpromsSrc, i18nextExtractionEproms);
 
 
 /*
  * extracting text from TrueNTH html files into json file
  */
-gulp.task("i18next-extraction-truenth", ["clean-truenth-src"], function() {
-  console.log("extracting text and generate json file ...");
-  return i18nextScanner(["gil/templates/gil/*.html"], "./src/" + truenthNameSpace + ".json");
-});
+const i18nextExtractionTruenth = function(callback) {
+  console.log("extracting i18next strings and generating TRUENTH source json file ...");
+  i18nextScanner(["gil/templates/gil/*.html"], "./src/" + truenthNameSpace + ".json");
+  callback();
+};
+exports.i18nextExtractionTruenth = series(cleanTruenthSrc, i18nextExtractionTruenth);
 
 /*
  * convert eproms json to pot (the definition file) for translator's consumption
  */
-gulp.task("i18nextConvertEpromsJSONToPOT", ["i18next-extraction-eproms"], function() {
-
-  const options = {/* you options here */}
-  /*
-  * converting json to pot
-  */
-  console.log("converting Eproms JSON to POT...");
-  return i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+epromsNameSpace+".json"), options).then(save(epromsSrcPotFileName));
-
-});
-
+const i18nextConvertEpromsJSONToPOT = function(callback) {
+  console.log("Converting EPROMS JSON source file to POT file...");
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+epromsNameSpace+".json"), options).then(function() {
+    save(epromsSrcPotFileName);
+    callback();
+  });
+};
+exports.i18nextConvertEpromsJSONToPOT = series(i18nextExtractionEproms, i18nextConvertEpromsJSONToPOT);
 /*
  * convert TrueNTH json to pot (the definition file) for translator's consumption
  */
-gulp.task("i18nextConvertTruenthJSONToPOT", ["i18next-extraction-truenth"], function() {
-
-  const options = {/* you options here */}
-  /*
-  * converting json to pot
-  */
-  console.log("converting gil JSON to POT...");
-  return i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+truenthNameSpace+".json"), options).then(save(truenthSrcPotFileName));
-
-});
+const i18nextConvertTruenthJSONToPOT = function(callback) {
+  options = {
+    /*
+    specify options here */
+  };
+  console.log("Converting GIL JSON source file to POT file...");
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+truenthNameSpace+".json"), options).then(function() {
+    save(truenthSrcPotFileName);
+    callback();
+  });
+};
+exports.i18nextConvertTruenthJSONToPOT = series(i18nextExtractionTruenth, i18nextConvertTruenthJSONToPOT);
 
 /*
  * convert common json file to pot (the definition file) for translator's consumption
  */
-gulp.task("i18nextConvertJSONToPOT", ["i18next-extraction"], function() {
-
-  const options = {/* you options here */}
-
-  /*
-    * converting json to pot
-  */
-  console.log("converting common JSON to POT...");
-  return i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(save(srcPotFileName));
-
-});
-
-/*
- * combine newly created pot file to existing messages.pot file ???
- * do we need this step??
- */
-gulp.task("combineAllPotFiles", ["i18nextConvertJSONToPOT"], function() {
-    console.log("combine all pot files ...")
-    return gulp.src([srcPotFileName, "translations/messages.pot"])
-          .pipe(concatPo("messages.pot"))
-          .pipe(gulp.dest("translations"));
-});
+const i18nextConvertJSONToPOT = function(callback) {
+  options = {
+    /*
+    specify options here */
+  };
+  console.log("Converting common JSON source file to POT file");
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(function() {
+    save(srcPotFileName);
+    callback();
+  });
+};
+exports.i18nextConvertJSONToPOT = series(i18nextExtraction, i18nextConvertJSONToPOT);
 
 /*
  * converting po to json files
@@ -186,14 +214,14 @@ gulp.task("combineAllPotFiles", ["i18nextConvertJSONToPOT"], function() {
  *    2. translated JSON into POT
  *    3. Po files have been returned from translator after uploading POT file from #2
  */
-gulp.task("i18nextConvertPOToJSON", ["clean-dest"], function() {
-  console.log("converting po to json ...");
-  const options = {/* you options here */}
+const i18nextConvertPOToJSON = function(callback) {
+  console.log("Converting PO files to destination JSON files ...");
+  const options = {/* you options here */};
    /*
     * translating po file to json for supported languages
     */
   var __path = path.join(__dirname,"./translations");
-  return fs.readdir(__path, function(err, files) {
+  fs.readdir(__path, function(err, files) {
       files.forEach(function(file) {
         //skip js directory - as it contains original translation json file
         if (file.toLowerCase() !== "js") {
@@ -221,21 +249,22 @@ gulp.task("i18nextConvertPOToJSON", ["clean-dest"], function() {
         }
       });
   });
-});
-
+  callback();
+};
+exports.i18nextConvertPOToJSON = series(i18nextConvertPOToJSON);
 
 /*
  * combining each json file in each locale folder into one file, namely, the translation.json file, to be consumed by the frontend
  * NOTE this task will need to be run after i18nextConvertPOToJSON task, which creates json files from po files
  */
-gulp.task("combineTranslationJsons", function() {
-  console.log("combining json files ...");
-  const options = {/* you options here */}
+const combineTranslationJsons = function(callback) {
+  console.log("Combining JSON files in each destination directory ...");
+  const options = {/* you options here */};
    /*
     * translating po file to json for supported languages
     */
   var __path = path.join(__dirname,"./translations");
-  return fs.readdir(__path, function(err, files) {
+  fs.readdir(__path, function(err, files) {
       files.forEach(function(file) {
           let filePath = __path + "/" + file;
           fs.stat(filePath, function(err, stat) {
@@ -253,12 +282,12 @@ gulp.task("combineTranslationJsons", function() {
                   console.log("merge json files...");
                   console.log("destination directory: " + destDir);
                   try {
-                    gulp.src(destDir +"/*.json")
-                      .pipe(using({}))
+                    src(destDir +"/*.json")
+                      .pipe(using())
                       .pipe(merge_json({
                         fileName: "translation.json"
                       }))
-                      .pipe(gulp.dest(destDir));
+                      .pipe(dest(destDir));
                   } catch(e) {
                     console.log("Error occurred merging files " + e.message);
                   };
@@ -267,61 +296,14 @@ gulp.task("combineTranslationJsons", function() {
           });
       });
   });
-});
-
-/*
- * clean eproms source file
- */
-gulp.task("clean-eproms-src", function() {
-  console.log("delete source file...");
-  return del([translationSourceDir + epromsNameSpace + ".json"]);
-});
-
-
-/*
- * clean truenth source file
- */
-gulp.task("clean-truenth-src", function() {
-  console.log("delete source file...");
-  return del([translationSourceDir + truenthNameSpace + ".json"]);
-});
-
-/*
- * clean common source file
- */
-gulp.task("clean-src", function() {
-  console.log("delete source file...");
-  return del([translationSourceDir + nameSpace + ".json"]);
-});
-
-/*
- * clean all generated destination json files
- */
-gulp.task("clean-dest", function() {
-  console.log("delete json files...");
-  return del([translationDestinationDir + "*/*.json"]);
-});
-
-/*
- * convert eproms translation json file to pot file
- */
-gulp.task("eproms", ["i18nextConvertEpromsJSONToPOT"], function() {
-  console.log("Running eproms translation task...");
-});
-
-/*
- * convert truenth translation json file to pot file
- */
-gulp.task("gil", ["i18nextConvertTruenthJSONToPOT"], function() {
-  console.log("Running gil translation task...");
-});
-
-
+  callback();
+};
+exports.combineTranslationJsons = series(combineTranslationJsons);
+exports.eproms = series(i18nextConvertEpromsJSONToPOT);
+exports.gil = series(i18nextConvertTruenthJSONToPOT);
 /*
  * NOTE, the task - converting po to json file is not included, as I think we need to upload pot to smartling first to have
    it return the po files
    so probably should run "i18nextConvertPOToJSON" task separately
  */
-gulp.task("default", ["i18nextConvertJSONToPOT"], function() {
-    console.log("running default task..");
-});
+exports.default = series(i18nextConvertJSONToPOT);

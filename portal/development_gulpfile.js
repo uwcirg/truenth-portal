@@ -7,34 +7,26 @@
  * for compiling less file, run specific task to compile each respective portal less file, e.g. gulp --gulpfile less_css_gulpfile.js [task name]
  * Running each compiling task will generate sourcemap for each less to css mappings
  */
-const gulp = require("gulp");
+const {series, parallel, watch, src, dest} = require("gulp");
 const concat = require("gulp-concat");
 const rename = require("gulp-rename");
 const sourcemaps = require("gulp-sourcemaps");
 const rootPath = "./";
 const GILPath = rootPath + "/gil/";
 const EPROMSPath = rootPath + "/eproms/";
-const jsPath = rootPath + "static/js";
-const jsSrc = rootPath + "static/js/src";
-const jsDest = rootPath + "static/js/dist";
 const lessPath = rootPath + "static/less";
 const cssPath = rootPath + "static/css";
 const mapPath = rootPath + "static/maps";
-const gutil = require("gulp-util");
-const jshint = require("gulp-jshint");
 const less = require("gulp-less");
-const LessPluginCleanCSS = require("less-plugin-clean-css"),
-    cleancss = new LessPluginCleanCSS({
-        advanced: true
-    });
 const replace = require("replace-in-file");
-const postCSS = require("gulp-clean-css");
 const GIL = "gil";
 const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
 const PSATRACKER = "psaTracker";
-const jsMainFiles = [jsSrc];
+const cleancss = require("clean-css");
+
+/*eslint no-console: off */
 
 // fetch command line arguments
 const arg = (argList => {
@@ -61,27 +53,6 @@ const arg = (argList => {
 
 })(process.argv);
 
-//linting JS
-/*
- * note can pass command line argument for a particular js file to lint
- * example: gulp jshint --file './static/js/main.js'
- * alternatively can use eslint, see command line tool:  https://eslint.org/docs/user-guide/getting-started
- */
-gulp.task("jshint", function() {
-    var files = jsMainFiles;
-    if (arg.file) {
-      files = [arg.file];
-    }
-    return gulp.src(files)
-        .pipe(jshint())
-        .pipe(jshint.reporter("jshint-stylish"));
-});
-
-//for development, any change in JS mail files will resulted in scripts task being run
-gulp.task("watchJS", function() {
-    gulp.watch(jsMainFiles, ["jshint"]);
-});
-
 /*
  * a workaround to replace $stdin string automatically added by gulp-less module
  */
@@ -102,20 +73,24 @@ function replaceStd(fileName) {
 /*
  * transforming eproms less to css
  */
-gulp.task("epromsLess", function() {
-    return gulp.src(lessPath + "/" + EPROMS + ".less")
+const epromsLess = function(callback) {
+    console.log("Compiling eproms Less.");
+    src(lessPath + "/" + EPROMS + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../../" + mapPath))
-        .pipe(gulp.dest(EPROMSPath + cssPath));
-});
+        .pipe(dest(EPROMSPath + cssPath));
+    callback();
+};
+exports.epromsLess = series(epromsLess);
 /*
  * transforming portal less to css
  */
-gulp.task("portalLess", function() {
-    gulp.src(lessPath + "/" + PORTAL + ".less")
+const portalLess = function(callback) {
+    console.log("Compiling portal less");
+    src(lessPath + "/" + PORTAL + ".less")
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + PORTAL + ".less"]
         }))
@@ -123,17 +98,19 @@ gulp.task("portalLess", function() {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../"+mapPath)) /* see documentation, https://www.npmjs.com/package/gulp-sourcemaps, to write external source map files, pass a path relative to the destination */
-        .pipe(gulp.dest(cssPath))
+        .pipe(dest(cssPath))
         .on("end", function() {
             replaceStd(PORTAL + ".css.map");
         });
-    return true;
-});
+    callback();
+};
+exports.portalLess = series(portalLess);
 /*
  * transforming GIL less to css
  */
-gulp.task("gilLess", () => {
-    gulp.src(lessPath + "/" + GIL + ".less")
+const gilLess = function(callback) {
+    console.log("Compiling GIL less");
+    src(lessPath + "/" + GIL + ".less")
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + GIL + ".less"]
         }))
@@ -141,62 +118,92 @@ gulp.task("gilLess", () => {
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
-        .pipe(gulp.dest(GILPath + cssPath))
+        .pipe(dest(GILPath + cssPath))
         .on("end", function() {
             replaceStd(GIL + ".css.map");
         });
-    return true;
-});
-/*
- *transforming portal wrapper/top nav less to css
- */
+    callback();
+};
+exports.gilLess = series(gilLess);
 
-gulp.task("topnavLess", function() {
-    gulp.src(lessPath + "/" + TOPNAV + ".less")
+/*
+ * transforming portal wrapper/top nav less to css
+ */
+const topnavLess = function(callback) {
+    console.log("Compiling portal wrapper less.");
+    src(lessPath + "/" + TOPNAV + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
-        .pipe(gulp.dest(cssPath))
+        .pipe(dest(cssPath))
         .on("end", function() {
             replaceStd(TOPNAV + ".css.map");
         });
-    return true;
-});
+    callback();
 
-gulp.task("psaTrackerLess", function() {
-    gulp.src(lessPath + "/" + PSATRACKER + ".less")
+};
+exports.topnavLess = series(topnavLess);
+
+/*
+ * transforming PSA tracker less to css
+ */
+const psaTrackerLess = function(callback) {
+    console.log("Compiling PSA Tracker less.");
+    src(lessPath + "/" + PSATRACKER + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
             plugins: [cleancss]
         }))
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
-        .pipe(gulp.dest(cssPath))
+        .pipe(dest(cssPath))
         .on("end", function() {
             replaceStd(PSATRACKER + ".css.map");
         });
-    return true;
-});
+    callback();
+};
+exports.psaTrackerLess = series(psaTrackerLess);
+
 /*
  * running watch task will update css automatically in vivo
  * useful during development
  */
-gulp.task("watchEproms", function() {
-    gulp.watch(lessPath + "/eproms.less", ["epromsLess"]);
-});
-gulp.task("watchPortal", function() {
-    gulp.watch(lessPath + "/portal.less", ["portalLess"]);
-});
-gulp.task("watchGil", function() {
-    gulp.watch(lessPath + "/gil.less", ["gilLess"]);
-});
-gulp.task("watchTopnav", function() {
-    gulp.watch(lessPath + "/topnav.less", ["topnavLess"]);
-});
-gulp.task("watchPsaTracker", function() {
-    gulp.watch(lessPath + "/" + PSATRACKER + ".less", ["psaTrackerLess"]);
-});
-gulp.task("lessAll", ["epromsLess", "portalLess", "topnavLess", "gilLess", "psaTrackerLess"], function() {
-    console.log("Compiling LESS files completed."); /*eslint no-console: off */
-});
+const watchEproms = function(callback) {
+    console.log("watching EPROMS less file");
+    watch([lessPath + "/" + EPROMS + ".less"]);
+    callback();
+};
+exports.watchEproms = series(watchEproms);
+
+const watchPortal = function(callback) {
+    console.log("watching Portal less file");
+    watch([lessPath + "/portal.less"]);
+    callback();
+};
+exports.watchPortal = series(watchPortal);
+
+const watchGil = function(callback) {
+    console.log("watching GIL less file");
+    watch([lessPath + "/gil.less"]);
+    callback();
+};
+exports.watchGil = series(watchGil);
+
+const watchTopnav = function(callback) {
+    console.log("watching portal wrapper less file");
+    watch([lessPath + "/topnav.less"]);
+    callback();
+};
+exports.watchTopnav = series(watchTopnav);
+const watchPsaTracker = function(callback) {
+    console.log("watching PSA Tracker less file");
+    watch([lessPath + "/" + PSATRACKER + ".less"]);
+    callback();
+};
+exports.watchPsaTracker = series(watchPsaTracker);
+
+/*
+ * compile all portal less files 
+ */
+exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess));
