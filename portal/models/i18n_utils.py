@@ -55,6 +55,8 @@ def smartling_authenticate():
         token = resp.json()['response']['data']['accessToken']
     except KeyError:
         sys.exit("no smartling access token found")
+
+    current_app.logger.info("authenticated in Smartling")
     return token
 
 
@@ -423,7 +425,6 @@ def upload_pot_file(fpath, fname, uri):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
 
     creds = {'bearer_token': smartling_authenticate()}
-    current_app.logger.debug("authenticated in Smartling")
     with open(fpath, 'rb') as potfile:
         resp = requests.post(
             upload_url.format(project_id),
@@ -442,7 +443,6 @@ def smartling_download(state, language=None):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
 
     creds = {'bearer_token': smartling_authenticate()}
-    current_app.logger.debug("authenticated in smartling")
     download_and_extract_po_file(
         language=language,
         fname='messages',
