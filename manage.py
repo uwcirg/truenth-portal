@@ -22,8 +22,13 @@ from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
 from portal.models.clinical_constants import add_static_concepts
-from portal.models.i18n import smartling_download, smartling_upload
-from portal.models.i18n_utils import compile_pos, download_all_translations
+from portal.models.i18n_utils import (
+    build_pot_files,
+    compile_pos,
+    download_all_translations,
+    smartling_download,
+    smartling_upload,
+)
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
@@ -293,6 +298,14 @@ def translation_upload():
     POSTs said .pot file to Smartling via their API
     """
     smartling_upload()
+
+@app.cli.command()
+def extract_i18n():
+    """Update .pot file on Smartling
+
+    Creates a new .pot file, updates the file with relevant DB entries
+    """
+    build_pot_files()
 
 
 @click.option('--language', '-l', help='language code (e.g. en_US).')
