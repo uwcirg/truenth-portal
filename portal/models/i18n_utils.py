@@ -381,8 +381,8 @@ def fix_references(pot_fpath):
     current_app.logger.debug("messages.pot file references fixed")
 
 
-def smartling_upload():
-    """Extract and upload strings to Smartling"""
+def build_pot_files():
+    """Extract back-end strings and fix POT file references"""
     messages_pot_fpath = os.path.join(
         current_app.root_path,
         'translations',
@@ -413,30 +413,27 @@ def smartling_upload():
     for pot_file_path in POT_FILES:
         fix_references(pot_file_path)
 
-        upload_pot_file(
-            fpath=pot_file_path,
-            fname=os.path.basename(pot_file_path),
-            uri=pot_file_path,
-        )
+def smartling_upload():
+    """Upload strings to Smartling"""
 
+    build_pot_files()
 
-def upload_pot_file(fpath, fname, uri):
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-
     creds = {'bearer_token': smartling_authenticate()}
-    with open(fpath, 'rb') as potfile:
-        resp = requests.post(
-            upload_url.format(project_id),
-            data={'fileUri': uri, 'fileType': 'gettext'},
-            files={'file': (fname, potfile)},
-            auth=BearerAuth(**creds),
-        )
-        resp.raise_for_status()
+    for pot_file_path in POT_FILES:
+        with open(pot_file_path, 'rb') as potfile:
+            resp = requests.post(
+                upload_url.format(project_id),
+                data={'fileUri': uri, 'fileType': 'gettext'},
+                files={'file': (fname, potfile)},
+                auth=BearerAuth(**creds),
+            )
+            resp.raise_for_status()
 
-    current_app.logger.debug(
-        "{} uploaded to Smartling project {}".format(fname, project_id)
-    )
+        current_app.logger.info(
+            "{} uploaded to Smartling project {}".format(fname, project_id)
+        )
 
 
 def smartling_download(state, language=None):
