@@ -14,7 +14,7 @@ from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE, Role
-from portal.models.user import User, UserRoles, active_patients
+from portal.models.user import User, UserRoles
 from portal.models.overall_status import OverallStatus
 
 # revision identifiers, used by Alembic.
@@ -61,6 +61,8 @@ def upgrade():
         return  # nothing to do on systems w/o RP changes
     fix_map = dict()
 
+    raise RuntimeError(
+        "Unsupported migration; code has changed - not maintained")
     for patient in active_patients(include_test_role=True).order_by(User.id):
         qnrs = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == patient.id).order_by(
