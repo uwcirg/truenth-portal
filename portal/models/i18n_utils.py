@@ -459,23 +459,20 @@ def smartling_download(state, language=None):
 
 
 def download_po_file(language, credentials, project_id, uri, state):
-    if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
-        sys.exit('invalid language code; expected format xx_XX')
-    language_id = language.replace('_', '-')
-    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
-        project_id,
-        language_id,
-    )
+    lang_code = language.replace('_', '-')
+    url = ''.join((
+        'https://api.smartling.com',
+        '/files-api/v2/projects/{}/locales/{}/file'.format(project_id, lang_code)
+    ))
     resp = requests.get(
         url,
+        params={'retrievalType': state, 'fileUri': uri},
         auth=BearerAuth(**credentials),
-        params={
-            'retrievalType': state,
-            'fileUri': uri,
-        },
     )
+    resp.raise_for_status()
+
     if not resp.content:
         sys.exit('no file returned')
-    current_app.logger.debug("{} po file downloaded "
-                             "from smartling".format(language))
+    current_app.logger.debug("{} po file downloaded from smartling".format(language))
+
     return resp.content
