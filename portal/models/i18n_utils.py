@@ -1,4 +1,5 @@
 """Module for i18n methods and functionality"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
@@ -320,12 +321,13 @@ def upsert_to_template_file():
     db_translatables.update(get_static_strings())
 
     try:
-        with open(
+        with io.open(
             os.path.join(
                 current_app.root_path,
                 "translations/messages.pot",
             ),
             "r+",
+            encoding="utf-8",
         ) as potfile:
             potlines = potfile.readlines()
             for i, line in enumerate(potlines):
