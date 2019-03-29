@@ -819,7 +819,7 @@ def withdraw_user_consent(user_id):
         acting_user=current_user())
 
 
-def withdraw_consent(user, org_id, acceptance_date, acting_user):
+def withdraw_consent(user, org_id, acting_user, acceptance_date=None):
     """execute consent withdrawal - view and test friendly function"""
     uc = UserConsent.query.filter_by(
         user_id=user.id, organization_id=org_id, status='consented').first()
