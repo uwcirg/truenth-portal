@@ -1,7 +1,7 @@
 """Unit test module for user consent"""
 from __future__ import unicode_literals  # isort:skip
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
@@ -301,7 +301,9 @@ class TestUserConsent(TestCase):
         self.test_user = db.session.merge(self.test_user)
         assert len(self.test_user.valid_consents) == 1
 
-        data = {'organization_id': org_id}
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        yesterday = yesterday.replace(microsecond=0)
+        data = {'organization_id': org_id, 'acceptance_date': yesterday}
         self.login()
         resp = self.client.post(
             '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
@@ -324,3 +326,4 @@ class TestUserConsent(TestCase):
             new_consent.staff_editable ==
             (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
+        assert new_consent.acceptance_date == yesterday
