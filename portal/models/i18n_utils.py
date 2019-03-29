@@ -422,17 +422,18 @@ def smartling_upload():
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
+        filename = os.path.basename(pot_file_path)
         with open(pot_file_path, 'rb') as potfile:
             resp = requests.post(
                 upload_url.format(project_id),
                 data={'fileUri': pot_file_path, 'fileType': 'gettext'},
-                files={'file': (fname, potfile)},
+                files={'file': (filename, potfile)},
                 auth=BearerAuth(**creds),
             )
             resp.raise_for_status()
 
         current_app.logger.info(
-            "{} uploaded to Smartling project {}".format(fname, project_id)
+            "{} uploaded to Smartling project {}".format(filename, project_id)
         )
 
 
