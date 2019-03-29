@@ -425,7 +425,7 @@ def smartling_upload():
         with open(pot_file_path, 'rb') as potfile:
             resp = requests.post(
                 upload_url.format(project_id),
-                data={'fileUri': uri, 'fileType': 'gettext'},
+                data={'fileUri': pot_file_path, 'fileType': 'gettext'},
                 files={'file': (fname, potfile)},
                 auth=BearerAuth(**creds),
             )
