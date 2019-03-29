@@ -755,6 +755,13 @@ def withdraw_user_consent(user_id):
           required:
             - organization_id
           properties:
+            acceptance_date:
+              type: string
+              format: date-time
+              description:
+                optional UTC date-time for when the withdrawal occurred if
+                other than the defaults of utcnow.
+                Dates in the future are not valid
             organization_id:
               type: integer
               format: int64
@@ -799,13 +806,20 @@ def withdraw_user_consent(user_id):
     org_id = request.json.get('organization_id')
     if not org_id:
         abort(400, "missing required organization ID")
+    acceptance_date = None
+    if 'acceptance_date' in request.json:
+        acceptance_date = FHIR_datetime.parse(request.json['acceptance_date'])
+        if acceptance_date > datetime.utcnow():
+            abort(400, "Future `acceptance_date` not permitted")
 
     current_app.logger.debug('withdraw user consent called for user {} '
                              'and org {}'.format(user.id, org_id))
-    return withdraw_consent(user, org_id, acting_user=current_user())
+    return withdraw_consent(
+        user=user, org_id=org_id, acceptance_date=acceptance_date,
+        acting_user=current_user())
 
 
-def withdraw_consent(user, org_id, acting_user):
+def withdraw_consent(user, org_id, acceptance_date, acting_user):
     """execute consent withdrawal - view and test friendly function"""
     uc = UserConsent.query.filter_by(
         user_id=user.id, organization_id=org_id, status='consented').first()
@@ -814,9 +828,11 @@ def withdraw_consent(user, org_id, acting_user):
         abort(404, "no UserConsent found for user ID {} and org ID {}".format(
             user.id, org_id))
     try:
+        if not acceptance_date:
+            acceptance_date = datetime.utcnow()
         suspended = UserConsent(
             user_id=user.id, organization_id=org_id, status='suspended',
-            acceptance_date=datetime.utcnow(), agreement_url=uc.agreement_url)
+            acceptance_date=acceptance_date, agreement_url=uc.agreement_url)
         suspended.send_reminders = False
         suspended.include_in_reports = True
         suspended.staff_editable = (not current_app.config.get('GIL'))
