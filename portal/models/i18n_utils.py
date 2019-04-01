@@ -423,7 +423,7 @@ def smartling_upload():
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
         filename = os.path.basename(pot_file_path)
-        with io.open(pot_file_path, 'r', encoding='utf-8',) as potfile:
+        with io.open(pot_file_path, 'r', encoding='utf-8') as potfile:
             resp = requests.post(
                 upload_url.format(project_id),
                 data={'fileUri': pot_file_path, 'fileType': 'gettext'},
