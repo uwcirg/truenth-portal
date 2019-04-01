@@ -129,43 +129,40 @@ export default (function() { /*global i18next $ */
 
         var topList = self.getTopLevelOrgs();
         topList.forEach(function(orgId) {
-            var allChildrenHidden = true;
             $("#" + self.containerElementId + " .org-container[data-parent-id='" + orgId + "']").each(function() {
                 var subOrgs = $(this).find(".org-container");
                 if (subOrgs.length > 0) {
                     var allSubOrgsHidden = true;
                     subOrgs.each(function() {
-                        var isVisible = false;
-                        $(this).find("input[name='organization']").each(function() {
-                            if ($(this).is(":visible") || String($(this).css("display")) !== "none") {
-                                isVisible = true;
-                                allChildrenHidden = false;
-                            }
+                        var visibleInputElements = $.grep($(this).find("input[name='organization']"), function(el){
+                            return $(el).is(":visible") || String($(el).css("display")) !== "none";
                         });
-                        if (!isVisible) {
+                        if (!visibleInputElements.length) {
                             $(this).hide();
                         } else {
+                            //set flag to false and return, no need to continue;
                             allSubOrgsHidden = false;
+                            return false;
                         }
                     });
                     if (allSubOrgsHidden) {
                         $(this).children("label").hide();
                     }
-                } else {
-                    var ip = $(this).find("input[name='organization']");
-                    if (ip.length > 0) {
-                        ip.each(function() {
-                            if ($(this).is(":visible") || String($(this).css("display")) !== "none") {
-                                allChildrenHidden = false;
-                            }
-                        });
-                    }
-                }
+                } 
             });
-            if (allChildrenHidden) {
-                $("#"+self.getContainerElementId()).find("legend[orgid='" + orgId + "']").hide();
+            /* for each top level organization, if there is matching org elements, show the legend, else hide it*/
+            var parentContainer = $("#" + orgId + "_container");
+            var inputElements = parentContainer.find("input[name='organization']");
+            var eligibleEls = $.grep (inputElements, function(el) {
+                return $(el).is(":visible") || String($(el).css("display")) !== "none";
+            });
+            if (eligibleEls.length) {
+                parentContainer.find("legend").show();
+            } else {
+                parentContainer.find("legend").hide()
             }
         });
+
     };
     OrgTool.prototype.findOrg = function(entry, orgId){
         var org;
@@ -294,9 +291,11 @@ export default (function() { /*global i18next $ */
             } else {
                 if ($("#userOrgs label[id='org-label-" + org + "']").length === 0) {
                     parentDiv.classList.add("parent-org-container", "parent-singleton");
-                    parentContent = `<label id="org-label-${org}" class="org-label">
+                    parentContent = `
+                        <legend orgId="${org}" class="singleton">${parentOrgName}</legend>
+                        <label id="org-label-${org}" class="org-label text-muted">
                         <input class="clinic" type="checkbox" name="organization" parent_org="true" id="${org}_org" state="${parentState}" value="${org}"
-                        data-parent-id="${org}"  data-org-name="${parentOrgName}" data-short-name="${orgShortName}" data-parent-name="${parentOrgName}"/><span>${parentOrgName}</span></label></div>`;
+                        data-parent-id="${org}"  data-org-name="${parentOrgName}" data-short-name="${orgShortName}" data-parent-name="${parentOrgName}"/>${parentOrgName}</label></div>`;
                 }
             }
             parentDiv.innerHTML = parentContent;
@@ -468,11 +467,16 @@ export default (function() { /*global i18next $ */
             var state = orgsList[item.id].state;
             if ($("#" + state + "_container").length > 0) {
                 var oo = orgsList[item.id];
+                contentHTML = `<div class="item">`;
                 if (!(parentOrgsToDraw.indexOf(item.name) !== -1) && oo.children.length > 0) {
-                    contentHTML = `<legend orgId="${item.id}">${i18next.t(item.name)}</legend><input class="tnth-hide" type="checkbox" name="organization" parent_org="true" data-org-name="${item.name}"  id="${item.id}_org" value="${item.id}" />`;
+                    contentHTML += `<legend orgId="${item.id}">${item.name}</legend><input class="tnth-hide" type="checkbox" name="organization" parent_org="true" data-org-name="${item.name}"  id="${item.id}_org" value="${item.id}" />`;
                 } else { //also need to check for top level orgs that do not have children and render those
-                    contentHTML = `<div class="radio parent-singleton"><label><input class="clinic" type="radio" id="${item.id}_org" value="${item.id}" state="${state}" name="organization" data-parent-name="${item.name}" data-parent-id="${item.id}">${i18next.t(item.name)}</label></div>`;
+                    contentHTML += `
+                    <div class="radio parent-singleton">
+                        <legend orgId="${item.id}" class="singleton">${item.name}</legend>
+                        <label><input class="clinic" type="radio" id="${item.id}_org" value="${item.id}" state="${state}" name="organization" data-parent-name="${item.name}" data-parent-id="${item.id}">${i18next.t(item.name)}</label></div>`;
                 }
+                contentHTML += `</div>`;
                 $("#" + state + "_container").append(contentHTML);
             }
         });
