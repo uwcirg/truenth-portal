@@ -2350,6 +2350,9 @@ div.main-state-container .noOrg-container {
     margin-top: 5px;
     margin-bottom: 5px;
   }
+  .item {
+    margin-bottom: 12px;
+  }
 }
 
 #userOrgs {
@@ -2420,16 +2423,23 @@ div.main-state-container .noOrg-container {
     }
   }
   .parent-singleton {
-    margin: 0.5em 0;
+    margin: 0.75em 0;
     label {
       position: relative;
-      top: 6px;
-      &.radio-label {
-        margin-left: 2px;
+      top: 2px;
+      left: 6px;
+      input {
+        display: inline-block;
+        margin-right: 6px;
       }
-      color: @baseColor;
       span {
         display: inline-block;
+      }
+      &.radio-label {
+        margin-left: 2px;
+        input {
+          margin-right: 2px;
+        }
       }
     }
     &.radio {
