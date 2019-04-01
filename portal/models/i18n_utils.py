@@ -1,5 +1,4 @@
 """Module for i18n methods and functionality"""
-from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
@@ -351,6 +350,7 @@ def upsert_to_template_file():
                 potlines.append("\n")
             potfile.truncate(0)
             potfile.seek(0)
+            potlines = [unicode(line) for line in potlines]
             potfile.writelines(potlines)
     except IOError, OSError:
         exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
@@ -422,18 +422,17 @@ def smartling_upload():
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
-        filename = os.path.basename(pot_file_path)
-        with io.open(pot_file_path, 'r', encoding='utf-8') as potfile:
-            resp = requests.post(
+        with open(pot_file_path, 'rb') as potfile:
+            response = requests.post(
                 upload_url.format(project_id),
                 data={'fileUri': pot_file_path, 'fileType': 'gettext'},
-                files={'file': (filename, potfile)},
+                files={'file': (pot_file_path, potfile)},
                 auth=BearerAuth(**creds),
             )
-            resp.raise_for_status()
+            response.raise_for_status()
 
         current_app.logger.info(
-            "{} uploaded to Smartling project {}".format(filename, project_id)
+            "{} uploaded to Smartling project {}".format(pot_file_path, project_id)
         )
 
 
