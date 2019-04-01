@@ -352,7 +352,7 @@ def upsert_to_template_file():
             potfile.seek(0)
             potlines = [unicode(line) for line in potlines]
             potfile.writelines(potlines)
-    except IOError, OSError:
+    except (IOError, OSError):
         exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
         sys.exit(
             "Could not write to translation file!\n ->%s" % (exceptionValue))
