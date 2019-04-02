@@ -1,19 +1,14 @@
 """Module for i18n methods and functionality"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
-from io import BytesIO
-import os
 import re
-import sys
-import tempfile
 
 from babel import negotiate_locale
 from flask import current_app, has_request_context, request, session
-from polib import pofile
-import requests
 
 from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
