@@ -341,10 +341,10 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN Baseline | Final Reminder"
+          "value": "IRONMAN Baseline | Week 4 Reminder"
         }
       ],
-      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"months\": 1}",
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_baseline"
@@ -357,10 +357,10 @@
         {
           "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
           "use": "usual",
-          "value": "IRONMAN v3 Baseline | Final Reminder"
+          "value": "IRONMAN v3 Baseline | Week 4 Reminder"
         }
       ],
-      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
       "notify_post_qb_start": "{\"months\": 1}",
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_baseline"
@@ -377,7 +377,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 0}",
+      "notify_post_qb_start": "{\"month\": 1, \"days\": 0}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
@@ -394,7 +394,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 0}",
+      "notify_post_qb_start": "{\"month\": 1, \"days\": 0}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
@@ -411,7 +411,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"weeks\": 1}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
@@ -428,7 +428,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"weeks\": 1}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
@@ -445,7 +445,7 @@
         }
       ],
       "lr_uuid": "b98cd174-7894-db68-b335-9e36e055592d",
-      "notify_post_qb_start": "{\"weeks\": 2}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
@@ -462,7 +462,7 @@
         }
       ],
       "lr_uuid": "b98cd174-7894-db68-b335-9e36e055592d",
-      "notify_post_qb_start": "{\"weeks\": 2}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
@@ -479,7 +479,7 @@
         }
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
-      "notify_post_qb_start": "{\"weeks\": 3}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 3}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
@@ -496,7 +496,7 @@
         }
       ],
       "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
-      "notify_post_qb_start": "{\"weeks\": 3}",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 3}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
@@ -512,8 +512,8 @@
           "value": "IRONMAN Recurring | 3 Month Final Reminder"
         }
       ],
-      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
-      "notify_post_qb_start": "{\"weeks\": 4}",
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 4}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_recurring_3mo_pattern"
@@ -529,8 +529,8 @@
           "value": "IRONMAN v3 Recurring | 3 Month Final Reminder"
         }
       ],
-      "lr_uuid": "d9514c96-4769-993f-f6e4-03a67d8f7424",
-      "notify_post_qb_start": "{\"weeks\": 4}",
+      "lr_uuid": "2c837970-71e3-d736-9d2f-626f417bbbad",
+      "notify_post_qb_start": "{\"month\": 1, \"weeks\": 4}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v3_recurring_3mo_pattern"
