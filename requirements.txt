@@ -45,7 +45,7 @@ idna==2.8                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==3.0.1
-kombu==4.3.0              # pyup: < 4.4 # via celery
+kombu==4.4.0              # pyup: < 5.0 # via celery
 mako==1.0.8               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
