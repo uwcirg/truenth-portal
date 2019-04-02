@@ -7,9 +7,12 @@
  * for compiling less file, run specific task to compile each respective portal less file, e.g. gulp --gulpfile less_css_gulpfile.js [task name]
  * Running each compiling task will generate sourcemap for each less to css mappings
  */
+/*
+ * an update of gulp to version 4 from version <=3 is a breaking change, run `npm audit` for detail, see https://gulpjs.com/
+ * syntax changes are required
+ * steps took to clean up before re-install:  npm prune --production  && rm -rf node_modules
+ */
 const {series, parallel, watch, src, dest} = require("gulp");
-const concat = require("gulp-concat");
-const rename = require("gulp-rename");
 const sourcemaps = require("gulp-sourcemaps");
 const rootPath = "./";
 const GILPath = rootPath + "/gil/";
@@ -74,7 +77,7 @@ function replaceStd(fileName) {
  * transforming eproms less to css
  */
 const epromsLess = function(callback) {
-    console.log("Compiling eproms Less.");
+    console.log("Compiling EPROMS Less...");
     src(lessPath + "/" + EPROMS + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
@@ -89,7 +92,7 @@ exports.epromsLess = series(epromsLess);
  * transforming portal less to css
  */
 const portalLess = function(callback) {
-    console.log("Compiling portal less");
+    console.log("Compiling portal less...");
     src(lessPath + "/" + PORTAL + ".less")
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + PORTAL + ".less"]
@@ -109,7 +112,7 @@ exports.portalLess = series(portalLess);
  * transforming GIL less to css
  */
 const gilLess = function(callback) {
-    console.log("Compiling GIL less");
+    console.log("Compiling GIL less...");
     src(lessPath + "/" + GIL + ".less")
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + GIL + ".less"]
@@ -130,7 +133,7 @@ exports.gilLess = series(gilLess);
  * transforming portal wrapper/top nav less to css
  */
 const topnavLess = function(callback) {
-    console.log("Compiling portal wrapper less.");
+    console.log("Compiling portal wrapper less...");
     src(lessPath + "/" + TOPNAV + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
@@ -150,7 +153,7 @@ exports.topnavLess = series(topnavLess);
  * transforming PSA tracker less to css
  */
 const psaTrackerLess = function(callback) {
-    console.log("Compiling PSA Tracker less.");
+    console.log("Compiling PSA Tracker less...");
     src(lessPath + "/" + PSATRACKER + ".less")
         .pipe(sourcemaps.init())
         .pipe(less({
@@ -166,38 +169,38 @@ const psaTrackerLess = function(callback) {
 exports.psaTrackerLess = series(psaTrackerLess);
 
 /*
- * running watch task will update css automatically in vivo
+ * running each watch task will update css automatically in vivo
  * useful during development
  */
 const watchEproms = function(callback) {
-    console.log("watching EPROMS less file");
+    console.log("Watching EPROMS less file...");
     watch([lessPath + "/" + EPROMS + ".less"]);
     callback();
 };
 exports.watchEproms = series(watchEproms);
 
 const watchPortal = function(callback) {
-    console.log("watching Portal less file");
+    console.log("watching portal less file...");
     watch([lessPath + "/portal.less"]);
     callback();
 };
 exports.watchPortal = series(watchPortal);
 
 const watchGil = function(callback) {
-    console.log("watching GIL less file");
+    console.log("watching GIL less file...");
     watch([lessPath + "/gil.less"]);
     callback();
 };
 exports.watchGil = series(watchGil);
 
 const watchTopnav = function(callback) {
-    console.log("watching portal wrapper less file");
+    console.log("Watching portal wrapper less file...");
     watch([lessPath + "/topnav.less"]);
     callback();
 };
 exports.watchTopnav = series(watchTopnav);
 const watchPsaTracker = function(callback) {
-    console.log("watching PSA Tracker less file");
+    console.log("Watching PSA Tracker less file");
     watch([lessPath + "/" + PSATRACKER + ".less"]);
     callback();
 };

@@ -89,7 +89,7 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
       .then(save(outputFileName));
     } catch(e) {
       console.log("Error occurred writing json from po file: ", messageFilePath);
-    };
+    }
   }
 };
 
@@ -97,7 +97,7 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
  * clean eproms source json file
  */
 const cleanEpromsSrc = function(callback) {
-  console.log("delete EPROM source JSON file...");
+  console.log("delete EPROMS source JSON file...");
   del([translationSourceDir + epromsNameSpace + ".json"]);
   callback();
 };
@@ -106,7 +106,7 @@ exports.cleanEpromsSrc = series(cleanEpromsSrc);
  * clean Truenth source json file
  */
 const cleanTruenthSrc = function(callback) {
-  console.log("Delete Truenth source JSON file...");
+  console.log("Delete TRUEnth source JSON file...");
   del([translationSourceDir + truenthNameSpace + ".json"]);
   callback();
 };
@@ -125,7 +125,7 @@ exports.cleanSrc = series(cleanSrc);
  * clean all generated destination json files
  */
 const cleanDest = function(callback) {
-  console.log("deleting json files in destination directory...");
+  console.log("Deleting json files in destination directory...");
   del([translationDestinationDir + "*/*.json"]);
   callback();
 };
@@ -198,7 +198,7 @@ const i18nextConvertJSONToPOT = function(callback) {
     /*
     specify options here */
   };
-  console.log("Converting common JSON source file to POT file");
+  console.log("Converting common JSON source file to POT file...");
   i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(function() {
     save(srcPotFileName);
     callback();
@@ -279,7 +279,7 @@ const combineTranslationJsons = function(callback) {
                  * note this plug-in will remove duplicate entries
                  * not this will not delete the original json files that were merged
                  */
-                  console.log("merge json files...");
+                  console.log("merge destination json files...");
                   console.log("destination directory: " + destDir);
                   try {
                     src(destDir +"/*.json")
@@ -299,7 +299,9 @@ const combineTranslationJsons = function(callback) {
   callback();
 };
 exports.combineTranslationJsons = series(combineTranslationJsons);
+//convert EPROMS source json file to POT file
 exports.eproms = series(i18nextConvertEpromsJSONToPOT);
+//convert GIL source json file to POT file
 exports.gil = series(i18nextConvertTruenthJSONToPOT);
 /*
  * NOTE, the task - converting po to json file is not included, as I think we need to upload pot to smartling first to have
@@ -307,3 +309,4 @@ exports.gil = series(i18nextConvertTruenthJSONToPOT);
    so probably should run "i18nextConvertPOToJSON" task separately
  */
 exports.default = series(i18nextConvertJSONToPOT);
+
