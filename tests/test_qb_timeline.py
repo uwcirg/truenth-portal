@@ -430,80 +430,80 @@ class HasAt(object):
         self.label = label
 
 
-n = HasAt(datetime.utcnow(), 'now')
-y = HasAt(n.at - relativedelta(days=1), 'yesterday')
-y2 = HasAt(y.at, 'yesterday again')
-wa = HasAt(n.at - relativedelta(weeks=1), 'week ago')
+origin = HasAt(datetime.strptime("2112-01-31", '%Y-%m-%d'), 'origin')
+day_before = HasAt(origin.at - relativedelta(days=1), 'day before')
+day_before2 = HasAt(day_before.at, 'day before again')
+week_before = HasAt(origin.at - relativedelta(weeks=1), 'week before')
 
 
 def test_at_ordered_empty():
     ao = AtOrderedList()
     assert len(ao) == 0
-    ao.append(n)
+    ao.append(origin)
     assert len(ao) == 1
-    assert ao.pop() == n
+    assert ao.pop() == origin
 
 
 def test_at_ordered_end():
     ao = AtOrderedList()
-    ao.append(wa)
+    ao.append(week_before)
 
-    # now append one (y)esterday, then a second
+    # now append one day before, then a second
     # expecting order based on 'at' and insertion
     # which should map to append order in this case
 
-    ao.append(y)
-    ao.append(y2)
+    ao.append(day_before)
+    ao.append(day_before2)
 
     assert len(ao) == 3
-    assert ao.pop().label == y2.label
-    assert ao.pop() == y
-    assert ao.pop() == wa
+    assert ao.pop().label == day_before2.label
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
 
 
 def test_at_ordered_insertion():
     ao = AtOrderedList()
-    ao.append(wa)
-    ao.append(n)
+    ao.append(week_before)
+    ao.append(origin)
 
-    # now insert one (y)esterday, then a second
+    # now insert one from day before, then a second
     # expecting order based on 'at' and insertion
-    # as (n)ow is already inserted and has a greater
+    # as origin is already inserted and has a greater
     # 'at' value, it should remain at the end.
-    ao.append(y)
-    ao.append(y2)
+    ao.append(day_before)
+    ao.append(day_before2)
 
     assert len(ao) == 4
-    assert ao.pop() == n
-    assert ao.pop().label == y2.label
-    assert ao.pop() == y
-    assert ao.pop() == wa
+    assert ao.pop() == origin
+    assert ao.pop().label == day_before2.label
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
 
 
 def test_at_ordered_first():
     ao = AtOrderedList()
-    ao.append(y)
-    ao.append(n)
+    ao.append(day_before)
+    ao.append(origin)
 
-    # now insert element (wa - week ago) that should land at front of list
-    ao.append(wa)
+    # now insert element that should land at front of list
+    ao.append(week_before)
 
     assert len(ao) == 3
-    assert ao.pop() == n
-    assert ao.pop() == y
-    assert ao.pop() == wa
+    assert ao.pop() == origin
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
 
 
 def test_at_ordered_first_match():
     ao = AtOrderedList()
-    ao.append(y)
-    ao.append(n)
+    ao.append(day_before)
+    ao.append(origin)
 
     # now insert element with same 'at' as first, expecting the original
     # first will remain first, and new, second
-    ao.append(y2)
+    ao.append(day_before2)
 
     assert len(ao) == 3
-    assert ao.pop() == n
-    assert ao.pop() == y2
-    assert ao.pop() == y
+    assert ao.pop() == origin
+    assert ao.pop() == day_before2
+    assert ao.pop() == day_before

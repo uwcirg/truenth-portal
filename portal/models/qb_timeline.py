@@ -63,15 +63,17 @@ class QBT(db.Model):
 
 
 class AtOrderedList(list):
-    """Specialize ``list`` to maintain insertion order and ``at`` values
+    """Specialize ``list`` to maintain insertion order and ``at`` attribute
 
     When building up QBTs for a user, we need to maintain both order and
-    sort by ``QBT.at`` values.  As there are rows with identical ``at``
-    values, it can't simply be sorted by a field.
+    sort by the ``QBT.at`` attribute.  As there are rows with identical ``at``
+    values, it can't simply be sorted by a field, as insertion order matters
+    in the case of a tie (as say the ``due`` status needs to precede a
+    ``completed``, which does happen with paper entry).
 
     As the build order matters, continue to add QBTs to the end of the list,
     taking special care to insert those with earlier ``at`` values in
-    the correct place.  Two or more identicle ``at`` values should result
+    the correct place.  Two or more identical ``at`` values should result
     in the latest addition following preexisting.
 
     """
