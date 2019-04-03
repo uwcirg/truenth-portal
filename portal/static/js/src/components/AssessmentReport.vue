@@ -34,18 +34,11 @@
 	</div>
 </template>
 <script>
+    import AssessmentReportData from "../data/AssessmentReportData.js";
 	export default {
     /* global i18next */
     data: function() {
-        return {
-            userId: $("#_report_user_id").val(),
-            reportDate: $("#_report_authored_date").val(),
-            instrumentId: $("#_report_instrument_id").val(),
-            errorMessage: "",
-            data: [],
-            tableHeaders: [i18next.t("Question"), i18next.t("Response")],
-            caption: {}
-        };
+        return AssessmentReportData;
     },
     mounted: function() {
         var self = this;
@@ -70,11 +63,11 @@
                 var sessionAuthoredDate = $("#_report_authored_date").val();
                 self.errorMessage = "";
                 if (data.error) {
-                    self.errorMessage = i18next.t("Server Error occurred retrieving report data");
+                    self.errorMessage = self.serverError;
                     return;
                 }
                 if (!data.entry || !data.entry.length) {
-                    self.errorMessage = i18next.t("No data returned from server");
+                    self.errorMessage = self.noDataError;
                     return;
                 }
                 var entries = data.entry;
@@ -127,7 +120,7 @@
                     });
                 });
             }).fail(function() {
-                self.errorMessage = i18next.t("Unable to load report data");
+                self.errorMessage = self.loadError;
             });
         }
     }
