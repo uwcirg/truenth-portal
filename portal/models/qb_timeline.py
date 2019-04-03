@@ -86,12 +86,12 @@ class AtOrderedList(list):
 
         """
         if not self.__len__():
-            return super().append(value)
+            return super(AtOrderedList, self).append(value)
 
         # Expecting to build in order; common case new value
         # lands at end.
         if self[-1].at <= value.at:
-            return super().append(value)
+            return super(AtOrderedList, self).append(value)
 
         # Otherwise, walk backwards till new value < existing
         for i, e in reversed(list(enumerate(self))):
