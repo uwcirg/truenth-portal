@@ -174,7 +174,7 @@ reset is necessary, an admin may perform the following:
 
 .. code:: bash
 
-    flask password-reset --email forgotten_user@server.com --password newPassword --actor <admin's email>
+    flask password-reset --email forgotten_user@server.com --password $NEW_PASSWORD --actor $ADMIN_EMAIL
 
 Install the Latest Package, Dependencies and Synchronize DB (via script)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
