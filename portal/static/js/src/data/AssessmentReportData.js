@@ -10,5 +10,3 @@ export default {
     noDataError: i18next.t("No data returned from server"),
     loadError: i18next.t("Unable to load report data")
 };
-
-
