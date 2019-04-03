@@ -86,21 +86,17 @@ class QuestionnaireResponse(db.Model):
         qn = Questionnaire.find_by_name(name=qn_name)
         qbstatus = QB_Status(self.subject, as_of_date=authored)
         qbd = qbstatus.current_qbd()
-        if (
-            qbd and qn and (qn.id in [
-            qbq.questionnaire.id for qbq in
-            qbd.questionnaire_bank.questionnaires])
-        ):
+        if qbd and qn and qn.id in [
+                q.questionnaire.id for q in
+                qbd.questionnaire_bank.questionnaires]:
             self.questionnaire_bank_id = qbd.qb_id
             self.qb_iteration = qbd.iteration
         # if a valid qb wasn't found, try the indefinite option
         else:
             qbd = qbstatus.current_qbd('indefinite')
-            if (
-                qbd and qn and (qn.id in [
-                qbq.qb_id for qbq in
-                qbd.questionnaire_bank.questionnaires])
-            ):
+            if qbd and qn and qn.id in [
+                    q.questionnaire.id for q in
+                    qbd.questionnaire_bank.questionnaires]:
                 self.questionnaire_bank_id = qbd.qb_id
                 self.qb_iteration = qbd.iteration
 
