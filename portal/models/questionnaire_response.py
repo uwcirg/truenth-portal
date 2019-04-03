@@ -12,7 +12,9 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from .audit import Audit
 from .fhir import bundle_results
+from .questionnaire import Questionnaire
 from .reference import Reference
 from .user import User, patients_query
 
@@ -60,6 +62,69 @@ class QuestionnaireResponse(db.Model):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
                "{0.status} {0.authored}".format(self)
+
+    def assign_qb_relationship(self, acting_user_id):
+        """Lookup and assign questionnaire bank and iteration
+
+        On submission, and subsequently when a user's state changes (such as
+        the criteria for trigger_date), determine the associated questionnaire
+        bank and iteration and assign, or clear if no match is found.
+
+        :param acting_user_id: current driver of process, for audit purposes
+
+        """
+        from .qb_status import QB_Status  # avoid cycle
+        initial_qb_id = self.questionnaire_bank_id
+        initial_qb_iteration = self.qb_iteration
+
+        # clear both until current values are determined
+        self.questionnaire_bank_id, self.qb_iteration = None, None
+
+        authored = FHIR_datetime.parse(self.document['authored'])
+        qn_ref = self.document.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.find_by_name(name=qn_name)
+        qbstatus = QB_Status(self.subject, as_of_date=authored)
+        qbd = qbstatus.current_qbd()
+        if (
+            qbd and qn and (qn.id in [
+            qbq.questionnaire.id for qbq in
+            qbd.questionnaire_bank.questionnaires])
+        ):
+            self.questionnaire_bank_id = qbd.qb_id
+            self.qb_iteration = qbd.iteration
+        # if a valid qb wasn't found, try the indefinite option
+        else:
+            qbd = qbstatus.current_qbd('indefinite')
+            if (
+                qbd and qn and (qn.id in [
+                qbq.qb_id for qbq in
+                qbd.questionnaire_bank.questionnaires])
+            ):
+                self.questionnaire_bank_id = qbd.qb_id
+                self.qb_iteration = qbd.iteration
+
+        if not self.questionnaire_bank_id:
+            current_app.logger.warning(
+                "Can't locate QB for patient {}'s questionnaire_response "
+                "with reference to given instrument {}".format(
+                    self.subject_id, qn_name))
+            self.questionnaire_bank_id = None
+            self.qb_iteration = None
+
+        if self.questionnaire_bank_id != initial_qb_id or (
+                self.qb_iteration != initial_qb_iteration):
+            msg = (
+                "Updating to qb_id ({}) and qb_iteration ({}) on"
+                " questionnaire_response {}".format(
+                    self.questionnaire_bank_id, self.qb_iteration,
+                    self.id))
+            audit = Audit(
+                subject_id=self.subject_id, user_id=acting_user_id,
+                context='assessment', comment=msg)
+            db.session.add(audit)
+
+
 
     @staticmethod
     def by_identifier(identifier):
