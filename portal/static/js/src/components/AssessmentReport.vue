@@ -34,7 +34,7 @@
 	</div>
 </template>
 <script>
-    import AssessmentReportData from "../data/AssessmentReportData.js";
+    import AssessmentReportData from "../data/common/AssessmentReportData.js";
 	export default {
     /* global i18next */
     data: function() {

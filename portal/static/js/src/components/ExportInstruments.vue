@@ -42,7 +42,7 @@
 </template>
 <script>
     import tnthAjax from "../modules/TnthAjax.js";
-    import ExportInstrumentsData from "../data/ExportInstrumentsData.js";
+    import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
     export default { /*global i18next */
         props: {
             instrumentsList: {
