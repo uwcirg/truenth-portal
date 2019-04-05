@@ -321,11 +321,11 @@ export default (function() { /*global i18next $ */
                     }
                     var attrObj = {dataAttributes:(' data-parent-id="' + topLevelOrgId + '"  data-parent-name="' + orgsList[topLevelOrgId].name + '" '), containerClass: "", textClass: ""};
                     if (_isTopLevel) {
+                        attrObj.containerClass = "sub-org-container";
                         attrObj.dataAttributes = (' data-parent-id="' + _parentOrgId + '"  data-parent-name="' + _parentOrg.name + '" ');
                     }
                     if (orgsList[item.id].children.length > 0) {
                         if (_isTopLevel) {
-                            attrObj.containerClass = "sub-org-container";
                             attrObj.textClass = "text-muted";
                         } else {
                             attrObj.textClass = "text-muter";
@@ -333,6 +333,8 @@ export default (function() { /*global i18next $ */
                     } else {
                         if (_isTopLevel) {
                             attrObj.textClass = "text-muted singleton";
+                        } else {
+                            attrObj.textClass = "child-item";
                         }
                     }
                     childClinic = `<div id="${item.id}_container" ${attrObj.dataAttributes} class="indent org-container ${attrObj.containerClass}">
@@ -340,6 +342,7 @@ export default (function() { /*global i18next $ */
                         <input class="clinic" type="checkbox" name="organization" id="${item.id}_org" data-org-name="${item.name}" data-short-name="${item.shortname || item.name}" state="${state ? state : ''}" value="${item.id}" ${attrObj.dataAttributes} />
                         <span>${item.name}</span></label></div>`;
                     var parentOrgContainer = $("#" + _parentOrgId + "_container");
+        
                     if (parentOrgContainer.length > 0) {
                         parentOrgContainer.append(childClinic);
                     } else {
