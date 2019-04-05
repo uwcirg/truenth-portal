@@ -85,6 +85,25 @@ input.clinic {
 	background: #7C959E;
     color: #FFF;
 }
+#fillOrgs .parent-singleton label.org-label { /* single parent org label */
+	display: block;
+	background: #FFF;
+	width: 100%;
+	color: #68727e;
+}
+#fillOrgs .parent-singleton label.org-label .sub-text {
+	display: none;
+}
+#fillOrgs .parent-singleton label.org-label .json-link {
+	display: none;
+}
+#fillOrgs .parent-singleton label.org-label:after {
+	content: "( single parent org )";
+	display: block;
+	color: #68727e;
+	width: 100%;
+	font-weight: 200;
+}
 #fillOrgs .parent-singleton .sub-text,
 #fillOrgs .parent-singleton .json-link  {
 	font-weight: 200;
@@ -93,6 +112,16 @@ input.clinic {
 #fillOrgs .parent-singleton label {
 	top: 2px;
 	padding: 4px;
+}
+#fillOrgs legend.singleton:after {
+	content: "\2193";
+	display: block;
+	width: 20px;
+	margin: auto;
+}
+#fillOrgs div.org-container label.org-label {
+	margin: 0.5em 0;
+	padding: 0.35em 0.25em;
 }
 div.org-container label.org-label {
 	padding: 0.35em 0.25em;
