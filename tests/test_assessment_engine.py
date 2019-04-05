@@ -1,5 +1,6 @@
 """Unit test module for Assessment Engine API"""
 from __future__ import unicode_literals  # isort:skip
+from dateutil.relativedelta import relativedelta
 import json
 import jsonschema
 import pytest
@@ -235,6 +236,66 @@ class TestAssessmentEngine(TestCase):
         assert (
             test_user.questionnaire_responses[0].questionnaire_bank_id
             == qb.id)
+        assert test_user.questionnaire_responses[0].qb_iteration is None
+
+    def test_submit_assessment_outside_window(self):
+        """Submit assessment outside QB window, confirm no QB assignment"""
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        qn = self.add_questionnaire(name='epic26')
+        org = Organization(name="testorg")
+        org.research_protocols.append(rp)
+        with SessionScope(db):
+            db.session.add(qn)
+            db.session.add(org)
+            db.session.commit()
+
+        qn, org = map(db.session.merge, (qn, org))
+        qb = QuestionnaireBank(
+            name='Test Questionnaire Bank',
+            classification='baseline',
+            research_protocol_id=rp_id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+
+        test_user = get_user(TEST_USER_ID)
+        test_user.organizations.append(org)
+        authored = FHIR_datetime.parse(data['authored'])
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org,
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=authored - relativedelta(days=91))
+
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.add(test_user)
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 200
+        test_user = get_user(TEST_USER_ID)
+        assert test_user.questionnaire_responses.count() == 1
+        assert (
+            test_user.questionnaire_responses[0].questionnaire_bank_id
+            is None)
+        assert test_user.questionnaire_responses[0].qb_iteration is None
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)

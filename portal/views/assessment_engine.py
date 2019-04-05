@@ -863,6 +863,8 @@ def assessment_update(patient_id):
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
     db.session.commit()
+    existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
+
     auditable_event(
         "updated {}".format(existing_qnr),
         user_id=current_user().id,
@@ -1530,50 +1532,17 @@ def assessment_add(patient_id):
             EC, request.args['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
-    qnr_qb = None
-    authored = FHIR_datetime.parse(request.json['authored'])
-    qn_ref = request.json.get("questionnaire").get("reference")
-    qn_name = qn_ref.split("/")[-1] if qn_ref else None
-    qn = Questionnaire.find_by_name(name=qn_name)
-    qbstatus = QB_Status(patient, as_of_date=authored)
-    qbd = qbstatus.current_qbd()
-    if (
-        qbd and qn and (qn.id in [
-        qbq.questionnaire.id for qbq in
-        qbd.questionnaire_bank.questionnaires])
-    ):
-        qnr_qb = qbd.questionnaire_bank
-        qb_iteration = qbd.iteration
-    # if a valid qb wasn't found, try the indefinite option
-    else:
-        qbd = qbstatus.current_qbd('indefinite')
-        if (
-            qbd and qn and (qn.id in [
-            qbq.questionnaire.id for qbq in
-            qbd.questionnaire_bank.questionnaires])
-        ):
-            qnr_qb = qbd.questionnaire_bank
-            qb_iteration = qbd.iteration
-
-    if not qnr_qb:
-        current_app.logger.warning(
-            "Received questionnaire_response yet current QBs for patient {}"
-            "don't contain reference to given instrument {}".format(
-                patient_id, qn_name))
-        qnr_qb = None
-        qb_iteration = None
-
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         status=request.json["status"],
         document=request.json,
         encounter=encounter,
-        questionnaire_bank=qnr_qb,
-        qb_iteration=qb_iteration
     )
 
     db.session.add(questionnaire_response)
     db.session.commit()
+    questionnaire_response.assign_qb_relationship(
+        acting_user_id=current_user().id)
     auditable_event("added {}".format(questionnaire_response),
                     user_id=current_user().id, subject_id=patient_id,
                     context='assessment')
