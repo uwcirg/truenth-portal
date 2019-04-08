@@ -200,6 +200,10 @@
         }
       ],
       "name": "UCSF Urologic Surgical Oncology Clinic",
+      "partOf": {
+        "display": "University of California, San Francisco",
+        "reference": "api/organization/202"
+      },
       "resourceType": "Organization"
     },
     {
