@@ -366,6 +366,38 @@ def qnr_document_id(
     return qnr.one()[0]
 
 
+def consolidate_answer_pairs(answers):
+    """
+    Merge paired answers (code and corresponding text) into single
+        row/answer
+
+    Codes are the preferred way of referring to options but option text
+        (at the time of administration) may be submitted alongside coded
+        answers for ease of display
+    """
+
+    answer_types = [a.keys()[0] for a in answers]
+
+    # Exit early if assumptions not met
+    if (
+        len(answers) % 2 or
+        answer_types.count('valueCoding') != answer_types.count('valueString')
+    ):
+        return answers
+
+    filtered_answers = []
+    for pair in zip(*[iter(answers)] * 2):
+        # Sort so first pair is always valueCoding
+        pair = sorted(pair, key=lambda k: k.keys()[0])
+        coded_answer, string_answer = pair
+
+        coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+        filtered_answers.append(coded_answer)
+
+    return filtered_answers
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
@@ -418,37 +450,6 @@ def generate_qnr_csv(qnr_bundle):
         except (KeyError, IndexError):
             return None, None
 
-    def consolidate_answer_pairs(answers):
-        """
-        Merge paired answers (code and corresponding text) into single
-            row/answer
-
-        Codes are the preferred way of referring to options but option text
-            (at the time of administration) may be submitted alongside coded
-            answers for ease of display
-        """
-
-        answer_types = [a.keys()[0] for a in answers]
-
-        # Exit early if assumptions not met
-        if (
-            len(answers) % 2 or
-            answer_types.count('valueCoding')
-                != answer_types.count('valueString')
-        ):
-            return answers
-
-        filtered_answers = []
-        for pair in zip(*[iter(answers)] * 2):
-            # Sort so first pair is always valueCoding
-            pair = sorted(pair, key=lambda k: k.keys()[0])
-            coded_answer, string_answer = pair
-
-            coded_answer['valueCoding']['text'] = string_answer['valueString']
-
-            filtered_answers.append(coded_answer)
-
-        return filtered_answers
 
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
