@@ -160,6 +160,28 @@
       "resourceType": "Organization"
     },
     {
+      "id": 202,
+      "identifier": [
+        {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "use": "official",
+          "value": "1164512851"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/decision-support-group",
+          "use": "secondary",
+          "value": "wisercare"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:CA"
+        }
+      ],
+      "name": "University of California, San Francisco",
+      "resourceType": "Organization"
+    },
+    {
       "extension": [
         {
           "timezone": "America/Los_Angeles",
@@ -200,28 +222,9 @@
         }
       ],
       "name": "UCSF Urologic Surgical Oncology Clinic",
-      "resourceType": "Organization"
-    },
-    {
-      "id": 202,
-      "identifier": [
-        {
-          "system": "http://hl7.org/fhir/sid/us-npi",
-          "use": "official",
-          "value": "1164512851"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/decision-support-group",
-          "use": "secondary",
-          "value": "wisercare"
-        },
-        {
-          "system": "http://us.truenth.org/identity-codes/practice-region",
-          "use": "secondary",
-          "value": "state:CA"
-        }
-      ],
-      "name": "University of California, San Francisco",
+      "partOf": {
+        "reference": "api/organization/202"
+      },
       "resourceType": "Organization"
     },
     {
