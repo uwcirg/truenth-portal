@@ -149,6 +149,23 @@ class Questionnaire(db.Model):
         values = {qi.value for qi in questionnaire_identifiers}
         return values
 
+    def questionnaire_code_map(self):
+        """Map of Questionnaire codes to corresponding option text"""
+
+        code_text_map = {}
+        questionnaire_fhir = self.as_fhir()
+        for question in questionnaire_fhir['item']:
+            for option in question.get('option', ()):
+                if 'valueCoding' not in option:
+                    continue
+
+                code = option['valueCoding']['code']
+                text = option['valueCoding']['display']
+
+                code_text_map[code] = text
+        return code_text_map
+
+
 class QuestionnaireIdentifier(db.Model):
     """link table for questionnaire : n identifiers"""
     __tablename__ = 'questionnaire_identifiers'

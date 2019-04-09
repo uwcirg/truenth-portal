@@ -11,9 +11,10 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from .audit import Audit
 from .fhir import bundle_results
+from .identifier import Identifier
 from .questionnaire import Questionnaire
 from .reference import Reference
 from .user import User, patients_query
@@ -155,6 +156,40 @@ class QuestionnaireResponse(db.Model):
         # Copy desired schema (to validate against) to outermost dict
         draft4_schema.update(swag['definitions'][validation_schema])
         jsonschema.validate(document, draft4_schema)
+
+    @property
+    def document_answered(self):
+        """Return a QuestionnaireResponse populated with text answers from the coded values"""
+        instrument_id = self.document['questionnaire']['reference'].split('/')[-1]
+        questionnaire = Questionnaire.find_by_name(name=instrument_id)
+        questionnaire_map = questionnaire.questionnaire_code_map()
+
+
+        document = self.document
+        for question in document['group']['question']:
+
+            combined_answers = consolidate_answer_pairs(question['answer'])
+
+            # Separate out text and coded answer, then override text
+            text_and_coded_answers = []
+            for answer in combined_answers:
+
+                # Add text answer before coded answer
+                if answer.keys()[0] == 'valueCoding':
+
+                    # Prefer text looked up from code over sibling valueString answer
+                    text_answer = questionnaire_map.get(
+                        answer['valueCoding']['code'],
+                        answer['valueCoding'].get('text')
+                    )
+
+                    text_and_coded_answers.append({'valueString': text_answer})
+
+                text_and_coded_answers.append(answer)
+            question['answer'] = text_and_coded_answers
+
+        return document
+
 
 
 QNR = namedtuple(
