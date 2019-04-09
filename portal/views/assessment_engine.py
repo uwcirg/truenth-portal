@@ -611,7 +611,7 @@ def assessment(patient_id, instrument_id):
 
     documents = []
     for qnr in questionnaire_responses:
-        for question in qnr.document['group']['question']:
+        for question in qnr.document_answered['group']['question']:
             for answer in question['answer']:
                 # Hack: Extensions should be a list, correct in-place if need be
                 # todo: migrate towards FHIR spec in persisted data

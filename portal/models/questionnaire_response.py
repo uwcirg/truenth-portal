@@ -330,7 +330,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
-        document = questionnaire_response.document.copy()
+        document = questionnaire_response.document_answered.copy()
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
         encounter_fhir = encounter.as_fhir()
