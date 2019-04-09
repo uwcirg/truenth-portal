@@ -203,7 +203,7 @@
       "recurs": [
         {
           "cycle_length": "{\"months\": 6}",
-          "start": "{\"months\": 2, \"days\": 15}",
+          "start": "{\"months\": 3, \"days\": -15}",
           "termination": "{\"months\": 24}"
         }
       ],
@@ -239,7 +239,7 @@
       "recurs": [
         {
           "cycle_length": "{\"months\": 6}",
-          "start": "{\"months\": 2, \"days\": 15}",
+          "start": "{\"months\": 3, \"days\": -15}",
           "termination": "{\"months\": 24}"
         }
       ],
@@ -282,7 +282,7 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 5, \"days\": 15}",
+          "start": "{\"months\": 6, \"days\": -15}",
           "termination": "{\"months\": 33}"
         }
       ],
@@ -325,7 +325,7 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 5, \"days\": 15}",
+          "start": "{\"months\": 6, \"days\": -15}",
           "termination": "{\"months\": 33}"
         }
       ],
@@ -382,7 +382,7 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 11, \"days\": 15}",
+          "start": "{\"months\": 12, \"days\": -15}",
           "termination": "{\"years\": 3, \"months\": 3}"
         }
       ],
@@ -439,7 +439,7 @@
       "recurs": [
         {
           "cycle_length": "{\"years\": 1}",
-          "start": "{\"months\": 11, \"days\": 15}",
+          "start": "{\"months\": 12, \"days\": -15}",
           "termination": "{\"years\": 3, \"months\": 3}"
         }
       ],
