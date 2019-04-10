@@ -154,15 +154,15 @@ class Questionnaire(db.Model):
 
         code_text_map = {}
         questionnaire_fhir = self.as_fhir()
-        for question in questionnaire_fhir['item']:
+        for question in questionnaire_fhir.get('item', ()):
             for option in question.get('option', ()):
                 if 'valueCoding' not in option:
                     continue
 
                 code = option['valueCoding']['code']
                 text = option['valueCoding']['display']
-
                 code_text_map[code] = text
+
         return code_text_map
 
 

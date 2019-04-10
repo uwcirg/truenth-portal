@@ -172,7 +172,7 @@ class QuestionnaireResponse(db.Model):
         questionnaire_map = questionnaire.questionnaire_code_map()
 
         document = self.document
-        for question in document['group']['question']:
+        for question in document.get('group', {}).get('question', ()):
 
             combined_answers = consolidate_answer_pairs(question['answer'])
 
