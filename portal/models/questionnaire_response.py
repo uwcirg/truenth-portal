@@ -159,11 +159,17 @@ class QuestionnaireResponse(db.Model):
 
     @property
     def document_answered(self):
-        """Return a QuestionnaireResponse populated with text answers from the coded values"""
+        """
+        Return a QuestionnaireResponse populated with text answers based on codes in valueCoding
+        """
         instrument_id = self.document['questionnaire']['reference'].split('/')[-1]
         questionnaire = Questionnaire.find_by_name(name=instrument_id)
-        questionnaire_map = questionnaire.questionnaire_code_map()
 
+        # return original document if no reference Questionnaire available
+        if not questionnaire:
+            return self.document
+
+        questionnaire_map = questionnaire.questionnaire_code_map()
 
         document = self.document
         for question in document['group']['question']:
