@@ -141,12 +141,12 @@ exports.cleanDest = series(cleanDest);
  */
 const i18nextExtraction = function(callback) {
   console.log("Extracting i18next strings from JS and HTML template files...");
-  i18nextScanner([[jsSrcPath+"*.{js,html}",
+  i18nextScanner([jsSrcPath+"*.{js,html}",
                   jsSrcPath+"components/*.{js,html}",
                   jsSrcPath+"mixins/*.{js,html}",
                   jsSrcPath+"modules/*.{js,html}",
                   jsSrcPath+"data/common/*.{js,html}",
-                  "templates/*.html"]], "./src/" + nameSpace + ".json");
+                  "templates/*.html"], "./src/" + nameSpace + ".json");
   callback();
 }
 exports.i18nextExtraction = series(cleanSrc, i18nextExtraction);
