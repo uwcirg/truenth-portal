@@ -320,12 +320,13 @@ def upsert_to_template_file():
     db_translatables.update(get_static_strings())
 
     try:
-        with open(
+        with io.open(
             os.path.join(
                 current_app.root_path,
                 "translations/messages.pot",
             ),
             "r+",
+            encoding="utf-8",
         ) as potfile:
             potlines = potfile.readlines()
             for i, line in enumerate(potlines):
@@ -349,8 +350,9 @@ def upsert_to_template_file():
                 potlines.append("\n")
             potfile.truncate(0)
             potfile.seek(0)
+            potlines = [unicode(line) for line in potlines]
             potfile.writelines(potlines)
-    except IOError, OSError:
+    except (IOError, OSError):
         exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
         sys.exit(
             "Could not write to translation file!\n ->%s" % (exceptionValue))
@@ -421,16 +423,16 @@ def smartling_upload():
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
         with open(pot_file_path, 'rb') as potfile:
-            resp = requests.post(
+            response = requests.post(
                 upload_url.format(project_id),
-                data={'fileUri': uri, 'fileType': 'gettext'},
-                files={'file': (fname, potfile)},
+                data={'fileUri': pot_file_path, 'fileType': 'gettext'},
+                files={'file': (pot_file_path, potfile)},
                 auth=BearerAuth(**creds),
             )
-            resp.raise_for_status()
+            response.raise_for_status()
 
         current_app.logger.info(
-            "{} uploaded to Smartling project {}".format(fname, project_id)
+            "{} uploaded to Smartling project {}".format(pot_file_path, project_id)
         )
 
 

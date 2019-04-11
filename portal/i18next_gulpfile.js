@@ -38,6 +38,11 @@ const epromsSrcPotFileName =  translationSourceDir+epromsNameSpace+".pot";
 const truenthSrcPotFileName = translationSourceDir+truenthNameSpace+".pot";
 
 /*
+ * JS source directory
+ */
+const jsSrcPath = "./static/js/src/";
+
+/*
  * helper function for writing file
  */
 function save(target) {
@@ -136,29 +141,32 @@ exports.cleanDest = series(cleanDest);
  */
 const i18nextExtraction = function(callback) {
   console.log("Extracting i18next strings from JS and HTML template files...");
-  i18nextScanner(["static/**/*.{js,html}", "templates/*.html"], "./src/" + nameSpace + ".json");
+  i18nextScanner([[jsSrcPath+"*.{js,html}",
+                  jsSrcPath+"components/*.{js,html}",
+                  jsSrcPath+"mixins/*.{js,html}",
+                  jsSrcPath+"modules/*.{js,html}",
+                  jsSrcPath+"data/common/*.{js,html}",
+                  "templates/*.html"]], "./src/" + nameSpace + ".json");
   callback();
 }
 exports.i18nextExtraction = series(cleanSrc, i18nextExtraction);
 
-
 /*
- * extracting text from  Eproms html files into json file
+ * extracting text from  EPROMS js/html files into json file
  */
 const i18nextExtractionEproms = function(callback) {
   console.log("Extracting i18next strings and generate EPROMS source json file ...");
-  i18nextScanner(["eproms/templates/eproms/*.html"], "./src/" + epromsNameSpace + ".json");
+  i18nextScanner(["eproms/templates/eproms/*.html", jsSrcPath+"data/eproms/*.{js,html}"], "./src/" + epromsNameSpace + ".json");
   callback();
 };
 exports.i18nextExtractionEproms = series(cleanEpromsSrc, i18nextExtractionEproms);
 
-
 /*
- * extracting text from TrueNTH html files into json file
+ * extracting text from TrueNTH(GIL) js/html files into json file
  */
 const i18nextExtractionTruenth = function(callback) {
   console.log("extracting i18next strings and generating TRUENTH source json file ...");
-  i18nextScanner(["gil/templates/gil/*.html"], "./src/" + truenthNameSpace + ".json");
+  i18nextScanner(["gil/templates/gil/*.html", jsSrcPath+"data/gil/*.{js,html}"], "./src/" + truenthNameSpace + ".json");
   callback();
 };
 exports.i18nextExtractionTruenth = series(cleanTruenthSrc, i18nextExtractionTruenth);

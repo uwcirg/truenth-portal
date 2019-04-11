@@ -11,8 +11,11 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+from .audit import Audit
 from .fhir import bundle_results
+from .identifier import Identifier
+from .questionnaire import Questionnaire
 from .reference import Reference
 from .user import User, patients_query
 
@@ -61,6 +64,63 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
                "{0.status} {0.authored}".format(self)
 
+    def assign_qb_relationship(self, acting_user_id):
+        """Lookup and assign questionnaire bank and iteration
+
+        On submission, and subsequently when a user's state changes (such as
+        the criteria for trigger_date), determine the associated questionnaire
+        bank and iteration and assign, or clear if no match is found.
+
+        :param acting_user_id: current driver of process, for audit purposes
+
+        """
+        from .qb_status import QB_Status  # avoid cycle
+        initial_qb_id = self.questionnaire_bank_id
+        initial_qb_iteration = self.qb_iteration
+
+        # clear both until current values are determined
+        self.questionnaire_bank_id, self.qb_iteration = None, None
+
+        authored = FHIR_datetime.parse(self.document['authored'])
+        qn_ref = self.document.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.find_by_name(name=qn_name)
+        qbstatus = QB_Status(self.subject, as_of_date=authored)
+        qbd = qbstatus.current_qbd()
+        if qbd and qn and qn.id in (
+                q.questionnaire.id for q in
+                qbd.questionnaire_bank.questionnaires):
+            self.questionnaire_bank_id = qbd.qb_id
+            self.qb_iteration = qbd.iteration
+        # if a valid qb wasn't found, try the indefinite option
+        else:
+            qbd = qbstatus.current_qbd('indefinite')
+            if qbd and qn and qn.id in (
+                    q.questionnaire.id for q in
+                    qbd.questionnaire_bank.questionnaires):
+                self.questionnaire_bank_id = qbd.qb_id
+                self.qb_iteration = qbd.iteration
+
+        if not self.questionnaire_bank_id:
+            current_app.logger.warning(
+                "Can't locate QB for patient {}'s questionnaire_response "
+                "with reference to given instrument {}".format(
+                    self.subject_id, qn_name))
+            self.questionnaire_bank_id = None
+            self.qb_iteration = None
+
+        if self.questionnaire_bank_id != initial_qb_id or (
+                self.qb_iteration != initial_qb_iteration):
+            msg = (
+                "Updating to qb_id ({}) and qb_iteration ({}) on"
+                " questionnaire_response {}".format(
+                    self.questionnaire_bank_id, self.qb_iteration,
+                    self.id))
+            audit = Audit(
+                subject_id=self.subject_id, user_id=acting_user_id,
+                context='assessment', comment=msg)
+            db.session.add(audit)
+
     @staticmethod
     def by_identifier(identifier):
         """Query for QuestionnaireResponse(s) with given identifier"""
@@ -96,6 +156,46 @@ class QuestionnaireResponse(db.Model):
         # Copy desired schema (to validate against) to outermost dict
         draft4_schema.update(swag['definitions'][validation_schema])
         jsonschema.validate(document, draft4_schema)
+
+    @property
+    def document_answered(self):
+        """
+        Return a QuestionnaireResponse populated with text answers based on codes in valueCoding
+        """
+        instrument_id = self.document['questionnaire']['reference'].split('/')[-1]
+        questionnaire = Questionnaire.find_by_name(name=instrument_id)
+
+        # return original document if no reference Questionnaire available
+        if not questionnaire:
+            return self.document
+
+        questionnaire_map = questionnaire.questionnaire_code_map()
+
+        document = self.document
+        for question in document.get('group', {}).get('question', ()):
+
+            combined_answers = consolidate_answer_pairs(question['answer'])
+
+            # Separate out text and coded answer, then override text
+            text_and_coded_answers = []
+            for answer in combined_answers:
+
+                # Add text answer before coded answer
+                if answer.keys()[0] == 'valueCoding':
+
+                    # Prefer text looked up from code over sibling valueString answer
+                    text_answer = questionnaire_map.get(
+                        answer['valueCoding']['code'],
+                        answer['valueCoding'].get('text')
+                    )
+
+                    text_and_coded_answers.append({'valueString': text_answer})
+
+                text_and_coded_answers.append(answer)
+            question['answer'] = text_and_coded_answers
+
+        return document
+
 
 
 QNR = namedtuple(
@@ -236,7 +336,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
-        document = questionnaire_response.document.copy()
+        document = questionnaire_response.document_answered.copy()
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
         encounter_fhir = encounter.as_fhir()
@@ -307,6 +407,38 @@ def qnr_document_id(
     return qnr.one()[0]
 
 
+def consolidate_answer_pairs(answers):
+    """
+    Merge paired answers (code and corresponding text) into single
+        row/answer
+
+    Codes are the preferred way of referring to options but option text
+        (at the time of administration) may be submitted alongside coded
+        answers for ease of display
+    """
+
+    answer_types = [a.keys()[0] for a in answers]
+
+    # Exit early if assumptions not met
+    if (
+        len(answers) % 2 or
+        answer_types.count('valueCoding') != answer_types.count('valueString')
+    ):
+        return answers
+
+    filtered_answers = []
+    for pair in zip(*[iter(answers)] * 2):
+        # Sort so first pair is always valueCoding
+        pair = sorted(pair, key=lambda k: k.keys()[0])
+        coded_answer, string_answer = pair
+
+        coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+        filtered_answers.append(coded_answer)
+
+    return filtered_answers
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
@@ -359,37 +491,6 @@ def generate_qnr_csv(qnr_bundle):
         except (KeyError, IndexError):
             return None, None
 
-    def consolidate_answer_pairs(answers):
-        """
-        Merge paired answers (code and corresponding text) into single
-            row/answer
-
-        Codes are the preferred way of referring to options but option text
-            (at the time of administration) may be submitted alongside coded
-            answers for ease of display
-        """
-
-        answer_types = [a.keys()[0] for a in answers]
-
-        # Exit early if assumptions not met
-        if (
-            len(answers) % 2 or
-            answer_types.count('valueCoding')
-                != answer_types.count('valueString')
-        ):
-            return answers
-
-        filtered_answers = []
-        for pair in zip(*[iter(answers)] * 2):
-            # Sort so first pair is always valueCoding
-            pair = sorted(pair, key=lambda k: k.keys()[0])
-            coded_answer, string_answer = pair
-
-            coded_answer['valueCoding']['text'] = string_answer['valueString']
-
-            filtered_answers.append(coded_answer)
-
-        return filtered_answers
 
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept

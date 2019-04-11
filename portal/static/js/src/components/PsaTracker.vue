@@ -137,6 +137,7 @@
     import tnthAjax from "../modules/TnthAjax.js";
     import tnthDates from "../modules/TnthDate.js";
     import SYSTEM_IDENTIFIER_ENUM from "../modules/SYSTEM_IDENTIFIER_ENUM.js";
+    import PsaTrackerData from "../data/gil/PsaTrackerData.js";
     export default {
         components: { RefreshIcon, FilterControl},
         errorCaptured: function(Error, Component, info) { /*eslint no-console: off */
@@ -182,92 +183,7 @@
             });
         },
         data: function() {
-            return {
-                userId: "",
-                userIdKey: "psaTracker_currentUser",
-                clinicalCode: "666",
-                clinicalDisplay: "psa",
-                clinicalSystem: "http://us.truenth.org/clinical-codes",
-                loading: false,
-                savingInProgress: false,
-                addErrorMessage: "",
-                noResultMessage: i18next.t("No PSA results to display"),
-                editText: i18next.t("Edit"),
-                saveText: i18next.t("Save"),
-                closeText: i18next.t("Close"),
-                filterText: i18next.t("Filter"),
-                yLegendText: i18next.t("Result (ng/ml)"),
-                xLegendText: i18next.t("PSA Test Date"),
-                MIN_RESULT: 0.1,
-                MAX_RESULT: 10000,
-                MAX_RANGE_STEP: 9,
-                treatmentEditUrl: "profile#profileProceduresWrapper",
-                newItem: {
-                    id: "",
-                    result: "",
-                    date: "",
-                    edit: false
-                },
-                headers: [
-                    i18next.t("Date"),
-                    i18next.t("PSA (ng/ml)")
-                ],
-                intro: {
-                    header: i18next.t("Track Your PSA"),
-                    body: i18next.t("Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood."),
-                    addText: i18next.t("ADD NEW PSA RESULT")
-                },
-                fields: {
-                    resultLabel: i18next.t("PSA (ng/ml)"),
-                    dateLabel: i18next.t("PSA Test Date"),
-                    resultPlaceholder: i18next.t("Enter a number"),
-                    datePlaceholder: i18next.t("d M yyyy, example: 1 Jan, 2017")
-                },
-                items: [],
-                history: {
-                    title: i18next.t("PSA Result History"),
-                    items: [],
-                    buttonLabel: i18next.t("History"),
-                    sidenote: ""
-                },
-                originals: [],
-                resultRange: ["<= 4", ">= 2", ">= 3", ">= 4", ">= 5"],
-                RANGE_ENUM: {
-                    "<= 4": function(items) { return $.grep(items, function(item) {
-                        return item.result <= 4;
-                    });},
-                    ">= 2": function(items) { return $.grep(items, function(item) {
-                        return item.result >= 2;
-                    });},
-                    ">= 3": function(items) { return $.grep(items, function(item) {
-                        return item.result >= 3;
-                    });},
-                    ">= 4": function(items) { return $.grep(items, function(item) {
-                        return item.result >= 4;
-                    });},
-                    ">= 5": function(items) { return $.grep(items, function(item) {
-                        return item.result >= 5;
-                    });}
-                },
-                filters: {
-                    filterYearPrompt: i18next.t("Filter By Year"),
-                    filterResultPrompt: i18next.t("Filter By Result"),
-                    selectedFilterYearValue: "",
-                    selectedFilterResultRange: "",
-                    clearLabel: i18next.t("Clear Filters")
-                },
-                showRefresh: false,
-                treatment: {
-                    treatmentTextPrompt: i18next.t("Last Received Treatment:"),
-                    treatmentDatePrompt: i18next.t("Treatment Date:"),
-                    noTreatmentText: i18next.t("No treatment received as of today"),
-                    data: []
-                },
-                modalLoading: false,
-                editLink: i18next.t("Edit"),
-                editTitle: i18next.t("Edit PSA Result"),
-                addTitle: i18next.t("Add PSA Result")
-            };
+            return PsaTrackerData;
         },
         computed: {
             yearList: function() {
@@ -319,12 +235,12 @@
                 return this.addTitle;
             },
             getRefreshMessage: function() {
-                return i18next.t("Click to reload the page and try again.");
+                return this.refreshErrorMessage;
             },
             validateResult: function(val) {
                 var isValid = !(isNaN(val) || parseInt(val) < 0 || parseInt(val) > this.MAX_RESULT);
                 if(!isValid) {
-                    this.addErrorMessage = i18next.t("Result must be a number and within valid range (less than {max_result}).").replace("{max_result}", this.MAX_RESULT);
+                    this.addErrorMessage = this.resultValidationErrorMessage.replace("{max_result}", this.MAX_RESULT);
                     return false;
                 }
                 this.addErrorMessage = "";
@@ -336,7 +252,7 @@
                 }
                 var isValid = this.tnthDates.isValidDefaultDateFormat(date);
                 if(!isValid) {
-                    this.addErrorMessage = i18next.t("Date must be in the valid format.");
+                    this.addErrorMessage = this.dateValidationErrorMessage;
                 } else {
                     this.addErrorMessage = "";
                 }
@@ -493,12 +409,12 @@
                 this.loading = true;
                 this.tnthAjax.getClinical(this.getCurrentUserId(), {data: {patch_dstu2: true}}, function(data) {
                     if(data.error) {
-                        $("#psaTrackerErrorMessageContainer").html(i18next.t("Error occurred retrieving PSA result data"));
+                        $("#psaTrackerErrorMessageContainer").html(self.serverErrorMessage);
                         self.loading = false;
                         return false;
                     }
                     if (!data.entry) {
-                        $("#psaTrackerErrorMessageContainer").html(i18next.t("No result data found"));
+                        $("#psaTrackerErrorMessageContainer").html(self.noDataErrorMessage);
                         self.loading = false;
                         return false;
                     }
@@ -529,10 +445,10 @@
                         var tempResults = results;
                         results = results.slice(0, 10);
                         self.history.items = tempResults.slice(10, 20);
-                        self.history.sidenote = String(i18next.t("* Maximum of {resultNumber} results since {year}")).replace("{resultNumber}", 10).replace("{year}", self.getHistoryMinYear());
+                        self.history.sidenote = String(self.historySideNote).replace("{resultNumber}", 10).replace("{year}", self.getHistoryMinYear());
                     }
                     if (results.length === 0) {
-                        self.noResultMessage = i18next.t("No PSA results to display");
+                        self.noResultMessage = self.nullResultMessage;
                     }
                     self.items = self.originals = results;
                     self.filterData();
@@ -575,7 +491,7 @@
                     this.items = this.RANGE_ENUM[this.filters.selectedFilterResultRange](this.items);
                 }
                 if (this.items.length === 0 && this.isActedOn()) {
-                    this.noResultMessage = i18next.t("No PSA result matching the filtering criteria. Please try again.");
+                    this.noResultMessage = this.nullFilterResultMessage;
                 }
                 if (!redraw) {
                     return false;
@@ -623,7 +539,7 @@
                 this.savingInProgress = true;
                 this.tnthAjax.sendRequest(url, method, userId, { data: JSON.stringify(obsArray), async: true }, function(data) {
                     if(data.error) {
-                        self.addErrorMessage = i18next.t("Server error occurred adding PSA result.");
+                        self.addErrorMessage = self.addServerErrorMessage;
                     } else {
                         $("#addPSAModal").modal("hide");
                         self.clearFilter(); //clear filter after every new data update?
@@ -895,7 +811,7 @@
                         .style("stroke-width", "4px")
                         .style("fill", "#FFF")
                         .style("letter-spacing", "2px")
-                        .text(i18next.t("treatment"));
+                        .text(self.treatmentLabel);
                 }
 
                 // Add the valueline path.
@@ -926,7 +842,7 @@
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
                         tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
-                        tooltipContainer.html("<b>" + i18next.t("PSA") + "</b> " + d.display + "<br/><span class='small-text'>" + d.date + "</span>")
+                        tooltipContainer.html("<b>" + self.PSALabel + "</b> " + d.display + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
                             .style("left", (d3.event.pageX - TOOLTIP_WIDTH/2) + "px")

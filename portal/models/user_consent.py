@@ -146,16 +146,15 @@ class UserConsent(db.Model):
         return obj
 
 
-def latest_consent(user, org_id=None, include_suspended=False):
-    """Lookup latest consent for user
+def latest_consent(user, org_id=None):
+    """Lookup latest valid consent for user
 
     :param user: subject of query
     :param org_id: define to restrict to given org
-    :param include_suspended: set true to stop looking back, even if
-        the consent is marked suspended (aka withdrawn).  By default,
-        suspended consents are ignored, looking back to find the
-        previously valid acceptance date.  NB in a currently suspended
-        state, the previous is marked deleted
+
+    If latest consent for user is 'suspended' or 'deleted', this function
+    will return None.  See ``consent_withdrawal_dates()`` for that need.
+
     :returns: the most recent consent based on given criteria, or None
         if no match is located
 
@@ -164,15 +163,9 @@ def latest_consent(user, org_id=None, include_suspended=False):
         raise NotImplementedError
 
     # consents are ordered desc(acceptance_date)
-    # ignore suspended unless `include_suspended` is set
-    # include deleted, as in a suspended state, the previous
-    # acceptance will now be marked deleted.
-    for consent in user.all_consents:
-        if include_suspended and consent.status == 'suspended':
+    for consent in user.valid_consents:
+        if consent.status == 'consented':
             return consent
-        if not include_suspended and consent.status == 'suspended':
-            continue
-        return consent
 
     return None
 
@@ -180,15 +173,36 @@ def latest_consent(user, org_id=None, include_suspended=False):
 def consent_withdrawal_dates(user):
     """Lookup user's most recent consent and withdrawal dates
 
+    In a currently withdrawn case, lookup the date of withdrawal and the
+    acceptance_date of the consent prior to withdrawal.
+
+    If the user isn't currently withdrawn, simply return the current
+    consent and None for withdrawal date.
+
     :param user: subject of query
     :returns: (consent_date, withdrawal_date) for user.  Either value
         may be None if not found.
 
     """
     withdrawal_date = None
-    consent = latest_consent(user, include_suspended=True)
-    if consent and consent.status == 'suspended':
-        withdrawal_date = consent.acceptance_date
-        consent = latest_consent(user, include_suspended=False)
-    consent_date = consent.acceptance_date if consent else None
-    return consent_date, withdrawal_date
+    consent = latest_consent(user)
+    if consent:
+        # Valid consent found, user hasn't withdrawn; leave
+        return consent.acceptance_date, withdrawal_date
+
+    # Look for withdrawn case.  If found, also look up the previous
+    # consent date (prior to withdrawn)
+
+    prior_acceptance = None
+    for consent in user.all_consents:
+        if not withdrawal_date and (
+                consent.status == 'suspended' and not consent.deleted_id):
+            withdrawal_date = consent.acceptance_date
+            if prior_acceptance:
+                raise ValueError(
+                    "don't expect prior acceptance before withdrawal date")
+        if consent.status == 'deleted' and withdrawal_date:
+            prior_acceptance = consent.acceptance_date
+            break
+
+    return prior_acceptance, withdrawal_date
