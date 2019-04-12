@@ -111,6 +111,9 @@ var CurrentUser = { /* global $ i18next */
                 alert(i18next.t("Error occurred setting user organizations"));
             });
         },
+        hasTopLevelOrgs: function() {
+            return this.topLevelOrgs && this.topLevelOrgs.length;
+        },
         setTopLevelOrgs: function () {
             var self = this;
             this.topLevelOrgs = (this.userOrgs).map(function (orgId) {

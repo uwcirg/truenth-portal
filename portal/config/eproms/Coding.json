@@ -6119,6 +6119,12 @@
       "display": "Portuguese (Brazil)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "es_ES",
+      "display": "Spanish (Spain)",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
     }
   ],
   "id": "SitePersistence v0.2",

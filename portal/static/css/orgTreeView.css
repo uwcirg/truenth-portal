@@ -25,6 +25,14 @@ input.clinic {
 #fillOrgs * {
 	font-size: 12px;
 }
+#fillOrgs .parent-org-container,
+#fillOrgs .sub-org-container {
+	padding: 0.5em;
+}
+#fillOrgs .sub-org-container {
+	border: 2px solid #ececec;
+	margin-bottom: 0.25em;
+}
 #fillOrgs .sub-text,
 #fillOrgs .json-link {
 	font-size: 10px;
@@ -33,8 +41,11 @@ input.clinic {
 #fillOrgs .singleton {
 	color: #68727e;
     display: inline-block;
-    border: 1px solid #ececec !important;
+    border: 1px solid #ececec;
     padding: 0.5em !important;
+}
+#fillOrgs .sub-org-container .singleton {
+	border: 0;
 }
 #fillOrgs .text-muted:after {
 	content: "\2193";
@@ -50,10 +61,14 @@ input.clinic {
 	max-width: 100%;
 }
 #fillOrgs .text-muter {
-	color: #71464f;
+	color: #68727e;
+	opacity: 0.8;
 	display: inline-block;
 	padding: 0.5em;
 	border: 1px solid #ececec !important;
+}
+#fillOrgs .child-item {
+	border: 1px solid #ececec;
 }
 #fillOrgs .text-muter:after {
 	content: "\2193";
@@ -65,7 +80,7 @@ input.clinic {
 	content: "";
 }
 #fillOrgs legend,
-#fillOrgs .parent-singleton {
+#fillOrgs .parent-singleton legend {
     background: #7C959E;
     color: #FFF;
     margin: 4px 0;
@@ -85,6 +100,31 @@ input.clinic {
 	background: #7C959E;
     color: #FFF;
 }
+#fillOrgs .parent-singleton label.org-label { /* single parent org label */
+	display: block;
+	width: 100%;
+	left: 0;
+	background: #FFF;
+	color: #68727e;
+	border: 2px solid #ececec;
+}
+#fillOrgs .parent-singleton label.org-label .sub-text {
+	display: none;
+}
+#fillOrgs .parent-singleton label.org-label .json-link {
+	display: none;
+}
+#fillOrgs .parent-singleton label.org-label input {
+	display: none !important;
+}
+
+#fillOrgs .parent-singleton label.org-label:after {
+	content: "( single parent org )";
+	display: block;
+	width: 100%;
+	color: #68727e;
+	font-weight: 200;
+}
 #fillOrgs .parent-singleton .sub-text,
 #fillOrgs .parent-singleton .json-link  {
 	font-weight: 200;
@@ -93,6 +133,17 @@ input.clinic {
 #fillOrgs .parent-singleton label {
 	top: 2px;
 	padding: 4px;
+}
+#fillOrgs .parent-org-container legend:after,
+#fillOrgs legend.singleton:after {
+	content: "\2193";
+	display: block;
+	width: 20px;
+	margin-left: 2em;
+}
+#fillOrgs div.org-container label.org-label {
+	margin: 0.5em 0;
+	padding: 0.35em 0.25em;
 }
 div.org-container label.org-label {
 	padding: 0.35em 0.25em;

@@ -51,6 +51,7 @@ matrix:
     - env: TOXENV=docs
       services: []
       addons: {}
+      python: "3.6"
     - env: TOXENV=build-artifacts
       services:
         - docker

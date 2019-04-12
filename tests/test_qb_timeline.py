@@ -4,10 +4,10 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
-from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.qb_timeline import (
+    AtOrderedList,
     QB_StatusCacheKey,
     QBT,
     ordered_qbs,
@@ -190,13 +190,13 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
         assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
 
-    @pytest.mark.skip("can't have both ways - once withdrawn lose trigger")
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
         crv = self.setup_org_qbs()
         crv_id = crv.id
         # consent 17 months in past
         backdate = datetime.utcnow() - relativedelta(months=17)
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id, setdate=backdate)
 
@@ -421,3 +421,89 @@ class Test_QB_StatusCacheKey(TestCase):
         cache_key = QB_StatusCacheKey()
         cache_key.update(hourback)
         assert cache_key.minutes_old() == 60
+
+
+class HasAt(object):
+    """Mock the sorted portion of QBT for testing AtOrderedList"""
+    def __init__(self, at, label):
+        self.at = at
+        self.label = label
+
+
+origin = HasAt(datetime.strptime("2112-01-31", '%Y-%m-%d'), 'origin')
+day_before = HasAt(origin.at - relativedelta(days=1), 'day before')
+day_before2 = HasAt(day_before.at, 'day before again')
+week_before = HasAt(origin.at - relativedelta(weeks=1), 'week before')
+
+
+def test_at_ordered_empty():
+    ao = AtOrderedList()
+    assert len(ao) == 0
+    ao.append(origin)
+    assert len(ao) == 1
+    assert ao.pop() == origin
+
+
+def test_at_ordered_end():
+    ao = AtOrderedList()
+    ao.append(week_before)
+
+    # now append one day before, then a second
+    # expecting order based on 'at' and insertion
+    # which should map to append order in this case
+
+    ao.append(day_before)
+    ao.append(day_before2)
+
+    assert len(ao) == 3
+    assert ao.pop().label == day_before2.label
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
+
+
+def test_at_ordered_insertion():
+    ao = AtOrderedList()
+    ao.append(week_before)
+    ao.append(origin)
+
+    # now insert one from day before, then a second
+    # expecting order based on 'at' and insertion
+    # as origin is already inserted and has a greater
+    # 'at' value, it should remain at the end.
+    ao.append(day_before)
+    ao.append(day_before2)
+
+    assert len(ao) == 4
+    assert ao.pop() == origin
+    assert ao.pop().label == day_before2.label
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
+
+
+def test_at_ordered_first():
+    ao = AtOrderedList()
+    ao.append(day_before)
+    ao.append(origin)
+
+    # now insert element that should land at front of list
+    ao.append(week_before)
+
+    assert len(ao) == 3
+    assert ao.pop() == origin
+    assert ao.pop() == day_before
+    assert ao.pop() == week_before
+
+
+def test_at_ordered_first_match():
+    ao = AtOrderedList()
+    ao.append(day_before)
+    ao.append(origin)
+
+    # now insert element with same 'at' as first, expecting the original
+    # first will remain first, and new, second
+    ao.append(day_before2)
+
+    assert len(ao) == 3
+    assert ao.pop() == origin
+    assert ao.pop() == day_before2
+    assert ao.pop() == day_before

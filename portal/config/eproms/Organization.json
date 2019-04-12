@@ -1954,6 +1954,34 @@
       "resourceType": "Organization"
     },
     {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14672,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-72"
+        }
+      ],
+      "language": "en_GB",
+      "name": "The Christie NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
       "id": 30000,
       "identifier": [
         {
@@ -2139,6 +2167,73 @@
     },
     {
       "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_AU",
+                "display": "Australian English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "af_ZA",
+                "display": "Afrikaans",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "es_US",
+                "display": "Spanish (United States)",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "fr_CA",
+                "display": "Canadian French",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "zu_ZA",
+                "display": "Zulu",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "xh_ZA",
+                "display": "Xhosa",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "pt_BR",
+                "display": "Portuguese (Brazil)",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "sv_SE",
+                "display": "Swedish",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "es_ES",
+                "display": "Spanish (Spain)",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
         {
           "timezone": "America/New_York",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"

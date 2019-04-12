@@ -11,23 +11,19 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
-from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.coding import Coding
-from ..models.intervention import Intervention, UserIntervention
-from ..models.organization import Organization, OrgTree
+from ..models.intervention import Intervention
+from ..models.organization import Organization
 from ..models.qb_timeline import qb_status_visit_name, QB_StatusCacheKey
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import (
-    User,
-    active_patients,
     current_user,
     get_user_or_abort,
+    patients_query,
 )
-from ..models.user_consent import UserConsent
-from ..type_tools import check_int
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -51,112 +47,31 @@ def patients_root():
     expected and will raise a 400: Bad Request
 
     """
-    broken_role_situation = (
-        "Patients list for staff and intervention-staff are mutually"
-        " exclusive - user shouldn't have both roles")
 
-    def org_restriction(user):
-        """Determine if user (prefs) restrict list of patients by org
+    def org_preference_filter(user):
+        """Obtain user's preference for filtering organizations
 
-        :returns: None if no org restrictions apply, or a list of org_ids
+        :returns: list of org IDs to use as filter, or None
 
         """
-        pref_org_list = None
         # check user table preference for organization filters
         pref = TablePreference.query.filter_by(
             table_name='patientList', user_id=user.id).first()
         if pref and pref.filters:
-            pref_org_list = pref.filters.get('orgs_filter_control')
+            return pref.filters.get('orgs_filter_control')
+        return None
 
-        if (user.has_role(ROLE.ADMIN.value) or
-                user.has_role(ROLE.INTERVENTION_STAFF.value)):
-            # admins and intervention_staff aren't generally restricted by
-            # organization - only apply a restriction if they've set a filter
-            return pref_org_list
-
-        org_list = set()
-        if user.has_role(ROLE.STAFF.value):
-            if user.has_role(ROLE.INTERVENTION_STAFF.value):
-                abort(400, broken_role_situation)
-
-            # Build list of all organization ids, and their descendants, the
-            # user belongs to
-            ot = OrgTree()
-
-            if pref_org_list:
-                # for preferred filtered orgs
-                pref_org_list = set(pref_org_list)
-                for orgId in pref_org_list:
-                    if orgId == 0:  # None of the above doesn't count
-                        continue
-                    for org in user.organizations:
-                        if orgId in ot.here_and_below_id(org.id):
-                            org_list.add(orgId)
-                            break
-            else:
-                for org in user.organizations:
-                    if org.id == 0:  # None of the above doesn't count
-                        continue
-                    org_list.update(ot.here_and_below_id(org.id))
-            return list(org_list)
-
-    def intervention_restrictions(user):
-        """returns tuple of lists for interventions: (disallow, require)
-
-        Users may not have access to some interventions (such as randomized
-        control trials).  In such a case, the first of the tuple items
-        will name intervention ids which should not be included.
-
-        Other users get access to all patients with one or more
-        interventions.  In this case, a list of interventions for which
-        the user should be granted access is in the second position.
-
-        """
-        if user.has_role(ROLE.ADMIN.value):
-            return None, None  # no restrictions
-
-        disallowed, required = None, None
-        if user.has_role(ROLE.STAFF.value):
-            if user.has_role(ROLE.INTERVENTION_STAFF.value):
-                abort(400, broken_role_situation)
-            # staff users aren't to see patients from RCT interventions
-            disallowed = Intervention.rct_ids()
-        if user.has_role(ROLE.INTERVENTION_STAFF.value):
-            # Look up associated interventions
-            uis = UserIntervention.query.filter(
-                UserIntervention.user_id == user.id)
-            # check if the user is associated with any intervention at all
-            if uis.count() == 0:
-                abort(400, "User is not associated with any intervention.")
-            required = [ui.intervention_id for ui in uis]
-        return disallowed, required
+    include_test_role = request.args.get('include_test_role')
 
     if request.form.get('reset_cache'):
         QB_StatusCacheKey().update(datetime.utcnow())
 
     user = current_user()
-    # Not including test accounts by default, unless requested
-    include_test_roles = request.args.get('include_test_roles')
-
-    # If there are org restrictions, we also require consent
-    require_orgs = org_restriction(user)
-    consented_users = None
-    if require_orgs:
-        consent_query = UserConsent.query.filter(and_(
-            UserConsent.deleted_id.is_(None),
-            UserConsent.expires > datetime.utcnow()))
-        consented_users = [u.user_id for u in consent_query if u.staff_editable]
-
-    # Restrict by intervention or remove RCT user ids as applicable
-    disallowed_iv_ids, required_iv_ids = intervention_restrictions(user)
-
-    patients = active_patients(
-        require_orgs=require_orgs,
-        include_test_role=include_test_roles,
+    query = patients_query(
+        acting_user=user,
+        include_test_role=include_test_role,
         include_deleted=True,
-        require_interventions=required_iv_ids,
-        disallow_interventions=disallowed_iv_ids,
-        filter_by_ids=consented_users)
+        requested_orgs=org_preference_filter(user))
 
     # get assessment status only if it is needed as specified by config
     qb_status_cache_age = 0
@@ -164,21 +79,22 @@ def patients_root():
         status_cache_key = QB_StatusCacheKey()
         cached_as_of_key = status_cache_key.current()
         qb_status_cache_age = status_cache_key.minutes_old()
-        patient_list = []
-        for patient in patients:
+        patients_list = []
+        for patient in query:
             if patient.deleted:
-                patient_list.append(patient)
+                patients_list.append(patient)
                 continue
             a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
-            patient_list.append(patient)
-        patients = patient_list
+            patients_list.append(patient)
+    else:
+        patients_list = query
 
     return render_template(
-        'admin/patients_by_org.html', patients_list=patients, user=user,
+        'admin/patients_by_org.html', patients_list=patients_list, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
-        include_test_roles=include_test_roles)
+        include_test_role=include_test_role)
 
 
 @patients.route('/patient-profile-create')

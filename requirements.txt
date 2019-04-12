@@ -11,9 +11,9 @@ alembic==1.0.8            # via flask-migrate
 amqp==2.4.2               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
-billiard==3.5.0.5         # pyup: < 3.6.0  # pin until celery upgraded # via celery
+billiard==3.6.0         # pyup: < 4.0  # pin until celery upgraded # via celery
 blinker==1.4              # via flask-mail, flask-webtest
-celery==4.2.1
+celery==4.3.0
 certifi==2019.3.9        # via requests
 cffi==1.12.2              # via bcrypt
 chardet==3.0.4            # via requests
@@ -32,7 +32,7 @@ flask-oauthlib==0.9.5
 flask-recaptcha==0.4.2
 flask-session==0.3.1
 flask-sqlalchemy==2.3.2
-flask-swagger==0.2.13
+flask-swagger==0.2.14
 git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-wtf==0.14.2         # via flask-user
 flask==1.0.2
@@ -45,15 +45,15 @@ idna==2.8                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.10              # via flask, flask-babel, sphinx
 jsonschema==3.0.1
-kombu==4.4.0              # via celery
-mako==1.0.7               # via alembic
+kombu==4.5.0              # pyup: < 5.0 # via celery
+mako==1.0.8               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
 passlib==1.7.1            # via flask-user
 polib==1.1.0
 psycopg2==2.7.7
 pycparser==2.19           # via cffi
-pycryptodome==3.7.3       # via flask-user
+pycryptodome==3.8.1       # via flask-user
 python-dateutil==2.8.0
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
@@ -69,6 +69,6 @@ sqlalchemy==1.2.18         # via alembic, flask-sqlalchemy
 swagger-spec-validator==2.4.3
 urllib3==1.24.1             # via requests
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
-vine==1.2.0               # via amqp
+vine==1.3.0               # via amqp
 werkzeug==0.14.1          # via flask
 wtforms==2.2.1            # via flask-wtf

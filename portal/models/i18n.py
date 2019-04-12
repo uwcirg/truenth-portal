@@ -1,30 +1,19 @@
 """Module for i18n methods and functionality"""
+from __future__ import unicode_literals  # isort:skip
 from future import standard_library  # isort:skip
 
 standard_library.install_aliases()  # noqa: E402
 
 from collections import defaultdict
-from io import BytesIO
-import os
 import re
-from subprocess import check_call
-import sys
-import tempfile
 
 from babel import negotiate_locale
 from flask import current_app, has_request_context, request, session
-from polib import pofile
-import requests
 
 from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
 from .coding import Coding
-from .i18n_utils import (
-    BearerAuth,
-    download_and_extract_po_file,
-    smartling_authenticate,
-)
 from .intervention import Intervention
 from .organization import Organization
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
@@ -83,188 +72,6 @@ def get_static_strings():
             msgid_map['"{}"'.format(value)] = {'{}: {}'.format(
                 enum.name, value)}
     return msgid_map
-
-
-def upsert_to_template_file():
-    db_translatables = {}
-    db_translatables.update(get_db_strings())
-    if not db_translatables:
-        current_app.logger.warn("no DB strings extracted")
-        return
-
-    db_translatables.update(get_static_strings())
-
-    try:
-        with open(
-            os.path.join(
-                current_app.root_path,
-                "translations/messages.pot",
-            ),
-            "r+",
-        ) as potfile:
-            potlines = potfile.readlines()
-            for i, line in enumerate(potlines):
-                if not line.split() or (line.split()[0] != "msgid"):
-                    continue
-                msgid = line.split(" ", 1)[1].strip()
-                if msgid not in db_translatables:
-                    continue
-                for location in db_translatables[msgid]:
-                    locstring = "# " + location + "\n"
-                    if not any(t == locstring for t in potlines[i - 4:i]):
-                        potlines.insert(i, locstring)
-                del db_translatables[msgid]
-            for entry, locations in db_translatables.items():
-                if not entry:
-                    continue
-                for loc in locations:
-                    potlines.append("# " + loc + "\n")
-                potlines.append("msgid " + entry + "\n")
-                potlines.append("msgstr \"\"\n")
-                potlines.append("\n")
-            potfile.truncate(0)
-            potfile.seek(0)
-            potfile.writelines(potlines)
-    except:
-        exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-        sys.exit(
-            "Could not write to translation file!\n ->%s" % (exceptionValue))
-
-
-def fix_references(pot_fpath):
-    """Fix reference comments to remove checkout-specific paths"""
-    # Todo: override PoFileParser._process_comment() to perform this as part of `pybabel extract`
-
-    path_regex = re.compile(r"^#: {}(?P<rel_path>.*):(?P<line>\d+)".format(
-        os.path.dirname(current_app.root_path)
-    ))
-    base_url = "%s/tree/develop" % current_app.config.metadata['home-page']
-
-    with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
-        prefix='fix_references_',
-        suffix='.pot',
-        delete=False,
-    ) as tmpfile:
-        for line in infile:
-            tmpfile.write(
-                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url,
-                               line))
-
-    os.rename(tmpfile.name, pot_fpath)
-    current_app.logger.debug("messages.pot file references fixed")
-
-
-def smartling_upload():
-    # get relevant filepaths
-    config_fname = current_app.config['BABEL_CONFIG_FILENAME']
-    translation_fpath = os.path.join(current_app.root_path, "translations")
-    messages_pot_fpath = os.path.join(translation_fpath, 'messages.pot')
-    config_fpath = os.path.join(
-        current_app.root_path, "../instance/", config_fname
-    )
-
-    # create new .pot file from code
-    check_call((
-        'pybabel', 'extract',
-        '--no-wrap',
-        '--mapping-file', config_fpath,
-        '--project', current_app.config.metadata['name'],
-        '--version', current_app.config.metadata['version'],
-        '--output-file', messages_pot_fpath,
-        current_app.root_path,
-    ))
-    current_app.logger.debug("messages.pot file generated")
-
-    # update .pot file with db values
-    upsert_to_template_file()
-    current_app.logger.debug("messages.pot file updated with db strings")
-
-    fix_references(messages_pot_fpath)
-    upload_pot_file(
-        fpath=messages_pot_fpath,
-        fname='messages.pot',
-        uri='portal/translations/messages.pot',
-    )
-
-    frontend_pot_fpath = os.path.join(
-        translation_fpath, "js", "src", "frontend.pot"
-    )
-
-    fix_references(frontend_pot_fpath)
-    upload_pot_file(
-        fpath=frontend_pot_fpath,
-        fname='frontend.pot',
-        uri='portal/translations/js/src/frontend.pot'
-    )
-
-
-def upload_pot_file(fpath, fname, uri):
-    upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-    if project_id and current_app.config.get("SMARTLING_USER_SECRET"):
-        creds = {'bearer_token': smartling_authenticate()}
-        current_app.logger.debug("authenticated in smartling")
-        with open(fpath, 'rb') as potfile:
-            resp = requests.post(
-                upload_url.format(project_id),
-                data={'fileUri': uri, 'fileType': 'gettext'},
-                files={'file': (fname, potfile)},
-                auth=BearerAuth(**creds)
-            )
-            resp.raise_for_status()
-        current_app.logger.debug(
-            "{} uploaded to smartling project {}".format(fname, project_id)
-        )
-    else:
-        current_app.logger.warn(
-            "missing smartling config - file {} not uploaded".format(fname)
-        )
-
-
-def smartling_download(state, language=None):
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
-
-    creds = {'bearer_token': smartling_authenticate()}
-    current_app.logger.debug("authenticated in smartling")
-    download_and_extract_po_file(
-        language=language,
-        fname='messages',
-        uri='portal/translations/messages.pot',
-        state=state,
-        credentials=creds,
-        project_id=project_id,
-    )
-    download_and_extract_po_file(
-        language=language,
-        fname='frontend',
-        uri='portal/translations/js/src/frontend.pot',
-        state=state,
-        credentials=creds,
-        project_id=project_id,
-    )
-
-
-def download_po_file(language, credentials, project_id, uri, state):
-    if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
-        sys.exit('invalid language code; expected format xx_XX')
-    language_id = language.replace('_', '-')
-    url = 'https://api.smartling.com/files-api/v2/projects/{}/locales/{}/file'.format(
-        project_id,
-        language_id,
-    )
-    resp = requests.get(
-        url,
-        auth=BearerAuth(**credentials),
-        params={
-            'retrievalType': state,
-            'fileUri': uri,
-        },
-    )
-    if not resp.content:
-        sys.exit('no file returned')
-    current_app.logger.debug("{} po file downloaded "
-                             "from smartling".format(language))
-    return resp.content
 
 
 @babel.localeselector

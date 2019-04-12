@@ -712,18 +712,17 @@ def patient_reminder_email(user_id):
             name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserReminderEmail_ATMA.name_key()
-        questionnaire_bank_id = None
-        # Todo: optimize this lookup with a direct query on QB timeline
-        # for dates needed in `load_template_args`
+
+        # If the user has a pending questionnaire bank, include for due date
         qstats = QB_Status(user, as_of_date=datetime.utcnow())
         qbd = qstats.current_qbd()
-        if not qbd:
-            return "Not Available", 204
+        if qbd:
+            qb_id, qb_iteration = qbd.qb_id, qbd.iteration
+        else:
+            qb_id, qb_iteration = None, None
 
-        # pass in questionnaire bank id to get at the questionnaire due date
         args = load_template_args(
-            user=user, questionnaire_bank_id=qbd.qb_id,
-            qb_iteration=qbd.iteration)
+            user=user, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:

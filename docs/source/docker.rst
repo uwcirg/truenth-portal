@@ -20,7 +20,7 @@ Install `docker-compose` as per environment.  For example, from a debian system:
 
     # add user to docker group
     sudo usermod -aG docker $USER
-    sudo pip install docker_compose
+    pip install --user docker_compose
 
 .. note::
     A clean environment and fresh git checkout are recommended, but not required
@@ -44,6 +44,9 @@ By default, the ``truenth_portal`` image with the ``latest`` tag is downloaded a
     export DOCKER_IMAGE_TAG='stable'
     docker-compose pull web
     docker-compose up web
+
+.. note::
+    Any environment variable set in the shell can also be set in the ``.env`` file. Environment variables in the current shell override values in the ``.env`` file.
 
 Docker Images
 =============
@@ -71,7 +74,7 @@ Building a Shared Services Docker Image
 
 If you would like to build a Shared Services image, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
-    # Override default (Artifactory) docker repo to differentiate locally-built images
+    # Override default (Docker Hub) docker repo to differentiate locally-built images
     export DOCKER_REPOSITORY=''
 
     # Build the "web" image locally
@@ -124,6 +127,20 @@ To bootstrap an admin account after a fresh install, run the below ``flask`` CLI
 Advanced Configuration
 ======================
 
+Development
+-----------
+If you would like to use docker to work on the portal, you can configure ``docker-compose`` to use the development overrides as follows::
+
+    # Set COMPOSE_FILE in the current shell
+    export COMPOSE_FILE=docker-compose.yaml:docker-compose.dev.yaml
+    # or add to .env to preserve the change between shell sessions
+
+    docker-compose up web
+
+This will mount your checkout into a docker container and use the flask development server instead of the production default (gunicorn).
+
+Environment Variables
+---------------------
 Environment variables defined in the ``portal.env`` environment file are only passed to the underlying containers. However, some environment variables are used for configuration specific to docker-compose.
 
 An

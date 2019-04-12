@@ -5,12 +5,15 @@ ENV \
     DEBIAN_FRONTEND=noninteractive \
     GIT_REPO=https://github.com/uwcirg/truenth-portal
 
+# Install tools for reading build-time dependencies; see `Build-Depends`
+# Squelch superfluous output; apt-get has poor verbosity control
 RUN \
-    apt-get update --quiet && \
+    apt-get update --quiet > /dev/null && \
     apt-get install --quiet --quiet --no-install-recommends \
         devscripts \
         equivs \
-        git
+        git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
+        # only print package names and versions
 
 WORKDIR /root/portal
 

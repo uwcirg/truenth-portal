@@ -62,6 +62,52 @@ class QBT(db.Model):
             recur_id=self.qb_recur_id, qb_id=self.qb_id)
 
 
+class AtOrderedList(list):
+    """Specialize ``list`` to maintain insertion order and ``at`` attribute
+
+    When building up QBTs for a user, we need to maintain both order and
+    sort by the ``QBT.at`` attribute.  As there are rows with identical ``at``
+    values, it can't simply be sorted by a field, as insertion order matters
+    in the case of a tie (as say the ``due`` status needs to precede a
+    ``completed``, which does happen with paper entry).
+
+    As the build order matters, continue to add QBTs to the end of the list,
+    taking special care to insert those with earlier ``at`` values in
+    the correct place.  Two or more identical ``at`` values should result
+    in the latest addition following preexisting.
+
+    """
+
+    def append(self, value):
+        """Maintain order by appending or inserting as needed
+
+        If the given value.at is > current_end.at, append to end.
+        Otherwise, walk backwards till the new can be inserted
+        so the list remains ordered by the 'at' attribute, with
+        new matching values following existing
+
+        """
+        if not self.__len__():
+            return super(AtOrderedList, self).append(value)
+
+        # Expecting to build in order; common case new value
+        # lands at end.
+        if self[-1].at <= value.at:
+            return super(AtOrderedList, self).append(value)
+
+        # Otherwise, walk backwards till new value < existing
+        for i, e in reversed(list(enumerate(self))):
+            if i > 0:
+                # If not at start and previous is also greater
+                # than new, continue to walk backwards
+                if self[i-1].at > value.at:
+                    continue
+            if e.at > value.at:
+                return self.insert(i, value)
+
+        raise ValueError("still here?")
+
+
 def ordered_rp_qbs(rp_id, trigger_date):
     """Generator to yield ordered qbs by research protocol alone"""
     baselines = qbs_by_rp(rp_id, 'baseline')
@@ -158,6 +204,11 @@ def calc_and_adjust_start(user, qbd, initial_trigger):
 
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    if not users_trigger:
+        trace(
+            "no valid trigger, default to initial value: {}".format(
+                initial_trigger))
+        users_trigger = initial_trigger
     if initial_trigger > users_trigger:
         trace(
             "user {} has unexpected trigger date before consent date".format(
@@ -184,6 +235,11 @@ def calc_and_adjust_expired(user, qbd, initial_trigger):
 
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    if not users_trigger:
+        trace(
+            "no valid trigger, default to initial value: {}".format(
+                initial_trigger))
+        users_trigger = initial_trigger
     if initial_trigger > users_trigger:
         trace(
             "user {} has unexpected trigger date before consent date".format(
@@ -226,10 +282,14 @@ def ordered_qbs(user, classification=None):
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
     td = trigger_date(user=user)
-    _, withdrawal_date = consent_withdrawal_dates(user)
+    old_td, withdrawal_date = consent_withdrawal_dates(user)
     if not td:
-        trace("no trigger date therefore nothing from ordered_qbds()")
-        return
+        if old_td:
+            trace("withdrawn user, use previous trigger {}".format(old_td))
+            td = old_td
+        else:
+            trace("no trigger date therefore nothing from ordered_qbds()")
+            return
 
     # Zero to one RP makes things significantly easier - otherwise
     # swap in a strategy that can work with the change.
@@ -370,7 +430,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
         # As we move forward, capture state at each time point
 
-        pending_qbts = []
+        pending_qbts = AtOrderedList()
         kwargs = {"user_id": user_id}
         for qbd in qb_generator:
             qb_recur_id = qbd.recur.id if qbd.recur else None
@@ -416,12 +476,15 @@ def update_users_QBT(user_id, invalidate_existing=False):
                     pending_qbts.append(QBT(
                         at=complete_date, status='completed',
                         **kwargs))
-                    if complete_date < expired_date:
+                    if complete_date <= expired_date:
                         include_overdue = False
                         include_expired = False
                         expired_as_partial = False
 
             if include_overdue and overdue_date:
+                # Take care to add overdue in the right order wrt
+                # partial and complete rows.
+
                 pending_qbts.append(QBT(
                     at=overdue_date, status='overdue', **kwargs))
 

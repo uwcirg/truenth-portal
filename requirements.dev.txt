@@ -13,13 +13,13 @@ pluggy==0.9.0             # via tox
 py==1.8.0                 # via tox
 pygments==2.3.1           # via sphinx
 pyparsing==2.3.1          # via packaging
-pytest==4.3.1
+pytest==4.4.0
 selenium==3.141.0
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
-sphinx==1.8.5
+sphinx==2.0.0;python_version >= '3'
 sphinxcontrib-websupport==1.1.0  # via sphinx
-tox==3.7.0
+tox==3.8.6
 typing==3.6.6             # via sphinx
 virtualenv==16.4.3        # via tox
 waitress==1.2.1           # via webtest

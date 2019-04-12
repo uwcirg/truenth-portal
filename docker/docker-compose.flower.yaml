@@ -4,12 +4,11 @@ version: "3.4"
 services:
   celeryflower:
     environment:
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      REDIS_URL: redis://redis:6379/0
     build:
       context: https://github.com/mher/flower.git#v0.9.2
     entrypoint: /bin/sh
     command: -c '
-      env &&
       flower
         --address=0.0.0.0
         --broker="$$REDIS_URL"

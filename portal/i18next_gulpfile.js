@@ -43,6 +43,11 @@ const epromsSrcPotFileName =  translationSourceDir+epromsNameSpace+".pot";
 const truenthSrcPotFileName = translationSourceDir+truenthNameSpace+".pot";
 
 /*
+ * JS source directory
+ */
+const jsSrcPath = "./static/js/src/";
+
+/*
  * helper function for writing file
  */
 function save(target) {
@@ -103,25 +108,25 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
  */
 gulp.task("i18next-extraction", ["clean-src"], function() {
   console.log("extracting text and generate json file ...");
-  return i18nextScanner(["static/**/*.{js,html}", "templates/*.html"], "./src/" + nameSpace + ".json");
+  return i18nextScanner([jsSrcPath+"*.{js,html}", jsSrcPath+"components/*.{js,html}", jsSrcPath+"mixins/*.{js,html}", jsSrcPath+"modules/*.{js,html}", jsSrcPath+"data/common/*.{js,html}", "templates/*.html"], "./src/" + nameSpace + ".json");
 });
 
 
 /*
- * extracting text from  Eproms html files into json file
+ * extracting text from  Eproms js/html files into json file
  */
 gulp.task("i18next-extraction-eproms", ["clean-eproms-src"], function() {
   console.log("extracting text and generate json file ...");
-  return i18nextScanner(["eproms/templates/eproms/*.html"], "./src/" + epromsNameSpace + ".json");
+  return i18nextScanner(["eproms/templates/eproms/*.html", jsSrcPath+"data/eproms/*.{js,html}"], "./src/" + epromsNameSpace + ".json");
 });
 
 
 /*
- * extracting text from TrueNTH html files into json file
+ * extracting text from TrueNTH js/html files into json file
  */
 gulp.task("i18next-extraction-truenth", ["clean-truenth-src"], function() {
   console.log("extracting text and generate json file ...");
-  return i18nextScanner(["gil/templates/gil/*.html"], "./src/" + truenthNameSpace + ".json");
+  return i18nextScanner(["gil/templates/gil/*.html", jsSrcPath+"data/gil/*.{js,html}"], "./src/" + truenthNameSpace + ".json");
 });
 
 /*
