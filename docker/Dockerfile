@@ -1,4 +1,42 @@
-FROM debian:stretch
+FROM debian:stretch as builder
+
+ENV \
+    ARTIFACT_DIR=/tmp/artifacts \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install tools for reading build dependencies; see `Build-Depends`
+# Squelch superfluous output; apt-get has poor verbosity control
+RUN \
+    apt-get update --quiet > /dev/null && \
+    apt-get install --quiet --quiet --no-install-recommends \
+        devscripts \
+        equivs \
+        git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
+        # only print package names, versions
+
+WORKDIR "$HOME/portal"
+
+# Copy repo into image
+COPY . .
+
+# Install build dependencies
+RUN \
+    mk-build-deps debian/control \
+        --install \
+        --remove \
+        --tool "apt-get --quiet --quiet --no-install-recommends"
+
+# Generate changelog, build package and move package files to ARTIFACT_DIR
+RUN \
+    dpkg-buildpackage \
+        --unsigned-source \
+        --unsigned-changes \
+        --hook-init=debian/pre-build.sh \
+        --hook-done=debian/post-build.sh
+
+# -----------------------------------------------------------------------------
+
+FROM debian:stretch as production
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
@@ -11,7 +49,8 @@ ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
 
 RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
-COPY debian/artifacts "${ARTIFACT_DIR}"
+# Copy package files from previous stage
+COPY --from=builder "${ARTIFACT_DIR}" "${ARTIFACT_DIR}"
 
 RUN \
     apt-get update --quiet > /dev/null && \
