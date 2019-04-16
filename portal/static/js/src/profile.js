@@ -1727,7 +1727,6 @@ export default (function() {
                             //filtered out non-deleted items from all consents
                             return !item.deleted && String(item.status) === "suspended";
                         });
-                        console.log("widthdrawn? ", withdrawnItem);
                         if (withdrawnItem.length) {
                             //use PREVIOUSLY valid consent date
                             var consentItems = $.grep(dataArray, function(item) {
@@ -1781,7 +1780,7 @@ export default (function() {
                         if (!self.manualEntry.consentDate) {
                             return false;
                         }
-
+                        
                         //check completion date against consent date
                         //all date/time should be in GMT date/time
                         var completionDate = new Date(self.manualEntry.completionDate);
@@ -1794,8 +1793,7 @@ export default (function() {
                         var oConsentDate = new Date(cConsentDate.getTime());
                         var nCompletionDate = completionDate.setHours(0, 0, 0, 0);
                         var nConsentDate = cConsentDate.setHours(0, 0, 0, 0);
-                
-                        console.log("original complete date: " , completionDate, " consent ", oConsentDate, " competion date? ", nCompletionDate, " consent date? ", nConsentDate);
+            
                         /*
                          * set completion date/time to consent date/time IF the two dates are the same 
                          */
