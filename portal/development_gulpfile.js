@@ -7,11 +7,7 @@
  * for compiling less file, run specific task to compile each respective portal less file, e.g. gulp --gulpfile less_css_gulpfile.js [task name]
  * Running each compiling task will generate sourcemap for each less to css mappings
  */
-/*
- * an update of gulp to version 4 from version <=3 is a breaking change, run `npm audit` for detail, see https://gulpjs.com/
- * syntax changes are required
- * steps took to clean up before re-install:  npm prune --production  && rm -rf node_modules
- */
+
 const {series, parallel, watch, src, dest} = require("gulp");
 const sourcemaps = require("gulp-sourcemaps");
 const rootPath = "./";
@@ -108,6 +104,7 @@ const portalLess = function(callback) {
     callback();
 };
 exports.portalLess = series(portalLess);
+
 /*
  * transforming GIL less to css
  */
@@ -169,42 +166,31 @@ const psaTrackerLess = function(callback) {
 exports.psaTrackerLess = series(psaTrackerLess);
 
 /*
- * running each watch task will update css automatically in vivo
- * useful during development
+ * the following tasks watch for less file changes and recompile css for each
  */
-const watchEproms = function(callback) {
-    console.log("Watching EPROMS less file...");
-    watch([lessPath + "/" + EPROMS + ".less"]);
-    callback();
+//portal
+const watchPortalLess = () => {
+    watch(lessPath + "/" + PORTAL + ".less", {delay: 200}, portalLess);
 };
-exports.watchEproms = series(watchEproms);
+exports.watchPortalLess = series(watchPortalLess);
 
-const watchPortal = function(callback) {
-    console.log("watching portal less file...");
-    watch([lessPath + "/portal.less"]);
-    callback();
+//eproms
+const watchEpromsLess = () => {
+    watch(lessPath + "/" + EPROMS + ".less", {delay: 200}, epromsLess);
 };
-exports.watchPortal = series(watchPortal);
+exports.watchEpromsLess = series(watchEpromsLess);
 
-const watchGil = function(callback) {
-    console.log("watching GIL less file...");
-    watch([lessPath + "/gil.less"]);
-    callback();
+//GIL
+const watchGILLess = () => {
+    watch(lessPath + "/" + GIL + ".less", {delay: 200}, gilLess);
 };
-exports.watchGil = series(watchGil);
+exports.watchGILLess = series(watchGILLess);
 
-const watchTopnav = function(callback) {
-    console.log("Watching portal wrapper less file...");
-    watch([lessPath + "/topnav.less"]);
-    callback();
+//portal wrapper
+const watchTopNavLess = () => {
+    watch(lessPath + "/topnav.less", {delay: 200}, topnavLess);
 };
-exports.watchTopnav = series(watchTopnav);
-const watchPsaTracker = function(callback) {
-    console.log("Watching PSA Tracker less file");
-    watch([lessPath + "/" + PSATRACKER + ".less"]);
-    callback();
-};
-exports.watchPsaTracker = series(watchPsaTracker);
+exports.watchTopNavLess = series(watchTopNavLess);
 
 /*
  * compile all portal less files 

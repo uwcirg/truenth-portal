@@ -36,7 +36,7 @@
     "gulp-less": "^4.0.1",
     "gulp-merge-json": "^1.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^2.6.1",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-using": "^0.1.1",
     "i18next-conv": "^4.0.3",
     "i18next-scanner": "^2.10.1",
