@@ -6,7 +6,6 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
-import CONSENT_ENUM from "./modules/CONSENT_ENUM.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -1780,7 +1779,7 @@ export default (function() {
                         if (!self.manualEntry.consentDate) {
                             return false;
                         }
-                        
+
                         //check completion date against consent date
                         //all date/time should be in GMT date/time
                         var completionDate = new Date(self.manualEntry.completionDate);
