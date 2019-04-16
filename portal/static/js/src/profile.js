@@ -6,6 +6,7 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+import CONSENT_ENUM from "./modules/CONSENT_ENUM.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -1715,8 +1716,26 @@ export default (function() {
                         var items = $.grep(dataArray, function(item) { //filtered out non-deleted items from all consents
                             return !item.deleted && String(item.status) === "consented";
                         });
-                        if (items.length > 0) { //consent date in GMT
+                        if (items.length) { 
+                            //consent date in GMT
                             self.manualEntry.consentDate = items[0].acceptance_date;
+                            return;
+                        }
+                        //to reach here patient might have withdrawn?
+                        //do check for that
+                        const withdrawnItem = $.grep(dataArray, function(item) {
+                            //filtered out non-deleted items from all consents
+                            return !item.deleted && String(item.status) === "suspended";
+                        });
+                        console.log("widthdrawn? ", withdrawnItem);
+                        if (withdrawnItem.length) {
+                            //use PREVIOUSLY valid consent date
+                            var consentItems = $.grep(dataArray, function(item) {
+                                return item.deleted && Consent.hasConsentedFlags(item);
+                            });
+                            if (consentItems.length) {
+                                self.manualEntry.consentDate = consentItems[0].acceptance_date;
+                            }
                         }
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
@@ -1736,50 +1755,58 @@ export default (function() {
                 ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
                     var fd = $("#" + fn),
                         tnthDates = self.modules.tnthDates;
-                    fd.on("change", function() {
+                    fd.on("change", function(e) {
+                        e.stopImmediatePropagation();
                         var d = $("#qCompletionDay");
                         var m = $("#qCompletionMonth");
                         var y = $("#qCompletionYear");
-                        var todayObj = tnthDates.getTodayDateObj();
-                        var td = todayObj.displayDay, tm = todayObj.displayMonth, ty = todayObj.displayYear;
                         var isValid = d.val() !== "" && m.val() !== "" && y.val() !== "" && d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid;
                         if (!isValid) {
                             $("#meSubmit").attr("disabled", true);
+                            return;
                         }
-                        if (isValid) {
-                            var errorMsg = tnthDates.dateValidator(d.val(), m.val(), y.val());
-                            var consentDate = $("#manualEntryConsentDate").val();
-                            if (errorMsg || !consentDate) {
-                                self.manualEntry.errorMessage = i18next.t("All date fields are required");
-                                return false;
-                            }
-                            var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0); //noon UTC date
-                            self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj); //time zone based on user's
-                            //all date/time should be in GMT date/time
-                            var completionDate = new Date(self.manualEntry.completionDate);
-                            var cConsentDate = new Date(self.manualEntry.consentDate);
-                            var cToday = new Date(self.manualEntry.todayObj.gmtDate);
-                            var nCompletionDate = completionDate.setHours(0, 0, 0, 0);
-                            var nConsentDate = cConsentDate.setHours(0, 0, 0, 0);
-                            var nToday = cToday.setHours(0, 0, 0, 0);
-                            if (nCompletionDate < nConsentDate) {
-                                errorMsg = i18next.t("Completion date cannot be before consent date.");
-                            }
-                            if (nConsentDate >= nToday) {
-                                if (nCompletionDate > nConsentDate) {
-                                    errorMsg = i18next.t("Completion date cannot be in the future.");
-                                }
-                            } else {
-                                if (nCompletionDate > nToday) {
-                                    errorMsg = i18next.t("Completion date cannot be in the future.");
-                                }
-                            }
-                            self.manualEntry.errorMessage = errorMsg;
+                        var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        if (errorMessage) {
+                            self.manualEntry.errorMessage = errorMessage;
+                            return false;
+                        }
+
+                        //reset error
+                        self.manualEntry.errorMessage = "";
+
+                        var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
+                        self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
+
+                        //add check for consent date
+                        if (!self.manualEntry.consentDate) {
+                            return false;
+                        }
+
+                        //check completion date against consent date
+                        //all date/time should be in GMT date/time
+                        var completionDate = new Date(self.manualEntry.completionDate);
+                        //noting here that date/time in ISO date with added hours, minutes and seconds separated by T is converted again to UTC by firefox 
+                        //so need to use non-ISO date/time format for comparison to avoid additional conversion
+                        var cConsentDate = new Date(self.modules.tnthDates.formatDateString(self.manualEntry.consentDate, "mm/dd/yyyy hh:mm:ss"));
+                        //Get a copy of the consent date
+                        //NB: NEED to make a deep copy here because: Date object in javascript is MUTABLE
+                        //Changing the hour, minute and second in the subsequent code will ACTUALLY change the reference as well
+                        var oConsentDate = new Date(cConsentDate.getTime());
+                        var nCompletionDate = completionDate.setHours(0, 0, 0, 0);
+                        var nConsentDate = cConsentDate.setHours(0, 0, 0, 0);
+                
+                        console.log("original complete date: " , completionDate, " consent ", oConsentDate, " competion date? ", nCompletionDate, " consent date? ", nConsentDate);
+                        /*
+                         * set completion date/time to consent date/time IF the two dates are the same 
+                         */
+                        if (nCompletionDate === nConsentDate) {
+                            //set completion date to system format, recognized by backend
+                            self.manualEntry.completionDate = self.modules.tnthDates.formatDateString(oConsentDate, "system"); 
                         }
                     });
                 });
                 $(document).delegate("#meSubmit", "click", function() {
-                    var method = String(self.manualEntry.method), completionDate = self.modules.tnthDates.formatDateString(self.manualEntry.completionDate, "system"); //note completion date has both date and time info
+                    var method = String(self.manualEntry.method), completionDate = self.manualEntry.completionDate;
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
                     if (method === "") { return false; }
                     if (method !== "paper") {
@@ -1859,8 +1886,8 @@ export default (function() {
                         }
                         item.lastUpdated = self.modules.tnthDates.formatDateString(item.lastUpdated, "iso");
                         item.comment = item.comment ? self.escapeHtml(item.comment) : "";
-                        var c = String(item.comment);
-                        item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + c.substr(len + 1) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
+                        var c = decodeURIComponent(String(item.comment));
+                        item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +
                             "if (obj) {" +
                             'var f = $(obj).parent().find(".second"); ' +
@@ -1998,7 +2025,7 @@ export default (function() {
                 };
                 switch (consentStatus) {
                 case "deleted":
-                    if (se && sr && ir) {
+                    if (Consent.hasConsentedFlags(item)) {
                         sDisplay = oDisplayText.consented;
                     } else if (se && ir && !sr || (!se && ir && !sr)) {
                         sDisplay = oDisplayText.withdrawn;

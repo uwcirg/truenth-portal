@@ -1083,7 +1083,7 @@
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
                                     <div id="manualEntryMain" v-show="!manualEntry.initloading">
-                                        <p class="text-left text-muted">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
+                                        <p class="text-left">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
                                         <input type="hidden" id="manualEntryConsentDate" v-model="manualEntry.consentDate" />
                                         <input type="hidden" id="qCompletionDate" v-model="manualEntry.completionDate" />
                                         <input type="hidden" id="qToday" v-model="manualEntry.todayObj.gmtDate" />
@@ -1128,7 +1128,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<div id="errorCompletionDate" class="error-message"></div>-->
                                         {% raw %}
                                             <div id="manualEntryMessageContainer" class="error-message">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}

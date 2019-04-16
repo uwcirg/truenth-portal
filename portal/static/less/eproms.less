@@ -1169,15 +1169,6 @@ select:not([multiple]) {
     border-top: 1px solid #ddd;
     justify-content: space-around;
   }
-  #enterManualInfoContainer {
-    margin-bottom: 1em;
-    .flex {
-      flex-wrap: wrap
-    }
-  }
-  #manualEntryCompletionDateContainer {
-    margin-top: 1em
-  }
   #phone, #email, #altPhone  {
     width: 300px;
     max-width: 100%;
@@ -2929,6 +2920,9 @@ body.portal .copyright-container  {
   margin-bottom: 2em;
   letter-spacing: 1px;
 }
+.detail-title {
+  margin-bottom: 0;
+}
 #mainDiv.profile .profile-item-container .profile-item-title {
   max-width: 150px;
 }
@@ -3621,8 +3615,7 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
 }
 .custom-container {
   display: block;
-  margin-bottom: 2em;
-  border-bottom: 1px solid #E0E6E3;
+  margin-bottom: 1em;
   padding: 0.1em 0 1.5em 0;
   .profile-item-container {
     padding: 1.5em 2em 2em 2em;
@@ -3779,6 +3772,9 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
 }
 .modal-footer {
   min-height: 4em;
+}
+.modal-header,
+.modal-footer {
   padding: 0.7em;
 }
 .modal-header button,
@@ -3865,6 +3861,20 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   }
   .loading-message-indicator {
     display: block;
+  }
+}
+#enterManualInfoContainer {
+  margin-bottom: 1em;
+  .flex {
+    flex-wrap: wrap
+  }
+}
+#manualEntryCompletionDateContainer {
+  margin-top: 1em;
+  label {
+    position: relative;
+    top: 0.35em;
+    margin-bottom: 4px;
   }
 }
 #emailBodyModal .body-content {
@@ -4105,15 +4115,30 @@ div.biopsy-option:last-of-type{
   display: none;
 }
 #identityVerificationContainer {
-  padding: 2em 1.5em;
+  padding: 1em 0.5em;
   margin: 1em auto;
+  .title,
+  .hr {
+    font-weight: 500;
+    width: 350px;
+    max-width: 100%;
+  }
+  .hr {
+    margin: -8px 0 16px;
+  }
   input,
   select {
-    width: 100%;
+    width: 350px;
     max-width: 100%;
   }
   .form-group {
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
+  }
+  .name-container {
+    margin-bottom: 1.25em;
+  }
+  .form___submit_container {
+    margin-top: 1.5em;
   }
 }
 .box-shadow-container {
@@ -4200,6 +4225,16 @@ div.timezone-warning.text-warning {
     font-size: @mobileSmallSize;
     width: 100%;
     max-width: 100%;
+}
+#profileAuditLogTable {
+  td {
+    word-break: break-all;
+    .second {
+      display: block;
+      width: 500px;
+      max-width: 100%;
+    }
+  }
 }
 /** Responsive sizes **/
 @media (min-width: 423px) {
