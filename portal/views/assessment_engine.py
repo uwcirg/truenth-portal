@@ -1606,9 +1606,8 @@ def present_needed():
         return redirect('/')
 
     url = url_for('.present_assessment', **args)
-    auditable_event("present assessment url {}".format(url),
-                    user_id=current_user().id, subject_id=subject_id,
-                    context='assessment')
+    current_app.logger.debug('present assessment url: %s', url)
+    
     return redirect(url, code=302)
 
 
