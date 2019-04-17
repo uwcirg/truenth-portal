@@ -17,6 +17,10 @@ services:
 
   celeryworker:
     restart: unless-stopped
+    environment:
+      # Number of tasks a celery worker should run before being recreated
+      # https://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-worker_max_tasks_per_child
+      CELERYD_MAX_TASKS_PER_CHILD: 10
     # Set lower CPU priority to prevent blocking web service
     cap_add:
       - SYS_NICE
