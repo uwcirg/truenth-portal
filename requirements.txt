@@ -1,4 +1,4 @@
-alembic==1.0.8            # via flask-migrate
+alembic==1.0.9            # via flask-migrate
 amqp==2.4.2               # via kombu
 babel==2.6.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
