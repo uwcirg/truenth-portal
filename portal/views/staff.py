@@ -131,7 +131,6 @@ def staff_index():
     # Gather up all staff belonging to any of the orgs (and their children)
     # NOTE, a change from before, staff admin users can now edit records of
     # other users that have staff OR staff admin role(s)
-    # excluding users with ADMIN role from the list
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id == UserRoles.user_id,
              # exclude users with admin role
