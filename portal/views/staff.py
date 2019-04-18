@@ -113,9 +113,7 @@ def staff_index():
     ot = OrgTree()
     staff_role_id = Role.query.filter(
         Role.name == ROLE.STAFF.value).with_entities(Role.id).first()
-    admin_role_id = Role.query.filter(
-        Role.name == ROLE.ADMIN.value).with_entities(Role.id).first()
-
+   
     # empty patient query list to start, unionize with other relevant lists
     staff_list = User.query.filter(User.id == -1)
 
@@ -131,21 +129,14 @@ def staff_index():
         org_list.update(ot.here_and_below_id(org.id))
         user_orgs.add(org.id)
 
-    # Gather up all admin that belongs to user's org(s)
-    admin_staff = User.query.join(UserRoles).filter(
-        and_(User.id == UserRoles.user_id,
-             UserRoles.role_id.in_([admin_role_id]))
-    ).join(UserOrganization).filter(
-        and_(UserOrganization.user_id == User.id,
-             UserOrganization.organization_id.in_(user_orgs)))
-    admin_list = [u.id for u in admin_staff]
-
     # Gather up all staff belonging to any of the orgs (and their children)
     # NOTE, a change from before, staff admin users can now edit records of
     # other users that have staff OR staff admin role(s)
+    # excluding users with ADMIN role from the list
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id == UserRoles.user_id,
-             ~User.id.in_(admin_list),
+            # exclude users with admin role
+             ~User.roles.any(Role.name == ROLE.ADMIN.value),
              UserRoles.role_id == staff_role_id,
              # exclude current user from the list
              User.id != user.id)
