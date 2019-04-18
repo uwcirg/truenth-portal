@@ -113,7 +113,6 @@ def staff_index():
     ot = OrgTree()
     staff_role_id = Role.query.filter(
         Role.name == ROLE.STAFF.value).with_entities(Role.id).first()
-   
     # empty patient query list to start, unionize with other relevant lists
     staff_list = User.query.filter(User.id == -1)
 
@@ -135,7 +134,7 @@ def staff_index():
     # excluding users with ADMIN role from the list
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id == UserRoles.user_id,
-            # exclude users with admin role
+             # exclude users with admin role
              ~User.roles.any(Role.name == ROLE.ADMIN.value),
              UserRoles.role_id == staff_role_id,
              # exclude current user from the list
