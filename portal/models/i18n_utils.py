@@ -303,7 +303,7 @@ def compile_pos():
             file_basename = os.path.splitext(filename)[0]
 
             # only act on backend (flask, flask-user override) translation files
-            if filename not in ('messages.po',):
+            if filename not in ('messages.po', 'flask_user.po'):
                 continue
 
             po_filepath = os.path.join(dirpath, '{}.po'.format(file_basename))
