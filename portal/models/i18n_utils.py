@@ -298,18 +298,21 @@ def compile_pos():
 
     translations_dir = os.path.join(current_app.root_path, "translations")
     for dirpath, _, filenames in os.walk(translations_dir):
-        # only act on backend (flask) translation files
-        if 'messages.po' not in filenames:
-            continue
+        for filename in filenames:
+            # filename without extension
+            file_basename = os.path.splitext(filename)[0]
 
-        po_filepath = os.path.join(dirpath, 'messages.po')
-        mo_filepath = os.path.join(dirpath, 'messages.mo')
+            # only act on backend (flask, flask-user override) translation files
+            if filename not in ('messages.po',):
+                continue
 
-        pofile(po_filepath).save_as_mofile(mo_filepath)
-        current_app.logger.debug(
-            "Saved MO file: %s",
-            os.path.relpath(mo_filepath, current_app.root_path),
-        )
+            po_filepath = os.path.join(dirpath, '{}.po'.format(file_basename))
+            mo_filepath = os.path.join(dirpath, '{}.mo'.format(file_basename))
+            pofile(po_filepath).save_as_mofile(mo_filepath)
+            current_app.logger.debug(
+                "Saved MO file: %s",
+                os.path.relpath(mo_filepath, current_app.root_path),
+            )
 
 
 def upsert_to_template_file():
