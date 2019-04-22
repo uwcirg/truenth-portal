@@ -12,6 +12,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_babel import force_locale
 from flask_user import roles_required
 from sqlalchemy import and_, func
 from sqlalchemy.orm.exc import NoResultFound
@@ -1910,7 +1911,8 @@ def trigger_password_reset_email(user_id):
         abort(400, "invalid email address")
 
     try:
-        user_manager.send_reset_password_email(user.email)
+        with force_locale(user.locale_code):
+            user_manager.send_reset_password_email(user.email)
     except ValueError as e:
         abort(400, str(e))
 
