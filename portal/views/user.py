@@ -1914,9 +1914,12 @@ def trigger_password_reset_email(user_id):
     except ValueError as e:
         abort(400, str(e))
 
-    auditable_event("password reset email triggered for user {}".format(
-        user_id), user_id=current_user().id, subject_id=user_id,
-        context='login')
+    auditable_event(
+        "password reset email triggered for user {}".format(user_id),
+        user_id=current_user().id,
+        subject_id=user_id,
+        context='login',
+    )
     return jsonify(message="ok")
 
 
