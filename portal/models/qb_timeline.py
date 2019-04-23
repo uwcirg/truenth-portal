@@ -5,6 +5,7 @@ from sqlalchemy.types import Enum as SQLA_Enum
 import redis
 from werkzeug.exceptions import BadRequest
 
+from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..dogpile_cache import dogpile_cache
@@ -500,6 +501,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
                     at=expired_date, status='expired', **kwargs))
 
         # If user withdrew from study - remove any rows post withdrawal
+        num_stored = 0
         _, withdrawal_date = consent_withdrawal_dates(user)
         if withdrawal_date:
             trace("withdrawn as of {}".format(withdrawal_date))
@@ -508,9 +510,15 @@ def update_users_QBT(user_id, invalidate_existing=False):
             store_rows.append(
                 QBT(at=withdrawal_date, status='withdrawn', **kwargs))
             db.session.add_all(store_rows)
+            num_stored = len(store_rows)
         else:
             db.session.add_all(pending_qbts)
+            num_stored = len(pending_qbts)
 
+        if num_stored:
+            auditable_event(
+                message="qb_timeline updated; {} rows".format(num_stored),
+                user_id=user_id, subject_id=user_id, context="assessment")
         db.session.commit()
 
 
