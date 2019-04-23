@@ -1914,6 +1914,7 @@ def trigger_password_reset_email(user_id):
         with force_locale(user.locale_code):
             user_manager.send_reset_password_email(user.email)
     except ValueError as e:
+        current_app.logger.debug('failed to send reset password email to %s', user.email)
         abort(400, str(e))
 
     auditable_event(
