@@ -347,7 +347,7 @@
             {%- endif -%}
         </div>
         <div class="buttons-container">
-            <div class="loading-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <div class="loading-indicator invisible"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
             <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         </div>
         <div id="profileEmailMessage" class="text-info"></div>

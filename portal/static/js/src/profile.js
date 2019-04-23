@@ -1177,7 +1177,7 @@ export default (function() {
                     }
                     var resetBtn = function(disabled, showLoading) {
                         disabled = disabled || false;
-                        btnSelf.attr("disabled", disabled).show();
+                        btnSelf.attr("disabled", disabled).removeClass("opaque");
                         self.patientEmailForm.loading = showLoading;
                         if (!disabled) {
                             btnSelf.removeClass("disabled");
@@ -1186,7 +1186,7 @@ export default (function() {
                         }
                     };
                     resetBtn(true, true);
-                    btnSelf.hide();
+                    btnSelf.addClass("opaque");
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,
@@ -1258,7 +1258,6 @@ export default (function() {
                         return parentName ? parentName : i18next.t("your clinic");
                     })();
                     $(this).addClass("disabled").attr("disabled", true);
-                    $("#sendRegistrationEmailForm .loading-indicator").show();
                     $("#profileEmailErrorMessage").html("");
                     var btnRef = $(this);
                     $.ajax({
@@ -1283,7 +1282,7 @@ export default (function() {
                     if (!subject) {
                         subject = i18next.t("Registration invite from {clinicName}").replace("{clinicName}", clinicName);
                     }
-
+                    $("#sendRegistrationEmailForm .loading-indicator").addClass("visible").removeClass("invisible");
                     self.modules.tnthAjax.invite(self.subjectId, {
                         "subject": subject,"recipients": email,"body": body}, function(data) {
                         if (!data.error) {
@@ -1299,7 +1298,7 @@ export default (function() {
                                 $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
                             }
                         }
-                        $("#sendRegistrationEmailForm .loading-indicator").hide();
+                        $("#sendRegistrationEmailForm .loading-indicator").addClass("invisible").removeClass("visible");
                         btnRef.removeClass("disabled").attr("disabled", false);
                     });
                 });

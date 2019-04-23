@@ -40,7 +40,7 @@ import {getUrlParameter} from "./modules/Utility.js";
         return hasError;
     };
     CookieMonster.prototype.restoreVis = function() {
-        var loadingElements = document.querySelectorAll("#loadingIndicator, .loading-indicator, .loading-indicator-placeholder"), mainElement = document.getElementById("mainHolder");
+        var loadingElements = document.querySelectorAll("#loadingIndicator, .cookie-check-modal-loader"), mainElement = document.getElementById("mainHolder");
         if (mainElement) { mainElement.setAttribute("style", "visibility:visible;-ms-filter:'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';filter:alpha(opacity=100); -moz-opacity:1; -khtml-opacity:1; opacity:1"); }
         if (!loadingElements) {
             return;
