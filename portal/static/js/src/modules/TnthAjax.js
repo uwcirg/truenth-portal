@@ -2,6 +2,7 @@ import Utility from "./Utility.js";
 import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
+import Consent from "./Consent.js";
 export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
@@ -416,7 +417,7 @@ export default { /*global $ */
             }
             consentedOrgIds = $.grep(data.consent_agreements, function(item) {
                 var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
-                return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && item.staff_editable && item.send_reminders && item.include_in_reports;
+                return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && Consent.hasConsentedFlags(item);
             });
         });
         return consentedOrgIds.length;

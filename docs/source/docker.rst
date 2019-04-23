@@ -51,34 +51,17 @@ By default, the ``truenth_portal`` image with the ``latest`` tag is downloaded a
 Docker Images
 =============
 
-Two Dockerfiles (``Dockerfile.build`` and ``Dockerfile``) define how to build a docker image capable of creating a Debian package from the portal codebase, and how to install and configure the package into a working Shared Services instance.
-
-Building a Debian Package
--------------------------
-
-To build a Debian package from the current branch of your local repo::
-
-    # Build debian package from current local branch
-    docker-compose -f docker-compose.build.yaml run builder
-
-If you would like to create a package from a remote repository you can override the local repo as follows below::
-
-    # Override default with environment variable
-    export GIT_REPO='https://github.com/USERNAME/truenth-portal'
-
-    # Build the package from the above repo
-    docker-compose -f docker-compose.build.yaml run builder
+A single Dockerfile with two stages (``builder`` and ``production``) defines how to build a docker image containing the portal application. The ``builder`` stage produces a debian package which is subsequently copied and installed into the second image.
 
 Building a Shared Services Docker Image
 ---------------------------------------
 
-If you would like to build a Shared Services image, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
+To build a Shared Services docker image from the current branch of your local repo::
 
-    # Override default (Docker Hub) docker repo to differentiate locally-built images
-    export DOCKER_REPOSITORY=''
+    # Build debian package from current local branch
+    bin/docker-build.sh
 
-    # Build the "web" image locally
-    docker-compose build web
+After the image is built, it can be started in the same way as any downloaded image::
 
     docker-compose up web
 

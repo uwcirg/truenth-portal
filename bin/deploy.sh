@@ -89,6 +89,9 @@ if [ -n "$(flask config --config_key SMARTLING_USER_SECRET)" ]; then
 
     echo "Transforming translations for frontend"
     "${GIT_WORK_TREE}/bin/build-frontend-translations.sh"
+
+    echo "Compiling PO to MO files..."
+    flask compile-po-files
 fi
 
 echo "Updating package metadata"

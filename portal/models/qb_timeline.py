@@ -5,6 +5,7 @@ from sqlalchemy.types import Enum as SQLA_Enum
 import redis
 from werkzeug.exceptions import BadRequest
 
+from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..dogpile_cache import dogpile_cache
@@ -204,6 +205,11 @@ def calc_and_adjust_start(user, qbd, initial_trigger):
 
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    if not users_trigger:
+        trace(
+            "no valid trigger, default to initial value: {}".format(
+                initial_trigger))
+        users_trigger = initial_trigger
     if initial_trigger > users_trigger:
         trace(
             "user {} has unexpected trigger date before consent date".format(
@@ -230,6 +236,11 @@ def calc_and_adjust_expired(user, qbd, initial_trigger):
 
     """
     users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    if not users_trigger:
+        trace(
+            "no valid trigger, default to initial value: {}".format(
+                initial_trigger))
+        users_trigger = initial_trigger
     if initial_trigger > users_trigger:
         trace(
             "user {} has unexpected trigger date before consent date".format(
@@ -272,10 +283,14 @@ def ordered_qbs(user, classification=None):
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
     td = trigger_date(user=user)
-    _, withdrawal_date = consent_withdrawal_dates(user)
+    old_td, withdrawal_date = consent_withdrawal_dates(user)
     if not td:
-        trace("no trigger date therefore nothing from ordered_qbds()")
-        return
+        if old_td:
+            trace("withdrawn user, use previous trigger {}".format(old_td))
+            td = old_td
+        else:
+            trace("no trigger date therefore nothing from ordered_qbds()")
+            return
 
     # Zero to one RP makes things significantly easier - otherwise
     # swap in a strategy that can work with the change.
@@ -486,6 +501,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
                     at=expired_date, status='expired', **kwargs))
 
         # If user withdrew from study - remove any rows post withdrawal
+        num_stored = 0
         _, withdrawal_date = consent_withdrawal_dates(user)
         if withdrawal_date:
             trace("withdrawn as of {}".format(withdrawal_date))
@@ -494,9 +510,15 @@ def update_users_QBT(user_id, invalidate_existing=False):
             store_rows.append(
                 QBT(at=withdrawal_date, status='withdrawn', **kwargs))
             db.session.add_all(store_rows)
+            num_stored = len(store_rows)
         else:
             db.session.add_all(pending_qbts)
+            num_stored = len(pending_qbts)
 
+        if num_stored:
+            auditable_event(
+                message="qb_timeline updated; {} rows".format(num_stored),
+                user_id=user_id, subject_id=user_id, context="assessment")
         db.session.commit()
 
 

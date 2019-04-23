@@ -2,6 +2,9 @@ Source: portal
 Section: python
 Priority: extra
 Maintainer: CIRG, University of Washington <truenth-dev@uw.edu>
+# docs suggest building psycopg2 from source every time for prod
+# http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
+# Todo: investigate using binary in python-psycopg2 debian package
 Build-Depends: debhelper (>= 9), python, dh-virtualenv, libpq-dev, python-dev, python-pip, python-setuptools, python-setuptools-scm, python-wheel
 Standards-Version: 3.9.5
 

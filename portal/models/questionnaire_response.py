@@ -11,9 +11,10 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from .audit import Audit
 from .fhir import bundle_results
+from .identifier import Identifier
 from .questionnaire import Questionnaire
 from .reference import Reference
 from .user import User, patients_query
@@ -156,6 +157,46 @@ class QuestionnaireResponse(db.Model):
         draft4_schema.update(swag['definitions'][validation_schema])
         jsonschema.validate(document, draft4_schema)
 
+    @property
+    def document_answered(self):
+        """
+        Return a QuestionnaireResponse populated with text answers based on codes in valueCoding
+        """
+        instrument_id = self.document['questionnaire']['reference'].split('/')[-1]
+        questionnaire = Questionnaire.find_by_name(name=instrument_id)
+
+        # return original document if no reference Questionnaire available
+        if not questionnaire:
+            return self.document
+
+        questionnaire_map = questionnaire.questionnaire_code_map()
+
+        document = self.document
+        for question in document.get('group', {}).get('question', ()):
+
+            combined_answers = consolidate_answer_pairs(question['answer'])
+
+            # Separate out text and coded answer, then override text
+            text_and_coded_answers = []
+            for answer in combined_answers:
+
+                # Add text answer before coded answer
+                if answer.keys()[0] == 'valueCoding':
+
+                    # Prefer text looked up from code over sibling valueString answer
+                    text_answer = questionnaire_map.get(
+                        answer['valueCoding']['code'],
+                        answer['valueCoding'].get('text')
+                    )
+
+                    text_and_coded_answers.append({'valueString': text_answer})
+
+                text_and_coded_answers.append(answer)
+            question['answer'] = text_and_coded_answers
+
+        return document
+
+
 
 QNR = namedtuple(
     'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
@@ -295,7 +336,7 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
     for questionnaire_response in questionnaire_responses:
-        document = questionnaire_response.document.copy()
+        document = questionnaire_response.document_answered.copy()
         subject = questionnaire_response.subject
         encounter = questionnaire_response.encounter
         encounter_fhir = encounter.as_fhir()
@@ -366,6 +407,38 @@ def qnr_document_id(
     return qnr.one()[0]
 
 
+def consolidate_answer_pairs(answers):
+    """
+    Merge paired answers (code and corresponding text) into single
+        row/answer
+
+    Codes are the preferred way of referring to options but option text
+        (at the time of administration) may be submitted alongside coded
+        answers for ease of display
+    """
+
+    answer_types = [a.keys()[0] for a in answers]
+
+    # Exit early if assumptions not met
+    if (
+        len(answers) % 2 or
+        answer_types.count('valueCoding') != answer_types.count('valueString')
+    ):
+        return answers
+
+    filtered_answers = []
+    for pair in zip(*[iter(answers)] * 2):
+        # Sort so first pair is always valueCoding
+        pair = sorted(pair, key=lambda k: k.keys()[0])
+        coded_answer, string_answer = pair
+
+        coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+        filtered_answers.append(coded_answer)
+
+    return filtered_answers
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
 
@@ -418,37 +491,6 @@ def generate_qnr_csv(qnr_bundle):
         except (KeyError, IndexError):
             return None, None
 
-    def consolidate_answer_pairs(answers):
-        """
-        Merge paired answers (code and corresponding text) into single
-            row/answer
-
-        Codes are the preferred way of referring to options but option text
-            (at the time of administration) may be submitted alongside coded
-            answers for ease of display
-        """
-
-        answer_types = [a.keys()[0] for a in answers]
-
-        # Exit early if assumptions not met
-        if (
-            len(answers) % 2 or
-            answer_types.count('valueCoding')
-                != answer_types.count('valueString')
-        ):
-            return answers
-
-        filtered_answers = []
-        for pair in zip(*[iter(answers)] * 2):
-            # Sort so first pair is always valueCoding
-            pair = sorted(pair, key=lambda k: k.keys()[0])
-            coded_answer, string_answer = pair
-
-            coded_answer['valueCoding']['text'] = string_answer['valueString']
-
-            filtered_answers.append(coded_answer)
-
-        return filtered_answers
 
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
