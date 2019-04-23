@@ -33,7 +33,6 @@ env:
     - GIT_TAG="$TRAVIS_TAG"
     - GIT_HASH="$TRAVIS_COMMIT"
 
-    - PACKAGE_NAME="${PACKAGE_NAME:-${GH_REPO}}"
     - DOCKER_REPOSITORY=""
     - DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME:-truenth_portal}"
     - DOCKER_IMAGE_TAG=travis
@@ -122,23 +121,6 @@ before_deploy:
 
 # Only deploy from "build-artifacts" tox environment (see TOXENV) and corresponding TravisCI job
 deploy:
-  - provider: script
-    skip_cleanup: true
-    on:
-      all_branches: true
-      condition:
-        - $TOXENV = build-artifacts
-        - -v ARTIFACTORY_API_KEY
-        - -v ARTIFACTORY_DEB_REPO
-        # Only deploy from develop, master and release branches
-        - $GIT_BRANCH =~ ^(develop$|master$|release/)
-    script:
-      - curl
-          --verbose
-          --upload-file debian/artifacts/*.deb
-          --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_API_KEY"
-          "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb.distribution=stable;deb.component=main;deb.architecture=amd64"
-
   - provider: script
     skip_cleanup: true
     on:

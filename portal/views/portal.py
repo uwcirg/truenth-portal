@@ -586,7 +586,6 @@ def admin():
 
         # for selected filtered orgs, we also need to get the children
         # of each, if any
-        pref_org_list = set(pref_org_list.split(","))
         for orgId in pref_org_list:
             check_int(orgId)
             if orgId == 0:  # None of the above doesn't count

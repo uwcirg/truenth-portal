@@ -193,6 +193,9 @@ var tnthDates =  { /*global i18next */
             case "dd/mm/yyyy":
                 nd = day + "/" + month + "/" + year;
                 break;
+            case "mm/dd/yyyy hh:mm:ss":
+                nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                break;
             case "dd/mm/yyyy hh:mm:ss":
                 nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
                 break;
@@ -246,13 +249,14 @@ var tnthDates =  { /*global i18next */
         }
         return convertedDate;
     },
-    getDateWithTimeZone: function(dObj) {
+    getDateWithTimeZone: function(dObj, format) {
         /*
          * param is a date object - calculating UTC date using Date object's timezoneOffset method
          * the method return offset in minutes, so need to convert it to miliseconds - adding the resulting offset will be the UTC date/time
          */
+        format = format || "system";
         var utcDate = new Date(dObj.getTime() + (dObj.getTimezoneOffset()) * 60 * 1000);
-        return this.formatDateString(utcDate, "yyyy-mm-dd hh:mm:ss");  //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
+        return this.formatDateString(utcDate, format);  //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
     },
     getTodayDateObj: function() { //return object containing today's date/time information
         var today = new Date();

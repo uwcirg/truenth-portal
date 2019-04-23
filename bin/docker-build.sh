@@ -15,9 +15,8 @@ Usage:
           Show this help message
 
     Docker build helper script
+    Build a docker image from the current git checkout
 
-    Optional overrides:
-        "\${GIT_REPO}" - URL of git repository to build from (defaults to current repo)
 USAGE
    exit 1
 }
@@ -33,15 +32,23 @@ cp \
     "${root_path}/docker/portal.env.default" \
     "${root_path}/docker/portal.env"
 
-default_compose_file="${root_path}/docker/docker-compose.yaml:${root_path}/docker/docker-compose.build.yaml"
+# Use .gitignore as .dockerignore during build only
+# not worth the effort to maintain both, for now
+copy_output="$(
+    cp \
+        --no-clobber \
+        --verbose \
+        "${root_path}/.gitignore" \
+        "${root_path}/.dockerignore"
+)"
+
+default_compose_file="${root_path}/docker/docker-compose.yaml"
 export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
 
-
-# Build docker image that generates debian package from current repo and branch
-docker-compose build builder
-
-# Build debian package from current repo and branch
-docker-compose run builder
-
-# Build portal docker image from debian package
+echo "Building portal docker image..."
 docker-compose build web
+
+if echo "$copy_output" | grep --quiet "\->"; then
+    echo "Deleting generated .dockerignore..."
+    rm "${root_path}/.dockerignore"
+fi

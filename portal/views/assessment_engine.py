@@ -1606,6 +1606,7 @@ def present_needed():
         return redirect('/')
 
     url = url_for('.present_assessment', **args)
+    current_app.logger.debug('present assessment url, redirecting to: %s', url)
     return redirect(url, code=302)
 
 

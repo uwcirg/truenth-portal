@@ -322,6 +322,16 @@ export default { /*global i18next datepicker $*/
         }
         setTimeout(function() { tnthAjax.deleteConsent(userId, {"org": orgId});}, 350);
     },
+    /*
+        parameter: consent data item, as returned from consent API
+        boolean: return whether the item has all the relevant consent flags
+    */
+    hasConsentedFlags: function(item) {
+        if (!item) {
+            return false;
+        }
+        return item.send_reminders && item.staff_editable && item.include_in_reports;
+    },
     setConsentBySelectedOrg: function(userId, obj, isConsentWithTopLevelOrg, callback) {
         callback = callback || function() {};
         var self = this;
