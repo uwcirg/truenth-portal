@@ -247,6 +247,9 @@ class QB_Status(object):
         :return: QBD for best match, on None
 
         """
+        if self.withdrawn_by(self.as_of_date):
+            # User effectively withdrawn, no current
+            return None
         if classification == 'indefinite':
             return self._current_indef
         if self._current:
