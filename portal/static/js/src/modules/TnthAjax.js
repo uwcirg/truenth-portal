@@ -258,11 +258,11 @@ export default { /*global $ */
     },
     "getOrgs": function(userId, params, callback) {
         callback = callback || function() {};
+        if (sessionStorage.demoOrgsData) {
+            callback(JSON.parse(sessionStorage.demoOrgsData));
+            return true;
+        }
         this.sendRequest("/api/organization", "GET", userId, params, function(data) {
-            if (sessionStorage.demoOrgsData) {
-                callback(JSON.parse(sessionStorage.demoOrgsData));
-                return true;
-            }
             if (!data.error) {
                 $(".get-orgs-error").html("");
                 sessionStorage.setItem("demoOrgsData", JSON.stringify(data));
