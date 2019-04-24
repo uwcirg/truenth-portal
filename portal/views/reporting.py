@@ -269,7 +269,8 @@ def questionnaire_status():
             row['study_id'] = study_id
 
         # if no current, try previous (as current may be expired)
-        last_viable = qb_stats.current_qbd() or qb_stats.prev_qbd
+        last_viable = qb_stats.current_qbd(
+            even_if_withdrawn=True) or qb_stats.prev_qbd
         if last_viable:
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
