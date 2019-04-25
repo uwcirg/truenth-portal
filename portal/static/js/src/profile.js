@@ -1863,12 +1863,16 @@ export default (function() {
             },
             initAuditLogSection: function() {
                 var self = this;
+                $("#profileAuditLogTable").html(Utility.getLoaderHTML());
+                $("#profileAuditLogTable .loading-message-indicator").show();
                 this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
                     if (data.error) {
+                        $("#profileAuditLogTable").html("");
                         $("#profileAuditLogErrorMessage").text(i18next.t("Problem retrieving audit log from server."));
                         return false;
                     }
                     if (!data.audits || data.audits.length === 0) {
+                        $("#profileAuditLogTable").html("");
                         $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
                         return false;
                     }
@@ -1894,6 +1898,7 @@ export default (function() {
                         );
                         fData.push(item);
                     });
+                    $("#profileAuditLogTable").html("");
                     $("#profileAuditLogTable").bootstrapTable(self.setBootstrapTableConfig({
                         data: fData,
                         classes: "table table-responsive profile-audit-log",
