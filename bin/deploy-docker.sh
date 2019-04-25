@@ -45,17 +45,15 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
-# Bring env vars set in docker/.env into current shell
-if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
-    # export all new env vars by default
-    set -o allexport
-    . "${GIT_WORK_TREE}/docker/.env"
-fi
-
+# get COMPOSE_PROJECT_NAME (see .env)
+compose_project_name="$(
+    docker inspect "$(docker-compose ps --quiet web)" \
+        --format '{{ index .Config.Labels "com.docker.compose.project"}}'
+)"
 
 if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     web_image_hash="$(docker-compose images -q web | cut -c1-7)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${COMPOSE_PROJECT_NAME}"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${compose_project_name}"
 
     echo "Backing up current database..."
     docker-compose exec --user postgres db bash -c '\
