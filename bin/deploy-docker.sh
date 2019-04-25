@@ -4,6 +4,8 @@
 # Environment variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
 
 cmdname="$(basename "$0")"
+bin_path="$(cd "$(dirname "$0")" && pwd)"
+repo_path="${bin_path}/.."
 
 usage() {
     cat << USAGE >&2
@@ -34,8 +36,6 @@ while getopts "bhn" option; do
 done
 shift $((OPTIND-1))
 
-
-repo_path="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
 
 # git-specific environment variables
 # allow git commands outside repo path
