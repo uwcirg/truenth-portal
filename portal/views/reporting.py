@@ -294,6 +294,8 @@ def questionnaire_status():
                 patient, qbd.qb_id, qbd.iteration).entry_method()
             if entry_method:
                 historic['entry_method'] = entry_method
+            else:
+                historic.pop('entry_method', None)
             results.append(historic)
 
     if request.args.get('format', 'json').lower() == 'csv':

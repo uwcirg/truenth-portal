@@ -367,4 +367,4 @@ class TestQBStats(TestQuestionnaireBank):
             if item['status'] == 'Completed':
                 assert item['entry_method'] == 'interview_assisted'
             else:
-                assert item['entry_method'] is None
+                assert 'entry_method' not in item
