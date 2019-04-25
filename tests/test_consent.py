@@ -126,6 +126,8 @@ class TestUserConsent(TestCase):
         assert consent.organization_id, org1.id
         assert consent.staff_editable
         assert not consent.send_reminders
+        assert consent.acceptance_date.replace(
+            microsecond=0) == consent.acceptance_date
 
     def test_post_user_consent_dates(self):
         self.shallow_org_tree()

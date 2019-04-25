@@ -152,3 +152,9 @@ def localize_datetime(dt, user):
         best = dt
     d, m, y = best.strftime('%-d %b %Y').split()
     return ' '.join((d, _(m), y))
+
+
+def utcnow_sans_micro():
+    """Returns datetime.utcnow() with 0 microseconds"""
+    now = datetime.utcnow()
+    return now.replace(microsecond=0)
