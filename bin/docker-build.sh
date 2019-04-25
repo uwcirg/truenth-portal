@@ -42,8 +42,9 @@ copy_output="$(
         "${root_path}/.dockerignore"
 )"
 
-default_compose_file="${root_path}/docker/docker-compose.yaml"
-export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${root_path}/docker"
+cd "${docker_compose_directory}"
 
 echo "Building portal docker image..."
 docker-compose build web

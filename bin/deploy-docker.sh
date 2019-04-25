@@ -41,9 +41,9 @@ shift $((OPTIND-1))
 # allow git commands outside repo path
 export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
-
-# Set default docker-compose file if COMPOSE_FILE environment variable not set
-export COMPOSE_FILE="${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}"
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${repo_path}/docker"
+cd "${docker_compose_directory}"
 
 # Bring env vars set in docker/.env into current shell
 if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
@@ -52,7 +52,6 @@ if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
     . "${GIT_WORK_TREE}/docker/.env"
 fi
 
-cd "${GIT_WORK_TREE}/docker"
 
 if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
     web_image_hash="$(docker-compose images -q web | cut -c1-7)"
