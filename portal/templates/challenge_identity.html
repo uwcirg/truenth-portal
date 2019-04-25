@@ -2,18 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
 
-    <style>
-        .label {color: #777; font-size: 0.9em; margin-left: -8px; position: relative; top:-3px;}
-        .field {margin-top: 1.2em;}
-        .hr {margin-top: -8px;}
-        .title { color: #6b7571;}
-        .error-message { margin-left: 0; display: none;}
-    </style>
-    <h4 class="tnth-headline">{{ _("Identity Verification") }}</h4>
-
-    <hr/>
-
-    <br/>
+    <h4 class="tnth-headline challengeForm__h4">{{ _("Identity Verification") }}</h4>
 
     <p class="profile-item-title">{{ _("To ensure your personal details are not shared with others, please enter the following data for account confirmation.") }}</p>
 
@@ -88,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            <hr/>
+            <br/>
             <div class="form___submit_container">
                 <button type="submit" class="btn btn-tnth-primary">{{ _("Confirm Identity") }}</button>
             </div>

@@ -16,7 +16,7 @@
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
 @mobileJumbotranSize: 1.45em;
-@headlineSize:    1.30em;
+@headlineSize:    1.40em;
 @subheadSize:     1.20em;
 @subSmallHeadSize: 1.1em;
 @lgFontSize:      1.5em;
@@ -256,6 +256,12 @@ body {
   span.warning {
     display: inline-block;
     margin-right: 8px;
+  }
+}
+.form-group {
+  margin-bottom: 1.25em;
+  label {
+    margin-bottom: 3px;
   }
 }
 .form-control,
@@ -1128,6 +1134,12 @@ select:not([multiple]) {
   a.open,
   a.back {
     display: none;
+  }
+  .profile-header {
+    margin-bottom: 0.75em;
+  }
+  .detail-title {
+    margin-bottom: 0.25em;
   }
  .detail-title {
     color: #ebefeb;
@@ -3107,7 +3119,7 @@ body.portal .copyright-container  {
     flex: 0.3 350px;
 }
 .profile-name-label, .profile-birthdate-label {
-  margin-bottom: -4px;
+  margin-bottom: -4px !important;
 }
 
 .deceased-date-container {
@@ -4141,8 +4153,40 @@ div.biopsy-option:last-of-type{
 #profileSiteIDContainer, #mainDiv.profile .site-id-view {
   display: none;
 }
+.challengeForm__h4 {
+  border-bottom: 1px solid @HRColor;
+  padding-bottom: 0.5em;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}
+#challengeForm {
+  .label {
+    color: #777;
+    font-size: 0.9em;
+    margin-left: -8px;
+    position: relative;
+    top:-3px;
+  }
+  .field {
+    margin-top: 1.2em;
+  }
+  .hr {
+    margin-top: -8px;
+  }
+  .title {
+    color: #6b7571;
+    font-weight: 500;
+  }
+  .error-message {
+    margin-left: 0;
+    display: none;
+  }
+  .form___submit_container {
+    margin-top: 1em;
+  }
+}
 #identityVerificationContainer {
-  padding: 1em 0.5em;
+  padding: 1em 0;
   margin: 1em auto;
   .title,
   .hr {
@@ -4159,7 +4203,7 @@ div.biopsy-option:last-of-type{
     max-width: 100%;
   }
   .form-group {
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
   }
   .name-container {
     margin-bottom: 1.25em;

@@ -14,7 +14,7 @@
 }
 @baseFontSize:    16px;
 @baseMobileFontSize:  13.8px;
-@headlineSize:    1.30em;
+@headlineSize:    1.40em;
 @subheadSize:     1.25em;
 @subSmallHeadSize: 1.10em;
 @lgFontSize:      1.6em;
@@ -1587,9 +1587,17 @@ div.pull-right {
   width: 100%;
   max-width: 100%;
   color: #575F5C;
-  border-bottom: 1px solid  #7b7a7a;
-  padding: 0.7em 0.2em 0.83em 0.2em;
+  padding: 0.7em 0 0.83em;
   vertical-align: center;
+  display: flex;
+  justify-content: flex-start;
+
+  @media (min-width: 699px) {
+    & {
+      margin-top: -4em;
+      justify-content: flex-end;
+    }
+  }
 
   span.index-list {
     display: block;
@@ -1617,7 +1625,6 @@ div.pull-right {
 
   span.link {
     font-size: @mediumText;
-    margin-left: 0.3em;
     background: @featureBtnBgColor;
     border: solid @featureBtnBgColor 1px;
     cursor:pointer;
@@ -3146,12 +3153,42 @@ color: @labelColor
     }
   }
 }
+.challengeForm__h4 {
+  border-bottom: 1px solid @HRColor;
+  padding-bottom: 0.5em;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}
+#challengeForm {
+  .label {
+    color: #777;
+    font-size: 0.9em;
+    margin-left: -8px;
+    position: relative;
+    top:-3px;}
+  .field {margin-top: 1.2em;
+  }
+  .hr {
+    margin-top: -8px;
+  }
+  .title {
+    color: #6b7571;
+    font-weight: 500;
+  }
+  .error-message {
+    margin-left: 0;
+    display: none;
+  }
+  .form___submit_container {
+    margin-top: 1em;
+  }
+}
 #identityVerificationContainer {
-  padding: 2em 1.5em;
+  padding: 1em 0;
   margin: 1em auto;
   input,
   select {
-    width: 100%;
+    width: 75% !important;
     max-width: 100%;
   }
   .form-group {
@@ -3572,8 +3609,8 @@ div.timezone-warning.text-warning {
   }
 
   .profile-section {
-      padding-top: 0.5em;
-      padding-bottom: 0.5em;
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
   }
 
   #mainDiv.profile {
