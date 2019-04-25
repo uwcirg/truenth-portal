@@ -42,14 +42,14 @@ shift $((OPTIND-1))
 docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
-# get COMPOSE_PROJECT_NAME (see .env)
-compose_project_name="$(
-    docker inspect "$(docker-compose ps --quiet web)" \
-        --format '{{ index .Config.Labels "com.docker.compose.project"}}'
-)"
 
-if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
-    web_image_hash="$(docker-compose images -q web | cut -c1-7)"
+if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps --quiet db)" ]; then
+    # get COMPOSE_PROJECT_NAME (see .env)
+    compose_project_name="$(
+        docker inspect "$(docker-compose ps --quiet web)" \
+            --format '{{ index .Config.Labels "com.docker.compose.project"}}'
+    )"
+    web_image_hash="$(docker-compose images --quiet web | cut -c1-7)"
     dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${compose_project_name}"
 
     echo "Backing up current database..."
