@@ -37,10 +37,6 @@ done
 shift $((OPTIND-1))
 
 
-# git-specific environment variables
-# allow git commands outside repo path
-export GIT_WORK_TREE="$repo_path"
-export GIT_DIR="${GIT_WORK_TREE}/.git"
 # docker-compose commands must be run in the same directory as docker-compose.yaml
 docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
