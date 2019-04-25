@@ -49,6 +49,6 @@ echo "Building portal docker image..."
 docker-compose build web
 
 if echo "$copy_output" | grep --quiet "\->"; then
-    echo "Deleting generated .dockerignore..."
     rm "${root_path}/.dockerignore"
+    echo "Deleted generated .dockerignore"
 fi
