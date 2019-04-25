@@ -9,7 +9,7 @@ from flask_webtest import SessionScope
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.encounter import Encounter
+from portal.models.encounter import EC, Encounter
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.overall_status import OverallStatus
@@ -348,7 +348,7 @@ class TestQBStats(TestQuestionnaireBank):
             q = db.session.merge(q)
             mock_qr(
                 q.name, qb=threeMo, iteration=0, user_id=user4_id,
-                timestamp=back15)
+                timestamp=back15, entry_method=EC.INTERVIEW_ASSISTED)
 
         self.test_user = db.session.merge(self.test_user)
         self.promote_user(role_name=ROLE.STAFF.value)
@@ -362,3 +362,9 @@ class TestQBStats(TestQuestionnaireBank):
         expect = {'Due', 'Overdue', 'Completed', 'Expired'}
         found = set([item['status'] for item in response.json['entry']])
         assert expect == found
+        # the one done should have entry method set above
+        for item in response.json['entry']:
+            if item['status'] == 'Completed':
+                assert item['entry_method'] == 'interview_assisted'
+            else:
+                assert item['entry_method'] is None

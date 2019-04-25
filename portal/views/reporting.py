@@ -27,6 +27,7 @@ from ..extensions import oauth
 from ..models.fhir import bundle_results
 from ..models.organization import Organization, OrgTree
 from ..models.questionnaire_bank import visit_name
+from ..models.questionnaire_response import QNR_results
 from ..models.qb_status import QB_Status
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
@@ -274,6 +275,11 @@ def questionnaire_status():
         if last_viable:
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
+            entry_method = QNR_results(
+                patient, last_viable.qb_id,
+                last_viable.iteration).entry_method()
+            if entry_method:
+                row['entry_method'] = entry_method
 
         results.append(row)
 
@@ -284,16 +290,22 @@ def questionnaire_status():
             historic['status'] = status
             historic['qb'] = qbd.questionnaire_bank.name
             historic['visit'] = visit_name(qbd)
+            entry_method = QNR_results(
+                patient, qbd.qb_id, qbd.iteration).entry_method()
+            if entry_method:
+                historic['entry_method'] = entry_method
             results.append(historic)
 
     if request.args.get('format', 'json').lower() == 'csv':
         def gen(items):
-            desired_order = [
-                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
-            yield ','.join(desired_order) + '\n'  # header row
+            desired_order = (
+                'user_id', 'study_id', 'status', 'visit',
+                'entry_method', 'site', 'consent')
+            yield desired_order  # header row
             for i in items:
-                yield ','.join(
-                    [str(i.get(k, "")) for k in desired_order]) + '\n'
+                if int(i['user_id']) not in (1707, 1726):
+                    continue
+                yield [str(i.get(k, "")) for k in desired_order]
         # default file base title
         base_name = 'Questionnaire-Timeline-Data'
         if org_id:
@@ -301,8 +313,13 @@ def questionnaire_status():
                 base_name,
                 Organization.query.get(org_id).name.replace(' ', '-'))
         filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
+
+        si = StringIO()
+        cw = csv.writer(si)
+        cw.writerows(gen(results))
+
         return Response(
-            gen(results),
+            si.getvalue(),
             headers={
                 'Content-Disposition': 'attachment;filename={}'.format(
                     filename),
