@@ -2,7 +2,7 @@
 
 cmdname="$(basename "$0")"
 bin_path="$(cd "$(dirname "$0")" && pwd)"
-root_path="${bin_path}/.."
+repo_path="${bin_path}/.."
 
 
 usage() {
@@ -21,16 +21,16 @@ USAGE
    exit 1
 }
 
-
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 
+
 # Create env_file if it doesn't exist
 cp \
     --no-clobber \
-    "${root_path}/docker/portal.env.default" \
-    "${root_path}/docker/portal.env"
+    "${repo_path}/docker/portal.env.default" \
+    "${repo_path}/docker/portal.env"
 
 # Use .gitignore as .dockerignore during build only
 # not worth the effort to maintain both, for now
@@ -38,18 +38,18 @@ copy_output="$(
     cp \
         --no-clobber \
         --verbose \
-        "${root_path}/.gitignore" \
-        "${root_path}/.dockerignore"
+        "${repo_path}/.gitignore" \
+        "${repo_path}/.dockerignore"
 )"
 
 # docker-compose commands must be run in the same directory as docker-compose.yaml
-docker_compose_directory="${root_path}/docker"
+docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
 echo "Building portal docker image..."
 docker-compose build web
 
 if echo "$copy_output" | grep --quiet "\->"; then
-    rm "${root_path}/.dockerignore"
+    rm "${repo_path}/.dockerignore"
     echo "Deleted generated .dockerignore"
 fi

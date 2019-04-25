@@ -7,6 +7,7 @@ cmdname="$(basename "$0")"
 bin_path="$(cd "$(dirname "$0")" && pwd)"
 repo_path="${bin_path}/.."
 
+
 usage() {
     cat << USAGE >&2
 Usage:
