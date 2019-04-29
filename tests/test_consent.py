@@ -2,6 +2,7 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
+from time import sleep
 
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
@@ -175,6 +176,8 @@ class TestUserConsent(TestCase):
         first_user_acceptance_date = consent.acceptance_date
 
         # now add second, confirm time moved
+        # sleep for a second given microsecond chop on acceptance_dates
+        sleep(1)
         second_user = self.add_user('second')
         self.login(user_id=second_user.id)
         response = self.client.post(
