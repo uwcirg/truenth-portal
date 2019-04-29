@@ -23,6 +23,7 @@ const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
 const PSATRACKER = "psaTracker";
+const ORGTREEVIEW = "orgTreeView";
 const cleancss = require("clean-css");
 
 /*eslint no-console: off */
@@ -166,6 +167,26 @@ const psaTrackerLess = function(callback) {
 exports.psaTrackerLess = series(psaTrackerLess);
 
 /*
+ * transforming organization tree view less to css, see /api/organization?tree_view=True
+ */
+const orgTreeViewLess = function(callback) {
+    console.log("Compiling org tree less...");
+    src(lessPath + "/" + ORGTREEVIEW + ".less")
+        .pipe(sourcemaps.init())
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
+        .pipe(dest(cssPath))
+        .on("end", function() {
+            replaceStd(ORGTREEVIEW + ".css.map");
+        });
+    callback();
+
+};
+exports.orgTreeViewLess = series(orgTreeViewLess);
+
+/*
  * the following tasks watch for less file changes and recompile css for each
  */
 //portal
@@ -195,4 +216,4 @@ exports.watchTopNavLess = series(watchTopNavLess);
 /*
  * compile all portal less files 
  */
-exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess));
+exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess));
