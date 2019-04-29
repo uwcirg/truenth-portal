@@ -305,8 +305,6 @@ def questionnaire_status():
                 'entry_method', 'site', 'consent')
             yield desired_order  # header row
             for i in items:
-                if int(i['user_id']) not in (1707, 1726):
-                    continue
                 yield [str(i.get(k, "")) for k in desired_order]
         # default file base title
         base_name = 'Questionnaire-Timeline-Data'
