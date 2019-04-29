@@ -300,12 +300,23 @@ def questionnaire_status():
 
     if request.args.get('format', 'json').lower() == 'csv':
         def gen(items):
+            line = StringIO()
+            writer = csv.writer(line)
             desired_order = (
                 'user_id', 'study_id', 'status', 'visit',
                 'entry_method', 'site', 'consent')
-            yield desired_order  # header row
+            writer.writerow(desired_order)
+            line.seek(0)
+            yield line.read()  # header row
+            line.truncate(0)
+            line.seek(0)
             for i in items:
-                yield [str(i.get(k, "")) for k in desired_order]
+                writer.writerow([str(i.get(k, "")) for k in desired_order])
+                line.seek(0)
+                yield line.read()
+                line.truncate(0)
+                line.seek(0)
+
         # default file base title
         base_name = 'Questionnaire-Timeline-Data'
         if org_id:
@@ -314,12 +325,8 @@ def questionnaire_status():
                 Organization.query.get(org_id).name.replace(' ', '-'))
         filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
 
-        si = StringIO()
-        cw = csv.writer(si)
-        cw.writerows(gen(results))
-
         return Response(
-            si.getvalue(),
+            gen(results),
             headers={
                 'Content-Disposition': 'attachment;filename={}'.format(
                     filename),
