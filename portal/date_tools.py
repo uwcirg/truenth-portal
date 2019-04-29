@@ -162,7 +162,7 @@ def utcnow_sans_micro():
 
     For example, some 3rd party clients can't handle parsing more than 3
     digits of microseconds - difficult to guess which way to round for
-    all circumstances, and comparisons fill fail should the db have a
+    all circumstances, and comparisons will fail should the db have a
     microsecond value, and one of the variables does not.
 
     By storing time values truncated to the nearest second, the return
