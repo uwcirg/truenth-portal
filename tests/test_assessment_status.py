@@ -42,7 +42,7 @@ now = datetime.utcnow()
 
 def mock_qr(
         instrument_id, status='completed', timestamp=None, qb=None,
-        doc_id=None, iteration=None, user_id=TEST_USER_ID):
+        doc_id=None, iteration=None, user_id=TEST_USER_ID, entry_method=None):
     if not doc_id:
         doc_id = ''.join(choice(ascii_letters) for _ in range(10))
     timestamp = timestamp or datetime.utcnow()
@@ -62,6 +62,8 @@ def mock_qr(
     enc = Encounter(
         status='planned', auth_method='url_authenticated', user_id=user_id,
         start_time=timestamp)
+    if entry_method:
+        enc.type.append(entry_method.codings[0])
     with SessionScope(db):
         db.session.add(enc)
         db.session.commit()
