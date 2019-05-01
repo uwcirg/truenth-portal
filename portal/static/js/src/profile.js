@@ -1689,7 +1689,7 @@ export default (function() {
             },
             setInitManualEntryCompletionDate: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
-                //set initial completiont date as GMT date/time for today based on user timezone
+                //set initial completion date as GMT date/time for today based on user timezone
                 this.manualEntry.completionDate = this.manualEntry.todayObj.gmtDate;
                 //comparing consent date to completion date without the time element
                 if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") === 
@@ -1742,6 +1742,7 @@ export default (function() {
                                 self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(consentItems[0].acceptance_date, "system");
                             }
                         }
+                        //set completion date once consent date/time has been set
                         self.setInitManualEntryCompletionDate();
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
