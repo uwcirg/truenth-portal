@@ -45,7 +45,7 @@ const jsSrcPath = "./static/js/src/";
 /*
  * helper function for writing file
  */
-function save(target) {
+const saveFile = function(target) {
   return result => {
     fs.writeFileSync(target, result);
   };
@@ -54,7 +54,7 @@ function save(target) {
 /*
  * i18next scanner helper function
  */
-function i18nextScanner(files, outputFileName) {
+function i18nextScanner(files, outputFileName, callback) {
   return src(files)
                .pipe(scanner({
                     keySeparator: "|",
@@ -76,7 +76,10 @@ function i18nextScanner(files, outputFileName) {
                         suffix: "}"
                     }
                 }))
-              .pipe(dest("translations/js"));
+              .pipe(dest("translations/js"))
+              .on("end", function() {
+                callback();
+              });
 };
 
 /*
@@ -91,7 +94,7 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
     try {
       console.log("source file, " + messageFilePath + ", found for locale: ", locale, " outputFileName:", outputFileName);
       i18nextConv.gettextToI18next(locale, fs.readFileSync(messageFilePath), false)
-      .then(save(outputFileName));
+      .then(saveFile(outputFileName));
     } catch(e) {
       console.log("Error occurred writing json from po file: ", messageFilePath);
     }
@@ -146,8 +149,7 @@ const i18nextExtraction = function(callback) {
                   jsSrcPath+"mixins/*.{js,html}",
                   jsSrcPath+"modules/*.{js,html}",
                   jsSrcPath+"data/common/*.{js,html}",
-                  "templates/*.html"], "./src/" + nameSpace + ".json");
-  callback();
+                  "templates/*.html"], "./src/" + nameSpace + ".json", callback);
 }
 exports.i18nextExtraction = series(cleanSrc, i18nextExtraction);
 
@@ -156,8 +158,7 @@ exports.i18nextExtraction = series(cleanSrc, i18nextExtraction);
  */
 const i18nextExtractionEproms = function(callback) {
   console.log("Extracting i18next strings and generate EPROMS source json file ...");
-  i18nextScanner(["eproms/templates/eproms/*.html", jsSrcPath+"data/eproms/*.{js,html}"], "./src/" + epromsNameSpace + ".json");
-  callback();
+  i18nextScanner(["eproms/templates/eproms/*.html", jsSrcPath+"data/eproms/*.{js,html}"], "./src/" + epromsNameSpace + ".json", callback);
 };
 exports.i18nextExtractionEproms = series(cleanEpromsSrc, i18nextExtractionEproms);
 
@@ -166,8 +167,7 @@ exports.i18nextExtractionEproms = series(cleanEpromsSrc, i18nextExtractionEproms
  */
 const i18nextExtractionTruenth = function(callback) {
   console.log("extracting i18next strings and generating TRUENTH source json file ...");
-  i18nextScanner(["gil/templates/gil/*.html", jsSrcPath+"data/gil/*.{js,html}"], "./src/" + truenthNameSpace + ".json");
-  callback();
+  i18nextScanner(["gil/templates/gil/*.html", jsSrcPath+"data/gil/*.{js,html}"], "./src/" + truenthNameSpace + ".json", callback);
 };
 exports.i18nextExtractionTruenth = series(cleanTruenthSrc, i18nextExtractionTruenth);
 
@@ -175,11 +175,13 @@ exports.i18nextExtractionTruenth = series(cleanTruenthSrc, i18nextExtractionTrue
  * convert eproms json to pot (the definition file) for translator's consumption
  */
 const i18nextConvertEpromsJSONToPOT = function(callback) {
+  options = {
+    /*
+    specify options here */
+  };
   console.log("Converting EPROMS JSON source file to POT file...");
-  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+epromsNameSpace+".json"), options).then(function() {
-    save(epromsSrcPotFileName);
-    callback();
-  });
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+epromsNameSpace+".json"), options).then(saveFile(epromsSrcPotFileName));
+  callback();
 };
 exports.i18nextConvertEpromsJSONToPOT = series(i18nextExtractionEproms, i18nextConvertEpromsJSONToPOT);
 /*
@@ -191,10 +193,8 @@ const i18nextConvertTruenthJSONToPOT = function(callback) {
     specify options here */
   };
   console.log("Converting GIL JSON source file to POT file...");
-  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+truenthNameSpace+".json"), options).then(function() {
-    save(truenthSrcPotFileName);
-    callback();
-  });
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+truenthNameSpace+".json"), options).then(saveFile(truenthSrcPotFileName));
+  callback();
 };
 exports.i18nextConvertTruenthJSONToPOT = series(i18nextExtractionTruenth, i18nextConvertTruenthJSONToPOT);
 
@@ -207,10 +207,8 @@ const i18nextConvertJSONToPOT = function(callback) {
     specify options here */
   };
   console.log("Converting common JSON source file to POT file...");
-  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(function() {
-    save(srcPotFileName);
-    callback();
-  });
+  i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(saveFile(srcPotFileName));
+  callback();
 };
 exports.i18nextConvertJSONToPOT = series(i18nextExtraction, i18nextConvertJSONToPOT);
 
