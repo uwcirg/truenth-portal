@@ -1,9 +1,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: portal 19.3.20.dev37+g0b9d39ae\n"
+"Project-Id-Version: portal 19.4.24.dev24+g16c8d96b\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-02 16:51+0000\n"
+"POT-Creation-Date: 2019-05-01 17:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,63 +80,63 @@ msgstr "Qhagamshelana ne-TrueNTH"
 msgid "Use this form to get in touch with TrueNTH"
 msgstr "Sebenzisa le fomu ukuze uqhagamshelane ne-TrueNTH"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L14 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L27 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L48 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L175
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L15 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L16 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L48 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L175
 msgid "Name"
 msgstr "Igama"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L16
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L17
 msgid "Please enter your name"
 msgstr "Nceda ufake igama lakho"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L17
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L18
 msgid "Your Name"
 msgstr "IGama Lakho"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L21 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L48 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L60 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L43 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/register.html#L17 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L50
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L22 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L48 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L60 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L43 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/register.html#L17 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L50
 msgid "Email"
 msgstr "I-imeyile"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L23
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L24
 msgid "Your Email"
 msgstr "I-Imeyili Yakho"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L24
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L25
 msgid "This is not a valid e-mail address, please double-check."
 msgstr "Le asiyiyo idilesi ye-imeyile efanelekileyo, nceda uyihlole kwakhona."
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L30
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L31
 msgid "Enquiry Type"
 msgstr "Uhlobo Lwesicelo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L35
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L36
 msgid "Not sure"
 msgstr "Akuqinisekanga"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L40 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/invite.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/invite_sent.html#L18
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L41 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/invite.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/invite_sent.html#L18
 msgid "Subject"
 msgstr "Umxholo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L41
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L42
 msgid "What is this about?"
 msgstr "Imayela nantoni le nto?"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L44
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
 msgid "Text"
 msgstr "Umbhalo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L46
 msgid "Please add a message for TrueNTH"
 msgstr "Sicela wongeze umyalezo kwiTrueNTH"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L45
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L46
 msgid "What is on your mind?"
 msgstr "Ucinga ntoni wena?"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L56 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L778
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L57 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L778
 msgid "Submit"
 msgstr "Ngenisa"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L61
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/contact.html#L62
 msgid "Please confirm all fields are filled."
 msgstr "Sicela uqinisekise ukuba zonke izithuba zizalisiwe."
 
@@ -347,107 +347,107 @@ msgstr "Idilesi ye-imeyile esetyenzisiweyo asiyiyo"
 msgid "missing required data: "
 msgstr "i-data efunekayo ayikho: "
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L12
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L5
 msgid "Identity Verification"
 msgstr "Ukugunyaziswa Kwesazisi"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L18
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L7
 msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
 msgstr "Ukuze siqiniseke ukuba iinkcukacha zakho akwabelwana ngazo nabanye, sicela ufake le nkcazelo yoqinisekiso lwe-akhawunti."
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L32 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L219
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L21 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L219
 msgid "First name is required"
 msgstr "Igama liyafuneka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L46 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L58 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L41 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L32 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L219 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L179
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L46 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L58 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L41 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L21 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L219 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L179
 msgid "First Name"
 msgstr "IGama"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L40 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L226
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L29 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L226
 msgid "Last name is required"
 msgstr "Ifani iyafuneka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L47 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L59 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L42 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L40 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L226 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L187
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/admin.html#L47 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L59 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/staff_by_org.html#L42 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L29 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L226 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L187
 msgid "Last Name"
 msgstr "Ifani"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L46 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L253 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L125 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L127
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L35 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L253 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L125 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L127
 msgid "Birth Date"
 msgstr "Usuku Lokuzalwa"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L52
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L41
 msgid "Day"
 msgstr "Usuku"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L53
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L42
 msgid "Day is required"
 msgstr "Umhla uyafuneka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L61 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L63 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L260 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L304 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L132 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L800 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1000 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1110 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1111 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1215
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L50 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L52 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L260 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L304 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L132 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L800 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1001 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1111 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1112 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1215
 msgid "Month"
 msgstr "Inyanga"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L62
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L51
 msgid "Month is required"
 msgstr "Inyanga iyafuneka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L64 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L261 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L305 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L133 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L801 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1001 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1112 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1216
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L53 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L261 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L305 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L133 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L801 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1002 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1113 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1216
 msgid "January"
 msgstr "Januwari"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L65 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L262 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L306 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L134 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L802 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1002 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1113 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1217
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L54 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L262 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L306 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L134 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L802 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1003 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1114 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1217
 msgid "February"
 msgstr "Februwari"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L66 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L263 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L307 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L135 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L803 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1003 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1114 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1218
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L55 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L263 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L307 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L135 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L803 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1004 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1115 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1218
 msgid "March"
 msgstr "Matshi"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L67 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L264 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L308 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L136 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L804 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1004 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1115 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1219
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L56 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L264 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L308 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L136 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L804 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1005 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1116 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1219
 msgid "April"
 msgstr "Apreli"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L68 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L265 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L309 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L137 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L805 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1005 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1116 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1220
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L57 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L265 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L309 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L137 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L805 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1006 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1117 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1220
 msgid "May"
 msgstr "Meyi"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L69 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L266 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L310 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L138 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L806 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1006 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1117 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1221
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L58 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L266 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L310 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L138 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L806 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1007 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1118 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1221
 msgid "June"
 msgstr "Juni"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L70 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L267 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L311 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L139 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L807 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1007 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1118 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1222
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L59 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L267 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L311 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L139 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L807 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1008 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1119 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1222
 msgid "July"
 msgstr "Julayi"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L71 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L268 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L312 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L140 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L808 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1008 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1119 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1223
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L60 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L268 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L312 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L140 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L808 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1009 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1120 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1223
 msgid "August"
 msgstr "Agasti"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L72 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L269 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L313 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L141 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L809 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1009 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1120 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1224
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L61 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L269 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L313 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L141 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L809 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1010 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1121 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1224
 msgid "September"
 msgstr "Septemba"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L73 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L270 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L314 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L142 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L810 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1010 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1121 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1225
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L62 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L270 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L314 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L142 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L810 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1011 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1122 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1225
 msgid "October"
 msgstr "Oktobha"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L74 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L271 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L315 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L143 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L811 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1011 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1122 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1226
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L63 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L271 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L315 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L143 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L811 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1012 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1123 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1226
 msgid "November"
 msgstr "Novemba"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L75 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L272 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L316 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L144 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L812 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1012 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1123 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L64 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L272 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L316 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L144 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L812 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1013 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1124 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1227
 msgid "December"
 msgstr "Disemba"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L84
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L73
 msgid "Year"
 msgstr "Unyaka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L85
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L74
 msgid "Year is required"
 msgstr "Unyaka uyafuneka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L93
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/challenge_identity.html#L82
 msgid "Confirm Identity"
 msgstr "Qinisekisa Isazisi"
 
@@ -777,7 +777,7 @@ msgstr "Unyaka wokuzalwa uyafuneka yaye umele ube kwifomathi efanelekileyo"
 msgid "Have you had a prostate cancer biopsy?"
 msgstr "Ngaba sele uyenzile i-biopsy yomhlaza weprosteti?"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L292 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L366 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L388 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L616 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L982 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1264
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L292 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L366 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L388 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L616 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L983 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1264
 msgid "Yes"
 msgstr "Ewe"
 
@@ -797,7 +797,7 @@ msgstr "Inyanga ye-biopsy ifanele ikhethwe"
 msgid "The biopsy year is required and must be in valid format"
 msgstr "Unyaka we-biopsy uyafuneka yaye umele ube kwifomathi efanelekileyo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L328 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L393 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L618 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L982 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1264
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L328 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/initial_queries_macros.html#L393 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L618 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L983 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1264
 msgid "No"
 msgstr "Hayi"
 
@@ -1445,7 +1445,7 @@ msgstr "Imo Yephepha Lemibuzo"
 msgid "Visit"
 msgstr "Tyelela"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L68 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1034
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/admin/patients_by_org.html#L68 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1035
 msgid "Study ID"
 msgstr "i-ID Yophononongo"
 
@@ -1701,12 +1701,30 @@ msgstr ""
 "<p>Enkosi,</p>\n"
 "<p>Iqela leTrueNTH</p>\n"
 
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.html#L9
+#, python-format
+msgid ""
+"\n"
+"<p>Please do not reply to this email. If you have any questions about this message, reach out to your %(parent_org)s representative and they will gladly assist.</p>\n"
+msgstr ""
+"\n"
+"<p>Nceda ungaphenduli kule imeyile. Ukuba unayo nayiphi imibuzo ngalo myalezo, thetha nommeli wakho we-%(parent_org)s yaye uza kukuvuyela ukukunceda.</p>\n"
+
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L5
 msgid ""
 "\n"
 "Thank you,\n"
 "The TrueNTH Team\n"
 msgstr ""
+
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L9
+#, python-format
+msgid ""
+"\n"
+"Please do not reply to this email. If you have any questions about this message, reach out to your %(parent_org)s representative and they will gladly assist.\n"
+msgstr ""
+"\n"
+"Nceda ungaphenduli kule imeyile. Ukuba unayo nayiphi imibuzo ngalo myalezo, thetha nommeli wakho we-%(parent_org)s yaye uza kukuvuyela ukukunceda.\n"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/emails/eproms_forgot_password_message.html#L4
 #, python-format
@@ -2034,7 +2052,7 @@ msgstr "Thumela i-imeyile kwisigulana"
 msgid "Select Email..."
 msgstr "Khetha I-imeyile..."
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L308 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L351 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L478 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1057
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L308 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L351 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L478 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1058
 msgid "Send email"
 msgstr "Thumela i-imeyile"
 
@@ -2100,7 +2118,7 @@ msgstr "Ayikho efumanekayo"
 msgid "Email Message Content"
 msgstr "Isiqulatho Somyalezo We-imeyile"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L458 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L468 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L533 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1034
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L458 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L468 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L533 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1035
 msgid "Optional"
 msgstr "Yeyokuzikhethela"
 
@@ -2195,7 +2213,7 @@ msgstr "GMT ifomathi yeeyure ezingama-24"
 msgid "for this agreement to:"
 msgstr "ukuze esi sivumelwano:"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L796 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L799 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L816 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1107 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1110 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1127 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1211 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1214 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1231
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L796 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L799 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L816 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1108 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1111 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1128 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1211 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1214 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1231
 msgid "Date must be valid and in the required format."
 msgstr "Umhla umele ube ngofanelekileyo yaye ube kwifomathi efunekayo."
 
@@ -2276,186 +2294,190 @@ msgid "America/New York"
 msgstr "America/New York"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L932
+msgid "America/Sao Paulo"
+msgstr ""
+
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L933
 msgid "Australia/Adelaide"
 msgstr "Australia/Adelaide"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L933
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L934
 msgid "Australia/Brisbane"
 msgstr "Australia/Brisbane"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L934
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L935
 msgid "Australia/Broken_Hill"
 msgstr "Australia/Broken_Hill"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L935
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L936
 msgid "Australia/Canberra"
 msgstr "Australia/Canberra"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L936
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L937
 msgid "Australia/Currie"
 msgstr "Australia/Currie"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L937
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L938
 msgid "Australia/Darwin"
 msgstr "Australia/Darwin"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L938
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L939
 msgid "Australia/Eucla"
 msgstr "Australia/Eucla"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L939
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L940
 msgid "Australia/Hobart"
 msgstr "Australia/Hobart"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L940
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L941
 msgid "Australia/Lindeman"
 msgstr "Australia/Lindeman"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L941
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L942
 msgid "Australia/Lord_Howe"
 msgstr "Australia/Lord_Howe"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L942
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L943
 msgid "Australia/Melbourne"
 msgstr "Australia/Melbourne"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L943
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L944
 msgid "Australia/North"
 msgstr "Australia/North"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L944
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L945
 msgid "Australia/Perth"
 msgstr "Australia/Perth"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L945
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L946
 msgid "Australia/Queensland"
 msgstr "Australia/Queensland"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L946
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L947
 msgid "Australia/South"
 msgstr "Australia/South"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L947
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L948
 msgid "Australia/Sydney"
 msgstr "Australia/Sydney"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L948
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L949
 msgid "Australia/Tasmania"
 msgstr "Australia/Tasmania"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L949
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L950
 msgid "Australia/Victoria"
 msgstr "Australia/Victoria"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L950
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L951
 msgid "Australia/West"
 msgstr "Australia/West"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L951
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L952
 msgid "Australia/Yancowinna"
 msgstr "Australia/Yancowinna"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L952 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L955
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L953 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L956
 msgid "Europe/Andorra"
 msgstr "Europe/Andorra"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L953
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L954
 msgid "Europe/Vienna"
 msgstr "Europe/Vienna"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L954
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L955
 msgid "Europe/Brussels"
 msgstr "Europe/Brussels"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L956
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L957
 msgid "Europe/Stockholm"
 msgstr "Europe/Stockholm"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L957
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L958
 msgid "Europe/Sofia"
 msgstr "Europe/Sofia"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L958
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L959
 msgid "Europe/Zurich"
 msgstr "Europe/Zurich"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L968
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L969
 msgid "Deceased Status"
 msgstr "Imo Yokusweleka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L971
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L972
 msgid "Patient is deceased"
 msgstr "Isigulana siswelekile"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L977
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L978
 msgid "no data provided"
 msgstr "ayikho idatha elungiselelweyo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L981
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L982
 msgid "Has the patient passed away?"
 msgstr "Ngaba isigulana siswelekile?"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L982
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L983
 msgid "By checking this box, the patient's consent status will be updated to 'Withdrawn - Suspend Data Collection'. Do you want to continue?"
 msgstr ""
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L988
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L989
 msgid "Deceased Date"
 msgstr "Umhla Wokusweleka"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1043
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1044
 msgid "Site ID"
 msgstr "i-ID Yesayithi"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1053
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1054
 msgid "Three ways to complete questionnaire"
 msgstr "Indlela ezintathu zokuzalisa iphepha lemibuzo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1059
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1060
 msgid "Invite or remind patient over email to complete their questionnaire"
 msgstr "Mema okanye ukhumbuze isigulana nge-imeyile ukuba azalise iphepha lakhe lemibuzo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1064 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1066
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1065 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1067
 msgid "Log in as patient"
 msgstr "Loga ungene njengesigulana"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1065
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1066
 msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr "Oku kukuloga uphume, kuze kuloge kungenise isigulana ngaphandle kwemfuneko yokuba afake amagama okungena ayimfuneko. Oku kwenzelwa ukuba isigulana sizalise iphepha laso lemibuzo kwesi sixhobo. Yenzelwe ithabhlethi neekhompyutha ze-kiosk."
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1069 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1073
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1070 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1074
 msgid "Enter manually"
 msgstr "Faka ngokoqobo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1071
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1072
 msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr "Fakela isigulana iimpendulo zephepha lemibuzo. Kuyanceda xa iimpendulo zizaliswe ephepheni."
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1079
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1080
 msgid "Enter questionnaire manually on patient's behalf"
 msgstr "Fakela isigulana iphepha lemibuzo ngokoqobo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1086
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1087
 msgid "Select the method in which the questionnaire will be completed:"
 msgstr "Khetha indlela iphepha lemibuzo eliza kuzaliswa ngayo:"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1094
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1095
 msgid "Interview assisted"
 msgstr "Udliwano-ndlebe luncedisiwe"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1099
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1100
 msgid "Paper"
 msgstr "Iphepha"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1104
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1105
 msgid "Questionnaire completion date"
 msgstr "Umhla wokuzaliswa kwephepha lemibuzo"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1107
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1108
 msgid "Completion Day"
 msgstr "Usuku Lokugqitywa"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1127
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L1128
 msgid "Completion Year"
 msgstr "Unyaka Wokugqitywa"
 
@@ -2563,7 +2585,7 @@ msgstr "Iprofayile ka #%(user_id)s"
 msgid "New Staff"
 msgstr "Abasebenzi Abatsha"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/assessment_engine.py#L1637
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/assessment_engine.py#L1604
 msgid "All available questionnaires have been completed"
 msgstr "Onke amaxwebhu emibuzo akhoyo aye azaliswa"
 
@@ -2589,514 +2611,200 @@ msgstr "Ayikwazi kudibanisa ukuba yekabani"
 msgid "User Not Found"
 msgstr "Umsebenzisi Akafunyanwanga"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/portal.py#L1194
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/portal.py#L1193
 #, python-format
 msgid "I consent to sharing information with %(org_name)s"
 msgstr "Ndiyavuma ukwabelana ngenkcazelo kunye ne %(org_name)s"
 
-#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/reporting.py#L114
+#: https://github.com/uwcirg/truenth-portal/tree/develop/portal/views/reporting.py#L115
 msgid "TOTAL"
 msgstr "ISIMBUKU"
-
-# Intervention: assessment_engine
-msgid "Assessment Engine"
-msgstr ""
-
-# Intervention: decision_support_wisercare
-msgid "Decision Support WiserCare"
-msgstr "i-Decision Support WiserCare"
-
-# AppText: IRONMAN staff registraion email URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
-
-# classification_enum: Baseline
-msgid "Baseline"
-msgstr "Isiseko"
-
-# Organization: Macquarie University Hospital
-msgid "Macquarie University Hospital"
-msgstr ""
-
-# AppText: patient reminder email IRONMAN
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
-msgstr ""
-
-# Organization: Winship Cancer Institute Emory University
-msgid "Winship Cancer Institute Emory University"
-msgstr ""
-
-# Intervention: care_plan
-msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
-msgstr "<p>Intlangano kunye nokuxhaswa kweenkcukacha ezininzi zobomi njengomntu osinde kumhlaza weprosteti</p>"
-
-# Organization: BC Cancer Agency
-msgid "BC Cancer Agency"
-msgstr ""
-
-# AppText: portal registration
-msgid "TrueNTH Registration"
-msgstr "Ubhaliso lwe-TrueNTH"
-
-# AppText: site summary email IRONMAN
-# AppText: site summary email
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
-
-# ResearchProtocol: IRONMAN v2
-msgid "Ironman V2"
-msgstr "I-Ironman V2"
-
-# Organization: Memorial Sloan Kettering Cancer Center
-msgid "Memorial Sloan Kettering Cancer Center"
-msgstr ""
 
 # AppText: landing sub-title
 msgid " "
 msgstr " "
 
-# Organization: Doylestown Health
-msgid "Doylestown Health"
+# Organization: Department Of Urology, Princess Alexandra Hospital
+msgid "Department Of Urology, Princess Alexandra Hospital"
 msgstr ""
 
-# Organization: AU B Child Site 2
-msgid "AU B Child Site 2"
+# Role: content_manager
+msgid "Content Manager"
+msgstr "Umphathi Wesiqulatho"
+
+# Organization: Australian Prostate Cancer Research Centre
+msgid "Australian Prostate Cancer Research Centre"
 msgstr ""
 
-# AppText: About TrueNTH URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
-
-# Role: service
-msgid "Service"
-msgstr "Inkonzo"
-
-# QuestionnaireBank: CRV_baseline
-msgid "Crv Baseline"
-msgstr ""
-
-# AppText: site summary email TrueNTH Global Registry
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
-
-# Organization: Tulane University
-msgid "Tulane University"
-msgstr ""
-
-# Role: application_developer
-msgid "Application Developer"
-msgstr "UMyili we-Aplikeyishini"
-
-# Organization: Westmead Hospital
-msgid "Westmead Hospital"
+# Intervention: psa_tracker
+msgid "<p>Remember to update your PSA level.</p>"
 msgstr ""
 
 # Organization: TrueNTH Global
 msgid "TrueNTH Global"
 msgstr "I-TrueNTH Global"
 
-# Organization: United Kingdom (Region/Country Site)
-msgid "United Kingdom (Region/Country Site)"
-msgstr ""
+# AppText: registration prompt
+msgid "Create a password"
+msgstr "Yila iphaswedi"
 
-# ResearchProtocol: IRONMAN v3
-msgid "Ironman V3"
-msgstr "I-Ironman V3"
-
-# Organization: Sidney Kimmel Comprehensive Cancer Center
-msgid "Sidney Kimmel Comprehensive Cancer Center"
-msgstr ""
-
-# Organization: Tygerberg Hospital
-msgid "Tygerberg Hospital"
-msgstr ""
-
-# Organization: AU B Child Site 1
-msgid "AU B Child Site 1"
-msgstr ""
-
-# Role: access_on_verify
-msgid "Access On Verify"
-msgstr "Ufikelelo kuHlolo"
-
-# Organization: Sweden (Region/Country Site)
-msgid "Sweden (Region/Country Site)"
-msgstr ""
-
-# Organization: Urology South Brisbane
-msgid "Urology South Brisbane"
-msgstr ""
-
-# Role: intervention_staff
-msgid "Intervention Staff"
-msgstr "Abasebenzi boNgenelelo"
-
-# Intervention: music
-msgid "MUSIC Integration"
-msgstr ""
-
-# Organization: Epworth Healthcare
-msgid "Epworth Healthcare"
-msgstr ""
-
-# Organization: Australian Prostate Cancer Research Centre
-msgid "Australian Prostate Cancer Research Centre"
-msgstr ""
-
-# Organization: Centre Hospitalier de l'Université de Montréal
-msgid "Centre Hospitalier de l'Université de Montréal"
-msgstr ""
-
-# AppText: TrueNTH Global Registry website declaration form URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
-
-# AppText: IRONMAN website declaration form URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
-
-# Organization: Australian Urology Associates (AUA)
-msgid "Australian Urology Associates (AUA)"
+# Organization: Memorial Sloan Kettering Cancer Center
+msgid "Memorial Sloan Kettering Cancer Center"
 msgstr ""
 
 # AppText: IRONMAN patient privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
 
-# AppText: patient invite email IRONMAN
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
-
-# AppText: profileSendEmail invite email_body
-msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
-msgstr "<p>(umbuliso),</p><p>Le imeyile uyithunyelewe kuba usisigulana e(igama lekliniki) yaye unikele imvume yokuthatha inxaxheba Kwiziphumo Zomhlaza Weprosteti- (intlangano yomzali) Uphononongo Lobhaliso.</p><p>Esi sisimemo sokusebenzisa iwebhsaythi yeTrueNTH, apho uza kunikela ingxelo ngempilo yakho. Ukuthatha kwakho inxaxheba kuza kusinceda sonke siphucule unakekelo amadoda alufumanayo ebudeni bohamba lomhlaza weprosteti.</p><p>Ukuze uzalise uxwebhu lwemibuzo lokuqala, nceda uqale uqinisekise iakhawunti yakho.</p><div><a class=\"btn\" href=\"{0}\">Qinisekisa iakhawunti yakho</a></div><p>Ungafikelela nakwiwebhsaythi yeTrueNTH kule linki:<p/><p><a href=\"{0}\">{0}</a></p><p>Yigcine le imeyile ukuze ubuyele kwiTrueNTH nanagliphi na ixesha.</p><p>Ukuba kukho into ofuna ukuyibuza, nceda uqhagamshelane nommeli wakho e(igama lekliniki).</p>"
-
-# ResearchProtocol: TNGR v1
-msgid "Tngr V1"
+# Organization: Southampton
+msgid "Southampton"
 msgstr ""
 
-# Organization: AUA Local Data Center
-msgid "AUA Local Data Center"
+# Organization: Tulane University
+msgid "Tulane University"
 msgstr ""
 
-# Organization: Queensland University of Technology LDC
-msgid "Queensland University of Technology LDC"
-msgstr ""
+# AppText: portal registration
+msgid "TrueNTH Registration"
+msgstr "Ubhaliso lwe-TrueNTH"
 
-# Role: partner
-msgid "Partner"
-msgstr "Iqabane"
-
-# AppText: consent date label
-msgid "Study Consent Date"
-msgstr "Umhla Wemvume Yophononongo"
-
-# Organization: Australia Recruiting Site B
-msgid "Australia Recruiting Site B"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
-msgid "Ironman Recurring 3Mo Pattern"
-msgstr "Ipateni yeeNyanga ezi-3 ka-Ironman Ebuyelelayo"
-
-# AppText: TrueNTH Global Registry staff privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
-
-# AppText: TrueNTH Global Registry staff registraion email URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
-
-# Role: staff
-msgid "Staff"
-msgstr "Abasebenzi"
-
-# Role: admin
-msgid "Admin"
-msgstr "Ulawulo"
-
-# QuestionnaireBank: IRONMAN_v3_baseline
-msgid "Ironman V3 Baseline"
-msgstr "Isiseko se-Ironman V3"
-
-# Organization: Reading Health System
-msgid "Reading Health System"
-msgstr ""
-
-# AppText: TrueNTH Global Registry organization website consent URL
-# AppText: TrueNTH Global Registry patient website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
-
-# Organization: University of Washington
-msgid "University of Washington"
-msgstr ""
-
-# Organization: University of Wisconsin
-msgid "University of Wisconsin"
-msgstr ""
-
-# Organization: none of the above
-msgid "none of the above"
-msgstr "Ayikho kwezi Zingasentla"
-
-# Organization: Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital
-msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
-msgstr ""
-
-# Organization: University of Illinois at Chicago
-msgid "University of Illinois at Chicago"
-msgstr ""
-
-# AppText: IRONMAN staff terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
-
-# Organization: Princess Alexandra Hospital
-msgid "Princess Alexandra Hospital"
-msgstr ""
-
-# Organization: University of North Carolina
-msgid "University of North Carolina"
-msgstr ""
-
-# AppText: profileSendEmail reminder email_body
-msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
-msgstr "<p>Molo,</p><p>Le imeyili ithunyelwe kuwe yi (igama lekliniki). Kulapho unika khona ingxelo ngohambo lwakho lomhlaza weprosteti. Inkcazelo ethathiweyo iya kusetyenziselwa ukubona ukuba lungenziwa na uphuculo kuNyamekelo loMhlaza weProsteti.</p><p>Loga ungene ngoku ukuze uzalise uxwebhu lwakho lwemibuzo.</p><div><a class=\"btn\" href=\"{0}\">Qinisekisa i-akhawunti yakho uze uphendule uxwebhu lwakho lwemibuzo ngoku</a></div><p>Cofa iqhosha elingentla okanye usebenzise ilinki engezantsi ukuze utyelele i-TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Ukuba unayo nayiphi na imibuzo okanye izinto ezikuxhalabisayo, nceda uqhagamshelane (igama lekliniki).</p><p><em>— Le imeyili iye yathunyelwa ngenxa yokuba uye wavuma ukuthatha inxaxheba kwiprojekti yokubhalisa ye-TrueNTH</em></p>"
-
-# AppText: registration prompt
-msgid "Create a password"
-msgstr "Yila iphaswedi"
-
-# Organization: Oregon Health and Sciences Cancer Center
-msgid "Oregon Health and Sciences Cancer Center"
-msgstr ""
-
-# Organization: Juravinski Cancer Centre
-msgid "Juravinski Cancer Centre"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
-msgid "Ironman V3 Recurring Annual Pattern"
-msgstr "Ipateni yoNyaka ye-Ironman Ebuyelelayo ye-V3"
-
-# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
-msgid "Ironman Recurring 6Mo Pattern"
-msgstr "Ipateni yeeNyanga ezi-6 ka-Ironman Ebuyelelayo"
-
-# AppText: TrueNTH Global Registry staff terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
-
-# Intervention: psa_tracker
-msgid "PSA Tracker"
-msgstr ""
-
-# Organization: University of Michigan
-msgid "University of Michigan"
-msgstr ""
-
-# AppText: patient invite email TrueNTH Global Registry
-# AppText: patient invite email
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
-
-# QuestionnaireBank: IRONMAN_recurring_annual_pattern
-msgid "Ironman Recurring Annual Pattern"
-msgstr "Ipateni yoNyaka ye-Ironman Ebuyelelayo"
-
-# Organization: University of Chicago
-msgid "University of Chicago"
-msgstr ""
-
-# Intervention: decision_support_p3p
-msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
-msgstr " <p>Khangela amaxabiso akho, ukhetho lwakho, kunye nolwazi lwakho lwangoku lwezempilo ukuze sikuncede uxoxe ngokhetho lwakho lonyango kunye nogqirha wakho.</p>"
-
-# Organization: Chesapeake Urology Associates
-msgid "Chesapeake Urology Associates"
-msgstr ""
-
-# Organization: TrueNTH Global Registry
-msgid "TrueNTH Global Registry"
-msgstr ""
-
-# Organization: Wayne St. University Karmanos Cancer Institute
-msgid "Wayne St. University Karmanos Cancer Institute"
-msgstr ""
-
-# Organization: University of California San Diego
-msgid "University of California San Diego"
+# Organization: The Christie NHS Foundation Trust
+msgid "The Christie NHS Foundation Trust"
 msgstr ""
 
 # Organization: University of Alabama-Birmingham
 msgid "University of Alabama-Birmingham"
 msgstr ""
 
-# assessment_status: Completed
-msgid "Completed"
-msgstr "Igqityiwe"
-
-# Organization: Eastern Health
-msgid "Eastern Health"
-msgstr ""
-
-# Organization: Wesley Urology Clinic
-msgid "Wesley Urology Clinic"
-msgstr ""
-
-# Organization: Brazil (Region/Country Site)
-msgid "Brazil (Region/Country Site)"
-msgstr ""
+# AppText: TrueNTH Global Registry website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
 
 # Organization: Roswell Park Cancer Institute
 msgid "Roswell Park Cancer Institute"
 msgstr ""
 
-# Organization: Thomas Jefferson University
-msgid "Thomas Jefferson University"
+# Organization: Reading Health System
+msgid "Reading Health System"
 msgstr ""
 
-# Organization: University of Virgina (UVA)
-msgid "University of Virgina (UVA)"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_baseline
-msgid "Ironman Baseline"
-msgstr "Isiseko se-Ironman"
-
-# assessment_status: Expired
-msgid "Expired"
-msgstr "iphelelwe"
-
-# Organization: Southampton
-msgid "Southampton"
-msgstr ""
-
-# Organization: Canada (Region/Country Site)
-msgid "Canada (Region/Country Site)"
-msgstr ""
-
-# AppText: layout title
-msgid "Movember TrueNTH"
-msgstr "iTrueNTH kaMovember"
-
-# Organization: Dana-Farber Cancer Institute
-msgid "Dana-Farber Cancer Institute"
-msgstr ""
-
-# Organization: Örebro University Hospital
-msgid "Örebro University Hospital"
-msgstr ""
-
-# Organization: Test Site
-msgid "Test Site"
-msgstr ""
-
-# Intervention: care_plan
-msgid "Care Plan"
-msgstr "Iplani Yonakekelo"
-
-# Organization: CHU de Quebec - Universite Laval
-msgid "CHU de Quebec - Universite Laval"
-msgstr ""
-
-# AppText: landing title
-msgid "Report your health in order to improve prostate cancer care."
-msgstr ""
-
-# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern University
-msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
-msgstr ""
-
-# Intervention: decision_support_p3p
-msgid "Decision Support tool"
-msgstr "Isixhobo Sokuxhaswa Kwesigqibo"
-
-# Organization: Weill Cornell Medical Center
-msgid "Weill Cornell Medical Center"
-msgstr ""
-
-# AppText: IRONMAN patient terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
-
-# AppText: TrueNTH Global Registry patient terms and conditions URL
-# AppText: Initial Consent Terms URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
-
-# classification_enum: Recurring
-msgid "Recurring"
-msgstr "Iyaqhubeka"
-
-# QuestionnaireBank: IRONMAN_v3_indefinite
-msgid "Ironman V3 Indefinite"
-msgstr "Ironman V3 Engapheliyo"
-
-# Organization: Kantonsspitals Chur
-msgid "Kantonsspitals Chur"
-msgstr ""
-
-# Intervention: self_management
-msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
-msgstr "<p>Funda mayela neempawu eziqhelekileyo kumadoda anomhlaza weprosteti, nangeendlela zokuwulawula nokuphucula ezi mpawu.</p>"
-
-# Organization: Aria Health
-msgid "Aria Health"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
-msgid "Ironman V3 Recurring 3Mo Pattern"
-msgstr "Ipateni yeeNyanga ezi-3 ka-Ironman Ebuyelelayo ye-V3"
-
-# Organization: Switzerland (Region/Country Site)
-msgid "Switzerland (Region/Country Site)"
-msgstr ""
-
-# Organization: Redland Hospital
-msgid "Redland Hospital"
-msgstr ""
-
-# Organization: University of California Los Angeles
-msgid "University of California Los Angeles"
-msgstr ""
-
-# Organization: Queen Elizabeth II Jubilee Hospital
-msgid "Queen Elizabeth II Jubilee Hospital"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_indefinite
-msgid "Ironman Indefinite"
-msgstr "Ironman Engenasiphelo"
-
-# AppText: Cellphone
-msgid "Mobile"
-msgstr "Imobhayile"
-
-# Organization: Duke Comprehensive Cancer Center
-msgid "Duke Comprehensive Cancer Center"
-msgstr ""
-
-# Organization: Australia (Region/Country Site)
-msgid "Australia (Region/Country Site)"
-msgstr ""
-
-# Role: promote_without_identity_challenge
-msgid "Promote Without Identity Challenge"
+# Organization: Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital
+msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
 msgstr ""
 
 # AppText: registration title
 msgid "Register for TrueNTH"
 msgstr "Bhalisela i-TrueNTH"
 
+# Organization: Tygerberg Hospital
+msgid "Tygerberg Hospital"
+msgstr ""
+
+# Role: staff
+msgid "Staff"
+msgstr "Abasebenzi"
+
+# Organization: University of Illinois at Chicago
+msgid "University of Illinois at Chicago"
+msgstr ""
+
+# AppText: profileSendEmail invite email_body
+msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
+msgstr "<p>(umbuliso),</p><p>Le imeyile uyithunyelewe kuba usisigulana e(igama lekliniki) yaye unikele imvume yokuthatha inxaxheba Kwiziphumo Zomhlaza Weprosteti- (intlangano yomzali) Uphononongo Lobhaliso.</p><p>Esi sisimemo sokusebenzisa iwebhsaythi yeTrueNTH, apho uza kunikela ingxelo ngempilo yakho. Ukuthatha kwakho inxaxheba kuza kusinceda sonke siphucule unakekelo amadoda alufumanayo ebudeni bohamba lomhlaza weprosteti.</p><p>Ukuze uzalise uxwebhu lwemibuzo lokuqala, nceda uqale uqinisekise iakhawunti yakho.</p><div><a class=\"btn\" href=\"{0}\">Qinisekisa iakhawunti yakho</a></div><p>Ungafikelela nakwiwebhsaythi yeTrueNTH kule linki:<p/><p><a href=\"{0}\">{0}</a></p><p>Yigcine le imeyile ukuze ubuyele kwiTrueNTH nanagliphi na ixesha.</p><p>Ukuba kukho into ofuna ukuyibuza, nceda uqhagamshelane nommeli wakho e(igama lekliniki).</p>"
+
+# Organization: Thomas Jefferson University
+msgid "Thomas Jefferson University"
+msgstr ""
+
+# Organization: Macquarie University Hospital
+msgid "Macquarie University Hospital"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_baseline
+msgid "Ironman Baseline"
+msgstr "Isiseko se-Ironman"
+
+# Intervention: default
+msgid "OTHER: not yet officially supported"
+msgstr "EZINYE: ezingekaxhaswa ngokusemthethweni"
+
+# Organization: USA (Region/Country Site)
+msgid "USA (Region/Country Site)"
+msgstr ""
+
+# Role: admin
+msgid "Admin"
+msgstr "Ulawulo"
+
+# AppText: profileSendEmail reminder email_body
+msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
+msgstr "<p>Molo,</p><p>Le imeyili ithunyelwe kuwe yi (igama lekliniki). Kulapho unika khona ingxelo ngohambo lwakho lomhlaza weprosteti. Inkcazelo ethathiweyo iya kusetyenziselwa ukubona ukuba lungenziwa na uphuculo kuNyamekelo loMhlaza weProsteti.</p><p>Loga ungene ngoku ukuze uzalise uxwebhu lwakho lwemibuzo.</p><div><a class=\"btn\" href=\"{0}\">Qinisekisa i-akhawunti yakho uze uphendule uxwebhu lwakho lwemibuzo ngoku</a></div><p>Cofa iqhosha elingentla okanye usebenzise ilinki engezantsi ukuze utyelele i-TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Ukuba unayo nayiphi na imibuzo okanye izinto ezikuxhalabisayo, nceda uqhagamshelane (igama lekliniki).</p><p><em>— Le imeyili iye yathunyelwa ngenxa yokuba uye wavuma ukuthatha inxaxheba kwiprojekti yokubhalisa ye-TrueNTH</em></p>"
+
+# Organization: Gc Urology
+msgid "Gc Urology"
+msgstr ""
+
+# Organization: Örebro University Hospital
+msgid "Örebro University Hospital"
+msgstr ""
+
+# Intervention: sexual_recovery
+msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
+msgstr "<p>Funda iindlela zokuphuhlisa ubomi bakho obutsha kwezesondo emva konyango lomhlaza weprosteti.</p>"
+
 # Organization: Genesis Cancer Care Queensland
 msgid "Genesis Cancer Care Queensland"
 msgstr ""
 
-# AppText: TrueNTH Global Registry patient privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+# Organization: University of California San Diego
+msgid "University of California San Diego"
+msgstr ""
+
+# classification_enum: Recurring
+msgid "Recurring"
+msgstr "Iyaqhubeka"
+
+# AppText: patient invite email TrueNTH Global Registry
+# AppText: patient invite email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
+
+# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
+msgid "Ironman Recurring 6Mo Pattern"
+msgstr "Ipateni yeeNyanga ezi-6 ka-Ironman Ebuyelelayo"
+
+# Organization: Baylor College of Medicine
+msgid "Baylor College of Medicine"
+msgstr ""
+
+# Organization: Aria Health
+msgid "Aria Health"
+msgstr ""
+
+# classification_enum: Baseline
+msgid "Baseline"
+msgstr "Isiseko"
+
+# Role: promote_without_identity_challenge
+msgid "Promote Without Identity Challenge"
+msgstr ""
+
+# Organization: Australia (Region/Country Site)
+msgid "Australia (Region/Country Site)"
+msgstr ""
+
+# Organization: South Africa (Region/Country Site)
+msgid "South Africa (Region/Country Site)"
+msgstr ""
+
+# AppText: Initial Consent Terms URL
+# AppText: TrueNTH Global Registry patient terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+
+# QuestionnaireBank: CRV_baseline
+msgid "Crv Baseline"
+msgstr ""
 
 # classification_enum: Indefinite
 msgid "Indefinite"
@@ -3106,148 +2814,466 @@ msgstr "Engapheliyo"
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
 
-# AppText: patient reminder email TrueNTH Global Registry
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+# Intervention: decision_support_p3p
+msgid "Decision Support tool"
+msgstr "Isixhobo Sokuxhaswa Kwesigqibo"
+
+# Organization: Winship Cancer Institute Emory University
+msgid "Winship Cancer Institute Emory University"
 msgstr ""
 
-# Organization: Department Of Urology, Princess Alexandra Hospital
-msgid "Department Of Urology, Princess Alexandra Hospital"
+# Organization: Chesapeake Urology Associates
+msgid "Chesapeake Urology Associates"
 msgstr ""
 
-# Organization: Skane University Hospital
-msgid "Skane University Hospital"
+# AppText: layout title
+msgid "Movember TrueNTH"
+msgstr "iTrueNTH kaMovember"
+
+# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern University
+msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
 msgstr ""
 
-# assessment_status: Due
-msgid "Due"
-msgstr "Lixesha layo"
+# Intervention: care_plan
+msgid "Care Plan"
+msgstr "Iplani Yonakekelo"
 
-# Organization: Kantonsspitals St. Gallen
-msgid "Kantonsspitals St. Gallen"
+# AppText: IRONMAN staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+
+# Organization: Sidney Kimmel Comprehensive Cancer Center
+msgid "Sidney Kimmel Comprehensive Cancer Center"
 msgstr ""
 
-# Role: test
-msgid "Test"
-msgstr "Uvavanyo"
-
-# Organization: The Alfred
-msgid "The Alfred"
+# Organization: Queensland University of Technology LDC
+msgid "Queensland University of Technology LDC"
 msgstr ""
 
-# Intervention: default
-msgid "OTHER: not yet officially supported"
-msgstr "EZINYE: ezingekaxhaswa ngokusemthethweni"
+# Role: anon
+msgid "Anon"
+msgstr "I-Anon"
 
-# Role: content_manager
-msgid "Content Manager"
-msgstr "Umphathi Wesiqulatho"
-
-# Intervention: social_support
-msgid "Social Support Network"
-msgstr "Inethiwekhi Yenkxaso Yabantu"
-
-# AppText: IRONMAN staff website consent URL
-# AppText: TrueNTH Global Registry staff website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
-
-# Organization: Guys St. Thomas NHS Foundation Trust
-msgid "Guys St. Thomas NHS Foundation Trust"
-msgstr ""
-
-# Role: analyst
-msgid "Analyst"
-msgstr "Umhlalutyi"
-
-# AppText: IRONMAN patient website consent URL
-# AppText: IRONMAN organization website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
-
-# Intervention: community_of_wellness
-msgid "Community of Wellness"
-msgstr "Abantu Abanempilo-ntle"
-
-# Organization: Easton Hospital
-msgid "Easton Hospital"
-msgstr ""
-
-# Intervention: psa_tracker
-msgid "<p>Remember to update your PSA level.</p>"
-msgstr ""
-
-# assessment_status: In Progress
-msgid "In Progress"
-msgstr "Iyaqhubeka"
-
-# Organization: IRONMAN
-msgid "IRONMAN"
-msgstr ""
-
-# Organization: Ottawa Hospital Cancer Centre
-msgid "Ottawa Hospital Cancer Centre"
+# Organization: Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
 msgstr ""
 
 # QuestionnaireBank: IRONMAN_v3_recurring_6mo_pattern
 msgid "Ironman V3 Recurring 6Mo Pattern"
 msgstr "Ipateni yeeNyanga ezi-6 ka-Ironman Ebuyelelayo ye-V3"
 
-# Role: write_only
-msgid "Write Only"
-msgstr "Bhala Kuphela"
-
-# Organization: Columbia University
-msgid "Columbia University"
+# Organization: Urology South Brisbane
+msgid "Urology South Brisbane"
 msgstr ""
 
-# AppText: IRONMAN staff privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
-
-# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
-msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
+# Organization: University of Michigan
+msgid "University of Michigan"
 msgstr ""
 
-# AppText: profileSendEmail reminder email_subject
-msgid "Report your health on TrueNTH. Email from (clinic name)"
-msgstr "Nikela ingxelo ngempilo yakho kwiTrueNTH. I-imeyile esuka (igama lekliniki)"
+# Intervention: self_management
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
+msgstr "<p>Funda mayela neempawu eziqhelekileyo kumadoda anomhlaza weprosteti, nangeendlela zokuwulawula nokuphucula ezi mpawu.</p>"
 
-# Organization: Baylor College of Medicine
-msgid "Baylor College of Medicine"
-msgstr ""
+# AppText: consent date label
+msgid "Study Consent Date"
+msgstr "Umhla Wemvume Yophononongo"
 
-# Organization: Gc Urology
-msgid "Gc Urology"
-msgstr ""
+# assessment_status: Expired
+msgid "Expired"
+msgstr "iphelelwe"
 
-# Role: researcher
-msgid "Researcher"
-msgstr "Umphandi"
+# QuestionnaireBank: IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr "Ironman Engenasiphelo"
 
 # Organization: Centro de Pesquisa em Oncologia
 msgid "Centro de Pesquisa em Oncologia"
+msgstr ""
+
+# AppText: TrueNTH Global Registry patient privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+
+# QuestionnaireBank: IRONMAN_v3_baseline
+msgid "Ironman V3 Baseline"
+msgstr "Isiseko se-Ironman V3"
+
+# assessment_status: In Progress
+msgid "In Progress"
+msgstr "Iyaqhubeka"
+
+# Role: analyst
+msgid "Analyst"
+msgstr "Umhlalutyi"
+
+# Organization: none of the above
+msgid "none of the above"
+msgstr "Ayikho kwezi Zingasentla"
+
+# QuestionnaireBank: IRONMAN_recurring_annual_pattern
+msgid "Ironman Recurring Annual Pattern"
+msgstr "Ipateni yoNyaka ye-Ironman Ebuyelelayo"
+
+# Intervention: music
+msgid "MUSIC Integration"
 msgstr ""
 
 # assessment_status: Overdue
 msgid "Overdue"
 msgstr "Idlulelwe lixesha"
 
+# Organization: Duke Comprehensive Cancer Center
+msgid "Duke Comprehensive Cancer Center"
+msgstr ""
+
+# Organization: Test Site
+msgid "Test Site"
+msgstr ""
+
+# ResearchProtocol: TNGR v1
+msgid "Tngr V1"
+msgstr ""
+
+# Role: access_on_verify
+msgid "Access On Verify"
+msgstr "Ufikelelo kuHlolo"
+
+# Organization: University of California Los Angeles
+msgid "University of California Los Angeles"
+msgstr ""
+
+# AppText: patient reminder email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff website consent URL
+# AppText: IRONMAN staff website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+
+# QuestionnaireBank: IRONMAN_v3_indefinite
+msgid "Ironman V3 Indefinite"
+msgstr "Ironman V3 Engapheliyo"
+
+# AppText: IRONMAN patient terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+
+# Organization: University of Washington
+msgid "University of Washington"
+msgstr ""
+
+# ResearchProtocol: IRONMAN v3
+msgid "Ironman V3"
+msgstr "I-Ironman V3"
+
+# Organization: Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
+msgstr ""
+
+# Organization: Redland Hospital
+msgid "Redland Hospital"
+msgstr ""
+
+# Organization: Canada (Region/Country Site)
+msgid "Canada (Region/Country Site)"
+msgstr ""
+
+# AppText: landing title
+msgid "Report your health in order to improve prostate cancer care."
+msgstr ""
+
+# Organization: University of Wisconsin
+msgid "University of Wisconsin"
+msgstr ""
+
+# Organization: Wesley Urology Clinic
+msgid "Wesley Urology Clinic"
+msgstr ""
+
+# Role: service
+msgid "Service"
+msgstr "Inkonzo"
+
+# AppText: patient reminder email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgstr ""
+
+# assessment_status: Completed
+msgid "Completed"
+msgstr "Igqityiwe"
+
+# Role: write_only
+msgid "Write Only"
+msgstr "Bhala Kuphela"
+
+# AppText: IRONMAN website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
+
+# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
+msgid "Ironman V3 Recurring 3Mo Pattern"
+msgstr "Ipateni yeeNyanga ezi-3 ka-Ironman Ebuyelelayo ye-V3"
+
+# Organization: Australian Urology Associates (AUA)
+msgid "Australian Urology Associates (AUA)"
+msgstr ""
+
+# Organization: Kantonsspitals Chur
+msgid "Kantonsspitals Chur"
+msgstr ""
+
+# Organization: Brazil (Region/Country Site)
+msgid "Brazil (Region/Country Site)"
+msgstr ""
+
+# Organization: Dana-Farber Cancer Institute
+msgid "Dana-Farber Cancer Institute"
+msgstr ""
+
+# Role: partner
+msgid "Partner"
+msgstr "Iqabane"
+
+# Intervention: assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+# AppText: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Nikela ingxelo ngempilo yakho kwiTrueNTH. I-imeyile esuka (igama lekliniki)"
+
+# AppText: patient invite email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+
+# assessment_status: Due
+msgid "Due"
+msgstr "Lixesha layo"
+
+# Organization: Queen Elizabeth II Jubilee Hospital
+msgid "Queen Elizabeth II Jubilee Hospital"
+msgstr ""
+
+# Organization: Epworth Healthcare
+msgid "Epworth Healthcare"
+msgstr ""
+
+# Organization: Australia Recruiting Site B
+msgid "Australia Recruiting Site B"
+msgstr ""
+
+# Organization: United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
+msgstr ""
+
+# Organization: Columbia University
+msgid "Columbia University"
+msgstr ""
+
+# AppText: About TrueNTH URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+
+# AppText: IRONMAN patient website consent URL
+# AppText: IRONMAN organization website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+
+# Organization: AUA Local Data Center
+msgid "AUA Local Data Center"
+msgstr ""
+
+# Intervention: psa_tracker
+msgid "PSA Tracker"
+msgstr ""
+
+# Organization: Weill Cornell Medical Center
+msgid "Weill Cornell Medical Center"
+msgstr ""
+
+# Organization: Oregon Health and Sciences Cancer Center
+msgid "Oregon Health and Sciences Cancer Center"
+msgstr ""
+
+# Role: test
+msgid "Test"
+msgstr "Uvavanyo"
+
+# AppText: IRONMAN staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+
+# Organization: TrueNTH Global Registry
+msgid "TrueNTH Global Registry"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
+msgid "Ironman V3 Recurring Annual Pattern"
+msgstr "Ipateni yoNyaka ye-Ironman Ebuyelelayo ye-V3"
+
 # Intervention: sexual_recovery
 msgid "Sexual Recovery"
 msgstr "Ukuphila Kwezesondo"
 
-# Role: anon
-msgid "Anon"
-msgstr "I-Anon"
-
-# Organization: South Africa (Region/Country Site)
-msgid "South Africa (Region/Country Site)"
+# Organization: Wayne St. University Karmanos Cancer Institute
+msgid "Wayne St. University Karmanos Cancer Institute"
 msgstr ""
 
-# Organization: USA (Region/Country Site)
-msgid "USA (Region/Country Site)"
+# Organization: Easton Hospital
+msgid "Easton Hospital"
 msgstr ""
 
-# Intervention: sexual_recovery
-msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
-msgstr "<p>Funda iindlela zokuphuhlisa ubomi bakho obutsha kwezesondo emva konyango lomhlaza weprosteti.</p>"
+# Organization: University of Chicago
+msgid "University of Chicago"
+msgstr ""
+
+# Organization: Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
+msgstr ""
+
+# Organization: Doylestown Health
+msgid "Doylestown Health"
+msgstr ""
+
+# Organization: IRONMAN
+msgid "IRONMAN"
+msgstr ""
+
+# Organization: University of Virgina (UVA)
+msgid "University of Virgina (UVA)"
+msgstr ""
+
+# Organization: Juravinski Cancer Centre
+msgid "Juravinski Cancer Centre"
+msgstr ""
+
+# Organization: The Alfred
+msgid "The Alfred"
+msgstr ""
+
+# Organization: AU B Child Site 2
+msgid "AU B Child Site 2"
+msgstr ""
+
+# Organization: Skane University Hospital
+msgid "Skane University Hospital"
+msgstr ""
+
+# AppText: IRONMAN staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+
+# ResearchProtocol: IRONMAN v2
+msgid "Ironman V2"
+msgstr "I-Ironman V2"
+
+# Organization: University of North Carolina
+msgid "University of North Carolina"
+msgstr ""
+
+# Organization: Eastern Health
+msgid "Eastern Health"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+
+# AppText: TrueNTH Global Registry staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+
+# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
+msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
+msgstr ""
+
+# Intervention: community_of_wellness
+msgid "Community of Wellness"
+msgstr "Abantu Abanempilo-ntle"
+
+# Intervention: care_plan
+msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
+msgstr "<p>Intlangano kunye nokuxhaswa kweenkcukacha ezininzi zobomi njengomntu osinde kumhlaza weprosteti</p>"
+
+# AppText: Cellphone
+msgid "Mobile"
+msgstr "Imobhayile"
+
+# Intervention: decision_support_p3p
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
+msgstr " <p>Khangela amaxabiso akho, ukhetho lwakho, kunye nolwazi lwakho lwangoku lwezempilo ukuze sikuncede uxoxe ngokhetho lwakho lonyango kunye nogqirha wakho.</p>"
+
+# Role: researcher
+msgid "Researcher"
+msgstr "Umphandi"
+
+# Role: application_developer
+msgid "Application Developer"
+msgstr "UMyili we-Aplikeyishini"
+
+# Intervention: decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr "i-Decision Support WiserCare"
+
+# AppText: site summary email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+
+# Organization: BC Cancer Agency
+msgid "BC Cancer Agency"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+
+# Organization: Centre Hospitalier de l'Université de Montréal
+msgid "Centre Hospitalier de l'Université de Montréal"
+msgstr ""
+
+# Organization: Princess Alexandra Hospital
+msgid "Princess Alexandra Hospital"
+msgstr ""
+
+# Organization: Westmead Hospital
+msgid "Westmead Hospital"
+msgstr ""
+
+# Organization: AU B Child Site 1
+msgid "AU B Child Site 1"
+msgstr ""
+
+# AppText: TrueNTH Global Registry organization website consent URL
+# AppText: TrueNTH Global Registry patient website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+
+# Intervention: social_support
+msgid "Social Support Network"
+msgstr "Inethiwekhi Yenkxaso Yabantu"
+
+# Role: intervention_staff
+msgid "Intervention Staff"
+msgstr "Abasebenzi boNgenelelo"
+
+# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
+msgid "Ironman Recurring 3Mo Pattern"
+msgstr "Ipateni yeeNyanga ezi-3 ka-Ironman Ebuyelelayo"
+
+# Organization: CHU de Quebec - Universite Laval
+msgid "CHU de Quebec - Universite Laval"
+msgstr ""
+
+# AppText: site summary email
+# AppText: site summary email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+
+# Organization: Sweden (Region/Country Site)
+msgid "Sweden (Region/Country Site)"
+msgstr ""
+
+# Organization: Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
+msgstr ""
