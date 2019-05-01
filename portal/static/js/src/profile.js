@@ -1687,10 +1687,14 @@ export default (function() {
                     if (callback) { callback(); }
                 }, 1000, self.manualEntryModalVis);
             },
-            setInitManualEntryCompletionDate: function() {
+            setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
                 //set initial completion date as GMT date/time for today based on user timezone
                 this.manualEntry.completionDate = this.manualEntry.todayObj.gmtDate;
+            },
+            setInitManualEntryCompletionDate: function() {
+                //set initial completion date as GMT date/time for today based on user timezone
+                this.setManualEntryDateToToday();
                 //comparing consent date to completion date without the time element
                 if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") === 
                     this.modules.tnthDates.formatDateString(this.manualEntry.completionDate, "iso-short")) {
@@ -1752,9 +1756,12 @@ export default (function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
-                        //if method is interview assisted, reset completion date to GMT date/time for today (or consent date/time if same as today)
-                        self.setInitManualEntryCompletionDate();
+                        //if method is interview assisted, reset completion date to GMT date/time for today
+                        self.setManualEntryDateToToday();
+                        return;
                     }
+                    //paper entry
+                    self.setInitManualEntryCompletionDate();
                 });
 
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
