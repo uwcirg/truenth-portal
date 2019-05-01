@@ -1687,6 +1687,21 @@ export default (function() {
                     if (callback) { callback(); }
                 }, 1000, self.manualEntryModalVis);
             },
+            setManualEntryDateToToday: function() {
+                this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
+                //set initial completion date as GMT date/time for today based on user timezone
+                this.manualEntry.completionDate = this.manualEntry.todayObj.gmtDate;
+            },
+            setInitManualEntryCompletionDate: function() {
+                //set initial completion date as GMT date/time for today based on user timezone
+                this.setManualEntryDateToToday();
+                //comparing consent date to completion date without the time element
+                if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") === 
+                    this.modules.tnthDates.formatDateString(this.manualEntry.completionDate, "iso-short")) {
+                    //set completion date/time to consent date/time if equal
+                    this.manualEntry.completionDate = this.manualEntry.consentDate;
+                }
+            },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
                 $(window).on("beforeunload", function() { //fix for safari
@@ -1701,8 +1716,6 @@ export default (function() {
                 $("#manualEntryModal").on("shown.bs.modal", function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = "";
-                    self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //get GMT date/time for today
-                    self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -1716,8 +1729,7 @@ export default (function() {
                         });
                         if (items.length) { 
                             //consent date in GMT
-                            self.manualEntry.consentDate = items[0].acceptance_date;
-                            return;
+                            self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(items[0].acceptance_date, "system");
                         }
                         //to reach here patient might have withdrawn?
                         //do check for that
@@ -1731,9 +1743,11 @@ export default (function() {
                                 return item.deleted && Consent.hasConsentedFlags(item);
                             });
                             if (consentItems.length) {
-                                self.manualEntry.consentDate = consentItems[0].acceptance_date;
+                                self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(consentItems[0].acceptance_date, "system");
                             }
                         }
+                        //set completion date once consent date/time has been set
+                        self.setInitManualEntryCompletionDate();
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
                 });
@@ -1742,9 +1756,12 @@ export default (function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
-                        self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //if method is interview assisted, reset completion date to GMT date/time for today
-                        self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
+                        //if method is interview assisted, reset completion date to GMT date/time for today
+                        self.setManualEntryDateToToday();
+                        return;
                     }
+                    //paper entry
+                    self.setInitManualEntryCompletionDate();
                 });
 
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
