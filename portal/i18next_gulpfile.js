@@ -57,8 +57,8 @@ const saveFile = function(target) {
 function i18nextScanner(files, outputFileName, callback) {
   return src(files)
                .pipe(scanner({
-                    keySeparator: "|",
-                    nsSeparator: "|",
+                    keySeparator: false,
+                    nsSeparator: false,
                     attr: {
                         list: ["data-i18n"],
                         extensions: [".js", ".html", ".htm"]
@@ -69,7 +69,8 @@ function i18nextScanner(files, outputFileName, callback) {
                     },
                     resource: {
                         //the source path is relative to current working directory as specified in the destination folder
-                        savePath: outputFileName
+                        savePath: outputFileName,
+                        lineEnding: false
                     },
                     interpolation: {
                         prefix: "{",
@@ -204,7 +205,10 @@ exports.i18nextConvertTruenthJSONToPOT = series(i18nextExtractionTruenth, i18nex
 const i18nextConvertJSONToPOT = function(callback) {
   options = {
     /*
-    specify options here */
+     * default value for this is '_', which will cut off strings containing '_' unexpectedly
+     * see documentation: https://github.com/i18next/i18next-gettext-converter
+     */
+    ctxSeparator: false
   };
   console.log("Converting common JSON source file to POT file...");
   i18nextConv.i18nextToPot("en", fs.readFileSync(translationSourceDir+nameSpace+".json"), options).then(saveFile(srcPotFileName));
