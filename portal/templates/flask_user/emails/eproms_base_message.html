@@ -6,3 +6,6 @@
 <p>Thank you,</p>
 <p>The TrueNTH Team</p>
 {% endtrans %}
+{% trans parent_org=user.first_top_organization().name %}
+<p>Please do not reply to this email. If you have any questions about this message, reach out to your {{ parent_org }} representative and they will gladly assist.</p>
+{% endtrans %}

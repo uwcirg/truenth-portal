@@ -347,7 +347,7 @@
             {%- endif -%}
         </div>
         <div class="buttons-container">
-            <div class="loading-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <div class="loading-indicator invisible"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
             <button id="btnProfileSendEmail" class="btn btn-tnth-primary sm-btn btn-send-email" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{ _("Send email") }}</button>
         </div>
         <div id="profileEmailMessage" class="text-info"></div>
@@ -929,6 +929,7 @@
             <option value="America/Los_Angeles">{{_("America/Los Angeles")}}</option>
             <option value="America/Indianapolis">{{_("America/Indianapolis")}}</option>
             <option value="America/New_York">{{_("America/New York")}}</option>
+            <option value="America/Sao_Paulo">{{_("America/Sao Paulo")}}</option>
             <option value="Australia/Adelaide">{{_("Australia/Adelaide")}}</option>
             <option value="Australia/Brisbane">{{_("Australia/Brisbane")}}</option>
             <option value="Australia/Broken_Hill">{{_("Australia/Broken_Hill")}}</option>

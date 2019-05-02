@@ -665,6 +665,8 @@ class OrganizationIdentifier(db.Model):
 
     __table_args__ = (UniqueConstraint(
         'organization_id', 'identifier_id', name='_organization_identifier'),)
+    identifier = db.relationship(
+        'Identifier', cascade="save-update", foreign_keys=[identifier_id])
 
 
 class OrgNode(object):

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
+from time import sleep
 
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
@@ -126,6 +127,8 @@ class TestUserConsent(TestCase):
         assert consent.organization_id, org1.id
         assert consent.staff_editable
         assert not consent.send_reminders
+        assert consent.acceptance_date.replace(
+            microsecond=0) == consent.acceptance_date
 
     def test_post_user_consent_dates(self):
         self.shallow_org_tree()
@@ -173,6 +176,8 @@ class TestUserConsent(TestCase):
         first_user_acceptance_date = consent.acceptance_date
 
         # now add second, confirm time moved
+        # sleep for a second given microsecond chop on acceptance_dates
+        sleep(1)
         second_user = self.add_user('second')
         self.login(user_id=second_user.id)
         response = self.client.post(

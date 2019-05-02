@@ -1,0 +1,170 @@
+ /* overriding main css with inline style */
+ @borderColor: #ececec;
+ @labelColor: #68727e;
+ @singletonLegendColor: #7C959E;
+#fillOrgs.org-tree {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    input.clinic {
+        display: none;
+    }
+    margin: 1em !important;
+    font-size: 10pt;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    * {
+        font-size: 12px;
+    }
+    .indent {
+        padding: 0 2.5em;
+    }
+    .sub-text,
+    .json-link {
+        font-size: 10px;
+    }
+    .sub-text {
+        font-weight: 300;
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    .json-link {
+        font-weight: 300;
+        margin-left: 1em;
+        display: inline-block;
+        font-size: 10px;
+        letter-spacing: 0.1rem;
+        text-decoration: underline;
+    }
+    legend {
+        .json-link {
+            color: #FFF;
+        }
+        .json-link:hover {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #3B4551;
+        }
+    }
+    .text-muted,
+    .singleton {
+        color: @labelColor;
+        display: inline-block;
+        border: 1px solid @borderColor;
+        padding: 0.5em !important;
+    }
+    .parent-org-container {
+        margin: 1em 0;
+        max-width: 100%;
+    }
+    .parent-org-container,
+    .sub-org-container {
+        padding: 0.5em;
+    }
+    .sub-org-container {
+        border: 2px solid @borderColor;
+        margin-bottom: 0.25em;
+        .singleton {
+            border: 0;
+        }
+    }
+    .text-muted{
+        &:after {
+            content: "\2193";
+            display: block;
+            width: 20px;
+            margin: auto;
+        }
+        &.singleton:after {
+            content: "";
+        }
+    }
+    .text-muter {
+        color: @labelColor;
+        opacity: 0.8;
+        display: inline-block;
+        padding: 0.5em;
+        border: 1px solid @borderColor !important;
+    }
+    .child-item {
+        border: 1px solid @borderColor;
+    }
+    legend,
+    .parent-singleton legend {
+        background: @singletonLegendColor;
+        color: #FFF;
+        margin: 4px 0;
+        font-size: 14px !important;
+        letter-spacing: 0.05rem;
+        font-weight: 500;
+        border: 1px solid @borderColor;
+        padding: 0.5em;
+        display: inline-block;
+    }
+    .parent-org-container legend:after,
+    legend.singleton:after {
+        content: "\2193";
+        display: block;
+        width: 20px;
+        margin-left: 2em;
+    }
+    .parent-singleton {
+        padding: 4px;
+        * {
+            font-size: 14px;
+            font-weight: 500;
+            background: @singletonLegendColor;
+            color: #FFF;
+        }
+        label.org-label { /* single parent org label */
+            display: block;
+            width: 100%;
+            left: 0;
+            background: #FFF;
+            color: @labelColor;
+            border: 2px solid @borderColor;
+            .sub-text,
+            .json-link,
+            input {
+                display: none !important;
+            }
+            :after {
+                content: "( single parent org )";
+                display: block;
+                width: 100%;
+                color: @labelColor;
+                font-weight: 200;
+            }
+        }
+        .sub-text,
+        .json-link  {
+            font-weight: 200;
+            font-size: 10px;
+        }
+        label {
+            top: 2px;
+            padding: 4px;
+        }
+    }
+    div.org-container {
+        label.org-label {
+            margin: 0.5em 0;
+            padding: 0.35em 0.25em;
+        }
+    }
+    .info {
+        margin: 1em 1em 0;
+        border: 1px solid;
+        padding: 0.5em;
+        display: inline-block;
+        color: #9a9894;
+        font-size: 0.9em;
+    }
+}
+@media (min-width: 1200px) {
+    #fillOrgs.org-tree {
+        justify-content: space-between;
+        flex-wrap: nowrap;
+    }
+}

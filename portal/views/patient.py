@@ -338,7 +338,7 @@ def patient_timeline(patient_id):
     posted = [{
         'at, qb, iteration, status, name': "{}, {}, {}, {}, {}".format(
             qnr.authored,
-            qb_names[qnr.questionnaire_bank_id],
+            qb_names.get(qnr.questionnaire_bank_id),
             qnr.qb_iteration,
             qnr.status,
             qnr.document['questionnaire']['reference'].split('/')[-1])

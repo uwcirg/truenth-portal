@@ -233,7 +233,7 @@ class QB_Status(object):
         org = self.user.first_top_organization()
         return getattr(org, 'name', '')
 
-    def current_qbd(self, classification=None):
+    def current_qbd(self, classification=None, even_if_withdrawn=False):
         """ Looks for current QBD for given parameters
 
         If the user has a valid questionnaire bank for the given as_of_date
@@ -241,14 +241,15 @@ class QB_Status(object):
         (QBD), which fully defines the questionnaire bank, iteration, recur
         and start date.
 
-        :param as_of_date: point in time for reference, frequently utcnow
         :param classification: None defaults to all, special case for
           ``indefinite``
-        :return: QBD for best match, on None
+        :param even_if_withdrawn: Set true to get the current, even if the
+          patient may be in a withdrawn state.  By default, post the withdrawal
+          date, a patient doesn't have a current QBD.
+        :return: QBD for best match, or None
 
         """
-        if self.withdrawn_by(self.as_of_date):
-            # User effectively withdrawn, no current
+        if not even_if_withdrawn and self.withdrawn_by(self.as_of_date):
             return None
         if classification == 'indefinite':
             return self._current_indef

@@ -1177,7 +1177,7 @@ export default (function() {
                     }
                     var resetBtn = function(disabled, showLoading) {
                         disabled = disabled || false;
-                        btnSelf.attr("disabled", disabled).show();
+                        btnSelf.attr("disabled", disabled).removeClass("opaque");
                         self.patientEmailForm.loading = showLoading;
                         if (!disabled) {
                             btnSelf.removeClass("disabled");
@@ -1186,7 +1186,7 @@ export default (function() {
                         }
                     };
                     resetBtn(true, true);
-                    btnSelf.hide();
+                    btnSelf.addClass("opaque");
                     $.ajax({ //get email content via API
                         type: "GET",
                         url: emailUrl,
@@ -1258,7 +1258,6 @@ export default (function() {
                         return parentName ? parentName : i18next.t("your clinic");
                     })();
                     $(this).addClass("disabled").attr("disabled", true);
-                    $("#sendRegistrationEmailForm .loading-indicator").show();
                     $("#profileEmailErrorMessage").html("");
                     var btnRef = $(this);
                     $.ajax({
@@ -1283,7 +1282,7 @@ export default (function() {
                     if (!subject) {
                         subject = i18next.t("Registration invite from {clinicName}").replace("{clinicName}", clinicName);
                     }
-
+                    $("#sendRegistrationEmailForm .loading-indicator").addClass("visible").removeClass("invisible");
                     self.modules.tnthAjax.invite(self.subjectId, {
                         "subject": subject,"recipients": email,"body": body}, function(data) {
                         if (!data.error) {
@@ -1299,7 +1298,7 @@ export default (function() {
                                 $("#profileEmailErrorMessage").text(i18next.t("Error occurred while sending invite email."));
                             }
                         }
-                        $("#sendRegistrationEmailForm .loading-indicator").hide();
+                        $("#sendRegistrationEmailForm .loading-indicator").addClass("invisible").removeClass("visible");
                         btnRef.removeClass("disabled").attr("disabled", false);
                     });
                 });
@@ -1688,6 +1687,21 @@ export default (function() {
                     if (callback) { callback(); }
                 }, 1000, self.manualEntryModalVis);
             },
+            setManualEntryDateToToday: function() {
+                this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
+                //set initial completion date as GMT date/time for today based on user timezone
+                this.manualEntry.completionDate = this.manualEntry.todayObj.gmtDate;
+            },
+            setInitManualEntryCompletionDate: function() {
+                //set initial completion date as GMT date/time for today based on user timezone
+                this.setManualEntryDateToToday();
+                //comparing consent date to completion date without the time element
+                if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") === 
+                    this.modules.tnthDates.formatDateString(this.manualEntry.completionDate, "iso-short")) {
+                    //set completion date/time to consent date/time if equal
+                    this.manualEntry.completionDate = this.manualEntry.consentDate;
+                }
+            },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
                 $(window).on("beforeunload", function() { //fix for safari
@@ -1702,8 +1716,6 @@ export default (function() {
                 $("#manualEntryModal").on("shown.bs.modal", function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = "";
-                    self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //get GMT date/time for today
-                    self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -1717,8 +1729,7 @@ export default (function() {
                         });
                         if (items.length) { 
                             //consent date in GMT
-                            self.manualEntry.consentDate = items[0].acceptance_date;
-                            return;
+                            self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(items[0].acceptance_date, "system");
                         }
                         //to reach here patient might have withdrawn?
                         //do check for that
@@ -1732,9 +1743,11 @@ export default (function() {
                                 return item.deleted && Consent.hasConsentedFlags(item);
                             });
                             if (consentItems.length) {
-                                self.manualEntry.consentDate = consentItems[0].acceptance_date;
+                                self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(consentItems[0].acceptance_date, "system");
                             }
                         }
+                        //set completion date once consent date/time has been set
+                        self.setInitManualEntryCompletionDate();
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
                 });
@@ -1743,9 +1756,12 @@ export default (function() {
                     self.manualEntry.errorMessage = "";
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
-                        self.manualEntry.todayObj = self.modules.tnthDates.getTodayDateObj(); //if method is interview assisted, reset completion date to GMT date/time for today
-                        self.manualEntry.completionDate = self.manualEntry.todayObj.gmtDate;
+                        //if method is interview assisted, reset completion date to GMT date/time for today
+                        self.setManualEntryDateToToday();
+                        return;
                     }
+                    //paper entry
+                    self.setInitManualEntryCompletionDate();
                 });
 
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
@@ -1864,12 +1880,16 @@ export default (function() {
             },
             initAuditLogSection: function() {
                 var self = this;
+                $("#profileAuditLogTable").html(Utility.getLoaderHTML());
+                $("#profileAuditLogTable .loading-message-indicator").show();
                 this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
                     if (data.error) {
+                        $("#profileAuditLogTable").html("");
                         $("#profileAuditLogErrorMessage").text(i18next.t("Problem retrieving audit log from server."));
                         return false;
                     }
                     if (!data.audits || data.audits.length === 0) {
+                        $("#profileAuditLogTable").html("");
                         $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
                         return false;
                     }
@@ -1895,6 +1915,7 @@ export default (function() {
                         );
                         fData.push(item);
                     });
+                    $("#profileAuditLogTable").html("");
                     $("#profileAuditLogTable").bootstrapTable(self.setBootstrapTableConfig({
                         data: fData,
                         classes: "table table-responsive profile-audit-log",

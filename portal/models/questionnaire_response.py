@@ -11,10 +11,10 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from .audit import Audit
+from .encounter import Encounter
 from .fhir import bundle_results
-from .identifier import Identifier
 from .questionnaire import Questionnaire
 from .reference import Reference
 from .user import User, patients_query
@@ -197,9 +197,8 @@ class QuestionnaireResponse(db.Model):
         return document
 
 
-
-QNR = namedtuple(
-    'QNR', ['qb_id', 'iteration', 'status', 'instrument', 'authored'])
+QNR = namedtuple('QNR', [
+    'qb_id', 'iteration', 'status', 'instrument', 'authored', 'encounter_id'])
 
 
 class QNR_results(object):
@@ -215,7 +214,8 @@ class QNR_results(object):
             QuestionnaireResponse.status,
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')].label('instrument_id'),
-            QuestionnaireResponse.authored).order_by(
+            QuestionnaireResponse.authored,
+            QuestionnaireResponse.encounter_id).order_by(
             QuestionnaireResponse.authored)
         if qb_id:
             query = query.filter(
@@ -228,7 +228,8 @@ class QNR_results(object):
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=qnr.instrument_id.split('/')[-1],
-                authored=qnr.authored))
+                authored=qnr.authored,
+                encounter_id=qnr.encounter_id))
 
     def earliest_result(self, qb_id, iteration):
         """Returns timestamp of earliest result for given params, or None"""
@@ -236,6 +237,14 @@ class QNR_results(object):
             if (qnr.qb_id == qb_id and
                     qnr.iteration == iteration):
                 return qnr.authored
+
+    def entry_method(self):
+        """Returns first entry method found in results, or None"""
+        for qnr in self.qnrs:
+            if qnr.encounter_id is not None:
+                encounter = Encounter.query.get(qnr.encounter_id)
+                if encounter.type and len(encounter.type):
+                    return encounter.type[0].code
 
     def required_qs(self, qb_id):
         """Return required list (order counts) of Questionnaires for QB"""
@@ -291,7 +300,8 @@ class QNR_indef_results(QNR_results):
             QuestionnaireResponse.status,
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')].label('instrument_id'),
-            QuestionnaireResponse.authored).order_by(
+            QuestionnaireResponse.authored,
+            QuestionnaireResponse.encounter_id).order_by(
             QuestionnaireResponse.authored)
 
         self.qnrs = []
@@ -301,7 +311,8 @@ class QNR_indef_results(QNR_results):
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=qnr.instrument_id.split('/')[-1],
-                authored=qnr.authored))
+                authored=qnr.authored,
+                encounter_id=qnr.encounter_id))
 
 
 def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):

@@ -152,3 +152,23 @@ def localize_datetime(dt, user):
         best = dt
     d, m, y = best.strftime('%-d %b %Y').split()
     return ' '.join((d, _(m), y))
+
+
+def utcnow_sans_micro():
+    """Returns datetime.utcnow() with 0 microseconds
+
+    This is used by clients that don't need the microsecond accuracy,
+    and found it problematic in practice.
+
+    For example, some 3rd party clients can't handle parsing more than 3
+    digits of microseconds - difficult to guess which way to round for
+    all circumstances, and comparisons will fail should the db have a
+    microsecond value, and one of the variables does not.
+
+    By storing time values truncated to the nearest second, the return
+    datetime from any API using ``date_tools.as_fhir()`` will reliably
+    compare as expected.
+
+    """
+    now = datetime.utcnow()
+    return now.replace(microsecond=0)
