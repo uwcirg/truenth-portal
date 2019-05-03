@@ -31,7 +31,7 @@ setup_python_venv() {
     fi
 
     echo "Creating new Python virtual environment: ${python_venv_path}"
-    virtualenv "${python_venv_path}"
+    virtualenv "${python_venv_path}" --system-site-packages
 }
 
 
