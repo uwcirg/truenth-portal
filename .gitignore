@@ -19,7 +19,7 @@ pip-selfcheck.json
 log
 portal/test_uploads
 docker/portal.env
-docker/docker-compose.pb.yaml
+docker/docker-compose.dev.*.yaml
 
 geckodriver.log
 coverage.xml
