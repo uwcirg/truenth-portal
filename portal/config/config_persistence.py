@@ -1,4 +1,3 @@
-import logging
 import os
 
 from flask import current_app
@@ -27,10 +26,6 @@ class ConfigPersistence(ModelPersistence):
             raise ValueError(
                 "didn't find expected 'resourceType': {}".format(
                     SITE_CFG))
-        if not os.access(cfg_file, os.W_OK):
-            logging.warning("Can't write config to {}, skipping".format(
-                cfg_file))
-            return
         with open(cfg_file, 'w') as fp:
             for line in cfg_data['results']:
                 fp.write(line)
