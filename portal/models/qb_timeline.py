@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from flask import current_app
 from sqlalchemy.types import Enum as SQLA_Enum
 import redis
+from time import sleep
 from werkzeug.exceptions import BadRequest
 
 from ..audit import auditable_event
@@ -406,121 +407,140 @@ def update_users_QBT(user_id, invalidate_existing=False):
     :param invalidate_existing: set true to wipe any current rows first
 
     """
-    # acquire a multiprocessing lock to prevent multiple requests
-    # from duplicating rows during this slow process
-    timeout = current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT")
-    key = "update_users_QBT user:{}".format(user_id)
+    def attempt_update(user_id, invalidate_existing):
+        """Updates user's QBT or raises if lock is unattainable"""
 
-    with TimeoutLock(key=key, timeout=timeout):
-        if invalidate_existing:
-            QBT.query.filter(QBT.user_id == user_id).delete()
+        # acquire a multiprocessing lock to prevent multiple requests
+        # from duplicating rows during this slow process
+        timeout = current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT")
+        key = "update_users_QBT user:{}".format(user_id)
 
-        # if any rows are found, assume this user is current
-        if QBT.query.filter(QBT.user_id == user_id).count():
-            trace(
-                "found QBT rows, returning cached for {}".format(user_id))
-            return
+        with TimeoutLock(key=key, timeout=timeout):
+            if invalidate_existing:
+                QBT.query.filter(QBT.user_id == user_id).delete()
 
-        user = User.query.get(user_id)
-        if not user.has_role(ROLE.PATIENT.value):
-            raise ValueError("QB time line only applies to patients")
+            # if any rows are found, assume this user is current
+            if QBT.query.filter(QBT.user_id == user_id).count():
+                trace(
+                    "found QBT rows, returning cached for {}".format(user_id))
+                return
 
-        # Create time line for user, from initial trigger date
-        qb_generator = ordered_qbs(user)
-        user_qnrs = QNR_results(user)
+            user = User.query.get(user_id)
+            if not user.has_role(ROLE.PATIENT.value):
+                raise ValueError("QB time line only applies to patients")
 
-        # As we move forward, capture state at each time point
+            # Create time line for user, from initial trigger date
+            qb_generator = ordered_qbs(user)
+            user_qnrs = QNR_results(user)
 
-        pending_qbts = AtOrderedList()
-        kwargs = {"user_id": user_id}
-        for qbd in qb_generator:
-            qb_recur_id = qbd.recur.id if qbd.recur else None
-            kwargs = {
-                "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
-                "qb_iteration": qbd.iteration, "qb_recur_id": qb_recur_id}
-            start = qbd.relative_start
-            # Always add start (due)
-            pending_qbts.append(QBT(at=start, status='due', **kwargs))
+            # As we move forward, capture state at each time point
 
-            expired_date = start + RelativeDelta(
-                qbd.questionnaire_bank.expired)
-            overdue_date = None
-            if qbd.questionnaire_bank.overdue:  # not all qbs define
-                overdue_date = start + RelativeDelta(
-                    qbd.questionnaire_bank.overdue)
-            partial_date = user_qnrs.earliest_result(
-                qbd.questionnaire_bank.id, qbd.iteration)
-            include_overdue, include_expired = True, True
-            complete_date, expired_as_partial = None, False
+            pending_qbts = AtOrderedList()
+            kwargs = {"user_id": user_id}
+            for qbd in qb_generator:
+                qb_recur_id = qbd.recur.id if qbd.recur else None
+                kwargs = {
+                    "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
+                    "qb_iteration": qbd.iteration, "qb_recur_id": qb_recur_id}
+                start = qbd.relative_start
+                # Always add start (due)
+                pending_qbts.append(QBT(at=start, status='due', **kwargs))
 
-            # If we have at least one result for this (QB, iteration):
-            if partial_date:
-                complete_date = user_qnrs.completed_date(
+                expired_date = start + RelativeDelta(
+                    qbd.questionnaire_bank.expired)
+                overdue_date = None
+                if qbd.questionnaire_bank.overdue:  # not all qbs define
+                    overdue_date = start + RelativeDelta(
+                        qbd.questionnaire_bank.overdue)
+                partial_date = user_qnrs.earliest_result(
                     qbd.questionnaire_bank.id, qbd.iteration)
+                include_overdue, include_expired = True, True
+                complete_date, expired_as_partial = None, False
 
-                if partial_date != complete_date:
-                    if overdue_date and partial_date < overdue_date:
-                        include_overdue = False
-                    if partial_date < expired_date:
-                        pending_qbts.append(QBT(
-                            at=partial_date, status='in_progress',
-                            **kwargs))
-                        # Without subsequent results, expired == partial
-                        include_expired = False
-                        expired_as_partial = True
-                    else:
-                        pending_qbts.append(QBT(
-                            at=partial_date, status='partially_completed',
-                            **kwargs))
+                # If we have at least one result for this (QB, iteration):
+                if partial_date:
+                    complete_date = user_qnrs.completed_date(
+                        qbd.questionnaire_bank.id, qbd.iteration)
 
-                if complete_date:
+                    if partial_date != complete_date:
+                        if overdue_date and partial_date < overdue_date:
+                            include_overdue = False
+                        if partial_date < expired_date:
+                            pending_qbts.append(QBT(
+                                at=partial_date, status='in_progress',
+                                **kwargs))
+                            # Without subsequent results, expired == partial
+                            include_expired = False
+                            expired_as_partial = True
+                        else:
+                            pending_qbts.append(QBT(
+                                at=partial_date, status='partially_completed',
+                                **kwargs))
+
+                    if complete_date:
+                        pending_qbts.append(QBT(
+                            at=complete_date, status='completed',
+                            **kwargs))
+                        if complete_date <= expired_date:
+                            include_overdue = False
+                            include_expired = False
+                            expired_as_partial = False
+
+                if include_overdue and overdue_date:
+                    # Take care to add overdue in the right order wrt
+                    # partial and complete rows.
+
                     pending_qbts.append(QBT(
-                        at=complete_date, status='completed',
+                        at=overdue_date, status='overdue', **kwargs))
+
+                if expired_as_partial:
+                    pending_qbts.append(QBT(
+                        at=expired_date, status="partially_completed",
                         **kwargs))
-                    if complete_date <= expired_date:
-                        include_overdue = False
-                        include_expired = False
-                        expired_as_partial = False
+                    if include_expired:
+                        raise RuntimeError("conflicting state")
 
-            if include_overdue and overdue_date:
-                # Take care to add overdue in the right order wrt
-                # partial and complete rows.
-
-                pending_qbts.append(QBT(
-                    at=overdue_date, status='overdue', **kwargs))
-
-            if expired_as_partial:
-                pending_qbts.append(QBT(
-                    at=expired_date, status="partially_completed",
-                    **kwargs))
                 if include_expired:
-                    raise RuntimeError("conflicting state")
+                    pending_qbts.append(QBT(
+                        at=expired_date, status='expired', **kwargs))
 
-            if include_expired:
-                pending_qbts.append(QBT(
-                    at=expired_date, status='expired', **kwargs))
+            # If user withdrew from study - remove any rows post withdrawal
+            num_stored = 0
+            _, withdrawal_date = consent_withdrawal_dates(user)
+            if withdrawal_date:
+                trace("withdrawn as of {}".format(withdrawal_date))
+                store_rows = [
+                    qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
+                store_rows.append(
+                    QBT(at=withdrawal_date, status='withdrawn', **kwargs))
+                db.session.add_all(store_rows)
+                num_stored = len(store_rows)
+            else:
+                db.session.add_all(pending_qbts)
+                num_stored = len(pending_qbts)
 
-        # If user withdrew from study - remove any rows post withdrawal
-        num_stored = 0
-        _, withdrawal_date = consent_withdrawal_dates(user)
-        if withdrawal_date:
-            trace("withdrawn as of {}".format(withdrawal_date))
-            store_rows = [
-                qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
-            store_rows.append(
-                QBT(at=withdrawal_date, status='withdrawn', **kwargs))
-            db.session.add_all(store_rows)
-            num_stored = len(store_rows)
-        else:
-            db.session.add_all(pending_qbts)
-            num_stored = len(pending_qbts)
+            if num_stored:
+                auditable_event(
+                    message="qb_timeline updated; {} rows".format(num_stored),
+                    user_id=user_id, subject_id=user_id, context="assessment")
+            db.session.commit()
 
-        if num_stored:
-            auditable_event(
-                message="qb_timeline updated; {} rows".format(num_stored),
-                user_id=user_id, subject_id=user_id, context="assessment")
-        db.session.commit()
-
+    success = False
+    for attempt in range(1, 6):
+        try:
+            attempt_update(
+                user_id=user_id, invalidate_existing=invalidate_existing)
+            success = True
+            break
+        except ConnectionError as ce:
+            current_app.logger.warning(
+                "Failed to obtain lock for QBT on {} try; {}".format(
+                    attempt, ce))
+            sleep(1)  # give system a second to catch up
+    if not success:
+        current_app.logger.error(
+            "couldn't obtain lock, recommend manual refresh of stale "
+            "qb_timeline for {}".format(user_id))
 
 class QB_StatusCacheKey(object):
     redis = None
