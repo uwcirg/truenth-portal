@@ -300,22 +300,13 @@ def questionnaire_status():
 
     if request.args.get('format', 'json').lower() == 'csv':
         def gen(items):
-            line = StringIO()
-            writer = csv.writer(line)
-            desired_order = (
-                'user_id', 'study_id', 'status', 'visit',
-                'entry_method', 'site', 'consent')
-            writer.writerow(desired_order)
-            line.seek(0)
-            yield line.read()  # header row
-            line.truncate(0)
-            line.seek(0)
+            desired_order = [
+                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
+            yield ','.join(desired_order) + '\n'  # header row
             for i in items:
-                writer.writerow([str(i.get(k, "")) for k in desired_order])
-                line.seek(0)
-                yield line.read()
-                line.truncate(0)
-                line.seek(0)
+                yield ','.join(
+                    ['"{}"'.format(i.get(k, "")) for k in desired_order]
+                ) + '\n'
 
         # default file base title
         base_name = 'Questionnaire-Timeline-Data'
