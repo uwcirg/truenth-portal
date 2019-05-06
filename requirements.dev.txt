@@ -6,7 +6,7 @@ docutils==0.14            # via sphinx
 flask-testing==0.7.1
 flask-webtest==0.0.9
 imagesize==1.1.0          # via sphinx
-mock==2.0.0
+mock==3.0.4
 packaging==19.0           # via sphinx, tox
 page-objects==1.1.0
 pluggy==0.9.0             # via tox
