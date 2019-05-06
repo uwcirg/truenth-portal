@@ -305,7 +305,8 @@ def questionnaire_status():
             yield ','.join(desired_order) + '\n'  # header row
             for i in items:
                 yield ','.join(
-                    [str(i.get(k, "")) for k in desired_order]) + '\n'
+                    ['"{}"'.format(i.get(k, "")) for k in desired_order]
+                ) + '\n'
 
         # default file base title
         base_name = 'Questionnaire-Timeline-Data'
