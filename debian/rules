@@ -17,7 +17,10 @@ override_dh_virtualenv:
 
 	# Build front-end files
 	find / -name "*.whl" -print
-	rm -Rfv /usr/share/python-wheels/*
+	# work around virtualenv/pip/urllib3 bug
+	# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=880472
+	# https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1743886
+	python -m pip install --user --upgrade pip
 	bin/build-frontend-files.sh
 
 	# Build front-end translations (JSON) from gettext files (PO)
