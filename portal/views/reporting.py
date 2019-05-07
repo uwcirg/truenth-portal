@@ -12,26 +12,20 @@ from time import strftime
 
 from flask import (
     Blueprint,
-    Response,
-    jsonify,
     make_response,
     render_template,
     request,
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
-from werkzeug.exceptions import Unauthorized
 
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.fhir import bundle_results
 from ..models.organization import Organization, OrgTree
-from ..models.questionnaire_bank import visit_name
-from ..models.questionnaire_response import QNR_results
 from ..models.qb_status import QB_Status
+from ..models.reporting import adherence_report
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
-from ..models.user_consent import latest_consent
 
 reporting_api = Blueprint('reporting', __name__)
 
@@ -223,105 +217,16 @@ def questionnaire_status():
           permission to view requested user_id
 
     """
-
     if request.args.get('as_of_date'):
         as_of_date = FHIR_datetime.parse(request.args.get('as_of_date'))
     else:
         as_of_date = datetime.utcnow()
 
-    # If limited by org - grab org and all it's children as filter list
-    org_id = request.args.get('org_id')
-    requested_orgs = (
-        OrgTree().here_and_below_id(organization_id=org_id) if org_id
-        else None)
+    return adherence_report(
+        as_of_date=as_of_date,
+        acting_user_id=current_user().id,
+        include_test_role=request.args.get('include_test_role', False),
+        org_id=request.args.get('org_id'),
+        format=request.args.get('format', 'json').lower())
 
-    # Obtain list of qualifying patients
-    acting_user = current_user()
-    include_test_role = request.args.get('include_test_role', False)
-    patients = patients_query(
-        acting_user=acting_user,
-        include_test_role=include_test_role,
-        requested_orgs=requested_orgs)
-    results = []
-    for patient in patients:
-        if len(patient.organizations) == 0:
-            # Very unlikely we want to include patients w/o at least
-            # one org, skip this patient
-            continue
 
-        try:
-            acting_user.check_role('view', other_id=patient.id)
-        except Unauthorized:
-            # simply exclude any patients the user can't view
-            continue
-
-        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
-        row = {
-            'user_id': patient.id,
-            'site': patient.organizations[0].name,
-            'status': str(qb_stats.overall_status)}
-
-        consent = latest_consent(user=patient)
-        if consent:
-            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
-
-        study_id = patient.external_study_id
-        if study_id:
-            row['study_id'] = study_id
-
-        # if no current, try previous (as current may be expired)
-        last_viable = qb_stats.current_qbd(
-            even_if_withdrawn=True) or qb_stats.prev_qbd
-        if last_viable:
-            row['qb'] = last_viable.questionnaire_bank.name
-            row['visit'] = visit_name(last_viable)
-            entry_method = QNR_results(
-                patient, last_viable.qb_id,
-                last_viable.iteration).entry_method()
-            if entry_method:
-                row['entry_method'] = entry_method
-
-        results.append(row)
-
-        # as we require a full history, continue to add rows for each previous
-        # visit available
-        for qbd, status in qb_stats.older_qbds(last_viable):
-            historic = row.copy()
-            historic['status'] = status
-            historic['qb'] = qbd.questionnaire_bank.name
-            historic['visit'] = visit_name(qbd)
-            entry_method = QNR_results(
-                patient, qbd.qb_id, qbd.iteration).entry_method()
-            if entry_method:
-                historic['entry_method'] = entry_method
-            else:
-                historic.pop('entry_method', None)
-            results.append(historic)
-
-    if request.args.get('format', 'json').lower() == 'csv':
-        def gen(items):
-            desired_order = [
-                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
-            yield ','.join(desired_order) + '\n'  # header row
-            for i in items:
-                yield ','.join(
-                    ['"{}"'.format(i.get(k, "")) for k in desired_order]
-                ) + '\n'
-
-        # default file base title
-        base_name = 'Questionnaire-Timeline-Data'
-        if org_id:
-            base_name = '{}-{}'.format(
-                base_name,
-                Organization.query.get(org_id).name.replace(' ', '-'))
-        filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
-
-        return Response(
-            gen(results),
-            headers={
-                'Content-Disposition': 'attachment;filename={}'.format(
-                    filename),
-                'Content-type': "text/csv"}
-        )
-    else:
-        return jsonify(bundle_results(elements=results))

@@ -2,16 +2,19 @@
 from collections import defaultdict
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
+from time import strftime
 
-from flask import current_app
+from flask import Response, current_app, jsonify
 from flask_babel import force_locale
+from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..dogpile_cache import dogpile_cache
-from ..views.reporting import generate_overdue_table_html
+from ..date_tools import FHIR_datetime
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .clinical_constants import CC
 from .communication import load_template_args
+from .fhir import bundle_results
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
@@ -21,8 +24,11 @@ from .procedure_codes import (
     known_treatment_started,
 )
 from .qb_status import QB_Status
+from .questionnaire_bank import visit_name
+from .questionnaire_response import QNR_results
 from .role import ROLE
-from .user import User
+from .user import User, patients_query
+from .user_consent import latest_consent
 
 
 @dogpile_cache.region('reporting_cache_region')
@@ -102,6 +108,103 @@ def get_reporting_stats():
     return stats
 
 
+def adherence_report(
+        as_of_date, acting_user_id, include_test_role, org_id, format):
+    acting_user = User.query.get(acting_user_id)
+    # If limited by org - grab org and all it's children as filter list
+    requested_orgs = (
+        OrgTree().here_and_below_id(organization_id=org_id) if org_id
+        else None)
+
+    patients = patients_query(
+        acting_user=acting_user,
+        include_test_role=include_test_role,
+        requested_orgs=requested_orgs)
+    results = []
+    for patient in patients:
+        if len(patient.organizations) == 0:
+            # Very unlikely we want to include patients w/o at least
+            # one org, skip this patient
+            continue
+
+        try:
+            acting_user.check_role('view', other_id=patient.id)
+        except Unauthorized:
+            # simply exclude any patients the user can't view
+            continue
+
+        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
+        row = {
+            'user_id': patient.id,
+            'site': patient.organizations[0].name,
+            'status': str(qb_stats.overall_status)}
+
+        consent = latest_consent(user=patient)
+        if consent:
+            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
+
+        study_id = patient.external_study_id
+        if study_id:
+            row['study_id'] = study_id
+
+        # if no current, try previous (as current may be expired)
+        last_viable = qb_stats.current_qbd(
+            even_if_withdrawn=True) or qb_stats.prev_qbd
+        if last_viable:
+            row['qb'] = last_viable.questionnaire_bank.name
+            row['visit'] = visit_name(last_viable)
+            entry_method = QNR_results(
+                patient, last_viable.qb_id,
+                last_viable.iteration).entry_method()
+            if entry_method:
+                row['entry_method'] = entry_method
+
+        results.append(row)
+
+        # as we require a full history, continue to add rows for each previous
+        # visit available
+        for qbd, status in qb_stats.older_qbds(last_viable):
+            historic = row.copy()
+            historic['status'] = status
+            historic['qb'] = qbd.questionnaire_bank.name
+            historic['visit'] = visit_name(qbd)
+            entry_method = QNR_results(
+                patient, qbd.qb_id, qbd.iteration).entry_method()
+            if entry_method:
+                historic['entry_method'] = entry_method
+            else:
+                historic.pop('entry_method', None)
+            results.append(historic)
+
+    if format == 'csv':
+        def gen(items):
+            desired_order = [
+                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
+            yield ','.join(desired_order) + '\n'  # header row
+            for i in items:
+                yield ','.join(
+                    ['"{}"'.format(i.get(k, "")) for k in desired_order]
+                ) + '\n'
+
+        # default file base title
+        base_name = 'Questionnaire-Timeline-Data'
+        if org_id:
+            base_name = '{}-{}'.format(
+                base_name,
+                Organization.query.get(org_id).name.replace(' ', '-'))
+        filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
+
+        return Response(
+            gen(results),
+            headers={
+                'Content-Disposition': 'attachment;filename={}'.format(
+                    filename),
+                'Content-type': "text/csv"}
+        )
+    else:
+        return jsonify(bundle_results(elements=results))
+
+
 def calculate_days_overdue(user):
     now = datetime.utcnow()
     a_s = QB_Status(user, as_of_date=now)
@@ -136,6 +239,7 @@ def overdue_stats_by_org():
 
 
 def generate_and_send_summaries(cutoff_days, org_id):
+    from ..views.reporting import generate_overdue_table_html
     ostats = overdue_stats_by_org()
     cutoffs = [int(i) for i in cutoff_days.split(',')]
     error_emails = set()
