@@ -16,6 +16,7 @@ override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install
 
 	# Build front-end files
+	find / -name "*.whl" -print
 	rm -Rfv /usr/share/python-wheels/*
 	bin/build-frontend-files.sh
 
