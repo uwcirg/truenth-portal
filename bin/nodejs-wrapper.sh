@@ -30,12 +30,11 @@ setup_python_venv() {
         return
     fi
 
-    echo "Creating new Python virtual environment: ${python_venv_path}"
-    virtualenv "${python_venv_path}"
 
     echo virtualenv debug
     which virtualenv || true
     virtualenv --version || true
+    python -m virtualenv --version || true
     head "$(which virtualenv)" || true
 
     echo wheels debug
@@ -50,6 +49,8 @@ setup_python_venv() {
     pip --version || true
     pip freeze || true
 
+    echo "Creating new Python virtual environment: ${python_venv_path}"
+    python -m virtualenv "${python_venv_path}"
 }
 
 
