@@ -32,6 +32,24 @@ setup_python_venv() {
 
     echo "Creating new Python virtual environment: ${python_venv_path}"
     virtualenv "${python_venv_path}"
+
+    echo virtualenv debug
+    which virtualenv || true
+    virtualenv --version || true
+    head "$(which virtualenv)" || true
+
+    echo wheels debug
+    ls -lt /usr/share/python-wheels
+
+    echo python debug
+    which python || true
+    python --version || true
+
+    echo pip debug
+    which pip || true
+    pip --version || true
+    pip freeze || true
+
 }
 
 
