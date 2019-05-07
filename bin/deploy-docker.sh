@@ -4,6 +4,9 @@
 # Environment variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
 
 cmdname="$(basename "$0")"
+bin_path="$(cd "$(dirname "$0")" && pwd)"
+repo_path="${bin_path}/.."
+
 
 usage() {
     cat << USAGE >&2
@@ -35,28 +38,19 @@ done
 shift $((OPTIND-1))
 
 
-repo_path="$(cd "$(dirname "$0")" && git rev-parse --show-toplevel)"
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${repo_path}/docker"
+cd "${docker_compose_directory}"
 
-# git-specific environment variables
-# allow git commands outside repo path
-export GIT_WORK_TREE="$repo_path"
-export GIT_DIR="${GIT_WORK_TREE}/.git"
 
-# Set default docker-compose file if COMPOSE_FILE environment variable not set
-export COMPOSE_FILE="${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}"
-
-# Bring env vars set in docker/.env into current shell
-if [ -f "${GIT_WORK_TREE}/docker/.env" ]; then
-    # export all new env vars by default
-    set -o allexport
-    . "${GIT_WORK_TREE}/docker/.env"
-fi
-
-cd "${GIT_WORK_TREE}/docker"
-
-if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps -q db)" ]; then
-    web_image_hash="$(docker-compose images -q web | cut -c1-7)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${COMPOSE_PROJECT_NAME}"
+if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps --quiet db)" ]; then
+    # get COMPOSE_PROJECT_NAME (see .env)
+    compose_project_name="$(
+        docker inspect "$(docker-compose ps --quiet web)" \
+            --format '{{ index .Config.Labels "com.docker.compose.project"}}'
+    )"
+    web_image_hash="$(docker-compose images --quiet web | cut -c1-7)"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${compose_project_name}"
 
     echo "Backing up current database..."
     docker-compose exec --user postgres db bash -c '\
