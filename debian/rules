@@ -16,7 +16,6 @@ override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install
 
 	# Build front-end files
-	find / -name "*.whl" -print
 	# work around virtualenv/pip/urllib3 bug
 	# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=880472
 	# https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1743886
