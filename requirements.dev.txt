@@ -11,7 +11,7 @@ packaging==19.0           # via sphinx, tox
 page-objects==1.1.0
 pluggy==0.9.0             # via tox
 py==1.8.0                 # via tox
-pygments==2.3.1           # via sphinx
+pygments==2.4.0           # via sphinx
 pyparsing==2.4.0          # via packaging
 pytest==4.4.1
 selenium==3.141.0
