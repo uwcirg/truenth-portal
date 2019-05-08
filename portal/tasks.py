@@ -16,9 +16,8 @@ from traceback import format_exc
 
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
-from flask import current_app, url_for
+from flask import current_app
 import redis
-import requests
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
@@ -31,8 +30,11 @@ from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
-from .models.questionnaire_bank import QuestionnaireBank
-from .models.reporting import generate_and_send_summaries, get_reporting_stats
+from .models.reporting import (
+    adherence_report,
+    generate_and_send_summaries,
+    get_reporting_stats,
+)
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
 from .models.tou import update_tous
@@ -94,6 +96,13 @@ def info():
     return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
         current_app.config.get('BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
+
+
+@celery.task(bind=True, ignore_result=False, max_retries=3, track_started=True)
+def adherence_report_task(self, **kwargs):
+    logger.debug("launch adherence report task: %s", self.request.id)
+    kwargs['celery_task'] = self
+    return adherence_report(**kwargs)
 
 
 @celery.task(name="tasks.post_request", bind=True)

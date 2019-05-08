@@ -12,9 +12,11 @@ from time import strftime
 
 from flask import (
     Blueprint,
+    jsonify,
     make_response,
     render_template,
     request,
+    url_for,
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
@@ -23,7 +25,6 @@ from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
-from ..models.reporting import adherence_report
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
 
@@ -217,16 +218,20 @@ def questionnaire_status():
           permission to view requested user_id
 
     """
-    if request.args.get('as_of_date'):
-        as_of_date = FHIR_datetime.parse(request.args.get('as_of_date'))
-    else:
-        as_of_date = datetime.utcnow()
+    from ..tasks import adherence_report_task
 
-    return adherence_report(
-        as_of_date=as_of_date,
-        acting_user_id=current_user().id,
-        include_test_role=request.args.get('include_test_role', False),
-        org_id=request.args.get('org_id'),
-        format=request.args.get('format', 'json').lower())
+    # This frequently takes over a minute to produce.  Generate a serializable
+    # form of all args for reliable hand off to a background task.
+    kwargs = {
+        'requested_as_of_date': request.args.get('as_of_date'),
+        'acting_user_id': current_user().id,
+        'include_test_role': request.args.get('include_test_role', False),
+        'org_id': request.args.get('org_id'),
+        'response_format': request.args.get('format', 'json').lower()
+    }
 
-
+    # Hand the task off to the job queue, and return 202 with URL for
+    # checking the status of the task
+    task = adherence_report_task.apply_async(kwargs=kwargs)
+    return jsonify({}), 202, {'Location': url_for(
+        'portal.celery_status', task_id=task.id)}

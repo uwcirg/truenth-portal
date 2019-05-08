@@ -2,9 +2,8 @@
 from collections import defaultdict
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
-from time import strftime
 
-from flask import Response, current_app, jsonify
+from flask import current_app, url_for
 from flask_babel import force_locale
 from werkzeug.exceptions import Unauthorized
 
@@ -14,7 +13,6 @@ from ..date_tools import FHIR_datetime
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .clinical_constants import CC
 from .communication import load_template_args
-from .fhir import bundle_results
 from .intervention import Intervention
 from .message import EmailMessage
 from .organization import Organization, OrgTree
@@ -109,8 +107,29 @@ def get_reporting_stats():
 
 
 def adherence_report(
-        as_of_date, acting_user_id, include_test_role, org_id, format):
+        requested_as_of_date, acting_user_id, include_test_role, org_id,
+        response_format, celery_task):
+    """Generates the adherence report
+
+    Designed to be executed in a background task - all inputs and outputs are
+    easily serialized (executing celery_task parent an obvious exception).
+
+    :param requested_as_of_date: string form of as_of_date, or None to use now
+    :param acting_user_id: id of user evoking request, for permission check
+    :param include_test_role: set to include test patients in results
+    :param org_id: set to limit to patients belonging to a branch of org tree
+    :param response_format: 'json' or 'csv'
+    :param celery_task: used to update status when run as a celery task
+    :return: dictionary of results, easily stored as a task output, including
+       any details needed to assist the view method
+
+    """
     acting_user = User.query.get(acting_user_id)
+    if requested_as_of_date:
+        as_of_date = FHIR_datetime.parse(requested_as_of_date)
+    else:
+        as_of_date = datetime.utcnow()
+
     # If limited by org - grab org and all it's children as filter list
     requested_orgs = (
         OrgTree().here_and_below_id(organization_id=org_id) if org_id
@@ -120,8 +139,16 @@ def adherence_report(
         acting_user=acting_user,
         include_test_role=include_test_role,
         requested_orgs=requested_orgs)
-    results = []
+    data = []
+    current, total = 0, patients.count()
     for patient in patients:
+
+        # occasionally update the celery task status if defined
+        current += 1
+        if not current % 25 and celery_task:
+            celery_task.update_state(
+                state='PROGRESS', meta={'current': current, 'total': total})
+
         if len(patient.organizations) == 0:
             # Very unlikely we want to include patients w/o at least
             # one org, skip this patient
@@ -159,7 +186,7 @@ def adherence_report(
             if entry_method:
                 row['entry_method'] = entry_method
 
-        results.append(row)
+        data.append(row)
 
         # as we require a full history, continue to add rows for each previous
         # visit available
@@ -174,35 +201,20 @@ def adherence_report(
                 historic['entry_method'] = entry_method
             else:
                 historic.pop('entry_method', None)
-            results.append(historic)
+            data.append(historic)
 
-    if format == 'csv':
-        def gen(items):
-            desired_order = [
-                'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
-            yield ','.join(desired_order) + '\n'  # header row
-            for i in items:
-                yield ','.join(
-                    ['"{}"'.format(i.get(k, "")) for k in desired_order]
-                ) + '\n'
-
-        # default file base title
+    results = {'data': data, 'response_format': response_format}
+    if response_format == 'csv':
         base_name = 'Questionnaire-Timeline-Data'
         if org_id:
             base_name = '{}-{}'.format(
                 base_name,
                 Organization.query.get(org_id).name.replace(' ', '-'))
-        filename = '{}-{}.csv'.format(base_name, strftime('%Y_%m_%d-%H_%M'))
+        results['filename_prefix'] = base_name
+        results['column_headers'] = [
+            'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
 
-        return Response(
-            gen(results),
-            headers={
-                'Content-Disposition': 'attachment;filename={}'.format(
-                    filename),
-                'Content-type': "text/csv"}
-        )
-    else:
-        return jsonify(bundle_results(elements=results))
+    return results
 
 
 def calculate_days_overdue(user):
