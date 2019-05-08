@@ -147,11 +147,11 @@ msgstr ""
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L13
 msgid "TrueNTH Logo"
-msgstr ""
+msgstr "logotipo TrueNTH"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L25
 msgid "log in"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L26 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/patient_profile_create.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/patient_profile_create.html#L13 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L278 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L279 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/staff_profile_create.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/staff_profile_create.html#L13
 msgid "Email Address"
