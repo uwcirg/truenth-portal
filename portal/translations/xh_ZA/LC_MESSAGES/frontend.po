@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2018-12-03T19:43:42.016Z\n"
-"PO-Revision-Date: 2018-12-03T19:43:42.016Z\n"
+"POT-Creation-Date: 2019-05-07T23:43:19.569Z\n"
+"PO-Revision-Date: 2019-05-07T23:43:19.569Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -60,6 +60,9 @@ msgstr "Akufunyanwanga ngxelo zifanayo"
 msgid "Export data"
 msgstr "Khuphela idatha"
 
+msgid "Export patient list"
+msgstr ""
+
 msgid "User Id is required"
 msgstr "i-Id yomsebenzisi iyafuneka"
 
@@ -83,15 +86,6 @@ msgstr "Bhala"
 
 msgid "Select"
 msgstr "Khetha"
-
-msgid "Error occurred setting user roles"
-msgstr "Kwenzeke impazamo ngoxa kusetwa iindima zomsebenzisi"
-
-msgid "Error occurred setting user organizations"
-msgstr "Kwenzeke impazamo ukufaka iintlangano zomsebenzisi"
-
-msgid "Error occurred retrieving data from server."
-msgstr "Kwenzeke impazamo kukhangelwa inkcazelo kwiseva."
 
 msgid "Error occurred retrieving patient report"
 msgstr "Kwenzeke impazamo kukhangelwa ingxelo yesigulana."
@@ -117,14 +111,11 @@ msgstr "Ayisebenzi"
 msgid "Deactivate"
 msgstr "Yenze ingasebenzi"
 
-msgid "Server Error occurred retrieving report data"
-msgstr "Kwenzeke Impazamo kwiseva kukhangelwa inkcazelo yengxelo"
+msgid "Error occurred retrieving subject ID"
+msgstr ""
 
-msgid "GMT, Y-M-D"
-msgstr "GMT, Y-M-D"
-
-msgid "Unable to load report data"
-msgstr "Ayikwazanga ukulayisha ingxelo yedatha"
+msgid "Error occurred - unable to reach destination"
+msgstr ""
 
 msgid "Unable to set session variable for organization modal viewed."
 msgstr "Ayikwazi kuseta iseshoni eyahlukileyo yomlinganiselo wentlangano ohloliweyo."
@@ -140,6 +131,9 @@ msgstr "Kwenzeke impazamo kuhlaziywa intlangano."
 
 msgid "My Dashboard"
 msgstr "Ideshbhodi Yam"
+
+msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ..."
+msgstr ""
 
 msgid "You have entered an invalid access code.  Please try again"
 msgstr "Ufake ikhowudi yokufikelela engachananga.  Nceda uzame kwakhona"
@@ -159,263 +153,8 @@ msgstr ""
 msgid "Missing information for consent agreement.  Unable to complete request."
 msgstr ""
 
-msgid "No organizations available"
-msgstr "Azikho iintlangano ezikhoyo"
-
-msgid "success"
-msgstr "iphumelele"
-
-msgid "Unable to update. System/Server Error."
-msgstr "Ayikwazi ukuhlaziya. Isistim/Ingxaki yeSeva"
-
-msgid "unable to get needed core data"
-msgstr "ayikwazi kufumana eyona nkcazelo ifunekayo"
-
-msgid "unable to get required core data"
-msgstr "ayikwazi kufumana eyona nkcazelo iceliweyo"
-
-msgid "no data found"
-msgstr "akukho nkcazelo ifunyenweyo"
-
-msgid "Unable to retrieve portal footer html"
-msgstr "Ayikwazi ukukhangela i-portal footer html"
-
-msgid "No data found"
-msgstr "Akukho nkcazelo ifunyenweyo"
-
-msgid "Server error occurred retrieving organization/clinic information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yentlangano/yekliniki."
-
-msgid "Server error occurred retrieving consent information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yemvume."
-
-msgid "User id and parameters are required"
-msgstr "I-id yomsebenzisi neeparamitha ziyafuneka"
-
-msgid "Server error occurred setting consent status."
-msgstr "Kwenzeke impazamo kwiseva kusetwa imo yemvume."
-
-msgid "Server error occurred removing consent."
-msgstr "Kwenzeke impazamo kwiseva kususwa imvume."
-
-msgid "User id and organization id are required."
-msgstr "I-id yomsebenzisi ne-id yentlangano ziyafuneka."
-
-msgid "Error occurred setting suspended consent status."
-msgstr "Kwenzeke impazamo ngoxa kusetwa imo yemvume emisiweyo"
-
-msgid "Server error occurred retrieving demographics information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yobalo lwabantu."
-
-msgid "Server error occurred setting demographics information."
-msgstr "Kwenzeke impazamo kwiseva kusetwa inkcazelo yobalo lwabantu."
-
-msgid "Server error occurred retrieving locale information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yesiganeko."
-
-msgid "User id is required"
-msgstr "I-id yomsebenzisi iyafuneka"
-
-msgid "Error retrieving data from server"
-msgstr "Kwenzeke impazamo kukhangelwa inkcazelo kwiseva"
-
-msgid "Server error occurred saving procedure/treatment information."
-msgstr "Kwenzeke impazamo kwiseva kugcinwa inkcazelo yenkqubo/yonyango."
-
-msgid "Server error occurred removing procedure/treatment information."
-msgstr "Kwenzeke impazamo kwiseva kushenxiswa inkcazelo yenkqubo/yonyango."
-
-msgid "Server error occurred retrieving roles information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yeendima."
-
-msgid "Server error occurred retrieving user role information."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yendima yomsebenzisi."
-
-msgid "User Id is required."
+msgid "Error occurred deleting notification"
 msgstr ""
-
-msgid "Server error occurred setting user role information."
-msgstr "Kwenzeke impazamo kwiseva kusetwa inkcazelo yendima yomsebenzisi."
-
-msgid "Server error occurred deleting user role."
-msgstr "Kwenzeke impazamo kwiseva kucinywa indima yomsebenzisi."
-
-msgid "Server error occurred retrieving clinical data."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yezonyango."
-
-msgid "Server error occurred updating clinical data."
-msgstr "Kwenzeke impazamo kwiseva kuhlaziywa inkcazelo yezonyango."
-
-msgid "no url returned"
-msgstr "akukho url ibuyisiweyo"
-
-msgid "Server error occurred retrieving tou url."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa i-url ye-tou."
-
-msgid "Server error"
-msgstr "Impazamo kwiseva"
-
-msgid "error retrieving instruments list"
-msgstr "impazamo kukhangelwa uluhlu lwezixhobo"
-
-msgid "Server error occurred retrieving tou data."
-msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo ye-tou."
-
-msgid "Server error occurred saving terms of use information."
-msgstr "Kwenzeke impazamo kwiseva kugcinwa inkcazelo yemiqathango yokusebenzisa."
-
-msgid "Error occurred retrieving access url."
-msgstr "Kwenzeke impazamo kukhangelwa ukufikelela kwi-url."
-
-msgid "Invite data are required."
-msgstr "Umhla wokumama uyafuneka."
-
-msgid "Error occurred sending password reset request."
-msgstr "Kwenzeke impazamo kuthunyelwa isicelo sokuseta kwakhona iphaswedi."
-
-msgid "Error occurred retrieving assessment status."
-msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa kwemo."
-
-msgid "Questionnaire response data is required."
-msgstr "Ukuphendulwa kwenkcazelo yephepha lemibuzo kuyafuneka."
-
-msgid "Error occurred retrieving assessment list."
-msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa koluhlu."
-
-msgid "User id and instrument Id are required."
-msgstr "I-id yomsebenzisi ne-Id yesixhobo ziyafuneka."
-
-msgid "Error occurred retrieving assessment report."
-msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa kwengxelo."
-
-msgid "Error occurred retrieving current questionnaire bank for user."
-msgstr "Kwenzeke impazamo kukhangelwa ugcino lwephepha lemibuzo lwangoku lomsebenzisi."
-
-msgid "Error occurred retrieving patient report."
-msgstr "Kwenzeke impazamo kukhangelwa ingxelo yesigulana."
-
-msgid "Error occurred setting table preference."
-msgstr "Kwenzeke impazamo kusetwa ukhetho lwesiqulatho."
-
-msgid "Error occurred retrieving email audit entries."
-msgstr "Kwenzeke impazamo kukhangelwa ukufakwa kobalo lwee-imeyile."
-
-msgid "Error occurred retrieving audit log."
-msgstr "Kwenzeke impazamo kukhangelwa ilogi yobalo."
-
-msgid "configuration key is required."
-msgstr "ukulungelenisa okuyintloko kuyafuneka."
-
-msgid "Error occurred retrieving content for configuration key."
-msgstr "Kwenzeke impazamo kukhangelwa isiqulatho sokulungelelanisa okuyintloko."
-
-msgid "Error occurred deactivating user."
-msgstr ""
-
-msgid "Error occurred reactivating user."
-msgstr ""
-
-msgid "configuration variable name is required."
-msgstr ""
-
-msgid "Invalid date. Please try again."
-msgstr "Umhla ofanelekileyo. Sicela uzame kwakhona."
-
-msgid "Date must not be in the future. Please try again."
-msgstr "Umhla awumele ube kwikamva. Nceda uzame kwakhona."
-
-msgid "Date must not be before 1900. Please try again."
-msgstr "Umhla awumele ube ngongaphambi kowe 1900. Nceda uzame kwakhona."
-
-msgid "Year must be after 1900"
-msgstr "Unyaka umele ube semva kowe 1900"
-
-msgid "The date must not be in the future."
-msgstr "Umhla awumele ube kwikamva."
-
-msgid "Invalid Date. Please enter a valid date."
-msgstr "Umhla Awufanelekanga. Nceda ufake umhla ofanelekileyo."
-
-msgid "Missing value."
-msgstr "Ixabiso elingekhoyo."
-
-msgid "Error loading portal wrapper"
-msgstr "Kwenzeke impazamo ukufaka i-portal wrapper"
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. Intlangano 501(c)3 ebhalisiweyo nengenangeniso (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. i-Movember Foundation ngumbutho wesisa obhalisiweyo waseAustralia ABN 48894537905 (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. i-Movember Foundation ngumbutho wesisa nombolo CC51320 obhalisiweyo waseNew Zealand (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
-msgstr "© {year} Movember Foundation (Movember Foundation). Onke amalungelo agciniwe."
-
-msgid "Error occurred retrieving notification."
-msgstr "Kwenzeke impazamo kukhangelwa ukwaziswa."
-
-msgid "All fields must be complete."
-msgstr "Zonke izithuba zimele zizaliswe."
-
-msgid "Please enter a valid date."
-msgstr "Nceda ufake umhla ofanelekileyo."
-
-msgid "Please enter a valid month."
-msgstr "Nceda ufake inyanga efanelekileyo."
-
-msgid "Please enter a valid year."
-msgstr "Nceda ufake unyaka ofanelekileyo."
-
-msgid "Error occurred when verifying the uniqueness of email"
-msgstr ""
-
-msgid "This e-mail address is already in use. Please enter a different address."
-msgstr "Le dilesi ye-imeyile sele isetyenziswa. Nceda ufake idilesi eyahlukileyo."
-
-msgid "Please remove invalid characters and try again."
-msgstr "Nceda ususe iikharektha ezingafunekiyo uze uzame kwakhona."
-
-msgid "Sorry, this isn't a valid date. Please try again."
-msgstr "Kuxolo, lo ayinguwo umhla ofanelekileyo. Sicela uzame kwakhona."
-
-msgid "This isn't a valid e-mail address, please double-check."
-msgstr "Le asiyiyo idilesi ye-imeyile efanelekileyo, nceda uyihlole kwakhona."
-
-msgid "You haven't entered any management option yet."
-msgstr "Awukafaki naluphi ukhetho lokulawula okwangoku."
-
-msgid "you"
-msgstr "wena"
-
-msgid "Are you sure you want to delete this treatment?"
-msgstr "Ngaba uqinisekile ukuba ufuna ukulucima olu nyango?"
-
-msgid "Delete"
-msgstr "Cima"
-
-msgid "this patient"
-msgstr "esi sigulana"
-
-msgid "staff member"
-msgstr "ilungu labasebenzi"
-
-msgid "(date entered by %actor on %date)"
-msgstr "(umhla ofakwe ngu %endaweni ka %umhla)"
-
-msgid "Added!"
-msgstr "Yongeziwe!"
-
-msgid "error ocurred retrieving user procedures"
-msgstr "kwenzeke impazamo kukhangelwa iinkqubo zomsebenzisi"
-
-msgid "REMOVE"
-msgstr "SHENXISA"
-
-msgid "The procedure date must be valid and in required format."
-msgstr "Umhla wenkqubo umele ube ngofanelekileyo yaye ube kwifomathi efunekayo."
 
 msgid "Alabama"
 msgstr "Alabama"
@@ -759,35 +498,11 @@ msgstr "Kukho ingxaki nokukhangelwa kwenkcazelo yeseshoni ekwiseva."
 msgid "Click to view report"
 msgstr "Cofa ukuze uhlole ingxelo"
 
-msgid "What is your main clinic for prostate cancer care"
-msgstr "Yeyiphi eyona kliniki yakho eyintloko yokunyanyekelwa komhlaza weprosteti"
-
-msgid "Other"
-msgstr "Ezinye"
-
 msgid "No affiliated clinic"
 msgstr "Ayikho ikliniki enxulumeneyo"
 
-msgid "Unable to set default consent agreement"
-msgstr "Ayikwazi ukuseta isivumelwano semvume sedifolthi"
-
-msgid "Consent to share information"
-msgstr "Imvume yokwabelana ngenkcazelo"
-
-msgid "Close"
-msgstr "Vala"
-
 msgid "The user does not have a valid assessment link."
 msgstr "Umsebenzisi akanayo ilinki yohlolo efunekayo."
-
-msgid "All date fields are required"
-msgstr "Zonke iifildi zomhla ziyafuneka"
-
-msgid "Completion date cannot be before consent date."
-msgstr "Umhla wokugqitywa awukwazi kuba phambi komhla wemvume."
-
-msgid "Completion date cannot be in the future."
-msgstr "Umhla wokugqitywa awumele ube kwikamva."
 
 msgid "Server error occurred checking questionnaire window"
 msgstr ""
@@ -840,6 +555,15 @@ msgstr "Uyivumile imimiselo"
 msgid "{projectName} Terms of Use"
 msgstr "{igama leprojekthi} Imimiselo Yokusebenzisa"
 
+msgid "Error occurred retrieving consent list content."
+msgstr "Kwenzeke impazamo kukhangelwa isiqulatho soluhlu lwemvume."
+
+msgid "Error occurred setting user roles"
+msgstr "Kwenzeke impazamo ngoxa kusetwa iindima zomsebenzisi"
+
+msgid "Error occurred setting user organizations"
+msgstr "Kwenzeke impazamo ukufaka iintlangano zomsebenzisi"
+
 msgid "Date must in the valid format."
 msgstr "Umhla umele ube kwifomathi efanelekileyo."
 
@@ -858,101 +582,248 @@ msgstr "Umele ufake umhla/ixesha"
 msgid "Error processing data.  Make sure the date is in the correct format."
 msgstr "Impazamo ekudluliseleni kwenkcazelo.  Qiniseka ukuba umhla ukwifomathi echanileyo."
 
-msgid "Error occurred retrieving consent list content."
-msgstr "Kwenzeke impazamo kukhangelwa isiqulatho soluhlu lwemvume."
+msgid "Consent to share information"
+msgstr "Imvume yokwabelana ngenkcazelo"
 
-msgid "No PSA results to display"
+msgid "Close"
+msgstr "Vala"
+
+msgid "Unable to set default consent agreement"
+msgstr "Ayikwazi ukuseta isivumelwano semvume sedifolthi"
+
+msgid "Error loading portal wrapper"
+msgstr "Kwenzeke impazamo ukufaka i-portal wrapper"
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. Intlangano 501(c)3 ebhalisiweyo nengenangeniso (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. i-Movember Foundation ngumbutho wesisa obhalisiweyo waseAustralia ABN 48894537905 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Onke amalungelo agciniwe. i-Movember Foundation ngumbutho wesisa nombolo CC51320 obhalisiweyo waseNew Zealand (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
+msgstr "© {year} Movember Foundation (Movember Foundation). Onke amalungelo agciniwe."
+
+msgid "User id is required"
+msgstr "I-id yomsebenzisi iyafuneka"
+
+msgid "Error occurred retrieving notification."
+msgstr "Kwenzeke impazamo kukhangelwa ukwaziswa."
+
+msgid "No organizations available"
+msgstr "Azikho iintlangano ezikhoyo"
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr "Yeyiphi eyona kliniki yakho eyintloko yokunyanyekelwa komhlaza weprosteti"
+
+msgid "Other"
+msgstr "Ezinye"
+
+msgid "error occurred setting current user id"
 msgstr ""
 
-msgid "Edit"
-msgstr "Lungisa"
+msgid "no data found"
+msgstr "akukho nkcazelo ifunyenweyo"
 
-msgid "Save"
-msgstr "Gcina"
+msgid "you"
+msgstr "wena"
 
-msgid "Filter"
+msgid "this patient"
+msgstr "esi sigulana"
+
+msgid "staff member"
+msgstr "ilungu labasebenzi"
+
+msgid "Added!"
+msgstr "Yongeziwe!"
+
+msgid "You haven't entered any management option yet."
+msgstr "Awukafaki naluphi ukhetho lokulawula okwangoku."
+
+msgid "error occurred retrieving user procedures"
 msgstr ""
 
-msgid "Result (ng/ml)"
+msgid "(data entered by %actor on %date)"
 msgstr ""
 
-msgid "PSA Test Date"
+msgid "REMOVE"
+msgstr "SHENXISA"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "Umhla wenkqubo umele ube ngofanelekileyo yaye ube kwifomathi efunekayo."
+
+msgid "success"
+msgstr "iphumelele"
+
+msgid "Unable to update. System/Server Error."
+msgstr "Ayikwazi ukuhlaziya. Isistim/Ingxaki yeSeva"
+
+msgid "unable to get needed core data"
+msgstr "ayikwazi kufumana eyona nkcazelo ifunekayo"
+
+msgid "unable to get required core data"
+msgstr "ayikwazi kufumana eyona nkcazelo iceliweyo"
+
+msgid "Unable to retrieve portal footer html"
+msgstr "Ayikwazi ukukhangela i-portal footer html"
+
+msgid "No data found"
+msgstr "Akukho nkcazelo ifunyenweyo"
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yentlangano/yekliniki."
+
+msgid "Server error occurred retrieving consent information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yemvume."
+
+msgid "User id and parameters are required"
+msgstr "I-id yomsebenzisi neeparamitha ziyafuneka"
+
+msgid "Server error occurred setting consent status."
+msgstr "Kwenzeke impazamo kwiseva kusetwa imo yemvume."
+
+msgid "Server error occurred removing consent."
+msgstr "Kwenzeke impazamo kwiseva kususwa imvume."
+
+msgid "User id and organization id are required."
+msgstr "I-id yomsebenzisi ne-id yentlangano ziyafuneka."
+
+msgid "Error occurred setting suspended consent status."
+msgstr "Kwenzeke impazamo ngoxa kusetwa imo yemvume emisiweyo"
+
+msgid "Server error occurred retrieving demographics information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yobalo lwabantu."
+
+msgid "Server error occurred setting demographics information."
+msgstr "Kwenzeke impazamo kwiseva kusetwa inkcazelo yobalo lwabantu."
+
+msgid "Server error occurred retrieving locale information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yesiganeko."
+
+msgid "Error retrieving data from server"
+msgstr "Kwenzeke impazamo kukhangelwa inkcazelo kwiseva"
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr "Kwenzeke impazamo kwiseva kugcinwa inkcazelo yenkqubo/yonyango."
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr "Kwenzeke impazamo kwiseva kushenxiswa inkcazelo yenkqubo/yonyango."
+
+msgid "Server error occurred retrieving roles information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yeendima."
+
+msgid "Server error occurred retrieving user role information."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yendima yomsebenzisi."
+
+msgid "User Id is required."
 msgstr ""
 
-msgid "PSA (ng/ml)"
+msgid "Server error occurred setting user role information."
+msgstr "Kwenzeke impazamo kwiseva kusetwa inkcazelo yendima yomsebenzisi."
+
+msgid "Server error occurred deleting user role."
+msgstr "Kwenzeke impazamo kwiseva kucinywa indima yomsebenzisi."
+
+msgid "Server error occurred retrieving clinical data."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yezonyango."
+
+msgid "Server error occurred updating clinical data."
+msgstr "Kwenzeke impazamo kwiseva kuhlaziywa inkcazelo yezonyango."
+
+msgid "no url returned"
+msgstr "akukho url ibuyisiweyo"
+
+msgid "Server error occurred retrieving tou url."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa i-url ye-tou."
+
+msgid "Server error"
+msgstr "Impazamo kwiseva"
+
+msgid "error retrieving instruments list"
+msgstr "impazamo kukhangelwa uluhlu lwezixhobo"
+
+msgid "Server error occurred retrieving tou data."
+msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo ye-tou."
+
+msgid "Server error occurred saving terms of use information."
+msgstr "Kwenzeke impazamo kwiseva kugcinwa inkcazelo yemiqathango yokusebenzisa."
+
+msgid "Error occurred retrieving access url."
+msgstr "Kwenzeke impazamo kukhangelwa ukufikelela kwi-url."
+
+msgid "Invite data are required."
+msgstr "Umhla wokumama uyafuneka."
+
+msgid "Error occurred sending password reset request."
+msgstr "Kwenzeke impazamo kuthunyelwa isicelo sokuseta kwakhona iphaswedi."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa kwemo."
+
+msgid "Questionnaire response data is required."
+msgstr "Ukuphendulwa kwenkcazelo yephepha lemibuzo kuyafuneka."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa koluhlu."
+
+msgid "User id and instrument Id are required."
+msgstr "I-id yomsebenzisi ne-Id yesixhobo ziyafuneka."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Kwenzeke impazamo kukhangelwa ukuhlolisiswa kwengxelo."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Kwenzeke impazamo kukhangelwa ugcino lwephepha lemibuzo lwangoku lomsebenzisi."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Kwenzeke impazamo kukhangelwa ingxelo yesigulana."
+
+msgid "Error occurred setting table preference."
+msgstr "Kwenzeke impazamo kusetwa ukhetho lwesiqulatho."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "Kwenzeke impazamo kukhangelwa ukufakwa kobalo lwee-imeyile."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Kwenzeke impazamo kukhangelwa ilogi yobalo."
+
+msgid "configuration key is required."
+msgstr "ukulungelenisa okuyintloko kuyafuneka."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Kwenzeke impazamo kukhangelwa isiqulatho sokulungelelanisa okuyintloko."
+
+msgid "Error occurred deactivating user."
 msgstr ""
 
-msgid "Track Your PSA"
+msgid "Error occurred reactivating user."
 msgstr ""
 
-msgid "Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood."
+msgid "configuration variable name is required."
 msgstr ""
 
-msgid "ADD NEW PSA RESULT"
-msgstr ""
+msgid "Invalid date. Please try again."
+msgstr "Umhla ofanelekileyo. Sicela uzame kwakhona."
 
-msgid "Enter a number"
-msgstr "Faka inani"
+msgid "Date must not be in the future. Please try again."
+msgstr "Umhla awumele ube kwikamva. Nceda uzame kwakhona."
 
-msgid "d M yyyy, example: 1 Jan, 2017"
-msgstr "d M yyyy, umzekelo: 1 Jan, 2017"
+msgid "Date must not be before 1900. Please try again."
+msgstr "Umhla awumele ube ngongaphambi kowe 1900. Nceda uzame kwakhona."
 
-msgid "PSA Result History"
-msgstr ""
+msgid "Year must be after 1900"
+msgstr "Unyaka umele ube semva kowe 1900"
 
-msgid "History"
-msgstr "Imbali"
+msgid "The date must not be in the future."
+msgstr "Umhla awumele ube kwikamva."
 
-msgid "Filter By Year"
-msgstr ""
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Umhla Awufanelekanga. Nceda ufake umhla ofanelekileyo."
 
-msgid "Filter By Result"
-msgstr ""
-
-msgid "Clear Filters"
-msgstr ""
-
-msgid "Last Received Treatment:"
-msgstr ""
-
-msgid "Treatment Date:"
-msgstr ""
-
-msgid "No treatment received as of today"
-msgstr ""
-
-msgid "Edit PSA Result"
-msgstr ""
-
-msgid "Add PSA Result"
-msgstr ""
-
-msgid "Click to reload the page and try again."
-msgstr ""
-
-msgid "Date must be in the valid format."
-msgstr "Umhla umele ube yifomathi efanelekileyo."
-
-msgid "Error occurred retrieving PSA result data"
-msgstr ""
-
-msgid "No result data found"
-msgstr "Ayikho idatha yeziphumo efunyenweyo"
-
-msgid "* Maximum of {resultNumber} results since {year}"
-msgstr ""
-
-msgid "No PSA result matching the filtering criteria. Please try again."
-msgstr ""
-
-msgid "Server error occurred adding PSA result."
-msgstr ""
-
-msgid "treatment"
-msgstr ""
-
-msgid "PSA"
-msgstr ""
+msgid "Missing value."
+msgstr "Ixabiso elingekhoyo."
 
 msgid "Url is required."
 msgstr "I-Url iyafuneka."
@@ -966,13 +837,47 @@ msgstr ""
 msgid "Thanks for your patience while we upgrade our site."
 msgstr ""
 
-msgid "Please re-type your password."
-msgstr "Nceda utayiphe kwakhona iphaswedi yakho."
-
-msgctxt "name}. Proceeding to registration ..."
-msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org"
-msgstr "Enkosi, ikhowudi yakho yofikelelo {shortcut_alias} Ibonisa ukumbutho i- {org"
-
-msgctxt "result})."
-msgid "Result must be a number and within valid range (less than {max"
+msgid "Error occurred when verifying the uniqueness of email"
 msgstr ""
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr "Le dilesi ye-imeyile sele isetyenziswa. Nceda ufake idilesi eyahlukileyo."
+
+msgid "Invalid characters in text."
+msgstr ""
+
+msgid "Identifier value must be unique"
+msgstr ""
+
+msgid "Question"
+msgstr "Umbuzo"
+
+msgid "Response"
+msgstr "Impendulo"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Kwenzeke Impazamo kwiseva kukhangelwa inkcazelo yengxelo"
+
+msgid "No data returned from server"
+msgstr ""
+
+msgid "Unable to load report data"
+msgstr "Ayikwazanga ukulayisha ingxelo yedatha"
+
+msgid "Export questionnaire data"
+msgstr "Thumela inkcazelo Yephepha Lemibuzo"
+
+msgid "Export"
+msgstr "Ezithunyelwayo"
+
+msgid "Data type:"
+msgstr "Uhlobo lwenkcazelo:"
+
+msgid "Instrument(s) to export data from:"
+msgstr "Isi(zi)xhobo sokuthumela inkcazelo esuka:"
+
+msgid "CSV"
+msgstr "i-CSV"
+
+msgid "JSON"
+msgstr "i-JSON"
