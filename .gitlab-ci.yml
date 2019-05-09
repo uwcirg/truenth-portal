@@ -7,11 +7,10 @@ stages:
 variables:
   SECRET_KEY: "$(openssl rand -base64 32)"
   FLASK_APP: "$(readlink --canonicalize manage.py)"
-  SQLALCHEMY_DATABASE_TEST_URI: "postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
+  SQLALCHEMY_DATABASE_TEST_URI: "postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST:-postgres}/${PGDATABASE}"
 
   REDIS_URL: redis://redis:6379/0
 
-  PGHOST: postgres
   PGDATABASE: portaldb
   PGPASSWORD: ""
   PGUSER: postgres
