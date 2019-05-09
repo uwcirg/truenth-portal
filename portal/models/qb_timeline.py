@@ -412,7 +412,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
-        timeout = current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT")
+        timeout = int(current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT"))
         key = "update_users_QBT user:{}".format(user_id)
 
         with TimeoutLock(key=key, timeout=timeout):
