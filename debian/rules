@@ -27,17 +27,6 @@ override_dh_builddeb:
 	# lines preceding `dh_builddeb` occur after venv creation && `pip install`
 	# but before debian package creation
 
-	# Manually fix paths erroneously pointing to build environment
-	find \
-		'$(VENV_BUILD_DIR)/portal/lib/' \
-		-name easy-install.pth \
-		-exec \
-			sed \
-				--in-place \
-				--expression 's|$(VENV_BUILD_DIR)/|/opt/venvs/|g' \
-				{} \; \
-		-print
-
 
 	# change directory to something other than the original checkout
 	# `flask` commands will ignore given entrypoint (FLASK_APP) otherwise
