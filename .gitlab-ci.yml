@@ -10,7 +10,11 @@ before_script:
   # Install dependencies
   - tox --notest
 
+script:
+  - tox
+
 python3:
+  variables:
+    TOXENV: py3
   image: python:3.6
   stage: test
-  script: tox -e py3
