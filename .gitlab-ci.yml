@@ -1,3 +1,15 @@
 # GitLab CI/CD Pipeline Configuration file
 # https://docs.gitlab.com/ee/ci/yaml/
 ---
+stages:
+  - test
+
+before_script:
+  - curl --remote-name https://bootstrap.pypa.io/get-pip.py
+  - python get-pip.py
+  - pip install tox
+
+python3:
+  image: python:3.6
+  stage: test
+  script: tox -e py3
