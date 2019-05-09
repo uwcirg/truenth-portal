@@ -5,8 +5,6 @@ stages:
   - test
 
 before_script:
-  - curl --remote-name https://bootstrap.pypa.io/get-pip.py
-  - python get-pip.py
   - pip install tox
 
 python3:
