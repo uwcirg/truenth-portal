@@ -4,6 +4,10 @@
 stages:
   - test
 
+variables:
+  SECRET_KEY: "$(openssl rand -base64 32)"
+  FLASK_APP: "$(readlink --canonicalize manage.py)"
+
 before_script:
   - pip install tox
 
