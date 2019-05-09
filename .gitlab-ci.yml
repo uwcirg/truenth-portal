@@ -7,14 +7,20 @@ stages:
 before_script:
   - pip install tox
 
+  - echo $TOXENV
+  - printenv TOXENV
+  - env
   # Install dependencies
   - tox --notest
 
-script:
-  - tox
 
 python3:
   variables:
     TOXENV: py3
   image: python:3.6
   stage: test
+  script:
+    - echo $TOXENV
+    - printenv TOXENV
+    - env
+    - tox
