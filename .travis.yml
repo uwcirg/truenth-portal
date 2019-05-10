@@ -13,8 +13,6 @@ services:
   - postgresql
   - redis-server
 env:
-  matrix:
-    - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
     - SECRET_KEY="$(openssl rand -base64 32)"
@@ -42,7 +40,6 @@ env:
 
 matrix:
   include:
-    - env: TOXENV=py27
     - env: TOXENV=translations PERSISTENCE_DIR="gil"
     - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=docs
@@ -108,7 +105,7 @@ after_success:
   - if
     [ -n "$CODACY_PROJECT_TOKEN" ] &&
     [ -f "coverage.xml" ] &&
-    [ "$TOXENV" = "py27" ] &&
+    [ "$TOXENV" = "build-artifacts" ] &&
     [ "$GIT_BRANCH" = "develop" ]; then
       pip install codacy-coverage ;
       python-codacy-coverage -r coverage.xml ;
