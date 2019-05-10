@@ -42,6 +42,14 @@ python3:
   script:
     - tox
 
+python2:
+  variables:
+    TOXENV: py27
+  image: python:2.7
+  stage: test
+  script:
+    - tox
+
 services:
   - postgres:10
   - redis:latest
