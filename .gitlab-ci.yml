@@ -34,9 +34,11 @@ before_script:
     - redis:latest
   before_script:
     - pip install tox
+
+    # Install all dependencies
+    - tox --notest
+
     # Start celery from tox virtual environment
-    - echo "./.tox/${TOXENV}/bin/"
-    - ls "./.tox/${TOXENV}/bin/" -l
     - PATH="./.tox/${TOXENV}/bin/"
       celery worker
         --detach
