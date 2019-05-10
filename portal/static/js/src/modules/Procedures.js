@@ -231,7 +231,7 @@ export default (function() {
                 var creatorRef = (val.resource.meta.by.reference).match(/\d+/)[0];  // just the user ID, not eg "api/patient/46";
                 var creator = self.getCreatorDisplay(creatorRef, val.resource.meta.by.display || creatorRef);
                 var dateEdited = new Date(val.resource.meta.lastUpdated);
-                var creationText = i18next.t("(data entered by %actor on %date)").replace("%actor", creator).replace("%date", dateEdited.toLocaleDateString("en-GB", {
+                var creationText = i18next.t("(data entered by {actor} on {date})").replace("{actor}", creator).replace("{date}", dateEdited.toLocaleDateString("en-GB", {
                     day: "numeric",
                     month: "short",
                     year: "numeric"
