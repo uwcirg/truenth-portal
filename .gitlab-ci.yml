@@ -34,21 +34,19 @@ before_script:
       ;
     fi
 
-python3:
+unit_tests-python3:
   variables:
     TOXENV: py3
   image: python:3.6
   stage: test
-  script:
-    - tox
+  script: tox
 
-python2:
+unit_tests-python2:
   variables:
     TOXENV: py27
   image: python:2.7
   stage: test
-  script:
-    - tox
+  script: tox
 
 services:
   - postgres:10
