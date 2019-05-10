@@ -129,7 +129,10 @@ class BaseConfig(object):
     SHOW_PUBLIC_TERMS = True
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = best_sql_url()
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
+        best_sql_url()
+    )
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
 
