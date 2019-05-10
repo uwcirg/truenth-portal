@@ -51,3 +51,8 @@ unit_tests-python2:
     TOXENV: py27
   <<: *unit_test_template
   image: python:2.7
+
+docgen_test:
+  variables:
+    TOXENV: docs
+  <<: *test_template
