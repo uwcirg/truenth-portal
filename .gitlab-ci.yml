@@ -40,8 +40,6 @@ python3:
   image: python:3.6
   stage: test
   script:
-    - printenv REDIS_URL
-    - echo $REDIS_URL
     - tox
 
 services:
