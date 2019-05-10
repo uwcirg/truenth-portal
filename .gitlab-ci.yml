@@ -23,6 +23,15 @@ before_script:
   # Install dependencies
   - tox --notest
 
+  # Start celery from tox virtual environment, if installed
+  - if [ -f "./.tox/${TOXENV}/bin/celery" ]; then
+      PATH="./.tox/${TOXENV}/bin/"
+      celery worker
+        --detach
+        --app portal.celery_worker.celery
+        --loglevel info
+      ;
+    fi
 
 python3:
   variables:
