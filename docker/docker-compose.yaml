@@ -5,7 +5,7 @@ x-service-base: &service_base
   image: "${DOCKER_REPOSITORY-uwcirg/}${DOCKER_IMAGE_NAME:-truenth_portal}:${DOCKER_IMAGE_TAG:-latest}"
   build:
     context: ..
-    dockerfile: Dockerfile
+    dockerfile: docker/Dockerfile
     target: production
   env_file:
     - ${PORTAL_ENV_FILE:-portal.env}
