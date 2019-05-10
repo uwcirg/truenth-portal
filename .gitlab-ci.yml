@@ -20,36 +20,34 @@ variables:
 before_script:
   - pip install tox
 
-  # Install dependencies
-  - tox --notest
-
-  # Start celery from tox virtual environment, if installed
-  - if [ -f "./.tox/${TOXENV}/bin/celery" ]; then
-      PATH="./.tox/${TOXENV}/bin/"
-      celery worker
-        --detach
-        --app portal.celery_worker.celery
-        --loglevel info
-      ;
-    fi
-
-
+# base template
 .test_template: &test_definition
   image: python:3.6
   script: tox
   stage: test
 
+# unit test template/overrides
+.unit_test_template: &unit_test_definition
+  <<: *test_definition
+  services:
+    - postgres:10
+    - redis:latest
+  before_script:
+    - pip install tox
+    # Start celery from tox virtual environment
+    - PATH="./.tox/${TOXENV}/bin/"
+      celery worker
+        --detach
+        --app portal.celery_worker.celery
+        --loglevel info
+
 unit_tests:
   variables:
     TOXENV: py3
-  <<: *test_definition
+  <<: *unit_test_template
 
 unit_tests-python2:
   variables:
     TOXENV: py27
-  <<: *test_definition
+  <<: *unit_test_template
   image: python:2.7
-
-services:
-  - postgres:10
-  - redis:latest
