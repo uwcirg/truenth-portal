@@ -111,7 +111,8 @@ class BaseConfig(object):
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
-    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
+    PROTECTED_ORG = os.environ.get('PROTECTED_ORG')
+    PROTECTED_FIELDS = os.environ.get('PROTECTED_FIELDS')
 
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \

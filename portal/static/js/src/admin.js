@@ -472,7 +472,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
             /*
              * a function dedicated to hide account creation button based on org name from setting
              * @params
-             * setting_name String, generally a configuration/setting variable name whose values corresponds to an org name of interest e.g. MedidataRave_Org
+             * setting_name String, generally a configuration/setting variable name whose values corresponds to an org name of interest e.g. PROTECTED_ORG
              * params Object, passed to ajax call to get configuration settings
              */
             setCreateAccountVisByTopOrgSetting: function(setting_name, params) {
@@ -509,8 +509,8 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 if (!this.isPatientsList()) { //check if this is a patients list
                     return false;
                 }
-                //hide account creation button based on MEDIDATA RAVE ORG setting
-                this.setCreateAccountVisByTopOrgSetting("MEDIDATA_RAVE_ORG", params); 
+                //hide account creation button based on PROTECTED_ORG setting
+                this.setCreateAccountVisByTopOrgSetting("PROTECTED_ORG", params); 
             },
             /*
              * a function dedicated to handle MUSIC-related UI events/changes
