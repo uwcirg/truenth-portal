@@ -234,4 +234,4 @@ def questionnaire_status():
     # checking the status of the task
     task = adherence_report_task.apply_async(kwargs=kwargs)
     return jsonify({}), 202, {'Location': url_for(
-        'portal.celery_status', task_id=task.id)}
+        'portal.task_status', task_id=task.id, _external=True)}
