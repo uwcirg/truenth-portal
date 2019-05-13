@@ -511,7 +511,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             var self = this;
             orgs = orgs || this.getCurrentUserTopLevelOrgs();
             this.__getSettings(function(result) {
-                if (result.data.MEDIDATA_RAVE_ORG && orgs.indexOf(result.data.MEDIDATA_RAVE_ORG) !== -1) {
+                if (result.data.PROTECTED_ORG && orgs.indexOf(result.data.PROTECTED_ORG) !== -1) {
                     self.setDisableAccountCreation();
                 }
             });
