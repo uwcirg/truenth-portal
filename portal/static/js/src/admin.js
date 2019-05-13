@@ -160,10 +160,19 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 $("#btnExportReport").attr("disabled", true);
                 $(".exportReport__status").addClass("active");
             },
-            onAfterExportReportData: function() {
+            onAfterExportReportData: function(options) {
+                options = options || {};
                 $("#btnExportReport").attr("disabled", false);
-                $("#exportReportContainer").popover("hide");
                 $(".exportReport__status").removeClass("active");
+                if (options.error) {
+                    this.updateProgressDisplay("", "");
+                    $(".exportReport__error .message").html("Request to export report data failed.");
+                    $(".exportReport__retry").removeClass("tnth-hide");
+                    return;
+                } 
+                $("#exportReportContainer").popover("hide");
+                $(".exportReport__error .message").html("");
+                $(".exportReport__retry").addClass("tnth-hide");
             },
             initExportReportDataSelector: function() {
                 let self = this;
@@ -182,6 +191,15 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     $(window).on("resize", function() {
                         self.onAfterExportReportData();
                     });
+                    $('#exportReportContainer').on('shown.bs.popover', function () {
+                        $(".exportReport__retry").off("click").on("click", function(e) {
+                            e.stopImmediatePropagation();
+                            $("#exportReportContainer").popover("hide");
+                            setTimeout(function() {
+                                $("#btnExportReport").trigger("click");
+                            }, 50);
+                        });
+                    });
                     $("#exportReportContainer .data-types li").on("click", function(e) {
                         e.stopPropagation();
                         let dataType = $(this).attr("data-type");
@@ -194,14 +212,13 @@ import CurrentUser from "./mixins/CurrentUser.js";
                             type: 'GET',
                             url: reportUrl,
                             success: function(data, status, request) {
-                                let statusUrl= request.getResponseHeader('Location');
-                                self.updateExportProgress(statusUrl, function() {
-                                    self.onAfterExportReportData();
+                                let statusUrl= request.getResponseHeader("Location");
+                                self.updateExportProgress(statusUrl, function(data) {
+                                    self.onAfterExportReportData(data);
                                 });
                             },
                             error: function(xhr) {
-                                alert('Unexpected report export error');
-                                self.onAfterExportReportData();
+                                self.onAfterExportReportData({error: true});
                             }
                         });
                     });
@@ -220,17 +237,17 @@ import CurrentUser from "./mixins/CurrentUser.js";
             updateExportProgress: function(statusUrl, callback) {
                 callback = callback || function() {};
                 if (!statusUrl) {
-                    callback();
+                    callback({error: true});
                     return;
                 }
                 let self = this;
                 // send GET request to status URL
                 $.getJSON(statusUrl, function(data) {
                     if (!data) {
-                        callback();
+                        callback({error: true});
                         return;
                     }
-                    let percent = "", exportStatus = data["state"].toUpperCase();
+                    let percent = "0%", exportStatus = data["state"].toUpperCase();
                     if (data["current"] && data["total"] && parseInt(data["total"]) > 0) {
                         percent = parseInt(data['current'] * 100 / data['total']) + "%";
                     }
@@ -255,6 +272,8 @@ import CurrentUser from "./mixins/CurrentUser.js";
                             self.updateExportProgress(statusUrl, callback);
                         }.bind(self), 2000);
                     }
+                }).fail(function() {
+                    callback({error: true});
                 });
             },
             onCurrentUserInit: function() {

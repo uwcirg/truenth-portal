@@ -1777,6 +1777,10 @@ div.footer-wrapper.right-panel {
   overflow: hidden;
   .exportReport__display-container {
     margin-top: 1em;
+    .exportReport__retry{
+      padding: 0.5em 0.7em;
+      margin-top: 1em;
+    }
   }
   .exportReport__loader {
     margin-right: 8px;
@@ -1795,8 +1799,11 @@ div.footer-wrapper.right-panel {
     content: " ";
     bottom: 0;
     left: 0;
-    width: 20px;
-    border-bottom: 2px solid darken(@btnDefaultBorderColor, 5%);
+    top: 20px;
+    width: 10px;
+    height: 10px;
+    background: darken(@btnDefaultBorderColor, 5%);
+    border-radius: 100%;
     opacity: 0.6;
   }
 }

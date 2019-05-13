@@ -168,10 +168,16 @@
         <div class='text-info text-center'><h4>{{_("Export request submitted")}}</h4></div>
         <span class='exportReport__text-warning'>{{_("Note: due to the size of result data, this may take a while.")}}</span>
         <div class="text-center exportReport__display-container">
-          <span class="exportReport__loader tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
+          <!--<span class="exportReport__loader tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></span>-->
           <span class="exportReport__status"></span>
           <span class="exportReport__percentage"></span>
           <span class="exportReport__result"></span>
+          <div class="exportReport__error" class="error-message">
+            <div class="message error-message"></div>
+            <div>
+              <button class="exportReport__retry tnth-hide">{{_("Retry")}}</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
