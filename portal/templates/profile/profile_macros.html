@@ -980,7 +980,7 @@
                 {% call editSection() -%}
                     <div class="checkbox" id="boolDeathGroup" data-save-container-id="boolDeathGroup">
                         <label><input type="checkbox" name="boolDeath" id="boolDeath" value="1" />{{_("Has the patient passed away?")}}</label>
-                        <a id="deceasedConsentPopover" data-toggle="popover"  data-placement="top" data-container="body" data-trigger="manual" data-html="true" data-content="<div class='deceased-popover-content'>{{_("By checking this box, the patient's consent status will be updated to 'Withdrawn - Suspend Data Collection'. Do you want to continue?")}}</div><div class='deceased-popover-buttons-container'><button id='btnDeceasedConsentYes'>{{_('Yes')}}</button><button id='btnDeceasedConsentNo'>{{_('No')}}</button></div>"></a>
+                        <a id="deceasedConsentPopover" data-toggle="popover"  data-placement="top" data-container="body" data-trigger="manual" data-html="true" data-content="<div class='deceased-popover-content'>{{_("By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?", new_consent_status=_("Withdrawn - Suspend Data Collection"))}}</div><div class='deceased-popover-buttons-container'><button id='btnDeceasedConsentYes'>{{_('Yes')}}</button><button id='btnDeceasedConsentNo'>{{_('No')}}</button></div>"></a>
                     </div>
                     {{saveLoaderDiv("boolDeathGroup")}}
                     <div id="deceasedInfo" class="error-message"></div>
