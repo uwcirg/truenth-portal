@@ -56,9 +56,13 @@ chown --verbose "$RUN_USER:$RUN_USER" \
 
 # Add script to run before every (bash) shell; see BASH_ENV
 echo "Adding runtime envvar-setting script to shell startup scripts..."
-cat > /etc/profile.d/remap_envvars.sh << 'SCRIPT_CONTENTS'
+cat > /etc/profile.d/remap_envvars.sh << SCRIPT_CONTENTS
 #!/bin/sh -e
+
+echo Setting run-time environment variables from package defaults...
+. "/etc/default/${PACKAGE_NAME}"
+
 echo Remapping database URL to postgresql standard env vars...
-eval $(remap_envvars.py)
+eval \$(remap_envvars.py)"
 
 SCRIPT_CONTENTS
