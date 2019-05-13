@@ -111,7 +111,7 @@ class BaseConfig(object):
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
-    PROTECTED_ORG = os.environ.get('PROTECTED_ORG') # protected organization name
+    PROTECTED_ORG = os.environ.get('PROTECTED_ORG')  # use organization name
     PROTECTED_FIELDS = os.environ['PROTECTED_FIELDS'].split(',') \
         if os.environ.get('PROTECTED_FIELDS') else None
 
