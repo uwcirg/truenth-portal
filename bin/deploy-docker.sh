@@ -42,14 +42,20 @@ done
 shift $((OPTIND-1))
 
 
+if [ -n "$BACKUP" ]; then
+    default_backups_dir=/var/opt/portal
+    # write backups to system-wide location, if able
+    if [ -w "$default_backups_dir" ]; then
+        "${bin_path}"/backup-docker.sh -b "$default_backups_dir"
+    else
+        "${bin_path}"/backup-docker.sh
+    fi
+fi
+
+
 # docker-compose commands must be run in the same directory as docker-compose.yaml
 docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
-
-
-if [ -n "$BACKUP" ]; then
-    "${bin_path}"/backup-docker.sh
-fi
 
 if [ -z "$NO_PULL" ]; then
     echo "Updating images..."
