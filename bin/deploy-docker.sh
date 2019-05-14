@@ -43,23 +43,8 @@ docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
 
-if [ -n "$BACKUP" ] && [ -n "$(docker-compose ps --quiet db)" ]; then
-    # get COMPOSE_PROJECT_NAME (see .env)
-    compose_project_name="$(
-        docker inspect "$(docker-compose ps --quiet web)" \
-            --format '{{ index .Config.Labels "com.docker.compose.project"}}'
-    )"
-    web_image_hash="$(docker-compose images --quiet web | cut -c1-7)"
-    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${compose_project_name}"
-
-    echo "Backing up current database..."
-    docker-compose exec --user postgres db bash -c '\
-        pg_dump \
-            --dbname $POSTGRES_DB \
-            --no-acl \
-            --no-owner \
-            --encoding utf8 '\
-    > "/tmp/${dump_filename}.sql"
+if [ -n "$BACKUP" ]; then
+    "${bin_path}"/backup-docker.sh
 fi
 
 if [ -z "$NO_PULL" ]; then
