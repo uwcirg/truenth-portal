@@ -3,6 +3,7 @@ from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from re import search
+from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
@@ -238,11 +239,30 @@ class TestReporting(TestCase):
 
 class TestQBStats(TestQuestionnaireBank):
 
+    def results_from_async_call(self, url, timeout=5):
+        """Wrap task of obtaining results from an async request"""
+        response = self.client.get(url)
+        # expect 202 response with location of status
+        assert response.status_code == 202
+        status_url = response.headers.get('Location')
+
+        # Give task a number of one second pauses to complete
+        for i in range(0, timeout):
+            response = self.client.get(status_url)
+            if response.json['state'] == 'SUCCESS':
+                break
+            sleep(1)
+
+        assert response.json['state'] == 'SUCCESS'
+
+        # done, now pull result (chop /status from status url for task result)
+        return self.client.get(status_url[:-len('/status')])
+
     def test_empty(self):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
-        response = self.client.get("/api/report/questionnaire_status")
-        assert response.status_code == 200
+        response = self.results_from_async_call(
+            "/api/report/questionnaire_status")
         assert response.json['resourceType'] == 'Bundle'
         assert response.json['total'] == 0
 
@@ -289,16 +309,16 @@ class TestQBStats(TestQuestionnaireBank):
         self.test_user = db.session.merge(self.test_user)
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
-        response = self.client.get("/api/report/questionnaire_status")
-        assert response.status_code == 200
+        response = self.results_from_async_call(
+            "/api/report/questionnaire_status")
 
         # with zero orgs in common, should see empty result set
         assert response.json['total'] == 0
 
         # Add org to staff to see results from matching patiens (2&3)
         self.consent_with_org(org_id=org1_id)
-        response = self.client.get("/api/report/questionnaire_status")
-        assert response.status_code == 200
+        response = self.results_from_async_call(
+            "/api/report/questionnaire_status")
         assert response.json['total'] == 2
 
     def test_results(self):
@@ -354,8 +374,8 @@ class TestQBStats(TestQuestionnaireBank):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.consent_with_org(org_id=org_id)
         self.login()
-        response = self.client.get("/api/report/questionnaire_status")
-        assert response.status_code == 200
+        response = self.results_from_async_call(
+            "/api/report/questionnaire_status", timeout=10)
 
         # expect baseline for each plus 3 mo for user4
         assert response.json['total'] == 4
