@@ -256,9 +256,9 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.updateProgressDisplay(exportStatus, percent, true);
                     let arrIncompleteStatus = ['PENDING', 'PROGRESS', 'STARTED'];
                     if (arrIncompleteStatus.indexOf(exportStatus) === -1) {
-                        if (exportStatus === "SUCCESS" && data["data"]) {
+                        if (exportStatus === "SUCCESS") {
                             setTimeout(function() {
-                                window.location.assign(statusUrl.replace("status", "result"));
+                                window.location.assign(statusUrl.replace("/status", ""));
                             }.bind(self), 0);
                         }
                         self.updateProgressDisplay(data["state"], "");
