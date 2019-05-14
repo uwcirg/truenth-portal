@@ -1055,6 +1055,7 @@ def celery_test(x=16, y=16):
     from ..tasks import add
     x = int(request.args.get("x", x))
     y = int(request.args.get("y", y))
+    # Don't queue up a bunch of test tasks; expire if not responsive
     res = add.apply_async((x, y), expires=2.0)
     return jsonify(result=res.get(), task_id=res.task_id)
 
