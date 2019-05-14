@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from flask import current_app
 from sqlalchemy.types import Enum as SQLA_Enum
 import redis
+from redis.exceptions import ConnectionError
 from time import sleep
 from werkzeug.exceptions import BadRequest
 
