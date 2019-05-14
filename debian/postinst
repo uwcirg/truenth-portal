@@ -36,6 +36,7 @@ echo "Loading debian package-specific defaults..."
 . "/etc/default/${PACKAGE_NAME}"
 PROJECT_DIR="${PROJECT_DIR:-$venv_install_dir}"
 
+# check for required environment variables
 : "${FILE_UPLOAD_DIR?Need to set FILE_UPLOAD_DIR}"
 : "${PERSISTENCE_EXCLUSIONS_DIR?Need to set PERSISTENCE_EXCLUSIONS_DIR}"
 : "${PROJECT_DIR?Need to set PROJECT_DIR}"
@@ -53,10 +54,15 @@ chown --verbose "$RUN_USER:$RUN_USER" \
     "${PERSISTENCE_EXCLUSIONS_DIR}" \
     "${PROJECT_DIR}/var/portal-instance/"
 
-echo "Adding remap_envvars.py wrapper to run at start..."
-cat > /etc/profile.d/remap_envvars.sh << 'SCRIPT_CONTENTS'
+# Add script to run before every (bash) shell; see BASH_ENV
+echo "Adding runtime envvar-setting script to shell startup scripts..."
+cat > /etc/profile.d/remap_envvars.sh << SCRIPT_CONTENTS
 #!/bin/sh -e
+
+echo Setting run-time environment variables from package defaults...
+. "/etc/default/${PACKAGE_NAME}"
+
 echo Remapping database URL to postgresql standard env vars...
-eval $(remap_envvars.py)
+eval \$(remap_envvars.py)"
 
 SCRIPT_CONTENTS
