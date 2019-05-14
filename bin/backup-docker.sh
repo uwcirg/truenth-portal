@@ -11,8 +11,9 @@ repo_path="${bin_path}/.."
 usage() {
     cat << USAGE >&2
 Usage:
-    $cmdname [-h]
+    $cmdname [-h] [-b backup_location]
     -h     Show this help message
+    -b     Override default backup location (/tmp)
 
     Application backup script
     Dump application database and uploaded content
@@ -21,10 +22,10 @@ USAGE
     exit 1
 }
 
-while getopts "h" option; do
+while getopts "hb:" option; do
     case "${option}" in
         b)
-            BACKUP=true
+            backups_dir="${OPTARG}"
             ;;
         h)
             usage
@@ -36,6 +37,8 @@ while getopts "h" option; do
 done
 shift $((OPTIND-1))
 
+default_backups_dir=/tmp
+BACKUPS_DIR="${backups_dir:-$default_backups_dir}"
 
 # docker-compose commands must be run in the same directory as docker-compose.yaml
 docker_compose_directory="${repo_path}/docker"
@@ -61,5 +64,5 @@ docker-compose exec --user postgres db bash -c '\
         --no-acl \
         --no-owner \
         --encoding utf8 '\
-> "/tmp/${dump_filename}.sql"
+> "${BACKUPS_DIR}/${dump_filename}.sql"
 echo "Backup complete"
