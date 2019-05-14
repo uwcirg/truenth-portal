@@ -15,6 +15,10 @@ Usage:
     -b     Backup current database before attempting update
     -n     Do not pull docker images prior to starting
     -h     Show this help message
+
+    Docker deployment script
+    Pull the latest docker image and recreate relevant containers
+
 USAGE
     exit 1
 }
