@@ -105,7 +105,8 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 data: [],
                 message: "",
                 loading: false
-            }
+            },
+            exportReportTimeoutID: 0
         },
         methods: {
             injectDependencies: function () {
@@ -153,6 +154,26 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 dataType = dataType||"json";
                 return `/api/report/questionnaire_status?format=${dataType}`;
             },
+            onBeforeExportReportData: function() {
+                clearTimeout(self.exportReportTimeoutID);
+                $("#exportReportContainer").removeClass("open").popover("show");
+                $("#btnExportReport").attr("disabled", true);
+                $(".exportReport__status").addClass("active");
+            },
+            onAfterExportReportData: function(options) {
+                options = options || {};
+                $("#btnExportReport").attr("disabled", false);
+                $(".exportReport__status").removeClass("active");
+                if (options.error) {
+                    this.updateProgressDisplay("", "");
+                    $(".exportReport__error .message").html("Request to export report data failed.");
+                    $(".exportReport__retry").removeClass("tnth-hide");
+                    return;
+                } 
+                $("#exportReportContainer").popover("hide");
+                $(".exportReport__error .message").html("");
+                $(".exportReport__retry").addClass("tnth-hide");
+            },
             initExportReportDataSelector: function() {
                 let self = this;
                 tnthAjax.getConfiguration(this.userId, false, function(data) {
@@ -161,26 +182,98 @@ import CurrentUser from "./mixins/CurrentUser.js";
                         return false;
                     }
                     let html = $("#exportReportPopoverWrapper").html();
-                    const DELAY_INTERVAL = 150;
+                    const DELAY_INTERVAL = 50;
                     $("#adminTableContainer .fixed-table-toolbar .columns-right").append(html);
                     $("#exportReportContainer").attr("data-content", $("#exportReportPopoverContent").html());
                     $("#exportReportContainer .data-types li").each(function() {
                         $(this).attr("title", self.getExportReportUrl($(this).attr("data-type")));
                     });
+                    $(window).on("resize", function() {
+                        self.onAfterExportReportData();
+                    });
+                    $('#exportReportContainer').on('shown.bs.popover', function () {
+                        $(".exportReport__retry").off("click").on("click", function(e) {
+                            e.stopImmediatePropagation();
+                            $("#exportReportContainer").popover("hide");
+                            setTimeout(function() {
+                                $("#btnExportReport").trigger("click");
+                            }, 50);
+                        });
+                    });
                     $("#exportReportContainer .data-types li").on("click", function(e) {
                         e.stopPropagation();
                         let dataType = $(this).attr("data-type");
+                        let reportUrl = self.getExportReportUrl(dataType);
+                        self.updateProgressDisplay("", "");
                         setTimeout(function() {
-                            window.location.assign(this.getExportReportUrl(dataType));
-                        }.bind(self), 0);
-                        setTimeout(function() {
-                            $("#exportReportContainer").removeClass("open").popover("show");
+                            self.onBeforeExportReportData();
                         }, DELAY_INTERVAL);
-                        setTimeout(function() {
-                            $("#exportReportContainer").popover("hide");
-                        }, DELAY_INTERVAL*50);
+                        $.ajax({
+                            type: 'GET',
+                            url: reportUrl,
+                            success: function(data, status, request) {
+                                let statusUrl= request.getResponseHeader("Location");
+                                self.updateExportProgress(statusUrl, function(data) {
+                                    self.onAfterExportReportData(data);
+                                });
+                            },
+                            error: function(xhr) {
+                                self.onAfterExportReportData({error: true});
+                            }
+                        });
                     });
                     $("#adminTableContainer .columns-right .export button").attr("title", i18next.t("Export patient list"));
+                });
+            },
+            updateProgressDisplay: function(status, percentage, showLoader) {
+                $(".exportReport__percentage").text(percentage);
+                $(".exportReport__status").text(status);
+                if (showLoader) {
+                    $(".exportReport__loader").removeClass("tnth-hide");
+                } else {
+                    $(".exportReport__loader").addClass("tnth-hide")
+                }
+            },
+            updateExportProgress: function(statusUrl, callback) {
+                callback = callback || function() {};
+                if (!statusUrl) {
+                    callback({error: true});
+                    return;
+                }
+                let self = this;
+                // send GET request to status URL
+                $.getJSON(statusUrl, function(data) {
+                    if (!data) {
+                        callback({error: true});
+                        return;
+                    }
+                    let percent = "0%", exportStatus = data["state"].toUpperCase();
+                    if (data["current"] && data["total"] && parseInt(data["total"]) > 0) {
+                        percent = parseInt(data['current'] * 100 / data['total']) + "%";
+                    }
+
+                    //update status and percentage displays
+                    self.updateProgressDisplay(exportStatus, percent, true);
+                    let arrIncompleteStatus = ['PENDING', 'PROGRESS', 'STARTED'];
+                    if (arrIncompleteStatus.indexOf(exportStatus) === -1) {
+                        if (exportStatus === "SUCCESS" && data["data"]) {
+                            setTimeout(function() {
+                                window.location.assign(statusUrl.replace("status", "result"));
+                            }.bind(self), 0);
+                        }
+                        self.updateProgressDisplay(data["state"], "");
+                        setTimeout(function() {
+                            callback();
+                        }, 300);
+                    }
+                    else {
+                        // rerun in 2 seconds
+                        self.exportReportTimeoutID = setTimeout(function() {
+                            self.updateExportProgress(statusUrl, callback);
+                        }.bind(self), 2000);
+                    }
+                }).fail(function() {
+                    callback({error: true});
                 });
             },
             onCurrentUserInit: function() {
