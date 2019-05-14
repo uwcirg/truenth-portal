@@ -1,7 +1,4 @@
 #!/bin/sh -e
-# docker-compose deployment script
-# Build or update a set of containers as defined by a docker-compose.yaml file
-# Environment variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
 
 cmdname="$(basename "$0")"
 bin_path="$(cd "$(dirname "$0")" && pwd)"
@@ -11,10 +8,10 @@ repo_path="${bin_path}/.."
 usage() {
     cat << USAGE >&2
 Usage:
-    $cmdname [-b] [-h]
+    $cmdname [-h] [-b] [-n]
+    -h     Show this help message
     -b     Backup current database before attempting update
     -n     Do not pull docker images prior to starting
-    -h     Show this help message
 
     Docker deployment script
     Pull the latest docker image and recreate relevant containers

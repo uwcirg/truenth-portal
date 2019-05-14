@@ -1,7 +1,4 @@
 #!/bin/sh -e
-# docker-compose deployment script
-# Build or update a set of containers as defined by a docker-compose.yaml file
-# Environment variables passed to this script (eg IMAGE_TAG) will be available to the given docker-compose.yaml file
 
 cmdname="$(basename "$0")"
 bin_path="$(cd "$(dirname "$0")" && pwd)"
