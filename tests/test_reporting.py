@@ -328,7 +328,7 @@ class TestQBStats(TestQuestionnaireBank):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
         response = self.results_from_async_call(
-            "/api/report/questionnaire_status")
+            "/api/report/questionnaire_status", timeout=10)
 
         # with zero orgs in common, should see empty result set
         assert response.json['total'] == 0
@@ -336,7 +336,7 @@ class TestQBStats(TestQuestionnaireBank):
         # Add org to staff to see results from matching patiens (2&3)
         self.consent_with_org(org_id=org1_id)
         response = self.results_from_async_call(
-            "/api/report/questionnaire_status")
+            "/api/report/questionnaire_status", timeout=10)
         assert response.json['total'] == 2
 
     def test_results(self):
