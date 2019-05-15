@@ -43,14 +43,16 @@ def setup_periodic_tasks(sender, **kwargs):
             ScheduledJob.query.count()))
         for job in session.query(ScheduledJob).all():
             task = getattr(tasks, job.task, None)
-            if task:
-                logger.info("Adding task (id=`{}`, task=`{}` "
-                            "to CeleryBeat".format(job.id, job.task))
-                args_in = job.args.split(',') if job.args else []
-                kwargs_in = job.kwargs or {}
-                kwargs_in['job_id'] = job.id
-                try:
-                    sender.add_periodic_task(job.crontab_schedule(),
-                                             task.s(*args_in, **kwargs_in))
-                except Exception as exc:
-                    logger.error(exc)
+            if not task:
+                continue
+
+            logger.info("Adding task (id=`{}`, task=`{}` "
+                        "to CeleryBeat".format(job.id, job.task))
+            args_in = job.args.split(',') if job.args else []
+            kwargs_in = job.kwargs or {}
+            kwargs_in['job_id'] = job.id
+            try:
+                sender.add_periodic_task(job.crontab_schedule(),
+                                         task.s(*args_in, **kwargs_in))
+            except Exception as exc:
+                logger.error(exc)
