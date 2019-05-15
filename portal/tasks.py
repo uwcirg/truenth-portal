@@ -10,11 +10,8 @@ NB: a celery worker must be started for these to ever return.  See
 from datetime import datetime
 from functools import wraps
 import json
-import random
-import time
 from traceback import format_exc
 
-from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
 from flask import current_app
 import redis
@@ -145,8 +142,6 @@ def test(**kwargs):
 @celery.task
 @scheduled_task
 def test_args(*args, **kwargs):
-    alist = ",".join(args)
-    klist = json.dumps(kwargs)
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
