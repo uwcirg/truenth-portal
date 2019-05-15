@@ -95,7 +95,7 @@ def info():
         current_app.config.get('SERVER_NAME'))
 
 
-@celery.task(bind=True, ignore_result=False, max_retries=3, track_started=True)
+@celery.task(bind=True, track_started=True)
 def adherence_report_task(self, **kwargs):
     logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
