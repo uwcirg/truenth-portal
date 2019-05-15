@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from flask import current_app
 from sqlalchemy.types import Enum as SQLA_Enum
 import redis
+from redis.exceptions import ConnectionError
 from time import sleep
 from werkzeug.exceptions import BadRequest
 
@@ -412,7 +413,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
-        timeout = current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT")
+        timeout = int(current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT"))
         key = "update_users_QBT user:{}".format(user_id)
 
         with TimeoutLock(key=key, timeout=timeout):

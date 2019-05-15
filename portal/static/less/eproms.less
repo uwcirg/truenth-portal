@@ -1770,6 +1770,54 @@ div.footer-wrapper.right-panel {
     top: 94%;
   }
 }
+.exportReport__popovercontent {
+  top: 4px;
+  padding-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  .exportReport__display-container {
+    margin-top: 1em;
+    .exportReport__retry{
+      padding: 0.5em 0.7em;
+      margin-top: 1em;
+    }
+  }
+  .exportReport__loader {
+    margin-right: 8px;
+    position: relative;
+    top: 4px;
+  }
+  .exportReport__status {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 4px;
+  }
+  .exportReport__status.active:before {
+    position: absolute;
+    animation: borderLoader 750ms infinite linear;
+    display: block;
+    content: " ";
+    bottom: 0;
+    left: 0;
+    top: 20px;
+    width: 10px;
+    height: 10px;
+    background: darken(@btnDefaultBorderColor, 5%);
+    border-radius: 100%;
+    opacity: 0.6;
+  }
+}
+@keyframes borderLoader {
+  0% {
+      left: 0;
+  }
+  50% {
+      left: 50%;
+  }
+  100% {
+      left: 100%;
+  }
+}
 #adminTableContainer {
   position: relative;
   opacity: 0;
@@ -2300,8 +2348,6 @@ div.footer-wrapper.right-panel {
   flex-direction: column;
 }
 #patientListOptions {
-  margin-bottom: 1.5em;
-  border-bottom: solid 1px @HRColor;
   padding: 0.5em 0;
 }
 #patientListOptions.disabled {

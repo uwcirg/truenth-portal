@@ -689,11 +689,11 @@ class OrgNode(object):
     def insert(self, id, partOf_id=None):
         """Insert new nodes into the org tree
 
-        Designed for this special organizaion purpose, we expect the
+        Designed for this special organization purpose, we expect the
         tree is built from the top (root) down, so no rebalancing is
         necessary.
 
-        :param id: of organizaiton to insert
+        :param id: of organization to insert
         :param partOf_id: if organization has a parent - its identifier
         :returns: the newly inserted node
 
@@ -737,7 +737,7 @@ class OrgTree(object):
     Organizations may define a 'partOf' in the database records to describe
     where the organization fits in a hierarchy.  As there may be any
     number of organization tiers, and the need exists to lookup where
-    an organiztion fits in this hiearchy.  For example, needing to lookup
+    an organization fits in this hierarchy.  For example, needing to lookup
     the top level organization for any node, or all the organizations at or
     below a level for permission issues. etc.
 

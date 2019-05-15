@@ -97,7 +97,7 @@ class ScheduledJob(db.Model):
                     "portal.tasks.{}".format(self.task),
                     args=args_in, kwargs=kwargs_in)
                 result_url = url_for(
-                    'portal.celery_result', task_id=res.task_id)
+                    'portal.task_result', task_id=res.task_id)
                 msg = "Task sent to celery; see {} for results".format(
                     result_url, _external=True)
             except Exception as exc:

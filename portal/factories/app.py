@@ -16,7 +16,7 @@ from werkzeug.contrib.profiler import ProfilerMiddleware
 
 # Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..audit import configure_audit_log
-from ..config.config import SITE_CFG, DefaultConfig
+from ..config.config import SITE_CFG, DefaultConfig, TestConfig
 from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
@@ -137,6 +137,8 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+    elif os.environ.get('TESTING', 'false').lower() == 'true':
+        app.config.from_object(TestConfig)
 
     # Set email "from" addresss if not set yet
     if 'MAIL_DEFAULT_SENDER' not in app.config:
