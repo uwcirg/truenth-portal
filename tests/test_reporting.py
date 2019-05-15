@@ -239,7 +239,8 @@ class TestReporting(TestCase):
 
 class TestQBStats(TestQuestionnaireBank):
 
-    def results_from_async_call(self, url, timeout=5):
+    def results_from_async_call(
+            self, url, timeout=5, include_task_path=False):
         """Wrap task of obtaining results from an async request"""
         response = self.client.get(url)
         # expect 202 response with location of status
@@ -256,7 +257,11 @@ class TestQBStats(TestQuestionnaireBank):
         assert response.json['state'] == 'SUCCESS'
 
         # done, now pull result (chop /status from status url for task result)
-        return self.client.get(status_url[:-len('/status')])
+        task_path = status_url[:-len('/status')]
+        results = self.client.get(task_path)
+        if include_task_path:
+            return task_path, results
+        return results
 
     def test_empty(self):
         self.promote_user(role_name=ROLE.STAFF.value)
@@ -265,6 +270,19 @@ class TestQBStats(TestQuestionnaireBank):
             "/api/report/questionnaire_status")
         assert response.json['resourceType'] == 'Bundle'
         assert response.json['total'] == 0
+
+    def test_protected_results(self):
+        self.promote_user(role_name=ROLE.STAFF.value)
+        self.login()
+        task_path, response = self.results_from_async_call(
+            "/api/report/questionnaire_status", include_task_path=True)
+
+        # login as different user and attempt to access results
+        second_user = self.add_user('second_user')
+        self.login(second_user.id)
+        response = self.client.get(task_path)
+        assert response.status_code == 401
+        assert not response.json
 
     def test_permissions(self):
         """Shouldn't get results from orgs outside view permissions"""

@@ -203,7 +203,10 @@ def adherence_report(
                 historic.pop('entry_method', None)
             data.append(historic)
 
-    results = {'data': data, 'response_format': response_format}
+    results = {
+        'data': data,
+        'response_format': response_format,
+        'required_user_id': acting_user_id}
     if response_format == 'csv':
         base_name = 'Questionnaire-Timeline-Data'
         if org_id:
