@@ -31,14 +31,16 @@ def setup_periodic_tasks(sender, **kwargs):
     # the resource, which otherwise prevents test runs from purging the db
     with db.scoped_session as session:
         # create test task if non-existent
-        if not session.query(ScheduledJob).filter_by(name="__test_celery__").first():
+        if not session.query(ScheduledJob).filter_by(
+                name="__test_celery__").first():
             test_job = ScheduledJob(name="__test_celery__", task="test",
                                     schedule="0 * * * *", active=True)
             session.add(test_job)
             session.commit()
 
         # add all tasks to Celery
-        logger.info("ScheduledJobs found: {}".format(ScheduledJob.query.count()))
+        logger.info("ScheduledJobs found: {}".format(
+            ScheduledJob.query.count()))
         for job in session.query(ScheduledJob).all():
             task = getattr(tasks, job.task, None)
             if task:
