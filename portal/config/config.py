@@ -58,11 +58,9 @@ class BaseConfig(object):
     # also reset the other variables using it as a default below
     REDIS_URL = os.environ.get(
         'REDIS_URL',
-        (
-            'redis://localhost:6379/5' \
-                if os.environ.get('TESTING', 'false').lower() == 'true' \
-                else 'redis://localhost:6379/0'
-        )
+        'redis://localhost:6379/5'
+        if os.environ.get('TESTING', 'false').lower() == 'true'
+        else 'redis://localhost:6379/0',
     )
 
     ANONYMOUS_USER_ACCOUNT = True
