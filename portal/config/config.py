@@ -51,18 +51,17 @@ class BaseConfig(object):
         'localhost'
     )
 
-    # Allow Heroku env vars to override most defaults
+    # Allow Heroku environment variables to override service defaults
     # NB: The value of REDIS_URL may change at any point
 
     # We override REDIS_URL when testing now to avoid needing to
     # also reset the other variables using it as a default below
-    if os.environ.get('TESTING', 'false').lower() == 'true':
-        REDIS_URL = 'redis://localhost:6379/5'
-    else:
-        REDIS_URL = os.environ.get(
-            'REDIS_URL',
-            'redis://localhost:6379/0'
-        )
+    REDIS_URL = os.environ.get(
+        'REDIS_URL',
+        'redis://localhost:6379/5' \
+            if os.environ.get('TESTING', 'false').lower() == 'true' \
+            else 'redis://localhost:6379/0'
+    )
 
     ANONYMOUS_USER_ACCOUNT = True
     BROKER_URL = os.environ.get(
