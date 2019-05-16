@@ -10,15 +10,11 @@ NB: a celery worker must be started for these to ever return.  See
 from datetime import datetime
 from functools import wraps
 import json
-import random
-import time
 from traceback import format_exc
 
-from celery.exceptions import SoftTimeLimitExceeded
 from celery.utils.log import get_task_logger
-from flask import current_app, url_for
+from flask import current_app
 import redis
-import requests
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
@@ -31,8 +27,11 @@ from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
-from .models.questionnaire_bank import QuestionnaireBank
-from .models.reporting import generate_and_send_summaries, get_reporting_stats
+from .models.reporting import (
+    adherence_report,
+    generate_and_send_summaries,
+    get_reporting_stats,
+)
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
 from .models.tou import update_tous
@@ -96,6 +95,13 @@ def info():
         current_app.config.get('SERVER_NAME'))
 
 
+@celery.task(bind=True, track_started=True)
+def adherence_report_task(self, **kwargs):
+    logger.debug("launch adherence report task: %s", self.request.id)
+    kwargs['celery_task'] = self
+    return adherence_report(**kwargs)
+
+
 @celery.task(name="tasks.post_request", bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
     """Wrap requests.post for asyncronous posts - includes timeout & retry"""
@@ -136,49 +142,7 @@ def test(**kwargs):
 @celery.task
 @scheduled_task
 def test_args(*args, **kwargs):
-    alist = ",".join(args)
-    klist = json.dumps(kwargs)
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
-
-
-@celery.task(
-    name="tasks.test_consume_list", ignore_result=True, soft_time_limit=4)
-def test_consume_list(id_list, priority):
-    """Proof of concept / test code to eval producer/consumer pattern.
-
-    See also the produce_list() task, and the trigger view
-    at /test-producer-consumer
-
-    """
-    try:
-        # sleep for a number of seconds, so the process looks to take
-        # a bit and evaluation of tasks and priorities can be observed.
-        time.sleep(random.randint(1, 5))
-        logger.info("priority: {} consuming {}".format(priority, id_list))
-    except SoftTimeLimitExceeded:
-        logger.info("timed out")
-
-
-@celery.task(name="tasks.test_produce_list")
-def test_produce_list():
-    """Proof of concept / test code to eval producer/consumer pattern.
-
-    See also the consume_list() task, and the trigger view
-    at /test-producer-consumer
-
-    """
-    j = 0
-    step = 5
-    numlists = 50
-    for i in range(step, (step*numlists)+1, step):
-        id_list = (range(j, i))
-        priority = random.choice((0, 5, 9))
-        logger.info("priority {}; producing {}".format(priority, id_list))
-        test_consume_list.apply_async(
-            priority=priority,
-            kwargs={'id_list': id_list, 'priority': priority})
-        j = i
-    logger.info("producer done")
 
 
 @celery.task

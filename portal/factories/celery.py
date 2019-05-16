@@ -12,6 +12,10 @@ def create_celery(app):
     if __celery:
         return __celery
 
+    app.logger.debug("Create celery w/ backends {} & {}".format(
+        app.config['CELERY_RESULT_BACKEND'],
+        app.config['SQLALCHEMY_DATABASE_URI']))
+
     celery = Celery(
         app.import_name,
         backend=app.config['CELERY_RESULT_BACKEND'],

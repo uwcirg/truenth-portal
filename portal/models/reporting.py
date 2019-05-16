@@ -3,12 +3,13 @@ from collections import defaultdict
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
 
-from flask import current_app
+from flask import current_app, url_for
 from flask_babel import force_locale
+from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..dogpile_cache import dogpile_cache
-from ..views.reporting import generate_overdue_table_html
+from ..date_tools import FHIR_datetime
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .clinical_constants import CC
 from .communication import load_template_args
@@ -21,8 +22,11 @@ from .procedure_codes import (
     known_treatment_started,
 )
 from .qb_status import QB_Status
+from .questionnaire_bank import visit_name
+from .questionnaire_response import QNR_results
 from .role import ROLE
-from .user import User
+from .user import User, patients_query
+from .user_consent import latest_consent
 
 
 @dogpile_cache.region('reporting_cache_region')
@@ -102,6 +106,120 @@ def get_reporting_stats():
     return stats
 
 
+def adherence_report(
+        requested_as_of_date, acting_user_id, include_test_role, org_id,
+        response_format, celery_task):
+    """Generates the adherence report
+
+    Designed to be executed in a background task - all inputs and outputs are
+    easily serialized (executing celery_task parent an obvious exception).
+
+    :param requested_as_of_date: string form of as_of_date, or None to use now
+    :param acting_user_id: id of user evoking request, for permission check
+    :param include_test_role: set to include test patients in results
+    :param org_id: set to limit to patients belonging to a branch of org tree
+    :param response_format: 'json' or 'csv'
+    :param celery_task: used to update status when run as a celery task
+    :return: dictionary of results, easily stored as a task output, including
+       any details needed to assist the view method
+
+    """
+    acting_user = User.query.get(acting_user_id)
+    if requested_as_of_date:
+        as_of_date = FHIR_datetime.parse(requested_as_of_date)
+    else:
+        as_of_date = datetime.utcnow()
+
+    # If limited by org - grab org and all it's children as filter list
+    requested_orgs = (
+        OrgTree().here_and_below_id(organization_id=org_id) if org_id
+        else None)
+
+    patients = patients_query(
+        acting_user=acting_user,
+        include_test_role=include_test_role,
+        requested_orgs=requested_orgs)
+    data = []
+    current, total = 0, patients.count()
+    for patient in patients:
+
+        # occasionally update the celery task status if defined
+        current += 1
+        if not current % 25 and celery_task:
+            celery_task.update_state(
+                state='PROGRESS', meta={'current': current, 'total': total})
+
+        if len(patient.organizations) == 0:
+            # Very unlikely we want to include patients w/o at least
+            # one org, skip this patient
+            continue
+
+        try:
+            acting_user.check_role('view', other_id=patient.id)
+        except Unauthorized:
+            # simply exclude any patients the user can't view
+            continue
+
+        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
+        row = {
+            'user_id': patient.id,
+            'site': patient.organizations[0].name,
+            'status': str(qb_stats.overall_status)}
+
+        consent = latest_consent(user=patient)
+        if consent:
+            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
+
+        study_id = patient.external_study_id
+        if study_id:
+            row['study_id'] = study_id
+
+        # if no current, try previous (as current may be expired)
+        last_viable = qb_stats.current_qbd(
+            even_if_withdrawn=True) or qb_stats.prev_qbd
+        if last_viable:
+            row['qb'] = last_viable.questionnaire_bank.name
+            row['visit'] = visit_name(last_viable)
+            entry_method = QNR_results(
+                patient, last_viable.qb_id,
+                last_viable.iteration).entry_method()
+            if entry_method:
+                row['entry_method'] = entry_method
+
+        data.append(row)
+
+        # as we require a full history, continue to add rows for each previous
+        # visit available
+        for qbd, status in qb_stats.older_qbds(last_viable):
+            historic = row.copy()
+            historic['status'] = status
+            historic['qb'] = qbd.questionnaire_bank.name
+            historic['visit'] = visit_name(qbd)
+            entry_method = QNR_results(
+                patient, qbd.qb_id, qbd.iteration).entry_method()
+            if entry_method:
+                historic['entry_method'] = entry_method
+            else:
+                historic.pop('entry_method', None)
+            data.append(historic)
+
+    results = {
+        'data': data,
+        'response_format': response_format,
+        'required_user_id': acting_user_id}
+    if response_format == 'csv':
+        base_name = 'Questionnaire-Timeline-Data'
+        if org_id:
+            base_name = '{}-{}'.format(
+                base_name,
+                Organization.query.get(org_id).name.replace(' ', '-'))
+        results['filename_prefix'] = base_name
+        results['column_headers'] = [
+            'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
+
+    return results
+
+
 def calculate_days_overdue(user):
     now = datetime.utcnow()
     a_s = QB_Status(user, as_of_date=now)
@@ -136,6 +254,7 @@ def overdue_stats_by_org():
 
 
 def generate_and_send_summaries(cutoff_days, org_id):
+    from ..views.reporting import generate_overdue_table_html
     ostats = overdue_stats_by_org()
     cutoffs = [int(i) for i in cutoff_days.split(',')]
     error_emails = set()

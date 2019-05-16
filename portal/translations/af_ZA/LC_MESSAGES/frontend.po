@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2018-12-03T19:43:42.016Z\n"
-"PO-Revision-Date: 2018-12-03T19:43:42.016Z\n"
+"POT-Creation-Date: 2019-05-07T23:43:19.569Z\n"
+"PO-Revision-Date: 2019-05-07T23:43:19.569Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -60,6 +60,9 @@ msgstr "Geen passende rekords gevind nie"
 msgid "Export data"
 msgstr "Voer data uit"
 
+msgid "Export patient list"
+msgstr ""
+
 msgid "User Id is required"
 msgstr "Gebruiker-ID word vereis"
 
@@ -83,15 +86,6 @@ msgstr "Voer teks in"
 
 msgid "Select"
 msgstr "Kies"
-
-msgid "Error occurred setting user roles"
-msgstr "Gebruikersrolle kon nie opgestel word nie"
-
-msgid "Error occurred setting user organizations"
-msgstr "Gebruikersorganisasies kon nie opgestel word nie"
-
-msgid "Error occurred retrieving data from server."
-msgstr "Data kon nie van die bediener afgelaai word nie."
 
 msgid "Error occurred retrieving patient report"
 msgstr "Pasiëntverslag kon nie afgelaai word nie"
@@ -117,14 +111,11 @@ msgstr "Onaktief"
 msgid "Deactivate"
 msgstr "Deaktiveer"
 
-msgid "Server Error occurred retrieving report data"
-msgstr "Daar was ’n bedienerfout terwyl verslagdata afgelaai is"
+msgid "Error occurred retrieving subject ID"
+msgstr ""
 
-msgid "GMT, Y-M-D"
-msgstr "GMT, J-M-D"
-
-msgid "Unable to load report data"
-msgstr "Verslagdata kon nie laai nie"
+msgid "Error occurred - unable to reach destination"
+msgstr ""
 
 msgid "Unable to set session variable for organization modal viewed."
 msgstr "Sessieveranderlike vir die organisasiemodaal wat bekyk is, kon nie gestel word nie."
@@ -140,6 +131,9 @@ msgstr "Organisasie kon nie bygewerk word nie"
 
 msgid "My Dashboard"
 msgstr "My kontroleskerm"
+
+msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ..."
+msgstr ""
 
 msgid "You have entered an invalid access code.  Please try again"
 msgstr "Jy het ’n ongeldige toegangskode ingevoer.  Probeer asseblief weer"
@@ -159,263 +153,8 @@ msgstr ""
 msgid "Missing information for consent agreement.  Unable to complete request."
 msgstr ""
 
-msgid "No organizations available"
-msgstr "Geen organisasies beskikbaar nie"
-
-msgid "success"
-msgstr "sukses"
-
-msgid "Unable to update. System/Server Error."
-msgstr "Kon nie bywerk nie. Stelsel-/bedienerfout."
-
-msgid "unable to get needed core data"
-msgstr "kon nie die benodigde kerndata kry nie"
-
-msgid "unable to get required core data"
-msgstr "kon nie die vereiste kerndata kry nie"
-
-msgid "no data found"
-msgstr "geen data gevind nie"
-
-msgid "Unable to retrieve portal footer html"
-msgstr "Kon nie poortvoetnota-html aflaai nie"
-
-msgid "No data found"
-msgstr "Geen data gevind nie"
-
-msgid "Server error occurred retrieving organization/clinic information."
-msgstr "Daar was ’n bedienerfout terwyl organisasie-/kliniekinligting afgelaai is."
-
-msgid "Server error occurred retrieving consent information."
-msgstr "Daar was ’n bedienerfout terwyl toestemmingsinligting afgelaai is."
-
-msgid "User id and parameters are required"
-msgstr "Gebruiker-ID en -parameters word vereis"
-
-msgid "Server error occurred setting consent status."
-msgstr "Daar was ’n bedienerfout terwyl toestemmingstatus gestel is."
-
-msgid "Server error occurred removing consent."
-msgstr "Daar was ’n bedienerfout terwyl toestemming verwyder is."
-
-msgid "User id and organization id are required."
-msgstr "Gebruiker-ID en organisasie-ID word vereis."
-
-msgid "Error occurred setting suspended consent status."
-msgstr "Opgeskorte toestemmingstatus kon nie opgestel word nie."
-
-msgid "Server error occurred retrieving demographics information."
-msgstr "Daar was ’n bedienerfout toe demografiese inligting afgelaai is."
-
-msgid "Server error occurred setting demographics information."
-msgstr "Daar was ’n bedienerfout terwyl demografiese inligting gestel is."
-
-msgid "Server error occurred retrieving locale information."
-msgstr "Daar was ’n bedienerfout toe liggingsinligting afgelaai is."
-
-msgid "User id is required"
-msgstr "Gebruiker-ID word vereis"
-
-msgid "Error retrieving data from server"
-msgstr "Kon nie data van bediener aflaai nie"
-
-msgid "Server error occurred saving procedure/treatment information."
-msgstr "Daar was ’n bedienerfout terwyl prosedure-/behandelingsinligting gestoor is."
-
-msgid "Server error occurred removing procedure/treatment information."
-msgstr "Daar was ’n bedienerfout terwyl prosedure-/behandelingsinligting verwyder is."
-
-msgid "Server error occurred retrieving roles information."
-msgstr "Daar was ’n bedienerfout terwyl rolleinligting afgelaai is."
-
-msgid "Server error occurred retrieving user role information."
-msgstr "Daar was ’n bedienerfout terwyl gebruikersrolinligting afgelaai is."
-
-msgid "User Id is required."
+msgid "Error occurred deleting notification"
 msgstr ""
-
-msgid "Server error occurred setting user role information."
-msgstr "Daar was ’n bedienerfout terwyl gebruikersrolinligting gestel is."
-
-msgid "Server error occurred deleting user role."
-msgstr "Daar was ’n bedienerfout terwyl gebruikersrol geskrap is."
-
-msgid "Server error occurred retrieving clinical data."
-msgstr "Daar was ’n bedienerfout terwyl kliniese data afgelaai is."
-
-msgid "Server error occurred updating clinical data."
-msgstr "Daar was ’n bedienerfout terwyl kliniese data bygewerk is."
-
-msgid "no url returned"
-msgstr "geen url terugontvang nie"
-
-msgid "Server error occurred retrieving tou url."
-msgstr "Daar was ’n bedienerfout terwyl die tou-url afgelaai is."
-
-msgid "Server error"
-msgstr "Bedienerfout"
-
-msgid "error retrieving instruments list"
-msgstr "instrumentelys kon nie afgelaai word nie"
-
-msgid "Server error occurred retrieving tou data."
-msgstr "Daar was ’n bedienerfout terwyl tou-data afgelaai is."
-
-msgid "Server error occurred saving terms of use information."
-msgstr "Daar was ’n bedienerfout terwyl bepalingsinligting gestoor is."
-
-msgid "Error occurred retrieving access url."
-msgstr "Toegangs-url kon nie afgelaai word nie."
-
-msgid "Invite data are required."
-msgstr "Uitnodigingsdata word vereis."
-
-msgid "Error occurred sending password reset request."
-msgstr "Wagwoordterugstellingsversoek kon nie gestuur word nie."
-
-msgid "Error occurred retrieving assessment status."
-msgstr "Assesseringstatus kon nie afgelaai word nie."
-
-msgid "Questionnaire response data is required."
-msgstr "Vraelysantwoorddata word vereis."
-
-msgid "Error occurred retrieving assessment list."
-msgstr "Assesseringslys kon nie afgelaai word nie."
-
-msgid "User id and instrument Id are required."
-msgstr "Gebruiker-ID en instrument-ID word vereis."
-
-msgid "Error occurred retrieving assessment report."
-msgstr "Assesseringsverslag kon nie afgelaai word nie."
-
-msgid "Error occurred retrieving current questionnaire bank for user."
-msgstr "Huidige vraelysbank vir gebruiker kon nie afgelaai word nie."
-
-msgid "Error occurred retrieving patient report."
-msgstr "Pasiëntverslag kon nie afgelaai word nie."
-
-msgid "Error occurred setting table preference."
-msgstr "Tabelvoorkeur kon nie gestel word nie."
-
-msgid "Error occurred retrieving email audit entries."
-msgstr "E-posouditinskrywings kon nie afgelaai word nie."
-
-msgid "Error occurred retrieving audit log."
-msgstr "Ouditlog kon nie afgelaai word nie."
-
-msgid "configuration key is required."
-msgstr "konfigurasiesleutel word vereis."
-
-msgid "Error occurred retrieving content for configuration key."
-msgstr "Inhoud vir konfigurasiesleutel kon nie afgelaai word nie."
-
-msgid "Error occurred deactivating user."
-msgstr ""
-
-msgid "Error occurred reactivating user."
-msgstr ""
-
-msgid "configuration variable name is required."
-msgstr ""
-
-msgid "Invalid date. Please try again."
-msgstr "Ongeldige datum. Probeer asseblief weer."
-
-msgid "Date must not be in the future. Please try again."
-msgstr "Datum moet nie in die toekoms wees nie. Probeer asseblief weer."
-
-msgid "Date must not be before 1900. Please try again."
-msgstr "Datum kan nie voor 1900 wees nie. Probeer asseblief weer."
-
-msgid "Year must be after 1900"
-msgstr "Jaar moet ná 1900 wees"
-
-msgid "The date must not be in the future."
-msgstr "Die datum kan nie in die toekoms wees nie."
-
-msgid "Invalid Date. Please enter a valid date."
-msgstr "Ongeldige datum. Voer asseblief ’n geldige datum in."
-
-msgid "Missing value."
-msgstr "Ontbrekende waarde."
-
-msgid "Error loading portal wrapper"
-msgstr "Portaalomslag kon nie gelaai word nie"
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Alle regte voorbehou. 'n Geregistreerde 501(c)3 nie-winsgewende organisasie (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Alle regte voorbehou. Die Movember Foundation is ’n geregistreerde liefdadigheidsorganisasie in Australië ABN 48894537905 (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
-msgstr "© {year} Movember Foundation. Alle regte voorbehou. Die Movember Foundation is ’n Nieu-Seeland-geregistreerde liefdadigheidsorganisasie – nommer CC51320 (Movember Foundation)."
-
-msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
-msgstr "© {year} Movember Foundation (Movember Foundation). Alle regte voorbehou."
-
-msgid "Error occurred retrieving notification."
-msgstr "Kennisgewing kon nie afgelaai word nie."
-
-msgid "All fields must be complete."
-msgstr "Alle velde moet voltooid wees."
-
-msgid "Please enter a valid date."
-msgstr "Voer asseblief ’n geldige datum in."
-
-msgid "Please enter a valid month."
-msgstr "Voer asseblief ’n geldige maand in."
-
-msgid "Please enter a valid year."
-msgstr "Voer asseblief ’n geldige jaar in."
-
-msgid "Error occurred when verifying the uniqueness of email"
-msgstr ""
-
-msgid "This e-mail address is already in use. Please enter a different address."
-msgstr "Hierdie e-posadres is reeds in gebruik. Voer asseblief ’n ander adres in."
-
-msgid "Please remove invalid characters and try again."
-msgstr "Verwyder asseblief ongeldige karakters en probeer weer."
-
-msgid "Sorry, this isn't a valid date. Please try again."
-msgstr "Jammer, hierdie is nie ’n geldige datum nie. Probeer asseblief weer."
-
-msgid "This isn't a valid e-mail address, please double-check."
-msgstr "Hierdie is nie ’n geldige e-posadres nie; maak asseblief seker."
-
-msgid "You haven't entered any management option yet."
-msgstr "Jy het nog geen bestuursopsie ingevoer nie."
-
-msgid "you"
-msgstr "jy"
-
-msgid "Are you sure you want to delete this treatment?"
-msgstr "Is jy seker jy wil hierdie behandeling skrap?"
-
-msgid "Delete"
-msgstr "Skrap"
-
-msgid "this patient"
-msgstr "hierdie pasiënt"
-
-msgid "staff member"
-msgstr "personneellid"
-
-msgid "(date entered by %actor on %date)"
-msgstr "(datum ingevoer deur %actor op %date)"
-
-msgid "Added!"
-msgstr "Bygevoeg!"
-
-msgid "error ocurred retrieving user procedures"
-msgstr "gebruikerprosedures kon nie afgelaai word nie"
-
-msgid "REMOVE"
-msgstr "VERWYDER"
-
-msgid "The procedure date must be valid and in required format."
-msgstr "Die proseduredata moet geldig en in die vereiste formaat wees."
 
 msgid "Alabama"
 msgstr "Alabama"
@@ -759,35 +498,11 @@ msgstr "Sessiedata kon nie van die bediener afgelaai word nie."
 msgid "Click to view report"
 msgstr "Klik om verslag te sien"
 
-msgid "What is your main clinic for prostate cancer care"
-msgstr "Wat is jou hoofkliniek vir prostaatkankersorg"
-
-msgid "Other"
-msgstr "Ander"
-
 msgid "No affiliated clinic"
 msgstr "Geen geaffilieerde kliniek nie"
 
-msgid "Unable to set default consent agreement"
-msgstr "Kon nie verstektoestemmingsooreenkoms stel nie"
-
-msgid "Consent to share information"
-msgstr "Toestemming dat inligting gedeel mag word"
-
-msgid "Close"
-msgstr "Maak toe"
-
 msgid "The user does not have a valid assessment link."
 msgstr "Die gebruiker het nie ’n geldige assesseringskakel nie."
-
-msgid "All date fields are required"
-msgstr "Alle datumvelde word vereis"
-
-msgid "Completion date cannot be before consent date."
-msgstr "Voltooiingsdatum kan nie voor die toestemmingsdatum wees nie."
-
-msgid "Completion date cannot be in the future."
-msgstr "Voltooiingsdatum kan nie in die toekoms wees nie."
 
 msgid "Server error occurred checking questionnaire window"
 msgstr ""
@@ -840,6 +555,15 @@ msgstr "Ingestem tot bepalings"
 msgid "{projectName} Terms of Use"
 msgstr "{project name} Gebruiksbepalings"
 
+msgid "Error occurred retrieving consent list content."
+msgstr "Toestemminglysinhoud kon nie afgelaai word nie."
+
+msgid "Error occurred setting user roles"
+msgstr "Gebruikersrolle kon nie opgestel word nie"
+
+msgid "Error occurred setting user organizations"
+msgstr "Gebruikersorganisasies kon nie opgestel word nie"
+
 msgid "Date must in the valid format."
 msgstr "Datum moet in die geldige formaat wees."
 
@@ -858,101 +582,248 @@ msgstr "Jy moet ŉ datum/tyd invoer"
 msgid "Error processing data.  Make sure the date is in the correct format."
 msgstr "Data kon nie verwerk word nie.  Maak seker die datum is in die korrekte formaat."
 
-msgid "Error occurred retrieving consent list content."
-msgstr "Toestemminglysinhoud kon nie afgelaai word nie."
+msgid "Consent to share information"
+msgstr "Toestemming dat inligting gedeel mag word"
 
-msgid "No PSA results to display"
+msgid "Close"
+msgstr "Maak toe"
+
+msgid "Unable to set default consent agreement"
+msgstr "Kon nie verstektoestemmingsooreenkoms stel nie"
+
+msgid "Error loading portal wrapper"
+msgstr "Portaalomslag kon nie gelaai word nie"
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle regte voorbehou. 'n Geregistreerde 501(c)3 nie-winsgewende organisasie (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle regte voorbehou. Die Movember Foundation is ’n geregistreerde liefdadigheidsorganisasie in Australië ABN 48894537905 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle regte voorbehou. Die Movember Foundation is ’n Nieu-Seeland-geregistreerde liefdadigheidsorganisasie – nommer CC51320 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
+msgstr "© {year} Movember Foundation (Movember Foundation). Alle regte voorbehou."
+
+msgid "User id is required"
+msgstr "Gebruiker-ID word vereis"
+
+msgid "Error occurred retrieving notification."
+msgstr "Kennisgewing kon nie afgelaai word nie."
+
+msgid "No organizations available"
+msgstr "Geen organisasies beskikbaar nie"
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr "Wat is jou hoofkliniek vir prostaatkankersorg"
+
+msgid "Other"
+msgstr "Ander"
+
+msgid "error occurred setting current user id"
 msgstr ""
 
-msgid "Edit"
-msgstr "Wysig"
+msgid "no data found"
+msgstr "geen data gevind nie"
 
-msgid "Save"
-msgstr "Stoor"
+msgid "you"
+msgstr "jy"
 
-msgid "Filter"
+msgid "this patient"
+msgstr "hierdie pasiënt"
+
+msgid "staff member"
+msgstr "personneellid"
+
+msgid "Added!"
+msgstr "Bygevoeg!"
+
+msgid "You haven't entered any management option yet."
+msgstr "Jy het nog geen bestuursopsie ingevoer nie."
+
+msgid "error occurred retrieving user procedures"
 msgstr ""
 
-msgid "Result (ng/ml)"
+msgid "(data entered by %actor on %date)"
 msgstr ""
 
-msgid "PSA Test Date"
+msgid "REMOVE"
+msgstr "VERWYDER"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "Die proseduredata moet geldig en in die vereiste formaat wees."
+
+msgid "success"
+msgstr "sukses"
+
+msgid "Unable to update. System/Server Error."
+msgstr "Kon nie bywerk nie. Stelsel-/bedienerfout."
+
+msgid "unable to get needed core data"
+msgstr "kon nie die benodigde kerndata kry nie"
+
+msgid "unable to get required core data"
+msgstr "kon nie die vereiste kerndata kry nie"
+
+msgid "Unable to retrieve portal footer html"
+msgstr "Kon nie poortvoetnota-html aflaai nie"
+
+msgid "No data found"
+msgstr "Geen data gevind nie"
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr "Daar was ’n bedienerfout terwyl organisasie-/kliniekinligting afgelaai is."
+
+msgid "Server error occurred retrieving consent information."
+msgstr "Daar was ’n bedienerfout terwyl toestemmingsinligting afgelaai is."
+
+msgid "User id and parameters are required"
+msgstr "Gebruiker-ID en -parameters word vereis"
+
+msgid "Server error occurred setting consent status."
+msgstr "Daar was ’n bedienerfout terwyl toestemmingstatus gestel is."
+
+msgid "Server error occurred removing consent."
+msgstr "Daar was ’n bedienerfout terwyl toestemming verwyder is."
+
+msgid "User id and organization id are required."
+msgstr "Gebruiker-ID en organisasie-ID word vereis."
+
+msgid "Error occurred setting suspended consent status."
+msgstr "Opgeskorte toestemmingstatus kon nie opgestel word nie."
+
+msgid "Server error occurred retrieving demographics information."
+msgstr "Daar was ’n bedienerfout toe demografiese inligting afgelaai is."
+
+msgid "Server error occurred setting demographics information."
+msgstr "Daar was ’n bedienerfout terwyl demografiese inligting gestel is."
+
+msgid "Server error occurred retrieving locale information."
+msgstr "Daar was ’n bedienerfout toe liggingsinligting afgelaai is."
+
+msgid "Error retrieving data from server"
+msgstr "Kon nie data van bediener aflaai nie"
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr "Daar was ’n bedienerfout terwyl prosedure-/behandelingsinligting gestoor is."
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr "Daar was ’n bedienerfout terwyl prosedure-/behandelingsinligting verwyder is."
+
+msgid "Server error occurred retrieving roles information."
+msgstr "Daar was ’n bedienerfout terwyl rolleinligting afgelaai is."
+
+msgid "Server error occurred retrieving user role information."
+msgstr "Daar was ’n bedienerfout terwyl gebruikersrolinligting afgelaai is."
+
+msgid "User Id is required."
 msgstr ""
 
-msgid "PSA (ng/ml)"
+msgid "Server error occurred setting user role information."
+msgstr "Daar was ’n bedienerfout terwyl gebruikersrolinligting gestel is."
+
+msgid "Server error occurred deleting user role."
+msgstr "Daar was ’n bedienerfout terwyl gebruikersrol geskrap is."
+
+msgid "Server error occurred retrieving clinical data."
+msgstr "Daar was ’n bedienerfout terwyl kliniese data afgelaai is."
+
+msgid "Server error occurred updating clinical data."
+msgstr "Daar was ’n bedienerfout terwyl kliniese data bygewerk is."
+
+msgid "no url returned"
+msgstr "geen url terugontvang nie"
+
+msgid "Server error occurred retrieving tou url."
+msgstr "Daar was ’n bedienerfout terwyl die tou-url afgelaai is."
+
+msgid "Server error"
+msgstr "Bedienerfout"
+
+msgid "error retrieving instruments list"
+msgstr "instrumentelys kon nie afgelaai word nie"
+
+msgid "Server error occurred retrieving tou data."
+msgstr "Daar was ’n bedienerfout terwyl tou-data afgelaai is."
+
+msgid "Server error occurred saving terms of use information."
+msgstr "Daar was ’n bedienerfout terwyl bepalingsinligting gestoor is."
+
+msgid "Error occurred retrieving access url."
+msgstr "Toegangs-url kon nie afgelaai word nie."
+
+msgid "Invite data are required."
+msgstr "Uitnodigingsdata word vereis."
+
+msgid "Error occurred sending password reset request."
+msgstr "Wagwoordterugstellingsversoek kon nie gestuur word nie."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Assesseringstatus kon nie afgelaai word nie."
+
+msgid "Questionnaire response data is required."
+msgstr "Vraelysantwoorddata word vereis."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Assesseringslys kon nie afgelaai word nie."
+
+msgid "User id and instrument Id are required."
+msgstr "Gebruiker-ID en instrument-ID word vereis."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Assesseringsverslag kon nie afgelaai word nie."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Huidige vraelysbank vir gebruiker kon nie afgelaai word nie."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Pasiëntverslag kon nie afgelaai word nie."
+
+msgid "Error occurred setting table preference."
+msgstr "Tabelvoorkeur kon nie gestel word nie."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "E-posouditinskrywings kon nie afgelaai word nie."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Ouditlog kon nie afgelaai word nie."
+
+msgid "configuration key is required."
+msgstr "konfigurasiesleutel word vereis."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Inhoud vir konfigurasiesleutel kon nie afgelaai word nie."
+
+msgid "Error occurred deactivating user."
 msgstr ""
 
-msgid "Track Your PSA"
+msgid "Error occurred reactivating user."
 msgstr ""
 
-msgid "Prostate-specific antigen, or PSA, is a protein produced by cells of the prostate gland. The PSA test measures the level of PSA in a man's blood. For this test, a blood sample is sent to a laboratory for analysis. The results are reported as nanograms of PSA per milliliter (ng/mL) of blood."
+msgid "configuration variable name is required."
 msgstr ""
 
-msgid "ADD NEW PSA RESULT"
-msgstr ""
+msgid "Invalid date. Please try again."
+msgstr "Ongeldige datum. Probeer asseblief weer."
 
-msgid "Enter a number"
-msgstr "Voer ŉ nommer in"
+msgid "Date must not be in the future. Please try again."
+msgstr "Datum moet nie in die toekoms wees nie. Probeer asseblief weer."
 
-msgid "d M yyyy, example: 1 Jan, 2017"
-msgstr "d M jjjj, byvoorbeeld: 1 Jan, 2017"
+msgid "Date must not be before 1900. Please try again."
+msgstr "Datum kan nie voor 1900 wees nie. Probeer asseblief weer."
 
-msgid "PSA Result History"
-msgstr ""
+msgid "Year must be after 1900"
+msgstr "Jaar moet ná 1900 wees"
 
-msgid "History"
-msgstr "Geskiedenis"
+msgid "The date must not be in the future."
+msgstr "Die datum kan nie in die toekoms wees nie."
 
-msgid "Filter By Year"
-msgstr ""
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Ongeldige datum. Voer asseblief ’n geldige datum in."
 
-msgid "Filter By Result"
-msgstr ""
-
-msgid "Clear Filters"
-msgstr ""
-
-msgid "Last Received Treatment:"
-msgstr ""
-
-msgid "Treatment Date:"
-msgstr ""
-
-msgid "No treatment received as of today"
-msgstr ""
-
-msgid "Edit PSA Result"
-msgstr ""
-
-msgid "Add PSA Result"
-msgstr ""
-
-msgid "Click to reload the page and try again."
-msgstr ""
-
-msgid "Date must be in the valid format."
-msgstr "Datum moet in die geldige formaat wees."
-
-msgid "Error occurred retrieving PSA result data"
-msgstr ""
-
-msgid "No result data found"
-msgstr "Geen resultaatdata gevind nie."
-
-msgid "* Maximum of {resultNumber} results since {year}"
-msgstr ""
-
-msgid "No PSA result matching the filtering criteria. Please try again."
-msgstr ""
-
-msgid "Server error occurred adding PSA result."
-msgstr ""
-
-msgid "treatment"
-msgstr ""
-
-msgid "PSA"
-msgstr ""
+msgid "Missing value."
+msgstr "Ontbrekende waarde."
 
 msgid "Url is required."
 msgstr "URL word vereis"
@@ -966,13 +837,47 @@ msgstr ""
 msgid "Thanks for your patience while we upgrade our site."
 msgstr ""
 
-msgid "Please re-type your password."
-msgstr "Tik asseblief weer jou wagwoord in."
-
-msgctxt "name}. Proceeding to registration ..."
-msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org"
-msgstr "Dankie. Jou toegangskode {shortcut_alias} dui aan dat jy jouself bevind by die {org"
-
-msgctxt "result})."
-msgid "Result must be a number and within valid range (less than {max"
+msgid "Error occurred when verifying the uniqueness of email"
 msgstr ""
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr "Hierdie e-posadres is reeds in gebruik. Voer asseblief ’n ander adres in."
+
+msgid "Invalid characters in text."
+msgstr ""
+
+msgid "Identifier value must be unique"
+msgstr ""
+
+msgid "Question"
+msgstr "Vraag"
+
+msgid "Response"
+msgstr "Antwoord"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Daar was ’n bedienerfout terwyl verslagdata afgelaai is"
+
+msgid "No data returned from server"
+msgstr ""
+
+msgid "Unable to load report data"
+msgstr "Verslagdata kon nie laai nie"
+
+msgid "Export questionnaire data"
+msgstr "Voer vraelysdata uit"
+
+msgid "Export"
+msgstr "Voer uit"
+
+msgid "Data type:"
+msgstr "Datatipe:"
+
+msgid "Instrument(s) to export data from:"
+msgstr "Instrument(e) waarvan data uitgevoer kan word:"
+
+msgid "CSV"
+msgstr "CSV"
+
+msgid "JSON"
+msgstr "JSON"

@@ -53,10 +53,16 @@ class BaseConfig(object):
 
     # Allow Heroku env vars to override most defaults
     # NB: The value of REDIS_URL may change at any point
-    REDIS_URL = os.environ.get(
-        'REDIS_URL',
-        'redis://localhost:6379/0'
-    )
+
+    # We override REDIS_URL when testing now to avoid needing to
+    # also reset the other variables using it as a default below
+    if os.environ.get('TESTING', 'false').lower() == 'true':
+        REDIS_URL = 'redis://localhost:6379/5'
+    else:
+        REDIS_URL = os.environ.get(
+            'REDIS_URL',
+            'redis://localhost:6379/0'
+        )
 
     ANONYMOUS_USER_ACCOUNT = True
     BROKER_URL = os.environ.get(
@@ -111,7 +117,9 @@ class BaseConfig(object):
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
-    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
+    PROTECTED_ORG = os.environ.get('PROTECTED_ORG')  # use organization name
+    PROTECTED_FIELDS = os.environ['PROTECTED_FIELDS'].split(',') \
+        if os.environ.get('PROTECTED_FIELDS') else None
 
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
