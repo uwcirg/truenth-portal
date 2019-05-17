@@ -17,7 +17,7 @@ before_script:
 
 # test templates
 .test_template: &test_definition
-  image: python:3.6
+  image: python:3.5
   script: tox
   stage: test
 
