@@ -26,12 +26,6 @@ before_script:
   services:
     - postgres:10
     - redis:latest
-  before_script:
-    - pip install tox
-
-    # Install dependencies
-    - tox --notest
-    - echo TESTING $TESTING
 
 
 # test jobs
