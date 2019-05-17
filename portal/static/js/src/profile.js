@@ -6,6 +6,7 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+import ASSESSMENT_STATUS_ENUM from "./modules/ASSESSMENT_STATUS_ENUM.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -1503,16 +1504,24 @@ export default (function() {
                         }
                         var authoredDate = String(entry.authored);
                         var reportLink = "/patients/session-report/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var displayString = self.getAssessmentStatusDisplay(entry.status);
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
-                            display: i18next.t(entry.questionnaire.display),
-                            status: i18next.t(entry.status),
+                            display: entry.questionnaire.display,
+                            status: displayString?displayString:entry.status,
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
                     });
                 });
+            },
+            getAssessmentStatusDisplay: function(status) {
+                var matchedItem = ASSESSMENT_STATUS_ENUM[String(status).toLowerCase().replace("-", " ")];
+                if (matchedItem) {
+                    return matchedItem;
+                }
+                return "";
             },
             handleSelectedState: function(event) {
                 var newValue = event.target.value;

@@ -97,8 +97,8 @@
                             {% endif %}
                         </td>
                       {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                      <td>{{patient.assessment_status if patient.assessment_status}}</td>
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS%}
+                      <td>{{_(patient.assessment_status if patient.assessment_status)}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
                       {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
