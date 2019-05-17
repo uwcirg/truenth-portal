@@ -22,7 +22,7 @@ from flask import current_app
 from flask_babel import gettext
 from future.utils import with_metaclass
 import requests
-from requests.exceptions import ConnectionError, MissingSchema
+from requests.exceptions import ConnectionError, MissingSchema, InvalidURL
 
 from ..database import db
 
@@ -392,7 +392,7 @@ class UnversionedResource(object):
             try:
                 response = time_request(url)
                 self._asset = response.text
-            except MissingSchema:
+            except (MissingSchema, InvalidURL):
                 if current_app.config.get('TESTING'):
                     self._asset = '[TESTING - fake response]'
                 else:
@@ -450,7 +450,7 @@ class VersionedResource(object):
             self.url = self._permanent_url(
                 generic_url=self.url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
-        except MissingSchema:
+        except (MissingSchema, InvalidURL):
             if current_app.config.get('TESTING'):
                 self._asset = '[TESTING - fake response]'
             else:
@@ -549,7 +549,7 @@ class MailResource(object):
             self.url = self._permanent_url(
                 generic_url=self.url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
-        except MissingSchema:
+        except (MissingSchema, InvalidURL):
             if current_app.config.get('TESTING'):
                 self._subject = 'TESTING SUBJECT'
                 self._body = 'TESTING BODY'
