@@ -31,7 +31,6 @@ def time_request(url):
     """Wrap the requests.get(url) and log the timing"""
     start = timeit.default_timer()
     response = requests.get(url)
-    response.raise_for_status()
     duration = timeit.default_timer() - start
     message = ('TIME {duration:.4f} seconds to GET {url}'.format(
         url=url, duration=duration))
