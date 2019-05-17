@@ -1517,7 +1517,7 @@ export default (function() {
                 });
             },
             getAssessmentStatusDisplay: function(status) {
-                var matchedItem = ASSESSMENT_STATUS_ENUM[String(status).toLowerCase().replace("-", " ")];
+                var matchedItem = ASSESSMENT_STATUS_ENUM[String(status).toLowerCase().replace(/\-/g, " ")]; //assessment status can have dash(es), "in-progress"
                 if (matchedItem) {
                     return matchedItem;
                 }
