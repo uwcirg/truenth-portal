@@ -34,12 +34,6 @@ before_script:
     - tox --notest
     - echo TESTING $TESTING
 
-    # Start celery from tox virtual environment installed in previous step
-    - PATH="./.tox/${TOXENV}/bin/"
-      celery worker
-        --detach
-        --app portal.celery_worker.celery
-        --loglevel info
 
 # test jobs
 unit_tests:
