@@ -315,39 +315,27 @@ def compile_pos():
             )
 
 
-def upsert_to_template_file():
+def upsert_to_template_file(pot_filepath, new_strings):
     """Upsert newly extracted strings into existing POT file"""
-    db_translatables = get_db_strings()
-    if not db_translatables:
-        sys.exit("no DB strings extracted")
-
-    db_translatables.update(get_static_strings())
 
     try:
-        with io.open(
-            os.path.join(
-                current_app.root_path,
-                "translations/messages.pot",
-            ),
-            "r+",
-            encoding="utf-8",
-        ) as potfile:
+        with io.open(pot_filepath, "r+", encoding="utf-8") as potfile:
             potlines = potfile.readlines()
             for i, line in enumerate(potlines):
                 if not line.split() or (line.split()[0] != "msgid"):
                     continue
 
                 msgid = line.split(" ", 1)[1].strip()
-                if msgid not in db_translatables:
+                if msgid not in new_strings:
                     continue
 
-                for location in db_translatables[msgid]:
+                for location in new_strings[msgid]:
                     locstring = "# " + location + "\n"
                     if not any(t == locstring for t in potlines[i - 4:i]):
                         potlines.insert(i, locstring)
-                del db_translatables[msgid]
+                del new_strings[msgid]
 
-            for entry, locations in db_translatables.items():
+            for entry, locations in new_strings.items():
                 if not entry:
                     continue
                 for loc in locations:
@@ -413,9 +401,16 @@ def build_pot_files():
     ))
     current_app.logger.debug("messages.pot file generated")
 
-    # update .pot file with db values
-    upsert_to_template_file()
-    current_app.logger.debug("messages.pot file updated with db strings")
+    # update .pot file with values not extracted by pybabel
+    new_strings = {}
+    new_strings.update(get_db_strings())
+    new_strings.update(get_static_strings())
+
+    upsert_to_template_file(
+        pot_filepath=messages_pot_fpath,
+        new_strings=new_strings
+    )
+    current_app.logger.debug("messages.pot file updated with strings managed outside pybabel")
 
     for pot_file_path in POT_FILES:
         fix_references(pot_file_path)
