@@ -316,6 +316,7 @@ def compile_pos():
 
 
 def upsert_to_template_file():
+    """Upsert new strings into existing POT file"""
     db_translatables = get_db_strings()
     if not db_translatables:
         sys.exit("no DB strings extracted")
@@ -335,14 +336,17 @@ def upsert_to_template_file():
             for i, line in enumerate(potlines):
                 if not line.split() or (line.split()[0] != "msgid"):
                     continue
+
                 msgid = line.split(" ", 1)[1].strip()
                 if msgid not in db_translatables:
                     continue
+
                 for location in db_translatables[msgid]:
                     locstring = "# " + location + "\n"
                     if not any(t == locstring for t in potlines[i - 4:i]):
                         potlines.insert(i, locstring)
                 del db_translatables[msgid]
+
             for entry, locations in db_translatables.items():
                 if not entry:
                     continue
