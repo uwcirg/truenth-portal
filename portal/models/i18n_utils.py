@@ -316,7 +316,7 @@ def compile_pos():
 
 
 def upsert_to_template_file():
-    """Upsert new strings into existing POT file"""
+    """Upsert newly extracted strings into existing POT file"""
     db_translatables = get_db_strings()
     if not db_translatables:
         sys.exit("no DB strings extracted")
