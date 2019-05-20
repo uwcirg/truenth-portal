@@ -265,6 +265,16 @@ var Utility = (function() {
         }
         return obj;
     };
+    UtilityObj.prototype.capitalize = function(str) {
+        if (!str) {
+            return "";
+        }
+        const word = [];
+        for(let char of str.split(" ")){
+            word.push(char[0].toUpperCase() + char.slice(1))
+        }
+        return word.join(" ");
+    };
     UtilityObj.prototype.getUrlParameter = function(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
@@ -354,3 +364,4 @@ var Utility = (function() {
 export default Utility;
 export var getExportFileName = Utility.getExportFileName; /* expose common functions */
 export var getUrlParameter= Utility.getUrlParameter;
+export var capitalize = Utility.capitalize;
