@@ -271,7 +271,7 @@ var Utility = (function() {
         }
         const word = [];
         for(let char of str.split(" ")){
-            word.push(char[0].toUpperCase() + char.slice(1))
+            word.push(char[0].toUpperCase() + char.slice(1));
         }
         return word.join(" ");
     };
