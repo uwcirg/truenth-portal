@@ -400,7 +400,7 @@ def smartling_upload():
     build_pot_files()
 
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+    project_id = current_app.config["SMARTLING_PROJECT_ID"]
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
         with open(pot_file_path, 'rb') as potfile:
