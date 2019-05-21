@@ -324,7 +324,7 @@ def upsert_to_template_file(pot_filepath, new_strings):
         new_entry = POEntry(
             msgid=new_string,
             # list of (filepath, lineno) tuples
-            occurrences=[ (o, '') for o in references ],
+            occurrences=[(o, '') for o in references],
         )
 
         existing_entry = pot_file.find(new_entry.msgid)
@@ -352,7 +352,7 @@ def fix_references(pot_fpath):
         entry.occurrences = new_occurrences
 
     pot_file.save(pot_fpath)
-    current_app.logger.debug("messages.pot file references fixed")
+    current_app.logger.debug("%s file references fixed", pot_fpath)
 
 
 def build_pot_files():
