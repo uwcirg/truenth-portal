@@ -40,7 +40,7 @@ def get_db_strings():
                 if not msgid:
                     continue
                 msgid = '"{}"'.format(re.sub('"', r'\\"', msgid))
-                msgid_map[msgid].add("{model_name}: {field_ref}".format(
+                msgid_map[msgid].add("{model_name}:{field_ref}".format(
                     model_name=model.__name__,
                     field_ref=entry.name,
                 ))
@@ -58,8 +58,7 @@ def get_static_strings():
         'Expired',
     )
     msgid_map.update({
-        '"{}"'.format(s):
-            {'assessment_status: %s' % s} for s in status_strings
+        '"{}"'.format(s): {'assessment_status:%s' % s} for s in status_strings
     })
 
     enum_options = {
@@ -69,7 +68,7 @@ def get_static_strings():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
-            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(
+            msgid_map['"{}"'.format(value)] = {'{}:{}'.format(
                 enum.name, value)}
     return msgid_map
 
