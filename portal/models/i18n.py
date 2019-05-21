@@ -16,6 +16,7 @@ from .app_text import AppText
 from .coding import Coding
 from .intervention import Intervention
 from .organization import Organization
+from .overall_status import OverallStatus
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
 from .research_protocol import ResearchProtocol
 from .role import Role
@@ -49,21 +50,16 @@ def get_db_strings():
 def get_static_strings():
     """Manually add strings that are otherwise difficult to extract"""
     msgid_map = {}
-    status_strings = (
-        'Completed',
-        'Due',
-        'In Progress',
-        'Overdue',
-        'Expired',
-    )
-    msgid_map.update({
-        s: {'assessment_status:%s' % s} for s in status_strings
-    })
 
-    enum_options = {
+    enums = (OverallStatus, )
+    for enum in enums:
+        for member in enum:
+            msgid_map[str(member)] = {'{}:{}'.format(enum.__name__, member)}
+
+    SQLA_enum_options = {
         classification_types_enum: ('title',),
     }
-    for enum, options in enum_options.items():
+    for enum, options in SQLA_enum_options.items():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
