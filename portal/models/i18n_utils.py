@@ -319,11 +319,6 @@ def upsert_to_template_file(pot_filepath, new_strings):
 
     Existing strings in the POT file will have references combined
     """
-
-    # remove double quotes wrapping every key
-    # todo remove from other helpers
-    new_strings = {new_string[1:-1]: refs for new_string, refs in new_strings.items()}
-
     pot_file = pofile(pot_filepath)
     for new_string, references in new_strings.items():
         new_entry = POEntry(
