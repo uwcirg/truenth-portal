@@ -7,10 +7,8 @@ standard_library.install_aliases()  # noqa: E402
 from collections import defaultdict
 import io
 import os
-import re
 from subprocess import check_call
 import sys
-import tempfile
 from zipfile import ZipFile
 
 from flask import current_app
@@ -348,22 +346,17 @@ def fix_references(pot_fpath):
     """Fix reference comments to remove checkout-specific paths"""
     # Todo: override PoFileParser._process_comment() to perform this as part of `pybabel extract`
 
-    path_regex = re.compile(r"^#: {}(?P<rel_path>.*):(?P<line>\d+)".format(
-        os.path.dirname(current_app.root_path)
-    ))
-    base_url = "%s/tree/develop" % current_app.config.metadata['home-page']
+    pot_file = pofile(pot_fpath)
+    for entry in pot_file:
+        new_occurrences = []
+        for ref_file_path, ref_line_number in entry.occurrences:
+            # replace absolute path with repo-relative path
+            ref_file_path = ref_file_path.replace(current_app.root_path + '/', '')
 
-    with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
-        prefix='fix_references_',
-        suffix='.pot',
-        delete=False,
-    ) as tmpfile:
-        for line in infile:
-            tmpfile.write(
-                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line)
-            )
+            new_occurrences.append((ref_file_path, ref_line_number))
+        entry.occurrences = new_occurrences
 
-    os.rename(tmpfile.name, pot_fpath)
+    pot_file.save(pot_fpath)
     current_app.logger.debug("messages.pot file references fixed")
 
 
