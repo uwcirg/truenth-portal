@@ -1507,7 +1507,8 @@ export default (function() {
                             title: i18next.t("Click to view report"),
                             link: reportLink,
                             display: i18next.t(entry.questionnaire.display),
-                            status: i18next.t(entry.status),
+                            //title case the status to allow it to be translated correctly
+                            status: i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " "))),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
