@@ -14,7 +14,7 @@ import tempfile
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile, POFile
+from polib import pofile, POFile, POEntry
 import requests
 
 from .i18n import get_db_strings, get_static_strings
@@ -316,41 +316,32 @@ def compile_pos():
 
 
 def upsert_to_template_file(pot_filepath, new_strings):
-    """Upsert newly extracted strings into existing POT file"""
+    """
+    Upsert newly extracted strings into existing POT file
 
-    try:
-        with io.open(pot_filepath, "r+", encoding="utf-8") as potfile:
-            potlines = potfile.readlines()
-            for i, line in enumerate(potlines):
-                if not line.split() or (line.split()[0] != "msgid"):
-                    continue
+    Existing strings in the POT file will have references combined
+    """
 
-                msgid = line.split(" ", 1)[1].strip()
-                if msgid not in new_strings:
-                    continue
+    # remove double quotes wrapping every key
+    # todo remove from other helpers
+    new_strings = {new_string[1:-1]: refs for new_string, refs in new_strings.items()}
 
-                for location in new_strings[msgid]:
-                    locstring = "# " + location + "\n"
-                    if not any(t == locstring for t in potlines[i - 4:i]):
-                        potlines.insert(i, locstring)
-                del new_strings[msgid]
+    pot_file = pofile(pot_filepath)
+    for new_string, references in new_strings.items():
+        new_entry = POEntry(
+            msgid=new_string,
+            # list of (filepath, lineno) tuples
+            occurrences=[ (o, '') for o in references ],
+        )
 
-            for entry, locations in new_strings.items():
-                if not entry:
-                    continue
-                for loc in locations:
-                    potlines.append("# " + loc + "\n")
-                potlines.append("msgid " + entry + "\n")
-                potlines.append("msgstr \"\"\n")
-                potlines.append("\n")
-            potfile.truncate(0)
-            potfile.seek(0)
-            potlines = [unicode(line) for line in potlines]
-            potfile.writelines(potlines)
-    except (IOError, OSError):
-        exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-        sys.exit(
-            "Could not write to translation file!\n ->%s" % (exceptionValue))
+        existing_entry = pot_file.find(new_entry.msgid)
+        if not existing_entry:
+            pot_file.append(new_entry)
+            continue
+
+        # combine references of both entries
+        existing_entry.occurrences = set(existing_entry.occurrences + new_entry.occurrences)
+    pot_file.save(pot_filepath)
 
 
 def fix_references(pot_fpath):
