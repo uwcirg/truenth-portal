@@ -68,8 +68,7 @@ def get_static_strings():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
-            msgid_map['"{}"'.format(value)] = {'{}:{}'.format(
-                enum.name, value)}
+            msgid_map['"{}"'.format(value)] = {'{}:{}'.format(enum.name, value)}
     return msgid_map
 
 
