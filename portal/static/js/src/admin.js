@@ -106,7 +106,8 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 message: "",
                 loading: false
             },
-            exportReportTimeoutID: 0
+            exportReportTimeoutID: 0,
+            arrExportReportTimeoutID: []
         },
         methods: {
             injectDependencies: function () {
@@ -154,8 +155,16 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 dataType = dataType||"json";
                 return `/api/report/questionnaire_status?format=${dataType}`;
             },
+            clearExportReportTimeoutID: function() {
+                if (!this.arrExportReportTimeoutID.length) {
+                    return false;
+                }
+                let self = this;
+                for (var index=0; index < self.arrExportReportTimeoutID.length; index++) {
+                    clearTimeout(self.arrExportReportTimeoutID[index]);
+                }
+            },
             onBeforeExportReportData: function() {
-                clearTimeout(self.exportReportTimeoutID);
                 $("#exportReportContainer").removeClass("open").popover("show");
                 $("#btnExportReport").attr("disabled", true);
                 $(".exportReport__status").addClass("active");
@@ -191,7 +200,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     $(window).on("resize", function() {
                         self.onAfterExportReportData();
                     });
-                    $('#exportReportContainer').on('shown.bs.popover', function () {
+                    $("#exportReportContainer").on("shown.bs.popover", function () {
                         $(".exportReport__retry").off("click").on("click", function(e) {
                             e.stopImmediatePropagation();
                             $("#exportReportContainer").popover("hide");
@@ -199,6 +208,9 @@ import CurrentUser from "./mixins/CurrentUser.js";
                                 $("#btnExportReport").trigger("click");
                             }, 50);
                         });
+                    });
+                    $("#exportReportContainer").on("hide.bs.popover", function () {
+                       self.clearExportReportTimeoutID();
                     });
                     $("#exportReportContainer .data-types li").on("click", function(e) {
                         e.stopPropagation();
@@ -242,7 +254,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 }
                 let self = this;
                 // send GET request to status URL
-                $.getJSON(statusUrl, function(data) {
+                let rqId = $.getJSON(statusUrl, function(data) {
                     if (!data) {
                         callback({error: true});
                         return;
@@ -251,10 +263,9 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     if (data["current"] && data["total"] && parseInt(data["total"]) > 0) {
                         percent = parseInt(data['current'] * 100 / data['total']) + "%";
                     }
-
                     //update status and percentage displays
                     self.updateProgressDisplay(exportStatus, percent, true);
-                    let arrIncompleteStatus = ['PENDING', 'PROGRESS', 'STARTED'];
+                    let arrIncompleteStatus = ["PENDING", "PROGRESS", "STARTED"];
                     if (arrIncompleteStatus.indexOf(exportStatus) === -1) {
                         if (exportStatus === "SUCCESS") {
                             setTimeout(function() {
@@ -271,7 +282,8 @@ import CurrentUser from "./mixins/CurrentUser.js";
                         // rerun in 2 seconds
                         self.exportReportTimeoutID = setTimeout(function() {
                             self.updateExportProgress(statusUrl, callback);
-                        }.bind(self), 2000);
+                        }.bind(self), 2000); //each update invocation should be assigned a unique timeoutid
+                        (self.arrExportReportTimeoutID).push(self.exportReportTimeoutID);
                     }
                 }).fail(function() {
                     callback({error: true});
