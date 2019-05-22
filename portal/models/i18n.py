@@ -16,6 +16,7 @@ from .app_text import AppText
 from .coding import Coding
 from .intervention import Intervention
 from .organization import Organization
+from .overall_status import OverallStatus
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
 from .research_protocol import ResearchProtocol
 from .role import Role
@@ -50,17 +51,13 @@ def get_db_strings():
 def get_static_strings():
     """Manually add strings that are otherwise difficult to extract"""
     msgid_map = {}
-    status_strings = (
-        'Completed',
-        'Due',
-        'In Progress',
-        'Overdue',
-        'Expired',
-    )
-    msgid_map.update({
-        '"{}"'.format(s):
-            {'assessment_status: %s' % s} for s in status_strings
-    })
+
+    # python-native enums
+    enums = (OverallStatus, )
+    for enum in enums:
+        for member in enum:
+            # include enum class name with each value in PO reference
+            msgid_map['"{}"'.format(member)] = {'{}:{}'.format(enum.__name__, member)}
 
     enum_options = {
         classification_types_enum: ('title',),
