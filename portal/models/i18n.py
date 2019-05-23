@@ -24,6 +24,11 @@ from .user import current_user
 
 
 def get_db_strings():
+    """
+    Extract user-facing database strings
+
+    Requires a databases loaded with the latest site-persistence data
+    """
     msgid_map = defaultdict(set)
     i18n_fields = {
         AppText: ('custom_text',),
@@ -48,14 +53,19 @@ def get_db_strings():
 
 
 def get_static_strings():
-    """Manually add strings that are otherwise difficult to extract"""
+    """
+    Extract strings from constants and other static values in code (enums)
+    """
     msgid_map = {}
 
+    # python-native enums
     enums = (OverallStatus, )
     for enum in enums:
         for member in enum:
+            # include enum class name with each value in PO reference
             msgid_map[str(member)] = {'{}:{}'.format(enum.__name__, member)}
 
+    # SQLA (postgres-specific) enums
     SQLA_enum_options = {
         classification_types_enum: ('title',),
     }
