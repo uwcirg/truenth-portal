@@ -434,7 +434,7 @@
         {
           "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "146-44"
+          "value": "146-44-DISCONTINUED"
         }
       ],
       "language": "en_AU",
@@ -1994,7 +1994,7 @@
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
-      "id": 14644,
+      "id": 1464499,
       "identifier": [
         {
           "system": "http://pcctc.org/",
