@@ -425,8 +425,14 @@
     {
       "extension": [
         {
-          "timezone": "Australia/Brisbane",
+          "timezone": "Europe/London",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 14644,
@@ -434,13 +440,13 @@
         {
           "system": "http://pcctc.org/",
           "use": "secondary",
-          "value": "146-44-DISCONTINUED"
+          "value": "146-44"
         }
       ],
-      "language": "en_AU",
-      "name": "Queen Elizabeth II Jubilee Hospital",
+      "language": "en_GB",
+      "name": "The Royal Marsden NHS Foundation Trust",
       "partOf": {
-        "reference": "api/organization/21300"
+        "reference": "api/organization/26000"
       },
       "resourceType": "Organization"
     },
@@ -1976,34 +1982,6 @@
       ],
       "language": "en_GB",
       "name": "The Christie NHS Foundation Trust",
-      "partOf": {
-        "reference": "api/organization/26000"
-      },
-      "resourceType": "Organization"
-    },
-    {
-      "extension": [
-        {
-          "timezone": "Europe/London",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-			{"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
-        }
-      ],
-      "id": 1464499,
-      "identifier": [
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-44"
-        }
-      ],
-      "language": "en_GB",
-      "name": "The Royal Marsden NHS Foundation Trust",
       "partOf": {
         "reference": "api/organization/26000"
       },
