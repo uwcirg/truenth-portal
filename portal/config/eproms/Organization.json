@@ -425,34 +425,6 @@
     {
       "extension": [
         {
-          "timezone": "Europe/London",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-			{"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
-        }
-      ],
-      "id": 14644,
-      "identifier": [
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-44"
-        }
-      ],
-      "language": "en_GB",
-      "name": "The Royal Marsden NHS Foundation Trust",
-      "partOf": {
-        "reference": "api/organization/26000"
-      },
-      "resourceType": "Organization"
-    },
-    {
-      "extension": [
-        {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
@@ -1928,6 +1900,34 @@
       "name": "United Kingdom (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14644,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-44"
+        }
+      ],
+      "language": "en_GB",
+      "name": "The Royal Marsden NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
       },
       "resourceType": "Organization"
     },
