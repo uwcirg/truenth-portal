@@ -32,6 +32,7 @@ from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
+from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
@@ -713,6 +714,12 @@ def set_user_consents(user_id):
         consent_list = [consent, ]
         user.update_consents(
             consent_list=consent_list, acting_user=current_user())
+
+        # Moving consent dates potentially invalidates
+        # (questionnaire_response: visit_name) associations.
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=user.id, acting_user_id=current_user().id)
+
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
         invalidate_users_QBT(user_id=user.id)
@@ -839,9 +846,13 @@ def withdraw_consent(user, org_id, acceptance_date, acting_user):
         suspended.staff_editable = (not current_app.config.get('GIL'))
         user.update_consents(
             consent_list=[suspended], acting_user=acting_user)
-        # The updated consent may have altered the cached assessment
-        # status - invalidate this user's data at this time.
+
+        # NB - we do NOT call QuestionnaireResponse.purge_qb_relationship()
+        # in this case, as the user is withdrawing, not altering initial
+        # consent dates.  Doing so does alter the QB_timeline from point of
+        # withdrawal forward, so force a renewal of that.
         invalidate_users_QBT(user_id=user.id)
+
     except ValueError as e:
         abort(400, str(e))
 

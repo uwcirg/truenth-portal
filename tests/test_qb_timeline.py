@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
+from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.qb_timeline import (
@@ -15,6 +16,7 @@ from portal.models.qb_timeline import (
     update_users_QBT,
 )
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
+from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.views.user import withdraw_consent
 from portal.models.overall_status import OverallStatus
 from tests import TEST_USER_ID, associative_backdate, TestCase
@@ -189,6 +191,55 @@ class TestQbTimeline(TestQuestionnaireBank):
             QBT.status == OverallStatus.expired).count() == 7
         assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
         assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
+
+    def test_consent_change(self):
+        # Basic w/ one complete QB followed by consent change
+        # should clear QNR->QB relationships
+        crv = self.setup_org_qbs()
+        org_id = crv.id
+        back7, nowish = associative_backdate(
+            now=datetime.utcnow(), backdate=relativedelta(days=7))
+        self.bless_with_basics(setdate=back7)
+        self.test_user = db.session.merge(self.test_user)
+        self.test_user.organizations.append(crv)
+
+        # submit a mock response for all q's in baseline qb
+        # which should result in completed status
+        qb_name = "CRV Baseline v2"
+        baseline = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+
+        qb_count = 0
+        for q in baseline.questionnaires:
+            q = db.session.merge(q)
+            mock_qr(q.name, qb=baseline, timestamp=back7)
+            qb_count += 1
+
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
+
+        # prior to consent change, expect QNRs to have baseline association
+        assert (qb_count == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+
+        # move consent beyond QNR submission above, should remove QNR->QB
+        # association
+        data = {
+            'organization_id': org_id,
+            'agreement_url': "https://testing.com",
+            'acceptance_date': FHIR_datetime.as_fhir(nowish),
+            'staff_editable': True, 'send_reminders': True}
+
+        self.login()
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        self.assert200(response)
+        assert (0 == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
 
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal

@@ -122,6 +122,37 @@ class QuestionnaireResponse(db.Model):
             db.session.add(audit)
 
     @staticmethod
+    def purge_qb_relationship(subject_id, acting_user_id):
+        """Remove qb association from subject user's QuestionnaireResponses
+
+        An event such as changing consent date potentially alters the
+        "visit_name" (i.e. 3 month, baseline, etc.) any existing QNRs
+        may have been assigned.  This method removes all such QNR->QB
+        associations that may now apply to the wrong QB, forcing subsequent
+        recalculation
+
+        """
+        audits = []
+        matching = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == subject_id).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None))
+
+        for qnr in matching:
+            audit = Audit(
+                user_id=acting_user_id, subject_id=subject_id,
+                context='assessment',
+                comment="Removing qb_id:iteration {}:{} from QNR {}".format(
+                    qnr.questionnaire_bank_id, qnr.qb_iteration, qnr.id))
+            audits.append(audit)
+            qnr.questionnaire_bank_id = None
+            qnr.qb_iteration = None
+
+        for audit in audits:
+            db.session.add(audit)
+
+        db.session.commit()
+
+    @staticmethod
     def by_identifier(identifier):
         """Query for QuestionnaireResponse(s) with given identifier"""
         if not any((identifier.system, identifier.value)):
