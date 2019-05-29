@@ -381,6 +381,7 @@ def build_pot_files():
     current_app.logger.debug("messages.pot file generated")
 
     # update .pot file with values not extracted by pybabel
+    # todo: pass set of POEntry
     new_strings = {}
     new_strings.update(get_db_strings())
     new_strings.update(get_static_strings())

@@ -45,6 +45,7 @@ def get_db_strings():
                 msgid = getattr(entry, field_name)
                 if not msgid:
                     continue
+                # use model/field name for gettext reference
                 msgid_map[msgid].add("{model_name}:{field_ref}".format(
                     model_name=model.__name__,
                     field_ref=entry.name,
@@ -73,6 +74,7 @@ def get_static_strings():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
+            # use enum name/value for gettext reference
             msgid_map[value] = {'{}:{}'.format(enum.name, value)}
     return msgid_map
 
