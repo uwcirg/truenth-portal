@@ -52,6 +52,9 @@ def purge_3digit_org_ids(conn):
             continue
         kill_ids.append(id)
 
+    if not kill_ids:
+        return
+
     stmt = (
         "DELETE FROM organization_identifiers WHERE"
         " identifier_id IN :kill_ids")
@@ -95,6 +98,9 @@ def purge_3digit_user_ids(conn):
                 value))
             continue
         kill_ids.append(id)
+
+    if not kill_ids:
+        return
 
     stmt = "DELETE FROM user_identifiers WHERE identifier_id IN :kill_ids"
     conn.execute(text(stmt), kill_ids=tuple(kill_ids))
