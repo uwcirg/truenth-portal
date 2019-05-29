@@ -8,6 +8,11 @@ services:
       # Number of worker processes for handling requests
       # http://docs.gunicorn.org/en/stable/settings.html#workers
       WEB_CONCURRENCY: 4
+    # mount a tmpfs to prevent gunicorn from blocking
+    # http://docs.gunicorn.org/en/stable/faq.html#blocking-os-fchmod
+    volumes:
+      - target: /tmp
+        type: tmpfs
     healthcheck:
       test: flask healthcheck
       start_period: 2m
