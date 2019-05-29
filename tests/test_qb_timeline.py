@@ -208,6 +208,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         qb_name = "CRV Baseline v2"
         baseline = QuestionnaireBank.query.filter(
             QuestionnaireBank.name == qb_name).one()
+        baseline_id = baseline.id
 
         qb_count = 0
         for q in baseline.questionnaires:
@@ -221,7 +222,8 @@ class TestQbTimeline(TestQuestionnaireBank):
         # prior to consent change, expect QNRs to have baseline association
         assert (qb_count == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
-            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+            QuestionnaireResponse.questionnaire_bank_id == baseline_id).count(
+        ))
 
         # move consent beyond QNR submission above, should remove QNR->QB
         # association
