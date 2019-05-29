@@ -850,7 +850,7 @@ def withdraw_consent(user, org_id, acceptance_date, acting_user):
         # NB - we do NOT call QuestionnaireResponse.purge_qb_relationship()
         # in this case, as the user is withdrawing, not altering initial
         # consent dates.  Doing so does alter the QB_timeline from point of
-        # withdrawal forward, so force a renewal of that.
+        # withdrawal forward, so force QB_timeline renewal
         invalidate_users_QBT(user_id=user.id)
 
     except ValueError as e:
