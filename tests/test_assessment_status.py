@@ -745,8 +745,9 @@ class TestQB_Status(TestQuestionnaireSetup):
 
     def test_boundary_recurring_in_progress(self):
         self.login()
-        backdate, nowish = associative_backdate(
-            now=now, backdate=relativedelta(months=6, hours=-1))
+        nowish = datetime.strptime(
+            '2019-05-28 10:00:00', '%Y-%m-%d %H:%M:%S')
+        backdate = nowish - relativedelta(months=6, hours=-1)
         self.bless_with_basics(
             setdate=backdate, local_metastatic='metastatic')
         mr3_qb = QuestionnaireBank.query.filter_by(
