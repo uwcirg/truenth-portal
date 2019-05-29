@@ -51,11 +51,16 @@ class BaseConfig(object):
         'localhost'
     )
 
-    # Allow Heroku env vars to override most defaults
+    # Allow Heroku environment variables to override service defaults
     # NB: The value of REDIS_URL may change at any point
+
+    # We override REDIS_URL when testing now to avoid needing to
+    # also reset the other variables using it as a default below
     REDIS_URL = os.environ.get(
         'REDIS_URL',
-        'redis://localhost:6379/0'
+        'redis://localhost:6379/5'
+        if os.environ.get('TESTING', 'false').lower() == 'true'
+        else 'redis://localhost:6379/0',
     )
 
     ANONYMOUS_USER_ACCOUNT = True
@@ -111,7 +116,9 @@ class BaseConfig(object):
 
     # Medidata integration configuration
     # disable creation and editing of patients when active
-    MEDIDATA_RAVE_ORG = os.environ.get('MEDIDATA_RAVE_ORG')
+    PROTECTED_ORG = os.environ.get('PROTECTED_ORG')  # use organization name
+    PROTECTED_FIELDS = os.environ['PROTECTED_FIELDS'].split(',') \
+        if os.environ.get('PROTECTED_FIELDS') else None
 
     PERSISTENCE_EXCLUSIONS_DIR = os.environ.get('PERSISTENCE_EXCLUSIONS_DIR')
     PIWIK_DOMAINS = os.environ['PIWIK_DOMAINS'].split(',') \
@@ -129,7 +136,10 @@ class BaseConfig(object):
     SHOW_PUBLIC_TERMS = True
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = best_sql_url()
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
+        best_sql_url()
+    )
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
 

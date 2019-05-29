@@ -1,0 +1,46 @@
+# GitLab CI/CD Pipeline Configuration file
+# https://docs.gitlab.com/ee/ci/yaml/
+---
+# environment variables - also set in every service for a job
+# NB: setting PGHOST will cause the postgres service to fail
+variables:
+  SECRET_KEY: "$(openssl rand -base64 32)"
+  FLASK_APP: "$(readlink --canonicalize manage.py)"
+  SQLALCHEMY_DATABASE_TEST_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
+  REDIS_URL: redis://redis:6379/0
+  POSTGRES_DB: portaldb
+stages:
+  - test
+
+before_script:
+  - pip install tox
+
+# test templates
+.test_template: &test_definition
+  image: python:3.5
+  script: tox
+  stage: test
+
+.unit_test_template: &unit_test_definition
+  <<: *test_definition
+  services:
+    - postgres:10
+    - redis:latest
+
+
+# test jobs
+unit_tests:
+  variables:
+    TOXENV: py3
+  <<: *unit_test_definition
+
+unit_tests-python2:
+  variables:
+    TOXENV: py27
+  <<: *unit_test_definition
+  image: python:2.7
+
+docgen_test:
+  variables:
+    TOXENV: docs
+  <<: *test_definition

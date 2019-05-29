@@ -318,11 +318,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-34"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-034"
         }
       ],
       "language": "en_AU",
@@ -396,11 +391,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-42"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-042"
         }
       ],
       "language": "en_AU",
@@ -423,42 +413,10 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-43"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-043"
         }
       ],
       "language": "en_AU",
       "name": "Princess Alexandra Hospital",
-      "partOf": {
-        "reference": "api/organization/21300"
-      },
-      "resourceType": "Organization"
-    },
-    {
-      "extension": [
-        {
-          "timezone": "Australia/Brisbane",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        }
-      ],
-      "id": 14644,
-      "identifier": [
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-44"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-044"
-        }
-      ],
-      "language": "en_AU",
-      "name": "Queen Elizabeth II Jubilee Hospital",
       "partOf": {
         "reference": "api/organization/21300"
       },
@@ -477,11 +435,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-45"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-045"
         }
       ],
       "language": "en_AU",
@@ -511,11 +464,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-37"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-037"
         }
       ],
       "language": "en_AU",
@@ -545,11 +493,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-41"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-041"
         }
       ],
       "language": "en_AU",
@@ -579,11 +522,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-40"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-040"
         }
       ],
       "language": "en_AU",
@@ -612,11 +550,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-67"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-067"
         }
       ],
       "language": "en_AU",
@@ -673,11 +606,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-06"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-006"
         }
       ],
       "language": "en_US",
@@ -724,11 +652,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-33"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-033"
         }
       ],
       "language": "en_US",
@@ -758,11 +681,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-01"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-001"
         }
       ],
       "language": "en_US",
@@ -791,11 +709,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-62"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-062"
         }
       ],
       "language": "en_US",
@@ -824,11 +737,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-36"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-036"
         }
       ],
       "language": "en_US",
@@ -858,11 +766,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-95"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-095"
         }
       ],
       "language": "en_US",
@@ -891,11 +794,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-10"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-010"
         }
       ],
       "language": "en_US",
@@ -925,11 +823,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-07"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-007"
         }
       ],
       "language": "en_US",
@@ -959,11 +852,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-17"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-017"
         }
       ],
       "language": "en_US",
@@ -993,11 +881,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-94"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-094"
         }
       ],
       "language": "en_US",
@@ -1049,11 +932,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-29"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-029"
         }
       ],
       "language": "en_US",
@@ -1083,11 +961,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-30"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-030"
         }
       ],
       "language": "en_US",
@@ -1117,11 +990,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-31"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-031"
         }
       ],
       "language": "en_US",
@@ -1151,11 +1019,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-32"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-032"
         }
       ],
       "language": "en_US",
@@ -1185,11 +1048,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-99"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-099"
         }
       ],
       "language": "en_US",
@@ -1219,11 +1077,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-82"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-082"
         }
       ],
       "language": "en_US",
@@ -1253,11 +1106,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-09"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-009"
         }
       ],
       "language": "en_US",
@@ -1287,11 +1135,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-02"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-002"
         }
       ],
       "language": "en_US",
@@ -1321,11 +1164,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-03"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-003"
         }
       ],
       "language": "en_US",
@@ -1355,11 +1193,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-86"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-086"
         }
       ],
       "language": "en_US",
@@ -1389,11 +1222,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-84"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-084"
         }
       ],
       "language": "en_US",
@@ -1423,11 +1251,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-89"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-089"
         }
       ],
       "language": "en_US",
@@ -1457,11 +1280,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-26"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-026"
         }
       ],
       "language": "en_US",
@@ -1491,11 +1309,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-11"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-011"
         }
       ],
       "language": "en_US",
@@ -1524,11 +1337,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-35"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-035"
         }
       ],
       "language": "en_US",
@@ -1558,11 +1366,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-05"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-005"
         }
       ],
       "language": "en_US",
@@ -1592,11 +1395,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-13"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-013"
         }
       ],
       "language": "en_US",
@@ -1626,11 +1424,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-96"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-096"
         }
       ],
       "language": "en_US",
@@ -1687,11 +1480,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-38"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-038"
         }
       ],
       "language": "en_US",
@@ -1737,11 +1525,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-65"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-065"
         }
       ],
       "language": "fr_CA",
@@ -1787,11 +1570,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-66"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-066"
         }
       ],
       "language": "fr_CA",
@@ -1820,11 +1598,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-52"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-052"
         }
       ],
       "language": "en_US",
@@ -1853,11 +1626,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-53"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-053"
         }
       ],
       "language": "en_US",
@@ -1886,11 +1654,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-54"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-054"
         }
       ],
       "language": "en_US",
@@ -1952,11 +1715,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-55"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-055"
         }
       ],
       "language": "en_GB",
@@ -1985,11 +1743,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-69"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-069"
         }
       ],
       "language": "en_GB",
@@ -2068,11 +1821,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-47"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-047"
         }
       ],
       "language": "de_CH",
@@ -2119,11 +1867,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-39"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-039"
         }
       ],
       "language": "de_CH",
@@ -2173,17 +1916,40 @@
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
+      "id": 14644,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-44"
+        }
+      ],
+      "language": "en_GB",
+      "name": "The Royal Marsden NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
       "id": 14656,
       "identifier": [
         {
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-56"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-056"
         }
       ],
       "language": "en_GB",
@@ -2212,11 +1978,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-72"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-072"
         }
       ],
       "language": "en_GB",
@@ -2346,11 +2107,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-59"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-059"
         }
       ],
       "language": "en_GB",
@@ -2406,11 +2162,6 @@
           "system": "http://pcctc.org/",
           "use": "secondary",
           "value": "146-63"
-        },
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-063"
         }
       ],
       "language": "pt_BR",

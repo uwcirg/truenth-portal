@@ -23,8 +23,8 @@ USAGE
 
 setup_python_venv() {
     # Setup a python virtual environment on the given path, if not present
-    default_python_venv_path="${repo_root}/env"
-    python_venv_path="${1:-$default_python_venv_path}"
+    local default_python_venv_path="${repo_root}/env"
+    local python_venv_path="${1:-$default_python_venv_path}"
     if [ -d "${python_venv_path}" ]; then
         # Exit early if python virtual environment exists
         return
@@ -37,16 +37,16 @@ setup_python_venv() {
 
 setup_node_venv() {
     # Setup a virtual environment for NodeJS on the given path, if not present
-    default_node_venv_path="${repo_root}/node_env"
-    node_venv_path="${2:-$default_node_venv_path}"
+    local default_node_venv_path="${repo_root}/node_env"
+    local node_venv_path="${2:-$default_node_venv_path}"
     if [ -d "${node_venv_path}" ]; then
         # Exit early if node_env virtual environment exists
         return
     fi
 
     # Use existing python virtual environment to install nodeenv module
-    default_python_venv_path="${repo_root}/env"
-    python_venv_path="${1:-$default_python_venv_path}"
+    local default_python_venv_path="${repo_root}/env"
+    local python_venv_path="${1:-$default_python_venv_path}"
     echo "Activating python virtual environment..."
     . "${python_venv_path}/bin/activate"
 

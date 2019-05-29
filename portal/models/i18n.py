@@ -76,12 +76,12 @@ def get_static_strings():
 
 @babel.localeselector
 def get_locale():
-    if current_user() and current_user().locale_code:
-        return current_user().locale_code
-
-    # look for session variable in pre-logged-in state
     # confirm request context - not available from celery tasks
     if has_request_context():
+        if current_user() and current_user().locale_code:
+            return current_user().locale_code
+
+        # look for session variable in pre-logged-in state
         if session.get('locale_code'):
             return session['locale_code']
         browser_pref = negotiate_locale(

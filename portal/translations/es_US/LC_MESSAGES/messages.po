@@ -1,9 +1,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: portal 19.4.24.dev24+g16c8d96b\n"
+"Project-Id-Version: portal 19.4.30.3.dev13+g231a2747\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-05-01 17:23+0000\n"
+"POT-Creation-Date: 2019-05-07 23:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,11 +147,11 @@ msgstr ""
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L13
 msgid "TrueNTH Logo"
-msgstr ""
+msgstr "logotipo TrueNTH"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L25
 msgid "log in"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/eproms/templates/eproms/landing.html#L26 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/base.html#L202 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/contact.html#L51 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/patient_profile_create.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/patient_profile_create.html#L13 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L278 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L279 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/staff_profile_create.html#L12 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/staff_profile_create.html#L13
 msgid "Email Address"
@@ -227,8 +227,8 @@ msgstr "Imprimir"
 msgid "Back to Resources"
 msgstr ""
 
-# Intervention: exercise_diet
 # Intervention: community_of_wellness
+# Intervention: exercise_diet
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/exercise_diet/templates/exercise_diet/base.html#L2 https://github.com/uwcirg/truenth-portal/tree/develop/portal/exercise_diet/templates/exercise_diet/exercise-diet_portal.html#L13 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/base.html#L101 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/exercise-and-diet.html#L2 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/exercise-and-diet.html#L9
 msgid "Exercise and Diet"
 msgstr ""
@@ -431,8 +431,8 @@ msgstr ""
 msgid "Tool N<em>o</em>2: Monitoring"
 msgstr ""
 
-# Intervention: self_management
 # QuestionnaireBank: symptom_tracker
+# Intervention: self_management
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/about.html#L37 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/base.html#L100 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/index.html#L121 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/macros.html#L10 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/symptom-tracker.html#L2 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/symptom-tracker.html#L9 https://github.com/uwcirg/truenth-portal/tree/develop/portal/gil/templates/gil/symptom-tracker.html#L33 https://github.com/uwcirg/truenth-portal/tree/develop/portal/models/communication.py#L211 https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/portal_footer.html#L35
 msgid "Symptom Tracker"
 msgstr "Seguimiento de Síntomas"
@@ -2293,8 +2293,8 @@ msgstr "Invitación para probar TrueNTH"
 msgid "Body"
 msgstr "Cuerpo"
 
-# AppText: profileSendEmail invite email_subject
 # AppText: profileSendEmail option invite
+# AppText: profileSendEmail invite email_subject
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/invite.html#L17
 msgid "TrueNTH Invitation"
 msgstr "Invitación de TrueNTH"
@@ -3346,8 +3346,8 @@ msgstr "Enviar correo electrónico"
 msgid "TrueNTH Invite"
 msgstr "Invitación de TrueNTH"
 
-# AppText: profileSendEmail option reminder
 # AppText: profileSendEmail reminder email_subject
+# AppText: profileSendEmail option reminder
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/profile/profile_macros.html#L324
 msgid "TrueNTH Reminder"
 msgstr "Recordatorio de TrueNTH"
@@ -3900,256 +3900,68 @@ msgstr "Doy mi consentimiento para compartir información con %(org_name)s"
 msgid "TOTAL"
 msgstr "TOTAL"
 
-# Role: anon
-msgid "Anon"
-msgstr "Anon"
-
-# Organization: Duke Cancer Center Main Campus
-msgid "Duke Cancer Center Main Campus"
-msgstr ""
-
-# Organization: University of California, Davis
-msgid "University of California, Davis"
-msgstr ""
-
-# Role: partner
-msgid "Partner"
-msgstr "Socio"
-
-# Organization: Seattle Cancer Care Alliance (SCCA) Urology Clinic
-msgid "Seattle Cancer Care Alliance (SCCA) Urology Clinic"
-msgstr ""
-
-# Organization: The University of Michigan Department of Urology
-msgid "The University of Michigan Department of Urology"
-msgstr ""
-
-# AppText: profileSendEmail reminder email_body
-msgid "<p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>"
-msgstr ""
-
-# Organization: The Urology Clinic at Harborview
-msgid "The Urology Clinic at Harborview"
-msgstr ""
-
-# Role: intervention_staff
-msgid "Intervention Staff"
-msgstr "Personal de intervención"
-
-# Intervention: decision_support_wisercare
-msgid "WiserCare helps patients and providers make smarter, more confident treatment choices"
-msgstr ""
-
-# Organization: Clark Urology Center, Westwood
-msgid "Clark Urology Center, Westwood"
-msgstr ""
-
-# AppText: profileSendEmail invite email_body
-msgid "<p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>"
-msgstr ""
-
-# classification_enum: Indefinite
-msgid "Indefinite"
-msgstr "Indefinido"
-
-# Organization: University of California, Los Angeles
-msgid "University of California, Los Angeles"
+# Organization: Sibley Memorial Hospital
+msgid "Sibley Memorial Hospital"
 msgstr ""
 
 # AppText: registration prompt
 msgid "Create an account"
 msgstr ""
 
-# AppText: patient invite email
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=6d96f16f-c6fc-4fda-fa54-4e21027c8261"
-msgstr ""
-
-# assessment_status: Completed
-msgid "Completed"
-msgstr "Completado"
-
-# Organization: Duke Cancer Center North Durham
-msgid "Duke Cancer Center North Durham"
-msgstr ""
-
-# Intervention: music
-msgid "MUSIC Integration"
-msgstr ""
-
-# AppText: patient reminder email Michigan Urological Surgery Improvement Collaborative (MUSIC)
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96"
-msgstr ""
-
-# AppText: About TrueNTH URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
-
-# Organization: Dana-Farber Cancer Institute
-msgid "Dana-Farber Cancer Institute"
-msgstr ""
-
-# assessment_status: Expired
-msgid "Expired"
-msgstr "caducado"
-
-# AppText: Michigan Urological Surgery Improvement Collaborative (MUSIC) patient website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2836eccf-13c5-f249-6dac-8920060c3764&editorUrl=true"
-msgstr ""
-
-# Organization: Michigan Medicine - Department of Urology
-msgid "Michigan Medicine - Department of Urology"
-msgstr ""
-
-# Role: staff
-msgid "Staff"
-msgstr "Personal"
-
-# Organization: Karmanos Cancer Institute at Wayne State University
-msgid "Karmanos Cancer Institute at Wayne State University"
-msgstr ""
-
-# Organization: Comprehensive North
-msgid "Comprehensive North"
-msgstr ""
-
-# assessment_status: In Progress
-msgid "In Progress"
-msgstr "En progreso"
-
-# Organization: The Cancer Center at Beth Israel Deaconess Medical Center
-msgid "The Cancer Center at Beth Israel Deaconess Medical Center"
-msgstr ""
-
-# Intervention: exercise_diet
-msgid "To provide men and the people in their lives with the tools and support they need to optimize their health through exercise and diet."
-msgstr ""
-
-# Intervention: decision_support_p3p
-msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
-msgstr " <p>Explore sus valores, sus preferencias y sus conocimientos médicos actuales para ayudarlo a discutir sus opciones de tratamiento con sus doctores.</p>"
-
-# Role: promote_without_identity_challenge
-msgid "Promote Without Identity Challenge"
-msgstr ""
-
-# AppText: registration title
-msgid "Register for TrueNTH"
-msgstr "Registrarse en TrueNTH"
-
-# assessment_status: Due
-msgid "Due"
-msgstr "Fecha límite"
-
-# Role: admin
-msgid "Admin"
-msgstr "Admin"
-
-# Organization: Wayne State University Physician Group, Dearborn
-msgid "Wayne State University Physician Group, Dearborn"
-msgstr ""
-
-# AppText: About Movember URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
-
-# Organization: Sibley Memorial Hospital
-msgid "Sibley Memorial Hospital"
-msgstr ""
-
-# Organization: Michigan Urological Surgery Improvement Collaborative (MUSIC)
-msgid "Michigan Urological Surgery Improvement Collaborative (MUSIC)"
-msgstr ""
-
-# AppText: Cellphone
-msgid "Cellphone"
-msgstr ""
-
-# classification_enum: Recurring
-msgid "Recurring"
-msgstr "Recurrente"
-
-# Intervention: care_plan
-msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
-msgstr "<p>Organización y apoyo para los múltiples detalles de la vida como sobreviviente del cáncer de próstata</p>"
-
-# AppText: Privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true"
-msgstr ""
-
-# Organization: University of California, San Francisco
-msgid "University of California, San Francisco"
-msgstr ""
-
-# Role: write_only
-msgid "Write Only"
-msgstr "Solo escribir"
-
-# Organization: Sherwood Medical Center, PC
-msgid "Sherwood Medical Center, PC"
-msgstr ""
-
-# Organization: Memorial Sloan Kettering
-msgid "Memorial Sloan Kettering"
-msgstr ""
-
-# Intervention: decision_support_wisercare
-msgid "Decision Support WiserCare"
-msgstr "Apoyo de decisión WiserCare"
-
-# Role: application_developer
-msgid "Application Developer"
-msgstr "Desarrollador de aplicaciones"
-
-# Organization: Pinson Urology Center
-msgid "Pinson Urology Center"
-msgstr ""
-
-# Role: researcher
-msgid "Researcher"
-msgstr "Investigador"
-
-# Intervention: default
-msgid "OTHER: not yet officially supported"
-msgstr "OTROS: sin soporte oficial todavía"
-
-# Intervention: assessment_engine
-msgid "Assessment Engine"
-msgstr ""
-
-# Organization: Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center
-msgid "Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center"
-msgstr ""
-
-# Organization: Michigan Urological Clinic
-msgid "Michigan Urological Clinic"
-msgstr ""
-
-# Role: test
-msgid "Test"
-msgstr "Prueba"
-
-# AppText: Initial Consent Terms URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d57adc33-738c-67bf-187d-a6a9c5af81c5&editorUrl=true"
-msgstr ""
-
-# AppText: layout title
-msgid "TrueNTH USA"
-msgstr ""
-
 # Role: content_manager
 msgid "Content Manager"
 msgstr "Gestor de contenidos"
 
-# Organization: UC Davis Medical Center
-msgid "UC Davis Medical Center"
+# Intervention: psa_tracker
+msgid "<p>Remember to update your PSA level.</p>"
 msgstr ""
 
 # Organization: Spectrum Health Medical Group-Urology
 msgid "Spectrum Health Medical Group-Urology"
 msgstr ""
 
-# Organization: Dana-Farber/Brigham and Women's Cancer Center
-msgid "Dana-Farber/Brigham and Women's Cancer Center"
+# AppText: profileSendEmail reminder email_body
+msgid "<p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>"
+msgstr ""
+
+# AppText: About Movember URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
+
+# Organization: University of California, Los Angeles
+msgid "University of California, Los Angeles"
+msgstr ""
+
+# Organization: Wayne State University Physician Group, Dearborn
+msgid "Wayne State University Physician Group, Dearborn"
+msgstr ""
+
+# Organization: Dana-Farber Cancer Institute
+msgid "Dana-Farber Cancer Institute"
+msgstr ""
+
+# Intervention: assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+# Organization: Pinson Urology Center
+msgid "Pinson Urology Center"
+msgstr ""
+
+# Organization: Oregon Health & Science University
+msgid "Oregon Health & Science University"
+msgstr ""
+
+# Role: analyst
+msgid "Analyst"
+msgstr "Analista"
+
+# Intervention: sexual_recovery
+msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
+msgstr "<p>Aprenda estrategias para desarrollar una nueva normalidad en su vida sexual después del tratamiento de cáncer de próstata.</p>"
+
+# AppText: layout title
+msgid "TrueNTH USA"
 msgstr ""
 
 # AppText: WiserCare Clinical Institution organization consent URL
@@ -4157,60 +3969,168 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true"
 msgstr ""
 
-# Organization: University of North Carolina at Chapel Hill
-msgid "University of North Carolina at Chapel Hill"
-msgstr ""
-
-# Organization: Suburban Hospital
-msgid "Suburban Hospital"
-msgstr ""
-
-# Organization: UNC Lineberger Comprehensive Cancer Center
-msgid "UNC Lineberger Comprehensive Cancer Center"
-msgstr ""
-
-# AppText: staff terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=20bfc5d6-41a5-a4ec-5418-0904d25e0c7c&editorUrl=true"
-msgstr ""
-
-# Organization: Duke Cancer Center Raleigh
-msgid "Duke Cancer Center Raleigh"
-msgstr ""
-
-# Organization: Wertz Clinic at Karmanos Cancer Center
-msgid "Wertz Clinic at Karmanos Cancer Center"
-msgstr ""
-
-# Intervention: self_management
-msgid "<p>Compare your symptoms over time with men like you, and manage symptoms that bother you.</p>"
-msgstr ""
-
-# Organization: none of the above
-msgid "none of the above"
-msgstr "Ninguno de los anteriores"
-
-# Organization: University of Colorado Cancer Center - Anschutz
-msgid "University of Colorado Cancer Center - Anschutz"
+# Organization: UW Medicine (University of Washington)
+msgid "UW Medicine (University of Washington)"
 msgstr ""
 
 # AppText: patient invite email Michigan Urological Surgery Improvement Collaborative (MUSIC)
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=174a16fb-53a4-1806-6756-e5fa25723a88"
 msgstr ""
 
-# Intervention: psa_tracker
-msgid "<p>Remember to update your PSA level.</p>"
-msgstr ""
-
-# Organization: Winship Cancer Institute of Emory University
-msgid "Winship Cancer Institute of Emory University"
-msgstr ""
-
 # classification_enum: Baseline
 msgid "Baseline"
 msgstr "Línea de base"
 
-# AppText: patient reminder email
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9057ec06-1d9f-b4a6-2d32-2102a596ac5f"
+# Organization: University of California, San Francisco
+msgid "University of California, San Francisco"
+msgstr ""
+
+# AppText: staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=20bfc5d6-41a5-a4ec-5418-0904d25e0c7c&editorUrl=true"
+msgstr ""
+
+# AppText: About TrueNTH URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+
+# classification_enum: Recurring
+msgid "Recurring"
+msgstr "Recurrente"
+
+# QuestionnaireBank: symptom_tracker_recurring
+msgid "Symptom Tracker Recurring"
+msgstr ""
+
+# Intervention: decision_support_wisercare
+msgid "WiserCare helps patients and providers make smarter, more confident treatment choices"
+msgstr ""
+
+# AppText: patient invite email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=6d96f16f-c6fc-4fda-fa54-4e21027c8261"
+msgstr ""
+
+# assessment_status: Due
+msgid "Due"
+msgstr "Fecha límite"
+
+# Organization: Suburban Hospital
+msgid "Suburban Hospital"
+msgstr ""
+
+# Organization: Clark Urology Center, Westwood
+msgid "Clark Urology Center, Westwood"
+msgstr ""
+
+# Intervention: care_plan
+msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
+msgstr "<p>Organización y apoyo para los múltiples detalles de la vida como sobreviviente del cáncer de próstata</p>"
+
+# Organization: Frank Clark Urology Center, Santa Monica
+msgid "Frank Clark Urology Center, Santa Monica"
+msgstr ""
+
+# Organization: Sherwood Medical Center, PC
+msgid "Sherwood Medical Center, PC"
+msgstr ""
+
+# Role: intervention_staff
+msgid "Intervention Staff"
+msgstr "Personal de intervención"
+
+# AppText: Initial Consent Terms URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d57adc33-738c-67bf-187d-a6a9c5af81c5&editorUrl=true"
+msgstr ""
+
+# Organization: Integrated Healthcare Associates (IHA)
+msgid "Integrated Healthcare Associates (IHA)"
+msgstr ""
+
+# AppText: Cellphone
+msgid "Cellphone"
+msgstr ""
+
+# Intervention: music
+msgid "MUSIC Integration"
+msgstr ""
+
+# classification_enum: Indefinite
+msgid "Indefinite"
+msgstr "Indefinido"
+
+# Organization: Seattle Cancer Care Alliance (SCCA) Urology Clinic
+msgid "Seattle Cancer Care Alliance (SCCA) Urology Clinic"
+msgstr ""
+
+# Role: anon
+msgid "Anon"
+msgstr "Anon"
+
+# Intervention: decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr "Apoyo de decisión WiserCare"
+
+# AppText: Privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true"
+msgstr ""
+
+# Intervention: self_management
+msgid "<p>Compare your symptoms over time with men like you, and manage symptoms that bother you.</p>"
+msgstr ""
+
+# AppText: consent date label
+msgid "Consent Date"
+msgstr "Fecha de consentimiento"
+
+# Organization: Capital Urological Associates
+msgid "Capital Urological Associates"
+msgstr ""
+
+# Organization: Wertz Clinic at Karmanos Cancer Center
+msgid "Wertz Clinic at Karmanos Cancer Center"
+msgstr ""
+
+# Organization: UCSF Urologic Surgical Oncology Clinic
+msgid "UCSF Urologic Surgical Oncology Clinic"
+msgstr ""
+
+# Organization: University of Colorado Cancer Center - Anschutz
+msgid "University of Colorado Cancer Center - Anschutz"
+msgstr ""
+
+# Role: write_only
+msgid "Write Only"
+msgstr "Solo escribir"
+
+# AppText: portal registration
+msgid "TrueNTH Registration"
+msgstr "Registro de TrueNTH"
+
+# Organization: Memorial Sloan Kettering
+msgid "Memorial Sloan Kettering"
+msgstr ""
+
+# Intervention: decision_support_unavailable
+msgid "TrueNTH Decision Support is intended for use by men who have been diagnosed with localized prostate cancer (the cancer is not in other parts of the body), but who have not yet started active treatment."
+msgstr ""
+
+# Role: test
+msgid "Test"
+msgstr "Prueba"
+
+# assessment_status: In Progress
+msgid "In Progress"
+msgstr "En progreso"
+
+# Role: access_on_verify
+msgid "Access On Verify"
+msgstr "Acceso a verificar"
+
+# Organization: University of North Carolina at Chapel Hill
+msgid "University of North Carolina at Chapel Hill"
+msgstr ""
+
+# Organization: The University of Michigan Department of Urology
+msgid "The University of Michigan Department of Urology"
 msgstr ""
 
 # Intervention: community_of_wellness
@@ -4221,89 +4141,169 @@ msgstr "Comunidad de bienestar"
 msgid "Emory Saint Joseph's Hospital"
 msgstr ""
 
-# QuestionnaireBank: symptom_tracker_recurring
-msgid "Symptom Tracker Recurring"
-msgstr ""
-
-# Intervention: sexual_recovery
-msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
-msgstr "<p>Aprenda estrategias para desarrollar una nueva normalidad en su vida sexual después del tratamiento de cáncer de próstata.</p>"
-
-# AppText: patient terms and conditions URL
-# AppText: Terms and Conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true"
-msgstr ""
-
-# Organization: Oregon Health & Science University
-msgid "Oregon Health & Science University"
-msgstr ""
-
-# Organization: Capital Urological Associates
-msgid "Capital Urological Associates"
-msgstr ""
-
-# AppText: portal registration
-msgid "TrueNTH Registration"
-msgstr "Registro de TrueNTH"
-
-# Organization: University of Colorado, Denver
-msgid "University of Colorado, Denver"
-msgstr ""
-
-# Role: analyst
-msgid "Analyst"
-msgstr "Analista"
-
-# Organization: Urologic Consultants, PC
-msgid "Urologic Consultants, PC"
-msgstr ""
-
-# Intervention: psa_tracker
-msgid "PSA Tracker"
+# Organization: Duke Cancer Center Raleigh
+msgid "Duke Cancer Center Raleigh"
 msgstr ""
 
 # Role: service
 msgid "Service"
 msgstr "Servicio"
 
-# Organization: Frank Clark Urology Center, Santa Monica
-msgid "Frank Clark Urology Center, Santa Monica"
-msgstr ""
+# Role: researcher
+msgid "Researcher"
+msgstr "Investigador"
 
-# Organization: UCSF Urologic Surgical Oncology Clinic
-msgid "UCSF Urologic Surgical Oncology Clinic"
+# Organization: Dana-Farber/Brigham and Women's Cancer Center
+msgid "Dana-Farber/Brigham and Women's Cancer Center"
 msgstr ""
-
-# Organization: Integrated Healthcare Associates (IHA)
-msgid "Integrated Healthcare Associates (IHA)"
-msgstr ""
-
-# Role: access_on_verify
-msgid "Access On Verify"
-msgstr "Acceso a verificar"
 
 # Intervention: social_support
 msgid "Social Support Network"
 msgstr "Red de apoyo social"
 
+# Organization: University of California, Davis
+msgid "University of California, Davis"
+msgstr ""
+
+# Organization: Duke Cancer Center Main Campus
+msgid "Duke Cancer Center Main Campus"
+msgstr ""
+
+# Organization: The Cancer Center at Beth Israel Deaconess Medical Center
+msgid "The Cancer Center at Beth Israel Deaconess Medical Center"
+msgstr ""
+
+# Organization: Duke Cancer Center North Durham
+msgid "Duke Cancer Center North Durham"
+msgstr ""
+
+# Organization: Urologic Consultants, PC
+msgid "Urologic Consultants, PC"
+msgstr ""
+
+# Organization: none of the above
+msgid "none of the above"
+msgstr "Ninguno de los anteriores"
+
 # Intervention: sexual_recovery
 msgid "Sexual Recovery"
 msgstr "Recuperación sexual"
+
+# Organization: Michigan Medicine - Department of Urology
+msgid "Michigan Medicine - Department of Urology"
+msgstr ""
+
+# AppText: profileSendEmail invite email_body
+msgid "<p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td><a class=\"btn\" href=\"{0}\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br/><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p>"
+msgstr ""
+
+# AppText: patient terms and conditions URL
+# AppText: Terms and Conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true"
+msgstr ""
 
 # assessment_status: Overdue
 msgid "Overdue"
 msgstr "Vencido"
 
-# AppText: consent date label
-msgid "Consent Date"
-msgstr "Fecha de consentimiento"
-
-# Intervention: decision_support_unavailable
-msgid "TrueNTH Decision Support is intended for use by men who have been diagnosed with localized prostate cancer (the cancer is not in other parts of the body), but who have not yet started active treatment."
+# Organization: UC Davis Medical Center
+msgid "UC Davis Medical Center"
 msgstr ""
 
-# Organization: UW Medicine (University of Washington)
-msgid "UW Medicine (University of Washington)"
+# Organization: Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center
+msgid "Karmanos Cancer Institute at Lawrence and Idell Weisberg Cancer Treatment Center"
+msgstr ""
+
+# Organization: Comprehensive North
+msgid "Comprehensive North"
+msgstr ""
+
+# Role: staff
+msgid "Staff"
+msgstr "Personal"
+
+# Organization: The Urology Clinic at Harborview
+msgid "The Urology Clinic at Harborview"
+msgstr ""
+
+# Role: promote_without_identity_challenge
+msgid "Promote Without Identity Challenge"
+msgstr ""
+
+# AppText: patient reminder email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9057ec06-1d9f-b4a6-2d32-2102a596ac5f"
+msgstr ""
+
+# AppText: registration title
+msgid "Register for TrueNTH"
+msgstr "Registrarse en TrueNTH"
+
+# Intervention: psa_tracker
+msgid "PSA Tracker"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
+msgstr " <p>Explore sus valores, sus preferencias y sus conocimientos médicos actuales para ayudarlo a discutir sus opciones de tratamiento con sus doctores.</p>"
+
+# AppText: patient reminder email Michigan Urological Surgery Improvement Collaborative (MUSIC)
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d5ff0819-eff1-4330-12c9-d3ca71ad5f96"
+msgstr ""
+
+# Role: partner
+msgid "Partner"
+msgstr "Socio"
+
+# Organization: Winship Cancer Institute of Emory University
+msgid "Winship Cancer Institute of Emory University"
+msgstr ""
+
+# assessment_status: Expired
+msgid "Expired"
+msgstr "caducado"
+
+# Organization: University of Colorado, Denver
+msgid "University of Colorado, Denver"
+msgstr ""
+
+# Intervention: default
+msgid "OTHER: not yet officially supported"
+msgstr "OTROS: sin soporte oficial todavía"
+
+# Organization: Michigan Urological Clinic
+msgid "Michigan Urological Clinic"
+msgstr ""
+
+# Organization: Michigan Urological Surgery Improvement Collaborative (MUSIC)
+msgid "Michigan Urological Surgery Improvement Collaborative (MUSIC)"
+msgstr ""
+
+# Organization: Karmanos Cancer Institute at Wayne State University
+msgid "Karmanos Cancer Institute at Wayne State University"
+msgstr ""
+
+# assessment_status: Completed
+msgid "Completed"
+msgstr "Completado"
+
+# AppText: Michigan Urological Surgery Improvement Collaborative (MUSIC) patient website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2836eccf-13c5-f249-6dac-8920060c3764&editorUrl=true"
+msgstr ""
+
+# Role: admin
+msgid "Admin"
+msgstr "Admin"
+
+# Intervention: exercise_diet
+msgid "To provide men and the people in their lives with the tools and support they need to optimize their health through exercise and diet."
+msgstr ""
+
+# Role: application_developer
+msgid "Application Developer"
+msgstr "Desarrollador de aplicaciones"
+
+# Organization: UNC Lineberger Comprehensive Cancer Center
+msgid "UNC Lineberger Comprehensive Cancer Center"
 msgstr ""
 
 #: https://github.com/uwcirg/truenth-portal/tree/develop/portal/templates/flask_user/emails/eproms_base_message.txt#L5
@@ -4373,108 +4373,97 @@ msgstr ""
 msgid "Your password has been changed"
 msgstr "Su contraseña ha sido cambiada"
 
-# AppText: landing sub-title
-msgid " "
-msgstr " "
+# AppText: IRONMAN website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
 
-# Organization: Department Of Urology, Princess Alexandra Hospital
-msgid "Department Of Urology, Princess Alexandra Hospital"
-msgstr ""
-
-# Organization: Australian Prostate Cancer Research Centre
-msgid "Australian Prostate Cancer Research Centre"
-msgstr ""
-
-# Organization: TrueNTH Global
-msgid "TrueNTH Global"
-msgstr "TrueNTH Global"
-
-# AppText: registration prompt
-msgid "Create a password"
-msgstr "Crear contraseña"
-
-# AppText: IRONMAN patient privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
-
-# Organization: Southampton
-msgid "Southampton"
-msgstr ""
-
-# Organization: Tulane University
-msgid "Tulane University"
-msgstr ""
-
-# Organization: The Christie NHS Foundation Trust
-msgid "The Christie NHS Foundation Trust"
-msgstr ""
-
-# Organization: University of Alabama-Birmingham
-msgid "University of Alabama-Birmingham"
-msgstr ""
-
-# AppText: TrueNTH Global Registry website declaration form URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
-
-# Organization: Roswell Park Cancer Institute
-msgid "Roswell Park Cancer Institute"
-msgstr ""
-
-# Organization: Reading Health System
-msgid "Reading Health System"
-msgstr ""
-
-# Organization: Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital
-msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+# Organization: Easton Hospital
+msgid "Easton Hospital"
 msgstr ""
 
 # Organization: Tygerberg Hospital
 msgid "Tygerberg Hospital"
 msgstr ""
 
-# Organization: University of Illinois at Chicago
-msgid "University of Illinois at Chicago"
+# Organization: The Christie NHS Foundation Trust
+msgid "The Christie NHS Foundation Trust"
 msgstr ""
 
-# AppText: profileSendEmail invite email_body
-msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
-msgstr "<p>(saludo),</p><p>Este correo le fue enviado porque usted es un paciente de (nombre de la clínica) y otorgó su consentimiento para participar en el Estudio de registros de Resultados del cáncer de próstata (parent org).</p><p>Esta es una invitación para utilizar el sitio web de TrueNTH, donde usted informará sobre su estado de salud. Su participación nos ayudará de manera colectiva a mejorar la atención que los hombres reciben durante su travesía de cáncer de próstata.</p><p>Para completar su primer cuestionario, por favor verifique su cuenta.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta</a></div><p>Usted también puede ingresar al sitio de TrueNTH a través del enlace siguiente:<p/><p><a href=\"{0}\">{0}</a></p><p>Guarde este correo para regresar a TrueNTH en el momento que quiera.</p><p>Si tiene alguna duda, por favor póngase en contacto con su representante en (nombre de la clínica).</p>"
-
-# Organization: Thomas Jefferson University
-msgid "Thomas Jefferson University"
+# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
+msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
 msgstr ""
 
-# Organization: Macquarie University Hospital
-msgid "Macquarie University Hospital"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_baseline
-msgid "Ironman Baseline"
-msgstr "Base de Ironman"
-
-# Organization: USA (Region/Country Site)
-msgid "USA (Region/Country Site)"
-msgstr "Estados Unidos (región/país)"
-
-# AppText: profileSendEmail reminder email_body
-msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
-msgstr "<p>Hola,</p><p>Este correo le fue enviado a usted por (nombre de la clínica). Aquí es donde reporta usted sobre su estado de salud a lo largo de su travesía de cáncer de próstata. La información recolectada se usará para determinar si puede haber mejoras en el cuidado del cáncer de próstata.</p><p>Ingrese ahora para completar su cuestionario.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta y responda al cuestionario ahora</a></div><p>Haga clic en el botón de arriba o utilice el enlace a continuación para visitar TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Si usted tiene alguna pregunta o dudas, por favor contacte a (nombre de la clínica).</p><p><em>—Este correo electrónico le fue enviado a usted porque otorgó su consentimiento para participar en el proyecto de registro de TrueNTH</em></p>"
+# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
+msgid "Ironman V3 Recurring Annual Pattern"
+msgstr "Patrón recurrente anual de Ironman V3"
 
 # Organization: Gc Urology
 msgid "Gc Urology"
 msgstr ""
 
-# Organization: Örebro University Hospital
-msgid "Örebro University Hospital"
+# Organization: Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital
+msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
 msgstr ""
 
-# Organization: Genesis Cancer Care Queensland
-msgid "Genesis Cancer Care Queensland"
+# QuestionnaireBank: IRONMAN_v3_indefinite
+msgid "Ironman V3 Indefinite"
+msgstr "Ironman V3 indefinido"
+
+# AppText: IRONMAN staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+
+# Organization: United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
 msgstr ""
 
-# Organization: University of California San Diego
-msgid "University of California San Diego"
+# AppText: TrueNTH Global Registry website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+
+# Organization: TrueNTH Global
+msgid "TrueNTH Global"
+msgstr "TrueNTH Global"
+
+# Organization: CHU de Quebec - Universite Laval
+msgid "CHU de Quebec - Universite Laval"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr "Indefinido de Ironman"
+
+# AppText: Cellphone
+msgid "Mobile"
+msgstr "Teléfono celular"
+
+# Organization: Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
+msgstr ""
+
+# Organization: Centre Hospitalier de l'Université de Montréal
+msgid "Centre Hospitalier de l'Université de Montréal"
+msgstr ""
+
+# AppText: TrueNTH Global Registry patient terms and conditions URL
+# AppText: Initial Consent Terms URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr "nfig[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+
+# Organization: University of Alabama-Birmingham
+msgid "University of Alabama-Birmingham"
+msgstr ""
+
+# Intervention: self_management
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
+msgstr "<p>Aprenda sobre los síntomas que son comunes en los hombres con cáncer de próstata y sobre las maneras de manejar y mejorar estos síntomas.</p>"
+
+# Organization: Aria Health
+msgid "Aria Health"
+msgstr ""
+
+# Organization: AU B Child Site 1
+msgid "AU B Child Site 1"
 msgstr ""
 
 # AppText: patient invite email TrueNTH Global Registry
@@ -4482,129 +4471,239 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
 
-# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
-msgid "Ironman Recurring 6Mo Pattern"
-msgstr "Patrón recurrente de 6 meses de Ironman"
-
-# Organization: Baylor College of Medicine
-msgid "Baylor College of Medicine"
+# ResearchProtocol: TNGR v1
+msgid "Tngr V1"
 msgstr ""
 
-# Organization: Aria Health
-msgid "Aria Health"
+# Organization: Genesis Cancer Care Queensland
+msgid "Genesis Cancer Care Queensland"
 msgstr ""
 
-# Organization: Australia (Region/Country Site)
-msgid "Australia (Region/Country Site)"
-msgstr ""
-
-# Organization: South Africa (Region/Country Site)
-msgid "South Africa (Region/Country Site)"
-msgstr ""
-
-# AppText: Initial Consent Terms URL
-# AppText: TrueNTH Global Registry patient terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
-msgstr "nfig[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
-
-# QuestionnaireBank: CRV_baseline
-msgid "Crv Baseline"
-msgstr ""
-
-# AppText: TrueNTH Global Registry organization consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
-
-# Intervention: decision_support_p3p
-msgid "Decision Support tool"
-msgstr "Herramienta de apoyo de decisión"
-
-# Organization: Winship Cancer Institute Emory University
-msgid "Winship Cancer Institute Emory University"
-msgstr ""
-
-# Organization: Chesapeake Urology Associates
-msgid "Chesapeake Urology Associates"
+# Organization: Duke Comprehensive Cancer Center
+msgid "Duke Comprehensive Cancer Center"
 msgstr ""
 
 # AppText: layout title
 msgid "Movember TrueNTH"
 msgstr "Movember TrueNTH"
 
-# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern University
-msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
+# Organization: Örebro University Hospital
+msgid "Örebro University Hospital"
 msgstr ""
-
-# AppText: IRONMAN staff privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
-
-# Organization: Sidney Kimmel Comprehensive Cancer Center
-msgid "Sidney Kimmel Comprehensive Cancer Center"
-msgstr ""
-
-# Organization: Queensland University of Technology LDC
-msgid "Queensland University of Technology LDC"
-msgstr ""
-
-# Organization: Switzerland (Region/Country Site)
-msgid "Switzerland (Region/Country Site)"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_v3_recurring_6mo_pattern
-msgid "Ironman V3 Recurring 6Mo Pattern"
-msgstr "Patrón recurrente de 6 meses de Ironman V3"
-
-# Organization: Urology South Brisbane
-msgid "Urology South Brisbane"
-msgstr ""
-
-# Intervention: self_management
-msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
-msgstr "<p>Aprenda sobre los síntomas que son comunes en los hombres con cáncer de próstata y sobre las maneras de manejar y mejorar estos síntomas.</p>"
-
-# AppText: consent date label
-msgid "Study Consent Date"
-msgstr "Fecha de consentimiento del estudio"
-
-# QuestionnaireBank: IRONMAN_indefinite
-msgid "Ironman Indefinite"
-msgstr "Indefinido de Ironman"
-
-# Organization: Centro de Pesquisa em Oncologia
-msgid "Centro de Pesquisa em Oncologia"
-msgstr ""
-
-# AppText: TrueNTH Global Registry patient privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
 
 # QuestionnaireBank: IRONMAN_v3_baseline
 msgid "Ironman V3 Baseline"
 msgstr "Base de Ironman V3"
 
-# QuestionnaireBank: IRONMAN_recurring_annual_pattern
-msgid "Ironman Recurring Annual Pattern"
-msgstr "Patrón anual recurrente de Ironman"
-
-# Organization: Duke Comprehensive Cancer Center
-msgid "Duke Comprehensive Cancer Center"
-msgstr ""
-
 # Organization: Test Site
 msgid "Test Site"
 msgstr ""
 
-# ResearchProtocol: TNGR v1
-msgid "Tngr V1"
+# Organization: Southampton
+msgid "Southampton"
+msgstr ""
+
+# AppText: TrueNTH Global Registry patient website consent URL
+# AppText: TrueNTH Global Registry organization website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+
+# Organization: Chesapeake Urology Associates
+msgid "Chesapeake Urology Associates"
+msgstr ""
+
+# AppText: IRONMAN staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+
+# Organization: Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
+msgstr ""
+
+# Organization: Weill Cornell Medical Center
+msgid "Weill Cornell Medical Center"
+msgstr ""
+
+# Organization: USA (Region/Country Site)
+msgid "USA (Region/Country Site)"
+msgstr "Estados Unidos (región/país)"
+
+# Organization: Reading Health System
+msgid "Reading Health System"
+msgstr ""
+
+# Organization: South Africa (Region/Country Site)
+msgid "South Africa (Region/Country Site)"
+msgstr ""
+
+# Organization: TrueNTH Global Registry
+msgid "TrueNTH Global Registry"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_baseline
+msgid "Ironman Baseline"
+msgstr "Base de Ironman"
+
+# Organization: Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
+msgstr ""
+
+# Organization: Australian Urology Associates (AUA)
+msgid "Australian Urology Associates (AUA)"
+msgstr ""
+
+# Organization: Oregon Health and Sciences Cancer Center
+msgid "Oregon Health and Sciences Cancer Center"
+msgstr ""
+
+# Organization: Brazil (Region/Country Site)
+msgid "Brazil (Region/Country Site)"
+msgstr ""
+
+# AppText: consent date label
+msgid "Study Consent Date"
+msgstr "Fecha de consentimiento del estudio"
+
+# AppText: IRONMAN organization website consent URL
+# AppText: IRONMAN patient website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+
+# AppText: patient reminder email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgstr ""
+
+# AppText: TrueNTH Global Registry staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+
+# AppText: TrueNTH Global Registry staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+
+# Organization: Columbia University
+msgid "Columbia University"
+msgstr ""
+
+# AppText: landing sub-title
+msgid " "
+msgstr " "
+
+# QuestionnaireBank: CRV_baseline
+msgid "Crv Baseline"
+msgstr ""
+
+# Organization: Australian Prostate Cancer Research Centre
+msgid "Australian Prostate Cancer Research Centre"
+msgstr ""
+
+# ResearchProtocol: IRONMAN v3
+msgid "Ironman V3"
+msgstr "Ironman V3"
+
+# AppText: IRONMAN staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+
+# Organization: Eastern Health
+msgid "Eastern Health"
+msgstr ""
+
+# Organization: Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
 msgstr ""
 
 # Organization: University of California Los Angeles
 msgid "University of California Los Angeles"
 msgstr ""
 
+# Organization: Queensland University of Technology LDC
+msgid "Queensland University of Technology LDC"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
+msgid "Ironman V3 Recurring 3Mo Pattern"
+msgstr "Patrón recurrente de 3 meses de Ironman V3"
+
+# Organization: Sweden (Region/Country Site)
+msgid "Sweden (Region/Country Site)"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_v3_recurring_6mo_pattern
+msgid "Ironman V3 Recurring 6Mo Pattern"
+msgstr "Patrón recurrente de 6 meses de Ironman V3"
+
+# Organization: University of Virgina (UVA)
+msgid "University of Virgina (UVA)"
+msgstr ""
+
+# AppText: site summary email
+# AppText: site summary email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+
+# AppText: profileSendEmail reminder email_body
+msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
+msgstr "<p>Hola,</p><p>Este correo le fue enviado a usted por (nombre de la clínica). Aquí es donde reporta usted sobre su estado de salud a lo largo de su travesía de cáncer de próstata. La información recolectada se usará para determinar si puede haber mejoras en el cuidado del cáncer de próstata.</p><p>Ingrese ahora para completar su cuestionario.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta y responda al cuestionario ahora</a></div><p>Haga clic en el botón de arriba o utilice el enlace a continuación para visitar TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Si usted tiene alguna pregunta o dudas, por favor contacte a (nombre de la clínica).</p><p><em>—Este correo electrónico le fue enviado a usted porque otorgó su consentimiento para participar en el proyecto de registro de TrueNTH</em></p>"
+
+# AppText: TrueNTH Global Registry patient privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+
+# Organization: The Alfred
+msgid "The Alfred"
+msgstr ""
+
 # AppText: patient reminder email TrueNTH Global Registry
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+# Organization: University of North Carolina
+msgid "University of North Carolina"
+msgstr ""
+
+# Organization: Redland Hospital
+msgid "Redland Hospital"
+msgstr ""
+
+# Organization: University of California San Diego
+msgid "University of California San Diego"
+msgstr ""
+
+# Organization: Westmead Hospital
+msgid "Westmead Hospital"
+msgstr ""
+
+# Organization: Wayne St. University Karmanos Cancer Institute
+msgid "Wayne St. University Karmanos Cancer Institute"
+msgstr ""
+
+# AppText: registration prompt
+msgid "Create a password"
+msgstr "Crear contraseña"
+
+# AppText: patient invite email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+
+# Organization: AU B Child Site 2
+msgid "AU B Child Site 2"
+msgstr ""
+
+# Organization: Department Of Urology, Princess Alexandra Hospital
+msgid "Department Of Urology, Princess Alexandra Hospital"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_6mo_pattern
+msgid "Ironman Recurring 6Mo Pattern"
+msgstr "Patrón recurrente de 6 meses de Ironman"
+
+# AppText: TrueNTH Global Registry staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+
+# Organization: Robert H. Lurie Comprehensive Cancer Center Northwestern University
+msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
 msgstr ""
 
 # AppText: TrueNTH Global Registry staff website consent URL
@@ -4612,24 +4711,104 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
 
-# QuestionnaireBank: IRONMAN_v3_indefinite
-msgid "Ironman V3 Indefinite"
-msgstr "Ironman V3 indefinido"
+# AppText: IRONMAN patient privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+
+# Organization: Winship Cancer Institute Emory University
+msgid "Winship Cancer Institute Emory University"
+msgstr ""
+
+# Organization: Australia (Region/Country Site)
+msgid "Australia (Region/Country Site)"
+msgstr ""
+
+# Organization: Queen Elizabeth II Jubilee Hospital
+msgid "Queen Elizabeth II Jubilee Hospital"
+msgstr ""
+
+# QuestionnaireBank: IRONMAN_recurring_annual_pattern
+msgid "Ironman Recurring Annual Pattern"
+msgstr "Patrón anual recurrente de Ironman"
+
+# Organization: Sidney Kimmel Comprehensive Cancer Center
+msgid "Sidney Kimmel Comprehensive Cancer Center"
+msgstr ""
+
+# Organization: Urology South Brisbane
+msgid "Urology South Brisbane"
+msgstr ""
+
+# AppText: site summary email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+
+# Organization: Macquarie University Hospital
+msgid "Macquarie University Hospital"
+msgstr ""
+
+# Organization: University of Wisconsin
+msgid "University of Wisconsin"
+msgstr ""
 
 # AppText: IRONMAN patient terms and conditions URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
 
-# ResearchProtocol: IRONMAN v3
-msgid "Ironman V3"
-msgstr "Ironman V3"
-
-# Organization: Ottawa Hospital Cancer Centre
-msgid "Ottawa Hospital Cancer Centre"
+# Organization: BC Cancer Agency
+msgid "BC Cancer Agency"
 msgstr ""
 
-# Organization: Redland Hospital
-msgid "Redland Hospital"
+# Organization: Skane University Hospital
+msgid "Skane University Hospital"
+msgstr ""
+
+# Organization: IRONMAN
+msgid "IRONMAN"
+msgstr ""
+
+# Intervention: decision_support_p3p
+msgid "Decision Support tool"
+msgstr "Herramienta de apoyo de decisión"
+
+# Organization: University of Chicago
+msgid "University of Chicago"
+msgstr ""
+
+# AppText: profileSendEmail invite email_body
+msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
+msgstr "<p>(saludo),</p><p>Este correo le fue enviado porque usted es un paciente de (nombre de la clínica) y otorgó su consentimiento para participar en el Estudio de registros de Resultados del cáncer de próstata (parent org).</p><p>Esta es una invitación para utilizar el sitio web de TrueNTH, donde usted informará sobre su estado de salud. Su participación nos ayudará de manera colectiva a mejorar la atención que los hombres reciben durante su travesía de cáncer de próstata.</p><p>Para completar su primer cuestionario, por favor verifique su cuenta.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta</a></div><p>Usted también puede ingresar al sitio de TrueNTH a través del enlace siguiente:<p/><p><a href=\"{0}\">{0}</a></p><p>Guarde este correo para regresar a TrueNTH en el momento que quiera.</p><p>Si tiene alguna duda, por favor póngase en contacto con su representante en (nombre de la clínica).</p>"
+
+# AppText: TrueNTH Global Registry organization consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
+
+# Organization: Juravinski Cancer Centre
+msgid "Juravinski Cancer Centre"
+msgstr ""
+
+# Organization: Epworth Healthcare
+msgid "Epworth Healthcare"
+msgstr ""
+
+# Organization: AUA Local Data Center
+msgid "AUA Local Data Center"
+msgstr ""
+
+# Organization: Centro de Pesquisa em Oncologia
+msgid "Centro de Pesquisa em Oncologia"
+msgstr ""
+
+# Organization: University of Illinois at Chicago
+msgid "University of Illinois at Chicago"
+msgstr ""
+
+# ResearchProtocol: IRONMAN v2
+msgid "Ironman V2"
+msgstr "Ironman V2"
+
+# Organization: Doylestown Health
+msgid "Doylestown Health"
 msgstr ""
 
 # Organization: Canada (Region/Country Site)
@@ -4640,221 +4819,42 @@ msgstr ""
 msgid "Report your health in order to improve prostate cancer care."
 msgstr ""
 
-# Organization: University of Wisconsin
-msgid "University of Wisconsin"
+# AppText: profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Informe su estado de salud en TrueNTH Correo electrónico de (nombre de la clínica)"
+
+# Organization: Baylor College of Medicine
+msgid "Baylor College of Medicine"
 msgstr ""
 
-# Organization: Wesley Urology Clinic
-msgid "Wesley Urology Clinic"
+# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
+msgid "Ironman Recurring 3Mo Pattern"
+msgstr "Patrón recurrente de 3 meses de Ironman"
+
+# Organization: Roswell Park Cancer Institute
+msgid "Roswell Park Cancer Institute"
 msgstr ""
 
-# AppText: patient reminder email IRONMAN
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
-msgstr ""
-
-# AppText: IRONMAN website declaration form URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
-
-# QuestionnaireBank: IRONMAN_v3_recurring_3mo_pattern
-msgid "Ironman V3 Recurring 3Mo Pattern"
-msgstr "Patrón recurrente de 3 meses de Ironman V3"
-
-# Organization: Australian Urology Associates (AUA)
-msgid "Australian Urology Associates (AUA)"
+# Organization: Thomas Jefferson University
+msgid "Thomas Jefferson University"
 msgstr ""
 
 # Organization: Kantonsspitals Chur
 msgid "Kantonsspitals Chur"
 msgstr ""
 
-# Organization: Brazil (Region/Country Site)
-msgid "Brazil (Region/Country Site)"
-msgstr ""
-
-# AppText: profileSendEmail reminder email_subject
-msgid "Report your health on TrueNTH. Email from (clinic name)"
-msgstr "Informe su estado de salud en TrueNTH Correo electrónico de (nombre de la clínica)"
-
-# AppText: patient invite email IRONMAN
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
-
-# Organization: Queen Elizabeth II Jubilee Hospital
-msgid "Queen Elizabeth II Jubilee Hospital"
-msgstr ""
-
-# Organization: Epworth Healthcare
-msgid "Epworth Healthcare"
+# Organization: Wesley Urology Clinic
+msgid "Wesley Urology Clinic"
 msgstr ""
 
 # Organization: Australia Recruiting Site B
 msgid "Australia Recruiting Site B"
 msgstr ""
 
-# Organization: United Kingdom (Region/Country Site)
-msgid "United Kingdom (Region/Country Site)"
-msgstr ""
-
-# Organization: Columbia University
-msgid "Columbia University"
-msgstr ""
-
-# AppText: IRONMAN patient website consent URL
-# AppText: IRONMAN organization website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
-
-# Organization: AUA Local Data Center
-msgid "AUA Local Data Center"
-msgstr ""
-
-# Organization: Weill Cornell Medical Center
-msgid "Weill Cornell Medical Center"
-msgstr ""
-
-# Organization: Oregon Health and Sciences Cancer Center
-msgid "Oregon Health and Sciences Cancer Center"
-msgstr ""
-
-# AppText: IRONMAN staff registraion email URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
-
-# Organization: TrueNTH Global Registry
-msgid "TrueNTH Global Registry"
-msgstr ""
-
-# QuestionnaireBank: IRONMAN_v3_recurring_annual_pattern
-msgid "Ironman V3 Recurring Annual Pattern"
-msgstr "Patrón recurrente anual de Ironman V3"
-
-# Organization: Wayne St. University Karmanos Cancer Institute
-msgid "Wayne St. University Karmanos Cancer Institute"
-msgstr ""
-
-# Organization: Easton Hospital
-msgid "Easton Hospital"
-msgstr ""
-
-# Organization: University of Chicago
-msgid "University of Chicago"
-msgstr ""
-
-# Organization: Kantonsspitals St. Gallen
-msgid "Kantonsspitals St. Gallen"
-msgstr ""
-
-# Organization: Doylestown Health
-msgid "Doylestown Health"
-msgstr ""
-
-# Organization: IRONMAN
-msgid "IRONMAN"
-msgstr ""
-
-# Organization: University of Virgina (UVA)
-msgid "University of Virgina (UVA)"
-msgstr ""
-
-# Organization: Juravinski Cancer Centre
-msgid "Juravinski Cancer Centre"
-msgstr ""
-
-# Organization: The Alfred
-msgid "The Alfred"
-msgstr ""
-
-# Organization: AU B Child Site 2
-msgid "AU B Child Site 2"
-msgstr ""
-
-# Organization: Skane University Hospital
-msgid "Skane University Hospital"
-msgstr ""
-
-# AppText: IRONMAN staff terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
-
-# ResearchProtocol: IRONMAN v2
-msgid "Ironman V2"
-msgstr "Ironman V2"
-
-# Organization: University of North Carolina
-msgid "University of North Carolina"
-msgstr ""
-
-# Organization: Eastern Health
-msgid "Eastern Health"
-msgstr ""
-
-# AppText: TrueNTH Global Registry staff terms and conditions URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
-
-# AppText: TrueNTH Global Registry staff privacy URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
-
-# Organization: Australian Prostate Cancer Research Centre-Qld (QUT)
-msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
-msgstr ""
-
-# AppText: Cellphone
-msgid "Mobile"
-msgstr "Teléfono celular"
-
-# AppText: site summary email TrueNTH Global Registry
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
-
-# Organization: BC Cancer Agency
-msgid "BC Cancer Agency"
-msgstr ""
-
-# AppText: TrueNTH Global Registry staff registraion email URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
-
-# Organization: Centre Hospitalier de l'Université de Montréal
-msgid "Centre Hospitalier de l'Université de Montréal"
-msgstr ""
-
 # Organization: Princess Alexandra Hospital
 msgid "Princess Alexandra Hospital"
 msgstr ""
 
-# Organization: Westmead Hospital
-msgid "Westmead Hospital"
-msgstr ""
-
-# Organization: AU B Child Site 1
-msgid "AU B Child Site 1"
-msgstr ""
-
-# AppText: TrueNTH Global Registry organization website consent URL
-# AppText: TrueNTH Global Registry patient website consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
-
-# QuestionnaireBank: IRONMAN_recurring_3mo_pattern
-msgid "Ironman Recurring 3Mo Pattern"
-msgstr "Patrón recurrente de 3 meses de Ironman"
-
-# Organization: CHU de Quebec - Universite Laval
-msgid "CHU de Quebec - Universite Laval"
-msgstr ""
-
-# AppText: site summary email
-# AppText: site summary email IRONMAN
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
-
-# Organization: Sweden (Region/Country Site)
-msgid "Sweden (Region/Country Site)"
-msgstr ""
-
-# Organization: Guys St. Thomas NHS Foundation Trust
-msgid "Guys St. Thomas NHS Foundation Trust"
+# Organization: Tulane University
+msgid "Tulane University"
 msgstr ""

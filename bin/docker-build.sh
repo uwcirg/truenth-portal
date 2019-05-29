@@ -2,7 +2,7 @@
 
 cmdname="$(basename "$0")"
 bin_path="$(cd "$(dirname "$0")" && pwd)"
-root_path="${bin_path}/.."
+repo_path="${bin_path}/.."
 
 
 usage() {
@@ -21,16 +21,24 @@ USAGE
    exit 1
 }
 
+cleanup_generated_dockerignore() {
+    local file_copied="$1"
+    if [ -n "$file_copied" ]; then
+        rm "${repo_path}/.dockerignore"
+        echo "Deleted generated .dockerignore"
+    fi
+}
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
 fi
 
+
 # Create env_file if it doesn't exist
 cp \
     --no-clobber \
-    "${root_path}/docker/portal.env.default" \
-    "${root_path}/docker/portal.env"
+    "${repo_path}/docker/portal.env.default" \
+    "${repo_path}/docker/portal.env"
 
 # Use .gitignore as .dockerignore during build only
 # not worth the effort to maintain both, for now
@@ -38,17 +46,19 @@ copy_output="$(
     cp \
         --no-clobber \
         --verbose \
-        "${root_path}/.gitignore" \
-        "${root_path}/.dockerignore"
+        "${repo_path}/.gitignore" \
+        "${repo_path}/.dockerignore"
 )"
+file_copied="$(echo "$copy_output" | grep "\->" || true)"
 
-default_compose_file="${root_path}/docker/docker-compose.yaml"
-export COMPOSE_FILE="${COMPOSE_FILE:-$default_compose_file}"
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${repo_path}/docker"
+cd "${docker_compose_directory}"
 
+# use trap to cleanup generated .dockerignore on early exit
+trap 'cleanup_generated_dockerignore "$file_copied"; exit' INT TERM EXIT
 echo "Building portal docker image..."
 docker-compose build web
+trap - INT TERM EXIT
 
-if echo "$copy_output" | grep --quiet "\->"; then
-    echo "Deleting generated .dockerignore..."
-    rm "${root_path}/.dockerignore"
-fi
+cleanup_generated_dockerignore "$file_copied"

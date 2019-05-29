@@ -297,15 +297,15 @@ export default (function() {
                 return this.disableFields.indexOf(fieldId) !== -1;
             },
             handleMedidataRaveFields: function(params) {
-                if (!this.settings.MEDIDATA_RAVE_FIELDS || !this.settings.MEDIDATA_RAVE_ORG) { //expected config example: MEDIDATA_RAVE_FIELDS = ['deceased', 'studyid', 'consent_status', 'dob', 'org'] and MEDIDATA_RAVE_ORG = 'IRONMAN'
+                if (!this.settings.PROTECTED_FIELDS || !this.settings.PROTECTED_ORG) { //expected config example: PROTECTED_FIELDS = ['deceased', 'study_id', 'consent_status', 'dob', 'org'] and PROTECTED_ORG = 'IRONMAN'
                     return false;
                 }
                 var self = this;
                 this.setCurrentUserOrgs(params, function() {
-                    if (self.topLevelOrgs.indexOf(self.settings.MEDIDATA_RAVE_ORG) === -1) {
+                    if (self.topLevelOrgs.indexOf(self.settings.PROTECTED_ORG) === -1) {
                         return false;
                     }
-                    $.merge(self.disableFields, self.settings.MEDIDATA_RAVE_FIELDS);
+                    $.merge(self.disableFields, self.settings.PROTECTED_FIELDS);
                 });
             },
             setDisableEditButtons: function() {
@@ -1507,7 +1507,8 @@ export default (function() {
                             title: i18next.t("Click to view report"),
                             link: reportLink,
                             display: i18next.t(entry.questionnaire.display),
-                            status: i18next.t(entry.status),
+                            //title case the status to allow it to be translated correctly
+                            status: i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " "))),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
