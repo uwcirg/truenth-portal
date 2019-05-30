@@ -215,7 +215,8 @@ def adherence_report(
                 Organization.query.get(org_id).name.replace(' ', '-'))
         results['filename_prefix'] = base_name
         results['column_headers'] = [
-            'user_id', 'study_id', 'status', 'visit', 'site', 'consent']
+            'user_id', 'study_id', 'status', 'visit', 'entry_method', 'site',
+            'consent']
 
     return results
 
