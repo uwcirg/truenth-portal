@@ -2,7 +2,7 @@
 
 alembic==1.0.10            # via flask-migrate
 amqp==2.4.2               # via kombu
-babel==2.6.0              # via flask-babel, sphinx
+babel==2.7.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
 billiard==3.6.0         # pyup: < 4.0  # pin until celery upgraded # via celery
 blinker==1.4              # via flask-mail, flask-webtest
