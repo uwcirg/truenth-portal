@@ -24,8 +24,8 @@ from .user import current_user
 
 
 def get_db_strings():
-    """
-    Extract user-facing database strings
+    """Extract user-facing database strings
+
 
     Requires a databases loaded with the latest site-persistence data
     """
@@ -54,9 +54,7 @@ def get_db_strings():
 
 
 def get_static_strings():
-    """
-    Extract strings from constants and other static values in code (enums)
-    """
+    """Extract strings from constants and other static values in code (enums)"""
     msgid_map = {}
 
     # python-native enums
