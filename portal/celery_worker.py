@@ -28,8 +28,12 @@ def setup_periodic_tasks(sender, **kwargs):
     logger.info("Starting ScheduledJob load...")
     # create test task if non-existent
     if not ScheduledJob.query.filter_by(name="__test_celery__").first():
-        test_job = ScheduledJob(name="__test_celery__", task="test",
-                                schedule="0 * * * *", active=True)
+        test_job = ScheduledJob(
+            name="__test_celery__",
+            task="test",
+            schedule="0 * * * *",
+            active=True,
+        )
         db.session.add(test_job)
         db.session.commit()
         test_job = db.session.merge(test_job)
@@ -39,8 +43,10 @@ def setup_periodic_tasks(sender, **kwargs):
     for job in ScheduledJob.query.all():
         task = getattr(tasks, job.task, None)
         if task:
-            logger.info("Adding task (id=`{}`, task=`{}` "
-                        "to CeleryBeat".format(job.id, job.task))
+            logger.info(
+                "Adding task (id=`%s`, task=`%s`) to CeleryBeat",
+                job.id, job.task,
+            )
             args_in = job.args.split(',') if job.args else []
             kwargs_in = job.kwargs or {}
             kwargs_in['job_id'] = job.id
