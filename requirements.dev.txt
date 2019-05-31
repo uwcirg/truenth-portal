@@ -10,7 +10,7 @@ imagesize==1.1.0          # via sphinx
 mock==3.0.5
 packaging==19.0           # via sphinx, tox
 page-objects==1.1.0
-pluggy==0.11.0             # via tox
+pluggy==0.12.0             # via tox
 # use pre-compiled binary for testing, build from source for prod
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 psycopg2-binary==2.8.2
