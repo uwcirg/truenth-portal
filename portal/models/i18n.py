@@ -16,6 +16,7 @@ from .app_text import AppText
 from .coding import Coding
 from .intervention import Intervention
 from .organization import Organization
+from .overall_status import OverallStatus
 from .questionnaire_bank import QuestionnaireBank, classification_types_enum
 from .research_protocol import ResearchProtocol
 from .role import Role
@@ -23,6 +24,11 @@ from .user import current_user
 
 
 def get_db_strings():
+    """Extract user-facing database strings
+
+
+    Requires a databases loaded with the latest site-persistence data
+    """
     msgid_map = defaultdict(set)
     i18n_fields = {
         AppText: ('custom_text',),
@@ -39,8 +45,8 @@ def get_db_strings():
                 msgid = getattr(entry, field_name)
                 if not msgid:
                     continue
-                msgid = '"{}"'.format(re.sub('"', r'\\"', msgid))
-                msgid_map[msgid].add("{model_name}: {field_ref}".format(
+                # use model/field name for gettext reference
+                msgid_map[msgid].add("{model_name}:{field_ref}".format(
                     model_name=model.__name__,
                     field_ref=entry.name,
                 ))
@@ -48,29 +54,26 @@ def get_db_strings():
 
 
 def get_static_strings():
-    """Manually add strings that are otherwise difficult to extract"""
+    """Extract strings from constants and other static values in code (enums)"""
     msgid_map = {}
-    status_strings = (
-        'Completed',
-        'Due',
-        'In Progress',
-        'Overdue',
-        'Expired',
-    )
-    msgid_map.update({
-        '"{}"'.format(s):
-            {'assessment_status: %s' % s} for s in status_strings
-    })
 
-    enum_options = {
+    # python-native enums
+    enums = (OverallStatus, )
+    for enum in enums:
+        for member in enum:
+            # include enum class name with each value in PO reference
+            msgid_map[str(member)] = {'{}:{}'.format(enum.__name__, member)}
+
+    # SQLA (postgres-specific) enums
+    SQLA_enum_options = {
         classification_types_enum: ('title',),
     }
-    for enum, options in enum_options.items():
+    for enum, options in SQLA_enum_options.items():
         for value in enum.enums:
             for function_name in options:
                 value = getattr(value, function_name)()
-            msgid_map['"{}"'.format(value)] = {'{}: {}'.format(
-                enum.name, value)}
+            # use enum name/value for gettext reference
+            msgid_map[value] = {'{}:{}'.format(enum.name, value)}
     return msgid_map
 
 
