@@ -44,3 +44,15 @@ docgen_test:
   variables:
     TOXENV: docs
   <<: *test_definition
+
+i18n_test_eproms:
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: eproms
+  <<: *unit_test_definition
+
+i18n_test_tnusa:
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: gil
+  <<: *unit_test_definition
