@@ -56,3 +56,19 @@ i18n_test_tnusa:
     TOXENV: translations
     PERSISTENCE_DIR: gil
   <<: *unit_test_definition
+
+
+# deploy jobs
+i18n_upload_eproms:
+  <<: *i18n_test_eproms
+  stage: deploy
+  script:
+    - tox
+    - .tox/${TOXENV}/bin/python -m flask translation-upload
+
+.i18n_upload_tnusa:
+  <<: *i18n_test_tnusa
+  stage: deploy
+  script:
+    - tox
+    - .tox/${TOXENV}/bin/python -m flask translation-upload
