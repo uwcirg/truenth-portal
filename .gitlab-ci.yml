@@ -45,13 +45,13 @@ docgen_test:
     TOXENV: docs
   <<: *test_definition
 
-i18n_test_eproms:
+i18n_test_eproms: &i18n_test_eproms_definition
   variables:
     TOXENV: translations
     PERSISTENCE_DIR: eproms
   <<: *unit_test_definition
 
-i18n_test_tnusa:
+i18n_test_tnusa: &i18n_test_tnusa_definition
   variables:
     TOXENV: translations
     PERSISTENCE_DIR: gil
@@ -60,14 +60,14 @@ i18n_test_tnusa:
 
 # deploy jobs
 i18n_upload_eproms:
-  <<: *i18n_test_eproms
+  <<: *i18n_test_eproms_definition
   stage: deploy
   script:
     - tox
     - .tox/${TOXENV}/bin/python -m flask translation-upload
 
 .i18n_upload_tnusa:
-  <<: *i18n_test_tnusa
+  <<: *i18n_test_tnusa_definition
   stage: deploy
   script:
     - tox
