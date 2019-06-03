@@ -11,6 +11,7 @@ variables:
   POSTGRES_DB: portaldb
 stages:
   - test
+  - deploy
 
 before_script:
   - pip install tox
