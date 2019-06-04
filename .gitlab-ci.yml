@@ -65,6 +65,8 @@ i18n_upload_eproms:
   script:
     - tox
     - .tox/${TOXENV}/bin/python -m flask translation-upload
+  variables:
+    FLASK_APP: manage.py
 
 .i18n_upload_tnusa:
   <<: *i18n_test_tnusa_definition
@@ -72,3 +74,6 @@ i18n_upload_eproms:
   script:
     - tox
     - .tox/${TOXENV}/bin/python -m flask translation-upload
+  variables:
+    FLASK_APP: manage.py
+    SQLALCHEMY_DATABASE_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
