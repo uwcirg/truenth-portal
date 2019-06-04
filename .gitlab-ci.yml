@@ -28,12 +28,12 @@ before_script:
     - redis:latest
 
 # test jobs
-.unit_tests:
+unit_tests:
   variables:
     TOXENV: py3
   <<: *unit_test_definition
 
-.unit_tests-python2:
+unit_tests-python2:
   variables:
     TOXENV: py27
   <<: *unit_test_definition
