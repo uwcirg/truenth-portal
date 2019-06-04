@@ -27,7 +27,6 @@ before_script:
     - postgres:10
     - redis:latest
 
-
 # test jobs
 .unit_tests:
   variables:
@@ -45,32 +44,37 @@ docgen_test:
     TOXENV: docs
   <<: *test_definition
 
-i18n_test_eproms: &i18n_test_eproms_definition
+i18n_test_eproms:
   variables:
     TOXENV: translations
     PERSISTENCE_DIR: eproms
   <<: *unit_test_definition
 
-i18n_test_tnusa: &i18n_test_tnusa_definition
+i18n_test_tnusa:
   variables:
     TOXENV: translations
     PERSISTENCE_DIR: gil
   <<: *unit_test_definition
 
 
-# deploy jobs
-i18n_upload_eproms:
-  <<: *i18n_test_eproms_definition
+# deploy templates
+.i18n_upload_template: &i18n_upload_definition
   stage: deploy
   script:
     - tox
-    - git status
     - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
 
-.i18n_upload_tnusa:
-  <<: *i18n_test_tnusa_definition
-  stage: deploy
-  script:
-    - tox
-    - git status
-    - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
+# deploy jobs
+i18n_upload_eproms:
+  <<: *unit_test_definition
+  <<: *i18n_upload_definition
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: eproms
+
+i18n_upload_tnusa:
+  <<: *unit_test_definition
+  <<: *i18n_upload_definition
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: gil
