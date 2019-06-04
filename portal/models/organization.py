@@ -3,6 +3,7 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
+from __future__ import unicode_literals  # isort:skip
 from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -81,11 +82,7 @@ class Organization(db.Model):
         super(Organization, self).__init__(**kwargs)
 
     def __str__(self):
-        part_of = 'partOf {} '.format(self.partOf_id) if self.partOf_id else ''
-        addresses = '; '.join([str(a) for a in self.addresses])
-
-        return 'Organization {0.name} {0.type} {0.phone} {0.email} '.format(
-            self) + part_of + addresses
+        return 'Organization({0.id}) {0.name}'.format(self)
 
     @hybrid_property
     def use_specific_codings(self):
