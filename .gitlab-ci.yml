@@ -64,9 +64,7 @@ i18n_upload_eproms:
   stage: deploy
   script:
     - tox
-    - env
-    - printenv FLASK_APP
-    - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
+    - .tox/${TOXENV}/bin/python -m flask translation-upload
 
 .i18n_upload_tnusa:
   <<: *i18n_test_tnusa_definition
