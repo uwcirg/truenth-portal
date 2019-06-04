@@ -5,7 +5,6 @@
 # NB: setting PGHOST will cause the postgres service to fail
 variables:
   SECRET_KEY: "$(openssl rand -base64 32)"
-  FLASK_APP: "$(readlink --canonicalize manage.py)"
   SQLALCHEMY_DATABASE_TEST_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
   REDIS_URL: redis://redis:6379/0
   POSTGRES_DB: portaldb
