@@ -398,8 +398,6 @@ def build_pot_files():
 def smartling_upload():
     """Upload strings to Smartling"""
 
-    build_pot_files()
-
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
     project_id = current_app.config["SMARTLING_PROJECT_ID"]
     creds = {'bearer_token': smartling_authenticate()}
