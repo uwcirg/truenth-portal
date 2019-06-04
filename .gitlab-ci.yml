@@ -4,8 +4,8 @@
 # environment variables - also set in every service for a job
 # NB: setting PGHOST will cause the postgres service to fail
 variables:
-  SECRET_KEY: "$(openssl rand -base64 32)"
-  SQLALCHEMY_DATABASE_TEST_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
+  SECRET_KEY: static secret key
+  SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:@postgres/${POSTGRES_DB}
   REDIS_URL: redis://redis:6379/0
   POSTGRES_DB: portaldb
 stages:
