@@ -64,20 +64,13 @@ i18n_upload_eproms:
   stage: deploy
   script:
     - tox
-    - .tox/${TOXENV}/bin/python -m flask translation-upload
-  variables:
-    FLASK_APP: manage.py
-    TOXENV: translations
-    PERSISTENCE_DIR: eproms
+    - git status
+    - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
 
 .i18n_upload_tnusa:
   <<: *i18n_test_tnusa_definition
   stage: deploy
   script:
     - tox
-    - .tox/${TOXENV}/bin/python -m flask translation-upload
-  variables:
-    FLASK_APP: manage.py
-    SQLALCHEMY_DATABASE_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
-    TOXENV: translations
-    PERSISTENCE_DIR: gil
+    - git status
+    - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
