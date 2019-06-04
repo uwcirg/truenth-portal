@@ -62,6 +62,7 @@ i18n_test_tnusa:
   stage: deploy
   script:
     - tox
+    # reuse tox virtual environment to also upload translations
     - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
 
 # deploy jobs
