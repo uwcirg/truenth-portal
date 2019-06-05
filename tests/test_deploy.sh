@@ -24,18 +24,26 @@ fi
 
 PATH="${PATH}:${repo_root}/bin"
 
+# save environment variables to required env file
 env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"
 
 docker-build.sh
 
+# use locally-created images instead of pulling latest
 COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml \
 deploy-docker.sh -n
 
+# sleep until after first healthcheck occurs
 sleep 6m
 docker-compose logs web
 
-health="$(docker inspect --format "{{ .State.Health.Status }}" $(docker-compose ps --quiet web))"
-test "$health" = "healthy"
-exit_code=$?
+web_health="$(docker inspect --format "{{ .State.Health.Status }}" $(docker-compose ps --quiet web))"
 docker-compose down --volumes
-exit $exit_code
+
+if [ "$web_health" = healthy ]; then
+    echo "Web process healthy; exiting"
+    exit 0
+fi
+
+>&2 echo "Error: web process not healthy"
+exit 1
