@@ -15,6 +15,7 @@ stages:
 before_script:
   - pip install tox
 
+
 # test templates
 .test_template: &test_definition
   image: python:3.5
@@ -26,6 +27,7 @@ before_script:
   services:
     - postgres:10
     - redis:latest
+
 
 # test jobs
 unit_tests:
