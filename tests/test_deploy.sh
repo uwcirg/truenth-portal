@@ -24,21 +24,18 @@ fi
 
 PATH="${PATH}:${repo_root}/bin"
 
-sh -c 'env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"'
+env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"
 
-sh -c "{toxinidir}/bin/docker-build.sh"
-sh -c " \
-    COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml \
-    {toxinidir}/bin/deploy-docker.sh -n \
-"
+docker-build.sh
 
-sh -c 'sleep 6m'
-sh -c 'docker-compose logs web'
+COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml \
+deploy-docker.sh -n
 
-sh -c ' \
-    health="$(docker inspect --format "\{\{ .State.Health.Status \}\}" $(docker-compose ps -q web))"; \
-    test "$health" = "healthy"; \
-    exit_code=$?; \
-    docker-compose down --volumes; \
-    exit $exit_code \
-'
+sleep 6m
+docker-compose logs web
+
+health="$(docker inspect --format "{{ .State.Health.Status }}" $(docker-compose ps --quiet web))"
+test "$health" = "healthy"
+exit_code=$?
+docker-compose down --volumes
+exit $exit_code
