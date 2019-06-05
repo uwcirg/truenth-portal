@@ -24,6 +24,10 @@ fi
 
 PATH="${PATH}:${repo_root}/bin"
 
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${repo_root}/docker"
+cd "${docker_compose_directory}"
+
 # use production overrides to include healthcheck config
 export COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml
 
