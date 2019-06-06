@@ -49,6 +49,8 @@ copy_output="$(
         "${repo_path}/.gitignore" \
         "${repo_path}/.dockerignore"
 )"
+
+# "->" will appear in `cp` output if file is sucessfully copied
 file_copied="$(echo "$copy_output" | grep "\->" || true)"
 
 # docker-compose commands must be run in the same directory as docker-compose.yaml
