@@ -434,6 +434,10 @@ def update_users_QBT(user_id, invalidate_existing=False):
             qb_generator = ordered_qbs(user)
             user_qnrs = QNR_results(user)
 
+            # Force recalculation of QNR->QB association if needed
+            if user_qnrs.qnrs_missing_qb_association():
+                user_qnrs.assign_qb_relationships(qb_generator=ordered_qbs)
+
             # As we move forward, capture state at each time point
 
             pending_qbts = AtOrderedList()
@@ -542,6 +546,7 @@ def update_users_QBT(user_id, invalidate_existing=False):
         current_app.logger.error(
             "couldn't obtain lock, recommend manual refresh of stale "
             "qb_timeline for {}".format(user_id))
+
 
 class QB_StatusCacheKey(object):
     redis = None

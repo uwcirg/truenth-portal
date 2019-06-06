@@ -7,6 +7,7 @@ from portal.database import db
 from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
+from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import (
     AtOrderedList,
     QB_StatusCacheKey,
@@ -242,6 +243,78 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert (0 == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+
+        # QB_Status requires system user for audits
+        self.add_user(username='__system__')
+
+        # update QBT should not re-establish baseline connection given dates
+        qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert qbstatus.overall_status == OverallStatus.due
+        assert (0 == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+
+    def test_qb_post_consent_change(self):
+        # Basic w/ one complete QB followed by consent change
+        # should re-establish appropriate QNR->QB relationships
+        crv = self.setup_org_qbs()
+        org_id = crv.id
+        back7, nowish = associative_backdate(
+            now=datetime.utcnow(), backdate=relativedelta(days=7))
+        nowish = nowish.replace(microsecond=0)
+        self.bless_with_basics(setdate=nowish)
+        self.test_user = db.session.merge(self.test_user)
+        self.test_user.organizations.append(crv)
+
+        # submit a mock response for all q's in baseline qb
+        # which should result in completed status
+        qb_name = "CRV Baseline v2"
+        baseline = QuestionnaireBank.query.filter(
+            QuestionnaireBank.name == qb_name).one()
+        baseline_id = baseline.id
+
+        qb_count = 0
+        for q in baseline.questionnaires:
+            q = db.session.merge(q)
+            mock_qr(q.name, qb=baseline, timestamp=nowish)
+            qb_count += 1
+
+        self.test_user = db.session.merge(self.test_user)
+        update_users_QBT(TEST_USER_ID)
+
+        # prior to consent change, expect QNRs to have baseline association
+        assert (qb_count == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id == baseline_id).count(
+        ))
+
+        # move consent prior to QNR submission above, should remove QNR->QB
+        # association
+        data = {
+            'organization_id': org_id,
+            'agreement_url': "https://testing.com",
+            'acceptance_date': FHIR_datetime.as_fhir(back7),
+            'staff_editable': True, 'send_reminders': True}
+
+        self.login()
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        self.assert200(response)
+        assert (0 == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+
+        # QB_Status requires system user for audits
+        self.add_user(username='__system__')
+
+        # update QBT should re-establish baseline connection
+        qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
+        assert (qb_count == QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+        assert qbstatus.overall_status == OverallStatus.completed
 
     def test_withdrawn(self):
         # qbs should halt beyond withdrawal
