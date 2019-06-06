@@ -32,7 +32,7 @@ cd "${docker_compose_directory}"
 export COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml
 
 # save environment variables to required env_file
-env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"
+env | grep SERVER_NAME > "$PORTAL_ENV_FILE"
 
 docker-build.sh
 
