@@ -248,6 +248,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.add_user(username='__system__')
 
         # update QBT should not re-establish baseline connection given dates
+        self.test_user = db.session.merge(self.test_user)
         qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
         assert qbstatus.overall_status == OverallStatus.due
         assert (0 == QuestionnaireResponse.query.filter(
@@ -310,6 +311,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.add_user(username='__system__')
 
         # update QBT should re-establish baseline connection
+        self.test_user = db.session.merge(self.test_user)
         qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
         assert (qb_count == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
