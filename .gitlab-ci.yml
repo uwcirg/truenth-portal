@@ -10,6 +10,7 @@ variables:
   POSTGRES_DB: portaldb
 stages:
   - test
+  - build
   - deploy
 
 before_script:
@@ -57,6 +58,15 @@ i18n_test_tnusa:
     TOXENV: translations
     PERSISTENCE_DIR: gil
   <<: *unit_test_definition
+
+
+# build jobs
+# build and test deployment locally, but do not publish artifacts
+build_test:
+  <<: *test_definition
+  variables:
+    TOXENV: build-artifacts
+  stage: build
 
 
 # deploy templates
