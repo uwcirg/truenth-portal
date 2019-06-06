@@ -40,8 +40,6 @@ env:
 
 matrix:
   include:
-    - env: TOXENV=translations PERSISTENCE_DIR="gil"
-    - env: TOXENV=translations PERSISTENCE_DIR="eproms"
     - env: TOXENV=build-artifacts
       services:
         - docker
