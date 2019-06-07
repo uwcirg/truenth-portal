@@ -15,7 +15,7 @@ VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
 
 override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install
-
+	# todo: conditionally build front-end file if necessary (check if any JS bundles exist)
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 override_dh_builddeb:
