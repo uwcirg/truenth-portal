@@ -41,6 +41,8 @@ setup_python_venv() {
 
 
 setup_node_venv() {
+    setup_python_venv
+
     # Setup a virtual environment for NodeJS on the given path, if not present
     local default_node_venv_path="${repo_root}/node_env"
     local node_venv_path="${2:-$default_node_venv_path}"
@@ -70,8 +72,6 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 # Setup virtual environments
-setup_python_venv
-
 node_venv="${repo_root}/node_env"
 setup_node_venv "" "$node_venv"
 
