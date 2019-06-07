@@ -31,7 +31,12 @@ setup_python_venv() {
     fi
 
     echo "Creating new Python virtual environment: ${python_venv_path}"
-    virtualenv "${python_venv_path}"
+    if command -v virtualenv; then
+        virtualenv "${python_venv_path}"
+    else
+        python3 -m venv "${python_venv_path}"
+    fi
+
 }
 
 
