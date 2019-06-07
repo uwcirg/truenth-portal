@@ -1,3 +1,29 @@
+FROM debian:buster as frontend
+
+
+ENV \
+    DEBIAN_FRONTEND=noninteractive
+
+WORKDIR "$HOME/portal"
+
+# Copy repo into image
+COPY . .
+
+# Squelch superfluous output; apt-get has poor verbosity control
+RUN \
+    apt-get update --quiet > /dev/null && \
+    apt-get install --quiet --quiet --no-install-recommends \
+        python3 \
+        python3-venv \
+        python3-setuptools-scm \
+        python3-wheel \
+        | grep "Setting up" | awk '{print $3 $4}' ORS=' '
+        # only print package names, versions
+
+RUN bin/build-frontend-files.sh
+
+# -----------------------------------------------------------------------------
+
 FROM debian:stretch as builder
 
 ENV \
@@ -14,10 +40,15 @@ RUN \
         git | grep "Setting up" | awk '{print $3 $4}' ORS=' '
         # only print package names, versions
 
-WORKDIR "$HOME/portal"
+WORKDIR "/portal"
 
 # Copy repo into image
 COPY . .
+
+# Copy front-end files built in previous stage
+COPY --from=frontend "/portal/portal/static" "/portal/portal/static"
+COPY --from=frontend "/portal/portal/gil/static" "/portal/portal/gil/static"
+COPY --from=frontend "/portal/portal/eproms/static" "/portal/portal/eproms/static"
 
 # Install build dependencies
 RUN \
