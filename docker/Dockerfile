@@ -2,8 +2,10 @@ FROM node:10 as frontend
 
 WORKDIR "/portal"
 
-# Copy repo into image
-COPY . .
+# Copy required front-end files only
+# preserve partial checkout structure
+COPY bin/ bin/
+COPY portal/ portal/
 
 RUN bin/build-frontend-files.sh
 
