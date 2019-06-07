@@ -16,9 +16,6 @@ VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
 override_dh_virtualenv:
 	# lines preceding `dh_virtualenv` occur before venv creation and pip install
 
-	# Build front-end translations (JSON) from gettext files (PO)
-	bin/build-frontend-translations.sh
-
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 override_dh_builddeb:

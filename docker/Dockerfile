@@ -22,6 +22,7 @@ RUN \
 
 RUN bin/build-frontend-files.sh
 
+RUN bin/build-frontend-translations.sh
 # -----------------------------------------------------------------------------
 
 FROM debian:stretch as builder
