@@ -4,7 +4,7 @@ FROM debian:buster as frontend
 ENV \
     DEBIAN_FRONTEND=noninteractive
 
-WORKDIR "$HOME/portal"
+WORKDIR "/portal"
 
 # Copy repo into image
 COPY . .
