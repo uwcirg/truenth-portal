@@ -41,6 +41,11 @@ setup_python_venv() {
 
 
 setup_node_venv() {
+    if command -v npm; then
+        # Exit early if npm already installed
+        return
+    fi
+
     setup_python_venv
 
     # Setup a virtual environment for NodeJS on the given path, if not present
@@ -75,9 +80,11 @@ fi
 node_venv="${repo_root}/node_env"
 setup_node_venv "" "$node_venv"
 
+if [ -f "${node_venv}/bin/activate" ]; then
+    . "${node_venv}/bin/activate"
+    echo "Activating NodeJS virtual environment..."
+fi
 
-echo "Activating NodeJS virtual environment..."
-. "${node_venv}/bin/activate"
 
 echo "Installing NodeJS dependencies..."
 npm --prefix "${repo_root}/portal" install --no-progress --quiet
