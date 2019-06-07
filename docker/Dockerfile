@@ -1,24 +1,9 @@
-FROM debian:buster as frontend
-
-
-ENV \
-    DEBIAN_FRONTEND=noninteractive
+FROM node:10 as frontend
 
 WORKDIR "/portal"
 
 # Copy repo into image
 COPY . .
-
-# Squelch superfluous output; apt-get has poor verbosity control
-RUN \
-    apt-get update --quiet > /dev/null && \
-    apt-get install --quiet --quiet --no-install-recommends \
-        python3 \
-        python3-venv \
-        python3-setuptools-scm \
-        python3-wheel \
-        | grep "Setting up" | awk '{print $3 $4}' ORS=' '
-        # only print package names, versions
 
 RUN bin/build-frontend-files.sh
 
