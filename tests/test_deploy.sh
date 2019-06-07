@@ -31,8 +31,10 @@ cd "${docker_compose_directory}"
 # use production overrides to include healthcheck config
 export COMPOSE_FILE=docker-compose.yaml:docker-compose.prod.yaml
 
+sh -c "env | grep -v SMART"
+
 # save environment variables to required env_file
-env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"
+env | grep -e SERVER_NAME > "$PORTAL_ENV_FILE"
 
 docker-build.sh
 
