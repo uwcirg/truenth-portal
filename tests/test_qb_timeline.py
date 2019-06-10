@@ -198,8 +198,9 @@ class TestQbTimeline(TestQuestionnaireBank):
         # should clear QNR->QB relationships
         crv = self.setup_org_qbs()
         org_id = crv.id
-        back7, nowish = associative_backdate(
-            now=datetime.utcnow(), backdate=relativedelta(days=7))
+        timepoint = datetime.strptime(
+            "2019-01-08 12:00:00", "%Y-%m-%d %H:%M:%S")
+        back7 = datetime.strptime("2019-01-01 12:00:00", "%Y-%m-%d %H:%M:%S")
         self.bless_with_basics(setdate=back7)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
@@ -231,7 +232,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         data = {
             'organization_id': org_id,
             'agreement_url': "https://testing.com",
-            'acceptance_date': FHIR_datetime.as_fhir(nowish),
+            'acceptance_date': FHIR_datetime.as_fhir(timepoint),
             'staff_editable': True, 'send_reminders': True}
 
         self.login()
@@ -249,7 +250,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # update QBT should not re-establish baseline connection given dates
         self.test_user = db.session.merge(self.test_user)
-        qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
+        qbstatus = QB_Status(user=self.test_user, as_of_date=timepoint)
         assert qbstatus.overall_status == OverallStatus.due
         assert (0 == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
@@ -260,10 +261,10 @@ class TestQbTimeline(TestQuestionnaireBank):
         # should re-establish appropriate QNR->QB relationships
         crv = self.setup_org_qbs()
         org_id = crv.id
-        back7, nowish = associative_backdate(
-            now=datetime.utcnow(), backdate=relativedelta(days=7))
-        nowish = nowish.replace(microsecond=0)
-        self.bless_with_basics(setdate=nowish)
+        timepoint = datetime.strptime(
+            "2019-01-08 12:00:00", "%Y-%m-%d %H:%M:%S")
+        back7 = datetime.strptime("2019-01-01 12:00:00", "%Y-%m-%d %H:%M:%S")
+        self.bless_with_basics(setdate=timepoint)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
@@ -277,7 +278,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         qb_count = 0
         for q in baseline.questionnaires:
             q = db.session.merge(q)
-            mock_qr(q.name, qb=baseline, timestamp=nowish)
+            mock_qr(q.name, qb=baseline, timestamp=timepoint)
             qb_count += 1
 
         self.test_user = db.session.merge(self.test_user)
@@ -312,7 +313,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # update QBT should re-establish baseline connection
         self.test_user = db.session.merge(self.test_user)
-        qbstatus = QB_Status(user=self.test_user, as_of_date=nowish)
+        qbstatus = QB_Status(user=self.test_user, as_of_date=timepoint)
         assert (qb_count == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())

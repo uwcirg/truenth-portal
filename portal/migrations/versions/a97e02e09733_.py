@@ -25,6 +25,9 @@ def upgrade():
 
     qualifying_user_ids = [
         row.subject_id for row in conn.execute(query).fetchall()]
+    if not qualifying_user_ids:
+        print("No users needing refresh - exit")
+        return
     print("Found {} users needing refresh".format(len(qualifying_user_ids)))
 
     # Purge the QNR -> QB relationships
