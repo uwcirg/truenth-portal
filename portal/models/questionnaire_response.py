@@ -16,8 +16,10 @@ from .audit import Audit
 from .encounter import Encounter
 from .fhir import bundle_results
 from .questionnaire import Questionnaire
+from .questionnaire_bank import trigger_date
 from .reference import Reference
-from .user import User, patients_query
+from .user import User, current_user, patients_query
+from .user_consent import consent_withdrawal_dates
 
 
 class QuestionnaireResponse(db.Model):
@@ -64,7 +66,7 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
                "{0.status} {0.authored}".format(self)
 
-    def assign_qb_relationship(self, acting_user_id):
+    def assign_qb_relationship(self, acting_user_id, qbd_accessor=None):
         """Lookup and assign questionnaire bank and iteration
 
         On submission, and subsequently when a user's state changes (such as
@@ -72,21 +74,32 @@ class QuestionnaireResponse(db.Model):
         bank and iteration and assign, or clear if no match is found.
 
         :param acting_user_id: current driver of process, for audit purposes
+        :param qbd_accessor: function to look up appropriate QBD for given QNR
+          Takes ``as_of_date`` and ``classification`` parameters
 
         """
-        from .qb_status import QB_Status  # avoid cycle
+        authored = FHIR_datetime.parse(self.document['authored'])
+        if qbd_accessor is None:
+            from .qb_status import QB_Status  # avoid cycle
+            qbstatus = QB_Status(self.subject, as_of_date=authored)
+
+            def qbstats_current_qbd(as_of_date, classification):
+                if as_of_date != authored:
+                    raise RuntimeError(
+                        "local QB_Status instantiated w/ wrong as_of_date")
+                return qbstatus.current_qbd(classification)
+            qbd_accessor = qbstats_current_qbd
+
         initial_qb_id = self.questionnaire_bank_id
         initial_qb_iteration = self.qb_iteration
 
         # clear both until current values are determined
         self.questionnaire_bank_id, self.qb_iteration = None, None
 
-        authored = FHIR_datetime.parse(self.document['authored'])
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
-        qbstatus = QB_Status(self.subject, as_of_date=authored)
-        qbd = qbstatus.current_qbd()
+        qbd = qbd_accessor(as_of_date=authored, classification=None)
         if qbd and qn and qn.id in (
                 q.questionnaire.id for q in
                 qbd.questionnaire_bank.questionnaires):
@@ -94,7 +107,8 @@ class QuestionnaireResponse(db.Model):
             self.qb_iteration = qbd.iteration
         # if a valid qb wasn't found, try the indefinite option
         else:
-            qbd = qbstatus.current_qbd('indefinite')
+            qbd = qbd_accessor(
+                as_of_date=authored, classification='indefinite')
             if qbd and qn and qn.id in (
                     q.questionnaire.id for q in
                     qbd.questionnaire_bank.questionnaires):
@@ -120,6 +134,37 @@ class QuestionnaireResponse(db.Model):
                 subject_id=self.subject_id, user_id=acting_user_id,
                 context='assessment', comment=msg)
             db.session.add(audit)
+
+    @staticmethod
+    def purge_qb_relationship(subject_id, acting_user_id):
+        """Remove qb association from subject user's QuestionnaireResponses
+
+        An event such as changing consent date potentially alters the
+        "visit_name" (i.e. 3 month, baseline, etc.) any existing QNRs
+        may have been assigned.  This method removes all such QNR->QB
+        associations that may now apply to the wrong QB, forcing subsequent
+        recalculation
+
+        """
+        audits = []
+        matching = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == subject_id).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None))
+
+        for qnr in matching:
+            audit = Audit(
+                user_id=acting_user_id, subject_id=subject_id,
+                context='assessment',
+                comment="Removing qb_id:iteration {}:{} from QNR {}".format(
+                    qnr.questionnaire_bank_id, qnr.qb_iteration, qnr.id))
+            audits.append(audit)
+            qnr.questionnaire_bank_id = None
+            qnr.qb_iteration = None
+
+        for audit in audits:
+            db.session.add(audit)
+
+        db.session.commit()
 
     @staticmethod
     def by_identifier(identifier):
@@ -198,17 +243,29 @@ class QuestionnaireResponse(db.Model):
 
 
 QNR = namedtuple('QNR', [
-    'qb_id', 'iteration', 'status', 'instrument', 'authored', 'encounter_id'])
+    'qnr_id', 'qb_id', 'iteration', 'status', 'instrument', 'authored',
+    'encounter_id'])
 
 
 class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
     def __init__(self, user, qb_id=None, qb_iteration=None):
-        """Optionally include qb_id, qb_iteration and recur to limit"""
+        """Optionally include qb_id and qb_iteration to limit"""
         self.user = user
+        self.qb_id = qb_id
+        self.qb_iteration = qb_iteration
+        self._qnrs = None
+
+    @property
+    def qnrs(self):
+        """Return cached qnrs or query first time"""
+        if self._qnrs is not None:
+            return self._qnrs
+
         query = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.subject_id == user.id).with_entities(
+            QuestionnaireResponse.subject_id == self.user.id).with_entities(
+            QuestionnaireResponse.id,
             QuestionnaireResponse.questionnaire_bank_id,
             QuestionnaireResponse.qb_iteration,
             QuestionnaireResponse.status,
@@ -217,19 +274,95 @@ class QNR_results(object):
             QuestionnaireResponse.authored,
             QuestionnaireResponse.encounter_id).order_by(
             QuestionnaireResponse.authored)
-        if qb_id:
+        if self.qb_id:
             query = query.filter(
-                QuestionnaireResponse.questionnaire_bank_id == qb_id).filter(
-                QuestionnaireResponse.qb_iteration == qb_iteration)
-        self.qnrs = []
+                QuestionnaireResponse.questionnaire_bank_id == self.qb_id
+            ).filter(
+                QuestionnaireResponse.qb_iteration == self.qb_iteration)
+        self._qnrs = []
         for qnr in query:
-            self.qnrs.append(QNR(
+            self._qnrs.append(QNR(
+                qnr_id=qnr.id,
                 qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=qnr.instrument_id.split('/')[-1],
                 authored=qnr.authored,
                 encounter_id=qnr.encounter_id))
+        return self._qnrs
+
+    def assign_qb_relationships(self, qb_generator):
+        """Associate any QNRs with respective qbs
+
+        Typically, done at time of QNR POST - however occasionally events
+        force a renewed lookup of QNR -> QB association.
+
+        """
+        from .qb_timeline import calc_and_adjust_expired, calc_and_adjust_start
+
+        if self.qb_id:
+            raise ValueError(
+                "Can't associate results when restricted to single QB")
+
+        qbs = [qb for qb in qb_generator(self.user)]
+        indef_qbs = [qb for qb in qb_generator(
+            self.user, classification="indefinite")]
+
+        td = trigger_date(user=self.user)
+        old_td, withdrawal_date = consent_withdrawal_dates(self.user)
+        if not td and old_td:
+            td = old_td
+
+        def qbd_accessor(as_of_date, classification):
+            """Simplified qbd lookup consults only assigned qbs"""
+            if classification == 'indefinite':
+                container = indef_qbs
+            else:
+                container = qbs
+
+            # Loop until date matching qb found, break if beyond
+            for qbd in container:
+                qb_start = calc_and_adjust_start(
+                    user=self.user, qbd=qbd, initial_trigger=td)
+                qb_expired = calc_and_adjust_expired(
+                    user=self.user, qbd=qbd, initial_trigger=td)
+                if as_of_date < qb_start:
+                    continue
+                if qb_start <= as_of_date < qb_expired:
+                    return qbd
+                if as_of_date > qb_expired:
+                    break
+
+        # typically triggered from updating task job - use system
+        # as acting user in audits, if no current user is available
+        acting_user = current_user()
+        if not acting_user:
+            acting_user = User.query.filter_by(email='__system__').first()
+        for qnr in self.qnrs:
+            QuestionnaireResponse.query.get(
+                qnr.qnr_id).assign_qb_relationship(
+                acting_user_id=acting_user.id, qbd_accessor=qbd_accessor)
+        db.session.commit()
+
+        # Force fresh lookup on next access
+        self._qnrs = None
+
+    def qnrs_missing_qb_association(self):
+        """Returns true if any QNRs exist without qb associations
+
+        Business rules mandate purging qnr->qb association following
+        events such as a change of consent date.  This method can be
+        used to determine if qnr->qb association lookup may be required.
+
+        NB - it can be legitimate for QNRs to never have a QB association,
+        such as systems that don't define QBs for all assessments or those
+        taken prior to a new trigger date.
+
+        :returns: True if at least one QNR exists for the user missing qb_id
+
+        """
+        associated = [qnr for qnr in self.qnrs if qnr.qb_id is not None]
+        return len(self.qnrs) != len(associated)
 
     def earliest_result(self, qb_id, iteration):
         """Returns timestamp of earliest result for given params, or None"""
