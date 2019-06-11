@@ -17,7 +17,7 @@ psycopg2-binary==2.8.2
 py==1.8.0                 # via tox
 pygments==2.4.2           # via sphinx
 pyparsing==2.4.0          # via packaging
-pytest==4.5.0
+pytest==4.6.3
 selenium==3.141.0
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
