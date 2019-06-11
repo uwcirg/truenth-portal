@@ -34,7 +34,7 @@ status_types = ENUM(
 auth_method_types = ENUM(
     'password_authenticated', 'url_authenticated', 'staff_authenticated',
     'staff_handed_to_patient', 'service_token_authenticated',
-    'url_authenticated_and_verified',
+    'url_authenticated_and_verified', 'failsafe',
     name='auth_methods', create_type=False)
 
 
@@ -178,6 +178,7 @@ def initiate_encounter(user, auth_method):
         start_time=datetime.utcnow(), user_id=user.id)
     db.session.add(encounter)
     db.session.commit()
+    return db.session.merge(encounter)
 
 
 def finish_encounter(user):
