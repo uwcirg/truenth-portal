@@ -22,6 +22,7 @@ from werkzeug.exceptions import (
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.auth import AuthProvider
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
@@ -1179,6 +1180,8 @@ class TestUser(TestCase):
             self.shallow_org_tree()
             orgs = Organization.query.limit(2)
             other = db.session.merge(other)
+            ap = AuthProvider(provider_id=0, user=other)
+            db.session.add(ap)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
             deceased_audit = Audit(
@@ -1197,6 +1200,8 @@ class TestUser(TestCase):
                     == {o.name for o in orgs})
             assert user.deceased
             assert user.timezone == 'US/Central'
+            assert user.auth_providers.count() == 1
+            assert other.auth_providers.count() == 0
 
     def test_promote(self):
         with SessionScope(db):
