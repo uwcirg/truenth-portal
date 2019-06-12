@@ -2241,7 +2241,7 @@
           }
         },
         {
-          "timezone": "Europe/Madrid",
+          "timezone": "Europe/Dublin",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         }
       ],
