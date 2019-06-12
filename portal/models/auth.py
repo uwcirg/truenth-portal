@@ -7,6 +7,7 @@ from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
@@ -46,6 +47,20 @@ class AuthProvider(OAuthConsumerMixin, db.Model):
             'system': '{system}/{provider}'.format(
                 system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider),
             'value': self.provider_id}
+
+    def reassign_owner(self, target_owner_id):
+        """For invited user flows, the auth needs to follow original user
+
+        Used specifically when an auth_provider row needs to migrate from
+        a temporary account (generated during the registration process) is
+        merged back into the initial account.
+
+        """
+        auditable_event("reassign {} auth from user {} to user {}".format(
+            self.provider, self.id, target_owner_id),
+            user_id=self.user_id, subject_id=target_owner_id,
+            context='authentication')
+        self.user_id = target_owner_id
 
 
 class AuthProviderPersistable(AuthProvider):

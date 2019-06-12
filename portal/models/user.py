@@ -1511,6 +1511,11 @@ class User(db.Model, UserMixin):
             for item in append_list:
                 self_entity.append(item)
 
+        # If other user has an external (3rd party) auth_provider, reassign
+        # to self
+        for ap in other.auth_providers:
+            ap.reassign_owner(self.id)
+
     def promote_to_registered(self, registered_user):
         """Promote a weakly authenticated account to a registered one"""
         assert self.id != registered_user.id
