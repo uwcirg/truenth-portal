@@ -120,7 +120,11 @@ If you would like to use docker to work on the portal, you can configure ``docke
 
     docker-compose up web
 
-This will mount your checkout into a docker container and use the flask development server instead of the production default (gunicorn).
+This will mount your checkout into a docker container and use the flask development server instead of the default (gunicorn).
+
+.. note::
+    Migrations and static DB values will not be automatically updated. Run ``flask sync`` as needed
+
 
 Environment Variables
 ---------------------
