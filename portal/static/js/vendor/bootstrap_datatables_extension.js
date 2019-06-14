@@ -38,25 +38,32 @@ var tnthTables = {
     "dateSorter": function(a, b) {
         a = a || 0;
         b = b || 0;
+        var a_d = 0, b_d = 0;
         /*
          * make sure the string passed in does not have line break element if so it is a possible mult-line text, split it up and use the first item in the resulting array
          */
         var regex = /<br\s*[\/]?>/gi;
-        a = a.replace(regex, "\n");
-        b = b.replace(regex, "\n");
-        var ar = a.split("\n");
-        if (ar.length > 0) {
-            a = ar[0];
+        //NOTE: adding if clause here because a is set to 0 if null/undefined, attempting to perform string specific operations,e.g. regular expression matching as follows, on 0, a numeric variable will result in runtime error
+        if (a) {
+            a = a.replace(regex, "\n");
+            var ar = a.split("\n");
+            if (ar.length > 0) {
+                a = ar[0];
+            }
+            /* note getTime returns the numeric value corresponding to the time for the specified date according to universal time
+            * therefore, can be used for sorting
+            */
+            a_d = (new Date(a)).getTime();
         }
-        var br = b.split("\n");
-        if (br.length > 0) {
-            b = br[0];
+        //NOTE: adding if clause here because b is set to 0 if null/undefined, attempting to perform string specific operations,e.g. regular expression matching as follows, on 0, a numeric variable will result in runtime error
+        if (b) {
+            b = b.replace(regex, "\n");
+            var br = b.split("\n");
+            if (br.length > 0) {
+                b = br[0];
+            }
+            b_d = (new Date(b)).getTime();
         }
-        /* note getTime returns the numeric value corresponding to the time for the specified date according to universal time
-         * therefore, can be used for sorting
-         */
-        var a_d = (new Date(a)).getTime();
-        var b_d = (new Date(b)).getTime();
 
         if (isNaN(a_d)) {
             a_d = 0;
@@ -64,7 +71,6 @@ var tnthTables = {
         if (isNaN(b_d)) {
             b_d = 0;
         }
-
         return b_d - a_d;
     },
     /***

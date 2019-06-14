@@ -7,14 +7,12 @@ standard_library.install_aliases()  # noqa: E402
 from collections import defaultdict
 import io
 import os
-import re
 from subprocess import check_call
 import sys
-import tempfile
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile, POFile
+from polib import pofile, POFile, POEntry
 import requests
 
 from .i18n import get_db_strings, get_static_strings
@@ -315,73 +313,46 @@ def compile_pos():
             )
 
 
-def upsert_to_template_file():
-    db_translatables = get_db_strings()
-    if not db_translatables:
-        sys.exit("no DB strings extracted")
+def upsert_to_template_file(pot_filepath, new_strings):
+    """
+    Upsert newly extracted strings into existing POT file
 
-    db_translatables.update(get_static_strings())
+    Existing strings in the POT file will have references combined
+    """
+    pot_file = pofile(pot_filepath)
+    for new_string, references in new_strings.items():
+        new_entry = POEntry(
+            msgid=new_string,
+            # list of (filepath, lineno) tuples
+            occurrences=[(o, '') for o in references],
+        )
 
-    try:
-        with io.open(
-            os.path.join(
-                current_app.root_path,
-                "translations/messages.pot",
-            ),
-            "r+",
-            encoding="utf-8",
-        ) as potfile:
-            potlines = potfile.readlines()
-            for i, line in enumerate(potlines):
-                if not line.split() or (line.split()[0] != "msgid"):
-                    continue
-                msgid = line.split(" ", 1)[1].strip()
-                if msgid not in db_translatables:
-                    continue
-                for location in db_translatables[msgid]:
-                    locstring = "# " + location + "\n"
-                    if not any(t == locstring for t in potlines[i - 4:i]):
-                        potlines.insert(i, locstring)
-                del db_translatables[msgid]
-            for entry, locations in db_translatables.items():
-                if not entry:
-                    continue
-                for loc in locations:
-                    potlines.append("# " + loc + "\n")
-                potlines.append("msgid " + entry + "\n")
-                potlines.append("msgstr \"\"\n")
-                potlines.append("\n")
-            potfile.truncate(0)
-            potfile.seek(0)
-            potlines = [unicode(line) for line in potlines]
-            potfile.writelines(potlines)
-    except (IOError, OSError):
-        exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-        sys.exit(
-            "Could not write to translation file!\n ->%s" % (exceptionValue))
+        existing_entry = pot_file.find(new_entry.msgid)
+        if not existing_entry:
+            pot_file.append(new_entry)
+            continue
+
+        # combine references of both entries
+        existing_entry.occurrences = set(existing_entry.occurrences + new_entry.occurrences)
+    pot_file.save(pot_filepath)
 
 
 def fix_references(pot_fpath):
     """Fix reference comments to remove checkout-specific paths"""
     # Todo: override PoFileParser._process_comment() to perform this as part of `pybabel extract`
 
-    path_regex = re.compile(r"^#: {}(?P<rel_path>.*):(?P<line>\d+)".format(
-        os.path.dirname(current_app.root_path)
-    ))
-    base_url = "%s/tree/develop" % current_app.config.metadata['home-page']
+    pot_file = pofile(pot_fpath)
+    for entry in pot_file:
+        new_occurrences = []
+        for ref_file_path, ref_line_number in entry.occurrences:
+            # replace absolute path with repo-relative path
+            ref_file_path = ref_file_path.replace(current_app.root_path + '/', '')
 
-    with open(pot_fpath) as infile, tempfile.NamedTemporaryFile(
-        prefix='fix_references_',
-        suffix='.pot',
-        delete=False,
-    ) as tmpfile:
-        for line in infile:
-            tmpfile.write(
-                path_regex.sub(r"#: %s\g<rel_path>#L\g<line>" % base_url, line)
-            )
+            new_occurrences.append((ref_file_path, ref_line_number))
+        entry.occurrences = new_occurrences
 
-    os.rename(tmpfile.name, pot_fpath)
-    current_app.logger.debug("messages.pot file references fixed")
+    pot_file.save(pot_fpath)
+    current_app.logger.debug("%s file references fixed", pot_fpath)
 
 
 def build_pot_files():
@@ -409,9 +380,17 @@ def build_pot_files():
     ))
     current_app.logger.debug("messages.pot file generated")
 
-    # update .pot file with db values
-    upsert_to_template_file()
-    current_app.logger.debug("messages.pot file updated with db strings")
+    # update .pot file with values not extracted by pybabel
+    # todo: pass set of POEntry
+    new_strings = {}
+    new_strings.update(get_db_strings())
+    new_strings.update(get_static_strings())
+
+    upsert_to_template_file(
+        pot_filepath=messages_pot_fpath,
+        new_strings=new_strings
+    )
+    current_app.logger.debug("messages.pot file updated with strings managed outside pybabel")
 
     for pot_file_path in POT_FILES:
         fix_references(pot_file_path)
@@ -419,10 +398,8 @@ def build_pot_files():
 def smartling_upload():
     """Upload strings to Smartling"""
 
-    build_pot_files()
-
     upload_url = 'https://api.smartling.com/files-api/v2/projects/{}/file'
-    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+    project_id = current_app.config["SMARTLING_PROJECT_ID"]
     creds = {'bearer_token': smartling_authenticate()}
     for pot_file_path in POT_FILES:
         with open(pot_file_path, 'rb') as potfile:

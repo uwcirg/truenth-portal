@@ -4,16 +4,17 @@
 # environment variables - also set in every service for a job
 # NB: setting PGHOST will cause the postgres service to fail
 variables:
-  SECRET_KEY: "$(openssl rand -base64 32)"
-  FLASK_APP: "$(readlink --canonicalize manage.py)"
-  SQLALCHEMY_DATABASE_TEST_URI: "postgresql://postgres:@postgres/${POSTGRES_DB}"
+  SECRET_KEY: static secret key
+  SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:@postgres/${POSTGRES_DB}
   REDIS_URL: redis://redis:6379/0
   POSTGRES_DB: portaldb
 stages:
   - test
+  - deploy
 
 before_script:
   - pip install tox
+
 
 # test templates
 .test_template: &test_definition
@@ -44,3 +45,42 @@ docgen_test:
   variables:
     TOXENV: docs
   <<: *test_definition
+
+i18n_test_eproms:
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: eproms
+  <<: *unit_test_definition
+
+i18n_test_tnusa:
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: gil
+  <<: *unit_test_definition
+
+
+# deploy templates
+.i18n_upload_template: &i18n_upload_definition
+  stage: deploy
+  script:
+    - tox
+    # reuse tox virtual environment to also upload translations
+    - FLASK_APP=manage.py .tox/${TOXENV}/bin/python -m flask translation-upload
+  # only upload translations from develop branch
+  only:
+    refs: [develop]
+
+# deploy jobs
+i18n_upload_eproms:
+  <<: *unit_test_definition
+  <<: *i18n_upload_definition
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: eproms
+
+i18n_upload_tnusa:
+  <<: *unit_test_definition
+  <<: *i18n_upload_definition
+  variables:
+    TOXENV: translations
+    PERSISTENCE_DIR: gil

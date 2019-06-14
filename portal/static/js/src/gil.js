@@ -1339,7 +1339,7 @@ module.exports = utilObj = (function() {
           params.subject_id = $("#currentUserId").val() ? $("#currentUserId").val() : 0;
           params.page_url = window.location.href;
           //don't think we want to translate message sent back to the server here
-          params.message = "In GIL, error loading nav elements from portal - " + xhr.responseText;
+          params.message = "In GIL, error loading nav elements from portal - " + ("status code: "+ xhr.status) + "\nresponse: " + (xhr.responseText?xhr.responseText:"empty");
 
           $.ajax ({
               type: "GET",

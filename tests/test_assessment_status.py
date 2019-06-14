@@ -10,6 +10,7 @@ from flask_webtest import SessionScope
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
+from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -47,6 +48,7 @@ def mock_qr(
         doc_id = ''.join(choice(ascii_letters) for _ in range(10))
     timestamp = timestamp or datetime.utcnow()
     qr_document = {
+        "authored": FHIR_datetime.as_fhir(timestamp),
         "questionnaire": {
             "display": "Additional questions",
             "reference":
