@@ -330,7 +330,7 @@ class QNR_results(object):
                     continue
                 if qb_start <= as_of_date < qb_expired:
                     return qbd
-                if as_of_date > qb_expired:
+                if qb_expired > as_of_date:
                     break
 
         # typically triggered from updating task job - use system
