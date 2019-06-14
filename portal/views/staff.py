@@ -56,19 +56,9 @@ def staff_profile_create():
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
 
-    # compiling org list for staff
-    # org list should include all orgs under the current user's org(s)
-    ot = OrgTree()
-    org_list = set()
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-            continue
-        org_list.update(ot.here_and_below_id(org.id))
-
     return render_template(
         "profile/staff_profile_create.html", user=user,
-        consent_agreements=consent_agreements,
-        org_list=list(org_list))
+        consent_agreements=consent_agreements)
 
 
 @staff.route('/staff_profile/<int:user_id>')
@@ -83,18 +73,9 @@ def staff_profile(user_id):
         app_text(InitialConsent_ATMA.name_key()),
         locale_code=user.locale_code)
 
-    # compiling org list for staff admin user
-    # org list should include all orgs under the current user's org(s)
-    ot = OrgTree()
-    org_list = set()
-    for org in current_user().organizations:
-        if org.id == 0:  # None of the above doesn't count
-            continue
-        org_list.update(ot.here_and_below_id(org.id))
-
     return render_template(
         'profile/staff_profile.html', user=user, terms=terms,
-        current_user=current_user(), org_list=list(org_list),
+        current_user=current_user(),
         consent_agreements=consent_agreements)
 
 

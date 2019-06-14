@@ -63,54 +63,6 @@
     <p>{{_("No communications found.")}}</p>
     {% endif %}
 {% endblock %}
-{% block document_ready %}
-
-/*
- * initialize communication modal
- */
-$(document).ready(function() {
-   $('#commModal').modal({
-      show: false
-    });
-});
-
-function previewComm(event, commId) {
-    if (event) event.stopPropagation();
-    var myWindow;
-    if (commId) {
-         $.ajax ({
-              type: "GET",
-              url: "/communicate/preview/" + commId,
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json',
-              async: false
-          }).done(function(data) {
-                if (data) {
-                    $("#commRecipients").html(data["recipients"]||"{{_('Not available')}}");
-                    $("#commSubject").html(data["subject"]||"{{_('Not available')}}");
-                    $("#commBody").html(data.body||"{{_('Not available')}}");
-                    /*
-                     * prevent links and buttons in email body from being clickable
-                     */
-                    $("#commBody a").each(function() {
-                      $(this).on("click", function(e) {
-                          e.preventDefault();
-                          return false;
-                      });
-                    });
-                    /*
-                     * remove inline style in email body
-                     * style here is already applied via css
-                     */
-                    $("#commBody style").remove();
-                    $("#commModal").modal("show");
-                };
-          }).fail(function(xhr) {
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
-                $("#commMessage").html("{{_('Unable to receive content')}}");
-          });
-    };
-};
-
-{% endblock %}
+{% block additional_scripts %}
+    <script src="{{ url_for('static', filename='js/dist/communications.bundle.js') }}"></script>
+{% endblock additional_scripts %}

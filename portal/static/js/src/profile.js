@@ -251,10 +251,20 @@ export default (function() {
                 }
                 this.initChecks.pop();
             },
+            getCurrentUserOrgs: function() {
+                if (!this.userOrgs || !this.userOrgs.length) {
+                    return false;
+                }
+                return this.userOrgs;
+            },
             setCurrentUserOrgs: function(params, callback){
                 callback = callback || function() {};
                 if (!this.currentUserId) {
                     callback({"error": "Current user id is required."});
+                    return;
+                }
+                if (this.getCurrentUserOrgs()) {
+                    callback(this.getCurrentUserOrgs());
                     return;
                 }
                 var self = this;
@@ -274,7 +284,7 @@ export default (function() {
                     self.topLevelOrgs = topLevelOrgs.map(function(item) {
                         return orgTool.getOrgName(item);
                     });
-                    callback(data);
+                    callback(self.getCurrentUserOrgs());
                 });
             },
             isUserEmailReady: function() {
@@ -1546,17 +1556,24 @@ export default (function() {
                 orgTool.onLoaded(subjectId, true);
                 orgTool.setOrgsVis(this.demo.data,
                     function() {
-                        if ((typeof leafOrgs !== "undefined") && leafOrgs) { /*global leafOrgs*/
-                            orgTool.filterOrgs(leafOrgs);
-                        }
-                        if ($("#requireMorph").val()) {
-                            orgTool.morphPatientOrgs();
-                        }
-                        self.handleOrgsEvent();
-                        self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
-                            self.getConsentList(data);
+                        self.setCurrentUserOrgs(false, function(data) {
+                            //admin staff can select any orgs (leaf orgs for patient)
+                            var orgsToBeFiltered = self.isAdmin() ? orgTool.getTopLevelOrgs(): data;
+                            if (self.isSubjectPatient()) {
+                                //for patient, only leaf orgs are selectable
+                                orgTool.filterOrgs(orgTool.getLeafOrgs(orgsToBeFiltered));
+                            } else {
+                                orgTool.filterOrgs(orgTool.getHereBelowOrgs(orgsToBeFiltered));
+                            }
+                            if ($("#requireMorph").val()) {
+                                orgTool.morphPatientOrgs();
+                            }
+                            self.handleOrgsEvent();
+                            self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
+                                self.getConsentList(data);
+                            });
+                            $("#clinics").attr("loaded", true);
                         });
-                        $("#clinics").attr("loaded", true);
                     });
             },
             handleOrgsEvent: function() {
