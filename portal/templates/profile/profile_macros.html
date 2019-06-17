@@ -551,11 +551,6 @@
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
     <div class="put-demo-error error-message"></div>
-    {%- if ((person.has_role(ROLE.PATIENT.value) or current_user.has_role(ROLE.PATIENT.value)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
-                ((person.has_role(ROLE.PATIENT.value) and current_user.has_role(ROLE.STAFF.value)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
-             -%}
-    <input type="hidden" id="requireMorph" value="true" />
-    {%- endif -%}
 {%- endmacro %}
 {% macro default_consent_modal() -%}
     {% raw %}

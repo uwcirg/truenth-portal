@@ -1562,11 +1562,9 @@ export default (function() {
                             if (self.isSubjectPatient()) {
                                 //for patient, only leaf orgs are selectable
                                 orgTool.filterOrgs(orgTool.getLeafOrgs(orgsToBeFiltered));
+                                orgTool.morphPatientOrgs();
                             } else {
                                 orgTool.filterOrgs(orgTool.getHereBelowOrgs(orgsToBeFiltered));
-                            }
-                            if ($("#requireMorph").val()) {
-                                orgTool.morphPatientOrgs();
                             }
                             self.handleOrgsEvent();
                             self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
