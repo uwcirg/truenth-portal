@@ -1904,7 +1904,13 @@ export default (function() {
                         }
                         item.lastUpdated = self.modules.tnthDates.formatDateString(item.lastUpdated, "iso");
                         item.comment = item.comment ? self.escapeHtml(item.comment) : "";
-                        var c = decodeURIComponent(String(item.comment));
+                        var c = String(item.comment);
+                        try {
+                            c = decodeURIComponent(c);
+                        } catch(e) { //catch error, output to console e.g. URI malformed error. output error to console for debugging purpose
+                            console.log("Error decoding auditing comment " + c);
+                            console.log(e);
+                        }
                         item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +
                             "if (obj) {" +
