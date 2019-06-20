@@ -1894,7 +1894,7 @@ export default (function() {
                         $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
                         return false;
                     }
-                    var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80));
+                    var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80)), errorMessage="";
                     (data.audits).forEach(function(item) {
                         item.by = item.by.reference || "-";
                         var r = /\d+/g;
@@ -1910,6 +1910,7 @@ export default (function() {
                         } catch(e) { //catch error, output to console e.g. URI malformed error. output error to console for debugging purpose
                             console.log("Error decoding auditing comment " + c);
                             console.log(e);
+                            errorMessage = e.message + "" + e.stack;
                         }
                         item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +
@@ -1922,6 +1923,10 @@ export default (function() {
                         );
                         fData.push(item);
                     });
+                    if (errorMessage) {
+                        //report error if rendering audit log generates runtime JS error
+                        self.modules.tnthAjax.reportError(self.subjectId, "/api/user/" + self.subjectId + "/audit", errorMessage);
+                    }
                     $("#profileAuditLogTable").html("");
                     $("#profileAuditLogTable").bootstrapTable(self.setBootstrapTableConfig({
                         data: fData,
