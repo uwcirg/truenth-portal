@@ -11,12 +11,13 @@ $(document).ready(function() {
     $("#commModal").modal({
         show: false
     });
+    $(".btn-communication").on("click", function(e) {
+        e.stopImmediatePropagation();
+        previewComm($(this).attr("data-communication-id"));
+    });
 });
 
-function previewComm(event, commId) {
-    if (event) {
-        event.stopPropagation();
-    }
+function previewComm(commId) {
     if (!commId) {
         return false;
     }
@@ -27,12 +28,14 @@ function previewComm(event, commId) {
         dataType: "json",
         async: false
     }).done(function(data) {
+        console.log(data)
         //no need for translation, as view by admin staff only
         if (!data) {
             $("#commMessage").html("No data returned");
             return false;
         }
         $("#commRecipients").html(data["recipients"]||"Not available");
+        $("#commSubject").html(data.subject || "Not available");
         $("#commBody").html(data.body||"Not available");
         /*
         * prevent links and buttons in email body from being clickable
