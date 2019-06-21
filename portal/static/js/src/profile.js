@@ -661,7 +661,7 @@ export default (function() {
                                 var noDataContainer = parent.find(".no-data-container");
                                 var btn = parent.find(".profile-item-edit-btn");
                                 if (section) {
-                                    if ((data.optional).indexOf(section) !== -1) {
+                                    if ((data.optional).indexOf(section) !== -1) { 
                                         sectionElement.show();
                                         noDataContainer.html("");
                                         btn.show();
@@ -1564,6 +1564,7 @@ export default (function() {
                                 orgTool.filterOrgs(orgTool.getLeafOrgs(orgsToBeFiltered));
                                 orgTool.morphPatientOrgs();
                             } else {
+                                //others e.g. staff
                                 orgTool.filterOrgs(orgTool.getHereBelowOrgs(orgsToBeFiltered));
                             }
                             self.handleOrgsEvent();
