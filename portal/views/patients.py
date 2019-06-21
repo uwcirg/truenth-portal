@@ -104,7 +104,6 @@ def patient_profile_create():
     user = current_user()
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
-    
     return render_template(
         "profile/patient_profile_create.html", user=user,
         consent_agreements=consent_agreements)
