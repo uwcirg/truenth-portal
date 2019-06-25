@@ -24,18 +24,6 @@
         </form>
     </article>
 {% endblock %}
-{% block document_ready %}
-    $("document").ready(function() {
-        $("#shortcut_alias").on("keyup", function() {
-            if ($(this).val() == "") {
-                $("#nextLink").addClass("disabled").attr("disabled", true);
-            } else {
-                $("#nextLink").removeClass("disabled").attr("disabled", false);
-            };
-        });
-
-        $("#shortcut_alias").attr("placeholder", "").focus();
-        if ($("#shortcut_alias").val() !== "")  $("#nextLink").removeClass("disabled").attr("disabled", false);
-    });
-
-{% endblock %}
+{% block additional_scripts %}
+    <script src="{{ url_for('static', filename='js/dist/shortcutAlias.bundle.js') }}"></script>
+{% endblock additional_scripts %}

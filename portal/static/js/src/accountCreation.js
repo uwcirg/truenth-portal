@@ -41,8 +41,6 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
         var i18next = this.__getDependency("i18next");
         var OT = new OrgTool();
-        var leafOrgs = this.__getDependency("leafOrgs");
-        var orgList = this.__getDependency("orgList");
 
         this.__isPatient = function() {
             return $("#accountCreationContentContainer").attr("data-account") === "patient";
@@ -454,9 +452,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
         this.populatePatientOrgs = function() {
-            if (leafOrgs) { /* global leafOrgs */
-                OT.filterOrgs(leafOrgs);
-            }
+            OT.filterOrgs(CurrentUserObj.getLeafOrgs());
             var userOrgs = $("#userOrgs input[name='organization']");
             userOrgs.each(function() {
                 $(this).closest("label").addClass("radio-label");
@@ -464,9 +460,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             });
         };
         this.populateStaffOrgs = function() {
-            if (orgList) { /*global orgList */
-                OT.filterOrgs(orgList);
-            }
+            OT.filterOrgs(CurrentUserObj.getHereBelowOrgs());
         };
         this.getCommunicationArray = function() {
             var arrCommunication = [];
@@ -495,11 +489,14 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.handleCurrentUser = function() {
             let self = this;
             CurrentUserObj.initCurrentUser(function() {
-                self.handleMedidataRave(CurrentUserObj.topLevelOrgs, CurrentUserObj.isAdminUser());
+                OT.init(function() {
+                    self.getOrgs(self.populateOrgsByRole);
+                    self.handleMedidataRave(CurrentUserObj.topLevelOrgs, CurrentUserObj.isAdminUser());
+                });
             });
         };
         this.getCurrentUserTopLevelOrgs = function() {
-            var topLevelOrgs = OT.getUserTopLevelParentOrgs(leafOrgs);
+            var topLevelOrgs = OT.getUserTopLevelParentOrgs(CurrentUserObj.getLeafOrgs());
             return topLevelOrgs.map(function(item) {
                 return OT.getOrgName(item);
             });
@@ -673,11 +670,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         if (isStaff) {
             roles = [{"name": "staff"}, {"name": "write_only"}];
         }
-        /* global i18next, tnthAjax, OrgTool, orgList, leafOrgs, SYSTEM_IDENTIFIER_ENUM */
-        var aco = new AccountCreationObj(roles, {"i18next": i18next, "orgList": orgList, "leafOrgs": leafOrgs});
+        /* global i18next, tnthAjax, OrgTool, SYSTEM_IDENTIFIER_ENUM */
+        var aco = new AccountCreationObj(roles, {"i18next": i18next});
         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
         aco.handleCurrentUser();
-        aco.getOrgs(aco.populateOrgsByRole);
         aco.handleEditConsentDate();
         aco.initFieldEvents();
         aco.initButtons();

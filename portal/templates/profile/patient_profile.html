@@ -113,7 +113,4 @@
       </div>
   {%- endif %}
 {% endblock %}
-{% block document_ready %}
-  var leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false{% endif %};
-  {{super()}}
-{% endblock %}
+
