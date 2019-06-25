@@ -28,7 +28,6 @@ function previewComm(commId) {
         dataType: "json",
         async: false
     }).done(function(data) {
-        console.log(data)
         //no need for translation, as view by admin staff only
         if (!data) {
             $("#commMessage").html("No data returned");
@@ -53,7 +52,7 @@ function previewComm(commId) {
         $("#commBody style").remove();
         $("#commModal").modal("show");
     }).fail(function(xhr) {
-        $("#commMessage").html("Unable to receive content <br/>" + "status " + xhr.status + "<br/>" + xhr.responseText);
+        $("#commMessage").html("Unable to retrieve content <br/>" + "status " + xhr.status + "<br/>" + xhr.responseText);
     });
 }
 
