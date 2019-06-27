@@ -14,7 +14,7 @@
 }
 @baseFontSize:    16px;
 @baseMobileFontSize:  13.8px;
-@headlineSize:    1.40em;
+@headlineSize:    1.50em;
 @subheadSize:     1.25em;
 @subSmallHeadSize: 1.10em;
 @lgFontSize:      1.6em;
@@ -180,6 +180,9 @@ legend,
 .form-group > label{
   font-size: @baseMobileFontSize;
  }
+label {
+  font-weight: normal;
+}
 legend {
   font-size: @baseFontSize;
 }
@@ -622,7 +625,7 @@ select:not([multiple]) {
     display: none;
   }
   #profileSiteId {
-    width: 350px;
+    width: 375px;
     max-width: 100%;
   }
   #profileSiteIDContainer {
@@ -1594,7 +1597,7 @@ div.pull-right {
 
   @media (min-width: 699px) {
     & {
-      margin-top: -4em;
+      margin-top: -5em;
       justify-content: flex-end;
     }
   }
@@ -2127,12 +2130,30 @@ div.pull-right {
 
   .profile-header {
     margin-bottom: 0.5em;
+    max-width: 100%;
+    width: 100%;
+    .subheader {
+      margin-top: 12px;
+      font-size: smaller;
+    }
+  }
+  @media (min-width: 699px) {
+    & .profile-header {
+      width: 72.5%;
+    }
+  }
+  @media (min-width: 1200px) {
+    & .profile-header {
+      width: 85%;
+    }
   }
   a.open,
   a.back {
     display: none
   }
-
+  #bdGroup {
+    margin-bottom: 0.5em;
+  }
   .email-form-container {
     display: flex;
     flex-direction: row;
@@ -2268,12 +2289,12 @@ div.pull-right {
     margin-top: 0.4em;
   }
   #profileSiteIDContainer {
-    margin-bottom: 1.8em;
+    margin-bottom: 1em;
   }
   #biopsyDateContainer {
-  label {
-    margin-bottom: 0.2em;
-  }
+    label {
+      margin-bottom: 0.2em;
+    }
   }
 }
 #mainDiv.profile .copyright-container,
@@ -2563,7 +2584,7 @@ div.noOrg-container {
     margin-top: 0.55em;
   }
   #phone, #email, #altPhone  {
-    width: 350px;
+    width: 375px;
     max-width: 100%;
   }
   #userOrgs .smaller-text {
@@ -2893,7 +2914,7 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   flex-wrap: wrap;
   justify-content: flex-start;
   div.flex-item {
-    padding: 8px 12px 8px 0;
+    padding: 4px 12px 4px 0;
     max-width: 100%;
   }
 }

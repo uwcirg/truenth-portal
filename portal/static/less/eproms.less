@@ -16,7 +16,7 @@
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
 @mobileJumbotranSize: 1.45em;
-@headlineSize:    1.40em;
+@headlineSize:    1.50em;
 @subheadSize:     1.20em;
 @subSmallHeadSize: 1.1em;
 @lgFontSize:      1.5em;
@@ -259,7 +259,7 @@ body {
   }
 }
 .form-group {
-  margin-bottom: 1.25em;
+  margin-bottom: 1em;
   label {
     margin-bottom: 3px;
   }
@@ -353,7 +353,6 @@ a:focus {
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
-    border-color: @linkHover;
     cursor: pointer;
     text-decoration: none;
   }
@@ -737,7 +736,6 @@ body.landing {
 }
 #regForm input,
 #loginForm input {
-  background: @wellColor;
   height: @jumboInputHeight;
   padding: 5px;
   border-radius: 0;
@@ -745,7 +743,6 @@ body.landing {
   max-width: 100%;
   margin: auto;
   display: block;
-  border: 1px solid @landingInputBorderColor;
   box-shadow: none;
 }
 
@@ -1137,6 +1134,10 @@ select:not([multiple]) {
   }
   .profile-header {
     margin-bottom: 0.75em;
+    .subheader {
+      margin-top: 12px;
+      font-size: smaller;
+    }
   }
   .detail-title {
     margin-bottom: 0.25em;
@@ -1181,6 +1182,9 @@ select:not([multiple]) {
     margin: 0 0.5em;
     border-top: 1px solid #ddd;
     justify-content: space-around;
+  }
+  #bdGroup {
+    margin-bottom: 0.5em;
   }
   #phone, #email, #altPhone  {
     width: 300px;
@@ -3171,7 +3175,7 @@ body.portal .copyright-container  {
 }
 
 .deceased-date-container {
-  margin-top: -1.2em;
+  margin-top: -0.75em;
 }
 
 #createUserLink {
@@ -3766,7 +3770,7 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   flex-wrap: wrap;
   justify-content: flex-start;
   div.flex-item {
-    padding: 8px 12px 8px 0;
+    padding: 4px 12px 4px 0;
     max-width: 100%;
   }
 }
@@ -4580,8 +4584,8 @@ div.timezone-warning.text-warning {
   }
 
   .profile-section {
-      padding-top: 0.5em;
-      padding-bottom: 0.5em;
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
   }
 
   #mainDiv.profile {
