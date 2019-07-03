@@ -57,6 +57,7 @@ auth = Blueprint('auth', __name__)
 
 google_blueprint = make_google_blueprint(
     scope=[
+        'openid',
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/userinfo.email'],
     login_url='/login/google/',
