@@ -1,3 +1,4 @@
+import tnthDates from "./TnthDate.js";
 var Utility = (function() {
     var UtilityObj = function() { /*global $ */
         this.requestAttempts = 0;
@@ -329,18 +330,35 @@ var Utility = (function() {
             if (!data.MAINTENANCE_WINDOW || !data.MAINTENANCE_WINDOW.length) {
                 return;
             }
-            //use maintenance window specified in config to compose the message, assuming in following example format: ["2018-11-02T12:00:00Z", "2018-11-02T18:00:00Z"], dates in system ISO format
+            //use maintenance window specified in config to compose the message
+            //assuming in following example format: ["2018-11-02T12:00:00Z", "2018-11-02T18:00:00Z"], dates in system ISO format
             var hoursDiff = function(d1, d2) {
                 if (!d1 || !d2) {
                     return 0;
                 }
                 return Math.floor(((d2.getTime() - d1.getTime())/ (1000 * 60 * 60)) % 24);
             };
+            var hideSystemMaintenanceElement = function() {
+                document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+            };
             //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
             var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
-            var hoursTil = hoursDiff(new Date(), startDate);
+            if (!tnthDates.isDate(startDate)) {
+                //display error in console
+                console.log("invalid start date entry - must be in valid system format: YYYY-MM-DDTHH:MM:SSZ ", data.MAINTENANCE_WINDOW[0]);
+                hideSystemMaintenanceElement();
+                return;
+            }
+            if (!tnthDates.isDate(endDate)) {
+                //indicate error in console
+                console.log("invalid end date entry - must be in valid system format: YYYY-MM-DDTHH:MM:SSZ ", data.MAINTENANCE_WINDOW[1]);
+                hideSystemMaintenanceElement();
+                return;
+            }
+
+            var hoursTil = hoursDiff(new Date(), endDate); //use end date of the maintenance window
             if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
-                document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+                hideSystemMaintenanceElement();
                 return;
             }
             /*global i18next */
@@ -355,7 +373,7 @@ var Utility = (function() {
                 messageElement.innerHTML = self.escapeHtml(message);
             } catch(e) {
                 console.log("Error occurred converting system outage date/time ", e); /*eslint no-console:off */
-                document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
+                hideSystemMaintenanceElement();
             }
         });
     };
