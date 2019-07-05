@@ -356,8 +356,8 @@ var Utility = (function() {
                 return;
             }
 
-            var hoursTil = hoursDiff(new Date(), endDate); //use end date of the maintenance window
-            if (hoursTil < 0 || isNaN(hoursTil)) { //maintenance window has passed
+            var hoursTilEnd = hoursDiff(new Date(), endDate); //use end date of the maintenance window
+            if (hoursTilEnd < 0 || isNaN(hoursTilEnd)) { //maintenance window has passed
                 hideSystemMaintenanceElement();
                 return;
             }
