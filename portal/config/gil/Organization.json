@@ -1586,6 +1586,136 @@
         "reference": "api/organization/40001"
       },
       "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40011,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Urologic Clinic of Southeast Michigan"
+        }
+      ],
+      "name": "Urologic Clinic of Southeast Michigan",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40012,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Lansing Institute of Urology"
+        }
+      ],
+      "name": "Lansing Institute of Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40013,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Lakeshore Urology"
+        }
+      ],
+      "name": "Lakeshore Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40014,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Wayne State University Physicians Group - Urology"
+        }
+      ],
+      "name": "Wayne State University Physicians Group - Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40015,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Bay Area Urology"
+        }
+      ],
+      "name": "Bay Area Urology",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

@@ -1,13 +1,13 @@
 # base application dependencies
 
-alembic==1.0.10            # via flask-migrate
-amqp==2.4.2               # via kombu
+alembic==1.0.11            # via flask-migrate
+amqp==2.5.0               # via kombu
 babel==2.7.0              # via flask-babel, sphinx
 bcrypt==3.1.6             # via flask-user
 billiard==3.6.0         # pyup: < 4.0  # pin until celery upgraded # via celery
 blinker==1.4              # via flask-mail, flask-webtest
 celery==4.3.0
-certifi==2019.3.9        # via requests
+certifi==2019.6.16        # via requests
 cffi==1.12.3              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
@@ -37,7 +37,7 @@ idna==2.8                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.10.1              # via flask, flask-babel, sphinx
 jsonschema==3.0.1
-kombu==4.5.0              # pyup: < 5.0 # via celery
+kombu==4.6.3              # pyup: < 5.0 # via celery
 mako==1.0.12               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
@@ -50,7 +50,7 @@ python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2019.1              # via babel, celery
-pyyaml==5.1              # via flask-swagger, swagger-spec-validator
+pyyaml==5.1.1              # via flask-swagger, swagger-spec-validator
 redis==3.2.1
 requests-cache==0.5.0
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib

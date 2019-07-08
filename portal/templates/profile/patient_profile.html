@@ -1,18 +1,20 @@
 {%- extends "profile/profile_base.html" -%}
 {%- import "profile/profile_macros.html" as profile_macro -%}
 {% block profile_title %}
-  {{ _("Patient Profile") }} -
-  {%- if user.first_name and user.last_name -%}
-    &nbsp;{{user.first_name}} {{user.last_name}}
-  {%- elif user.first_name -%}
-    &nbsp;{{user.first_name}}
-  {%- elif user.last_name -%}
-    &nbsp;{{user.last_name}}
-  {%- elif user.email -%}
-    &nbsp;{{ user.email }}
-  {%- else -%}
-    &nbsp;#{{ user.id}}
-  {%-endif-%}
+  {{ _("Patient Profile") }}
+  <div class="subheader">
+    {%- if user.first_name and user.last_name -%}
+    {{user.first_name}} {{user.last_name}}
+    {%- elif user.first_name -%}
+      {{user.first_name}}
+    {%- elif user.last_name -%}
+      {{user.last_name}}
+    {%- elif user.email -%}
+      {{ user.email }}
+    {%- else -%}
+      #{{ user.id}}
+    {%-endif-%}
+  </div> 
 {% endblock %}
 {% block profile_content %}
   {% if config.CUSTOM_PATIENT_DETAIL -%}
@@ -113,7 +115,4 @@
       </div>
   {%- endif %}
 {% endblock %}
-{% block document_ready %}
-  var leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false{% endif %};
-  {{super()}}
-{% endblock %}
+

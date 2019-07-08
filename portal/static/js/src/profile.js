@@ -251,10 +251,20 @@ export default (function() {
                 }
                 this.initChecks.pop();
             },
+            getCurrentUserOrgs: function() {
+                if (!this.userOrgs || !this.userOrgs.length) {
+                    return false;
+                }
+                return this.userOrgs;
+            },
             setCurrentUserOrgs: function(params, callback){
                 callback = callback || function() {};
                 if (!this.currentUserId) {
                     callback({"error": "Current user id is required."});
+                    return;
+                }
+                if (this.getCurrentUserOrgs()) {
+                    callback(this.getCurrentUserOrgs());
                     return;
                 }
                 var self = this;
@@ -274,7 +284,7 @@ export default (function() {
                     self.topLevelOrgs = topLevelOrgs.map(function(item) {
                         return orgTool.getOrgName(item);
                     });
-                    callback(data);
+                    callback(self.getCurrentUserOrgs());
                 });
             },
             isUserEmailReady: function() {
@@ -651,7 +661,7 @@ export default (function() {
                                 var noDataContainer = parent.find(".no-data-container");
                                 var btn = parent.find(".profile-item-edit-btn");
                                 if (section) {
-                                    if ((data.optional).indexOf(section) !== -1) {
+                                    if ((data.optional).indexOf(section) !== -1) { 
                                         sectionElement.show();
                                         noDataContainer.html("");
                                         btn.show();
@@ -1546,17 +1556,23 @@ export default (function() {
                 orgTool.onLoaded(subjectId, true);
                 orgTool.setOrgsVis(this.demo.data,
                     function() {
-                        if ((typeof leafOrgs !== "undefined") && leafOrgs) { /*global leafOrgs*/
-                            orgTool.filterOrgs(leafOrgs);
-                        }
-                        if ($("#requireMorph").val()) {
-                            orgTool.morphPatientOrgs();
-                        }
-                        self.handleOrgsEvent();
-                        self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
-                            self.getConsentList(data);
+                        self.setCurrentUserOrgs(false, function(data) {
+                            //admin staff can select any orgs (leaf orgs for patient)
+                            var orgsToBeFiltered = self.isAdmin() ? orgTool.getTopLevelOrgs(): data;
+                            if (self.isSubjectPatient()) {
+                                //for patient, only leaf orgs are selectable
+                                orgTool.filterOrgs(orgTool.getLeafOrgs(orgsToBeFiltered));
+                                orgTool.morphPatientOrgs();
+                            } else {
+                                //others e.g. staff
+                                orgTool.filterOrgs(orgTool.getHereBelowOrgs(orgsToBeFiltered));
+                            }
+                            self.handleOrgsEvent();
+                            self.modules.tnthAjax.getConsent(subjectId, {useWorker: true}, function(data) {
+                                self.getConsentList(data);
+                            });
+                            $("#clinics").attr("loaded", true);
                         });
-                        $("#clinics").attr("loaded", true);
                     });
             },
             handleOrgsEvent: function() {
@@ -1894,7 +1910,7 @@ export default (function() {
                         $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
                         return false;
                     }
-                    var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80));
+                    var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80)), errorMessage="";
                     (data.audits).forEach(function(item) {
                         item.by = item.by.reference || "-";
                         var r = /\d+/g;
@@ -1904,7 +1920,14 @@ export default (function() {
                         }
                         item.lastUpdated = self.modules.tnthDates.formatDateString(item.lastUpdated, "iso");
                         item.comment = item.comment ? self.escapeHtml(item.comment) : "";
-                        var c = decodeURIComponent(String(item.comment));
+                        var c = String(item.comment);
+                        try {
+                            c = decodeURIComponent(c);
+                        } catch(e) { //catch error, output to console e.g. URI malformed error. output error to console for debugging purpose
+                            console.log("Error decoding auditing comment " + c);
+                            console.log(e);
+                            errorMessage = e.message + "" + e.stack;
+                        }
                         item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +
                             "if (obj) {" +
@@ -1916,6 +1939,10 @@ export default (function() {
                         );
                         fData.push(item);
                     });
+                    if (errorMessage) {
+                        //report error if rendering audit log generates runtime JS error
+                        self.modules.tnthAjax.reportError(self.subjectId, "/api/user/" + self.subjectId + "/audit", errorMessage);
+                    }
                     $("#profileAuditLogTable").html("");
                     $("#profileAuditLogTable").bootstrapTable(self.setBootstrapTableConfig({
                         data: fData,

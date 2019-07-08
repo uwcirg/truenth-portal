@@ -104,11 +104,9 @@ def patient_profile_create():
     user = current_user()
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
-    leaf_organizations = user.leaf_organizations()
     return render_template(
         "profile/patient_profile_create.html", user=user,
-        consent_agreements=consent_agreements,
-        leaf_organizations=leaf_organizations)
+        consent_agreements=consent_agreements)
 
 
 @patients.route(

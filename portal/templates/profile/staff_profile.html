@@ -40,7 +40,4 @@
         </div>
     {%- endif %}
 {% endblock %}
-{% block document_ready %}
-    var leafOrgs = {% if org_list %}{{org_list | safe}}{% else %}false{% endif%};
-    {{super()}}
-{% endblock %}
+

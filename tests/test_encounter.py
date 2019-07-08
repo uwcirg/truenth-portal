@@ -54,7 +54,8 @@ class TestEncounter(TestCase):
         self.client.get('/logout', follow_redirects=True)
         assert len(self.test_user.encounters) > 1
         assert all(e.status == 'finished' for e in self.test_user.encounters)
-        assert not self.test_user.current_encounter
+        # as we generate failsafe on missing, confirm that's the type returned
+        assert self.test_user.current_encounter.auth_method == 'failsafe'
 
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
@@ -100,5 +101,35 @@ class TestEncounter(TestCase):
         response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         # should return 401 as test user isn't a patient or partner
         assert response.status_code == 401
-        assert not self.test_user.current_encounter
+        assert self.test_user.current_encounter.auth_method == 'failsafe'
         assert staff_user.current_encounter
+
+    def test_failsafe(self):
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.WRITE_ONLY.value)
+        self.test_user = db.session.merge(self.test_user)
+        consented_org = self.test_user.valid_consents[0].organization_id
+        staff_user = self.add_user(username='staff@example.com')
+        staff_user.organizations.append(Organization.query.get(consented_org))
+        self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
+        staff_user = db.session.merge(staff_user)
+        self.login(user_id=staff_user.id)
+        assert staff_user.current_encounter
+
+        # Switch to test_user using login_as, test the encounter
+        self.test_user = db.session.merge(self.test_user)
+        response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
+        assert response.status_code == 302  # sent to next_after_login
+        assert (self.test_user.current_encounter.auth_method
+                == 'staff_authenticated')
+        assert self.test_user._email.startswith(INVITE_PREFIX)
+
+        # Blow away test user's current encounter, and confirm a failsafe
+        # comes to life
+        e = Encounter.query.filter(Encounter.user_id == TEST_USER_ID).one()
+        db.session.delete(e)
+
+        self.test_user = db.session.merge(self.test_user)
+        encounter = self.test_user.current_encounter
+        assert encounter.auth_method == 'failsafe'
+        assert encounter.status == 'in-progress'

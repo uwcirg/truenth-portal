@@ -4,23 +4,25 @@ const JsSrcPath = "./static/js/src";
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = {
     entry: { /* files to be transpiled and optimized */
-        "main": JsSrcPath+"/main.js",
+        "account": JsSrcPath+"/accountCreation.js",
+        "admin": JsSrcPath+"/admin.js",
+        "assessmentReport": JsSrcPath+"/assessmentReport.js",
+        "communications": JsSrcPath+"/communications.js",
+        "CookieMonster": JsSrcPath+"/CookieMonster.js",
+        "coredata": JsSrcPath+"/coredata.js",
+        "initialQueries": JsSrcPath+"/initialQueries.js",
         "gil": JsSrcPath+"/gil.js",
         "gilIndex": JsSrcPath+"/gilIndex.js",
         "landing": JsSrcPath+"/landing.js",
-        "account": JsSrcPath+"/accountCreation.js",
-        "admin": JsSrcPath+"/admin.js",
-        "research": JsSrcPath+"/research.js",
-        "CookieMonster": JsSrcPath+"/CookieMonster.js",
-        "profile": JsSrcPath+"/profile.js",
-        "initialQueries": JsSrcPath+"/initialQueries.js",
-        "coredata": JsSrcPath+"/coredata.js",
-        "psaTracker": JsSrcPath+"/psaTracker.js",
+        "main": JsSrcPath+"/main.js",
         "orgTreeView": JsSrcPath+"/orgTreeView.js",
-        "assessmentReport": JsSrcPath+"/assessmentReport.js",
-        "websiteConsentScript": JsSrcPath+"/websiteConsentScript.js",
+        "profile": JsSrcPath+"/profile.js",
+        "psaTracker": JsSrcPath+"/psaTracker.js",
         "reportingDashboard": JsSrcPath+"/reportingDashboard.js",
-        "scheduledJobs": JsSrcPath+"/scheduledJobs.js"
+        "research": JsSrcPath+"/research.js",
+        "scheduledJobs": JsSrcPath+"/scheduledJobs.js",
+        "shortcutAlias": JsSrcPath+"/shortcutAlias.js",
+        "websiteConsentScript": JsSrcPath+"/websiteConsentScript.js"
     },
     output: {
         filename: "[name].bundle.js",

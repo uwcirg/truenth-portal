@@ -738,6 +738,30 @@ export default (function() { /*global i18next $ */
         });
         return here_below_orgs;
     };
+    OrgTool.prototype.getLeafOrgs = function(userOrgs, orgList) {
+        if (!userOrgs) {
+            return [];
+        }
+        let mainOrgsList = this.getOrgsList(), self = this, currentList = [], childOrgs = [];
+        userOrgs.forEach(function(orgId) {
+            let orgItem = mainOrgsList[orgId];
+            if (!orgItem) {
+                return true;
+            }
+            if (orgItem.children && orgItem.children.length) {
+                let arrChildOrgs = orgItem.children.map(item => item.id);
+                childOrgs = childOrgs.concat(arrChildOrgs);
+            } else {
+                currentList.push(orgId);
+            }
+        });
+        orgList = orgList || [];
+        orgList = orgList.concat(currentList);
+        if (childOrgs.length) {
+            return self.getLeafOrgs(childOrgs, orgList);
+        }
+        return orgList;
+    };
     OrgTool.prototype.morphPatientOrgs = function() {
         var checkedOrgs = {}, orgs = $("#userOrgs input[name='organization']");
         orgs.each(function() {

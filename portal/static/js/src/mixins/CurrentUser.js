@@ -13,6 +13,7 @@ var CurrentUser = { /* global $ i18next */
             userRoles: [],
             userOrgs: [],
             topLevelOrgs: [],
+            leafOrgs: [],
             hereBelowOrgs: []
         };
     },
@@ -122,6 +123,12 @@ var CurrentUser = { /* global $ i18next */
             let redux = (names) => names.filter((v,i) => names.indexOf(v) === i);
             this.topLevelOrgs = redux(this.topLevelOrgs);
         },
+        setLeafOrgs: function() {
+            this.leafOrgs = this.orgTool.getLeafOrgs(this.getUserOrgs());
+        },
+        getLeafOrgs: function() {
+            return this.leafOrgs;
+        }, 
         setHereBelowOrgs: function() {
             this.hereBelowOrgs = this.orgTool.getHereBelowOrgs(this.getUserOrgs());
         },
@@ -150,6 +157,7 @@ var CurrentUser = { /* global $ i18next */
                 }
                 self.setTopLevelOrgs();
                 self.setHereBelowOrgs();
+                self.setLeafOrgs();
                 if (doPopulate) {
                     self.orgTool.populateUI(); //populate orgs dropdown UI
                     self.filterOrgs();

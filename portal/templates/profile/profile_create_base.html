@@ -60,7 +60,4 @@
 {% block additional_scripts %}
     <script src="{{ url_for('static', filename='js/dist/account.bundle.js') }}"></script>
 {% endblock additional_scripts %}
-{% block document_ready %} /* information from server, will remove when API is available */
-var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
-var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
-{% endblock %}
+

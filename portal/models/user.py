@@ -37,7 +37,7 @@ from ..system_uri import (
 from .audit import Audit
 from .codeable_concept import CodeableConcept
 from .coding import Coding
-from .encounter import Encounter
+from .encounter import Encounter, initiate_encounter
 from .extension import CCExtension, TimezoneExtension
 from .fhir import bundle_results, v_or_first, v_or_n
 from .identifier import Identifier, UserIdentifier
@@ -403,7 +403,7 @@ class User(db.Model, UserMixin):
 
     @property
     def current_encounter(self):
-        """Shortcut to current encounter, if present
+        """Shortcut to current encounter, generate failsafe if not found
 
         An encounter is typically bound to the logged in user, not
         the subject, if a different user is performing the action.
@@ -411,7 +411,10 @@ class User(db.Model, UserMixin):
         query = Encounter.query.filter(Encounter.user_id == self.id).filter(
             Encounter.status == 'in-progress')
         if query.count() == 0:
-            return None
+            current_app.logger.error(
+                "Failed to locate in-progress encounter for {}"
+                "; generate failsafe".format(self))
+            return initiate_encounter(self, auth_method='failsafe')
         if query.count() != 1:
             # Not good - we should only have one `active` encounter for
             # the current user.  Log details for debugging and return the
@@ -1507,6 +1510,11 @@ class User(db.Model, UserMixin):
                                self_entity]
             for item in append_list:
                 self_entity.append(item)
+
+        # If other user has an external (3rd party) auth_provider, reassign
+        # to self
+        for ap in other.auth_providers:
+            ap.reassign_owner(self.id)
 
     def promote_to_registered(self, registered_user):
         """Promote a weakly authenticated account to a registered one"""
