@@ -47,6 +47,9 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
+    echo "Stopping containers"
+    docker-compose stop web celeryworker celerybeat
+
     echo "Dropping existing DB"
     docker-compose exec db dropdb --username postgres portaldb
 
