@@ -197,10 +197,14 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         var configSuffix = "COPYRIGHT_YEAR";
         var stCopyRight = sessionStorage.getItem("config_"+configSuffix);
         if (stCopyRight) {
-            callback({configSuffix : stCopyRight});
+            let copyrightObject = {};
+             //specifically set property key of object via variable, otherwise it will be interpreted literally as string
+             //caveat for setting object key via variable: https://stackoverflow.com/questions/11508463/javascript-set-object-key-by-variable
+            copyrightObject[configSuffix] = stCopyRight;
+            callback(copyrightObject);
             return;
         }
-        Utility.sendRequest("/api/settings/"+configSuffix,false, function(data) {
+        Utility.ajaxRequest("/api/settings/"+configSuffix, false, function(data) {
             if (data && data.hasOwnProperty(configSuffix)) {
                 sessionStorage.setItem("config_"+configSuffix, data[configSuffix]);
             }
@@ -228,7 +232,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             var userLocale = self.getUserLocale(), footerElements = $("#homeFooter .copyright");
             var copyright_year = new Date().getFullYear();
             self.getCopyrightYear(function(data) {
-                if (data && data.COPYRIGHT_YEAR) {
+                if (data && data.hasOwnProperty("COPYRIGHT_YEAR")) {
                     copyright_year = data.COPYRIGHT_YEAR;
                 }
                 var getContent = (country_code, copyright_year) => {
