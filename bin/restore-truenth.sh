@@ -37,12 +37,8 @@ done
 shift $((OPTIND-1))
 
 
-# sql_dump is set via getopts while loop
-default_sql_dump=foo.sql
+# implement default variables (eg default_sql_dump) as necessary
 SQL_DUMP="${sql_dump:-$default_sql_dump}"
-
-# uploads_dir is set via getopts while loop
-default_uploads_dir=/tmp/bar
 UPLOADS_DIR="${uploads_dir:-$default_uploads_dir}"
 
 # docker-compose commands must be run in the same directory as docker-compose.yaml
@@ -51,9 +47,9 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
-    echo $SQL_DUMP
+    echo SQL_DUMP: $SQL_DUMP
 fi
 
 if [ -n "$UPLOADS_DIR" ]; then
-    echo $UPLOADS_DIR
+    echo UPLOADS_DIR: $UPLOADS_DIR
 fi
