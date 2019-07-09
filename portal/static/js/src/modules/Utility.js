@@ -342,7 +342,7 @@ var Utility = (function() {
                 document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
             };
             //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
-            //format dates in system format first, if not already
+            //format dates in system ISO 8601 format first, if not already
             //valid date examples: 2018-06-09T16:00:00Z, 2019-07-09T22:30:00-7:00, 2019-05-24T15:54:14.876Z
             var startDate = new Date(tnthDates.formatDateString(data.MAINTENANCE_WINDOW[0], "system")),
                 endDate = new Date(tnthDates.formatDateString(data.MAINTENANCE_WINDOW[1], "system"));
