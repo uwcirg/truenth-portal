@@ -37,7 +37,7 @@ done
 shift $((OPTIND-1))
 
 
-# implement default variables (eg default_sql_dump) as necessary
+# implement default variables (eg default_sql_dump, default_uploads_dir) as necessary
 SQL_DUMP="${sql_dump:-$default_sql_dump}"
 UPLOADS_DIR="${uploads_dir:-$default_uploads_dir}"
 
@@ -47,7 +47,10 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
-    echo SQL_DUMP: $SQL_DUMP
+    echo "Loading SQL dumpfile: ${SQL_DUMP}"
+    # Disable pseudo-tty allocation
+    docker-compose exec -T db psql --dbname portaldb --username postgres < "${SQL_DUMP}"
+    echo "Loaded SQL dumpfile"
 fi
 
 if [ -n "$UPLOADS_DIR" ]; then
