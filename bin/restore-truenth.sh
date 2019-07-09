@@ -54,5 +54,12 @@ if [ -n "$SQL_DUMP" ]; then
 fi
 
 if [ -n "$UPLOADS_DIR" ]; then
-    echo UPLOADS_DIR: $UPLOADS_DIR
+    web_file_upload_dir="$(docker-compose exec web flask config -c FILE_UPLOAD_DIR | grep --invert-match DEBUG | tr --delete '[:space:]')"
+    web_container_id=$(docker-compose ps --quiet web)
+
+    echo "Copying files from ${UPLOADS_DIR} to container upload dir (${web_file_upload_dir})"
+    # copy each file individually, to avoid overwriting entire upload directory
+    find "${UPLOADS_DIR}" -type f -exec \
+        docker cp {} "${web_container_id}":"${web_file_upload_dir}" \; -print
+    echo "Done copying uploaded files into container"
 fi
