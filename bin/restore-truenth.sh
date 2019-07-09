@@ -47,6 +47,12 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
+    echo "Dropping existing DB"
+    docker-compose exec db dropdb --username postgres portaldb
+
+    echo "Creating empty DB"
+    docker-compose exec db createdb --username postgres portaldb
+
     echo "Loading SQL dumpfile: ${SQL_DUMP}"
     # Disable pseudo-tty allocation
     docker-compose exec -T db psql --dbname portaldb --username postgres < "${SQL_DUMP}"
