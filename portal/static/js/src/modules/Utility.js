@@ -342,16 +342,19 @@ var Utility = (function() {
                 document.getElementById(systemMaintenanceElId).classList.add("tnth-hide");
             };
             //date object automatically convert iso date/time to local date/time as it assumes a timezone of UTC if date in ISO format
-            var startDate = new Date(data.MAINTENANCE_WINDOW[0]), endDate = new Date(data.MAINTENANCE_WINDOW[1]);
+            //format dates in system format first, if not already
+            //valid date examples: 2018-06-09T16:00:00Z, 2019-07-09T22:30:00-7:00, 2019-05-24T15:54:14.876Z
+            var startDate = new Date(tnthDates.formatDateString(data.MAINTENANCE_WINDOW[0], "system")),
+                endDate = new Date(tnthDates.formatDateString(data.MAINTENANCE_WINDOW[1], "system"));
             if (!tnthDates.isDate(startDate)) {
                 //display error in console
-                console.log("invalid start date entry - must be in valid system format: YYYY-MM-DDTHH:MM:SSZ ", data.MAINTENANCE_WINDOW[0]);
+                console.log("invalid start date entry - must be in valid format", data.MAINTENANCE_WINDOW[0]);
                 hideSystemMaintenanceElement();
                 return;
             }
             if (!tnthDates.isDate(endDate)) {
                 //indicate error in console
-                console.log("invalid end date entry - must be in valid system format: YYYY-MM-DDTHH:MM:SSZ ", data.MAINTENANCE_WINDOW[1]);
+                console.log("invalid end date entry - must be in valid format", data.MAINTENANCE_WINDOW[1]);
                 hideSystemMaintenanceElement();
                 return;
             }
