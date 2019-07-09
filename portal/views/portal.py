@@ -1193,23 +1193,6 @@ def task_status(task_id):
     return jsonify(response)
 
 
-@portal.route('/communicate')
-@roles_required([ROLE.ADMIN.value])
-@oauth.require_oauth()
-def communications_dashboard():
-    """Communications Dashboard
-
-    Displays a list of communication requests from the system;
-    includes a preview mode for specific requests.
-
-    """
-    comms = Communication.query.all()
-    for comm in comms:
-        comm.user_email = User.query.get(comm.user_id).email
-        comm.sent_at = comm.message.sent_at if comm.message else None
-    return render_template('admin/communications.html', communications=comms)
-
-
 @portal.route('/communicate/preview/<int:comm_id>')
 @roles_required([ROLE.ADMIN.value])
 @oauth.require_oauth()
