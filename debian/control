@@ -5,12 +5,12 @@ Maintainer: CIRG, University of Washington <truenth-dev@uw.edu>
 # docs suggest building psycopg2 from source every time for prod
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 # Todo: investigate using binary in python-psycopg2 debian package
-Build-Depends: debhelper (>= 9), python, dh-virtualenv, libpq-dev, python-dev, python-pip, python-setuptools, python-setuptools-scm, python-wheel
+Build-Depends: debhelper (>= 9), python3, dh-virtualenv, libpq-dev, python3-dev, python3-pip, python3-setuptools, python3-setuptools-scm, python3-wheel
 Standards-Version: 3.9.5
 
 Package: portal
 Architecture: any
-Pre-Depends: dpkg (>= 1.16.1), python2.7-minimal | python2.6-minimal, ${misc:Pre-Depends}
+Pre-Depends: dpkg (>= 1.16.1), python3-minimal | python3, ${misc:Pre-Depends}
 Depends: ${misc:Depends}, libpq5, ca-certificates
 Recommends: wait-for-it
 Description: TrueNTH Shared Services

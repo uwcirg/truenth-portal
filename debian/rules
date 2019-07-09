@@ -5,7 +5,7 @@
 # https://dh-virtualenv.readthedocs.io/en/1.1/usage.html
 DH_VIRTUALENV_ARGS = \
 	--requirements='requirements.prod.txt' \
-	--python='/usr/bin/python2' \
+	--python='/usr/bin/python3' \
 	--extra-pip-arg='--progress-bar=off' \
 	--extra-pip-arg='--quiet'
 
