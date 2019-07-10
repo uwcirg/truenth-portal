@@ -12,7 +12,6 @@ from abc import ABCMeta, abstractmethod
 import sys
 
 from flask import current_app
-from future.utils import with_metaclass
 
 from .audit import Audit
 from .clinical_constants import CC
@@ -114,7 +113,7 @@ class Coredata(object):
         return setattr(self.instance, name, value)
 
 
-class CoredataPoint(with_metaclass(ABCMeta, object)):
+class CoredataPoint(object, metaclass=ABCMeta):
     """Abstract base class - defining methods each datapoint needs"""
 
     @abstractmethod
