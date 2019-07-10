@@ -19,7 +19,7 @@ pygments==2.4.2           # via sphinx
 pyparsing==2.4.0          # via packaging
 pytest==4.6.3
 selenium==3.141.0
-snowballstemmer==1.2.1    # via sphinx
+snowballstemmer==1.9.0    # via sphinx
 sphinx-rtd-theme==0.4.3
 sphinx==2.1.2;python_version >= '3'
 sphinxcontrib-websupport==1.1.2  # via sphinx
