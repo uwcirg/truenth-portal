@@ -28,7 +28,7 @@ flask-sqlalchemy==2.4.0
 flask-swagger==0.2.14
 git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-wtf==0.14.2         # via flask-user
-flask==1.0.3
+flask==1.1.1
 functools32==3.2.3.post2;python_version < '3'
 future==0.17.1
 fuzzywuzzy==0.17.0
