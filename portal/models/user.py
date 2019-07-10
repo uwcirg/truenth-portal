@@ -181,7 +181,7 @@ def user_extension_map(user, extension):
 
     :returns: adapter implementing apply_fhir and as_fhir methods
 
-    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+    :raises :py:exc:`ValueError`: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:

@@ -612,7 +612,7 @@ def org_extension_map(organization, extension):
 
     :returns: adapter implementing apply_fhir and as_fhir methods
 
-    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+    :raises :py:exc:`ValueError`: if the extension isn't recognized
 
     """
     for kls in org_extension_classes:
