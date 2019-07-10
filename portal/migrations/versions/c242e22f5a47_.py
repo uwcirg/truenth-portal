@@ -53,8 +53,9 @@ def upgrade():
     version = lookup_version()
     for subject_id in changed_user_ids:
         conn.execute(text(
-            "INSERT INTO audit (comment, user_id, subject_id, context, timestamp, version) "
-            "VALUES (:comment, :user_id, :subject_id, :context, :timestamp, :version)"),
+            "INSERT INTO audit (comment, user_id, subject_id, context, "
+            "timestamp, version) VALUES (:comment, :user_id, :subject_id, "
+            ":context, :timestamp, :version)"),
             comment="masked email at end of SR RCT",
             user_id=admin_id,
             subject_id=subject_id,
