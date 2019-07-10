@@ -1,5 +1,4 @@
 """Unit test module for stat reporting"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from re import search

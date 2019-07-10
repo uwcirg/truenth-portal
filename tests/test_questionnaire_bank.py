@@ -1,5 +1,4 @@
 """Unit test module for questionnaire_bank"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta

@@ -1,5 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from pprint import pformat

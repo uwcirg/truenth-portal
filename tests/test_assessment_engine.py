@@ -1,5 +1,4 @@
 """Unit test module for Assessment Engine API"""
-from __future__ import unicode_literals  # isort:skip
 from dateutil.relativedelta import relativedelta
 import json
 import jsonschema

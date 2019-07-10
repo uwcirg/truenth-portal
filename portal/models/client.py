@@ -1,6 +1,4 @@
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 
 import base64
 import hashlib

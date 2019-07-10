@@ -1,6 +1,4 @@
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 import _thread
 from sqlalchemy.orm.util import class_mapper
 

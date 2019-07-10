@@ -1,5 +1,4 @@
 """Test identifiers"""
-from __future__ import unicode_literals  # isort:skip
 
 from flask_webtest import SessionScope
 import json

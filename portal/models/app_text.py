@@ -7,10 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
-from __future__ import unicode_literals  # isort:skip
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 
 from abc import ABCMeta, abstractmethod
 from builtins import str

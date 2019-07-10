@@ -1,5 +1,4 @@
 """Unit test module for Reference class"""
-from __future__ import unicode_literals  # isort:skip
 
 from portal.models.intervention import Intervention
 from portal.models.questionnaire_bank import QuestionnaireBank

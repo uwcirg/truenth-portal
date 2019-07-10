@@ -1,4 +1,3 @@
-from __future__ import unicode_literals  # isort:skip
 
 import json
 from os.path import join as path_join

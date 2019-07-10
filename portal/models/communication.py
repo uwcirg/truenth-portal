@@ -1,5 +1,4 @@
 """Communication model"""
-from __future__ import unicode_literals  # isort:skip
 
 from collections import MutableMapping
 from datetime import datetime

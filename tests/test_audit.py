@@ -1,5 +1,4 @@
 """Test module for audit functionality"""
-from __future__ import unicode_literals  # isort:skip
 
 from dateutil import parser
 from flask_webtest import SessionScope
