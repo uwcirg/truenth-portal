@@ -1,4 +1,4 @@
-FROM debian:stretch as builder
+FROM debian:buster as builder
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
@@ -36,7 +36,7 @@ RUN \
 
 # -----------------------------------------------------------------------------
 
-FROM debian:stretch as production
+FROM debian:buster as production
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
