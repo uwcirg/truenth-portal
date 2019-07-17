@@ -1,17 +1,18 @@
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 import pytest
 
 from portal.database import db
 from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
+from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import (
+    QBT,
     AtOrderedList,
     QB_StatusCacheKey,
-    QBT,
     ordered_qbs,
     second_null_safe_datetime,
     update_users_QBT,
@@ -19,8 +20,7 @@ from portal.models.qb_timeline import (
 from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.views.user import withdraw_consent
-from portal.models.overall_status import OverallStatus
-from tests import TEST_USER_ID, associative_backdate, TestCase
+from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
 

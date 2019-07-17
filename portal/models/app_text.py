@@ -18,7 +18,7 @@ from urllib.parse import parse_qsl, urlencode, urlparse
 from flask import current_app
 from flask_babel import gettext
 import requests
-from requests.exceptions import ConnectionError, MissingSchema, InvalidURL
+from requests.exceptions import ConnectionError, InvalidURL, MissingSchema
 
 from ..database import db
 

@@ -1,7 +1,8 @@
 """Test identifiers"""
 
-from flask_webtest import SessionScope
 import json
+
+from flask_webtest import SessionScope
 import pytest
 from werkzeug.exceptions import Conflict
 

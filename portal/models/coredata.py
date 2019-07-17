@@ -18,8 +18,8 @@ from .clinical_constants import CC
 from .intervention import INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree
 from .procedure_codes import (
+    known_treatment_not_started,
     known_treatment_started,
-    known_treatment_not_started
 )
 from .role import ROLE
 from .tou import ToU

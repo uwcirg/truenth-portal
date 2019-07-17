@@ -1,6 +1,7 @@
 
-import _thread
 from sqlalchemy.orm.util import class_mapper
+
+import _thread
 
 from ..database import db
 

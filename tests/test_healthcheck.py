@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from mock import Mock, patch
 import pytest
 import redis

@@ -1,9 +1,4 @@
-from flask import (
-    Blueprint,
-    jsonify,
-    render_template,
-    request,
-)
+from flask import Blueprint, jsonify, render_template, request
 from flask_user import roles_required
 from sqlalchemy import and_
 

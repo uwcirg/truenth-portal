@@ -5,6 +5,7 @@ FLASK_APP=manage.py flask --help
 """
 import json
 import os
+import sys
 
 import alembic.config
 import click
@@ -14,7 +15,6 @@ import redis
 import requests
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
-import sys
 
 from portal.audit import auditable_event
 from portal.config.site_persistence import SitePersistence
@@ -32,16 +32,16 @@ from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
+from portal.models.url_token import (
+    BadSignature,
+    SignatureExpired,
+    verify_token,
+)
 from portal.models.user import (
     User,
     flag_test,
     permanently_delete_user,
     validate_email,
-)
-from portal.models.url_token import (
-    BadSignature,
-    SignatureExpired,
-    verify_token,
 )
 from portal.tasks import celery_beat_health_check
 

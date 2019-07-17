@@ -21,12 +21,11 @@ from portal.models.intervention import (
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
+from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.models.user_consent import UserConsent
-from portal.models.qb_timeline import invalidate_users_QBT
-
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import (

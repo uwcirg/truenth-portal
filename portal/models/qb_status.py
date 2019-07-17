@@ -3,10 +3,10 @@
 API to lookup user's status with respect to assigned questionnaire banks.
 
 """
-from .overall_status import OverallStatus
-from .qb_timeline import ordered_qbs, QBT, update_users_QBT
-from .questionnaire_response import qnr_document_id, QNR_results
 from ..trace import trace
+from .overall_status import OverallStatus
+from .qb_timeline import QBT, ordered_qbs, update_users_QBT
+from .questionnaire_response import QNR_results, qnr_document_id
 
 
 class NoCurrentQB(Exception):

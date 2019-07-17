@@ -21,9 +21,9 @@ from ..models.identifier import (
     parse_identifier_params,
 )
 from ..models.overall_status import OverallStatus
+from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import QuestionnaireResponse
-from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.reference import Reference
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort

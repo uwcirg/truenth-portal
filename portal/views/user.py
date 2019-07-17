@@ -1,5 +1,6 @@
 """User API view functions"""
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
@@ -36,6 +37,7 @@ from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
+from ..models.url_token import url_token
 from ..models.user import (
     INVITE_PREFIX,
     User,
@@ -47,7 +49,6 @@ from ..models.user import (
 )
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
-from ..models.url_token import url_token
 from ..type_tools import check_int
 from .auth import logout
 from .crossdomain import crossdomain

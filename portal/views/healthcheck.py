@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from flask import Blueprint, current_app
 from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
+from flask import Blueprint, current_app
 import redis
 from sqlalchemy import text
 

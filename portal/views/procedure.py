@@ -6,9 +6,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
-from ..models.qb_timeline import invalidate_users_QBT
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxNotStartedConstants, TxStartedConstants
+from ..models.qb_timeline import invalidate_users_QBT
 from ..models.user import current_user, get_user_or_abort
 from .crossdomain import crossdomain
 

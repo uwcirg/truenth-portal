@@ -22,9 +22,9 @@ from portal.models.questionnaire_bank import (
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.views.reporting import generate_overdue_table_html
-from tests import TestCase, TEST_USER_ID, associative_backdate
-from tests.test_questionnaire_bank import TestQuestionnaireBank
+from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
+from tests.test_questionnaire_bank import TestQuestionnaireBank
 
 
 class TestReporting(TestCase):
