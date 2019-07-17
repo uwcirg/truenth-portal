@@ -8,8 +8,8 @@ Create Date: 2019-04-23 11:29:22.633160
 import re
 
 from portal.database import db
-from portal.models.organization import OrganizationIdentifier
 from portal.models.identifier import Identifier
+from portal.models.organization import OrganizationIdentifier
 from portal.models.user import UserIdentifier
 from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 

@@ -6,16 +6,17 @@ Create Date: 2019-02-21 12:23:53.525121
 
 """
 import copy
+import logging
+
 from flask import current_app
 from flask_swagger import swagger
 import jsonschema
-import logging
 
 from portal.database import db
-from portal.system_uri import DECISION_SUPPORT_GROUP
 from portal.models.audit import Audit
-from portal.models.user import User
 from portal.models.questionnaire_response import QuestionnaireResponse
+from portal.models.user import User
+from portal.system_uri import DECISION_SUPPORT_GROUP
 
 # revision identifiers, used by Alembic.
 revision = '69af4bd9ac9a'
