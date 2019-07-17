@@ -222,6 +222,10 @@ def login_user_with_provider(request, provider):
                 subject_id=user.id,
                 context='login'
             )
+            # Potential path for invited users, now coming in with
+            # matching email from external IdP.  Clear any pre-registered
+            # roles if found.
+            user.remove_pre_registered_roles()
         else:
             # This user has never logged in before.
             # Create a new entry in the user table.
