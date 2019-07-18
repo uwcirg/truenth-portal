@@ -1239,6 +1239,13 @@ class User(db.Model, UserMixin):
             role_list=[role for role in self.roles if role not in role_list],
             acting_user=acting_user)
 
+    def remove_pre_registered_roles(self):
+        non_registered_roles = current_app.config['PRE_REGISTERED_ROLES']
+        self.update_roles(
+            [role for role in self.roles if role.name not in
+             non_registered_roles],
+            acting_user=self)
+
     def update_roles(self, role_list, acting_user):
         """Update user's roles
 
@@ -1540,11 +1547,7 @@ class User(db.Model, UserMixin):
         self.merge_with(registered_user.id)
 
         # remove special roles from invited user, if present
-        non_registered_roles = current_app.config['PRE_REGISTERED_ROLES']
-        self.update_roles(
-            [role for role in self.roles if role.name not in
-             non_registered_roles],
-            acting_user=self)
+        self.remove_pre_registered_roles()
 
         # delete temporary registered user account
         registered_user.delete_user(acting_user=self)
