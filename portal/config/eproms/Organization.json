@@ -2151,6 +2151,11 @@
           "valueCodeableConcept": {
             "coding": [
               {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
                 "code": "pt_BR",
                 "display": "Portuguese (Brazil)",
                 "system": "urn:ietf:bcp:47"
@@ -2164,7 +2169,7 @@
         }
       ],
       "id": 28000,
-      "language": "pt_BR",
+      "language": "en_US",
       "name": "Brazil (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
@@ -2192,7 +2197,7 @@
           "value": "146-63"
         }
       ],
-      "language": "pt_BR",
+      "language": "en_US",
       "name": "Centro de Pesquisa em Oncologia",
       "partOf": {
         "reference": "api/organization/28000"
