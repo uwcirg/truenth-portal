@@ -2263,6 +2263,34 @@
     {
       "extension": [
         {
+          "timezone": "America/Sao_Paulo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146101,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-101"
+        }
+      ],
+      "language": "en_US",
+      "name": "Instituto do Câncer e Transplante",
+      "partOf": {
+        "reference": "api/organization/28000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
