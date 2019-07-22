@@ -2207,6 +2207,34 @@
     {
       "extension": [
         {
+          "timezone": "America/Sao_Paulo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14678,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-78"
+        }
+      ],
+      "language": "en_US",
+      "name": "Centro de Paulista de Oncologia",
+      "partOf": {
+        "reference": "api/organization/28000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
