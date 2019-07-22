@@ -8,7 +8,7 @@ var tnthDates =  { /*global i18next */
         d = parseInt(d);
         y = parseInt(y);
         var errorField = $("#" + errorFieldId);
-        if (!m || !d || !/(19|20)\d{2}/.test(y)) {  /* prevent premature validation until year has been entered */
+        if (!m || !d || !/\d{4}/.test(y)) {  /* prevent premature validation until year has been entered */
             errorField.html("");
             return false;
         }
