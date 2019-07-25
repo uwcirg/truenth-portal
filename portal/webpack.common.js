@@ -7,7 +7,6 @@ module.exports = {
         "account": JsSrcPath+"/accountCreation.js",
         "admin": JsSrcPath+"/admin.js",
         "assessmentReport": JsSrcPath+"/assessmentReport.js",
-        "communications": JsSrcPath+"/communications.js",
         "CookieMonster": JsSrcPath+"/CookieMonster.js",
         "coredata": JsSrcPath+"/coredata.js",
         "initialQueries": JsSrcPath+"/initialQueries.js",
