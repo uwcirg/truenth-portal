@@ -16,7 +16,6 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
-from past.builtins import basestring
 from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -459,7 +458,7 @@ class User(db.Model, UserMixin):
         # Called in different contexts - only compare string
         # value if it's a base string type, as opposed to when
         # its being used in a query statement (email.ilike('foo'))
-        if isinstance(self._email, basestring):
+        if isinstance(self._email, str):
             if self._email.startswith(INVITE_PREFIX):
                 # strip the invite prefix for UI
                 return self._email[len(INVITE_PREFIX):]

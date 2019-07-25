@@ -10,7 +10,6 @@ import alembic.config
 import click
 from flask import url_for
 from flask_migrate import Migrate
-from past.builtins import basestring
 import redis
 import requests
 from sqlalchemy import func
@@ -366,7 +365,7 @@ def config(config_key):
         return
     print(json.dumps(
         # Skip un-serializable values
-        {k: v for k, v in app.config.items() if isinstance(v, basestring)},
+        {k: v for k, v in app.config.items() if isinstance(v, str)},
         indent=2,
     ))
 

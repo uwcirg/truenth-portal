@@ -1,5 +1,3 @@
-from past.builtins import basestring
-
 from ..database import db
 
 
@@ -23,7 +21,7 @@ class ValueQuantity(db.Model):
             try:
                 self.value = int(value) != 0
             except (TypeError, ValueError) as e:
-                if value is None or isinstance(value, basestring):
+                if value is None or isinstance(value, str):
                     pass
                 else:
                     raise e
