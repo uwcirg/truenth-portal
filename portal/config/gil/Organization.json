@@ -1250,6 +1250,48 @@
       "resourceType": "Organization"
     },
     {
+      "id": 1404,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MD"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Sidney Kimmel"
+        }
+      ],
+      "name": "Sidney Kimmel Comprehensive Cancer Center",
+      "partOf": {
+        "display": "Johns Hopkins University",
+        "reference": "api/organization/1402"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "id": 1405,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MD"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Green Spring Station"
+        }
+      ],
+      "name": "Green Spring Station",
+      "partOf": {
+        "display": "Johns Hopkins University",
+        "reference": "api/organization/1402"
+      },
+      "resourceType": "Organization"
+    },
+    {
       "extension": [
         {
           "timezone": "America/New_York",
