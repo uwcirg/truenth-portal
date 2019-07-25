@@ -45,7 +45,7 @@ ENV \
     RUN_USER=www-data
 
 # Install locally from $ARTIFACT_DIR by default
-ARG debian_sources_entry="deb file:${ARTIFACT_DIR} ./"
+ARG debian_sources_entry="deb [trusted=yes] file:${ARTIFACT_DIR} ./"
 
 RUN echo $debian_sources_entry > /etc/apt/sources.list.d/truenth-portal.list
 
@@ -54,7 +54,7 @@ COPY --from=builder "${ARTIFACT_DIR}" "${ARTIFACT_DIR}"
 
 RUN \
     apt-get update --quiet > /dev/null && \
-    apt-get install --quiet --quiet --allow-unauthenticated portal && \
+    apt-get install --quiet --quiet portal && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 ENV \
