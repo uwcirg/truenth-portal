@@ -12,11 +12,11 @@
                 {% endfor %}
             {% else %}
                 {% if helpText %}
-                    <div class="text-muted" style="margin-left: 8px;font-size:0.87em">{{ helpText|safe }}</div>
+                    <div class="text-muted" style="margin-left: 8px;font-size:0.9em">{{ helpText|safe }}</div>
                 {% endif %}
             {% endif %}
         </div>
-        <div id="{{field.id}}InfoText" class="text-muted" style="font-size:0.87em">{{infoText|safe}}</div>
+        <div id="{{field.id}}InfoText" class="text-muted" style="font-size:0.9em">{{infoText|safe}}</div>
     </div>
 {%- endmacro %}
 

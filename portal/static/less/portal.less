@@ -14,7 +14,7 @@
 }
 @baseFontSize:    16px;
 @baseMobileFontSize:  13.8px;
-@headlineSize:    1.50em;
+@headlineSize:    1.45em;
 @subheadSize:     1.25em;
 @subSmallHeadSize: 1.10em;
 @lgFontSize:      1.6em;
@@ -85,9 +85,9 @@
 @dividerColor: #e0e0e0;
 @HRColor:#eee;
 @warningColor: #8a6d3b;
-@inputHeight: 2.4em;
 @disabledOpacity: 0.6;
 @profileItemBgColor: #e8e8e8;
+@inputHeight: 2.5em;
 
 
 /**
@@ -337,6 +337,22 @@ a.btn {
   visibility: hidden !important;
 }
 
+#socialMediaRegistrationContainer {
+  .profile-item-title {
+    margin-bottom: 0.5em;
+  }
+}
+#regForm {
+  .or-divider {
+    width: 95%;
+    left: -2.5%;
+    margin: -1.75em auto 20px auto;
+  }
+  .or {
+    left: -2.5%;
+    margin: 1.5em auto;
+  }
+}
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #loginForm input[type="submit"],
@@ -647,7 +663,6 @@ select:not([multiple]) {
   }
 }
 #profileSiteId {
-  width: 300px;
   max-width: 100%;
 }
 
@@ -723,7 +738,7 @@ div.right-panel {
 #termsText {
   padding: 0.5em;
   ol {
-    padding: 1em;
+    padding: 1em 1em 0.25em;
   }
 }
 #agreeLabel {
@@ -743,7 +758,9 @@ div.right-panel {
 }
 #topTerms .terms-checkbox-container {
   margin-left: 0;
-  margin-top: 0.5em;
+  margin-top: 0;
+  border-top: 1px solid @HRColor;
+  padding-top: 12px;
 }
 #termsCheckbox {
   width: 1000px;
@@ -770,6 +787,7 @@ div.right-panel {
   }
 }
 .terms-tick-box-text {
+  font-weight: 600;
   float: left;
   margin-left: 4px;
   width: 93%;
@@ -806,6 +824,9 @@ div.right-panel {
     margin: 1em auto;
     padding: 0.5em 0;
     display: none;
+    .profile-item-title {
+      margin-bottom: 0.5em;
+    }
   }
   #buttonsContainer {
     width: 350px;
@@ -814,7 +835,7 @@ div.right-panel {
     position: relative;
   }
   #buttonsContainer.continue {
-    margin: 1em auto;
+    margin: 0.5em auto;
   }
   .iq-container {
     width: 100%;
@@ -844,17 +865,26 @@ div.right-panel {
   }
   .iq-container .content-body {
     background: @wellColor;
-    padding: 8em 2.5em 5em 2.5em;
+    padding: 7.5em 3em 3em 3em;
     margin: 2em auto;
+    .radio {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      input[type=radio] {
+        top: -2px;
+        left: 2px;
+      }
+    }
   }
   .iq-container .subtitle {
-    color: sectionTitleColor;
+    color: @sectionTitleColor;
     margin: 1em auto;
     font-size: @subSmallHeadSize;
     position: relative;
   }
   .iq-container #clinics {
     margin-top: 2em;
+    margin-bottom: 1.5em;
   }
   input[type='text'],
   select,
@@ -881,6 +911,33 @@ div.right-panel {
   #nameGroup {
     margin-top: 2.5em;
     position: relative;
+    .dummy {
+      display: none;
+    }
+  }
+  @media(min-width: 768px) {
+    #nameGroup {
+      .dummy {
+        display: inline-block;
+      }
+    }
+  }
+  #bdGroup {
+    margin-top: 8px;
+  }
+  #rolesGroup {
+    margin-bottom: 20px;
+    input {
+      float: left;
+      display: inline-block;
+      margin-right: 12px;
+      height: 1.5em;
+      vertical-align: top;
+    }
+    label {
+      width: 95%;
+      max-width: 100%;
+    }
   }
   .bd-optional {
     display: none;
@@ -922,7 +979,7 @@ div.right-panel {
     left: 0;
     color: #fff;
     display: block;
-    height: 6em;
+    height: 5em;
     line-height: 58px;
     background-color: #FFF;
     background: -moz-linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
@@ -932,6 +989,11 @@ div.right-panel {
     border-top: 1px solid rgba(203, 210, 217, 0.2);
     border-left: 1px solid rgba(203, 210, 217, 0.2);
     font-size: @subheadSize;
+  }
+  @media (min-width: 1200px) {
+    .iq-container .heading {
+      height: 6em;
+    }
   }
   .iq-container .noOrg-container {
     margin-left: 0.8em;
@@ -971,7 +1033,7 @@ div.right-panel {
 #progressWrapper {
   display: none;
   width: 100%;
-  margin: 4% auto 9% auto;
+  margin: 4% auto 8.5% auto;
   position: relative;
   .progressbar {
     counter-reset: step;
@@ -1410,7 +1472,7 @@ div.pull-right {
           display: inline-block;
           line-height: 1.6em;
           vertical-align: top;
-          max-width: 350px;
+          max-width: 325px;
           font-size: @baseMobileFontSize;
         }
         .divider + label {
@@ -1673,7 +1735,7 @@ div.pull-right {
 #patientList {
   padding: 1em 0;
   #patientListOptions {
-    padding: 1em 0 0;
+    padding: 1em 0 0.5em;
     border-bottom: 1px solid #ececec;
     margin-bottom: 2em;
   }
@@ -1699,6 +1761,7 @@ div.pull-right {
 #staffList {
   #staffListOptions {
     border-bottom: 1px solid @HRColor;
+    padding-bottom: 0.5em;
   }
   div.or {
     display: block;
@@ -2134,7 +2197,6 @@ div.pull-right {
     width: 100%;
     .subheader {
       margin-top: 12px;
-      font-size: smaller;
     }
   }
   @media (min-width: 699px) {
@@ -2188,7 +2250,7 @@ div.pull-right {
   }
   .profile-item-container {
       .profile-item-title  {
-        max-width: 150px;
+        max-width: 200px;
       }
    }
   .section-loader {
@@ -2304,7 +2366,7 @@ div.pull-right {
 }
 .profile-item-title {
   color: #5b5e61;
-  margin-bottom: 1.5em;
+  margin-bottom: 1.25em;
   letter-spacing: 1px;
 }
 .profile-name-label, .profile-birthdate-label {
@@ -2324,6 +2386,9 @@ div.pull-right {
 }
 .deceased-date-container {
   margin-top:-18px
+}
+#boolDeathGroup {
+  margin-bottom: 12px;
 }
 .communication-prompt {
   margin-bottom: 1em;
@@ -2416,7 +2481,7 @@ div.main-state-container .noOrg-container {
     line-height: 2em;
   }
   #stateSelector {
-    width: 30%;
+    width: 50%;
     min-width: 150px;
     max-width: 250px;
   }
@@ -2437,7 +2502,11 @@ div.main-state-container .noOrg-container {
 #fillOrgs {
   margin-top: 0.2em;
   &.orgs-by-state {
-    margin-top: 2em;
+    margin-top: 1.5em;
+    .radio {
+      margin-top: 6px !important;
+      margin-bottom: 8px !important;
+    }
   }
   .divider + label {
     margin-left: 0.5em;
@@ -2459,7 +2528,7 @@ div.main-state-container .noOrg-container {
     }
   }
   .parent-org-container {
-    margin: 0.4em 0 0.5em;
+    margin: 0.4em 0 1em;
     input {
       vertical-align: top;
     }
@@ -2482,7 +2551,7 @@ div.main-state-container .noOrg-container {
     margin: 0.75em 0;
     label {
       position: relative;
-      top: 2px;
+      top: 4px;
       left: 6px;
       input {
         display: inline-block;
@@ -2700,6 +2769,7 @@ div.noOrg-container {
     margin: 1em 0;
   }
 }
+
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
@@ -2985,6 +3055,9 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     top: 0;
     margin-right: 0.5em;
   }
+  .close {
+    opacity: 0.8;
+  }
 }
 .modal-header,
 .modal-footer {
@@ -3114,6 +3187,7 @@ color: @labelColor
   label {
   font-weight: normal;
   margin-left: 6px;
+  margin-top: 8px;
   }
   a {
   color:@linkColor;
@@ -3124,6 +3198,9 @@ color: @labelColor
   }
   .terms-container * {
     font-size: @baseMobileFontSize;
+  }
+  .modal-body {
+    padding: 1em 2em 2em;
   }
 }
 .consent-checkbox {
@@ -3250,12 +3327,21 @@ div.org-container {
   margin-left: 0.5em;
 }
 
+#profileProceduresWrapper {
+  .title-text {
+    width: 90%;
+    max-width: 100%;
+    margin-top: 0.5em;
+  }
+}
+
 #profileProcedureContainer {
   table {
     border: 0;
   }
   #tnthproc {
-    max-width: 95%
+    width: 70.5%;
+    max-width: 100%;
   }
   div.input-group.date {
     width: 60%;
@@ -3311,7 +3397,7 @@ div.org-container {
   font-size: 0.96em;
   label {
     margin-right: 0.2em;
-    margin-bottom: 0;
+    margin-bottom: 4px;
   }
   input {
     margin: 0.5em 0;
@@ -3380,7 +3466,15 @@ div.timezone-warning.text-warning {
 #aboutForm {
   .bd-element,
   .biopsy-date-element {
-    margin: 0.5em 0;
+    margin: 0.5em auto;
+  }
+}
+@media (min-width: 992px) {
+  #aboutForm {
+    .bd-element,
+    .biopsy-date-element {
+      margin: 0;
+    }
   }
 }
 
@@ -3402,13 +3496,13 @@ div.timezone-warning.text-warning {
     font-size: @mediumText;
   }
 
-  #altPhone, #email, #phone {
-    width: 300px;
+  #altPhone, #email, #phone, #profileSiteId {
+    width: 320px;
   }
   #profileForm {
     #firstname,
     #lastname {
-      width: 300px;
+      width: 385px;
     }
   }
 }
@@ -3465,6 +3559,14 @@ div.timezone-warning.text-warning {
     margin: 30px 0 20px;
     font-size: @headlineSize;
     letter-spacing: 1px;
+  }
+  .terms-of-use-intro {
+    .tnth-headline {
+      margin: 30px 0 8px;
+    }
+    hr {
+      margin-top: 0 !important;
+    }
   }
   .tnth-subhead {
     font-size: @subheadSize;
@@ -3523,6 +3625,16 @@ div.timezone-warning.text-warning {
     font-size: @formSize;
   }
 
+  #loginForm {
+    #emailInfoText {
+      width: 95%;
+      max-width: 100%;
+      a {
+        font-size: @smallText;
+      }
+    }
+  }
+
   .modal-body {
   font-size: @baseFontSize;
   }
@@ -3553,13 +3665,6 @@ div.timezone-warning.text-warning {
   #wellContainer {
     .tnth-well {
       height: 100%;
-    }
-  }
-
-  #bdGroup {
-    #month {
-      max-width: 100%;
-      width: 250px;
     }
   }
 
@@ -3744,6 +3849,12 @@ div.timezone-warning.text-warning {
   .tnth-splash-bottom-link {
     font-size: 24px;
   }
+  #bdGroup {
+    #month {
+      max-width: 100%;
+      width: 250px;
+    }
+  }
 }
 @media (min-width: 828px) {
  #indexNavBar span.index-list, #indexContainer {
@@ -3861,7 +3972,7 @@ div.timezone-warning.text-warning {
   }
   #aboutForm.full-size {
     max-width: 100%;
-    margin: 2em 0;
+    margin: 0;
     padding: 1em 0;
     #next {
       margin-left: 0;
@@ -4017,15 +4128,15 @@ div.timezone-warning.text-warning {
 .btn-google.disabled,.btn-google[disabled],fieldset[disabled] .btn-google,.btn-google.disabled:hover,.btn-google[disabled]:hover,fieldset[disabled] .btn-google:hover,.btn-google.disabled:focus,.btn-google[disabled]:focus,fieldset[disabled] .btn-google:focus,.btn-google.disabled:active,.btn-google[disabled]:active,fieldset[disabled] .btn-google:active,.btn-google.disabled.active,.btn-google[disabled].active,fieldset[disabled] .btn-google.active{background-color:#dd4b39;border-color:rgba(0,0,0,0.2)}
 .btn-google .badge{color:#dd4b39;background-color:#fff}
 .btn-social-container {
-  width: 400px;
+  width: 425px;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0.5em auto;
   .divider {
     margin: 0.25em;
   }
 }
 #createAcctTxt {
-  margin: 2em 0 0.5em 0;
+  margin: 1em 0 0.5em;
 }
 
 #socialMediaRegistrationContainer .btn-social > :first-child,
@@ -4038,7 +4149,7 @@ div.timezone-warning.text-warning {
 #socialMediaRegistrationContainer .divider,
 #socialMediaLoginContainer .divider
 {
-  height: 0.5em;
+  height: 0.25em;
 }
 .reg-title {
   font-size: @headlineSize;

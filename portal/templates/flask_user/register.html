@@ -4,9 +4,10 @@
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate">
     <div class="row">
-        <div class="col-md-push-3 col-md-5 col-xs-12">
+        <div class="col-md-push-3 col-md-6 col-xs-12">
              <div class="btn-social-container">
                 <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
+                <p id="createAcctTxt" class="profile-item-title">{{ app_text('registration prompt') }}:</p>
                 {{ form.hidden_tag() }}
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
@@ -17,7 +18,6 @@
                 {% set email_field_name = gettext('Email') %}
                 {{ render_field(form.email, label=email_field_name, label_visible=false, tabindex=230, data_customemail="true", class="input-field") }}
                 {% endif %}
-                <p id="createAcctTxt" class="profile-item-title">{{ app_text('registration prompt') }}</p>
                 <div class="password-wrapper">
                 {% set password_label = gettext('Password') %}
                 {% set password_data_error = gettext('Oops, the password does not meet the minimum requirements.') %}
@@ -30,11 +30,11 @@
                 {% set retype_data_error = gettext('Please re-type your password.') %}
                 {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
-                <br/>
+
                 <div class="form___submit_container">
                     {{ render_submit_field(form.submit, _("Register"), tabindex=280) }}
                 </div>
-                <br/><br/><br/>
+                <br/>
                 <div class="divider"></div>
                 <div class="or">{{_('or')}}</div>
                 <div class="or-divider"></div>
@@ -42,8 +42,7 @@
             </div>
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
-                     <p class="profile-item-title">{{ _("Register using:")}}</p>
-                    <div class="divider"></div>
+                    <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <div>
                         <a href="{{ url_for('facebook.login', provider_name='facebook', next=request.args.get('next')) }}"
                            class="btn btn-social btn-facebook">

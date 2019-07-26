@@ -213,16 +213,16 @@
   {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup" data-profile-section-id="demo">
-        <div class="col-md-5 col-sm-6 col-xs-10">
+        <div class="col-md-6 col-sm-6 col-xs-10">
           <div class="form-group float-input-label">
             <label>Name</label>
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}" v-model="demo.data.name.given" lazy />
             <div class="help-block with-errors"></div>
           </div>
         </div>
-        <div class="col-md-5 col-sm-6 col-xs-10">
+        <div class="col-md-6 col-sm-6 col-xs-10">
           <div class="form-group float-input-label">
-            <label>&nbsp;</label>
+            <label class="dummy">&nbsp;</label>
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" v-model="demo.data.name.family" lazy/>
             <div class="help-block with-errors"></div>
           </div>
@@ -284,7 +284,6 @@
   {% macro patientQGroup(user) -%}
     <div id="patientQ">
         <div id="patBiopsy" data-topic="biopsy" class="pat-q">
-          <br />
           <p class="pat-label">{{ _("Have you had a prostate cancer biopsy?") }}</p>
           <div class="form-group">
             <div class="radio biopsy-option">
