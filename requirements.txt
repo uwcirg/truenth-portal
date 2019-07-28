@@ -51,7 +51,7 @@ python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2019.1              # via babel, celery
 pyyaml==5.1.1              # via flask-swagger, swagger-spec-validator
-redis==3.2.1
+redis==3.3.0
 requests-cache==0.5.0
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
 requests==2.22.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx
