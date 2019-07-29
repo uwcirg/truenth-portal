@@ -489,7 +489,7 @@
         <div id="clinics" data-loader-container="true" data-profile-section-id="orgsstateselector" data-save-container-id="clinics">
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
-               <p class="prompt text-muted">
+               <p class="prompt">
                 {% if  current_user and current_user.has_role(ROLE.STAFF.value) %}
                     {{_("In what state is the patient currently receiving prostate cancer care?")}}
                 {% else %}
@@ -571,7 +571,6 @@
                                 <label class="radio-inline"><input type="radio" name="toConsent" id="{orgId}_consent_no" data-org="{orgId}"  value="no"/>{no}</label>
                             </div>
                         </div>
-                        <br/>
                         <div id="{orgId}_consentAgreementMessage" class="set-consent-error error-message"></div>
                     </div>
                     <br/>
@@ -613,7 +612,6 @@
                               <label class="radio-inline"><input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>{{ _("No") }}</label>
                             </div>
                         </div>
-                        <br/>
                         <div id="{{org}}_consentAgreementMessage" class="set-consent-error error-message"></div>
                      </div>
                      <br/>
@@ -979,7 +977,6 @@
                     </div>
                     {{saveLoaderDiv("boolDeathGroup")}}
                     <div id="deceasedInfo" class="error-message"></div>
-                    <hr/>
                     <div class="form-group">
                         <label class="text-muted">{{_("Deceased Date")}}</label>
                     </div>
@@ -1053,7 +1050,6 @@
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
-                    <br/>
                     <div>{{profileSendEmail(person)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
@@ -1177,7 +1173,7 @@
                 {%- endcall %}
                 {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
                 {% call editSection() -%}
-                    <p class="text-muted">
+                    <p class="title-text text-muted">
                         {%-if current_user and current_user.has_role(ROLE.STAFF.value)-%}
                             {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
                         {%-elif person and current_user and (person.id == current_user.id) -%}

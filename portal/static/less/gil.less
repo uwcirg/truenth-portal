@@ -7332,8 +7332,8 @@ figure.nav-overlay {
 }
 
 .page-intro__main {
-    font-size: 35px;
-    line-height: 40px;
+    font-size: 37px;
+    line-height: 45px;
     font-weight: 700;
     margin-bottom: 25px
 }
@@ -7351,7 +7351,7 @@ figure.nav-overlay {
 }
 
 .page-intro__sub {
-    margin-bottom: 0
+    margin-bottom: 4px;
 }
 
 .page-intro__content {
@@ -8824,9 +8824,16 @@ aside .module--flex {
     width: 400px;
     margin: 0 auto;
     position: relative;
-    padding: 3em;
+    padding: 3em 2em;
     text-align: center;
-    transition: all 0.5s ease-in
+    transition: all 0.5s ease-in;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    figure {
+        top: -2px !important;
+    }
 }
 
 .home--item-container-full {
@@ -8846,14 +8853,16 @@ aside .module--flex {
         margin: .1em 0!important
     }
     .icon-box__button span {
-        font-size: .75em
+        font-size: .75em;
+        padding-left: 12px;
     }
     .icon-box__lowhead {
-        font-size: 1.2em
+        font-size: 1.25em
     }
     .page-intro__main {
         margin-bottom: 0
     }
+
 }
 
 .home--footer-container {
@@ -8950,11 +8959,12 @@ div.modal.fade::-webkit-scrollbar {
 
 .home--item-text {
     font-weight: 400;
-    font-size: 1em;
-    margin: 1.5em 0 .5em 0;
-    padding: .5 .3em;
+    font-size: 1.1em;
+    margin: 0 0 1em 0;
+    padding: 0.5em 0.3em;
     height: 80px;
-    overflow: hidden
+    overflow: hidden;
+    line-height: 1.55;
 }
 
 a.home--modal-link {
@@ -8963,7 +8973,8 @@ a.home--modal-link {
 }
 
 .home--item-text * {
-    font-size: .97em
+    font-size: .97em;
+    line-height: 1.55;
 }
 
 #portalScrollArrow {
@@ -9315,7 +9326,7 @@ a.home--modal-link {
             font-size: .9em
         }
         .icon-box__button--main {
-            height: 66px;
+            height: 54px;
             line-height: 1.5em
         }
     }
