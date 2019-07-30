@@ -48,6 +48,12 @@ def upgrade():
             email=email, id=r[0])
         changed_user_ids.append(r[0])
 
+    # remove any associated auth_provider rows
+    if changed_user_ids:
+        conn.execute(
+            text("DELETE FROM auth_providers WHERE user_id IN :user_ids"),
+            user_ids=tuple(changed_user_ids))
+
     # add audit data
     now = datetime.utcnow()
     version = lookup_version()

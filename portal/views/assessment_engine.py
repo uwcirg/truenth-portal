@@ -870,6 +870,7 @@ def assessment_update(patient_id):
         context='assessment',
     )
     response.update({'message': 'questionnaire response updated successfully'})
+    invalidate_users_QBT(patient.id)
     return jsonify(response)
 
 

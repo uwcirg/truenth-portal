@@ -8,7 +8,7 @@ var tnthDates =  { /*global i18next */
         d = parseInt(d);
         y = parseInt(y);
         var errorField = $("#" + errorFieldId);
-        if (!m || !d || !/(19|20)\d{2}/.test(y)) {  /* prevent premature validation until year has been entered */
+        if (!m || !d || !/\d{4}/.test(y)) {  /* prevent premature validation until year has been entered */
             errorField.html("");
             return false;
         }
@@ -145,16 +145,26 @@ var tnthDates =  { /*global i18next */
     "getGivenDate": function(y, m, d) {
         return "" + y + m + d;
     },
+    "isSystemDate": function(dateString) {
+        /* IOS (8601) date format test */
+        /**
+         * RegExp to test a string for a full ISO 8601 Date
+         * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
+         *  YYYY-MM-DDThh:mm:ss
+         *  YYYY-MM-DDThh:mm:ssTZD
+         *  YYYY-MM-DDThh:mm:ss.sTZD
+         * @see: https://www.w3.org/TR/NOTE-datetime
+         * @type {RegExp}
+         */
+        var IOSDateTest = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-](\d)?\d:\d\d)|Z)?$/i;
+        return IOSDateTest.test(dateString);
+    },
     "formatDateString": function(dateString, format) { //NB For dateString in ISO-8601 format date as returned from server e.g. '2011-06-29T16:52:48'
         if (dateString) {
-            /* IOS (8601) date format test */
-            var IOSDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
             var d = new Date(dateString);
             var day, month, year, hours, minutes, seconds, nd;
-            if (!IOSDateTest && !isNaN(d) && !this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
-                return "";
-            }
-            if (IOSDateTest.test(dateString)) {
+             /* IOS (8601) date format test */
+            if (this.isSystemDate(dateString)) {
                 //IOS date, no need to convert again to date object, just parse it as is
                 //issue when passing it into Date object, the output date is inconsistent across from browsers
                 var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
@@ -165,6 +175,9 @@ var tnthDates =  { /*global i18next */
                 minutes = dArray[4] || "0";
                 seconds = dArray[5] || "0";
             } else {
+                if (!this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
+                    return "";
+                }
                 day = d.getDate();
                 month = d.getMonth() + 1;
                 year = d.getFullYear();
