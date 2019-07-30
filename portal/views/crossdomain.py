@@ -3,7 +3,6 @@ from datetime import timedelta
 from functools import update_wrapper
 
 from flask import current_app, make_response, request
-from past.builtins import basestring
 
 from ..models.client import validate_origin
 
@@ -45,7 +44,7 @@ def crossdomain(
     """
 
     def get_headers():
-        if headers is not None and not isinstance(headers, basestring):
+        if headers is not None and not isinstance(headers, str):
             return ', '.join(x.upper() for x in headers)
         return headers
 
@@ -59,7 +58,7 @@ def crossdomain(
     def get_origin():
         """Given origin used blind, request.origin requires validation"""
         if origin:
-            if not isinstance(origin, basestring):
+            if not isinstance(origin, str):
                 return ', '.join(origin)
             return origin
 

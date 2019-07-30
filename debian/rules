@@ -6,6 +6,8 @@
 DH_VIRTUALENV_ARGS = \
 	--requirements='requirements.prod.txt' \
 	--python='/usr/bin/python3' \
+	--builtin-venv \
+	--preinstall=wheel \
 	--extra-pip-arg='--progress-bar=off' \
 	--extra-pip-arg='--quiet'
 
