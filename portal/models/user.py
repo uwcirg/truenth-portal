@@ -1,8 +1,5 @@
 """User model """
-from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library  # isort:skip
-standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
 from datetime import datetime, timedelta
@@ -184,7 +181,7 @@ def user_extension_map(user, extension):
 
     :returns: adapter implementing apply_fhir and as_fhir methods
 
-    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+    :raises :py:exc:`ValueError`: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:

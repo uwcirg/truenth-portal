@@ -16,14 +16,10 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization
-from ..models.qb_timeline import qb_status_visit_name, QB_StatusCacheKey
+from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import (
-    current_user,
-    get_user_or_abort,
-    patients_query,
-)
+from ..models.user import current_user, get_user_or_abort, patients_query
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 

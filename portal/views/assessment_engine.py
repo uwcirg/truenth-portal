@@ -1,6 +1,5 @@
 """Assessment Engine API view functions"""
 from datetime import datetime
-import jsonschema
 
 from flask import (
     Blueprint,
@@ -16,6 +15,7 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
+import jsonschema
 import requests
 
 from ..audit import auditable_event

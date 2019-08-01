@@ -6,7 +6,6 @@ integration tests.  For example, does a complicated strategy come
 to life and properly control the visibility of a intervention card?
 
 """
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 import os

@@ -11,7 +11,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-from __future__ import unicode_literals  # isort:skip
 
 import datetime
 import email.parser
@@ -318,6 +317,6 @@ texinfo_documents = [(
 # texinfo_no_detailmenu = False
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/2.7', None),
+    'python': ('https://docs.python.org/3', None),
     'werkzeug': ('http://werkzeug.pocoo.org/docs/latest', None),
 }

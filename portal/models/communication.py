@@ -1,5 +1,4 @@
 """Communication model"""
-from __future__ import unicode_literals  # isort:skip
 
 from collections import MutableMapping
 from datetime import datetime
@@ -23,8 +22,8 @@ from .message import EmailMessage
 from .overall_status import OverallStatus
 from .practitioner import Practitioner
 from .questionnaire_bank import QuestionnaireBank
-from .user import User
 from .url_token import url_token
+from .user import User
 
 # https://www.hl7.org/fhir/valueset-event-status.html
 event_status_types = ENUM(

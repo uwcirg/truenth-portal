@@ -3,7 +3,6 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
-from __future__ import unicode_literals  # isort:skip
 from flask import current_app, url_for
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -613,7 +612,7 @@ def org_extension_map(organization, extension):
 
     :returns: adapter implementing apply_fhir and as_fhir methods
 
-    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+    :raises :py:exc:`ValueError`: if the extension isn't recognized
 
     """
     for kls in org_extension_classes:

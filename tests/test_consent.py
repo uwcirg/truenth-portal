@@ -1,5 +1,4 @@
 """Unit test module for user consent"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
 from time import sleep

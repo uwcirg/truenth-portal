@@ -1,5 +1,4 @@
 """Unit test module for Selenium testing"""
-from __future__ import unicode_literals  # isort:skip
 
 import os
 import sys

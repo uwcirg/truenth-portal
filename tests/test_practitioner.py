@@ -1,5 +1,4 @@
 """Unit test module for Practitioner module"""
-from __future__ import unicode_literals  # isort:skip
 
 import json
 

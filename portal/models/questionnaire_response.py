@@ -1,10 +1,10 @@
 from collections import namedtuple
 from html.parser import HTMLParser
 import json
-import jsonschema
 
 from flask import current_app, url_for
 from flask_swagger import swagger
+import jsonschema
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 

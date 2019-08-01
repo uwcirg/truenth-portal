@@ -1,5 +1,4 @@
 """Auth related view functions"""
-from __future__ import unicode_literals  # isort:skip
 
 import base64
 from datetime import datetime

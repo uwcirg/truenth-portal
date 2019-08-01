@@ -5,9 +5,10 @@ Revises: ee3a3a61484f
 Create Date: 2019-05-15 15:27:05.531769
 
 """
-from alembic import op
 import logging
 import re
+
+from alembic import op
 from sqlalchemy.sql import text
 
 from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM

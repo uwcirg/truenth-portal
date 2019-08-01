@@ -8,8 +8,8 @@ from flask_babel import force_locale
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
-from ..dogpile_cache import dogpile_cache
 from ..date_tools import FHIR_datetime
+from ..dogpile_cache import dogpile_cache
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .clinical_constants import CC
 from .communication import load_template_args

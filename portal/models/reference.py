@@ -99,7 +99,7 @@ class Reference(object):
             the referenced object can not be found
         :raises :py:exc:`portal.models.reference.MultipleReference`: if
             the referenced object retrieves multiple results
-        :raises :py:exc:`exceptions.ValueError`: if the text format
+        :raises :py:exc:`ValueError`: if the text format
             can't be parsed
 
         """

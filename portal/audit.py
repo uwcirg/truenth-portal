@@ -8,7 +8,6 @@ auditable_event()
 Audit data is also persisted in the database *audit* table.
 
 """
-from __future__ import unicode_literals  # isort:skip
 
 import logging
 import os

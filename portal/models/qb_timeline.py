@@ -1,10 +1,11 @@
-from datetime import datetime, MAXYEAR
+from datetime import MAXYEAR, datetime
+from time import sleep
+
 from dateutil.relativedelta import relativedelta
 from flask import current_app
-from sqlalchemy.types import Enum as SQLA_Enum
 import redis
 from redis.exceptions import ConnectionError
-from time import sleep
+from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
 from ..audit import auditable_event
@@ -16,8 +17,8 @@ from ..trace import trace
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire_bank import (
-    qbs_by_rp,
     qbs_by_intervention,
+    qbs_by_rp,
     trigger_date,
     visit_name,
 )

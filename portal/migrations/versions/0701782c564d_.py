@@ -10,13 +10,13 @@ import logging
 from portal.database import db
 from portal.models.audit import Audit
 from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.user import User
 from portal.models.user_consent import (
-    STAFF_EDITABLE_MASK,
     INCLUDE_IN_REPORTS_MASK,
     SEND_REMINDERS_MASK,
+    STAFF_EDITABLE_MASK,
     UserConsent,
 )
-from portal.models.user import User
 
 # revision identifiers, used by Alembic.
 revision = '0701782c564d'

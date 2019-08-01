@@ -8,39 +8,45 @@ options:
     py.test --help
 
 """
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
+
 from flask import url_for
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
 
-from portal.factories.app import create_app
 from portal.config.config import TestConfig
 from portal.database import db
+from portal.factories.app import create_app
 from portal.models.audit import Audit
 from portal.models.client import Client
-from portal.models.clinical_constants import add_static_concepts, CC
+from portal.models.clinical_constants import CC, add_static_concepts
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.communication_request import CommunicationRequest
 from portal.models.encounter import Encounter
 from portal.models.identifier import Identifier
-from portal.models.intervention import add_static_interventions, INTERVENTION
-from portal.models.organization import Organization, add_static_organization
-from portal.models.organization import OrgTree
+from portal.models.intervention import INTERVENTION, add_static_interventions
+from portal.models.organization import (
+    Organization,
+    OrgTree,
+    add_static_organization,
+)
 from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
-from portal.models.role import Role, add_static_roles, ROLE
+from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles, get_user
-from portal.models.user_consent import UserConsent, SEND_REMINDERS_MASK
-from portal.models.user_consent import STAFF_EDITABLE_MASK
-from portal.models.user_consent import INCLUDE_IN_REPORTS_MASK
+from portal.models.user_consent import (
+    INCLUDE_IN_REPORTS_MASK,
+    SEND_REMINDERS_MASK,
+    STAFF_EDITABLE_MASK,
+    UserConsent,
+)
 from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
 
 DEFAULT_PASSWORD = 'fakePa$$'

@@ -1,5 +1,4 @@
 """Module to test Recur model"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
 
