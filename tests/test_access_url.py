@@ -1,5 +1,4 @@
 """Unit test module for access URLs"""
-from __future__ import unicode_literals  # isort:skip
 
 from flask import url_for
 

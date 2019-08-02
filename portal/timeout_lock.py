@@ -1,7 +1,7 @@
 import time
-import redis
 
 from flask import current_app
+import redis
 
 
 class LockTimeout(BaseException):

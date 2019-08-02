@@ -1,5 +1,4 @@
 """Unit test module for Encounter API and model"""
-from __future__ import unicode_literals  # isort:skip
 
 import json
 import os

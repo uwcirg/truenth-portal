@@ -1,5 +1,4 @@
 """Portal module"""
-from __future__ import print_function
 
 import email.parser
 import logging

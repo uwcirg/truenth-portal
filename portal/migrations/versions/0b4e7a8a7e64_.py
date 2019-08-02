@@ -8,11 +8,10 @@ Create Date: 2019-03-18 16:01:13.361506
 import sqlalchemy as sa
 
 from portal.database import db
+from portal.models.qb_timeline import QBT
+from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRoles
 from portal.models.user_consent import UserConsent
-from portal.models.qb_timeline import QBT
-from portal.models.role import Role, ROLE
-
 
 # revision identifiers, used by Alembic.
 revision = '0b4e7a8a7e64'

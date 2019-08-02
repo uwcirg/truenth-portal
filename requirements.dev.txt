@@ -21,7 +21,7 @@ pytest==4.6.3
 selenium==3.141.0
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
-sphinx==2.1.2;python_version >= '3'
+sphinx==2.1.2
 sphinxcontrib-websupport==1.1.2  # via sphinx
 tox==3.13.2
 typing==3.7.4             # via sphinx

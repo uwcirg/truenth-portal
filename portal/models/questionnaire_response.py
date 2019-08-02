@@ -1,11 +1,10 @@
 from collections import namedtuple
 from html.parser import HTMLParser
 import json
-import jsonschema
 
 from flask import current_app, url_for
 from flask_swagger import swagger
-from past.builtins import basestring
+import jsonschema
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
@@ -734,7 +733,7 @@ def generate_qnr_csv(qnr_bundle):
                     column = csv_null_value if column is None else column
 
                     # Handle JSON column escaping/enclosing
-                    if not isinstance(column, basestring):
+                    if not isinstance(column, str):
                         column = json.dumps(column).replace('"', '""')
                     row.append('"' + column + '"')
 

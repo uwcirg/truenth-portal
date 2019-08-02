@@ -1,6 +1,5 @@
 from alembic import op
 
-
 """rename DSTU2 Questionnaire.group to item
 
 Revision ID: e5aec2aebe7e

@@ -6,8 +6,9 @@ Create Date: 2019-07-09 15:34:06.820410
 
 """
 
-from alembic import op
 from datetime import datetime
+
+from alembic import op
 from sqlalchemy.sql import text
 
 from portal.models.audit import lookup_version

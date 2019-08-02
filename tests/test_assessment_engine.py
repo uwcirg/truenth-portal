@@ -1,13 +1,12 @@
 """Unit test module for Assessment Engine API"""
-from __future__ import unicode_literals  # isort:skip
-from dateutil.relativedelta import relativedelta
 import json
-import jsonschema
-import pytest
 import os
 
+from dateutil.relativedelta import relativedelta
 from flask_swagger import swagger
 from flask_webtest import SessionScope
+import jsonschema
+import pytest
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db

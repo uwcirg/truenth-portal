@@ -1,5 +1,4 @@
 """Unit test module for auth"""
-from __future__ import unicode_literals  # isort:skip
 from collections import namedtuple
 import datetime
 

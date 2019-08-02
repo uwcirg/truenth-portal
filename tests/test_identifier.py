@@ -1,8 +1,8 @@
 """Test identifiers"""
-from __future__ import unicode_literals  # isort:skip
+
+import json
 
 from flask_webtest import SessionScope
-import json
 import pytest
 from werkzeug.exceptions import Conflict
 

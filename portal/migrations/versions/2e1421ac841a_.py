@@ -9,7 +9,7 @@ import sqlalchemy as sa
 
 from portal.database import db
 from portal.models.qb_timeline import QBT
-from portal.models.role import Role, ROLE
+from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRoles
 from portal.models.user_consent import UserConsent
 

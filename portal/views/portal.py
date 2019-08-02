@@ -1,5 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from pprint import pformat
@@ -76,8 +75,8 @@ from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import User, current_user, get_user_or_abort
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
+from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
 from ..type_tools import check_int

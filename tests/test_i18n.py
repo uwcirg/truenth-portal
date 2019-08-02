@@ -1,5 +1,4 @@
 """Unit test module for internationalization logic"""
-from __future__ import unicode_literals  # isort:skip
 
 from flask import current_app
 from flask_login import login_user

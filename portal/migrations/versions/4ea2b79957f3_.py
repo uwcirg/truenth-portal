@@ -6,11 +6,12 @@ Create Date: 2019-04-30 12:17:03.382443
 
 """
 import re
-from sqlalchemy.orm.session import Session
-from alembic import op
 
-from portal.models.organization import OrganizationIdentifier
+from alembic import op
+from sqlalchemy.orm.session import Session
+
 from portal.models.identifier import Identifier
+from portal.models.organization import OrganizationIdentifier
 from portal.models.user import UserIdentifier
 from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 

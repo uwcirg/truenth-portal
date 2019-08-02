@@ -5,7 +5,9 @@
 # https://dh-virtualenv.readthedocs.io/en/1.1/usage.html
 DH_VIRTUALENV_ARGS = \
 	--requirements='requirements.prod.txt' \
-	--python='/usr/bin/python2' \
+	--python='/usr/bin/python3' \
+	--builtin-venv \
+	--preinstall=wheel \
 	--extra-pip-arg='--progress-bar=off' \
 	--extra-pip-arg='--quiet'
 
@@ -38,6 +40,7 @@ override_dh_builddeb:
 	# avoid calling `flask` script directly
 	# import paths are relative to venv *after* .deb installation
 	cd / && \
+	LANG=C.UTF-8 \
 	FLASK_APP='$(VENV_BUILD_DIR)/portal/bin/manage.py' \
 	SECRET_KEY='' \
 	PATH='$(VENV_BUILD_DIR)/portal/bin' \

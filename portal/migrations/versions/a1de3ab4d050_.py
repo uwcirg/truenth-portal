@@ -6,7 +6,9 @@ Create Date: 2019-02-11 16:48:55.332527
 
 """
 import json
+
 from sqlalchemy import func
+
 from portal.database import db
 from portal.dict_tools import dict_compare
 from portal.models.audit import Audit

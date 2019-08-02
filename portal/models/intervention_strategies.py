@@ -13,7 +13,6 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 import json

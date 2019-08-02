@@ -1,5 +1,4 @@
 """Unit test module for address model"""
-from __future__ import unicode_literals  # isort:skip
 
 from portal.models.address import Address
 from tests import TestCase

@@ -1,5 +1,4 @@
 """SSL extension module"""
-from __future__ import unicode_literals  # isort:skip
 
 from logging.handlers import SMTPHandler
 
