@@ -1,4 +1,3 @@
-
 from sqlalchemy.orm.util import class_mapper
 
 import _thread

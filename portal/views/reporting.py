@@ -1,6 +1,3 @@
-
-
-
 from collections import defaultdict
 import csv
 from datetime import datetime

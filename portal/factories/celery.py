@@ -1,4 +1,3 @@
-
 from celery import Celery
 
 from ..extensions import db

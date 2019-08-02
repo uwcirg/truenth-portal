@@ -1,4 +1,3 @@
-
 from logging.config import fileConfig
 
 # add your model's MetaData object here

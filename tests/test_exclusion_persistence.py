@@ -1,4 +1,3 @@
-
 import json
 from os.path import join as path_join
 from shutil import rmtree
