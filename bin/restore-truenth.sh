@@ -8,10 +8,13 @@ repo_path="${bin_path}/.."
 usage() {
     cat << USAGE >&2
 Usage:
-    $cmdname
+    $cmdname [-h] [-s dump.sql] [-u upload_dir]
 
     Restore a deployment from archived files
 
+    -h     Show this help message
+    -s     Restore the databases from given SQL dump
+    -u     Restore user uploads from given directory
 
 USAGE
     exit 1
