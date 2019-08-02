@@ -50,16 +50,16 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
-    echo "Stopping containers"
+    echo "Stopping containers..."
     docker-compose stop web celeryworker celerybeat
 
-    echo "Dropping existing DB"
+    echo "Dropping existing DB..."
     docker-compose exec db dropdb --username postgres portaldb
 
-    echo "Creating empty DB"
+    echo "Creating empty DB..."
     docker-compose exec db createdb --username postgres portaldb
 
-    echo "Loading SQL dumpfile: ${SQL_DUMP}"
+    echo "Loading SQL dumpfile: ${SQL_DUMP}..."
     # Disable pseudo-tty allocation
     docker-compose exec -T db psql --dbname portaldb --username postgres < "${SQL_DUMP}"
     echo "Loaded SQL dumpfile"
@@ -69,7 +69,7 @@ if [ -n "$UPLOADS_DIR" ]; then
     web_file_upload_dir="$(docker-compose exec web flask config -c FILE_UPLOAD_DIR | grep --invert-match DEBUG | tr --delete '[:space:]')"
     web_container_id=$(docker-compose ps --quiet web)
 
-    echo "Copying files from ${UPLOADS_DIR} to container upload dir (${web_file_upload_dir})"
+    echo "Copying files from ${UPLOADS_DIR} to container upload dir (${web_file_upload_dir})..."
     # copy each file individually, to avoid overwriting entire upload directory
     find "${UPLOADS_DIR}" -type f -exec \
         docker cp {} "${web_container_id}":"${web_file_upload_dir}" \; -print
