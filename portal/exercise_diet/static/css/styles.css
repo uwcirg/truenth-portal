@@ -38,6 +38,11 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
     padding-top: 4em;
     padding-bottom: 3em;
 }
+@media (min-width: 800px) {
+    .main.exercise-diet .header {
+        margin-top: 12px;
+    }
+}
 .main.portal .Hero-title h2 {
     margin-top: -1em;
 }
@@ -46,6 +51,66 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 	position: relative;
 	display: block;
 	margin: 0px auto;
+}
+.page-exercise-diet-portal #Exercise-Diet_Acknowledgement {
+    display: none;
+}
+#Exercise-Diet_Acknowledgement {
+    background: #3B4449;
+    padding: 90px 0;
+}
+#Exercise-Diet_Acknowledgement .accent-heading {
+    color: #D2D1C5;
+}
+#Exercise-Diet_Acknowledgement .objective-content {
+    margin: 0px auto;
+    padding-left: 2em;
+    padding-right: 2em;
+    z-index: 100;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    font-size: 20px;
+    line-height: 1.4;
+    color: #FFF;
+}
+#Exercise-Diet_Acknowledgement .module__body {
+    font-size: 18px;
+    text-align: left;
+    max-width: 100%;
+}
+#Exercise-Diet_Acknowledgement .mini-box {
+    padding: 30px 40px;
+}
+#Exercise-Diet_Acknowledgement .mini-box__copy {
+    padding: 0 0 8px;
+}
+#Exercise-Diet_Acknowledgement .mini-box__copy,
+#Exercise-Diet_Acknowledgement .mini-box__head {
+    text-align: left;
+}
+#Exercise-Diet_Acknowledgement .mini-mini-box {
+    display: flex;
+    flex-wrap: wrap;
+}
+#Exercise-Diet_Acknowledgement .mini-mini-box__item {
+    margin-right: 24px;
+}
+#Exercise-Diet_Acknowledgement .accent-heading--no-border {
+    padding-bottom: 20px;
+}
+@media (min-width: 992px) {
+    #Exercise-Diet_Acknowledgement .accent-heading--no-border {
+        padding-bottom: 40px;
+    }
+    #Exercise-Diet_Acknowledgement .objective-content {
+        width: 875px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+    #Exercise-Diet_Acknowledgement .module__body {
+        font-size: 24px;
+    }
 }
 #Exercise-Diet-Portal h1 {
 	position: relative;
@@ -62,7 +127,8 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
     max-width: 740px;
     border: 0;
 }
-#Exercise-Diet-Portal h2 {
+#Exercise-Diet-Portal h2,
+#Exercise-Diet_Acknowledgement h2 {
 	position: relative;
 	display: block;
 	margin: 0px auto 25px;
@@ -78,13 +144,15 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 }
 @media (min-width: 400px) {
     #Exercise-Diet-Portal h1,
-    #Exercise-Diet-Portal h2 {
+    #Exercise-Diet-Portal h2,
+    #Exercise-Diet_Acknowledgement h2 {
         font-size: 30px;
     }
 }
 @media (min-width: 699px) {
     #Exercise-Diet-Portal h1,
-    #Exercise-Diet-Portal h2 {
+    #Exercise-Diet-Portal h2,
+    #Exercise-Diet_Acknowledgement h2 {
         font-size: 35px;
     }
 }
