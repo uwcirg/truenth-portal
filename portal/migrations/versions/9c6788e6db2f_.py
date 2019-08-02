@@ -19,7 +19,8 @@ down_revision = 'c242e22f5a47'
 
 def upgrade():
     sys_user = User.query.filter_by(email='__system__').one()
-    if len(sys_user.roles) != 1 or not sys_user.has_role(ROLE.ADMIN.value):
+    if not(len(sys_user.roles) == 1 and
+           sys_user.has_role(ROLE.ADMIN.value)):
         admin_only = Role.query.filter(Role.name == ROLE.ADMIN.value).all()
         sys_user.update_roles(role_list=admin_only, acting_user=sys_user)
 
