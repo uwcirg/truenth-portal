@@ -25,6 +25,7 @@ const TOPNAV = "topnav";
 const PSATRACKER = "psaTracker";
 const ORGTREEVIEW = "orgTreeView";
 const cleancss = require("clean-css");
+const postCSS = require("gulp-clean-css"); //gulp wrapper around clean-css to minify css
 
 /*eslint no-console: off */
 
@@ -80,6 +81,7 @@ const epromsLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../../" + mapPath))
         .pipe(dest(EPROMSPath + cssPath));
     callback();
@@ -97,6 +99,7 @@ const portalLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* see documentation, https://www.npmjs.com/package/gulp-sourcemaps, to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
         .on("end", function() {
@@ -118,6 +121,7 @@ const gilLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(GILPath + cssPath))
         .on("end", function() {
@@ -137,6 +141,7 @@ const topnavLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
         .on("end", function() {
@@ -157,6 +162,7 @@ const psaTrackerLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
         .on("end", function() {
@@ -176,6 +182,7 @@ const orgTreeViewLess = function(callback) {
         .pipe(less({
             plugins: [cleancss]
         }))
+        .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
         .on("end", function() {
