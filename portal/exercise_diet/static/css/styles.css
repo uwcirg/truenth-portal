@@ -35,13 +35,8 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 }
 .main.exercise-diet {
     top: 0em;
-    padding-top: 4em;
+    padding-top: 4.5em;
     padding-bottom: 3em;
-}
-@media (min-width: 800px) {
-    .main.exercise-diet .header {
-        margin-top: 12px;
-    }
 }
 .main.portal .Hero-title h2 {
     margin-top: -1em;
