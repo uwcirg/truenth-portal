@@ -93,7 +93,7 @@
                     });
 
                 } else {
-                    self.caption.lastUpdated = sessionAuthoredDate;
+                    self.caption.lastUpdated = sessionAuthoredDate; //display the date/time as is
                 }
                 self.caption.timezone = i18next.t("GMT, Y-M-D");
                 (entry.group.question).forEach(function(entry) {
