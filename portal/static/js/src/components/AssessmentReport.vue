@@ -62,8 +62,6 @@
                 url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId
             }).done(function(data) {
                 var sessionAuthoredDate = $("#_report_authored_date").val();
-                console.log("date: ", sessionAuthoredDate);
-                ///
                 self.errorMessage = "";
                 if (data.error) {
                     self.errorMessage = self.serverError;
