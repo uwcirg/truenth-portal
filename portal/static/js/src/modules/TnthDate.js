@@ -176,7 +176,7 @@ var tnthDates =  { /*global i18next */
                 seconds = dArray[5] || "0";
             } else {
                 if (!this.isDateObj(d)) { //note instantiating ios formatted date using Date object resulted in error in IE
-                    return "";
+                    return dateString; //return dateString as is without any parsing
                 }
                 day = d.getDate();
                 month = d.getMonth() + 1;
