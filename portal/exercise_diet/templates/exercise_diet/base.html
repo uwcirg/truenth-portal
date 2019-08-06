@@ -28,6 +28,42 @@
         </div>
     {% endblock %}
 {% endblock %}
+{% block footnote %}
+    <!-- content currently hardcoded can change to retrieval via LR if need to-->
+    <div class="footnote-container">
+        <div id="Exercise-Diet_Acknowledgement">
+            <div class="accent-heading accent-heading--no-border">{{_("ACKNOWLEDGEMENT")}}</div>
+            <div class="objective-content">
+                <p class="module__body module__body--left">{{_("This resource was designed and developed by a multi-disciplinary team of scientists and health care professionals as part of the TrueNTH collaborative network, led by:")}}</p><!-- OHSU (Kerri Winters-Stone and Kimi Daniels) and UCSF (June Chan, Erin Van BLarigan, Greta Macaire, and Stacey Kenfield).-->
+                <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
+                    <div class="mini-boxes__item">
+                        <div class="mini-box">
+                            <h5 class="mini-box__head">OHSU</h5>
+                            <p class="mini-box__copy">Kerri Winters-Stone</p>
+                            <p class="mini-box__copy">Kimi Daniels</p>
+                        </div>
+                    </div>
+                    <div class="mini-boxes__item">
+                        <div class="mini-box">
+                            <h5 class="mini-box__head">UCSF</h5>
+                            <div class="mini-mini-box">
+                                <div class="mini-mini-box__item">
+                                    <p class="mini-box__copy">June Chan</p>
+                                    <p class="mini-box__copy">Erin Van Blarigan</p>
+                                </div>
+                                <div class="mini-mini-box__item">
+                                    <p class="mini-box__copy">Greta Macaire</p>
+                                    <p class="mini-box__copy">Stacey Kenfield</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{super()}}
+    </div>
+{% endblock %}
 {% block init_scripts %}
     {{super()}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
