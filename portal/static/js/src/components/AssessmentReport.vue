@@ -35,6 +35,7 @@
 </template>
 <script>
     import AssessmentReportData from "../data/common/AssessmentReportData.js";
+    import tnthDates from "../modules/TnthDate.js";
 	export default {
     /* global i18next */
     data: function() {
@@ -61,6 +62,8 @@
                 url: "/api/patient/" + this.userId + "/assessment/" + this.instrumentId
             }).done(function(data) {
                 var sessionAuthoredDate = $("#_report_authored_date").val();
+                console.log("date: ", sessionAuthoredDate);
+                ///
                 self.errorMessage = "";
                 if (data.error) {
                     self.errorMessage = self.serverError;
@@ -78,15 +81,20 @@
                 entry = entry[0] || entries[0];
                 self.caption.title = i18next.t(entries[0].questionnaire.display);
                 var lastUpdatedDateObj = new Date(sessionAuthoredDate);
-                self.caption.lastUpdated = new Date(lastUpdatedDateObj.toUTCString().slice(0, -4));
-                self.caption.lastUpdated = self.caption.lastUpdated.toLocaleDateString("en-GB", { //use native date function
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit"
-                });
+                if (tnthDates.isDateObj(lastUpdatedDateObj)) { //make sure the date is valid before formatting it
+                    self.caption.lastUpdated = new Date(lastUpdatedDateObj.toUTCString().slice(0, -4));
+                    self.caption.lastUpdated = self.caption.lastUpdated.toLocaleDateString("en-GB", { //use native date function
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
+                    });
+
+                } else {
+                    self.caption.lastUpdated = sessionAuthoredDate;
+                }
                 self.caption.timezone = i18next.t("GMT, Y-M-D");
                 (entry.group.question).forEach(function(entry) {
                     var q = (entry.text ? entry.text.replace(/^[\d\w]{1,3}\./, "") : ""),
