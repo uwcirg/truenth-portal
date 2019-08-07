@@ -145,6 +145,31 @@ var tnthDates =  { /*global i18next */
     "getGivenDate": function(y, m, d) {
         return "" + y + m + d;
     },
+    /*
+     *  given a UTC date string, converted to locale/language sensitive date string
+     */
+    "setUTCDateToLocaleDateString": function(utcDateString, params) {
+        if (!utcDateString) {
+            return "";
+        }
+        var dateObj = new Date(utcDateString);
+        if (!this.isDateObj(dateObj)) {
+            return utcDateString; //return date string as is without re-formattiing
+        }
+        if (!params) {
+            params = { //date format parameters
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            };
+        }
+        var reformattedLocaleDateString = new Date(dateObj.toUTCString().slice(0, -4));
+        reformattedLocaleDateString = reformattedLocaleDateString.toLocaleDateString("en-GB", params); //native Javascript date function, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+        return reformattedLocaleDateString;
+    },
     "isSystemDate": function(dateString) {
         /* IOS (8601) date format test */
         /**
