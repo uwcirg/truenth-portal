@@ -47,15 +47,18 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 	display: block;
 	margin: 0px auto;
 }
-.page-exercise-diet-portal #Exercise-Diet_Acknowledgement {
-    display: none;
-}
 #Exercise-Diet_Acknowledgement {
     background: #3B4449;
-    padding: 90px 0;
+    padding: 84px 0 90px;
 }
 #Exercise-Diet_Acknowledgement .accent-heading {
     color: #D2D1C5;
+}
+body.page-exercise-diet-portal #Exercise-Diet_Acknowledgement {
+    padding: 90px 0;
+}
+body.page-exercise-diet-portal #Exercise-Diet_Acknowledgement .accent-heading {
+    margin-top: 2em;
 }
 #Exercise-Diet_Acknowledgement .objective-content {
     margin: 0px auto;
