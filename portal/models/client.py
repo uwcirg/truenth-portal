@@ -141,9 +141,9 @@ class Client(db.Model):
 
         data['algorithm'] = 'HMAC-SHA256'
         data['issued_at'] = int(time.time())
-        payload = base64.urlsafe_b64encode(json.dumps(data))
+        payload = base64.urlsafe_b64encode(json.dumps(data).encode('utf-8'))
         sig = hmac.new(
-            str(self.client_secret), msg=payload,
+            self.client_secret.encode('utf-8'), msg=payload,
             digestmod=hashlib.sha256).digest()
         encoded_sig = base64.urlsafe_b64encode(sig)
 
