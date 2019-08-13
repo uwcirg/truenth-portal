@@ -2485,6 +2485,34 @@
     {
       "extension": [
         {
+          "timezone": "Europe/Dublin",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146105,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-105"
+        }
+      ],
+      "language": "en_GB",
+      "name": "St. Vincent's University Hospital",
+      "partOf": {
+        "reference": "api/organization/20100"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
