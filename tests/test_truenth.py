@@ -1,4 +1,3 @@
-
 from tests import FIRST_NAME, LAST_NAME, TestCase
 
 

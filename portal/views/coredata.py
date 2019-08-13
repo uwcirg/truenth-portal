@@ -1,5 +1,3 @@
-
-
 from urllib.parse import parse_qsl, urlencode, urlparse
 
 from flask import (
