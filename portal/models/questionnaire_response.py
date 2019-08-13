@@ -334,9 +334,10 @@ class QNR_results(object):
 
         # typically triggered from updating task job - use system
         # as acting user in audits, if no current user is available
+        acting_user = None
         if has_request_context():
             acting_user = current_user()
-        else:
+        if not acting_user:
             acting_user = User.query.filter_by(email='__system__').first()
         for qnr in self.qnrs:
             QuestionnaireResponse.query.get(
