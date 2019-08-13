@@ -714,7 +714,7 @@ def generate_qnr_csv(qnr_bundle):
             for answer in answers:
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'other_text': answer.values()[0]}
+                    answer_data = {'other_text': list(answer.values())[0]}
 
                     # ...unless nested code (ie valueCode)
                     if list(answer.keys())[0] == 'valueCoding':
