@@ -2,7 +2,7 @@ from collections import namedtuple
 from html.parser import HTMLParser
 import json
 
-from flask import current_app, url_for
+from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
 import jsonschema
 from sqlalchemy import or_
@@ -334,8 +334,9 @@ class QNR_results(object):
 
         # typically triggered from updating task job - use system
         # as acting user in audits, if no current user is available
-        acting_user = current_user()
-        if not acting_user:
+        if has_request_context():
+            acting_user = current_user()
+        else:
             acting_user = User.query.filter_by(email='__system__').first()
         for qnr in self.qnrs:
             QuestionnaireResponse.query.get(
