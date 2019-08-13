@@ -12,10 +12,8 @@ from flask import (
     request,
     url_for,
 )
-from flask_babel import gettext as _
 from flask_user import roles_required
 
-from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
@@ -26,13 +24,18 @@ reporting_api = Blueprint('reporting', __name__)
 
 
 @reporting_api.route('/admin/overdue-table')
-@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required(ROLE.STAFF.value)
 @oauth.require_oauth()
 def overdue_table(top_org=None):
-    """View for admin access to generated email content
+    """View for staff access to generated email content
 
     Typically called by scheduled job, expected this view is only
     used for debugging & QA
+
+    The included patients depends on current user's organization
+    affiliation, including all patients at and below any level of the
+    organization tree for which the current user has access.  Further
+    limited to the patients below top_org, if defined.
 
     :param org_id: Top level organization ID to test
     :returns: html content typically sent directly to site resource
@@ -43,74 +46,48 @@ def overdue_table(top_org=None):
         org_id = request.args.get('org_id', 0)
         top_org = Organization.query.get_or_404(org_id)
 
-    # Use values from ScheduledJob.json - just debugging utility
-    # for now.  If made mainstream, pull directly from table.
-    cutoff_days = []
-    if top_org.name == "TrueNTH Global Registry":
-        cutoff_days = [30, 60, 90]
-    if top_org.name == "IRONMAN":
-        cutoff_days = [7, 14, 21, 30]
-
     return generate_overdue_table_html(
-        cutoff_days=cutoff_days, overdue_stats=overdue_stats_by_org(),
+        overdue_stats=overdue_stats_by_org(),
         user=current_user(), top_org=top_org)
 
 
-def generate_overdue_table_html(cutoff_days, overdue_stats, user, top_org):
-    cutoff_days.sort()
+def generate_overdue_table_html(overdue_stats, user, top_org):
+    """generate html from given statistics
 
-    day_ranges = []
-    curr_min = 0
-    for cd in cutoff_days:
-        day_ranges.append("{}-{}".format(curr_min + 1, cd))
-        curr_min = cd
+    :param overdue_stats: a dict keyed by
+     ``overdue_stats[(org_id, org_name)]``, and for each org, a list
+      of overdue patient tuples, respectively containing
+      ``(user.id, study_id, visit_name, due_date, expired_date)``
+    :param user: the user generating the table, necessary to determine
+      patient visibility
+    :param top_org: used to restrict report to a portion of the patients
+      for which the given user has view permissions
 
+    :returns: report in html
+
+    """
     ot = OrgTree()
     rows = []
-    totals = defaultdict(int)
-
     for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
         if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
             continue
-        user_accessible = False
-        for user_org in user.organizations:
-            if ot.at_or_below_ids(user_org.id, [org_id]):
-                user_accessible = True
-                break
-        if not user_accessible:
+        if not user.can_view_org(org_id):
             continue
-        counts = overdue_stats[(org_id, org_name)]
-        org_row = [org_name]
-        source_row = [org_name+'[user_ids]']
-        curr_min = 0
-        row_total = 0
-        for cd in cutoff_days:
-            uids = []
-            for days_overdue, user_id in counts:
-                if days_overdue > curr_min and days_overdue <= cd:
-                    uids.append(user_id)
-            count = len(
-                [i for i, uid in counts if ((i > curr_min) and (i <= cd))])
-            org_row.append(count)
-            source_row.append(uids)
-            totals[cd] += count
-            row_total += count
-            curr_min = cd
-        org_row.append(row_total)
-        rows.append(org_row)
-        # Uncomment the following row to display user ids behind numbers
-        # rows.append(source_row)
 
-    totalrow = [_("TOTAL")]
-    row_total = 0
-    for cd in cutoff_days:
-        totalrow.append(totals[cd])
-        row_total += totals[cd]
-    totalrow.append(row_total)
-    rows.append(totalrow)
+        # For each org, generate a row with org name in position 0
+        rows.append((org_name, org_id, '', '', '', ''))
+
+        # Prepend each patient row to line up with header
+        site_spacer = ''
+        od_tups = overdue_stats[(org_id, org_name)]
+        for user_id, study_id, visit_name, due_date, expired_date in od_tups:
+            rows.append((
+                site_spacer, user_id, study_id, visit_name,
+                due_date.strftime("%d-%b-%Y %H:%M:%S"),
+                expired_date.strftime("%d-%b-%Y %H:%M:%S")))
 
     return render_template(
-        'site_overdue_table.html', ranges=day_ranges, rows=rows)
+        'site_overdue_table.html', rows=rows)
 
 
 @reporting_api.route('/admin/overdue-numbers')

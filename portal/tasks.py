@@ -310,10 +310,9 @@ def send_user_messages(user, force_update=False):
 @celery.task
 @scheduled_task
 def send_questionnaire_summary(**kwargs):
-    "Generate and send a summary of questionnaire counts to all Staff in org"
-    cutoff_days = kwargs['cutoff_days']
+    """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
-    error_emails = generate_and_send_summaries(cutoff_days, org_id)
+    error_emails = generate_and_send_summaries(org_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '
                 '{}'.format(', '.join(error_emails)))

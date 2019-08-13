@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
 
-from flask import current_app, url_for
+from flask import current_app
 from flask_babel import force_locale
 from werkzeug.exceptions import Unauthorized
 
@@ -22,10 +22,11 @@ from .procedure_codes import (
     known_treatment_started,
 )
 from .qb_status import QB_Status
+from .qb_timeline import qb_status_visit_name
 from .questionnaire_bank import visit_name
 from .questionnaire_response import QNR_results
-from .role import ROLE
-from .user import User, patients_query
+from .role import ROLE, Role
+from .user import User, UserRoles, patients_query
 from .user_consent import latest_consent
 
 
@@ -221,43 +222,61 @@ def adherence_report(
     return results
 
 
-def calculate_days_overdue(user):
-    now = datetime.utcnow()
-    a_s = QB_Status(user, as_of_date=now)
-    if a_s.overall_status in (
-            OverallStatus.completed, OverallStatus.expired,
-            OverallStatus.partially_completed):
-        return 0
-    overdue = a_s.overdue_date
-    return (datetime.utcnow() - overdue).days if overdue else 0
+def overdue_dates(user, as_of):
+    """Determine if user is overdue, return details if applicable
+
+    :param user: for whom QB Status should be evaluated
+    :param as_of: utc datetime for comparision, typically utcnow
+    :return: IF user is overdue, tuple of
+     (visit_name, due_date, expired_date), otherwise (None, None, None)
+
+    """
+    na = None, None, None
+    status, visit = qb_status_visit_name(user.id, as_of)
+
+    if status != OverallStatus.overdue:
+        return na
+
+    a_s = QB_Status(user, as_of_date=as_of)
+    assert a_s.overall_status == status
+    if a_s.overdue_date is None:
+        return na
+
+    return visit, a_s.due_date, a_s.expired_date
 
 
 @dogpile_cache.region('reporting_cache_region')
 def overdue_stats_by_org():
-    """Generate cacheable stats by org
+    """Generate cacheable overdue statistics
+
+    Used in generating reports of overdue statistics.  Generates values for
+    *all* patients - clients must validate permission for current_user to
+    view each respective row.
 
     In order to avoid caching db objects, save organization's (id, name) as
-    the returned dictionary key, value contains list of tuples, (number of
-    days overdue and the respective user_id)
+    the returned dictionary key, value contains list of tuples:
+      (respective user_id, study_id, due_date, expired_date)
 
     """
     current_app.logger.debug("CACHE MISS: {}".format(__name__))
     overdue_stats = defaultdict(list)
-    for user in User.query.filter_by(active=True):
-        if (user.has_role(ROLE.TEST.value) or not
-                user.has_role(ROLE.PATIENT.value)):
-            continue
-        overdue = calculate_days_overdue(user)
-        if overdue > 0:
+    now = datetime.utcnow()
+
+    # use system user to avoid pruning any patients during cache population
+    sys = User.query.filter_by(email='__system__').one()
+    for user in patients_query(acting_user=sys):
+        visit, due_date, expired_date = overdue_dates(user, as_of=now)
+        study_id = user.external_study_id or ''
+        if due_date is not None:
             for org in user.organizations:
-                overdue_stats[(org.id, org.name)].append((overdue, user.id))
+                overdue_stats[(org.id, org.name)].append((
+                    user.id, study_id, visit, due_date, expired_date))
     return overdue_stats
 
 
-def generate_and_send_summaries(cutoff_days, org_id):
+def generate_and_send_summaries(org_id):
     from ..views.reporting import generate_overdue_table_html
     ostats = overdue_stats_by_org()
-    cutoffs = [int(i) for i in cutoff_days.split(',')]
     error_emails = set()
 
     ot = OrgTree()
@@ -266,22 +285,28 @@ def generate_and_send_summaries(cutoff_days, org_id):
         raise ValueError("No org with ID {} found.".format(org_id))
     name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
 
-    for user in User.query.filter_by(deleted_id=None).all():
-        if not (user.has_role(ROLE.STAFF.value) and user.email_ready()[0]
-                and (top_org in ot.find_top_level_orgs(user.organizations))):
+    for staff_user in User.query.join(
+            UserRoles).join(Role).filter(
+            Role.name == ROLE.STAFF.value).filter(
+            User.id == UserRoles.user_id).filter(
+            Role.id == UserRoles.role_id).filter(
+            User.deleted_id.is_(None)):
+        if not(
+                staff_user.email_ready()[0] and
+                top_org in ot.find_top_level_orgs(staff_user.organizations)):
             continue
 
-        args = load_template_args(user=user)
-        with force_locale(user.locale_code):
+        args = load_template_args(user=staff_user)
+        with force_locale(staff_user.locale_code):
             args['eproms_site_summary_table'] = generate_overdue_table_html(
-                cutoff_days=cutoffs,
                 overdue_stats=ostats,
-                user=user,
+                user=staff_user,
                 top_org=top_org,
             )
         summary_email = MailResource(
-            app_text(name_key), locale_code=user.locale_code, variables=args)
-        em = EmailMessage(recipients=user.email,
+            app_text(name_key), locale_code=staff_user.locale_code,
+            variables=args)
+        em = EmailMessage(recipients=staff_user.email,
                           sender=current_app.config['MAIL_DEFAULT_SENDER'],
                           subject=summary_email.subject,
                           body=summary_email.body)
@@ -289,13 +314,13 @@ def generate_and_send_summaries(cutoff_days, org_id):
             em.send_message()
         except SMTPRecipientsRefused as exc:
             msg = ("Error sending site summary email to {}: "
-                   "{}".format(user.email, exc))
+                   "{}".format(staff_user.email, exc))
 
             sys = User.query.filter_by(email='__system__').first()
 
             auditable_event(message=msg,
-                            user_id=(sys.id if sys else user.id),
-                            subject_id=user.id,
+                            user_id=(sys.id if sys else staff_user.id),
+                            subject_id=staff_user.id,
                             context="user")
 
             current_app.logger.error(msg)

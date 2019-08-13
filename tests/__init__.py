@@ -187,7 +187,7 @@ class TestCase(Base):
         if not user:
             user = self.test_user
         ident = Identifier(system=system, _value=value).add_if_not_found()
-        user.identifiers.append(ident)
+        user.add_identifier(ident)
 
     def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""
@@ -285,7 +285,9 @@ class TestCase(Base):
         """create and return system user expected for some tasks """
         sysusername = '__system__'
         if not User.query.filter_by(username=sysusername).first():
-            return self.add_user(sysusername, 'System', 'Admin')
+            sys_user = self.add_user(sysusername, 'System', 'Admin')
+        self.promote_user(sys_user, ROLE.ADMIN.value)
+        return sys_user
 
     def add_required_clinical_data(self, backdate=None, setdate=None):
         """Add clinical data to get beyond the landing page

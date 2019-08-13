@@ -1,7 +1,6 @@
 """Unit test module for stat reporting"""
 
 from datetime import datetime
-from re import search
 from time import sleep
 
 from dateutil.relativedelta import relativedelta
@@ -21,7 +20,7 @@ from portal.models.questionnaire_bank import (
 )
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.views.reporting import generate_overdue_table_html
+from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
@@ -117,6 +116,11 @@ class TestReporting(TestCase):
 
     def test_overdue_stats(self):
         self.promote_user(user=self.test_user, role_name=ROLE.PATIENT.value)
+        self.test_user = db.session.merge(self.test_user)
+        self.add_user_identifier(
+            user=self.test_user, system=TRUENTH_EXTERNAL_STUDY_SYSTEM,
+            value='clever study id')
+        self.add_system_user()
 
         rp = ResearchProtocol(name='proto')
         with SessionScope(db):
@@ -173,67 +177,13 @@ class TestReporting(TestCase):
 
         ostats = self.get_ostats()
         assert len(ostats) == 1
-        assert ostats[(crv.id, crv.name)] == [(15, TEST_USER_ID)]
-
-    def test_overdue_table_html(self):
-        org = Organization(name='OrgC', id=101)
-        org2 = Organization(name='OrgB', id=102, partOf_id=101)
-        org3 = Organization(name='OrgA', id=103, partOf_id=101)
-        false_org = Organization(name='falseorg')
-
-        user = self.add_user('test_user)')
-
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.add(org3)
-            db.session.add(org2)
-            db.session.add(false_org)
-            user.organizations.append(org)
-            user.organizations.append(org3)
-            user.organizations.append(org2)
-            user.organizations.append(false_org)
-            db.session.add(user)
-            db.session.commit()
-        org, org2, org3, false_org, user = map(
-            db.session.merge, (org, org2, org3, false_org, user))
-
-        ostats = {
-            (org3.id, org3.name): [(2, 101), (3, 102)],
-            (org2.id, org2.name): [(1, 103), (5, 104)],
-            (org.id, org.name): [(1, 105), (8, 106), (9, 107), (11, 108)]}
-        cutoffs = [5, 10]
-
-        table1 = generate_overdue_table_html(cutoff_days=cutoffs,
-                                             overdue_stats=ostats,
-                                             user=user,
-                                             top_org=org)
-
-        assert '<table>' in table1
-        assert '<th>1-5 Days</th>' in table1
-        assert '<th>6-10 Days</th>' in table1
-        assert '<td>{}</td>'.format(org.name) in table1
-        org_row = r'\s*'.join((
-            '<td>{}</td>',
-            '<td>1</td>',
-            '<td>2</td>',
-            '<td>3</td>',
-        )).format(org.name)
-        assert search(org_row, table1)
-        # confirm alphabetical order
-        org_order = r'{}[^O]*{}[^O]*{}'.format(org3.name, org2.name, org.name)
-        assert search(org_order, table1)
-
-        # confirm that the table contains no orgs
-        table2 = generate_overdue_table_html(cutoff_days=cutoffs,
-                                             overdue_stats=ostats,
-                                             user=user,
-                                             top_org=false_org)
-
-        assert '<table>' in table2
-        # org should not show up, as the table's top_org=false_org
-        assert not '<td>{}</td>'.format(org.name) in table2
-        # false_org should not show up, as it's not in the ostats
-        assert not '<td>{}</td>'.format(false_org.name) in table2
+        row = ostats[(crv.id, crv.name)][0]
+        assert len(row) == 5
+        assert row[0] == TEST_USER_ID
+        assert row[1] == 'clever study id'
+        assert row[2] == 'Baseline'
+        assert row[3] == a_s.due_date
+        assert row[4] == a_s.expired_date
 
 
 class TestQBStats(TestQuestionnaireBank):
@@ -339,8 +289,6 @@ class TestQBStats(TestQuestionnaireBank):
         assert response.json['total'] == 2
 
     def test_results(self):
-        from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
-
         # Generate a few patients with differing results
         org = self.setup_org_qbs()
         org_id, org_name = org.id, org.name
