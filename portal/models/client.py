@@ -141,14 +141,16 @@ class Client(db.Model):
 
         data['algorithm'] = 'HMAC-SHA256'
         data['issued_at'] = int(time.time())
-        payload = base64.urlsafe_b64encode(json.dumps(data).encode('utf-8'))
+        b64payload = base64.urlsafe_b64encode(json.dumps(data).encode('utf-8'))
         sig = hmac.new(
-            self.client_secret.encode('utf-8'), msg=payload,
-            digestmod=hashlib.sha256).digest()
-        encoded_sig = base64.urlsafe_b64encode(sig)
+            key=self.client_secret.encode('utf-8'),
+            msg=b64payload,
+            digestmod=hashlib.sha256,
+        ).digest()
+        b64sig = base64.urlsafe_b64encode(sig).decode()
 
         formdata = {
-            'signed_request': "{0}.{1}".format(encoded_sig, payload)}
+            'signed_request': "{0}.{1}".format(b64sig, b64payload)}
         current_app.logger.debug(
             "POSTing {} event to {}".format(data['event'], self.callback_url))
 
