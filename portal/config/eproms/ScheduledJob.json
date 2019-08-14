@@ -56,17 +56,6 @@
     },
     {
       "active": true,
-      "args": null,
-      "id": 3,
-      "kwargs": null,
-      "name": "Update reporting stats cache",
-      "resourceType": "ScheduledJob",
-      "comment": "UTC times, desire 9 am & pm PTC",
-      "schedule": "r 4,16 * * *",
-      "task": "cache_reporting_stats"
-    },
-    {
-      "active": true,
       "kwargs": null,
       "name": "Celery Beat Health Check",
       "resourceType": "ScheduledJob",

@@ -46,17 +46,6 @@
       "task": "token_watchdog"
     },
     {
-      "active": true,
-      "args": null,
-      "id": 3,
-      "kwargs": null,
-      "name": "Update reporting stats cache",
-      "resourceType": "ScheduledJob",
-      "comment": "UTC times, desire 11 am & pm PTC",
-      "schedule": "r 6,18 * * *",
-      "task": "cache_reporting_stats"
-    },
-    {
       "active": false,
       "args": null,
       "kwargs": {

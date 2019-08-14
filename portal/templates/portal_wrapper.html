@@ -79,9 +79,6 @@
                             <li><a href="{{PORTAL}}/scheduled_jobs">{{ _("Scheduled Jobs") }}</a></li>
                             <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                             {% endif %}
-                            {% if user and (user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.ANALYST.value)) %}
-                            <li><a href="{{PORTAL}}/reporting">{{ _("Reporting Dashboard") }}</a></li>
-                            {% endif %}
                             {% if user and user.has_role(ROLE.RESEARCHER.value) %}
                             <li><a href="{{PORTAL}}/research">{{ _("Research Data") }}</a></li>
                             {% endif %}
@@ -130,7 +127,6 @@
                     <li><a href="{{PORTAL}}/scheduled_jobs">{{ _("Scheduled Jobs") }}</a></li>
                     <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                     {% endif %}
-                    {% if user and (user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.ANALYST.value)) %}<li><a href="{{PORTAL}}/reporting">{{ _("Reporting Dashboard") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.RESEARCHER.value) %}
                     <li><a href="{{PORTAL}}/research">{{ _("Research Data") }}</a></li>
                     {% endif %}
