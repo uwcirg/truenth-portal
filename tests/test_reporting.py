@@ -8,8 +8,7 @@ from flask_webtest import SessionScope
 
 from portal.dogpile_cache import dogpile_cache
 from portal.extensions import db
-from portal.models.encounter import EC, Encounter
-from portal.models.intervention import INTERVENTION
+from portal.models.encounter import EC
 from portal.models.organization import Organization
 from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
@@ -29,90 +28,12 @@ from tests.test_questionnaire_bank import TestQuestionnaireBank
 class TestReporting(TestCase):
     """Reporting tests"""
 
-    def get_stats(self, invalidate=True):
-        """Cache free access for testing"""
-        from portal.models.reporting import get_reporting_stats
-        if invalidate:
-            dogpile_cache.invalidate(get_reporting_stats)
-        return get_reporting_stats()
-
     def get_ostats(self, invalidate=True):
         """Cache free access for testing"""
         from portal.models.reporting import overdue_stats_by_org
         if invalidate:
             dogpile_cache.invalidate(overdue_stats_by_org)
         return overdue_stats_by_org()
-
-    def test_reporting_stats(self):
-        user1 = self.add_user('test1')
-        user2 = self.add_user('test2')
-        user3 = self.add_user('test3')
-        org = Organization(name='testorg')
-        interv1 = INTERVENTION.COMMUNITY_OF_WELLNESS
-        interv2 = INTERVENTION.DECISION_SUPPORT_P3P
-        interv1.public_access = False
-        interv2.public_access = True
-
-        user1, user2, user3 = map(
-            db.session.merge, (user1, user2, user3))
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.add(interv1)
-            db.session.add(interv2)
-            user1.organizations.append(org)
-            user2.organizations.append(org)
-            user2.interventions.append(interv1)
-            user3.interventions.append(interv2)
-            map(db.session.add, (user1, user2, user3))
-            db.session.commit()
-        user1, user2, user3, org = map(db.session.merge,
-                                       (user1, user2, user3, org))
-        userid = user1.id
-
-        self.promote_user(user=user1, role_name=ROLE.PATIENT.value)
-        self.promote_user(user=user2, role_name=ROLE.PATIENT.value)
-        self.promote_user(user=user3, role_name=ROLE.PATIENT.value)
-        self.promote_user(user=user2, role_name=ROLE.PARTNER.value)
-        self.promote_user(user=user3, role_name=ROLE.STAFF.value)
-
-        with SessionScope(db):
-            for i in range(5):
-                enc = Encounter(
-                    status='finished',
-                    auth_method='password_authenticated',
-                    start_time=datetime.utcnow(),
-                    user_id=userid)
-                db.session.add(enc)
-            db.session.commit()
-
-        stats = self.get_stats()
-
-        assert 'Decision Support P3P' not in stats['interventions']
-        assert stats['interventions']['Community of Wellness'] == 1
-
-        assert stats['organizations']['testorg'] == 2
-        assert stats['organizations']['Unspecified'] == 2
-
-        assert stats['roles']['patient'] == 3
-        assert stats['roles']['staff'] == 1
-        assert stats['roles']['partner'] == 1
-
-        assert len(stats['encounters']['all']) == 5
-
-        # test adding a new encounter, to confirm still using cached stats
-        with SessionScope(db):
-            enc = Encounter(
-                status='finished',
-                auth_method='password_authenticated',
-                start_time=datetime.utcnow(),
-                user_id=userid)
-            db.session.add(enc)
-            db.session.commit()
-
-        stats2 = self.get_stats(invalidate=False)
-
-        # should not have changed, if still using cached values
-        assert len(stats2['encounters']['all']) == 5
 
     def test_overdue_stats(self):
         self.promote_user(user=self.test_user, role_name=ROLE.PATIENT.value)

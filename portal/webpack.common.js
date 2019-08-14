@@ -17,7 +17,6 @@ module.exports = {
         "orgTreeView": JsSrcPath+"/orgTreeView.js",
         "profile": JsSrcPath+"/profile.js",
         "psaTracker": JsSrcPath+"/psaTracker.js",
-        "reportingDashboard": JsSrcPath+"/reportingDashboard.js",
         "research": JsSrcPath+"/research.js",
         "scheduledJobs": JsSrcPath+"/scheduledJobs.js",
         "shortcutAlias": JsSrcPath+"/shortcutAlias.js",
