@@ -1911,6 +1911,51 @@
           "valueCodeableConcept": {
             "coding": [
               {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14621,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-21"
+        }
+      ],
+      "language": "de_CH",
+      "name": "Universitätsspital Zürich",
+      "partOf": {
+        "reference": "api/organization/25000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
                 "code": "en_GB",
                 "display": "English",
                 "system": "urn:ietf:bcp:47"
@@ -2394,6 +2439,62 @@
       ],
       "language": "es_ES",
       "name": "Vall d'Hebron Institute of Oncology",
+      "partOf": {
+        "reference": "api/organization/29000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Madrid",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146103,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-103"
+        }
+      ],
+      "language": "es_ES",
+      "name": "Hospital Universitario Virgen de la Victoria",
+      "partOf": {
+        "reference": "api/organization/29000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Madrid",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146106,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-106"
+        }
+      ],
+      "language": "es_ES",
+      "name": "Hospital Clínic de Barcelona",
       "partOf": {
         "reference": "api/organization/29000"
       },
