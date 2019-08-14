@@ -147,7 +147,7 @@ class Client(db.Model):
             msg=b64payload,
             digestmod=hashlib.sha256,
         ).digest()
-        b64sig = base64.urlsafe_b64encode(sig)
+        b64sig = base64.urlsafe_b64encode(sig).decode()
 
         formdata = {
             'signed_request': "{0}.{1}".format(b64sig, b64payload)}
