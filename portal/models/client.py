@@ -147,10 +147,11 @@ class Client(db.Model):
             msg=b64payload,
             digestmod=hashlib.sha256,
         ).digest()
-        b64sig = base64.urlsafe_b64encode(sig).decode()
+        b64sig = base64.urlsafe_b64encode(sig)
 
-        formdata = {
-            'signed_request': "{0}.{1}".format(b64sig, b64payload)}
+        # decode bytes to the string types the clients are expecting
+        formdata = {'signed_request': "{0}.{1}".format(
+            b64sig.decode(), b64payload.decode())}
         current_app.logger.debug(
             "POSTing {} event to {}".format(data['event'], self.callback_url))
 
