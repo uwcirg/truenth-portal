@@ -1,5 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from pprint import pformat
@@ -73,11 +72,10 @@ from ..models.organization import (
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import QuestionnaireResponse
-from ..models.reporting import get_reporting_stats
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import User, current_user, get_user_or_abort
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
+from ..models.user import User, current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..trace import dump_trace, establish_trace, trace
 from ..type_tools import check_int
@@ -921,30 +919,6 @@ def research_dashboard():
         user=current_user(),
         instruments=Questionnaire.questionnaire_codes()
     )
-
-
-@portal.route('/reporting')
-@roles_required([ROLE.ADMIN.value, ROLE.ANALYST.value])
-@oauth.require_oauth()
-def reporting_dashboard():
-    """Executive Reporting Dashboard
-
-    Only accessible to Admins, or those with the Analyst role (no PHI access).
-
-    Usage: graphs showing user registrations and logins per day;
-           filterable by date and/or by intervention
-
-    User Stats: counts of users by role, intervention, etc.
-
-    Institution Stats: counts of users per org
-
-    Analytics: Usage stats from piwik (time on site, geographic usage,
-               referral sources for new visitors, etc)
-
-    """
-    return render_template(
-        'reporting_dashboard.html', now=datetime.utcnow(),
-        counts=get_reporting_stats())
 
 
 @portal.route('/spec')

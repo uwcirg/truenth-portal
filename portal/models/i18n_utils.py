@@ -1,7 +1,5 @@
 """Module for i18n methods and functionality"""
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 
 
 from collections import defaultdict
@@ -12,7 +10,7 @@ import sys
 from zipfile import ZipFile
 
 from flask import current_app
-from polib import pofile, POFile, POEntry
+from polib import POEntry, POFile, pofile
 import requests
 
 from .i18n import get_db_strings, get_static_strings

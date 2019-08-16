@@ -6,6 +6,7 @@ Create Date: 2019-03-12 14:16:02.704403
 
 """
 import copy
+
 from portal.database import db
 from portal.models.table_preference import TablePreference
 

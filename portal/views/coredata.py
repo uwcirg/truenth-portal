@@ -1,7 +1,3 @@
-from future import standard_library  # isort:skip
-
-standard_library.install_aliases()  # noqa: E402
-
 from urllib.parse import parse_qsl, urlencode, urlparse
 
 from flask import (

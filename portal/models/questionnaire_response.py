@@ -1,11 +1,10 @@
 from collections import namedtuple
 from html.parser import HTMLParser
 import json
-import jsonschema
 
-from flask import current_app, url_for
+from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
-from past.builtins import basestring
+import jsonschema
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
@@ -226,7 +225,7 @@ class QuestionnaireResponse(db.Model):
             for answer in combined_answers:
 
                 # Add text answer before coded answer
-                if answer.keys()[0] == 'valueCoding':
+                if list(answer.keys())[0] == 'valueCoding':
 
                     # Prefer text looked up from code over sibling valueString answer
                     text_answer = questionnaire_map.get(
@@ -335,7 +334,9 @@ class QNR_results(object):
 
         # typically triggered from updating task job - use system
         # as acting user in audits, if no current user is available
-        acting_user = current_user()
+        acting_user = None
+        if has_request_context():
+            acting_user = current_user()
         if not acting_user:
             acting_user = User.query.filter_by(email='__system__').first()
         for qnr in self.qnrs:
@@ -561,7 +562,7 @@ def consolidate_answer_pairs(answers):
         answers for ease of display
     """
 
-    answer_types = [a.keys()[0] for a in answers]
+    answer_types = [list(a.keys())[0] for a in answers]
 
     # Exit early if assumptions not met
     if (
@@ -573,7 +574,7 @@ def consolidate_answer_pairs(answers):
     filtered_answers = []
     for pair in zip(*[iter(answers)] * 2):
         # Sort so first pair is always valueCoding
-        pair = sorted(pair, key=lambda k: k.keys()[0])
+        pair = sorted(pair, key=lambda k: list(k.keys())[0])
         coded_answer, string_answer = pair
 
         coded_answer['valueCoding']['text'] = string_answer['valueString']
@@ -713,10 +714,10 @@ def generate_qnr_csv(qnr_bundle):
             for answer in answers:
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'other_text': answer.values()[0]}
+                    answer_data = {'other_text': list(answer.values())[0]}
 
                     # ...unless nested code (ie valueCode)
-                    if answer.keys()[0] == 'valueCoding':
+                    if list(answer.keys())[0] == 'valueCoding':
                         answer_data.update({
                             'answer_code': answer['valueCoding']['code'],
 
@@ -734,7 +735,7 @@ def generate_qnr_csv(qnr_bundle):
                     column = csv_null_value if column is None else column
 
                     # Handle JSON column escaping/enclosing
-                    if not isinstance(column, basestring):
+                    if not isinstance(column, str):
                         column = json.dumps(column).replace('"', '""')
                     row.append('"' + column + '"')
 

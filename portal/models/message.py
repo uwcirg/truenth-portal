@@ -1,5 +1,4 @@
 """Model classes for message data"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from textwrap import fill

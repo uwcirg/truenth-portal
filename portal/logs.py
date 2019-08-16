@@ -1,5 +1,4 @@
 """SSL extension module"""
-from __future__ import unicode_literals  # isort:skip
 
 from logging.handlers import SMTPHandler
 
@@ -33,7 +32,7 @@ class SSLSMTPHandler(SMTPHandler):
             smtp_config = {
                 'host': self.mailhost,
                 'port': port,
-                'timeout': self._timeout,
+                'timeout': self.timeout,
             }
             # todo: make `use_ssl` a proper attribute
             if hasattr(self, 'use_ssl') and self.use_ssl:

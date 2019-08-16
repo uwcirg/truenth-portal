@@ -1,5 +1,4 @@
 """Unit test module for portal views"""
-from __future__ import unicode_literals  # isort:skip
 
 from tests import TestCase
 

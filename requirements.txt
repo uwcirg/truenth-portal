@@ -29,8 +29,6 @@ flask-swagger==0.2.14
 git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-wtf==0.14.2         # via flask-user
 flask==1.0.3
-functools32==3.2.3.post2;python_version < '3'
-future==0.17.1
 fuzzywuzzy==0.17.0
 healthcheck==1.3.3
 idna==2.8                 # via requests
@@ -38,7 +36,7 @@ itsdangerous==1.1.0        # via flask
 jinja2==2.10.1              # via flask, flask-babel, sphinx
 jsonschema==3.0.1
 kombu==4.6.3              # pyup: < 5.0 # via celery
-mako==1.0.13               # via alembic
+mako==1.0.14               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
 passlib==1.7.1            # via flask-user

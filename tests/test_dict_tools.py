@@ -1,5 +1,3 @@
-from __future__ import unicode_literals  # isort:skip
-
 import io
 
 from portal.dict_tools import dict_compare, dict_match, strip_empties

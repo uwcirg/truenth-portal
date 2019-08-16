@@ -1,5 +1,4 @@
 """Unit test module for Procedure API and model"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime, timedelta
 import json

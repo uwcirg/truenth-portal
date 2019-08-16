@@ -20,7 +20,6 @@ from requests.exceptions import RequestException
 from sqlalchemy import and_
 
 from .database import db
-from .dogpile_cache import dogpile_cache
 from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
@@ -30,7 +29,6 @@ from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
     adherence_report,
     generate_and_send_summaries,
-    get_reporting_stats,
 )
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
@@ -143,20 +141,6 @@ def test(**kwargs):
 @scheduled_task
 def test_args(*args, **kwargs):
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
-
-
-@celery.task
-@scheduled_task
-def cache_reporting_stats(**kwargs):
-    """Populate reporting dashboard stats cache
-
-    Reporting stats can be a VERY expensive lookup - cached for an hour
-    at a time.  This task is responsible for renewing the potentially
-    stale cache.  Expected to be called as a scheduled job.
-
-    """
-    dogpile_cache.invalidate(get_reporting_stats)
-    dogpile_cache.refresh(get_reporting_stats)
 
 
 @celery.task
@@ -310,10 +294,9 @@ def send_user_messages(user, force_update=False):
 @celery.task
 @scheduled_task
 def send_questionnaire_summary(**kwargs):
-    "Generate and send a summary of questionnaire counts to all Staff in org"
-    cutoff_days = kwargs['cutoff_days']
+    """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
-    error_emails = generate_and_send_summaries(cutoff_days, org_id)
+    error_emails = generate_and_send_summaries(org_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '
                 '{}'.format(', '.join(error_emails)))

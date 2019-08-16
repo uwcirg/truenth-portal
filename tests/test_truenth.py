@@ -1,5 +1,3 @@
-from __future__ import unicode_literals  # isort:skip
-
 from tests import FIRST_NAME, LAST_NAME, TestCase
 
 

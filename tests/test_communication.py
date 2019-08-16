@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Unit test module for communication"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 import re

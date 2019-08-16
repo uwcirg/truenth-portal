@@ -5,7 +5,6 @@
       "args": null,
       "id": 6,
       "kwargs": {
-        "cutoff_days": "7,14,21,30",
         "org_id": 20000
       },
       "name": "IRONMAN site summary email",
@@ -38,7 +37,6 @@
       "args": null,
       "id": 7,
       "kwargs": {
-        "cutoff_days": "30,60,90",
         "org_id": 10000
       },
       "name": "TNGR site summary email",
@@ -55,17 +53,6 @@
       "resourceType": "ScheduledJob",
       "schedule": "r */2 * * *",
       "task": "cache_assessment_status"
-    },
-    {
-      "active": true,
-      "args": null,
-      "id": 3,
-      "kwargs": null,
-      "name": "Update reporting stats cache",
-      "resourceType": "ScheduledJob",
-      "comment": "UTC times, desire 9 am & pm PTC",
-      "schedule": "r 4,16 * * *",
-      "task": "cache_reporting_stats"
     },
     {
       "active": true,

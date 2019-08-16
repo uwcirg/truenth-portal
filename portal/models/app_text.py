@@ -7,10 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
-from __future__ import unicode_literals  # isort:skip
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 
 from abc import ABCMeta, abstractmethod
 from builtins import str
@@ -20,9 +17,8 @@ from urllib.parse import parse_qsl, urlencode, urlparse
 
 from flask import current_app
 from flask_babel import gettext
-from future.utils import with_metaclass
 import requests
-from requests.exceptions import ConnectionError, MissingSchema, InvalidURL
+from requests.exceptions import ConnectionError, InvalidURL, MissingSchema
 
 from ..database import db
 
@@ -125,7 +121,7 @@ class AppText(db.Model):
         return d
 
 
-class AppTextModelAdapter(with_metaclass(ABCMeta, object)):
+class AppTextModelAdapter(object, metaclass=ABCMeta):
     """Several special purpose patterns used for lookups
 
     Make access consistent and easy for model classes where appropriate

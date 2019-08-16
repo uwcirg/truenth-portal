@@ -2,7 +2,7 @@
 --requirement requirements.txt
 
 alabaster==0.7.12         # via sphinx
-beautifulsoup4==4.7.1     # via webtest
+beautifulsoup4==4.8.0     # via webtest
 docutils==0.14            # via sphinx
 flask-testing==0.7.1
 flask-webtest==0.0.9
@@ -16,12 +16,12 @@ pluggy==0.12.0             # via tox
 psycopg2-binary==2.8.3
 py==1.8.0                 # via tox
 pygments==2.4.2           # via sphinx
-pyparsing==2.4.0          # via packaging
+pyparsing==2.4.1.1          # via packaging
 pytest==4.6.3
 selenium==3.141.0
 snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
-sphinx==2.1.2;python_version >= '3'
+sphinx==2.1.2
 sphinxcontrib-websupport==1.1.2  # via sphinx
 tox==3.13.2
 typing==3.7.4             # via sphinx

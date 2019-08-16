@@ -31,7 +31,8 @@ setup_python_venv() {
     fi
 
     echo "Creating new Python virtual environment: ${python_venv_path}"
-    virtualenv "${python_venv_path}"
+    # reuse system packages so wheel module doesn't have to be downloaded
+    python3 -m venv "${python_venv_path}" --system-site-packages
 }
 
 
@@ -51,7 +52,7 @@ setup_node_venv() {
     . "${python_venv_path}/bin/activate"
 
     echo "Installing node_env"
-    pip install nodeenv
+    python3 -m pip install nodeenv
 
     echo "Creating new virtual environment for NodeJS: ${node_venv_path}"
     nodeenv "${node_venv_path}"

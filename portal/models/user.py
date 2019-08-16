@@ -1,8 +1,5 @@
 """User model """
-from __future__ import unicode_literals  # isort:skip
 
-from future import standard_library  # isort:skip
-standard_library.install_aliases()  # noqa: E402
 
 from cgi import escape
 from datetime import datetime, timedelta
@@ -16,7 +13,6 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
-from past.builtins import basestring
 from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -185,7 +181,7 @@ def user_extension_map(user, extension):
 
     :returns: adapter implementing apply_fhir and as_fhir methods
 
-    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+    :raises :py:exc:`ValueError`: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:
@@ -459,7 +455,7 @@ class User(db.Model, UserMixin):
         # Called in different contexts - only compare string
         # value if it's a base string type, as opposed to when
         # its being used in a query statement (email.ilike('foo'))
-        if isinstance(self._email, basestring):
+        if isinstance(self._email, str):
             if self._email.startswith(INVITE_PREFIX):
                 # strip the invite prefix for UI
                 return self._email[len(INVITE_PREFIX):]
@@ -1568,6 +1564,25 @@ class User(db.Model, UserMixin):
             to registered user {}'
             .format(self.id, registered_user.id)
         )
+
+    def can_view_org(self, org_id):
+        """optimized ``check_role`` method for staff
+
+        intended for use in report generation and other tight loop
+        operations where calling in a users consents and all is overkill.
+        for general use case, see ``check_role``
+
+        :return: True, if self (staff) has organization association to
+          view patient consented at given org_id, False otherwise
+
+        """
+        if not self.has_role(ROLE.STAFF.value):
+            raise ValueError("limited to staff")
+
+        ot = OrgTree()
+        for org in self.organizations:
+            if ot.at_or_below_ids(org.id, [org_id]):
+                return True
 
     def check_role(self, permission, other_id):
         """check user for adequate role

@@ -1096,11 +1096,11 @@ export default (function() {
                     var self = this;
                     if (data.messages && data.messages.length > 0) {
                         (data.messages).forEach(function(item) {
-                            item.sent_at = self.modules.tnthDates.formatDateString(item.sent_at, "iso");
                             item.subject = `<i id="messageLoader_${item.id}" class="message-loader fa fa-spinner fa-spin tnth-hide"></i>
                                            <a id="messageLink_${item.id}" class="item-link" data-user-id="${userId}" data-item-id="${item.id}"><u>${item.subject}</u></a>`;
                         });
                         $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
+                        //noting here that displaying sent_date date/time as is, in GMT
                         $("#profileEmailLogTable").bootstrapTable(this.setBootstrapTableConfig({
                             data: data.messages,
                             classes: "table table-responsive profile-email-log",

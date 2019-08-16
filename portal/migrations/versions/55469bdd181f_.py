@@ -7,6 +7,7 @@ Create Date: 2019-02-04 13:36:04.709868
 """
 from portal.database import db
 from portal.models.audit import Audit
+from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import QBT, invalidate_users_QBT
 from portal.models.qbd import QBD
@@ -15,7 +16,6 @@ from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRoles
-from portal.models.overall_status import OverallStatus
 
 # revision identifiers, used by Alembic.
 revision = '55469bdd181f'

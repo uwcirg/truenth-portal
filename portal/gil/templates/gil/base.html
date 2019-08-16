@@ -76,9 +76,6 @@
           {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('client.clients_list')}}">{{_("Client Applications")}}</a></li>
           {% endif %}
-          {% if user and (user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.ANALYST.value)) %}
-              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.reporting_dashboard')}}">{{_("Reporting Dashboard")}}</a></li>
-          {% endif %}
           {% if user and user.has_role(ROLE.RESEARCHER.value) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Data")}}</a></li>
           {% endif %}

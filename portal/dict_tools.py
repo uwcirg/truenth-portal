@@ -1,5 +1,4 @@
 """Module for additional dictionary tools/utilities"""
-from __future__ import unicode_literals  # isort:skip
 
 import numbers
 

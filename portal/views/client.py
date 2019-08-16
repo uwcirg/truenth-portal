@@ -1,8 +1,3 @@
-from __future__ import unicode_literals  # isort:skip
-from future import standard_library  # isort:skip
-
-standard_library.install_aliases()  # noqa: E402
-
 from datetime import datetime
 from urllib.parse import urlparse
 

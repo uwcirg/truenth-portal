@@ -1,5 +1,3 @@
-from __future__ import unicode_literals  # isort:skip
-
 from flask import abort
 
 

@@ -1,5 +1,4 @@
 """Module to test assessment_status"""
-from __future__ import unicode_literals  # isort:skip
 
 from datetime import datetime
 from random import choice

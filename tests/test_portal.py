@@ -1,15 +1,11 @@
 """Unit test module for portal views"""
-from __future__ import unicode_literals  # isort:skip
-from future import standard_library  # isort:skip
 
-standard_library.install_aliases()  # noqa: E402
 from datetime import datetime
 import tempfile
 import urllib
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
-from past.builtins import basestring
 from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
@@ -179,7 +175,7 @@ class TestPortal(TestCase):
         body = message.style_message(message.body)
         assert 'DOCTYPE' in body
         assert 'style' in body
-        assert isinstance(body, basestring)
+        assert isinstance(body, str)
 
         self.login()
         response = self.client.get('/invite/{0}'.format(message.id))
