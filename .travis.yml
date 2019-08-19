@@ -1,6 +1,6 @@
 ---
 language: python
-python: "2.7"
+python: "3.6"
 sudo: false
 cache: pip
 # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since the last release
