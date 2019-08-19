@@ -123,4 +123,5 @@ deploy:
       - ./bin/docker-push.sh
 
 after_deploy:
+  # print image tags and hashes for reference/debugging
   - docker images --digests --all
