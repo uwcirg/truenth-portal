@@ -24,10 +24,10 @@ USAGE
 while getopts "hs:u:" option; do
     case "${option}" in
         s)
-            sql_dump="${OPTARG}"
+            SQL_DUMP="${OPTARG}"
             ;;
         u)
-            uploads_dir="${OPTARG}"
+            UPLOADS_DIR="${OPTARG}"
             ;;
         h)
             usage
@@ -39,17 +39,10 @@ while getopts "hs:u:" option; do
 done
 shift $((OPTIND-1))
 
+restore_sqldump() {
+    # restore a deployment from a given SQL dump file path
+    local sqldump_path="$1"
 
-# implement default variables (eg default_sql_dump, default_uploads_dir) as necessary
-SQL_DUMP="${sql_dump:-$default_sql_dump}"
-UPLOADS_DIR="${uploads_dir:-$default_uploads_dir}"
-
-# docker-compose commands must be run in the same directory as docker-compose.yaml
-docker_compose_directory="${repo_path}/docker"
-cd "${docker_compose_directory}"
-
-
-if [ -n "$SQL_DUMP" ]; then
     echo "Stopping services..."
     docker-compose stop web celeryworker celerybeat
 
@@ -61,14 +54,17 @@ if [ -n "$SQL_DUMP" ]; then
     docker-compose exec db \
         createdb --username postgres portaldb
 
-    echo "Loading SQL dumpfile: ${SQL_DUMP}..."
+    echo "Loading SQL dumpfile: ${sqldump_path}..."
     # Disable pseudo-tty allocation
     docker-compose exec -T db \
-        psql --dbname portaldb --username postgres < "${SQL_DUMP}"
+        psql --dbname portaldb --username postgres < "${sqldump_path}"
     echo "Loaded SQL dumpfile"
-fi
+}
 
-if [ -n "$UPLOADS_DIR" ]; then
+restore_uploads() {
+    # restore user uploads from given directory
+    local uploads_dir="$1"
+
     # todo: remove DEBUG output from stdout when running `flask config`
     web_file_upload_dir="$(
         docker-compose exec web \
@@ -78,9 +74,9 @@ if [ -n "$UPLOADS_DIR" ]; then
     run_user="$(docker-compose exec web printenv RUN_USER)"
     web_container_id=$(docker-compose ps --quiet web)
 
-    echo "Copying files from ${UPLOADS_DIR} to container upload dir (${web_file_upload_dir})..."
+    echo "Copying files from ${uploads_dir} to container upload dir (${web_file_upload_dir})..."
     # copy each file individually, to avoid overwriting entire upload directory
-    find "${UPLOADS_DIR}" -type f -exec \
+    find "${uploads_dir}" -type f -exec \
         docker cp {} ${web_container_id}:"${web_file_upload_dir}" \; -print
     echo "Done copying uploaded files into container"
 
@@ -88,4 +84,17 @@ if [ -n "$UPLOADS_DIR" ]; then
     docker-compose exec --user root web \
         chown --recursive "${run_user}:${run_user}" "${web_file_upload_dir}"
     echo "Finished importing uploads"
+}
+
+
+# docker-compose commands must be run in the same directory as docker-compose.yaml
+docker_compose_directory="${repo_path}/docker"
+cd "${docker_compose_directory}"
+
+if [ -n "$SQL_DUMP" ]; then
+    restore_sqldump "$SQL_DUMP"
+fi
+
+if [ -n "$UPLOADS_DIR" ]; then
+    restore_uploads "$UPLOADS_DIR"
 fi
