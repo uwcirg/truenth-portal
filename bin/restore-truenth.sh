@@ -50,7 +50,7 @@ cd "${docker_compose_directory}"
 
 
 if [ -n "$SQL_DUMP" ]; then
-    echo "Stopping containers..."
+    echo "Stopping services..."
     docker-compose stop web celeryworker celerybeat
 
     echo "Dropping existing DB..."
@@ -82,8 +82,10 @@ if [ -n "$UPLOADS_DIR" ]; then
     # copy each file individually, to avoid overwriting entire upload directory
     find "${UPLOADS_DIR}" -type f -exec \
         docker cp {} ${web_container_id}:"${web_file_upload_dir}" \; -print
+    echo "Done copying uploaded files into container"
+
     echo "Setting ownership to web user..."
     docker-compose exec --user root web \
-        chown --recursive "$run_user:$run_user" "${web_file_upload_dir}"
-    echo "Done copying uploaded files into container"
+        chown --recursive "${run_user}:${run_user}" "${web_file_upload_dir}"
+    echo "Finished importing uploads"
 fi
