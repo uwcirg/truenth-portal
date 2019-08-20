@@ -114,7 +114,7 @@ deploy:
       condition:
         - $TOXENV = build-artifacts
         - -v ARTIFACTORY_API_KEY
-        # Only deploy from `develop`, `master`, and branches prefixed by release/ or test/
+        # Only deploy from "develop", "master", and branches prefixed by "release/" or "test/"
         - $GIT_BRANCH =~ ^(develop$|master$|release/|test/)
     script:
       - ./bin/docker-push.sh
