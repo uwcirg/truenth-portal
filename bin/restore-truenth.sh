@@ -54,20 +54,27 @@ if [ -n "$SQL_DUMP" ]; then
     docker-compose stop web celeryworker celerybeat
 
     echo "Dropping existing DB..."
-    docker-compose exec db dropdb --username postgres portaldb
+    docker-compose exec db \
+        dropdb --username postgres portaldb
 
     echo "Creating empty DB..."
-    docker-compose exec db createdb --username postgres portaldb
+    docker-compose exec db \
+        createdb --username postgres portaldb
 
     echo "Loading SQL dumpfile: ${SQL_DUMP}..."
     # Disable pseudo-tty allocation
-    docker-compose exec -T db psql --dbname portaldb --username postgres < "${SQL_DUMP}"
+    docker-compose exec -T db \
+        psql --dbname portaldb --username postgres < "${SQL_DUMP}"
     echo "Loaded SQL dumpfile"
 fi
 
 if [ -n "$UPLOADS_DIR" ]; then
     # todo: remove DEBUG output from stdout when running `flask config`
-    web_file_upload_dir="$(docker-compose exec web flask config -c FILE_UPLOAD_DIR | grep --invert-match DEBUG | tr --delete '[:space:]')"
+    web_file_upload_dir="$(
+        docker-compose exec web \
+            flask config -c FILE_UPLOAD_DIR \
+        | grep --invert-match DEBUG | tr --delete '[:space:]'
+    )"
     run_user="$(docker-compose exec web printenv RUN_USER)"
     web_container_id=$(docker-compose ps --quiet web)
 
