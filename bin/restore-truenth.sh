@@ -96,6 +96,8 @@ docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
 if [ -n "$SQL_DUMP" ]; then
+    # exit if given dump does not meet expectations: exists and has non-zero filesize
+    test -s "$SQL_DUMP" || exit 1
     if [ -z "$FORCE" ]; then
         # not forced; prompt to confirm
         echo "This operation will drop the current database and restore from the given SQL dump:"
