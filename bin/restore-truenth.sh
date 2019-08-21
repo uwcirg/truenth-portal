@@ -66,13 +66,13 @@ restore_uploads() {
     local uploads_dir="$1"
 
     # todo: remove DEBUG output from stdout when running `flask config`
-    web_file_upload_dir="$(
+    local web_file_upload_dir="$(
         docker-compose exec web \
             flask config -c FILE_UPLOAD_DIR \
         | grep --invert-match DEBUG | tr --delete '[:space:]'
     )"
-    run_user="$(docker-compose exec web printenv RUN_USER | tr -d [:space:])"
-    web_container_id=$(docker-compose ps --quiet web)
+    local run_user="$(docker-compose exec web printenv RUN_USER | tr -d [:space:])"
+    local web_container_id=$(docker-compose ps --quiet web)
 
     echo "Copying files from ${uploads_dir} to container upload dir (${web_file_upload_dir})..."
     # copy each file individually, to avoid overwriting entire upload directory
