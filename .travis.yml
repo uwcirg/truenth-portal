@@ -1,17 +1,11 @@
 ---
 language: python
-python: "2.7"
+python: "3.6"
 sudo: false
 cache: pip
 # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since the last release
 git:
   depth: 10000
-addons:
-  postgresql: "9.4"
-
-services:
-  - postgresql
-  - redis-server
 env:
   global:
     - FLASK_APP="$(readlink -f manage.py)"
@@ -48,6 +42,9 @@ matrix:
       addons:
         postgresql: "9.4"
         sauce_connect: true
+      services:
+        - postgresql
+        - redis-server
   allow_failures:
     - env: TOXENV=ui
 
@@ -117,10 +114,11 @@ deploy:
       condition:
         - $TOXENV = build-artifacts
         - -v ARTIFACTORY_API_KEY
-        # Only deploy from develop, master and release branches
-        - $GIT_BRANCH =~ ^(develop$|master$|release/)
+        # Only deploy from "develop", "master", and branches prefixed by "release/" or "test/"
+        - $GIT_BRANCH =~ ^(develop$|master$|release/|test/)
     script:
       - ./bin/docker-push.sh
 
 after_deploy:
+  # print image tags and hashes for reference/debugging
   - docker images --digests --all

@@ -1565,6 +1565,25 @@ class User(db.Model, UserMixin):
             .format(self.id, registered_user.id)
         )
 
+    def can_view_org(self, org_id):
+        """optimized ``check_role`` method for staff
+
+        intended for use in report generation and other tight loop
+        operations where calling in a users consents and all is overkill.
+        for general use case, see ``check_role``
+
+        :return: True, if self (staff) has organization association to
+          view patient consented at given org_id, False otherwise
+
+        """
+        if not self.has_role(ROLE.STAFF.value):
+            raise ValueError("limited to staff")
+
+        ot = OrgTree()
+        for org in self.organizations:
+            if ot.at_or_below_ids(org.id, [org_id]):
+                return True
+
     def check_role(self, permission, other_id):
         """check user for adequate role
 

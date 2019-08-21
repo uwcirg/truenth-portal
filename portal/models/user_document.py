@@ -95,7 +95,7 @@ class UserDocument(db.Model):
         if not os.path.exists(filepath):
             raise ValueError("could not find file")
         try:
-            with open(filepath, "r") as file_in:
+            with open(filepath, "rb") as file_in:
                 file_contents = file_in.read()
         except:
             raise ValueError("could not open file")
