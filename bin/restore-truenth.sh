@@ -8,11 +8,12 @@ repo_path="${bin_path}/.."
 usage() {
     cat << USAGE >&2
 Usage:
-    $cmdname [-h] [-s dump.sql] [-u upload_dir]
+    $cmdname [-h] [-f] [-s dump.sql] [-u upload_dir]
 
     Restore a deployment from archived files
 
     -h     Show this help message
+    -f     Force; assume yes for all prompts
     -s     Restore the databases from given SQL dump
     -u     Restore user uploads from given directory
 
@@ -21,7 +22,7 @@ USAGE
 }
 
 
-while getopts "hs:u:" option; do
+while getopts "hfs:u:" option; do
     case "${option}" in
         s)
             SQL_DUMP="${OPTARG}"
@@ -31,6 +32,9 @@ while getopts "hs:u:" option; do
             ;;
         h)
             usage
+            ;;
+        f)
+            FORCE=true
             ;;
         *)
             usage
@@ -92,6 +96,15 @@ docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
 if [ -n "$SQL_DUMP" ]; then
+    if [ -z "$FORCE" ]; then
+        # not forced; prompt to confirm
+        echo "This operation will drop the current database and restore from the given SQL dump:"
+        echo "$SQL_DUMP"
+
+        echo "Are you sure you want to proceed (y/n)?"
+        read response
+        test "$response" = y || exit
+    fi
     restore_sqldump "$SQL_DUMP"
 fi
 
