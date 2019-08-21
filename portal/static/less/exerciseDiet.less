@@ -46,7 +46,7 @@
 @mobileButtonFontSize: 18px;
 @miniBoxTitleFontSize: 17px;
 @miniBoxFontSize: 19px;
-@modalBodyFontSize: 18px;
+@modalBodyFontSize: 17px;
 @modalHeadingSize: 24px;
 @h3FontSize: 32px;
 @h3MobileFontSize: 28px;
@@ -157,7 +157,7 @@ h4, h5, h6 {
 h1 {
 	position: relative;
 	font-size: 2.4em;
-	line-height: 1.4em;
+	line-height: 1.3;
 	font-weight: 700;
     color: @headerColor;
     text-align: center;
@@ -538,10 +538,10 @@ table b, table strong {
 }
 .watermark {
     top: 0;
-    padding: 0;
+    padding: 4px 0 0;
     z-index: 3000;
     width: 100%;
-    color: #FFF;
+    color: #603b00;
     min-height: 26px;
     background: #EEAB50;
     font-size: 12px;
@@ -1065,6 +1065,8 @@ ul.intro-li {
         margin-left: 8px;
         list-style-position: outside;
         list-style-type: none;
+        position: relative;
+        left: 1em;
     }
 }
 
@@ -1093,6 +1095,7 @@ ul.intro-li {
             letter-spacing: 1.2px;
             margin: auto;
             text-align: center;
+            min-height: 40px;
         }
     }
     .healthy-fats-accordion,
@@ -1636,7 +1639,7 @@ table#diet-table ul {
 
 #ED-Intro .section {
     border-top: 2px solid @sectionBorderColor;
-    padding: 10px 20px 40px;
+    padding: 10px 20px 32px;
     text-align: center;
     &.resources {
         background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
@@ -2286,7 +2289,7 @@ span.right-button a  {
 	padding: 12px 20px 16px;
     width: 100%;
     max-width: 100%;
-	margin: 8px;
+	margin: 8px auto;
 	background-color: @miniBoxBackgroundColor;
     display: flex;
     flex-direction: column;
