@@ -1,0 +1,2904 @@
+//@mainBackgroundColor: #334a48;
+@mainBackgroundColor: #2e3e2e;
+@alternativeBackgroundColor: #253534;
+@bodyTextColor: #4a4a4a;
+@navbarBorderColor: #d7dde0;
+@navbarColor: #7c959e;
+@navbarBackgroundColor: rgba(210,209,197,.2);
+@highlightColor: #dccab2;
+@modalHighlightColor: #6a5944;
+@headerColor: #FFF;
+@tnthPrimaryColor: #7C959D;
+@btnTruenthPrimaryColor: #7C959D;
+@btnTruenthArrowColor: #4c5e6e;
+@btnTruenthPrimaryHoverColor: #576E76;
+@miniBoxContainerBackgroundColor: #5f676e;
+@miniBoxBackgroundColor: rgba(51,54,56,.8);
+@miniBoxHeaderColor: #dccab2;
+@miniBoxHeaderFontSize: 18px;
+@miniBoxHeaderFontWeight: 500;
+@cellBorderColor: #818a92;
+@cellHeaderColor: #404d50;
+//@cellBackgroundColor: rgba(59,68,73,.8);
+@cellBackgroundColor: rgb(81, 97, 101);
+@cellHoverColor: darken(rgba(59,68,73,.8), 10%);
+@sectionBorderColor: #3a463a;
+@modalHeaderBackgroundColor: #607277;
+@modalHeadingColor: #4b5e6f;
+@modalSubHeadingColor: #4a4a4a;
+@modalHeadingBorderColor: #cfd5d8;
+@inputBackgroundColor: #f1efec;
+@resourceLinkColor: #bedfea;
+//@resourceBackgroundColor: rgba(51,54,56,.8);
+@resourceBackgroundColor: rgba(59,68,73,.5);
+@infoButtonBackgroundColor: #8f9385;
+@figureBackgroundColor: #4c5e6e;
+@mainNavFontSize: 13px;
+@mainNavCellHeight: 56px;
+@contentFontSize: 24px;
+@contentPromptFontSize: 28px;
+@mobileContentFontSize: 20px;
+@buttonFontSize: 20px;
+@tableCellFontSize: 18px;
+@mobileTableCellFontSize: 14px;
+@mobileTableCellFontSize: 16px;
+@smallerTextFontSize: 16px;
+@mobileButtonFontSize: 18px;
+@miniBoxTitleFontSize: 17px;
+@miniBoxFontSize: 19px;
+@modalBodyFontSize: 18px;
+@modalHeadingSize: 24px;
+@h3FontSize: 32px;
+@h3MobileFontSize: 28px;
+@referenceFontSize: 18px;
+@resourceHeaderFontSize: 27px;
+@bodyFontFamily: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
+@modalHeaderFontWeight: 700;
+
+body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.35em;
+    letter-spacing: .02em;
+    font-weight: 500;
+    font-style: normal;
+    color: #333;
+    background-color: #FFF;
+    font-family: @bodyFontFamily;
+}
+
+:not(.is-scrolled) .theme--intro-light .logo {
+    color: black;
+    background-image: url(../../../../gil/static/img/logo-base.png);
+}
+
+main .module-assets {
+    overflow: auto;
+    p {
+        margin: 0 1.5em;
+    }
+}
+@media (min-width: 912px) {
+    main.exercise-diet .module-assets {
+        max-width: 100%;
+        margin: -2em auto auto;
+    }
+}
+.main.exercise-diet {
+    top: 0em;
+    padding-top: 5em;
+    //padding-bottom: 3em;
+    padding-bottom: 0;
+    margin-bottom: -2.25em;
+    position: relative;
+}
+main {
+    position: relative;
+    &:after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        content: "";
+        display: block;
+        background: #FFF;
+        opacity: 0.7;
+        z-index: 3;
+        transform: translateY(0);
+        transition: all 350ms ease;
+        overflow-x: hidden;
+    }
+    &.active:after {
+        opacity: 0;
+        transform: translateY(-500%);
+    }
+}
+
+// main [data-target] {
+//     cursor: pointer;
+// }
+em {
+	font-weight: 400;
+	font-style: normal;
+	letter-spacing: 1.2px;
+}
+.accent-heading em {
+    font-size: 9px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+p {
+	margin: 0;
+	padding: 0 0 10px;
+}
+ul {
+	margin: 0;
+	padding: 0;
+}
+.row-hover {
+	background-color: @cellHoverColor;
+}
+.cell-hover {
+    background-color: @cellHoverColor;
+}
+
+h1, h2, h3, h4 {
+    color: @headerColor;
+    line-height: 1.3;
+}
+h4, h5, h6 {
+    text-transform: uppercase;
+}
+
+h1 {
+	position: relative;
+	font-size: 2.4em;
+	line-height: 1.4em;
+	font-weight: 700;
+    color: @headerColor;
+    text-align: center;
+   // border: 1px solid @cellBorderColor;
+    padding: 16px;
+    margin: 20px auto 20px;
+}
+h2 {
+	position: relative;
+    font-size: 2em;
+    line-height: 1.4em;
+    font-weight: 600;
+    color: @headerColor;
+    text-align: center;
+    border: none;
+    padding: 20px 15px;
+    margin: 10px 0px 10px;
+    a {
+        font-weight: 500;
+        color: @btnTruenthPrimaryColor;
+        background-color: white;
+        border: none;
+        border-radius: none;
+        font-weight: 500;
+        font-style: normal;
+        font-size: 11px;
+        line-height: 1.4em;
+        letter-spacing: .3em;
+        text-align: right;
+        padding: 0px 0px 0px 0px;
+        text-decoration: underline;
+    }
+}
+h2 a:hover {
+    color: @btnTruenthPrimaryHoverColor;
+}
+h3 {
+    font-size: @h3MobileFontSize;
+    line-height: 1.3;
+	font-weight: 600;
+	letter-spacing: .03em;
+    color: @headerColor;
+    text-align: center;
+    padding: 5px 0;
+    margin-top: 0px;
+}
+@media (min-width: 768px) {
+    h3 {
+        font-size: @h3FontSize;
+    }
+}
+h3 a {
+	letter-spacing: .01em;
+    color: @highlightColor;
+    text-align: center;
+    padding: 5px 0;
+    margin-top: 0px;
+    &:hover {
+        color: #FFF;
+        text-decoration: underline;
+    }
+}
+h3.module__head {
+    color: #FFF;
+}
+h6, h6 span {
+	font-size: 15px;
+    line-height: 1.35;
+    letter-spacing: 1.2px;
+    font-style: normal;
+    font-weight: 500;
+    color: #FFF;
+    text-align: center;
+    vertical-align: top;
+    width: auto;
+    margin: 0px 2px 3px;
+}
+
+hr {
+    border-top: 1px solid @sectionBorderColor;
+}
+hr.objective {
+	margin: 10px auto 30px;
+	padding: 0px 0px 0px 0px;
+	background: rgba(255, 255, 255, 0.5);
+    display: block;
+    height: .05px;
+    width: 233px;
+}
+
+.clearfix {
+    clear:both;
+}
+
+.objective-content p:last-child {
+	padding: 0px 0px 100px;
+}
+
+a {
+    color: @btnTruenthPrimaryColor;
+    &:hover {
+        color: @btnTruenthPrimaryHoverColor;
+    }
+
+}
+
+a, button, .btn, input {
+    outline: none;
+    text-decoration:none;
+    &:hover,
+    &:focus,
+    &:visited {
+        outline: none !important;
+        text-decoration: none;
+        box-shadow: none;
+        cursor: pointer;
+    }
+}
+
+.button-container {
+    position: relative;
+    &:after {
+        content: "\2192";
+        font-family: symbol;
+        font-style: normal;
+        font-weight: normal;
+        display: inline-block;
+        margin-left: 8px;
+        color: @btnTruenthArrowColor;
+    }
+}
+.figure {
+    color: @figureBackgroundColor;
+    display: inline-block !important;
+    min-height: 1em !important;
+    &:hover {
+        color: #FFF;
+    }
+}
+.box__content {
+    background: @miniBoxBackgroundColor;
+    padding: 24px 12px 28px;
+    margin: 12px auto;
+    width: 100%;
+    max-width: 100%;
+}
+.box__content--container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 12px auto;
+    .box__content {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+@media(min-width: 768px) {
+    .box__content {
+        width: 70%;
+    }
+}
+@media (min-width: 1200px) {
+    .box__content--container {
+        .box__content {
+            min-height: 260px;
+            width: 480px;
+        }
+    }
+}
+@media (min-width: 1400px) {
+    .box__content--container {
+        width: 1100px;
+    }
+}
+.container {
+	position: relative;
+    max-width: 1000px;
+    min-width: 320px;
+    width: 100%;
+    min-height: auto;
+    background-color: transparent;
+    padding: 0;
+    margin: 0 auto;
+    overflow: visible;
+}
+.navbar-toggle {
+    display: none;
+}
+.navbar {
+    margin:8px -15px;
+}
+#mainNavContainer {
+    background-color:white;
+}
+#mainNav {
+    display:flex;
+    align-content:center;
+    margin:0;
+    background-image:none;
+    border:0;
+    border-radius:0;
+    margin-top:45px;
+    margin-bottom:30px;
+}
+#mainNavbar {
+    background-color:white;
+    border:0;
+    z-index: 2;
+    ul {
+        display:flex;
+        //align-items:flex-end;
+        justify-content:center;
+        list-style-type: none;
+        min-height:@mainNavCellHeight;
+    }
+    li {
+        display:flex;
+        margin-left: 4px;
+        margin-right: 4px;
+        cursor: pointer;
+        &:hover {
+            a {
+                color: @btnTruenthPrimaryHoverColor;
+                cursor: pointer;
+            }
+        }
+        &.disabled {
+            display: none;
+        }
+        a {
+            display: flex;
+            color: @navbarColor;
+            background-color: @navbarBackgroundColor;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: @mainNavFontSize;
+            font-weight: 500;
+            max-width: 250px;
+            height: @mainNavCellHeight;
+            text-align: center;
+            padding: 8px 40px 4px 40px;
+            align-items: center;
+            border: 0;
+        
+        }
+        &.active  a {
+            font-weight: 600;
+            color: #FFF;
+            background: @navbarColor;
+            background-image: none;
+            z-index: 999;
+            box-shadow: none;
+        }
+    }
+}
+.is-scrolled {
+    #mainNavbar {
+        background-color: lighten(@navbarBackgroundColor, 10%);
+        a {
+            background : #FFF;
+        }
+    }
+}
+.navbar-nav {
+    overflow: hidden;
+    ul {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+    }
+}
+@media (min-width: 768px) {
+    #mainNavContainer {
+    background-color:white;
+    }
+    #mainNav {
+        display:flex;
+        align-content:center;
+        margin:0;
+        background-image:none;
+        border:0;
+        border-radius:0;
+        margin-top:45px;
+        margin-bottom:30px;
+    }
+    #mainNavbar {
+        background-color:white;
+        border:0;
+        margin-bottom: -4px;
+    }
+}
+.navbar-nav {
+    overflow: hidden;
+}
+strong {
+    font-size: 1em;
+    font-weight: 600;
+    font-style: normal;
+    line-height: 1.35em;
+    margin: 20px auto;
+    vertical-align: top;
+}
+b, strong {
+	color: @highlightColor;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+p {
+    b, strong {
+        font-weight: 500;
+    }
+}
+h2 b, h3 b, h4 b {
+    color: @headerColor;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+td {
+	padding: 12px 8px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+    line-height: 1.35em;
+    font-size: @mobileTableCellFontSize !important;
+    background-color: @cellBackgroundColor;
+    word-break: break-word;
+    p, li {
+        font-size: @mobileTableCellFontSize !important;
+        color: #FFF;
+    }
+    &.image-cell {
+        vertical-align: middle;
+        img {
+            margin-top: 8px;
+        }
+    }
+    &:hover {
+        background-color: @cellHoverColor;
+    }
+}
+@media (min-width: 768px) {
+    td {
+        word-break: normal;
+        font-size: @tableCellFontSize !important;
+        p, li {
+            font-size: @tableCellFontSize !important;
+        }
+    }
+}
+
+tr {
+	padding: 3px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+}
+
+table b, table strong {
+    font-weight: 500;
+    font-style: normal;
+    color: lighten(@highlightColor, 10%);
+}
+
+
+.mini__head, p.mini__head {
+    font-size: @miniBoxTitleFontSize;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 500;
+}
+.watermark {
+    top: 0;
+    padding: 0;
+    z-index: 3000;
+    width: 100%;
+    color: #FFF;
+    min-height: 26px;
+    background: #EEAB50;
+    font-size: 12px;
+}
+
+.page-intro__content {
+    max-width: 100%;
+}
+body.page-exercise-diet-portal footer {
+    margin: 0 1em;
+}
+@media (min-width: 401px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 1.35em;
+    }
+}
+
+@media (min-width: 900px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 2em;
+    }
+}
+
+body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
+    margin-top: 2em;
+}
+
+//acknowledgment section
+#Exercise-Diet_Acknowledgement {
+    background: #3B4449;
+    padding: 55px 0 90px;
+}
+
+body.page-exercise-diet-portal {
+    #Exercise-Diet_Acknowledgement {
+        padding: 90px 0;
+    }
+}
+#Exercise-Diet_Acknowledgement {
+    .accent-heading {
+        //margin-top: 28px;
+        margin-top: 60px;
+        color: #D2D1C5;
+    }
+    .objective-content {
+        margin: 0px auto;
+        padding-left: 2em;
+        padding-right: 2em;
+        z-index: 100;
+        text-align: center;
+        width: 100%;
+        max-width: 100%;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+    }
+    .module__body {
+        font-size: 18px;
+        text-align: left;
+        max-width: 100%;
+    }
+    .mini-box {
+        padding: 30px 40px;
+    }
+    .mini-box__copy {
+        padding: 0 0 8px;
+    }
+    .mini-box__copy,
+    .mini-box__head {
+        text-align: left;
+    }
+    .mini-mini-box {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .mini-mini-box__item {
+        margin-right: 24px;
+    }
+    .accent-heading--no-border {
+        padding-bottom: 20px;
+    }
+}
+@media (min-width: 992px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading--no-border {
+            padding-bottom: 40px;
+        }
+        .objective-content {
+            width: 875px;
+            padding-right: 0;
+            padding-left: 0;
+        }
+        .module__body {
+            font-size: @contentFontSize;
+        }
+    }
+}
+//exercise diet portal
+#Exercise-Diet-Portal {
+	position: relative;
+	display: block;
+    margin: 0px auto;
+    h1 {
+        position: relative;
+        display: block;
+        margin: 0px auto 12px;
+        font-weight: 600;
+        color: #fff;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: 28px;
+        line-height: 40px;
+        text-align: center;
+        padding: 100px 10px 0px;
+        max-width: 740px;
+        border: 0;
+    }
+    .intro-content,
+    .objective-content
+    {
+        width: 780px;
+        max-width: 100%;
+        padding: 1em 2.5em;
+    }
+    .intro-content {
+        padding-top: 3.75em;
+    }
+    .start-button-intro {
+        position: relative;
+        margin: 0px 0px 10px;
+        font-weight: 400;
+        color: rgb(255, 255, 255);
+        background: @tnthPrimaryColor;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: 18px;
+        line-height: 26px;
+        letter-spacing: 5px;
+        display: inline-block;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 25px 25px 22px;
+        width: 250px;
+        margin-top: 40px;
+    }
+    img {
+        margin: 0px auto;
+        width: 100%;
+        z-index: 0;
+        border: none;
+        border: 0;
+    }
+}
+
+#Exercise-Diet-Portal h2,
+#Exercise-Diet_Acknowledgement h2 {
+	position: relative;
+	display: block;
+	margin: 0px auto 25px;
+    font-weight: 600;
+    color: #fff;
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: 28px;
+    line-height: 1.35;
+    text-align: center;
+    padding: 1px 10px 1px;
+    max-width: 740px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2,
+    #Exercise-Diet_Acknowledgement h2 {
+        font-size: 30px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2,
+    #Exercise-Diet_Acknowledgement h2 {
+        font-size: 35px;
+    }
+}
+@media (min-width: 900px) {
+    #Exercise-Diet-Portal .intro-content {
+        padding-top: 8em;
+        margin-top: 5em;
+    }
+}
+
+
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal {
+        .start-button-intro {
+            font-size: 22px;
+        }
+        .watch-button-video {
+            font-size: 22px;
+            top: 60%;
+            left: 50%;
+        }
+    }
+}
+
+#Exercise-Diet-Portal {
+    .watch-button-video {
+        margin: 0 0 10px;
+        font-weight: 400;
+        color: #fff;
+        background: @btnTruenthPrimaryColor;
+        font-style: normal;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: 5px;
+        display: inline-block;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 25px;
+        width: 250px;
+        margin-top: 40px;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -125px;
+        margin-top: -37px;
+        height: 74px;
+    }
+    p {
+        position: relative;
+        display: block;
+        margin: 0px auto;
+        font-weight: 500;
+        color: #fff;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: @mobileContentFontSize;
+        line-height: 1.5;
+        letter-spacing: .03em;
+        text-align: left;
+        padding: 20px 12px;
+    }
+    h6.accent-heading {
+        color: rgb(169, 178, 183);
+        color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.7;
+        padding-bottom: 25px;
+        letter-spacing: 2.9px;
+        display: inline-block;
+        width: 100%;
+        clear: both;
+        margin: 50px auto 0;
+    }
+    ul {
+        margin: 0px auto;
+        padding: 0px;
+        padding-left: 1em;
+        width: 768px;
+        max-width: 100%;
+        li {
+            position: relative;
+            display: block;
+            font-weight: 500;
+            color: #fff;
+            font-style: normal;
+            font-size: @mobileContentFontSize;
+            line-height: 1.3em;
+            letter-spacing: .03em;
+            text-align: left;
+            background-image: url('../img/white-triangle-bullet.png');
+            background-repeat: no-repeat;
+            background-position: left 10px;
+            padding-left: 20px;
+            padding-bottom: 5px;
+            margin-left: 0;
+            list-style-position: outside;
+            list-style-type: none;
+        }
+    }
+}
+
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal p {
+        font-size: @contentFontSize;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: @contentFontSize;
+    }
+}
+
+.intro-module.intro-intro  {
+    position: relative;
+    margin-top: -4em;
+    height: 700px;
+}
+@media (min-width: 900px) {
+    .intro-module.intro-intro  {
+        margin-top: -6em;
+    }
+}
+.video-module.video-testimonial-hero {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-position: top center;
+    overflow: hidden;
+}
+.video-module iframe {
+    position: absolute;
+    left: 20px;
+    width: calc(100% - 40px);
+    height: 100%;
+    top: 0;
+}
+@media (min-width: 900px) {
+    .video-module iframe {
+        position: absolute;
+        left: 28px;
+        width: calc(100% - 56px);
+        height: 100%;
+        top: 0;
+    }
+}
+
+.video-module img {
+    visibility: hidden !important;
+    width: calc(100% - 50px) !important;
+    position: relative;
+    margin: 0;
+    top: 0;
+    padding: 0;
+}
+@media (min-width: 699px) {
+    .video-module img {
+        width: calc(100% - 65px) !important;
+    }
+}
+@media (min-width: 900px) {
+    .video-module img {
+        width: calc(100% - 87px) !important;
+    }
+}
+@media (min-width: 1100px) {
+    .video-module.video-testimonial-hero {
+        background-position: 100%;
+    }
+}
+
+@media (min-width: 1376px) {
+    .video-module img {
+        width: calc(100% - 97px) !important;
+    }
+}
+
+.intro-module, .video-module, .objective-module {
+	margin: 0px auto;
+	z-index: 0;
+	text-align: center;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 40px 0px;
+	width: 100%;
+}
+.intro-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.video-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.objective-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.toolbox {
+	position: relative;
+	width: 97%;
+    max-width: 100%;
+	height: 14em;
+    background: rgba(57, 56, 51, 0.8);
+	padding: 10px;
+	margin: 10px auto;
+    display: flex;
+    justify-content: flex-end;
+}
+@media (min-width: 585px) {
+    .toolbox {
+        height: 130px;
+        padding: 10px 24px;
+    }
+}
+.toolbox h5 {
+    color: #fff;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: @miniBoxFontSize;
+    line-height: 28px;
+    letter-spacing: .05em;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+.toolbox h6 {
+    color: rgb(169, 178, 183);
+    color: #7d959d;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+.toolbox h6 em {
+    font-size: 6px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+
+.toolbox h6 span {
+    color: rgb(169, 178, 183);
+    color: #bcc2a7;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    margin: 10px auto 10px;
+}
+
+.toolbox-start-button {
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    background: @btnTruenthPrimaryColor;
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: @mobileButtonFontSize;
+    line-height: 26px;
+    letter-spacing: 5px;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 1em 6px;
+    width: 210px;
+    margin: 20px 10px 20px;
+    height: 70px;
+    &:hover {
+        background: @btnTruenthPrimaryHoverColor;
+    }
+}
+@media (min-width: 518px) {
+    .toolbox-start-button {
+        font-size: @buttonFontSize;
+        padding: 25px;
+    }
+}
+
+.toolbox .icon-box {
+    background: #333638;
+    color: #fff;
+    display: block;
+    padding: 20px 20px 20px 135px;
+    margin: 0 10px 0 0;
+    position: relative;
+    min-height: 130px;
+    max-height: 100%;
+}
+
+.middle-content {
+	margin-right: 50px;
+}
+
+/* Intro page ul li */
+ul.intro-li {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+    margin-bottom: 0px;
+    max-width: 100%;
+    width: 100%;
+    li {
+        font-weight: 500;
+        font-style: normal;
+        font-size: @mobileContentFontSize;
+        line-height: 1.4em;
+        letter-spacing: .02em;
+        text-align: left;
+        color: #FFF;
+        background-image: url('../img/green-triangle-bullet.png');
+        background-repeat: no-repeat;
+        background-position: left 12px;
+        padding-left: 20px;
+        padding-bottom: 5px;
+        margin-left: 8px;
+        list-style-position: outside;
+        list-style-type: none;
+    }
+}
+
+@media (min-width: 768px) {
+    ul.intro-li li{
+        font-size: @contentFontSize;
+        margin: auto;
+        width: 820px;
+        position: relative;
+        left: 2.75em;
+    }
+}
+#Recipe-Accordions {
+	position: relative;
+	//margin: auto;
+    //padding: 56px 20px;
+    //padding: 0 40px 20px;
+    margin: -20px auto 0;
+    padding: 0 40px 70px;
+    background-color: @mainBackgroundColor;
+    //background: @alternativeBackgroundColor;
+    table {
+        h6 {
+            text-transform: uppercase;
+            color: @highlightColor;
+            letter-spacing: 1.2px;
+            margin: auto;
+            text-align: center;
+        }
+    }
+    .healthy-fats-accordion,
+    .vegetables-accordion,
+    .fish-accordion,
+    .tomatoes-accordion,
+    .alternatives-accordion,
+    [role='tabpanel']
+     {
+        position: relative;
+        max-width: 100%;
+        border-radius: 0;
+        h4 {
+            display: block;
+            position: relative;
+            //padding: 16px 12px 32px;
+            padding: 16px 12px 16px;
+            margin-bottom: 4px;
+            &:after {
+                content: "\f107";
+                font-family: FontAwesome;
+                font-style: normal;
+                font-weight: normal;
+                display: block;
+                position: absolute;
+                bottom: 4px;
+                width: 10px;
+                right: 4.5%;
+                top: 25%;
+                // left: 50%;
+                // right: 50%;
+            }
+            a {
+                display: block;
+                width: 100%;
+                height: 100%;
+                padding: 0px 16px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-radius: 0;
+            }
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Recipe-Accordions {
+        .healthy-fats-accordion,
+        .vegetables-accordion,
+        .fish-accordion,
+        .tomatoes-accordion,
+        .alternatives-accordion,
+        [role='tabpanel'] {
+            max-width: 650px;
+        }
+    }
+}
+
+#Recipe-Accordions [role='tabpanel'] {
+    opacity: 0.1;
+    transition: opacity 350ms ease;
+}
+#Recipe-Accordions [role='tabpanel'].visited {
+    opacity: 1;
+}
+
+.healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
+	position: relative;
+	margin: 1px auto 0px;
+	padding: 0 20px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.healthy-fats-accordion h4, .vegetables-accordion h4, .tomatoes-accordion h4, .fish-accordion h4, .alternatives-accordion h4 {
+	position: relative;
+	display: block;
+	margin: 1px auto 0px;
+	padding: 0px;
+	font-size: @mobileContentFontSize;
+	font-weight: 600;
+	letter-spacing: .03em;
+	background-color: @btnTruenthPrimaryColor;
+	color: #fff;
+	padding: 12px 10px ;
+	margin: 0px 0px 0px -0px;
+	min-height: 30px;
+	border-radius: 0;
+	text-align: center;
+}
+@media (min-width: 992px) {
+    .healthy-fats-accordion h4, .vegetables-accordion h4, .tomatoes-accordion h4, .fish-accordion h4, .alternatives-accordion h4 {
+        font-size: @contentFontSize;
+    }
+}
+.healthy-fats-accordion h4:hover, .vegetables-accordion h4:hover, .tomatoes-accordion h4:hover, .fish-accordion h4:hover, .alternatives-accordion h4:hover {
+	background-color: @btnTruenthPrimaryHoverColor;
+}
+
+.healthy-fats-accordion h4 a, 
+.vegetables-accordion h4 a, .tomatoes-accordion h4 a, .fish-accordion h4 a, .alternatives-accordion h4 a {
+	color: #fff;
+}
+.collapse {
+	padding: 12px 20px 12px;
+	margin: 0px auto 10px;
+	border-top: none;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+    -webkit-transition: margin 200ms, padding 200ms;
+    transition: margin 200ms, padding 200ms;
+}
+.collapse td {
+    font-weight: 600;
+    line-height: 1.2em;
+    font-size: 14px;
+    letter-spacing: .01em;
+    font-style: normal;
+    color: @btnTruenthPrimaryColor;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0px 2px 3px;
+    text-decoration: none;
+    width: auto;
+    width: 33%;
+}
+.collapse td a {
+    outline: none;
+    outline-offset: 0;
+    text-decoration: none;
+    font-weight: 600;
+    line-height: 1.2em;
+    font-size: 15px;
+    letter-spacing: .01em;
+    font-style: normal;
+    color: @btnTruenthPrimaryColor;
+    text-align: center;
+    vertical-align: middle;
+    width: auto;
+    margin: 0px;
+    text-decoration: none;
+}
+
+.collapse.in td a {
+    color: #FFF;
+}
+
+td.collapse.in a:focus {
+    outline: none;
+    outline-offset: 0;
+    text-decoration: none;
+}
+
+/*   new styling change id?  */
+img.recipe-table-image {
+    -webkit-transition: transform 300ms ease-in-out;
+    -o-transition: transform 300ms ease-in-out;
+    -moz-transition: transform 300ms ease-in-out;
+    transition: transform 300ms ease-in-out;
+}
+#healthy-fats.collapse.in img.recipe-table-image,
+#vegetables.collapse.in img.recipe-table-image,
+#tomatoes.collapse.in img.recipe-table-image,
+#fish.collapse.in img.recipe-table-image,
+#alternatives_to_processed_meats.collapse.in img.recipe-table-image {
+	position: relative;
+    border: 1px solid transparent;
+    display: block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    //padding: 1px;
+    width: 90%;
+    //width: 100%;
+    height: auto;
+}
+
+table#diet-table,
+table#avoid-foods-table {
+    table-layout: fixed;
+    p {
+        margin: 0 5px 0;
+    }
+    td {
+        cursor: pointer;
+    }
+}
+table#avoid-foods-table {
+    td {
+        vertical-align: middle;
+    }
+}
+table#diet-table img,
+table#avoid-foods-table img {
+	margin: 8px 2px 2px;
+	padding: 0;
+	width: 100%;
+	max-width:90px;
+	height: auto;
+	border: none;
+}
+
+table#diet-table ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+    margin-bottom: 0px;
+    li {
+        font-weight: 500;
+        font-style: normal;
+        line-height: 1.2em;
+        letter-spacing: .02em;
+        text-align: left;
+        color: #FFF;
+        background-image: url('../img/green-triangle-bullet.png');
+        background-repeat: no-repeat;
+        background-position: left 4px;
+        padding-left: 16px;
+        padding-bottom: 5px;
+        margin-left: 12px;
+        list-style-position: outside;
+        list-style-type: none;
+    }
+}
+
+#healthy-fats img,
+#nuts img,
+#vegetables img,
+#tomatoes img,
+#fish img,
+#processed-meats img,
+#poultry img,
+#whole-milk img,
+#supplements img {
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+	padding: 0px;
+	z-index: 1;
+	width: 100%;
+	margin: -70px auto 0;
+    position: relative;
+}
+.modal-copy {
+    #processed-meats b, strong,
+    #poultry b, strong,
+    #whole-milk b, strong,
+    #supplements b, strong {
+        color: @modalHighlightColor;
+        font-weight: 600;
+        letter-spacing: .01em;
+    }
+}
+
+#healthy-fats.cell-hover, #vegetables.cell-hover, #tomatoes.cell-hover, #fish.cell-hover, #alternatives_to_processed_meats.cell-hover {
+    background-color: @cellHoverColor;
+}
+
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+	position: relative;
+	padding: 0px;
+    margin: 0px auto;
+	width: 100%;
+    max-width: 100%;
+    background-color: @mainBackgroundColor;
+    p {
+        color: #FFF;
+    }
+}
+@media (min-width: 992px) {
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        padding: 0 20px;
+        max-width: 925px;
+    }
+}
+#Intro-Hero {
+	//position: relative;
+	width: 100%;
+    //padding: 0 20px;
+    //padding: 20px 0;
+    padding: 0;
+    padding: 60px 0 0;
+    height: 100%;
+}
+@media (min-width: 768px) {
+    #Intro-Hero {
+       padding: 0;
+    }
+}
+#ED-Diet #Intro-Hero {
+    padding: 60px 20px;
+}
+@media (min-width: 768px) {
+    #ED-Diet #Intro-Hero {
+        padding: 20px 0;
+    }
+}
+.Hero-image, .Hero.image {
+	position: relative;
+    z-index: 0;
+    width: 100%;
+    //height: 100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+#ED-Exercise {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1f1005;
+            z-index: 2;
+            opacity: 0.2;
+        }
+    }
+}
+#ED-Recipes {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #38383a;
+            z-index: 2;
+            opacity: 0.5;
+        }
+    }
+}
+@media (min-width: 1200px) {
+    .Hero-image, .Hero.image {
+        height: 65vh;
+    }
+}
+// @media (min-width: 1400px) {
+//     .Hero-image, .Hero.image {
+//         height: 75vh;
+//     }
+// }
+#Intro-Hero img {
+	/*border: 1px solid #404141;*/
+    width: 100%;
+}
+// #Intro-Hero {
+//     .Hero.image {
+//         background: url('../img/Intro-Hero.jpg') no-repeat scroll bottom center;
+//         background-size: cover;
+//     }
+// }
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    height: 100%;
+    //top: 5%;
+    // left: 0;
+    // right: 0;
+    // bottom: 0;
+    //margin: auto;
+    position: absolute;
+    //top: 25%;
+    top: 0;
+    margin: 20% auto;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    //margin: auto;
+    z-index: 5;
+}
+@media (min-width: 768px) {
+    .Hero-title {
+        margin: 12.5% auto;
+    }
+}
+
+.Hero-title h2 {
+    border: none;
+    font-size: 32px;
+    line-height: 1.3em;
+    padding: 0 15px;
+    padding: 0 30px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: .03em;
+    //text-shadow: 1px 1px #000;
+    margin: 0;
+    position: relative;
+    height: 50px;
+}
+@media (min-width: 768px) {
+    .Hero-title h2 {
+        height: 220px;
+        &:after,
+        &:before {
+            content: "\EA03";
+            display: inline-block;
+            font-family: symbols;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            font-size: 0.75em;
+        }
+        &:before {
+            content: "Learn More";
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+            color: #FFF;
+            margin-top: 0px;
+            text-transform: uppercase;
+            letter-spacing: 2.9px;
+            text-align: center;
+            margin: auto;
+            font-family: @bodyFontFamily;
+            left: 50%;
+            bottom: 64px;
+            width: 140px;
+            margin-left: -62.5px;
+        }
+        &:hover:before,
+        &:hover:after {
+            cursor: pointer;
+            color: darken(#FFF, 10%);
+        }
+    }
+}
+@media (min-width: 992px) {
+    .Hero-title h2 {
+        font-size: 37px;
+    }
+}
+
+#ED-Intro #Intro-content, #ED-Exercise #Intro-content {
+	//position: absolute;
+    /*padding: 0px 1em;*/
+    padding: 0 40px;
+    margin: 0px auto;
+}
+#ED-Intro #Intro-content {
+    padding: 0 20px;
+}
+@media (min-width: 699px) {
+    #ED-Intro #Intro-content {
+        padding: 0;
+    }
+}
+#ED-Exercise #Intro-content {
+    position: relative;
+    .content {
+       // width: 100%;
+        width: 100%;
+        margin: 24px auto 40px;
+        max-width: 100%;
+        text-align: center;
+    }
+}
+@media (min-width: 768px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 85%;
+            margin: 16px auto 40px;
+            padding: 20px 0;
+        }
+
+    }
+}
+@media (min-width: 992px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 65%;
+            margin: 16px auto 60px;
+        }
+    }
+}
+#ED-Recipes #Intro-content {
+    padding-bottom: 50px !important;
+}
+
+#ED-Recipes #Intro-Hero {
+    position: relative;
+}
+
+#ED-Diet #Intro-content, #ED-Recipes #Intro-content {
+    padding: 0 20px;
+	position: relative;
+    margin: 0px auto;
+    max-width: 100%;
+}
+@media (min-width: 768px) {
+    #ED-Recipes #Intro-content {
+        max-width: 80%;
+    }
+}
+@media (min-width: 992px) {
+    #ED-Exercise #Intro-content {
+        //padding: 20px 60px;
+        padding: 20px 0 0;
+        //max-width: 90%;
+        max-width: 100%;
+    }
+    #ED-Diet #Intro-content {
+        //max-width: 80%;
+        padding: 0 100px;
+        .content {
+            max-width: 72.5%;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+    }
+    #ED-Recipes #Intro-content {
+        max-width: 65%;
+        margin: 0 auto;
+    }
+}
+
+/* ******** */
+
+#ED-Intro .section {
+    border-top: 2px solid @sectionBorderColor;
+    padding: 10px 20px 40px;
+    text-align: center;
+    &.resources {
+        background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
+        background-size: cover;
+        padding: 24px 40px 72px;
+    }
+    &:first-of-type,
+    &:last-of-type {
+        border-top: 0;
+    }
+    // &:nth-child(odd) {
+    //     background-color: lighten(@mainBackgroundColor, 10%);
+    // }
+}
+
+#Intro-content {
+    p {
+        position: relative;
+        padding: 0px 16px;
+        margin: 0px 5px 10px;
+        line-height: 1.5;
+        font-size: @mobileContentFontSize;
+        width: 100%;
+        max-width: 100%;
+    }
+    p.content {
+        font-size: @contentFontSize;
+    }
+}
+@media (min-width: 768px) {
+    #Intro-content {
+        p {
+            font-size: @contentFontSize;
+            padding: 0 12px;
+            &.content {
+                font-size: @contentPromptFontSize;
+            }
+        }
+    }
+    #ED-Intro {
+        #Intro-content p {
+            font-size: @contentFontSize;
+            width: 780px;
+            margin: 0px auto 10px;
+        }
+    }
+}
+.start-button {
+    font-size: @mobileButtonFontSize;
+    line-height: 2.75em;
+    letter-spacing: 5px;
+    display: block;
+    text-transform: uppercase;
+    text-align: center;
+    //background-color: @btnTruenthPrimaryColor;
+    color: #fff;
+	width: 325px;
+    //margin: 32px auto 40px;
+    margin: 0 auto;
+    padding: 32px 0 40px;
+    &:hover {
+        .figure {
+            color: #FFF;
+        }
+    }
+}
+@media (min-width: 768px) {
+    .start-button {
+        font-size: @buttonFontSize;
+    }
+}
+.start-button a {
+	color:	#fff;
+    //padding: 12px 39px;
+    background-color: @btnTruenthPrimaryColor;
+	text-decoration: none;
+	transition: all 0.3s ease-out;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 6px 4px 4px;
+    &:hover {
+        color: #fff;
+    /* 	padding: 11px 41px; */
+        background-color: @btnTruenthPrimaryHoverColor;
+        text-decoration: none;
+    }
+}
+#Resources {
+    background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
+    background-size: cover;
+    position: relative;
+    z-index: 6;
+    hr {
+        display: none;
+    }
+    input { //text input
+        text-align: center;
+    }
+    input[type="text"] {
+        display: inline-block;
+        color: @bodyTextColor;
+        background: @inputBackgroundColor;
+        height: 44px;
+        padding: 5px;
+        border: 2px solid @inputBackgroundColor;
+        min-width: 150px;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .button-container {
+        min-width: 130px;
+        display: inline-block;
+        background: @btnTruenthPrimaryColor;
+        color: #FFF;
+        &:after {
+            position: absolute;
+            top: 22.5%;
+            right: 9%;
+        }
+        &:hover {
+            background-color: @btnTruenthPrimaryHoverColor;
+           
+        }
+        // &:after {
+        //     content: "\2192";
+        //     font-family: symbol;
+        //     font-style: normal;
+        //     font-weight: normal;
+        //     display: inline-block;
+        //     margin-left: 8px;
+        //     color: @btnTruenthArrowColor;
+        // }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+    input[type='submit'] {
+        background-color: transparent;
+        border: 0;
+        color: #FFF;
+        padding: 8px 16px 8px;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: inline-block;
+        position: relative;
+        &:hover {
+            background-color: @btnTruenthPrimaryHoverColor;
+            border: 0;
+        }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+    //border-top: 2px solid @sectionBorderColor;
+    margin-top: 36px;
+    max-width: 100%;
+    margin: 36px auto 0;
+   // background: @resourceBackgroundColor;
+    padding: 16px 40px 60px;
+    h3 {
+        text-transform: capitalize;
+    }
+    p {
+        margin: 0px;
+        font-size: @miniBoxFontSize;
+        line-height: 1.55em;
+        letter-spacing: .02em;
+        font-weight: 500;
+        font-style: normal;
+        color: #FFF;
+        padding: 0 1em;
+        a {
+            margin: 0px;
+            font-size: 1em;
+            line-height: 1.4em;
+            letter-spacing: .02em;
+            font-weight: 500;
+            font-style: normal;
+            color: @resourceLinkColor;
+        }
+        &.mini__head {
+            font-size: @miniBoxTitleFontSize;
+            margin: 8px 0 12px;
+            text-align: left;
+        }
+    }
+    .btn-primary {
+        color: #fff;
+        background: @btnTruenthPrimaryColor;
+        border: none;
+        margin: 24px 20px 12px;
+        padding: 16px 20px 14px;
+        //height: 2.2em;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 90%;
+        text-shadow: none;
+        border-radius: 0;
+        vertical-align: middle;
+        display: inline-block;
+        position: relative;
+        &:hover {
+            color: #fff;
+            background: @btnTruenthPrimaryHoverColor;
+            border: none;
+        }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Resources {
+       // width: 73.5%;
+       // margin: 40px auto 0;
+        margin: auto;
+        padding: 5%;
+    }
+    #ED-Diet {
+        h3 {
+            width: 65%;
+            margin: auto;
+        }
+        #Resources {
+            width: 100%;
+            margin: 20px auto 0;
+        }
+    }
+}
+.modal-open .modal.ED__modal.is-modal-active {
+    display: block !important;
+}
+body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
+    width: 100%;
+    max-width: 100%;
+}
+@media (min-width: 699px) {
+    body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
+        width: 624px;
+    }
+}
+
+/*.modal button */
+.modal-nav {
+	position: relative;
+	margin: 16px 8px;
+	padding: 1rem;
+	text-align: center;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+}
+.modal-nav span {
+	height: auto;
+}
+.modal-nav span span {
+/* 	display: table; */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	//height: 100%;
+}
+
+.modal-nav span span a {
+    flex: 0 0 100%;
+    //flex: 0 0 1;
+}
+
+span.left-button, span.right-button {
+    background: @btnTruenthPrimaryColor;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    min-width: 250px;
+    min-height: 32px;
+    //padding: 5px;
+    flex: 0 0 45%;
+    padding: 12px 16px 12px;
+    line-height: 1.4 !important;
+    //flex-grow: 1;
+    &:hover {
+        background: @btnTruenthPrimaryHoverColor;
+        .figure {
+            color: #FFF;
+        }
+    }
+    .figure {
+        float: left;
+        margin-top: 0;
+        margin-left: 8px;
+        margin-right: 8px;
+        position: relative;
+        top: -1px;
+        //top: -4px;
+    }
+    a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    a,span {
+        font-size: 15px !important;
+    }
+}
+
+span.left-button:hover, span.right-button:hover {
+	color: @btnTruenthPrimaryHoverColor;
+}
+span.left-button {
+    margin-right: 4px;
+    .figure {
+        float: left;
+    }
+}
+span.right-button {
+    margin-left: 4px;
+    .figure {
+        float: right;
+    }
+}
+// span.left-button {
+//     text-align: left;
+// }
+// span.right-button {
+//     text-align: right;
+// }
+span.left-button a,
+span.right-button a  {
+    color: #FFF;
+    text-decoration: none;
+    font-size: 16px !important;
+}
+.ED__modal {
+    .modal-open .modal {
+        overflow-x: hidden;
+        overflow-y: auto;
+        margin: 0 auto;
+    }
+    .modal-footer {
+       // border-top: 1px solid @sectionBorderColor;
+       //display: none;
+       border-top: 0;
+       margin-top: 12px;
+    }
+    .modal-content {
+        border-radius: 0;
+        text-align: right;
+        h2 {
+            font-size: @modalHeadingSize;
+            font-weight: @modalHeaderFontWeight;
+            text-align: center;
+            color: @modalHeadingColor;
+            padding: 28px 12.5% 20px;
+            &:after {
+                content: " ";
+                display: block;
+                width: 104px;
+                margin-top: 24px;
+                height: 1px;
+                background: @modalHeadingColor;
+                margin: 20px auto 0;
+                opacity: 0.5;
+            }
+            em {
+                font-weight: @modalHeaderFontWeight;
+                letter-spacing: 0;
+            }
+            //letter-spacing: .03em;
+            //background-color: @modalHeaderBackgroundColor;
+            //color: #fff;
+            //text-align: left;
+        }
+        a {
+            overflow-wrap: break-word;
+        }
+        h3, h4 {
+            text-transform: none;
+        }
+        strong, b {
+            color: @modalHighlightColor;
+            font-weight: 600;
+        }
+        td {
+            color: #FFF;
+            strong, b {
+                color: lighten(@modalHighlightColor, 40%);
+                font-weight: 500 !important;
+                font-style: normal;
+                text-transform: uppercase;
+                font-size: 16px;
+                letter-spacing: 1.2px;
+            }
+            &:hover {
+                background-color: @cellBackgroundColor;
+            }
+        }
+        p {
+            padding: 0;
+            line-height: 1.5;
+        }
+        ol {
+            padding-left: 24px;
+            &.references {
+                list-style-type: disc;
+                padding: 8px 24px;
+            }
+        }
+    }
+    .box-modal.modal-content {
+        text-align: center;
+    }
+    .modal-body {
+        position: relative;
+        border-radius: 0;
+        text-align: right;
+        padding: 0px;
+        font-size: @modalBodyFontSize;
+        //margin-bottom: 20px;
+        p, ul, ol, li, span {
+            font-size: @modalBodyFontSize;
+            line-height: 1.5;
+            &.smaller-text {
+                font-size: @smallerTextFontSize !important;
+            }
+        }
+        &.load:before {
+            position: absolute;
+            content: "";
+            display: block;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            background: #FFF;
+            opacity: 0.6;
+            z-index: 10;
+        }
+        &.load:after {
+            position: absolute;
+            content: "Loading...";
+            display: block;
+            left: 45%;
+            top: 25%;
+            z-index: 11;
+        }
+        .loader {
+            background: #FFF;
+            min-height: 10vh;
+            text-align: center;
+            padding: 24px;
+            opacity: 1;
+            transition: opacity ease 500ms;
+        }
+        &.load {
+            .loader {
+                opacity: 0;
+            }
+        }
+    }
+    
+    .modal-body img {
+        border-radius: 0;
+    /*     text-align: left; */
+        display: inline-block;
+        padding: 0;
+        z-index: 1;
+        width: 100%;
+    }
+    
+    #modal-copy {
+        text-align: left;
+        padding: 0 20px;
+    }
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-secondary b {
+        color: @btnTruenthPrimaryColor;
+        background-color: white;
+        border: none;
+        border-radius: none;
+        font-weight: 500 !important;
+        font-style: normal;
+        font-size: 16px !important;
+        line-height: 1.4em;
+        letter-spacing: 1.2px;
+        text-align: right;
+        text-transform: uppercase;
+        padding: 0px 4px 0px 0px;
+    }
+
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-secondary:hover,
+    .modal-footer .btn-secondary b:hover {
+        color: @btnTruenthPrimaryHoverColor;
+    }
+    .modal-footer .btn-secondary span {
+        font-weight: 500 !important;
+       // color: #fff;
+        color: @btnTruenthPrimaryColor;
+        //border: 1px solid lighten(@btnTruenthPrimaryColor, 10%);
+        //border-radius: 100%;
+        padding: 4px;
+        letter-spacing: 1.2px;
+        //margin-left: 4px;
+        cursor: pointer;
+    }
+    .modal-footer .btn-secondary span:hover {
+        color: @btnTruenthPrimaryHoverColor;
+       // background-color: #fff;
+        //border: 1px solid @btnTruenthPrimaryHoverColor;
+    }
+    
+    .modal-body button.btn.btn-secondary-top b {
+        //color: #fff;
+        color: lighten(@btnTruenthPrimaryColor, 20%);
+        background-color: transparent;
+        border: none;
+        font-weight: 500 !important;
+        font-style: normal;
+        font-size: 16px !important;
+        line-height: 1.4em;
+        letter-spacing: 1.2px;
+        text-align: right;
+        text-transform: uppercase;
+        padding: 0px 0px 0px 0px;
+        z-index: 10;
+        position: absolute;
+        margin: 4px -56px;
+        display: none;
+    }
+
+    .modal-body button.btn.btn-secondary-top {
+        background: transparent;
+    }
+    
+    .modal-body button.btn.btn-secondary-top span {
+        font-weight: 500 !important;
+        //color: @btnTruenthPrimaryColor;
+        //color: #FFF;
+        //color: lighten(@btnTruenthPrimaryColor, 20%);
+        background: @btnTruenthPrimaryColor;
+        color: #FFF;
+        //background-color: #fff;
+        border: none;
+        //border-radius: 100%;
+        letter-spacing: .2px;
+        cursor: pointer;
+        z-index: 10;
+        position: relative;
+        margin: 20px 0px 0px 8px;
+        line-height: 1.6em;
+        font-size: 16px;
+        padding: 8px;
+    }
+    .modal-body button.btn.btn-secondary-top:hover,
+    .modal-body button.btn.btn-secondary-top span:hover,
+    .modal-body button.btn.btn-secondary-top b:hover  {
+       // color: #fff;
+       // background-color: transparent;
+       background: @btnTruenthPrimaryHoverColor;
+       //border: 1px solid #fff;
+    }
+    .modal-body button.btn.btn-secondary-top span:hover {
+        color: #FFF;
+    }
+}
+.ED__modal {
+    &.modal.fade.in ul li {
+        font-weight: 500;
+        font-style: normal;
+        line-height: 1.35em;
+        letter-spacing: .02em;
+        text-align: left;
+        background-image: url('../img/green-triangle-bullet.png');
+        background-repeat: no-repeat;
+        background-position: left 8px;
+        padding-left: 16px;
+        padding-bottom: 5px;
+        margin-left: 12px;
+        list-style-position: outside;
+        list-style-type: none;
+    }
+    
+    &.modal.fade.in h3 {
+        position: relative;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: .02em;
+        color: @modalSubHeadingColor;
+        text-align: left;
+        border-bottom: 1px solid @modalHeadingBorderColor;
+        padding: 4px 0px;
+        margin: 12px auto 12px;
+        b {
+            color: @modalSubHeadingColor;
+        }
+    }
+    
+    &.modal.fade.in ul {
+        padding: 4px 0px 4px;
+        margin-bottom: 0px;
+    }
+}
+#ED-Intro {
+    h3 {
+        font-size: @h3MobileFontSize;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: @highlightColor;
+        text-align: center;
+        //border-top: 1px dotted #829d64;
+        //border-top: 2px solid @sectionBorderColor;
+        /*padding: 5px 0;*/
+        padding: 24px 0 5px;
+        margin-top: 0px;
+    }
+    .clearfix {
+        height: 0;
+    }
+    // h3:first-child {
+    //     border-top: 0;
+    // }
+}
+@media (min-width: 768px) {
+    #ED-Intro h3 {
+        font-size: 36px;
+        padding: 40px 0 12px;
+    }
+}
+.exercise-button-container {
+    position: relative;
+    z-index: 10;
+    background-color: transparent;
+    //background-color: @miniBoxContainerBackgroundColor;
+	border: 0;
+	padding: 5px;
+	margin: 15px auto 0;
+	width: 100%;
+	height: auto;
+    max-width: 766px;
+}
+.exercise-button {
+	//border: 1px solid #5e7c38;
+	padding: 12px 20px 16px;
+    width: 100%;
+    max-width: 100%;
+	margin: 8px;
+	background-color: @miniBoxBackgroundColor;
+    display: flex;
+    flex-direction: column;
+    min-height: 264px;
+    justify-content: center;
+    h3 {
+        font-size: @miniBoxTitleFontSize !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+        color: @miniBoxHeaderColor !important;
+        text-transform: uppercase;
+        padding: 8px 8px 12px !important;
+    }
+    p {
+        padding: 0 4px !important;
+        font-size: @miniBoxFontSize !important;
+        line-height: 1.2em;
+        letter-spacing: .02em;
+        font-weight: 500;
+        font-style: normal;
+        color: #FFF;
+    }
+}
+@media (min-width: 992px) {
+    .exercise-button {
+        width: 48.5%;
+        &:nth-child(odd) {
+            margin-left: 0;
+        }
+        &:nth-child(even) {
+            margin-right: 0;
+        }
+       // flex-grow: 1;
+    }
+}
+@media (min-width: 1282px) {
+    .exercise-button {
+        min-height: 220px;
+    }
+}
+.exercise-read-more {
+	font-size: 1.1em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #FFF;
+    text-align: center;
+    border-top: none;
+    padding: 0;
+    margin: 16px 8px 8px;
+    //text-decoration: underline;
+    text-transform: uppercase;
+    position: relative;
+    background: @infoButtonBackgroundColor;
+    width: 154px;
+    padding: 12px 12px 10px;
+    // &:after {
+    //     content: "\2192";
+    //     font-family: symbol;
+    //     font-style: normal;
+    //     font-weight: normal;
+    //     display: inline-block;
+    //     margin-left: 8px;
+    // }
+    cursor: pointer;
+    &:hover {
+        background: darken(@infoButtonBackgroundColor, 10%);
+    }
+}
+
+#exercise-trainer {
+    #modal-copy {
+        margin-top: 48px;
+    }
+    .btn-secondary-top {
+        display: none;
+    }
+}
+
+div#exercise-trainer.modal.fade.in h2,
+div#nutrition-resources.modal.fade.in h2 {
+    position: relative;
+    margin: -42px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+}
+
+@media (min-width: 768px) {
+    #diet-table, #avoid-foods-table {
+        width: 90% !important;
+        margin: auto;
+    }
+}
+
+#diet-table tr,
+#avoid-foods-table tr {
+	padding: 3px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+}
+
+
+thead .head-choose th,
+thead .head-lose th {
+	font-size: 22px;
+    line-height: 1.2em;
+    font-style: normal;
+    font-weight: 600;
+    padding: 12px;
+    color: #fff;
+    background-color:@cellHeaderColor;
+    height: 70px;
+    text-align: center;
+    letter-spacing: 1.14px;
+    vertical-align: middle;
+    border-bottom: 1px solid @cellBorderColor;
+}
+
+thead .head-lose th span {
+	font-size: 20px;
+    line-height: 1em;
+    font-style: normal;
+    font-weight: 500;
+    color: #fff;
+    background-color: @cellHeaderColor;
+/*     height: 70px; */
+    text-align: center;
+    letter-spacing: .1em;
+    vertical-align: middle;
+    //border-bottom: 1px solid @cellBorderColor;
+    text-decoration: none;
+}
+
+
+tr th.categories-choose {
+	font-size: @mobileTableCellFontSize;
+    line-height: 1.5em;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 500;
+    color: #fff;
+    background-color: darken(@cellHeaderColor, 5%);
+    height: 40px;
+    text-align: center;
+    vertical-align: middle;
+    width: auto;
+    border-right: 1px solid @cellBorderColor;
+}
+@media (min-width: 768px) {
+    tr th.categories-choose {
+        font-size: @tableCellFontSize;
+    }
+}
+h6.choose,
+h6.lose {
+    color: @highlightColor;
+    span {
+        color: @highlightColor;
+    }
+}
+
+/*                                  M O D A L s    E X E R C I S E */
+
+@media (max-width: 767px) {
+    body.modal-open .modal.is-modal-active .modal-dialog,
+    div#exercise-works.modal.fade.in,
+    div#exercise-benefits.modal.fade.in {
+        max-width: 100%;
+    }
+    .header {
+        padding: 40px 80px 25px;
+    }
+}
+div#exercise-works.modal.fade.in table,
+div#exercise-benefits.modal.fade.in table {
+    word-wrap: break-word;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+div#exercise-benefits.modal.fade.in table {
+    table-layout: fixed;
+}
+
+#exercise-benefits img,
+#exercise-types img,
+#exercise-works img,
+#exercise-prescription img,
+#exercise-safety img,
+#exercise-partner img {
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    padding: 0px;
+    z-index: 1;
+    width: 100%;
+    margin: -46px auto 15px;
+    position: relative;
+}
+
+
+div#exercise-benefits.modal.fade.in h2,
+div#exercise-types.modal.fade.in h2,
+div#exercise-works.modal.fade.in h2,
+div#exercise-prescription.modal.fade.in h2,
+div#exercise-safety.modal.fade.in h2,
+div#exercise-partner.modal.fade.in h2 {
+	position: relative;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#exercise-benefits.modal.fade.in,
+div#exercise-types.modal.fade.in,
+div#exercise-works.modal.fade.in,
+div#exercise-prescription.modal.fade.in,
+div#exercise-safety.modal.fade.in,
+div#exercise-partner.modal.fade.in {
+    h4 b, strong {
+        font-size: @modalBodyFontSize;
+        font-weight: 700;
+        font-style: normal;
+        line-height: 1.3em;
+        margin: 20px auto;
+    }
+}
+
+/*M O D A L s  D I E T  T A B L E */
+
+div#healthy-fats.modal.fade.in h2,
+div#nuts.modal.fade.in h2,
+div#vegetables.modal.fade.in h2,
+div#tomatoes.modal.fade.in h2,
+div#fish.modal.fade.in h2,
+div#processed-meats.modal.fade.in h2,
+div#poultry.modal.fade.in h2,
+div#whole-milk.modal.fade.in h2,
+div#supplements.modal.fade.in h2 {
+	position: relative;
+    margin: 0px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#healthy-fats.modal.fade.in,
+div#nuts.modal.fade.in,
+div#vegetables.modal.fade.in,
+div#tomatoes.modal.fade.in,
+div#fish.modal.fade.in,
+div#processed-meats.modal.fade.in,
+div#poultry.modal.fade.in,
+div#whole-milk.modal.fade.in,
+div#supplements.modal.fade.in,
+div#recipe-modal.fade.in {
+    h4 b, strong {
+        font-size: 1em;
+        font-weight: 700;
+        font-style: normal;
+        line-height: 1.3em;
+        margin: 10px auto;
+    }
+}
+
+/* M O D A L s  R E C I P E S and T I P S */
+#recipe-modal .btn.btn-secondary-top {
+    position: relative;
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+#recipe-modal img {
+	padding: 0px;
+	z-index: 1;
+	width: 100%;
+    //margin: -36px auto 0;
+    margin: -280px auto 0;
+    position: relative;
+}
+
+#recipe-modal img.veggie {
+    padding: 0px;
+/*     z-index: 1; */
+    width: 90%;
+    /* margin: -36px auto 0; */
+    position: relative;
+    margin: 1px auto 1px;
+}
+
+div#recipe-modal.modal.fade.in h2 {
+	position: relative;
+    margin: 0px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+    //text-align: center;
+    
+}
+div#recipe-modal.modal.fade.in h2.shopping {
+	position: relative;
+    margin: -40px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+}
+div#recipe-modal.modal.fade.in ol li {
+    font-weight: 500;
+    font-style: normal;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: none;
+	padding-left: 4px;
+    padding-bottom: 5px;
+    margin-left: 12px;
+    list-style-position: outside;
+    list-style-type: decimal;
+}
+div#recipe-modal.modal.fade.tip.in h2 b {
+	position: relative;
+	font-size: @modalHeadingSize;
+	font-weight: 600;
+    letter-spacing: .03em;
+    background-color: @modalHeaderBackgroundColor;
+    color: #fff;
+    text-align: left;
+    padding: 10px 10px 10px;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+div#recipe-modal.modal.fade.tip.in h3 b {
+    position: relative;
+    font-size: 20px;
+    letter-spacing: .01em;
+    color: @modalSubHeadingColor;
+    text-align: left;
+    border-bottom: 1px solid @modalSubHeadingColor;
+    padding: 5px 0px;
+    margin: 20px auto 10px;
+    font-weight: 600;
+}
+div#recipe-modal.modal.fade.tip.in ul {
+	//padding: 3px 3px 10px;
+	padding: 3px 0px 0;
+	margin-bottom: 10px;
+	margin-bottom: 0px;
+}
+div#recipe-modal.modal.fade.tip.in h4 b, strong {
+    font-size: @modalBodyFontSize;
+    font-weight: 600;
+    font-style: oblique;
+    line-height: 1.5;
+    margin: 4px auto;
+}
+
+#ED-Intro,
+#ED-Exercise,
+#ED-Diet {
+    overflow: hidden;
+}
+
+
+@media  (min-width: 1200px) {
+
+// #ED-Intro {
+//     height: 120em;
+// }
+
+.container {
+	position: relative;
+	max-width: 768px;
+}
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+	position: relative;
+	margin: 0 auto;
+	padding: 0 20px;
+/* 	max-width: 768px; */
+}
+
+}
+@media  (min-width: 768px) {
+
+    .container {
+        position: relative;
+        max-width: 768px;
+
+        width: 100%;
+    }
+
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0;
+        /*overflow: auto;*/
+        overflow: hidden;
+    /* 	max-width: 768px; */
+    }
+
+    #ED-Diet, #ED-Recipe {
+        padding: 0 40px;
+    }
+
+    #ED-Recipes {
+        margin-top: -2em;
+    }
+
+    .navbar-toggle {
+        display: none;
+    }
+
+    main .module-assets {
+        margin-top: -2em;
+        padding: 0 20px;
+    }
+
+    #mainNavbar > ul > li > a {
+        display: flex;
+        // color: #fff;
+        // text-transform: uppercase;
+        // letter-spacing: 2px;
+        // background-color: @btnTruenthPrimaryColor;
+        // font-size: @mainNavFontSize;
+        // font-weight: 600;
+        max-width: 400px;
+        &:visited, &:focused, &:hover {
+            text-decoration: none;
+            cursor: pointer;
+        }
+        // height: @mainNavCellHeight;
+        // text-align: center;
+        // padding: 8px 60px 5px 60px;
+        // align-items: center;
+    }
+
+    // #mainNavbar > ul > li.active > a {
+    //     font-weight: 600;
+    // 	background-color: white;
+    //     background-image: none;
+    //     color: black;
+    //     z-index: 999;
+    //     -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    //     -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    //     box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
+    // }
+
+    .navbar-collapse {
+        overflow-x: visible;
+        padding-right: 0px;
+        padding-left: 0px;
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        -webkit-overflow-scrolling: touch;
+
+        display: block;
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+
+    #ED-Exercise h3 {
+        font-size: @h3FontSize;
+        line-height: 1.35em;
+        font-weight: 600;
+        letter-spacing: .03em;
+        color: #FFF;
+        text-align: left;
+        border-top: none;
+        padding: 8px 8px 12px;
+        margin: 0;
+    }
+    .exercise-button-container {
+        // background-color: transparent;
+        // border: 1px solid transparent;
+        //padding: 5px;
+        padding: 20px 5%;
+        margin: 15px auto 0;
+        width: 100%;
+        height: auto;
+        /*max-width: 766px;*/
+        max-width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        h3 {
+            color: @miniBoxHeaderColor !important;
+            font-size: @miniBoxTitleFontSize !important;
+            font-weight: @miniBoxHeaderFontWeight !important;
+        }
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 10px;
+    }
+
+    #Resources h3 {
+     //   font-size: @resourceHeaderFontSize;
+        letter-spacing: 1px;
+        color: @headerColor;
+        text-align: center;
+        //border-top: 1px dotted #829d64;
+        padding: 16px 0;
+        margin-top: 8px;
+    }
+
+}
+
+@media  (min-width: 992px) {
+
+    .container {
+        position: relative;
+        max-width: 768px;
+    }
+
+    .page-intro__content {
+        padding-top: 170px;
+    }
+
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0;
+        /*max-width: 768px;*/
+        max-width: 100%;
+    }
+    .exercise-button-container {
+        padding: 60px 12.5%;
+        background-color: @miniBoxContainerBackgroundColor;
+    }
+
+}
+
+
+/* Breakpoints > (max-width: 768px) */
+@media  (max-width: 768px) {
+    .container {
+        position: relative;
+        max-width: 768px;
+        width: 100%;
+    }
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .navbar-toggle {
+        display: none;
+    }
+
+    .page-intro__content,
+    .page-intro {
+        margin-top: -50px;
+        padding-top: 0;
+    }
+    .page-intro__content {
+        max-width: 100%;
+    }
+
+    .page-intro {
+        margin-top: -120px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 10px;
+    }
+
+    #ED-Exercise h3 {
+        font-size: @h3MobileFontSize;
+        line-height: 1.2em;
+        font-weight: 600;
+        letter-spacing: .03em;
+        text-align: left;
+        border-top: none;
+        padding: 10px 0;
+        margin: 0;
+    }
+
+    #Resources h3 {
+        font-size: @h3MobileFontSize;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: @headerColor;
+        text-align: center;
+        //border-top: 1px dotted #829d64;
+        padding: 24px 0 16px;
+        margin-top: 0px;
+    }
+
+}
+@media  (max-width: 480px) {
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0 0.1em;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* iphone 6 plus */
+@media  (max-width: 414px) {
+    #ED-Intro #Intro-content,
+    #ED-Exercise #Intro-content {
+        padding: 0 1em;
+    }
+    #ED-Diet {
+        padding: 0 1em;
+    }
+}

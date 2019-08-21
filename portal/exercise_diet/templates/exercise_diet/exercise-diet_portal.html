@@ -18,9 +18,9 @@
 						<li>{{_("Delicious recipes and quick grocery shopping tips")}}</li>
 					</ul>
 					{% if not user %}
-						<div class="start-button-intro" data-toggle="modal" data-target="#modal-register">{% trans %}start <span>&rarr;</span>{% endtrans %}</div>
+						<div class="start-button-intro" data-toggle="modal" data-target="#modal-register">{% trans %}start <span class="figure">&rarr;</span>{% endtrans %}</div>
 					{% else %}
-						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><div class="start-button-intro">{% trans %}start <span>&rarr;</span>{% endtrans %}</div></a>
+						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><div class="start-button-intro">{% trans %}start <span class="figure">&rarr;</span>{% endtrans %}</div></a>
 					{% endif %}
 			</div><!-- end class="intro-content" -->
 		</div><!-- end class="intro-module intro-intro" -->
@@ -41,9 +41,9 @@
 					<h6><span>{{_("EXERCISE / DIET / RECIPES")}}</span></h6>
 					</div>
 					{% if not user %}
-						<span class="toolbox-start-button" data-toggle="modal" data-target="#modal-register">{% trans %}start &rarr;{% endtrans %}</span>
+						<span class="toolbox-start-button" data-toggle="modal" data-target="#modal-register">{% trans %}start <span class="figure">&rarr;</span>{% endtrans %}</span>
 					{% else %}
-						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><span class="toolbox-start-button">{% trans %}start &rarr;{% endtrans %}</span></a>
+						<a href="{{url_for('exercise_diet.introduction')}}" class="exercise_diet-link community_of_wellness-link"><span class="toolbox-start-button">{% trans %}start <span class="figure">&rarr;</span>{% endtrans %}</span></a>
 					{% endif %}
 				</div>
 			</div><!-- end class="objective-content" -->

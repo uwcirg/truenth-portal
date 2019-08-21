@@ -1,14 +1,14 @@
-{% trans %}<button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>{% endtrans %}
+{% trans %}<button type="button" class="btn btn-secondary-top" data-dismiss="modal"><span>X</span></button>{% endtrans %}
 {{ asset|safe }}
 <div class="modal-nav">
     {% if prev_heading != '' %}
     <span class="left-button">
-       <span> <a href="javascript:show_recipe('{{ prev_heading }}','{{ prev_item_index }}','{{ prev_asset_recipe_type }}');">{{ prev_asset_title|safe }}</a></span>
+       <a href="javascript:show_recipe('{{ prev_heading }}','{{ prev_item_index }}','{{ prev_asset_recipe_type }}');">{{ prev_asset_title|safe }}</a>
     </span>
     {% endif %}
     {% if next_heading != '' %}
     <span class="right-button">
-        <span><a href="javascript:show_recipe('{{ next_heading }}','{{ next_item_index }}','{{ next_asset_recipe_type }}');">{{ next_asset_title|safe }}</a></span>
+        <a href="javascript:show_recipe('{{ next_heading }}','{{ next_item_index }}','{{ next_asset_recipe_type }}');">{{ next_asset_title|safe }}</a>
     </span>
     {% endif %}
 </div>

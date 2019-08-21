@@ -17,35 +17,39 @@ function show_diet(new_item, current_item) {
 
 $(function(){
 
-    $('#diet-table tr').on('mouseenter',function(){
-        $(this).addClass('row-hover');
-        return false;
-    });
+    setTimeout(function() {
+        $("main").addClass("active");
+    }, 500);
 
-    $('#diet-table tr').on('mouseleave',function(){
-        $(this).removeClass('row-hover');
-        return false;
-    });
+    // $('#diet-table tr').on('mouseenter',function(){
+    //     $(this).addClass('row-hover');
+    //     return false;
+    // });
 
-    $('#avoid-foods-table td').on('mouseenter',function(){
-        $(this).addClass('cell-hover');
-        return false;
-    });
+    // $('#diet-table tr').on('mouseleave',function(){
+    //     $(this).removeClass('row-hover');
+    //     return false;
+    // });
 
-    $('#avoid-foods-table td').on('mouseleave',function(){
-        $(this).removeClass('cell-hover');
-        return false;
-    });
+    // $('#avoid-foods-table td').on('mouseenter',function(){
+    //     $(this).addClass('cell-hover');
+    //     return false;
+    // });
+
+    // $('#avoid-foods-table td').on('mouseleave',function(){
+    //     $(this).removeClass('cell-hover');
+    //     return false;
+    // });
 
     $('[data-toggle=modal]').on('click touchend', function(e) {
-      var target;
-      e.preventDefault();
-      e.stopPropagation();
-      target = $(this).attr('data-target');
-      $(target).appendTo('body');
-      return setTimeout(function() {
-        $(target).modal('show');
-      }, 150);
+        var target;
+        e.preventDefault();
+        e.stopPropagation();
+        target = $(this).attr('data-target');
+        $(target).appendTo('body');
+        return setTimeout(function() {
+            $(target).modal('show');
+        }, 50);
     });
     $(".watch-button-video").on("click", function(e) {
         e.stopPropagation();
@@ -85,34 +89,59 @@ $(function(){
 });
 
 function show_recipe(heading, item, recipe_type) {
-    if (recipe_type === 'tip') {
-        $('#recipe-modal').addClass('tip');
+    if (recipe_type === "tip") {
+        $("#recipe-modal").addClass("tip");
     }
     else {
-        $('#recipe-modal').removeClass('tip');
+        $("#recipe-modal").removeClass("tip");
     }
     $('#recipe-modal').modal('show');
-    $( ".modal-body" ).load( "recipe/" + heading + "/" + item );
+    $(".modal-body").addClass("load");
+    $(".modal-body" ).load( "recipe/" + heading + "/" + item, function() {
+        setTimeout(function() {
+            $(".modal-body").removeClass("load");
+        }, 500);
+    });
+    // $("#recipe-modal").on("show.bs.modal", function() {
+    //     $( ".modal-body" ).load( "recipe/" + heading + "/" + item, function() {
+    //         setTimeout(function() {
+    //             $(".modal-body").removeClass("load");
+    //         }, 500);
+    //     });
+    // });
+    // $(this).removeClass("load");
+    // $("#recipe-modal").on("shown.bs.modal", function() {
+    //     setTimeout(function() {
+    //         $(".modal-body").removeClass("load");
+    //     }, 150);
+    // });
+   
+    
 }
 
-$(function(){
+// $(function(){
 
-    $('td').on('mouseenter',function(){
-        $(this).addClass('cell-hover');
-        return false;
-    });
+//     $("td').on('mouseenter',function(){
+//         $(this).addClass('cell-hover');
+//         return false;
+//     });
 
-    $('td').on('mouseleave',function(){
-        $(this).removeClass('cell-hover');
-        return false;
-    });
+//     $('td').on('mouseleave',function(){
+//         $(this).removeClass('cell-hover');
+//         return false;
+//     });
 
-});
+// });
 
 $(document).ready(function() {
     if ($("#Exercise-Diet-Portal").length > 0) {
-        setTimeout(function() {
-            $("body").addClass("page-exercise-diet-portal");
-        }, 100);
+        //setTimeout(function() {
+        $("body").addClass("page-exercise-diet-portal");
+        //}, 100);
     }
+    $(".js-scroll-to").attr("style", "").on("click", function() {
+        $("html, body").animate({
+            scrollTop: ($(".anchor").offset().top - 80)
+        },1000);
+    });
 });
