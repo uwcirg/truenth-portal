@@ -75,7 +75,7 @@ restore_uploads() {
             flask config -c FILE_UPLOAD_DIR \
         | grep --invert-match DEBUG | tr --delete '[:space:]'
     )"
-    local run_user="$(docker-compose exec web printenv RUN_USER | tr -d [:space:])"
+    local run_user="$(docker-compose exec web printenv RUN_USER | tr --delete [:space:])"
     local web_container_id=$(docker-compose ps --quiet web)
 
     echo "Copying files from ${uploads_dir} to container upload dir (${web_file_upload_dir})..."
