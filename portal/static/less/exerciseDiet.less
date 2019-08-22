@@ -55,10 +55,11 @@
 @miniBoxFontSize: 18px;
 @modalBodyFontSize: 17px;
 @modalHeadingSize: 24px;
+@accordionHeaderFontSize: 22px;
 @h3FontSize: 30px;
 @h3MobileFontSize: 28px;
 @referenceFontSize: 18px;
-@resourceHeaderFontSize: 27px;
+
 @bodyFontFamily: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
 @modalHeaderFontWeight: 700;
 
@@ -325,22 +326,34 @@ a, button, .btn, input {
 }
 .box__content {
     background: @defaultBoxBackgroundColor;
-    padding: 24px 12px 28px;
+    padding: 20px 12px 24px;
     margin: 12px auto;
     width: 100%;
     max-width: 100%;
 }
 .box__content--container {
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     margin: 12px auto;
     .box__content {
         display: flex;
-        justify-content: center;
         align-items: flex-start;
         flex-direction: column;
+    }
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .box__content--container {
+        .box__content {
+            align-items: stretch;
+        }
+    }
+}
+@supports (-ms-accelerator:true) {
+    .box__content--container {
+        .box__content {
+            align-items: stretch;
+        }
     }
 }
 @media(min-width: 768px) {
@@ -1150,6 +1163,7 @@ ul.intro-li {
         max-width: 100%;
         border-radius: 0;
         h4 {
+            font-size: @accordionHeaderFontSize;
             display: block;
             position: relative;
             //padding: 16px 12px 32px;
@@ -1879,7 +1893,7 @@ table#diet-table ul {
         background-color: transparent;
         border: 0;
         color: #FFF;
-        padding: 8px 16px 8px;
+        padding: 10px 16px;
         font-size: 16px;
         font-weight: 400;
         letter-spacing: 2px;
