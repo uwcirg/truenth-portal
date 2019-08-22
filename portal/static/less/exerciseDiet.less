@@ -36,6 +36,7 @@
 @resourceBackgroundColor: rgba(59,68,73,.5);
 @infoButtonBackgroundColor: #8f9385;
 @figureBackgroundColor: #4c5e6e;
+@IntroOverlayBackgroundColor: #333;
 @ExerciseOverlayBackgroundColor: #13120f;
 @RecipieOverlayBackgroundColor: #353434;
 @calloutTextColor: #FFF;
@@ -1509,6 +1510,24 @@ table#diet-table ul {
         }
     }
 }
+
+#ED-Intro {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: @IntroOverlayBackgroundColor;
+            z-index: 2;
+            opacity: 0.2;
+        }
+    }
+}
+
 @media (min-width: 1400px) {
     .Hero-image, .Hero.image {
         height: 65vh;
