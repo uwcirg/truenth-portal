@@ -3,7 +3,7 @@
 @alternativeBackgroundColor: #253534;
 @bodyTextColor: #4a4a4a;
 @navbarBorderColor: #d7dde0;
-@navbarColor: #7c959e;
+@navbarColor: darken(#7c959e, 5%);
 //@navbarColor: #576E76;
 @navbarBackgroundColor: rgba(210,209,197,.2);
 @highlightColor: #dccab2;
@@ -38,7 +38,8 @@
 @mainNavFontSize: 13px;
 @mainNavCellHeight: 56px;
 @contentFontSize: 24px;
-@contentPromptFontSize: 28px;
+@contentSubheadingFontSize: 30px;
+@contentPromptFontSize: 30px;
 @mobileContentFontSize: 20px;
 @buttonFontSize: 20px;
 @tableCellFontSize: 18px;
@@ -385,6 +386,7 @@ a, button, .btn, input {
     margin-top:45px;
     margin-bottom:30px;
 }
+
 #mainNavbar {
     background-color:white;
     border:0;
@@ -417,13 +419,17 @@ a, button, .btn, input {
             text-transform: uppercase;
             letter-spacing: 3px;
             font-size: @mainNavFontSize;
-            font-weight: 600;
+            font-weight: 500;
             max-width: 250px;
             height: @mainNavCellHeight;
             text-align: center;
             padding: 8px 40px 4px 40px;
             align-items: center;
             border: 0;
+            &:visited, &:focused, &:hover {
+                text-decoration: none;
+                cursor: pointer;
+            }
         
         }
         &.active  a {
@@ -491,6 +497,7 @@ b, strong {
 p {
     b, strong {
         font-weight: 500;
+        letter-spacing: 0;
     }
 }
 h2 b, h3 b, h4 b {
@@ -548,13 +555,18 @@ table b, table strong {
     font-style: normal;
     color: lighten(@highlightColor, 10%);
 }
-
-
 .mini__head, p.mini__head {
     font-size: @miniBoxTitleFontSize;
     text-transform: uppercase;
     letter-spacing: 1.2px;
     font-weight: 500;
+}
+.sub__heading {
+    display: block;
+    font-size: @contentSubheadingFontSize;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 12px auto 20px;
 }
 .watermark {
     top: 0;
@@ -622,6 +634,7 @@ body.page-exercise-diet-portal {
         font-size: 18px;
         text-align: left;
         max-width: 100%;
+        line-height: 1.55;
     }
     .mini-box {
         padding: 30px 40px;
@@ -1096,7 +1109,7 @@ ul.intro-li {
         margin: auto;
         width: 820px;
         position: relative;
-        left: 2.5em;
+        left: 2.25em;
     }
 }
 #Recipe-Accordions {
@@ -1429,6 +1442,9 @@ table#diet-table ul {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center 22%;
 }
 #ED-Exercise {
     .Hero-image, .Hero.image {
@@ -1443,6 +1459,28 @@ table#diet-table ul {
             background: #1f1005;
             z-index: 2;
             opacity: 0.2;
+        }
+    }
+    .content__chunk {
+        width: 100%;
+        max-width: 100%;
+        margin: auto;
+    }
+    .sub__heading, .content__chunk {
+        margin-bottom: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #ED-Exercise {
+        .content__chunk {
+            width: 90%;
+        }
+    }
+}
+@media (min-width: 992px) {
+    #ED-Exercise {
+        .content__chunk {
+            width: 83%;
         }
     }
 }
@@ -1462,9 +1500,9 @@ table#diet-table ul {
         }
     }
 }
-@media (min-width: 1200px) {
+@media (min-width: 1400px) {
     .Hero-image, .Hero.image {
-        height: 82.5vh;
+        height: 65vh;
     }
 }
 // @media (min-width: 1400px) {
@@ -1505,13 +1543,19 @@ table#diet-table ul {
 }
 @media (min-width: 768px) {
     .Hero-title {
-        margin: 12% auto;
+        margin: 17% auto;
+       // margin: 17% auto;
     }
 }
-
+@media (min-width: 1400px) {
+    .Hero-title {
+        margin: 12% auto;
+       // margin: 17% auto;
+    }
+}
 .Hero-title h2 {
     border: none;
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1.3em;
     padding: 0 15px;
     padding: 0 30px;
@@ -1522,6 +1566,11 @@ table#diet-table ul {
     margin: 0;
     position: relative;
     height: 50px;
+}
+@media (min-width: 699px) {
+    .Hero-title h2 {
+        font-size: 30px;
+    }
 }
 @media (min-width: 768px) {
     .Hero-title h2 {
@@ -1599,7 +1648,7 @@ table#diet-table ul {
         margin: 24px auto 40px;
         max-width: 100%;
         text-align: center;
-        padding: 0 60px;
+        padding: 0 20px;
     }
 }
 @media (min-width: 768px) {
@@ -1615,8 +1664,8 @@ table#diet-table ul {
 @media (min-width: 992px) {
     #ED-Exercise #Intro-content {
         .content {
-            width: 65%;
-            margin: 16px auto 60px;
+            width: 52.5%;
+            margin: 16px auto 48px;
         }
     }
 }
@@ -1693,6 +1742,14 @@ table#diet-table ul {
     }
     p.content {
         font-size: @contentFontSize;
+    }
+}
+@media (min-width: 768px) {
+    #Intro-content {
+        p.sub__heading {
+            font-size: @contentSubheadingFontSize;
+            line-height: 1.4;
+        }
     }
 }
 #ED-Intro {
@@ -2301,7 +2358,7 @@ span.right-button a  {
 }
 @media (min-width: 768px) {
     #ED-Intro h3 {
-        font-size: 36px;
+        font-size: 35px;
         padding: 40px 0 12px;
     }
 }
@@ -2752,24 +2809,7 @@ div#recipe-modal.modal.fade.tip.in h4 b, strong {
         padding: 0 20px;
     }
 
-    #mainNavbar > ul > li > a {
-        display: flex;
-        // color: #fff;
-        // text-transform: uppercase;
-        // letter-spacing: 2px;
-        // background-color: @btnTruenthPrimaryColor;
-        // font-size: @mainNavFontSize;
-        // font-weight: 600;
-        max-width: 400px;
-        &:visited, &:focused, &:hover {
-            text-decoration: none;
-            cursor: pointer;
-        }
-        // height: @mainNavCellHeight;
-        // text-align: center;
-        // padding: 8px 60px 5px 60px;
-        // align-items: center;
-    }
+   
 
     // #mainNavbar > ul > li.active > a {
     //     font-weight: 600;
