@@ -4,6 +4,7 @@
 @bodyTextColor: #4a4a4a;
 @navbarBorderColor: #d7dde0;
 @navbarColor: #7c959e;
+//@navbarColor: #576E76;
 @navbarBackgroundColor: rgba(210,209,197,.2);
 @highlightColor: #dccab2;
 @modalHighlightColor: #6a5944;
@@ -45,8 +46,8 @@
 @mobileTableCellFontSize: 16px;
 @smallerTextFontSize: 16px;
 @mobileButtonFontSize: 18px;
-@miniBoxTitleFontSize: 17px;
-@miniBoxFontSize: 19px;
+@miniBoxTitleFontSize: 16px;
+@miniBoxFontSize: 18px;
 @modalBodyFontSize: 17px;
 @modalHeadingSize: 24px;
 @h3FontSize: 32px;
@@ -298,6 +299,13 @@ a, button, .btn, input {
         color: #FFF;
     }
 }
+.minibox__header {
+    font-size: @miniBoxHeaderFontSize;
+    color: @miniBoxHeaderColor;
+}
+.minibox__content {
+    font-size: @miniBoxFontSize;
+}
 .icon-box__subhead {
     font-size: 14px;
     line-height: 20px;
@@ -395,7 +403,7 @@ a, button, .btn, input {
         cursor: pointer;
         &:hover {
             a {
-                color: @btnTruenthPrimaryHoverColor;
+                color: darken(@btnTruenthPrimaryHoverColor, 5%);
                 cursor: pointer;
             }
         }
@@ -409,7 +417,7 @@ a, button, .btn, input {
             text-transform: uppercase;
             letter-spacing: 3px;
             font-size: @mainNavFontSize;
-            font-weight: 500;
+            font-weight: 600;
             max-width: 250px;
             height: @mainNavCellHeight;
             text-align: center;
@@ -1088,7 +1096,7 @@ ul.intro-li {
         margin: auto;
         width: 820px;
         position: relative;
-        left: 2.75em;
+        left: 2.5em;
     }
 }
 #Recipe-Accordions {
@@ -1497,13 +1505,13 @@ table#diet-table ul {
 }
 @media (min-width: 768px) {
     .Hero-title {
-        margin: 12.5% auto;
+        margin: 12% auto;
     }
 }
 
 .Hero-title h2 {
     border: none;
-    font-size: 32px;
+    font-size: 30px;
     line-height: 1.3em;
     padding: 0 15px;
     padding: 0 30px;
@@ -1517,7 +1525,7 @@ table#diet-table ul {
 }
 @media (min-width: 768px) {
     .Hero-title h2 {
-        height: 220px;
+        height: 212px;
         &:after,
         &:before {
             content: "\EA03";
@@ -1564,10 +1572,14 @@ table#diet-table ul {
     }
 }
 
-#ED-Intro #Intro-content, #ED-Exercise #Intro-content {
+#ED-Intro #Intro-content {
 	//position: absolute;
     /*padding: 0px 1em;*/
     padding: 0 40px;
+    margin: 0px auto;
+}
+#ED-Exercise #Intro-content {
+    padding: 0;
     margin: 0px auto;
 }
 #ED-Intro #Intro-content {
@@ -1586,13 +1598,14 @@ table#diet-table ul {
         margin: 24px auto 40px;
         max-width: 100%;
         text-align: center;
+        padding: 0 60px;
     }
 }
 @media (min-width: 768px) {
     #ED-Exercise #Intro-content {
         .content {
             width: 85%;
-            margin: 16px auto 40px;
+            margin: 16px auto 20px;
             padding: 20px 0;
         }
 
@@ -1745,6 +1758,12 @@ table#diet-table ul {
     background-size: cover;
     position: relative;
     z-index: 6;
+     //border-top: 2px solid @sectionBorderColor;
+     //margin-top: 36px;
+     max-width: 100%;
+     margin: 0 auto 0;
+    // background: @resourceBackgroundColor;
+     padding: 16px 40px 60px;
     hr {
         display: none;
     }
@@ -1808,12 +1827,7 @@ table#diet-table ul {
             color: #FFF;
         }
     }
-    //border-top: 2px solid @sectionBorderColor;
-    margin-top: 36px;
-    max-width: 100%;
-    margin: 36px auto 0;
-   // background: @resourceBackgroundColor;
-    padding: 16px 40px 60px;
+   
     h3 {
         text-transform: capitalize;
     }
@@ -2286,10 +2300,11 @@ span.right-button a  {
 .exercise-button-container {
     position: relative;
     z-index: 10;
-    background-color: transparent;
-    //background-color: @miniBoxContainerBackgroundColor;
+    //background-color: transparent;
+    background-color: @miniBoxContainerBackgroundColor;
 	border: 0;
-	padding: 5px;
+    //padding: 5px;
+    padding: 46px 40px;
 	margin: 15px auto 0;
 	width: 100%;
 	height: auto;
@@ -2300,12 +2315,14 @@ span.right-button a  {
 	padding: 12px 20px 16px;
     width: 100%;
     max-width: 100%;
-	margin: 8px auto;
+	margin: 12px auto;
 	background-color: @miniBoxBackgroundColor;
     display: flex;
     flex-direction: column;
-    min-height: 264px;
-    justify-content: center;
+    //min-height: 264px;
+    min-height: 200px;
+    //justify-content: center;
+    justify-content: space-between;
     h3 {
         font-size: @miniBoxTitleFontSize !important;
         font-weight: 500 !important;
@@ -2315,7 +2332,7 @@ span.right-button a  {
         padding: 8px 8px 12px !important;
     }
     p {
-        padding: 0 4px !important;
+        padding: 0 8px !important;
         font-size: @miniBoxFontSize !important;
         line-height: 1.2em;
         letter-spacing: .02em;
@@ -2323,10 +2340,14 @@ span.right-button a  {
         font-style: normal;
         color: #FFF;
     }
+    .minibox__content {
+        flex-grow: 1.5;
+    }
 }
 @media (min-width: 992px) {
     .exercise-button {
         width: 48.5%;
+        min-height: 264px;
         &:nth-child(odd) {
             margin-left: 0;
         }
@@ -2336,9 +2357,9 @@ span.right-button a  {
        // flex-grow: 1;
     }
 }
-@media (min-width: 1282px) {
+@media (min-width: 1200px) {
     .exercise-button {
-        min-height: 220px;
+        min-height: 232px;
     }
 }
 .exercise-read-more {
@@ -2781,7 +2802,8 @@ div#recipe-modal.modal.fade.tip.in h4 b, strong {
         // background-color: transparent;
         // border: 1px solid transparent;
         //padding: 5px;
-        padding: 20px 5%;
+        background-color: @miniBoxContainerBackgroundColor;
+        padding: 40px 5%;
         margin: 15px auto 0;
         width: 100%;
         height: auto;
@@ -2836,10 +2858,16 @@ div#recipe-modal.modal.fade.tip.in h4 b, strong {
         max-width: 100%;
     }
     .exercise-button-container {
-        padding: 60px 12.5%;
-        background-color: @miniBoxContainerBackgroundColor;
+        padding: 60px 5%;
+        //background-color: @miniBoxContainerBackgroundColor;
     }
 
+}
+
+@media (min-width: 1200px) {
+    .exercise-button-container {
+        padding: 60px 12%;
+    }
 }
 
 
