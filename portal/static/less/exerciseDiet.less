@@ -14,7 +14,8 @@
 @btnTruenthArrowColor: #4c5e6e;
 @btnTruenthPrimaryHoverColor: #576E76;
 @miniBoxContainerBackgroundColor: #5f676e;
-@miniBoxBackgroundColor: rgba(51,54,56,.8);
+@defaultBoxBackgroundColor: rgba(51,54,56,.8);
+@miniBoxBackgroundColor: rgba(59,68,73,.5);
 @miniBoxHeaderColor: #dccab2;
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
@@ -35,23 +36,26 @@
 @resourceBackgroundColor: rgba(59,68,73,.5);
 @infoButtonBackgroundColor: #8f9385;
 @figureBackgroundColor: #4c5e6e;
+@ExerciseOverlayBackgroundColor: #13120f;
+@RecipieOverlayBackgroundColor: #353434;
+@calloutTextColor: #FFF;
 @mainNavFontSize: 13px;
 @mainNavCellHeight: 56px;
 @contentFontSize: 24px;
-@contentSubheadingFontSize: 30px;
+@contentSubheadingFontSize: 32px;
 @contentPromptFontSize: 30px;
 @mobileContentFontSize: 20px;
-@buttonFontSize: 20px;
+@buttonFontSize: 18px;
 @tableCellFontSize: 18px;
 @mobileTableCellFontSize: 14px;
 @mobileTableCellFontSize: 16px;
 @smallerTextFontSize: 16px;
-@mobileButtonFontSize: 18px;
+@mobileButtonFontSize: 16px;
 @miniBoxTitleFontSize: 16px;
 @miniBoxFontSize: 18px;
 @modalBodyFontSize: 17px;
 @modalHeadingSize: 24px;
-@h3FontSize: 32px;
+@h3FontSize: 30px;
 @h3MobileFontSize: 28px;
 @referenceFontSize: 18px;
 @resourceHeaderFontSize: 27px;
@@ -303,6 +307,7 @@ a, button, .btn, input {
 .minibox__header {
     font-size: @miniBoxHeaderFontSize;
     color: @miniBoxHeaderColor;
+    letter-spacing: 1.2px;
 }
 .minibox__content {
     font-size: @miniBoxFontSize;
@@ -319,7 +324,7 @@ a, button, .btn, input {
     font-size: 12px;
 }
 .box__content {
-    background: @miniBoxBackgroundColor;
+    background: @defaultBoxBackgroundColor;
     padding: 24px 12px 28px;
     margin: 12px auto;
     width: 100%;
@@ -558,8 +563,11 @@ table b, table strong {
 .mini__head, p.mini__head {
     font-size: @miniBoxTitleFontSize;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.2px !important;
     font-weight: 500;
+    b {
+        letter-spacing: 1.2px !important;
+    }
 }
 .sub__heading {
     display: block;
@@ -1456,9 +1464,9 @@ table#diet-table ul {
             bottom: 0;
             left: 0;
             right: 0;
-            background: #1f1005;
+            background: @ExerciseOverlayBackgroundColor;
             z-index: 2;
-            opacity: 0.2;
+            opacity: 0.3;
         }
     }
     .content__chunk {
@@ -1467,23 +1475,10 @@ table#diet-table ul {
         margin: auto;
     }
     .sub__heading, .content__chunk {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
 }
-@media (min-width: 699px) {
-    #ED-Exercise {
-        .content__chunk {
-            width: 90%;
-        }
-    }
-}
-@media (min-width: 992px) {
-    #ED-Exercise {
-        .content__chunk {
-            width: 83%;
-        }
-    }
-}
+
 #ED-Recipes {
     .Hero-image, .Hero.image {
         &:after {
@@ -1494,9 +1489,9 @@ table#diet-table ul {
             bottom: 0;
             left: 0;
             right: 0;
-            background: #38383a;
+            background: @RecipieOverlayBackgroundColor;
             z-index: 2;
-            opacity: 0.5;
+            opacity: 0.7;
         }
     }
 }
@@ -1549,7 +1544,7 @@ table#diet-table ul {
 }
 @media (min-width: 1400px) {
     .Hero-title {
-        margin: 12% auto;
+        margin: 10% auto;
        // margin: 17% auto;
     }
 }
@@ -1590,6 +1585,7 @@ table#diet-table ul {
             bottom: 0;
             left: 50%;
             font-size: 0.75em;
+            color: @calloutTextColor;
         }
         &:before {
             content: "Learn More";
@@ -1597,7 +1593,7 @@ table#diet-table ul {
             font-size: 16px;
             font-weight: 700;
             line-height: 1;
-            color: #FFF;
+            color: @calloutTextColor;
             margin-top: 0px;
             text-transform: uppercase;
             letter-spacing: 2.9px;
@@ -1613,6 +1609,14 @@ table#diet-table ul {
         &:hover:after {
             cursor: pointer;
             color: darken(#FFF, 10%);
+        }
+    }
+    #ED-Intro {
+        .Hero-title h2 {
+            &:before,
+            &:after {
+                color: #FFF;
+            }
         }
     }
 }
@@ -1664,7 +1668,7 @@ table#diet-table ul {
 @media (min-width: 992px) {
     #ED-Exercise #Intro-content {
         .content {
-            width: 52.5%;
+            width: 880px;
             margin: 16px auto 48px;
         }
     }
@@ -1744,14 +1748,6 @@ table#diet-table ul {
         font-size: @contentFontSize;
     }
 }
-@media (min-width: 768px) {
-    #Intro-content {
-        p.sub__heading {
-            font-size: @contentSubheadingFontSize;
-            line-height: 1.4;
-        }
-    }
-}
 #ED-Intro {
     #Intro-content {
         p {
@@ -1766,6 +1762,10 @@ table#diet-table ul {
             padding: 0 12px;
             &.content {
                 font-size: @contentPromptFontSize;
+            }
+            &.sub__heading {
+                font-size: @contentSubheadingFontSize;
+                line-height: 1.4;
             }
         }
     }
@@ -1786,7 +1786,8 @@ table#diet-table ul {
     text-align: center;
     //background-color: @btnTruenthPrimaryColor;
     color: #fff;
-	width: 325px;
+    width: 325px;
+    max-width: 100%;
     //margin: 32px auto 40px;
     margin: 0 auto;
     padding: 32px 0 40px;
@@ -1795,29 +1796,30 @@ table#diet-table ul {
             color: #FFF;
         }
     }
+    a {
+        color:	#fff;
+        //padding: 12px 39px;
+        background-color: @btnTruenthPrimaryColor;
+        text-decoration: none;
+        transition: all 0.3s ease-out;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 8px 4px 6px;
+        &:hover {
+            color: #fff;
+        /* 	padding: 11px 41px; */
+            background-color: @btnTruenthPrimaryHoverColor;
+            text-decoration: none;
+        }
+    }
 }
 @media (min-width: 768px) {
     .start-button {
         font-size: @buttonFontSize;
     }
 }
-.start-button a {
-	color:	#fff;
-    //padding: 12px 39px;
-    background-color: @btnTruenthPrimaryColor;
-	text-decoration: none;
-	transition: all 0.3s ease-out;
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 6px 4px 4px;
-    &:hover {
-        color: #fff;
-    /* 	padding: 11px 41px; */
-        background-color: @btnTruenthPrimaryHoverColor;
-        text-decoration: none;
-    }
-}
+
 #Resources {
     background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
     background-size: cover;
@@ -1981,7 +1983,7 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
 /*.modal button */
 .modal-nav {
 	position: relative;
-	margin: 16px 8px;
+	margin: 16px 8px 12px;
 	padding: 1rem;
 	text-align: center;
 	display: flex;
@@ -2377,10 +2379,10 @@ span.right-button a  {
 }
 .exercise-button {
 	//border: 1px solid #5e7c38;
-	padding: 12px 20px 16px;
+	padding: 16px 20px 20px;
     width: 100%;
     max-width: 100%;
-	margin: 12px auto;
+	margin: 12px auto 4px;
 	background-color: @miniBoxBackgroundColor;
     display: flex;
     flex-direction: column;
@@ -2404,6 +2406,7 @@ span.right-button a  {
         font-weight: 500;
         font-style: normal;
         color: #FFF;
+        margin: 0 0 10px !important;
     }
     .minibox__content {
         flex-grow: 1.5;
@@ -2411,7 +2414,7 @@ span.right-button a  {
 }
 @media (min-width: 992px) {
     .exercise-button {
-        width: 48.5%;
+        width: 49.25%;
         min-height: 264px;
         &:nth-child(odd) {
             margin-left: 0;
@@ -2554,6 +2557,9 @@ h6.lose {
     span {
         color: @highlightColor;
     }
+}
+h6.lose {
+    min-height: 40px;
 }
 
 /*                                  M O D A L s    E X E R C I S E */
