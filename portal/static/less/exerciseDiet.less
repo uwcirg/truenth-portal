@@ -14,7 +14,9 @@
 @btnTruenthArrowColor: #4c5e6e;
 @btnTruenthPrimaryHoverColor: #576E76;
 @miniBoxContainerBackgroundColor: #5f676e;
+//@miniBoxContainerBackgroundColor: #3b4449;
 @defaultBoxBackgroundColor: rgba(51,54,56,.8);
+//@miniBoxBackgroundColor: rgba(51,54,56,.8);
 @miniBoxBackgroundColor: rgba(59,68,73,.5);
 @miniBoxHeaderColor: #dccab2;
 @miniBoxHeaderFontSize: 18px;
@@ -44,6 +46,7 @@
 @mainNavCellHeight: 56px;
 @contentFontSize: 24px;
 @contentSubheadingFontSize: 32px;
+@mobileSubheadingFontSize: 24px;
 @contentPromptFontSize: 30px;
 @mobileContentFontSize: 20px;
 @buttonFontSize: 18px;
@@ -337,6 +340,7 @@ a, button, .btn, input {
     align-items: center;
     flex-wrap: wrap;
     margin: 12px auto;
+    max-width: 100%;
     .box__content {
         display: flex;
         align-items: flex-start;
@@ -358,6 +362,9 @@ a, button, .btn, input {
     }
 }
 @media(min-width: 768px) {
+    .box__content--container {
+        width: 96%;
+    }
     .box__content {
         width: 70%;
     }
@@ -372,7 +379,7 @@ a, button, .btn, input {
 }
 @media (min-width: 1400px) {
     .box__content--container {
-        width: 1100px;
+        width: 1050px;
     }
 }
 .container {
@@ -463,9 +470,8 @@ a, button, .btn, input {
 }
 .is-scrolled {
     #mainNavbar {
-        background-color: lighten(@navbarBackgroundColor, 10%);
-        a {
-            background : #FFF;
+        a :not(.active) {
+            background : darken(@navbarBackgroundColor, 10%);
         }
     }
 }
@@ -585,10 +591,15 @@ table b, table strong {
 }
 .sub__heading {
     display: block;
-    font-size: @contentSubheadingFontSize;
+    font-size: @mobileSubheadingFontSize;
     font-weight: 600;
     line-height: 1.4;
     margin: 12px auto 20px;
+}
+@media (min-width: 768px) {
+    .sub__heading {
+        font-size: @contentSubheadingFontSize;
+    }
 }
 .watermark {
     top: 0;
@@ -1780,6 +1791,9 @@ table#diet-table ul {
     p.content {
         font-size: @contentFontSize;
     }
+    p.sub__heading {
+        font-size: @mobileSubheadingFontSize;
+    }
 }
 #ED-Intro {
     #Intro-content {
@@ -1854,7 +1868,7 @@ table#diet-table ul {
 }
 
 #Resources {
-    background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
+    background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll center center;
     background-size: cover;
     position: relative;
     z-index: 6;
@@ -1874,7 +1888,7 @@ table#diet-table ul {
         display: inline-block;
         color: @bodyTextColor;
         background: @inputBackgroundColor;
-        height: 44px;
+        height: 45px;
         padding: 5px;
         border: 2px solid @inputBackgroundColor;
         min-width: 150px;
@@ -2831,8 +2845,12 @@ div#recipe-modal.modal.fade.tip.in h4 b, strong {
     /* 	max-width: 768px; */
     }
 
-    #ED-Diet, #ED-Recipe {
+    #ED-Recipe {
         padding: 0 40px;
+    }
+
+    #ED-Diet {
+        padding: 0 20px;
     }
 
     #ED-Recipes {
