@@ -42,7 +42,7 @@
 @figureBackgroundColor: #4c5e6e;
 @IntroOverlayBackgroundColor: #333;
 @ExerciseOverlayBackgroundColor: #13120f;
-@RecipieOverlayBackgroundColor: #353434;
+@RecipieOverlayBackgroundColor: #323535;
 @calloutTextColor: #FFF;
 @mainNavFontSize: 13px;
 @mainNavCellHeight: 56px;
@@ -61,9 +61,14 @@
 @miniBoxFontSize: 18px; //
 @modalBodyFontSize: 18px;
 @modalHeadingSize: 24px;
-@accordionHeaderFontSize: 22px;
+@h2FontSize: 37px;
+@h2MobileFontSize: 30px;
 @h3FontSize: 30px;
-@h3MobileFontSize: 28px;
+@h3MobileFontSize: 26px;
+@h4FontSize: 22px;
+@h4MobileFontSize: 18px;
+@h6FontSize: 15px;
+@h6MobileFontSize: 12px;
 @referenceFontSize: 18px;
 
 @bodyFontFamily: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -181,13 +186,13 @@ h1 {
 }
 h2 {
 	position: relative;
-    font-size: 2em;
+    font-size: @h2MobileFontSize;
     line-height: 1.4em;
     font-weight: 600;
     color: @headerColor;
     text-align: center;
     border: none;
-    padding: 20px 15px;
+    padding: 20px 16px;
     margin: 10px 0px 10px;
     a {
         font-weight: 500;
@@ -208,6 +213,11 @@ h2 {
 h2 a:hover {
     color: @btnTruenthPrimaryHoverColor;
 }
+@media (min-width: 992px) {
+    h2 {
+        font-size: @h2FontSize;
+    }
+}
 h3 {
     font-size: @h3MobileFontSize;
     line-height: 1.3;
@@ -215,7 +225,7 @@ h3 {
 	letter-spacing: .03em;
     color: @headerColor;
     text-align: center;
-    padding: 5px 0;
+    padding: 5px 20px;
     margin-top: 0px;
 }
 @media (min-width: 768px) {
@@ -237,8 +247,16 @@ h3 a {
 h3.module__head {
     color: #FFF;
 }
+h4 {
+    font-size: @h4MobileFontSize;
+}
+@media (min-width: 768px) {
+    h4 {
+        font-size: @h4FontSize;
+    }
+}
 h6, h6 span {
-	font-size: 15px;
+	font-size: @h6MobileFontSize;
     line-height: 1.35;
     letter-spacing: 1.2px;
     font-style: normal;
@@ -248,6 +266,15 @@ h6, h6 span {
     vertical-align: top;
     width: auto;
     margin: 0px 2px 3px;
+}
+@media (min-width: 768px) {
+    h6, h6 span {
+        font-size: @h6FontSize;
+    }
+}
+
+img {
+    max-width: 100%;
 }
 
 hr {
@@ -605,13 +632,20 @@ table b, table strong {
 }
 .watermark {
     top: 0;
-    padding: 4px 0 0;
+    padding: 0;
     z-index: 3000;
     width: 100%;
     color: #603b00;
-    min-height: 26px;
+    min-height: 18px;
     background: #EEAB50;
-    font-size: 12px;
+    font-size: 10px;
+}
+@media (min-width: 768px) {
+    .watermark {
+        padding: 4px 0 0;
+        min-height: 26px;
+        font-size: 12px;
+    }
 }
 
 .page-intro__content {
@@ -639,7 +673,7 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 //acknowledgment section
 #Exercise-Diet_Acknowledgement {
     background: #3B4449;
-    padding: 55px 0 90px;
+    padding: 42px 0 90px;
 }
 
 body.page-exercise-diet-portal {
@@ -751,7 +785,7 @@ body.page-exercise-diet-portal {
         display: inline-block;
         text-transform: uppercase;
         text-align: center;
-        padding: 25px 25px 22px;
+        padding: 26px 25px 20px;
         width: 250px;
         margin-top: 40px;
     }
@@ -764,8 +798,7 @@ body.page-exercise-diet-portal {
     }
 }
 
-#Exercise-Diet-Portal h2,
-#Exercise-Diet_Acknowledgement h2 {
+#Exercise-Diet-Portal h2 {
 	position: relative;
 	display: block;
 	margin: 0px auto 25px;
@@ -781,16 +814,14 @@ body.page-exercise-diet-portal {
 }
 @media (min-width: 400px) {
     #Exercise-Diet-Portal h1,
-    #Exercise-Diet-Portal h2,
-    #Exercise-Diet_Acknowledgement h2 {
-        font-size: 30px;
+    #Exercise-Diet-Portal h2 {
+        font-size: @h2MobileFontSize;
     }
 }
 @media (min-width: 699px) {
     #Exercise-Diet-Portal h1,
-    #Exercise-Diet-Portal h2,
-    #Exercise-Diet_Acknowledgement h2 {
-        font-size: 35px;
+    #Exercise-Diet-Portal h2 {
+        font-size: @h2FontSize;
     }
 }
 @media (min-width: 900px) {
@@ -914,6 +945,9 @@ body.page-exercise-diet-portal {
 .intro-module.intro-intro  {
     position: relative;
     margin-top: -4em;
+    height: 100%;
+}
+@media (min-width: 500px) {
     height: 700px;
 }
 @media (min-width: 900px) {
@@ -1152,7 +1186,7 @@ ul.intro-li {
 	//margin: auto;
     //padding: 56px 20px;
     //padding: 0 40px 20px;
-    margin: -20px auto 0;
+    margin: -16px auto 0;
     padding: 0 40px 70px;
     background-color: @mainBackgroundColor;
     //background: @alternativeBackgroundColor;
@@ -1177,7 +1211,6 @@ ul.intro-li {
         max-width: 100%;
         border-radius: 0;
         h4 {
-            font-size: @accordionHeaderFontSize;
             display: block;
             position: relative;
             //padding: 16px 12px 32px;
@@ -1259,7 +1292,8 @@ ul.intro-li {
 	margin: 0px 0px 0px -0px;
 	min-height: 30px;
 	border-radius: 0;
-	text-align: center;
+    text-align: center;
+    cursor:pointer;
 }
 @media (min-width: 992px) {
     .healthy-fats-accordion h4, .vegetables-accordion h4, .tomatoes-accordion h4, .fish-accordion h4, .alternatives-accordion h4 {
@@ -1350,8 +1384,8 @@ img.recipe-table-image {
     height: auto;
 }
 
-table#diet-table,
-table#avoid-foods-table {
+#diet-table,
+#avoid-foods-table {
     table-layout: fixed;
     p {
         margin: 0 5px 0;
@@ -1360,13 +1394,13 @@ table#avoid-foods-table {
         cursor: pointer;
     }
 }
-table#avoid-foods-table {
+#avoid-foods-table {
     td {
         vertical-align: middle;
     }
 }
-table#diet-table img,
-table#avoid-foods-table img {
+#diet-table img,
+#avoid-foods-table img {
 	margin: 8px 2px 2px;
 	padding: 0;
 	width: 100%;
@@ -1375,7 +1409,7 @@ table#avoid-foods-table img {
 	border: none;
 }
 
-table#diet-table ul {
+#diet-table ul {
 	padding: 3px 3px 10px;
 	padding: 3px 0px 10px;
     margin-bottom: 0px;
@@ -1519,7 +1553,7 @@ table#diet-table ul {
             right: 0;
             background: @RecipieOverlayBackgroundColor;
             z-index: 2;
-            opacity: 0.7;
+            opacity: 0.5;
         }
     }
 }
@@ -1543,7 +1577,7 @@ table#diet-table ul {
 
 @media (min-width: 1400px) {
     .Hero-image, .Hero.image {
-        height: 65vh;
+        height: 650px;
     }
 }
 // @media (min-width: 1400px) {
@@ -1590,7 +1624,7 @@ table#diet-table ul {
 }
 @media (min-width: 1400px) {
     .Hero-title {
-        margin: 10% auto;
+        margin: 12% auto;
        // margin: 17% auto;
     }
 }
@@ -1610,13 +1644,13 @@ table#diet-table ul {
 }
 @media (min-width: 699px) {
     .Hero-title h2 {
-        font-size: 30px;
+        font-size: @h2MobileFontSize;
     }
 }
 @media (min-width: 768px) {
     .Hero-title h2 {
         height: 212px;
-        font-size: 36px;
+        font-size: @h2FontSize;
         &:after,
         &:before {
             content: "\EA03";
@@ -1666,11 +1700,11 @@ table#diet-table ul {
         }
     }
 }
-@media (min-width: 992px) {
-    .Hero-title h2 {
-        font-size: 38px;
-    }
-}
+// @media (min-width: 992px) {
+//     .Hero-title h2 {
+//         font-size: 38px;
+//     }
+// }
 
 #ED-Intro #Intro-content {
 	//position: absolute;
@@ -1719,9 +1753,6 @@ table#diet-table ul {
         }
     }
 }
-#ED-Recipes #Intro-content {
-    padding-bottom: 50px !important;
-}
 
 #ED-Recipes #Intro-Hero {
     position: relative;
@@ -1733,6 +1764,15 @@ table#diet-table ul {
     margin: 0px auto;
     max-width: 100%;
 }
+
+#ED-Recipes #Intro-content {
+    padding: 20px;
+    padding-bottom: 52px;
+    h3 {
+        padding: 8px 12px;
+    }
+}
+
 @media (min-width: 768px) {
     #ED-Recipes #Intro-content {
         max-width: 80%;
@@ -1747,16 +1787,26 @@ table#diet-table ul {
     }
     #ED-Diet #Intro-content {
         //max-width: 80%;
-        padding: 0 100px;
+        padding: 0 40px;
         .content {
-            max-width: 72.5%;
+           // width: 80%;
             margin: auto;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
     }
     #ED-Recipes #Intro-content {
-        max-width: 65%;
+        max-width: 75%;
         margin: 0 auto;
+    }
+}
+@media (min-width: 1200px) {
+    #ED-Diet #Intro-content {
+        .content {
+            width: 75%;
+        }
+    }
+    #ED-Recipes #Intro-content {
+        max-width: 62.5%;
     }
 }
 
@@ -2533,10 +2583,16 @@ div#nutrition-resources.modal.fade.in h2 {
     }
 }
 
+#diet-table {
+    margin-top: 28px;
+}
 @media (min-width: 1200px) {
     #diet-table, #avoid-foods-table {
         width: 90% !important;
         margin: auto;
+    }
+    #diet-table {
+        margin-top: 40px;
     }
 }
 
@@ -2548,8 +2604,8 @@ div#nutrition-resources.modal.fade.in h2 {
 }
 
 
-thead .head-choose th,
-thead .head-lose th {
+.head-choose th,
+.head-lose th {
 	font-size: 22px;
     line-height: 1.2em;
     font-style: normal;
@@ -2562,9 +2618,10 @@ thead .head-lose th {
     letter-spacing: 1.14px;
     vertical-align: middle;
     border-bottom: 1px solid @cellBorderColor;
+    word-break: break-word;
 }
 
-thead .head-lose th span {
+.head-lose th span {
 	font-size: 20px;
     line-height: 1em;
     font-style: normal;
@@ -2580,7 +2637,7 @@ thead .head-lose th span {
 }
 
 
-tr th.categories-choose {
+th.categories-choose {
 	font-size: @mobileTableCellFontSize;
     line-height: 1.5em;
     letter-spacing: 1.2px;
@@ -2594,9 +2651,10 @@ tr th.categories-choose {
     vertical-align: middle;
     width: auto;
     border-right: 1px solid @cellBorderColor;
+    word-break: break-word;
 }
 @media (min-width: 768px) {
-    tr th.categories-choose {
+    th.categories-choose {
         font-size: @tableCellFontSize;
     }
 }
@@ -2619,9 +2677,9 @@ h6.lose {
     div#exercise-benefits.modal.fade.in {
         max-width: 100%;
     }
-    .header {
-        padding: 40px 80px 25px;
-    }
+    // .header {
+    //     padding: 40px 80px 25px;
+    // }
 }
 div#exercise-works.modal.fade.in table,
 div#exercise-benefits.modal.fade.in table {
