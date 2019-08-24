@@ -1,7 +1,6 @@
-//@mainBackgroundColor: #334a48;
-//@mainBackgroundColor: #47575b;
-//@mainBackgroundColor: #2F4248;
 @mainBackgroundColor: #2e3e2e;
+//@mainBackgroundColor: #334146;
+
 @alternativeBackgroundColor: #253534;
 @bodyTextColor: #4a4a4a;
 @navbarBorderColor: #d7dde0;
@@ -24,12 +23,14 @@
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
-@cellBorderColor: #818a92;
+@cellBorderColor: #555b62;
 @cellHeaderColor: #404d50;
 //@cellBackgroundColor: rgba(59,68,73,.8);
-@cellBackgroundColor: rgb(81, 97, 101);
+//@cellBackgroundColor: rgb(81, 97, 101);
+@cellBackgroundColor: #2a3335;
 @cellHoverColor: darken(rgba(59,68,73,.8), 10%);
-@sectionBorderColor: #3a463a;
+//@sectionBorderColor: #3a463a;
+@sectionBorderColor: #343;
 @modalHeaderBackgroundColor: #607277;
 @modalHeadingColor: #4b5e6f;
 @modalSubHeadingColor: #4a4a4a;
@@ -539,7 +540,6 @@ strong {
     font-size: 1em;
     font-weight: 600;
     font-style: normal;
-    line-height: 1.35em;
     margin: 20px auto;
     vertical-align: top;
 }
@@ -564,16 +564,22 @@ table {
     border-spacing: 0;
     margin-bottom: 10px;
     margin-bottom: 20px;
+    .title {
+        text-align: center;
+    }
 }
 
 td {
 	padding: 12px 8px;
 	vertical-align: top;
 	border: 1px solid @cellBorderColor;
-    line-height: 1.35em;
     font-size: @mobileTableCellFontSize !important;
     background-color: @cellBackgroundColor;
     word-break: break-word;
+    line-height: 1.5;
+    li {
+        line-height: 1.3 !important;
+    }
     p, li {
         font-size: @mobileTableCellFontSize !important;
         color: #FFF;
@@ -1146,8 +1152,7 @@ body.page-exercise-diet-portal {
 
 /* Intro page ul li */
 ul.intro-li {
-	padding: 3px 3px 10px;
-	padding: 3px 0px 10px;
+	padding: 3px 8px 10px;
     margin-bottom: 0px;
     max-width: 100%;
     width: 100%;
@@ -1175,10 +1180,16 @@ ul.intro-li {
 @media (min-width: 768px) {
     ul.intro-li li{
         font-size: @contentFontSize;
+    }
+}
+
+@media (min-width: 992px) {
+    ul.intro-li li{
         margin: auto;
         width: 820px;
+        max-width: 100%;
         position: relative;
-        left: 2.25em;
+        left: 1.5em;
     }
 }
 #Recipe-Accordions {
@@ -1186,8 +1197,8 @@ ul.intro-li {
 	//margin: auto;
     //padding: 56px 20px;
     //padding: 0 40px 20px;
-    margin: -16px auto 0;
-    padding: 0 40px 70px;
+    margin: -8px auto 0;
+    padding: 0 40px 80px;
     background-color: @mainBackgroundColor;
     //background: @alternativeBackgroundColor;
     table {
@@ -1214,7 +1225,7 @@ ul.intro-li {
             display: block;
             position: relative;
             //padding: 16px 12px 32px;
-            padding: 16px 12px 16px;
+            padding: 18px 12px 16px;
             margin-bottom: 4px;
             &:after {
                 content: "\f107";
@@ -1265,7 +1276,7 @@ ul.intro-li {
 
 .healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
 	position: relative;
-	margin: 1px auto 0px;
+	margin: 1px auto 4px;
 	padding: 0 20px;
     display: -webkit-box;
     display: -webkit-flex;
@@ -1450,13 +1461,15 @@ img.recipe-table-image {
     position: relative;
 }
 .modal-copy {
-    #processed-meats b, strong,
-    #poultry b, strong,
-    #whole-milk b, strong,
-    #supplements b, strong {
-        color: @modalHighlightColor;
-        font-weight: 600;
-        letter-spacing: .01em;
+    #processed-meats,
+    #poultry,
+    #whole-milk,
+    #supplements {
+        b, strong {
+            color: @modalHighlightColor;
+            font-weight: 600;
+            letter-spacing: .01em;
+        }
     }
 }
 
@@ -1766,10 +1779,11 @@ img.recipe-table-image {
 }
 
 #ED-Recipes #Intro-content {
-    padding: 20px;
+    padding: 32px 40px;
     padding-bottom: 52px;
     h3 {
-        padding: 8px 12px;
+        padding: 8px;
+        margin-bottom: 20px;
     }
 }
 
@@ -1787,7 +1801,7 @@ img.recipe-table-image {
     }
     #ED-Diet #Intro-content {
         //max-width: 80%;
-        padding: 0 40px;
+        padding: 28px 40px;
         .content {
            // width: 80%;
             margin: auto;
@@ -1809,12 +1823,17 @@ img.recipe-table-image {
         max-width: 62.5%;
     }
 }
+@media (min-width: 1400px) {
+    #ED-Recipes #Intro-content {
+        max-width: 60%;
+    }
+}
 
 /* ******** */
 
 #ED-Intro .section {
     border-top: 2px solid @sectionBorderColor;
-    padding: 20px 20px 32px;
+    padding: 20px 32px 32px;
     text-align: center;
     &.resources {
         background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
@@ -1921,6 +1940,7 @@ img.recipe-table-image {
 
 #Resources {
     background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll center center;
+    //background: transparent url(/static/img/ST-Background.jpg) no-repeat scroll center center;
     background-size: cover;
     position: relative;
     z-index: 6;
@@ -2404,8 +2424,8 @@ span.right-button a  {
     &.modal.fade.in ul li {
         font-weight: 500;
         font-style: normal;
-        line-height: 1.35em;
-        letter-spacing: .02em;
+        line-height: 1.5;
+        //letter-spacing: .02em;
         text-align: left;
         background-image: url('../img/green-triangle-bullet.png');
         background-repeat: no-repeat;
@@ -2588,11 +2608,11 @@ div#nutrition-resources.modal.fade.in h2 {
 }
 @media (min-width: 1200px) {
     #diet-table, #avoid-foods-table {
-        width: 90% !important;
+        width: 85% !important;
         margin: auto;
     }
     #diet-table {
-        margin-top: 40px;
+        margin-top: 40px;  //test
     }
 }
 
@@ -2726,7 +2746,7 @@ div#exercise-works.modal.fade.in,
 div#exercise-prescription.modal.fade.in,
 div#exercise-safety.modal.fade.in,
 div#exercise-partner.modal.fade.in {
-    h4 b, strong {
+    h4 b, h4 strong {
         font-size: @modalBodyFontSize;
         font-weight: 700;
         font-style: normal;
@@ -2761,7 +2781,7 @@ div#poultry.modal.fade.in,
 div#whole-milk.modal.fade.in,
 div#supplements.modal.fade.in,
 div#recipe-modal.fade.in {
-    h4 b, strong {
+    h4 b, h4 strong {
         font-size: 1em;
         font-weight: 700;
         font-style: normal;
@@ -2853,12 +2873,14 @@ div#recipe-modal.modal.fade.tip.in ul {
 	margin-bottom: 10px;
 	margin-bottom: 0px;
 }
-div#recipe-modal.modal.fade.tip.in h4 b, strong {
-    font-size: @modalBodyFontSize;
-    font-weight: 600;
-    font-style: oblique;
-    line-height: 1.5;
-    margin: 4px auto;
+div#recipe-modal.modal.fade.tip.in h4 {
+    b, strong {
+        font-size: @modalBodyFontSize;
+        font-weight: 600;
+        font-style: oblique;
+        line-height: 1.5;
+        margin: 4px auto;
+    }
 }
 
 #ED-Intro,
