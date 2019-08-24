@@ -1,5 +1,6 @@
 //@mainBackgroundColor: #2e3e2e;
 @mainBackgroundColor: #304040;
+@lightBlueBackgroundColor: #4a6161;
 
 @alternativeBackgroundColor: #253534;
 @bodyTextColor: #4a4a4a;
@@ -652,6 +653,10 @@ table b, table strong {
         min-height: 26px;
         font-size: 12px;
     }
+}
+
+.light-blue-theme {
+    background-color: @lightBlueBackgroundColor;
 }
 
 .page-intro__content {
@@ -1485,6 +1490,9 @@ img.recipe-table-image {
 	width: 100%;
     max-width: 100%;
     background-color: @mainBackgroundColor;
+    &.light-blue-theme {
+        background-color: @lightBlueBackgroundColor;
+    }
     p {
         color: #FFF;
     }
@@ -1801,7 +1809,7 @@ img.recipe-table-image {
     }
     #ED-Diet #Intro-content {
         //max-width: 80%;
-        padding: 28px 40px;
+        padding: 28px 120px;
         .content {
            // width: 80%;
             margin: auto;
@@ -1816,7 +1824,7 @@ img.recipe-table-image {
 @media (min-width: 1200px) {
     #ED-Diet #Intro-content {
         .content {
-            width: 75%;
+            width: 72.5%;
         }
     }
     #ED-Recipes #Intro-content {
@@ -1832,7 +1840,7 @@ img.recipe-table-image {
 /* ******** */
 
 #ED-Intro .section {
-    border-top: 2px solid @sectionBorderColor;
+    //border-top: 2px solid @sectionBorderColor;
     padding: 20px 32px 32px;
     text-align: center;
     &.resources {
@@ -2077,7 +2085,7 @@ img.recipe-table-image {
     }
     #ED-Diet {
         h3 {
-            width: 65%;
+            width: 62.5%;
             margin: auto;
         }
         #Resources {
@@ -2129,11 +2137,12 @@ span.left-button, span.right-button {
     background: @btnTruenthPrimaryColor;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    min-width: 220px;
+    min-width: 200px;
     min-height: 32px;
     //padding: 5px;
     flex: 0 0 45%;
     padding: 12px 16px 12px;
+    margin-bottom: 12px;
     line-height: 1.4 !important;
     //flex-grow: 1;
     &:hover {
