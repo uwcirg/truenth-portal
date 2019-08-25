@@ -1,6 +1,7 @@
 //@mainBackgroundColor: #2e3e2e;
 @mainBackgroundColor: #304040;
 @lightBlueBackgroundColor: #4a6161;
+@lightGreenBackgroundColor: #44504f;
 
 @alternativeBackgroundColor: #253534;
 @bodyTextColor: #4a4a4a;
@@ -658,6 +659,9 @@ table b, table strong {
 .light-blue-theme {
     background-color: @lightBlueBackgroundColor;
 }
+.light-green-theme {
+    background-color: @lightGreenBackgroundColor;
+}
 
 .page-intro__content {
     max-width: 100%;
@@ -1178,9 +1182,10 @@ ul.intro-li {
         list-style-position: outside;
         list-style-type: none;
         position: relative;
-        left: 1em;
+        left: 0;
     }
 }
+
 
 @media (min-width: 768px) {
     ul.intro-li li{
@@ -1202,9 +1207,10 @@ ul.intro-li {
 	//margin: auto;
     //padding: 56px 20px;
     //padding: 0 40px 20px;
-    margin: -8px auto 0;
+    margin: -16px auto 0;
     padding: 0 40px 80px;
-    background-color: @mainBackgroundColor;
+    background-color: @lightGreenBackgroundColor;
+    //background-color: @mainBackgroundColor;
     //background: @alternativeBackgroundColor;
     table {
         h6 {
@@ -1492,6 +1498,9 @@ img.recipe-table-image {
     background-color: @mainBackgroundColor;
     &.light-blue-theme {
         background-color: @lightBlueBackgroundColor;
+    }
+    &.light-green-theme {
+        background-color: @lightGreenBackgroundColor;
     }
     p {
         color: #FFF;
@@ -1841,7 +1850,7 @@ img.recipe-table-image {
 
 #ED-Intro .section {
     //border-top: 2px solid @sectionBorderColor;
-    padding: 20px 32px 32px;
+    padding: 20px 20px 32px;
     text-align: center;
     &.resources {
         background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
@@ -1855,6 +1864,11 @@ img.recipe-table-image {
     // &:nth-child(odd) {
     //     background-color: lighten(@mainBackgroundColor, 10%);
     // }
+}
+@media (min-width: 699px) {
+    #ED-Intro .section {
+        padding: 20px 32px 32px;
+    }
 }
 
 #Intro-content {
