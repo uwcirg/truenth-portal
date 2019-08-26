@@ -9,7 +9,7 @@
 @navbarColor: darken(#7c959e, 5%);
 //@navbarColor: #576E76;
 @navbarBackgroundColor: rgba(210,209,197,.2);
-@highlightColor: #dccab2;
+@highlightColor: #f7debf;
 @modalHighlightColor: #6a5944;
 @headerColor: #FFF;
 @tnthPrimaryColor: #7C959D;
@@ -26,10 +26,11 @@
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
 @cellBorderColor: #555b62;
-@cellHeaderColor: #404d50;
+@cellHeaderColor: #334044;
 //@cellBackgroundColor: rgba(59,68,73,.8);
 //@cellBackgroundColor: rgb(81, 97, 101);
-@cellBackgroundColor: #2a3335;
+//@cellBackgroundColor: #2a3335;
+@cellBackgroundColor: #313b3e;
 @cellHoverColor: darken(rgba(59,68,73,.8), 10%);
 @sectionBorderColor: #343;
 @sectionBorderColor: #3b4e4e;
@@ -461,6 +462,7 @@ a, button, .btn, input {
         margin-left: 4px;
         margin-right: 4px;
         cursor: pointer;
+        position: relative;
         &:hover {
             a {
                 color: darken(@btnTruenthPrimaryHoverColor, 5%);
@@ -532,7 +534,7 @@ a, button, .btn, input {
     #mainNavbar {
         background-color:white;
         border:0;
-        margin-bottom: -4px;
+        margin-bottom: -36px;
     }
 }
 .navbar-nav {
@@ -648,7 +650,7 @@ table b, table strong {
     background: #EEAB50;
     font-size: 10px;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
     .watermark {
         padding: 4px 0 0;
         min-height: 26px;
@@ -747,7 +749,7 @@ body.page-exercise-diet-portal {
             padding-bottom: 40px;
         }
         .objective-content {
-            width: 875px;
+            width: 825px;
             padding-right: 0;
             padding-left: 0;
         }
@@ -1161,16 +1163,16 @@ body.page-exercise-diet-portal {
 
 /* Intro page ul li */
 ul.intro-li {
-	padding: 3px 8px 10px;
-    margin-bottom: 0px;
+	padding: 4px 8px 8px;
     max-width: 100%;
-    width: 100%;
+    width: 90%;
+    margin: auto;
     li {
         font-weight: 500;
         font-style: normal;
         font-size: @mobileContentFontSize;
         line-height: 1.4em;
-        letter-spacing: .02em;
+        //letter-spacing: .02em;
         text-align: left;
         color: #FFF;
         background-image: url('../img/green-triangle-bullet.png');
@@ -1196,24 +1198,24 @@ ul.intro-li {
 @media (min-width: 992px) {
     ul.intro-li li{
         margin: auto;
-        width: 820px;
+        width: 625px;
         max-width: 100%;
         position: relative;
         //left: 1.5em;
     }
 }
-@media (min-width: 1400px) {
-    ul.intro-li li{
-        left: 1.5em;
-    }
-}
+// @media (min-width: 1400px) {
+//     ul.intro-li li{
+//         left: 1.5em;
+//     }
+// }
 #Recipe-Accordions {
 	position: relative;
 	//margin: auto;
     //padding: 56px 20px;
     //padding: 0 40px 20px;
     margin: -16px auto 0;
-    padding: 0 40px 80px;
+    padding: 0 40px 64px;
     background-color: @lightGreenBackgroundColor;
     //background-color: @mainBackgroundColor;
     //background: @alternativeBackgroundColor;
@@ -1644,12 +1646,17 @@ img.recipe-table-image {
     position: absolute;
     //top: 25%;
     top: 0;
-    margin: 20% auto;
+    margin: 15% auto;
     left: 0;
     bottom: 0;
     right: 0;
     //margin: auto;
     z-index: 5;
+}
+@media (min-width: 699px) {
+    .Hero-title {
+        margin: 20% auto;
+    }
 }
 @media (min-width: 768px) {
     .Hero-title {
@@ -1783,17 +1790,35 @@ img.recipe-table-image {
 @media (min-width: 992px) {
     #ED-Exercise #Intro-content {
         .content {
-            width: 880px;
+            width: 780px;
             margin: 16px auto 48px;
         }
     }
 }
-
+@media (min-width: 1200px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 880px;
+        }
+    }
+}
 #ED-Recipes #Intro-Hero {
     position: relative;
 }
 
-#ED-Diet #Intro-content, #ED-Recipes #Intro-content {
+#ED-Diet #Intro-content {
+    padding: 0;
+	position: relative;
+    margin: 0px auto;
+    max-width: 100%;
+}
+@media (min-width: 699px) {
+    #ED-Diet #Intro-content {
+        padding: 0 20px;
+    }
+}
+
+#ED-Recipes #Intro-content {
     padding: 0 20px;
 	position: relative;
     margin: 0px auto;
@@ -1801,8 +1826,8 @@ img.recipe-table-image {
 }
 
 #ED-Recipes #Intro-content {
-    padding: 32px 40px;
-    padding-bottom: 52px;
+    padding: 28px 32px;
+    padding-bottom: 42px;
     h3 {
         padding: 8px;
         margin-bottom: 20px;
@@ -1823,33 +1848,38 @@ img.recipe-table-image {
     }
     #ED-Diet #Intro-content {
         //max-width: 80%;
-        padding: 8px 120px;
+        //padding: 8px 120px;
         .content {
            // width: 80%;
+            width: 880px;
             margin: auto;
-            margin-bottom: 28px;
+            margin-bottom: 36px;
         }
     }
     #ED-Recipes #Intro-content {
-        max-width: 75%;
+        //max-width: 75%;
         margin: 0 auto;
     }
 }
 @media (min-width: 1200px) {
-    #ED-Diet #Intro-content {
-        .content {
-            width: 72.5%;
-        }
-    }
+    // #ED-Diet #Intro-content {
+    //     .content {
+    //         //width: 72.5%;
+    //         width: 880px;
+    //     }
+    // }
     #ED-Recipes #Intro-content {
-        max-width: 62.5%;
+        width: 880px;
     }
+    // #ED-Recipes #Intro-content {
+    //     max-width: 62.5%;
+    // }
 }
-@media (min-width: 1400px) {
-    #ED-Recipes #Intro-content {
-        max-width: 60%;
-    }
-}
+// @media (min-width: 1400px) {
+//     #ED-Recipes #Intro-content {
+//         max-width: 60%;
+//     }
+// }
 
 /* ******** */
 
@@ -2108,10 +2138,10 @@ img.recipe-table-image {
         padding: 5%;
     }
     #ED-Diet {
-        h3 {
-            width: 62.5%;
-            margin: auto;
-        }
+        // h3 {
+        //     width: 62.5%;
+        //     margin: auto;
+        // }
         #Resources {
             width: 100%;
             margin: 20px auto 0;
@@ -2273,6 +2303,7 @@ span.right-button a  {
         }
         td {
             color: #FFF;
+            background-color: light(@cellBackgroundColor, 10%);
             strong, b {
                 color: lighten(@modalHighlightColor, 40%);
                 font-weight: 500 !important;
@@ -2641,11 +2672,11 @@ div#nutrition-resources.modal.fade.in h2 {
 }
 @media (min-width: 1200px) {
     #diet-table, #avoid-foods-table {
-        width: 85% !important;
+        width: 82.5% !important;
         margin: auto;
     }
     #diet-table {
-        margin-top: 40px;  //test
+        margin-top: 48px;  //test
     }
 }
 
