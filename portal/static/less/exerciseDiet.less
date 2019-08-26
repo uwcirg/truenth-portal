@@ -327,6 +327,12 @@ a, button, .btn, input {
     z-index: 9999;
     top: 24px;
 }
+.is-scrolled {
+    .home-button {
+        background: rgba(210,209,197,.2);
+        color: #7c959e;
+    }
+}
 
 .button-container {
     position: relative;
@@ -424,7 +430,7 @@ a, button, .btn, input {
 .mobile-view {
     display: block;
 }
-@media (min-width: 699px) {
+@media (min-width: 768px) {
     .mobile-view {
         display: none;
     }
@@ -1563,8 +1569,12 @@ img.recipe-table-image {
     padding: 60px 0 0;
     height: 100%;
 }
+#ED-Exercise #Intro-Hero {
+    padding: 72px 0 0;
+}
 @media (min-width: 768px) {
-    #Intro-Hero {
+    #Intro-Hero, 
+    #ED-Exercise #Intro-Hero {
        padding: 0;
     }
 }
@@ -1707,7 +1717,7 @@ img.recipe-table-image {
 }
 .Hero-title h2 {
     border: none;
-    font-size: 32px;
+    font-size: 30px;
     line-height: 1.3em;
     padding: 0 15px;
     padding: 0 30px;
