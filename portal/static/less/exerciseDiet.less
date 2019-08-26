@@ -25,7 +25,8 @@
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
-@cellBorderColor: #555b62;
+@cellBorderColor: #45494d;
+@cellCaptionHeaderColor: #212a2d;
 @cellHeaderColor: #334044;
 //@cellBackgroundColor: rgba(59,68,73,.8);
 //@cellBackgroundColor: rgb(81, 97, 101);
@@ -581,6 +582,22 @@ td {
     background-color: @cellBackgroundColor;
     word-break: break-word;
     line-height: 1.5;
+    &.filler-cell {
+        border: 0;
+    }
+    .filler-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .title {
+            height: 100%;
+            display: inline-block;
+            padding-right: 24px;
+            color: @highlightColor;
+            margin-bottom: 8px;
+        }
+    }
     li {
         line-height: 1.3 !important;
     }
@@ -1807,14 +1824,14 @@ img.recipe-table-image {
 }
 
 #ED-Diet #Intro-content {
-    padding: 0;
+    padding: 0 12px;
 	position: relative;
     margin: 0px auto;
     max-width: 100%;
 }
 @media (min-width: 699px) {
     #ED-Diet #Intro-content {
-        padding: 0 20px;
+        padding: 0 40px;
     }
 }
 
@@ -1854,6 +1871,9 @@ img.recipe-table-image {
             width: 880px;
             margin: auto;
             margin-bottom: 36px;
+        }
+        h3.content {
+            margin-bottom: 0;
         }
     }
     #ED-Recipes #Intro-content {
@@ -2663,22 +2683,31 @@ div#nutrition-resources.modal.fade.in h2 {
 #diet-table,
 #avoid-foods-table {
     td {
-        padding: 12px 0;
+        padding: 12px 4px;
     }
 }
 
-#diet-table {
-    margin-top: 28px;
-}
-@media (min-width: 1200px) {
+// #diet-table {
+//     margin-top: 28px;
+// }
+@media (min-width: 992px) {
     #diet-table, #avoid-foods-table {
-        width: 82.5% !important;
+        width: 880px;
+        margin: 28px auto 0;
+    }
+    #avoid-foods-table {
         margin: auto;
     }
-    #diet-table {
-        margin-top: 48px;  //test
-    }
 }
+// @media (min-width: 1200px) {
+//     // #diet-table, #avoid-foods-table {
+//     //    // width: 82.5% !important;
+//     //    // margin: auto;
+//     // }
+//     #diet-table {
+//         margin-top: 48px;  //test
+//     }
+// }
 
 #diet-table tr,
 #avoid-foods-table tr {
@@ -2696,7 +2725,7 @@ div#nutrition-resources.modal.fade.in h2 {
     font-weight: 600;
     padding: 12px;
     color: #fff;
-    background-color:@cellHeaderColor;
+    background-color:@cellCaptionHeaderColor;
     height: 70px;
     text-align: center;
     letter-spacing: 1.14px;
