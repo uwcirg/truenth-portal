@@ -1283,11 +1283,14 @@ ul.intro-li {
         position: relative;
         max-width: 100%;
         border-radius: 0;
+        table {
+            margin-bottom: 0;
+        }
         h4 {
             display: block;
             position: relative;
             //padding: 16px 12px 32px;
-            padding: 18px 12px 16px;
+            padding: 16px 12px 14px;
             margin-bottom: 4px;
             &:after {
                 content: "\f107";
@@ -2249,6 +2252,7 @@ span.left-button, span.right-button {
     padding: 12px 16px 12px;
     margin-bottom: 12px;
     line-height: 1.4 !important;
+    color: #FFF;
     //flex-grow: 1;
     &:hover {
         background: @btnTruenthPrimaryHoverColor;
@@ -2271,6 +2275,7 @@ span.left-button, span.right-button {
         align-items: center;
     }
     a,span {
+        color: #FFF;
         font-size: 15px !important;
     }
 }
@@ -2344,7 +2349,7 @@ span.right-button a  {
         }
         a {
             overflow-wrap: break-word;
-            color: darken(@btnTruenthPrimaryColor, 10%);
+           // color: darken(@btnTruenthPrimaryColor, 10%);
             &:hover {
                 text-decoration: none;
                 color: @btnTruenthPrimaryHoverColor;

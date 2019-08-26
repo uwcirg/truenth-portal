@@ -19,28 +19,8 @@ $(function(){
 
     setTimeout(function() {
         $("main").addClass("active");
-    }, 500);
-
-    // $('#diet-table tr').on('mouseenter',function(){
-    //     $(this).addClass('row-hover');
-    //     return false;
-    // });
-
-    // $('#diet-table tr').on('mouseleave',function(){
-    //     $(this).removeClass('row-hover');
-    //     return false;
-    // });
-
-    // $('#avoid-foods-table td').on('mouseenter',function(){
-    //     $(this).addClass('cell-hover');
-    //     return false;
-    // });
-
-    // $('#avoid-foods-table td').on('mouseleave',function(){
-    //     $(this).removeClass('cell-hover');
-    //     return false;
-    // });
-
+    }, 750);
+    
     $('[data-toggle=modal]').on('click touchend', function(e) {
         var target;
         e.preventDefault();
