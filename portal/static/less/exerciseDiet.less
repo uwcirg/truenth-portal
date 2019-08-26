@@ -1280,6 +1280,9 @@ ul.intro-li {
     .alternatives-accordion,
     [role='tabpanel']
      {
+        &.collapse {
+            padding: 0 20px 0;
+        }
         position: relative;
         max-width: 100%;
         border-radius: 0;
@@ -2616,7 +2619,7 @@ span.right-button a  {
     background-color: @miniBoxContainerBackgroundColor;
 	border: 0;
     //padding: 5px;
-    padding: 46px 40px;
+    padding: 46px 40px 56px;
 	margin: 15px auto 0;
 	width: 100%;
 	height: auto;
@@ -3189,6 +3192,12 @@ div#recipe-modal.modal.fade.tip.in h4 {
 @media (min-width: 1200px) {
     .exercise-button-container {
         padding: 60px 12%;
+    }
+}
+
+@media (min-width: 1400px) {
+    .exercise-button-container {
+        padding: 60px 16%;
     }
 }
 
