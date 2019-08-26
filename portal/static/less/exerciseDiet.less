@@ -95,7 +95,6 @@ body {
     color: black;
     background-image: url(../../../../gil/static/img/logo-base.png);
 }
-
 main .module-assets {
     overflow: auto;
     p {
@@ -225,7 +224,7 @@ h2 a:hover {
 }
 h3 {
     font-size: @h3MobileFontSize;
-    line-height: 1.3;
+    line-height: 1.35;
 	font-weight: 600;
 	letter-spacing: .03em;
     color: @headerColor;
@@ -322,6 +321,12 @@ a, button, .btn, input {
         cursor: pointer;
     }
 }
+.home-button {
+    position: fixed;
+    right: 12px;
+    z-index: 9999;
+    top: 24px;
+}
 
 .button-container {
     position: relative;
@@ -414,6 +419,14 @@ a, button, .btn, input {
 @media (min-width: 1400px) {
     .box__content--container {
         width: 1050px;
+    }
+}
+.mobile-view {
+    display: block;
+}
+@media (min-width: 699px) {
+    .mobile-view {
+        display: none;
     }
 }
 .container {
@@ -1220,7 +1233,7 @@ ul.intro-li {
 @media (min-width: 992px) {
     ul.intro-li li{
         margin: auto;
-        width: 625px;
+        width: 675px;
         max-width: 100%;
         position: relative;
         //left: 1.5em;
@@ -1694,7 +1707,7 @@ img.recipe-table-image {
 }
 .Hero-title h2 {
     border: none;
-    font-size: 28px;
+    font-size: 32px;
     line-height: 1.3em;
     padding: 0 15px;
     padding: 0 30px;
@@ -1777,7 +1790,7 @@ img.recipe-table-image {
     margin: 0px auto;
 }
 #ED-Exercise #Intro-content {
-    padding: 0;
+    padding: 0 12px;
     margin: 0px auto;
 }
 #ED-Intro #Intro-content {

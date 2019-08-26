@@ -28,6 +28,11 @@
         </div>
     {% endblock %}
 {% endblock %}
+{% block header %}
+        {{super()}}
+        <!-- TODO only authenticated user should see this?-->
+        <a href="{{ url_for('.introduction') }}" class="menu button button--small mobile-view home-button">Home</a>
+{% endblock %}
 {% block footnote %}
     <!-- content currently hardcoded can change to retrieval via LR if need to-->
     <div class="footnote-container">
