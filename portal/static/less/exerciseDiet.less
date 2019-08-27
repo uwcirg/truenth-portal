@@ -26,11 +26,11 @@
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
-@cellBorderColor: #868e99;
+@cellBorderColor: #959eab;
 @cellCaptionHeaderColor: #5a6d75;
 @cellHeaderColor: #5a6d75;
-@modalCellBackgroundColor: rgba(210,209,197,.4);
-@modalCellBorderColor: #d9dfe6;
+@modalCellBackgroundColor: hsla(113, 16%, 91%, 0.4);
+@modalCellBorderColor: #caced4;
 //@cellBackgroundColor: rgba(59,68,73,.8);
 //@cellBackgroundColor: rgb(81, 97, 101);
 //@cellBackgroundColor: #2a3335;
@@ -53,7 +53,7 @@
 @RecipieOverlayBackgroundColor: #323535;
 @calloutTextColor: #FFF;
 @mainNavFontSize: 13px;
-@mainNavCellHeight: 56px;
+@mainNavCellHeight: 54px;
 @contentFontSize: 24px;
 @contentSubheadingFontSize: 32px;
 @mobileSubheadingFontSize: 24px;
@@ -482,6 +482,7 @@ a, button, .btn, input {
     }
     li {
         display:flex;
+        justify-content: center;
         margin-left: 4px;
         margin-right: 4px;
         cursor: pointer;
@@ -497,6 +498,7 @@ a, button, .btn, input {
         }
         a {
             display: flex;
+            justify-content: center;
             color: @navbarColor;
             background-color: @navbarBackgroundColor;
             text-transform: uppercase;
@@ -506,7 +508,7 @@ a, button, .btn, input {
             max-width: 250px;
             height: @mainNavCellHeight;
             text-align: center;
-            padding: 8px 40px 4px 40px;
+            padding: 6px 36px 4px 36px;
             align-items: center;
             border: 0;
             &:visited, &:focused, &:hover {
@@ -563,6 +565,11 @@ a, button, .btn, input {
 @media (min-width: 992px) {
     #mainNavbar {
         margin-bottom: -28px;
+        ul {
+            a {
+                min-width: 225px;
+            }
+        }
     }
 }
 .navbar-nav {
@@ -2282,6 +2289,10 @@ span.left-button, span.right-button {
     line-height: 1.4 !important;
     color: #FFF;
     //flex-grow: 1;
+    a:hover {
+        background: @btnTruenthPrimaryHoverColor;
+        color: #FFF;
+    }
     &:hover {
         background: @btnTruenthPrimaryHoverColor;
         .figure {
@@ -2309,7 +2320,8 @@ span.left-button, span.right-button {
 }
 
 span.left-button:hover, span.right-button:hover {
-	color: @btnTruenthPrimaryHoverColor;
+    background: @btnTruenthPrimaryHoverColor;
+    color: #FFF;
 }
 span.left-button {
     margin-right: 4px;
@@ -2396,10 +2408,12 @@ span.right-button a  {
            // background-color: light(@cellBackgroundColor, 10%);
             background-color: @modalCellBackgroundColor;
             border: 1px solid @modalCellBorderColor;
+            line-height: 1.45;
+            padding: 12px;
             strong, b {
                 //color: lighten(@modalHighlightColor, 40%);
                 color: @darkenHighlightColor;
-                font-weight: 500 !important;
+                font-weight: 600 !important;
                 font-style: normal;
                 text-transform: uppercase;
                 font-size: 16px;
@@ -2580,20 +2594,27 @@ span.right-button a  {
     }
 }
 .ED__modal {
-    &.modal.fade.in ul li {
-        font-weight: 500;
-        font-style: normal;
-        line-height: 1.5;
-        //letter-spacing: .02em;
-        text-align: left;
-        background-image: url('../img/green-triangle-bullet.png');
-        background-repeat: no-repeat;
-        background-position: left 8px;
-        padding-left: 16px;
-        padding-bottom: 5px;
-        margin-left: 12px;
-        list-style-position: outside;
-        list-style-type: none;
+    &.modal.fade.in {
+        li {
+            font-weight: 500;
+            font-style: normal;
+            line-height: 1.5;
+            //letter-spacing: .02em;
+            text-align: left;
+            background-image: url('../img/green-triangle-bullet.png');
+            background-repeat: no-repeat;
+            background-position: left 8px;
+            padding-left: 16px;
+            padding-bottom: 5px;
+            margin-left: 12px;
+            list-style-position: outside;
+            list-style-type: none;
+        }
+        td {
+            li {
+                margin-left: 0;
+            }
+        }
     }
     
     &.modal.fade.in h3 {
