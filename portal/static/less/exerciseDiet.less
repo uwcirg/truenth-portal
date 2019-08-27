@@ -53,7 +53,7 @@
 @RecipieOverlayBackgroundColor: #323535;
 @calloutTextColor: #FFF;
 @mainNavFontSize: 13px;
-@mainNavCellHeight: 54px;
+@mainNavCellHeight: 58px;
 @contentFontSize: 24px;
 @contentSubheadingFontSize: 32px;
 @mobileSubheadingFontSize: 24px;
@@ -138,6 +138,14 @@ main {
     &.active:after {
         opacity: 0;
         transform: translateY(-500%);
+    }
+}
+.page-intro {
+    padding: 120px 30px 70px;
+}
+@media (min-width: 992px) {
+    .page-intro {
+        padding: 160px 30px 60px;
     }
 }
 
@@ -487,6 +495,13 @@ a, button, .btn, input {
         margin-right: 4px;
         cursor: pointer;
         position: relative;
+        width: 25%;
+        &:first-of-type {
+            margin-left: 0;
+        }
+        &:last-of-type {
+            margin-right: 0;
+        }
         &:hover {
             a {
                 color: darken(@btnTruenthPrimaryHoverColor, 5%);
@@ -505,7 +520,8 @@ a, button, .btn, input {
             letter-spacing: 3px;
             font-size: @mainNavFontSize;
             font-weight: 500;
-            max-width: 250px;
+            //max-width: 250px;
+            width: 100%;
             height: @mainNavCellHeight;
             text-align: center;
             padding: 6px 36px 4px 36px;
@@ -514,6 +530,7 @@ a, button, .btn, input {
             &:visited, &:focused, &:hover {
                 text-decoration: none;
                 cursor: pointer;
+                border: 0;
             }
         
         }
@@ -2875,7 +2892,8 @@ h6.lose {
     }
 }
 h6.lose {
-    min-height: 40px;
+    min-height: 60px;
+    padding-top: 2px;
 }
 
 /*                                  M O D A L s    E X E R C I S E */
@@ -3224,6 +3242,11 @@ div#recipe-modal.modal.fade.tip.in h4 {
 
     .page-intro__content {
         padding-top: 182px;
+    }
+    .is-scrolled {
+        .page-intro__content {
+            padding-top: 122px;
+        }
     }
 
     #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
