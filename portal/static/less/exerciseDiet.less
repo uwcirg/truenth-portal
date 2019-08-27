@@ -40,7 +40,7 @@
 @sectionBorderColor: #3b4e4e;
 @modalHeaderBackgroundColor: #607277;
 @modalHeadingColor: #4b5e6f;
-@modalSubHeadingColor: #4a4a4a;
+@modalSubHeadingColor: #303d48;
 @modalHeadingBorderColor: #cfd5d8;
 @inputBackgroundColor: #f1efec;
 @resourceLinkColor: #bedfea;
@@ -113,7 +113,6 @@ main .module-assets {
 .main.exercise-diet {
     top: 0em;
     padding-top: 5em;
-    //padding-bottom: 3em;
     padding-bottom: 0;
     margin-bottom: -2.25em;
     position: relative;
@@ -149,9 +148,6 @@ main {
     }
 }
 
-// main [data-target] {
-//     cursor: pointer;
-// }
 em {
 	font-weight: 400;
 	font-style: normal;
@@ -195,7 +191,6 @@ h1 {
 	font-weight: 700;
     color: @headerColor;
     text-align: center;
-   // border: 1px solid @cellBorderColor;
     padding: 16px;
     margin: 20px auto 20px;
 }
@@ -508,7 +503,6 @@ a, button, .btn, input {
     z-index: 2;
     ul {
         display:flex;
-        //align-items:flex-end;
         justify-content:center;
         list-style-type: none;
         min-height:@mainNavCellHeight;
@@ -569,13 +563,6 @@ a, button, .btn, input {
         }
     }
 }
-// .is-scrolled {
-//     #mainNavbar {
-//         a :not(.active) {
-//             background : darken(@navbarBackgroundColor, 10%);
-//         }
-//     }
-// }
 .navbar-nav {
     overflow: hidden;
     ul {
@@ -800,7 +787,6 @@ body.page-exercise-diet-portal {
 }
 #Exercise-Diet_Acknowledgement {
     .accent-heading {
-        //margin-top: 28px;
         margin-top: 60px;
         color: #D2D1C5;
     }
@@ -1304,24 +1290,13 @@ ul.intro-li {
         width: 735px;
         max-width: 100%;
         position: relative;
-        //left: 1.5em;
     }
 }
-// @media (min-width: 1400px) {
-//     ul.intro-li li{
-//         left: 1.5em;
-//     }
-// }
 #Recipe-Accordions {
 	position: relative;
-	//margin: auto;
-    //padding: 56px 20px;
-    //padding: 0 40px 20px;
     margin: -4px auto 0;
     padding: 0 40px 64px;
     background-color: @lightGreenBackgroundColor;
-    //background-color: @mainBackgroundColor;
-    //background: @alternativeBackgroundColor;
     table {
         h6 {
             text-transform: uppercase;
@@ -1351,7 +1326,6 @@ ul.intro-li {
         h4 {
             display: block;
             position: relative;
-            //padding: 16px 12px 32px;
             padding: 16px 12px 14px;
             margin-bottom: 4px;
             &:after {
@@ -1365,8 +1339,6 @@ ul.intro-li {
                 width: 10px;
                 right: 4.5%;
                 top: 25%;
-                // left: 50%;
-                // right: 50%;
             }
             a {
                 display: block;
@@ -1636,10 +1608,7 @@ img.recipe-table-image {
     }
 }
 #Intro-Hero {
-	//position: relative;
 	width: 100%;
-    //padding: 0 20px;
-    //padding: 20px 0;
     padding: 0;
     padding: 60px 0 0;
     height: 100%;
@@ -1665,7 +1634,6 @@ img.recipe-table-image {
 	position: relative;
     z-index: 0;
     width: 100%;
-    //height: 100%;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -1737,40 +1705,22 @@ img.recipe-table-image {
         height: 650px;
     }
 }
-// @media (min-width: 1400px) {
-//     .Hero-image, .Hero.image {
-//         height: 75vh;
-//     }
-// }
+
 #Intro-Hero img {
-	/*border: 1px solid #404141;*/
     width: 100%;
 }
-// #Intro-Hero {
-//     .Hero.image {
-//         background: url('../img/Intro-Hero.jpg') no-repeat scroll bottom center;
-//         background-size: cover;
-//     }
-// }
 
 .Hero-title  {
     position: absolute;
 	width: 100%;
     text-align: center;
     height: 100%;
-    //top: 5%;
-    // left: 0;
-    // right: 0;
-    // bottom: 0;
-    //margin: auto;
     position: absolute;
-    //top: 25%;
     top: 0;
     margin: 15% auto;
     left: 0;
     bottom: 0;
     right: 0;
-    //margin: auto;
     z-index: 5;
 }
 @media (min-width: 699px) {
@@ -1781,13 +1731,11 @@ img.recipe-table-image {
 @media (min-width: 768px) {
     .Hero-title {
         margin: 17% auto;
-       // margin: 17% auto;
     }
 }
 @media (min-width: 1400px) {
     .Hero-title {
         margin: 12% auto;
-       // margin: 17% auto;
     }
 }
 .Hero-title h2 {
@@ -1799,7 +1747,6 @@ img.recipe-table-image {
     font-weight: 600;
     color: #fff;
     letter-spacing: .03em;
-    //text-shadow: 1px 1px #000;
     margin: 0;
     position: relative;
     height: 50px;
@@ -1862,15 +1809,8 @@ img.recipe-table-image {
         }
     }
 }
-// @media (min-width: 992px) {
-//     .Hero-title h2 {
-//         font-size: 38px;
-//     }
-// }
 
 #ED-Intro #Intro-content {
-	//position: absolute;
-    /*padding: 0px 1em;*/
     padding: 0 40px;
     margin: 0px auto;
 }
@@ -1961,16 +1901,11 @@ img.recipe-table-image {
 }
 @media (min-width: 992px) {
     #ED-Exercise #Intro-content {
-        //padding: 20px 60px;
         padding: 20px 0 0;
-        //max-width: 90%;
         max-width: 100%;
     }
     #ED-Diet #Intro-content {
-        //max-width: 80%;
-        //padding: 8px 120px;
         .content {
-           // width: 80%;
             width: 880px;
             margin: auto;
             margin-bottom: 36px;
@@ -1980,7 +1915,6 @@ img.recipe-table-image {
         }
     }
     #ED-Recipes #Intro-content {
-        //max-width: 75%;
         margin: 0 auto;
     }
 }
@@ -2074,11 +2008,9 @@ img.recipe-table-image {
     display: block;
     text-transform: uppercase;
     text-align: center;
-    //background-color: @btnTruenthPrimaryColor;
     color: #fff;
     width: 325px;
     max-width: 100%;
-    //margin: 32px auto 40px;
     margin: 0 auto;
     padding: 32px 0 40px;
     &:hover {
@@ -2088,7 +2020,6 @@ img.recipe-table-image {
     }
     a {
         color:	#fff;
-        //padding: 12px 39px;
         background-color: @btnTruenthPrimaryColor;
         text-decoration: none;
         transition: all 0.3s ease-out;
@@ -2098,7 +2029,6 @@ img.recipe-table-image {
         padding: 10px 4px 8px;
         &:hover {
             color: #fff;
-        /* 	padding: 11px 41px; */
             background-color: @btnTruenthPrimaryHoverColor;
             text-decoration: none;
         }
@@ -2116,11 +2046,8 @@ img.recipe-table-image {
     background-size: cover;
     position: relative;
     z-index: 6;
-     //border-top: 2px solid @sectionBorderColor;
-     //margin-top: 36px;
      max-width: 100%;
      margin: 0 auto 0;
-    // background: @resourceBackgroundColor;
      padding: 16px 40px 60px;
     hr {
         display: none;
@@ -2210,7 +2137,6 @@ img.recipe-table-image {
         border: none;
         margin: 24px 20px 12px;
         padding: 16px 20px 14px;
-        //height: 2.2em;
         text-transform: uppercase;
         letter-spacing: 2px;
         font-size: 16px;
@@ -2276,16 +2202,13 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
 	height: auto;
 }
 .modal-nav span span {
-/* 	display: table; */
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	//height: 100%;
 }
 
 .modal-nav span span a {
     flex: 0 0 100%;
-    //flex: 0 0 1;
 }
 
 .left-button, .right-button {
@@ -2319,7 +2242,6 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
         margin-right: 8px;
         position: relative;
         top: -1px;
-        //top: -4px;
     }
     a {
         display: flex;
@@ -2388,14 +2310,9 @@ span.right-button a  {
                 font-weight: @modalHeaderFontWeight;
                 letter-spacing: 0;
             }
-            //letter-spacing: .03em;
-            //background-color: @modalHeaderBackgroundColor;
-            //color: #fff;
-            //text-align: left;
         }
         a {
             overflow-wrap: break-word;
-           // color: darken(@btnTruenthPrimaryColor, 10%);
             &:hover {
                 text-decoration: none;
                 color: @btnTruenthPrimaryHoverColor;
@@ -2409,15 +2326,12 @@ span.right-button a  {
             font-weight: 600;
         }
         td {
-            color: #FFF;
             color: #333;
-           // background-color: light(@cellBackgroundColor, 10%);
             background-color: @modalCellBackgroundColor;
             border: 1px solid @modalCellBorderColor;
             line-height: 1.45;
             padding: 12px;
             strong, b {
-                //color: lighten(@modalHighlightColor, 40%);
                 color: @darkenHighlightColor;
                 font-weight: 600 !important;
                 font-style: normal;
@@ -2426,7 +2340,6 @@ span.right-button a  {
                 letter-spacing: 0.5px;
             }
             &:hover {
-                //background-color: @cellBackgroundColor;
                 background-color: @modalCellBackgroundColor;
                 cursor: auto;
             }
@@ -2461,7 +2374,6 @@ span.right-button a  {
         text-align: right;
         padding: 0px;
         font-size: @modalBodyFontSize;
-        //margin-bottom: 20px;
         p, ul, ol, li, span {
             font-size: @modalBodyFontSize;
             line-height: 1.55;
@@ -2506,7 +2418,6 @@ span.right-button a  {
     
     .modal-body img {
         border-radius: 0;
-    /*     text-align: left; */
         display: inline-block;
         padding: 0;
         z-index: 1;
@@ -2540,23 +2451,16 @@ span.right-button a  {
     }
     .modal-footer .btn-secondary span {
         font-weight: 500 !important;
-       // color: #fff;
         color: @btnTruenthPrimaryColor;
-        //border: 1px solid lighten(@btnTruenthPrimaryColor, 10%);
-        //border-radius: 100%;
         padding: 4px;
         letter-spacing: 1.2px;
-        //margin-left: 4px;
         cursor: pointer;
     }
     .modal-footer .btn-secondary span:hover {
         color: @btnTruenthPrimaryHoverColor;
-       // background-color: #fff;
-        //border: 1px solid @btnTruenthPrimaryHoverColor;
     }
     
     .modal-body button.btn.btn-secondary-top b {
-        //color: #fff;
         color: lighten(@btnTruenthPrimaryColor, 20%);
         background-color: transparent;
         border: none;
@@ -2579,14 +2483,9 @@ span.right-button a  {
     
     .modal-body button.btn.btn-secondary-top span {
         font-weight: 500 !important;
-        //color: @btnTruenthPrimaryColor;
-        //color: #FFF;
-        //color: lighten(@btnTruenthPrimaryColor, 20%);
         background: @btnTruenthPrimaryColor;
         color: #FFF;
-        //background-color: #fff;
         border: none;
-        //border-radius: 100%;
         letter-spacing: .2px;
         cursor: pointer;
         z-index: 10;
@@ -2599,10 +2498,7 @@ span.right-button a  {
     .modal-body button.btn.btn-secondary-top:hover,
     .modal-body button.btn.btn-secondary-top span:hover,
     .modal-body button.btn.btn-secondary-top b:hover  {
-       // color: #fff;
-       // background-color: transparent;
        background: @btnTruenthPrimaryHoverColor;
-       //border: 1px solid #fff;
     }
     .modal-body button.btn.btn-secondary-top span:hover {
         color: #FFF;
@@ -2614,7 +2510,6 @@ span.right-button a  {
             font-weight: 500;
             font-style: normal;
             line-height: 1.5;
-            //letter-spacing: .02em;
             text-align: left;
             background-image: url('../img/green-triangle-bullet.png');
             background-repeat: no-repeat;
@@ -2659,18 +2554,12 @@ span.right-button a  {
         letter-spacing: 1px;
         color: @highlightColor;
         text-align: center;
-        //border-top: 1px dotted #829d64;
-        //border-top: 2px solid @sectionBorderColor;
-        /*padding: 5px 0;*/
         padding: 24px 0 5px;
         margin-top: 0px;
     }
     .clearfix {
         height: 0;
     }
-    // h3:first-child {
-    //     border-top: 0;
-    // }
 }
 @media (min-width: 768px) {
     #ED-Intro h3 {
@@ -2681,10 +2570,8 @@ span.right-button a  {
 .exercise-button-container {
     position: relative;
     z-index: 10;
-    //background-color: transparent;
     background-color: @miniBoxContainerBackgroundColor;
 	border: 0;
-    //padding: 5px;
     padding: 46px 40px 56px;
 	margin: 15px auto 0;
 	width: 100%;
@@ -2692,7 +2579,6 @@ span.right-button a  {
     max-width: 766px;
 }
 .exercise-button {
-	//border: 1px solid #5e7c38;
 	padding: 16px 20px 20px;
     width: 100%;
     max-width: 100%;
@@ -2700,9 +2586,7 @@ span.right-button a  {
 	background-color: @miniBoxBackgroundColor;
     display: flex;
     flex-direction: column;
-    //min-height: 264px;
     min-height: 200px;
-    //justify-content: center;
     justify-content: space-between;
     h3 {
         font-size: @miniBoxTitleFontSize !important;
@@ -2754,20 +2638,11 @@ span.right-button a  {
     border-top: none;
     padding: 0;
     margin: 16px 8px 8px;
-    //text-decoration: underline;
     text-transform: uppercase;
     position: relative;
     background: @infoButtonBackgroundColor;
     width: 154px;
     padding: 12px 12px 10px;
-    // &:after {
-    //     content: "\2192";
-    //     font-family: symbol;
-    //     font-style: normal;
-    //     font-weight: normal;
-    //     display: inline-block;
-    //     margin-left: 8px;
-    // }
     cursor: pointer;
     &:hover {
         background: darken(@infoButtonBackgroundColor, 15%);
@@ -2798,27 +2673,15 @@ div#nutrition-resources.modal.fade.in h2 {
     }
 }
 
-// #diet-table {
-//     margin-top: 28px;
-// }
 @media (min-width: 992px) {
     #diet-table, #avoid-foods-table {
-        width: 880px;
+        width: 825px;
         margin: 28px auto 0;
     }
     #avoid-foods-table {
         margin: auto;
     }
 }
-// @media (min-width: 1200px) {
-//     // #diet-table, #avoid-foods-table {
-//     //    // width: 82.5% !important;
-//     //    // margin: auto;
-//     // }
-//     #diet-table {
-//         margin-top: 48px;  //test
-//     }
-// }
 
 #diet-table tr,
 #avoid-foods-table tr {
