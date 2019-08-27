@@ -8,7 +8,7 @@
 @navbarBorderColor: #d7dde0;
 @navbarColor: darken(#7c959e, 5%);
 //@navbarColor: #576E76;
-@navbarBackgroundColor: rgba(210,209,197,.2);
+@navbarBackgroundColor: rgba(210,209,197,.3);
 @highlightColor: #f7ddbd;
 @darkenHighlightColor: #625748;
 @modalHighlightColor: #6a5944;
@@ -52,7 +52,9 @@
 @ExerciseOverlayBackgroundColor: #13120f;
 @RecipieOverlayBackgroundColor: #323535;
 @calloutTextColor: #FFF;
+@mobileMainNavFontSize: 12px;
 @mainNavFontSize: 13px;
+@mobileMainNavCellHeight: 52px;
 @mainNavCellHeight: 58px;
 @contentFontSize: 24px;
 @contentSubheadingFontSize: 32px;
@@ -505,13 +507,13 @@ a, button, .btn, input {
         display:flex;
         justify-content:center;
         list-style-type: none;
-        min-height:@mainNavCellHeight;
+        min-height:@mobileMainNavCellHeight;
     }
     li {
         display:flex;
         justify-content: center;
-        margin-left: 4px;
-        margin-right: 4px;
+        margin-left: 5px;
+        margin-right: 5px;
         cursor: pointer;
         position: relative;
         width: 25%;
@@ -523,7 +525,7 @@ a, button, .btn, input {
         }
         &:hover {
             a {
-                color: darken(@btnTruenthPrimaryHoverColor, 5%);
+                color: darken(@btnTruenthPrimaryHoverColor, 10%);
                 cursor: pointer;
             }
         }
@@ -537,11 +539,11 @@ a, button, .btn, input {
             background-color: @navbarBackgroundColor;
             text-transform: uppercase;
             letter-spacing: 3px;
-            font-size: @mainNavFontSize;
+            font-size: @mobileMainNavFontSize;
             font-weight: 500;
             //max-width: 250px;
             width: 100%;
-            height: @mainNavCellHeight;
+            height: @mobileMainNavCellHeight;
             text-align: center;
             padding: 6px 36px 4px 36px;
             align-items: center;
@@ -560,6 +562,20 @@ a, button, .btn, input {
             background-image: none;
             z-index: 999;
             box-shadow: none;
+        }
+    }
+}
+@media (min-width: 992px) {
+    #mainNavbar {
+        ul {
+            min-height:@mainNavCellHeight;
+        }
+        li {
+            a {
+                font-size: @mainNavFontSize;
+                height: @mainNavCellHeight;
+            
+            }
         }
     }
 }
@@ -588,12 +604,12 @@ a, button, .btn, input {
     #mainNavbar {
         background-color:white;
         border:0;
-        margin-bottom: -8px;
+        margin-bottom: -32px;
     }
 }
 @media (min-width: 992px) {
     #mainNavbar {
-        margin-bottom: -28px;
+        margin-bottom: -42px;
         ul {
             a {
                 min-width: 225px;
@@ -601,6 +617,11 @@ a, button, .btn, input {
         }
     }
 }
+// @media (min-width: 1200px) {
+//     #mainNavbar {
+//         margin-bottom: -42px;
+//     }
+// }
 .navbar-nav {
     overflow: hidden;
 }
@@ -669,7 +690,6 @@ td {
     }
     p, li {
         font-size: @mobileTableCellFontSize !important;
-        //color: #FFF;
         color: #333;
     }
     &.image-cell {
@@ -733,9 +753,9 @@ table b, table strong {
     z-index: 3000;
     width: 100%;
     color: #603b00;
-    min-height: 18px;
+    min-height: 16px;
     background: #EEAB50;
-    font-size: 10px;
+    font-size: 9px;
 }
 @media (min-width: 992px) {
     .watermark {
@@ -754,6 +774,7 @@ table b, table strong {
 
 .page-intro__content {
     max-width: 100%;
+    padding-top: 0;
 }
 body.page-exercise-diet-portal footer {
     margin: 0 1em;
@@ -1258,7 +1279,6 @@ ul.intro-li {
         font-style: normal;
         font-size: @mobileContentFontSize;
         line-height: 1.45em;
-        //letter-spacing: .02em;
         text-align: left;
         color: #FFF;
         background-image: url('../img/white-triangle-bullet.png');
@@ -1326,7 +1346,7 @@ ul.intro-li {
         h4 {
             display: block;
             position: relative;
-            padding: 16px 12px 14px;
+            padding: 18px 12px 16px;
             margin-bottom: 4px;
             &:after {
                 content: "\f107";
@@ -1487,11 +1507,8 @@ img.recipe-table-image {
     display: block;
     margin-left: 50%;
     transform: translateX(-50%);
-    //margin-top: 8px;
     margin-top: 4px;
-    //padding: 1px;
     width: 90%;
-    //width: 100%;
     height: auto;
 }
 
@@ -1829,7 +1846,6 @@ img.recipe-table-image {
 #ED-Exercise #Intro-content {
     position: relative;
     .content {
-       // width: 100%;
         width: 100%;
         margin: 24px auto 40px;
         max-width: 100%;
@@ -2159,16 +2175,10 @@ img.recipe-table-image {
 }
 @media (min-width: 768px) {
     #Resources {
-       // width: 73.5%;
-       // margin: 40px auto 0;
         margin: auto;
         padding: 5%;
     }
     #ED-Diet {
-        // h3 {
-        //     width: 62.5%;
-        //     margin: auto;
-        // }
         #Resources {
             width: 100%;
             margin: 20px auto 0;
@@ -2217,13 +2227,11 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
     letter-spacing: 1.2px;
     min-width: 200px;
     min-height: 32px;
-    //padding: 5px;
     flex: 0 0 45%;
     padding: 12px 16px 12px;
     margin-bottom: 12px;
     line-height: 1.4 !important;
     color: #FFF;
-    //flex-grow: 1;
     a:hover {
         background: @btnTruenthPrimaryHoverColor !important;
         color: #FFF !important;
@@ -2259,13 +2267,13 @@ span.left-button:hover, span.right-button:hover {
     color: #FFF;
 }
 span.left-button {
-    margin-right: 4px;
+  //  margin-right: 4px;
     .figure {
         float: left;
     }
 }
 span.right-button {
-    margin-left: 4px;
+   // margin-left: 4px;
     .figure {
         float: right;
     }
@@ -2620,7 +2628,6 @@ span.right-button a  {
         &:nth-child(even) {
             margin-right: 0;
         }
-       // flex-grow: 1;
     }
 }
 @media (min-width: 1200px) {
@@ -2693,7 +2700,7 @@ div#nutrition-resources.modal.fade.in h2 {
 
 .head-choose th,
 .head-lose th {
-	font-size: 22px;
+	font-size: 20px;
     line-height: 1.2em;
     font-style: normal;
     font-weight: 600;
@@ -2715,11 +2722,9 @@ div#nutrition-resources.modal.fade.in h2 {
     font-weight: 500;
     color: #fff;
     background-color: @cellCaptionHeaderColor;
-/*     height: 70px; */
     text-align: center;
     letter-spacing: .1em;
     vertical-align: middle;
-    //border-bottom: 1px solid @cellBorderColor;
     text-decoration: none;
 }
 
@@ -2757,7 +2762,7 @@ h6.lose {
     padding-top: 2px;
 }
 
-/*                                  M O D A L s    E X E R C I S E */
+/* M O D A L s    E X E R C I S E */
 
 @media (max-width: 767px) {
     body.modal-open .modal.is-modal-active .modal-dialog,
@@ -2765,9 +2770,6 @@ h6.lose {
     div#exercise-benefits.modal.fade.in {
         max-width: 100%;
     }
-    // .header {
-    //     padding: 40px 80px 25px;
-    // }
 }
 div#exercise-works.modal.fade.in table,
 div#exercise-benefits.modal.fade.in table {
@@ -2885,8 +2887,6 @@ div#recipe-modal.modal.fade.in h2 {
     margin: 0px -15px 15px -15px;
     display: block;
     min-height: 35px;
-    //text-align: center;
-    
 }
 div#recipe-modal.modal.fade.in h2.shopping {
 	position: relative;
@@ -2955,6 +2955,11 @@ div#recipe-modal.modal.fade.tip.in {
     overflow: hidden;
 }
 
+@media (min-width: 699px) {
+    .page-intro__content {
+        padding-top: 64px;
+    }
+}
 
 @media  (min-width: 1200px) {
     .container {
@@ -2976,14 +2981,16 @@ div#recipe-modal.modal.fade.tip.in {
 
         width: 100%;
     }
-
+    .is-scrolled {
+        .page-intro__content {
+            padding-top: 122px;
+        }
+    }
     #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
         position: relative;
         margin: 0 auto;
         padding: 0;
-        /*overflow: auto;*/
         overflow: hidden;
-    /* 	max-width: 768px; */
     }
 
     #ED-Recipe {
@@ -3066,27 +3073,30 @@ div#recipe-modal.modal.fade.tip.in {
 
 }
 
+@media (min-width: 900px) {
+    .page-intro__content {
+        padding-top: 214px;
+    }
+}
+
 @media  (min-width: 992px) {
+    .page-intro__content {
+        padding-top: 204px;
+    }
 
     .container {
         position: relative;
         max-width: 768px;
     }
 
-    .page-intro__content {
-        padding-top: 182px;
-    }
-    .is-scrolled {
-        .page-intro__content {
-            padding-top: 122px;
-        }
-    }
-
     #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
         position: relative;
-        margin: 0 auto;
+        margin: 32px auto 0;
         padding: 0;
         max-width: 100%;
+    }
+    #ED-Recipes {
+        margin: 8px auto 0;
     }
     .exercise-button-container {
         padding: 52px 5% 60px;
@@ -3114,7 +3124,7 @@ div#recipe-modal.modal.fade.tip.in {
     }
     #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
         position: relative;
-        margin: 0 auto;
+        margin: 0 auto 0;
         padding: 0;
     }
 
@@ -3131,10 +3141,7 @@ div#recipe-modal.modal.fade.tip.in {
         margin-top: -50px;
         padding-top: 0;
     }
-    .page-intro__content {
-        max-width: 100%;
-    }
-
+    
     .page-intro {
         margin-top: -120px;
     }
@@ -3176,6 +3183,10 @@ div#recipe-modal.modal.fade.tip.in {
         padding: 0 0.1em;
         width: 100%;
         max-width: 100%;
+    }
+    .page-intro__content {
+        max-width: 100%;
+        padding-top: 52px;
     }
 }
 
