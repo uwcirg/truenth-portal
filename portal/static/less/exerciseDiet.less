@@ -291,7 +291,12 @@ h6, h6 span {
 .collapsible-header {
     position: relative;
     padding-right: 42px !important;
+    letter-spacing: 0.5px;
     cursor: pointer;
+    &:hover,
+    &:hover b {
+        color: @btnTruenthPrimaryHoverColor !important;
+    }
     &:after {
         content: "\f107";
         font-family: FontAwesome;
@@ -301,8 +306,10 @@ h6, h6 span {
         position: absolute;
         bottom: 4px;
         width: 10px;
-        right: 4.5%;
-        top: 25%;
+        right: 2.5%;
+        top: 12.5;
+        font-size: 24px;
+        cursor: pointer;
     }
 }
 
@@ -1978,29 +1985,11 @@ img.recipe-table-image {
     }
 }
 @media (min-width: 1200px) {
-    // #ED-Diet #Intro-content {
-    //     .content {
-    //         //width: 72.5%;
-    //         width: 880px;
-    //     }
-    // }
     #ED-Recipes #Intro-content {
         width: 880px;
     }
-    // #ED-Recipes #Intro-content {
-    //     max-width: 62.5%;
-    // }
 }
-// @media (min-width: 1400px) {
-//     #ED-Recipes #Intro-content {
-//         max-width: 60%;
-//     }
-// }
-
-/* ******** */
-
 #ED-Intro .section {
-    //border-top: 2px solid @sectionBorderColor;
     padding: 20px 20px 32px;
     text-align: center;
     &.resources {
@@ -2012,9 +2001,6 @@ img.recipe-table-image {
     &:last-of-type {
         border-top: 0;
     }
-    // &:nth-child(odd) {
-    //     background-color: lighten(@mainBackgroundColor, 10%);
-    // }
 }
 @media (min-width: 699px) {
     #ED-Intro .section {
@@ -2023,7 +2009,7 @@ img.recipe-table-image {
 }
 @media (min-width: 992px) {
     #ED-Intro .section {
-        padding: 20px 10% 32px;
+        padding: 20px 20px 32px;
     }
 }
 
@@ -2167,15 +2153,6 @@ img.recipe-table-image {
             background-color: @btnTruenthPrimaryHoverColor;
            
         }
-        // &:after {
-        //     content: "\2192";
-        //     font-family: symbol;
-        //     font-style: normal;
-        //     font-weight: normal;
-        //     display: inline-block;
-        //     margin-left: 8px;
-        //     color: @btnTruenthArrowColor;
-        // }
         &:hover:after {
             color: #FFF;
         }
@@ -2371,12 +2348,6 @@ span.right-button {
         float: right;
     }
 }
-// span.left-button {
-//     text-align: left;
-// }
-// span.right-button {
-//     text-align: right;
-// }
 span.left-button a,
 span.right-button a  {
     color: #FFF;
@@ -2390,11 +2361,9 @@ span.right-button a  {
         margin: 0 auto;
     }
     .modal-footer {
-       // border-top: 1px solid @sectionBorderColor;
-       //display: none;
        border-top: 0;
        margin-top: 8px;
-       padding: 8px 15px;
+       padding: 8px 15px 15px;
     }
     .modal-content {
         border-radius: 0;
@@ -3037,16 +3006,13 @@ div#recipe-modal.fade.in {
 	padding: 0px;
 	z-index: 1;
 	width: 100%;
-    //margin: -36px auto 0;
     margin: -280px auto 0;
     position: relative;
 }
 
 #recipe-modal img.veggie {
     padding: 0px;
-/*     z-index: 1; */
     width: 90%;
-    /* margin: -36px auto 0; */
     position: relative;
     margin: 1px auto 1px;
 }
@@ -3078,46 +3044,47 @@ div#recipe-modal.modal.fade.in ol li {
     margin-left: 12px;
     list-style-position: outside;
     list-style-type: decimal;
-}
-div#recipe-modal.modal.fade.tip.in h2 b {
-	position: relative;
-	font-size: @modalHeadingSize;
-	font-weight: 600;
-    letter-spacing: .03em;
-    background-color: @modalHeaderBackgroundColor;
-    color: #fff;
-    text-align: left;
-    padding: 10px 10px 10px;
-    margin: -15px -15px 15px -15px;
-    display: block;
-    min-height: 45px;
-}
-div#recipe-modal.modal.fade.tip.in h3 b {
-    position: relative;
-    font-size: 20px;
-    letter-spacing: .01em;
-    color: @modalSubHeadingColor;
-    text-align: left;
-    border-bottom: 1px solid @modalSubHeadingColor;
-    padding: 5px 0px;
-    margin: 20px auto 10px;
-    font-weight: 600;
-}
-div#recipe-modal.modal.fade.tip.in ul {
-	//padding: 3px 3px 10px;
-	padding: 3px 0px 0;
-	margin-bottom: 10px;
-	margin-bottom: 0px;
-}
-div#recipe-modal.modal.fade.tip.in h4 {
-    b, strong {
-        font-size: @modalBodyFontSize;
+} 
+div#recipe-modal.modal.fade.tip.in {
+    h2 b {
+        position: relative;
+        font-size: @modalHeadingSize;
         font-weight: 600;
-        font-style: oblique;
-        line-height: 1.5;
-        margin: 4px auto;
+        letter-spacing: .03em;
+        background-color: @modalHeaderBackgroundColor;
+        color: #fff;
+        text-align: left;
+        padding: 10px 10px 10px;
+        margin: -15px -15px 15px -15px;
+        display: block;
+        min-height: 45px;
     }
-}
+    h3 b {
+        position: relative;
+        font-size: 20px;
+        letter-spacing: .01em;
+        color: @modalSubHeadingColor;
+        text-align: left;
+        border-bottom: 1px solid @modalSubHeadingColor;
+        padding: 5px 0px;
+        margin: 20px auto 10px;
+        font-weight: 600;
+    }
+    ul {
+        padding: 3px 0px 0;
+        margin-bottom: 10px;
+        margin-bottom: 0px;
+    }
+    h4 {
+        b, strong {
+            font-size: @modalBodyFontSize;
+            font-weight: 600;
+            font-style: oblique;
+            line-height: 1.5;
+            margin: 4px auto;
+        }
+    }
+} 
 
 #ED-Intro,
 #ED-Exercise,
@@ -3127,23 +3094,16 @@ div#recipe-modal.modal.fade.tip.in h4 {
 
 
 @media  (min-width: 1200px) {
+    .container {
+        position: relative;
+        max-width: 768px;
+    }
 
-// #ED-Intro {
-//     height: 120em;
-// }
-
-.container {
-	position: relative;
-	max-width: 768px;
-}
-
-#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
-	position: relative;
-	margin: 0 auto;
-	padding: 0 20px;
-/* 	max-width: 768px; */
-}
-
+    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
 }
 @media  (min-width: 768px) {
 
@@ -3184,19 +3144,6 @@ div#recipe-modal.modal.fade.tip.in h4 {
         padding: 0 20px;
     }
 
-   
-
-    // #mainNavbar > ul > li.active > a {
-    //     font-weight: 600;
-    // 	background-color: white;
-    //     background-image: none;
-    //     color: black;
-    //     z-index: 999;
-    //     -moz-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
-    //     -webkit-box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
-    //     box-shadow: 0px 25px 13px 7px rgba(0, 0, 0, 0.55);
-    // }
-
     .navbar-collapse {
         overflow-x: visible;
         padding-right: 0px;
@@ -3222,15 +3169,11 @@ div#recipe-modal.modal.fade.tip.in h4 {
         margin: 0;
     }
     .exercise-button-container {
-        // background-color: transparent;
-        // border: 1px solid transparent;
-        //padding: 5px;
         background-color: @miniBoxContainerBackgroundColor;
         padding: 40px 5%;
         margin: 15px auto 0;
         width: 100%;
         height: auto;
-        /*max-width: 766px;*/
         max-width: 100%;
         display: flex;
         flex-direction: row;
@@ -3251,11 +3194,9 @@ div#recipe-modal.modal.fade.tip.in h4 {
     }
 
     #Resources h3 {
-     //   font-size: @resourceHeaderFontSize;
         letter-spacing: 1px;
         color: @headerColor;
         text-align: center;
-        //border-top: 1px dotted #829d64;
         padding: 16px 0;
         margin-top: 8px;
     }
@@ -3282,12 +3223,10 @@ div#recipe-modal.modal.fade.tip.in h4 {
         position: relative;
         margin: 0 auto;
         padding: 0;
-        /*max-width: 768px;*/
         max-width: 100%;
     }
     .exercise-button-container {
-        padding: 60px 5%;
-        //background-color: @miniBoxContainerBackgroundColor;
+        padding: 52px 5% 60px;
     }
 
 }
@@ -3304,8 +3243,6 @@ div#recipe-modal.modal.fade.tip.in h4 {
     }
 }
 
-
-/* Breakpoints > (max-width: 768px) */
 @media  (max-width: 768px) {
     .container {
         position: relative;
