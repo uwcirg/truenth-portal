@@ -1451,7 +1451,7 @@ ul.intro-li {
     transition: margin 200ms, padding 200ms;
 }
 .collapse td {
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.2em;
     font-size: 14px;
     letter-spacing: .01em;
@@ -1584,7 +1584,7 @@ img.recipe-table-image {
 	padding: 0px;
 	z-index: 1;
 	width: 100%;
-	margin: -70px auto 0;
+	margin: -90px auto 0;
     position: relative;
 }
 .modal-copy {
@@ -2311,7 +2311,7 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
     //flex: 0 0 1;
 }
 
-span.left-button, span.right-button {
+.left-button, .right-button {
     background: @btnTruenthPrimaryColor;
     text-transform: uppercase;
     letter-spacing: 1.2px;
@@ -2325,11 +2325,12 @@ span.left-button, span.right-button {
     color: #FFF;
     //flex-grow: 1;
     a:hover {
-        background: @btnTruenthPrimaryHoverColor;
-        color: #FFF;
+        background: @btnTruenthPrimaryHoverColor !important;
+        color: #FFF !important;
     }
     &:hover {
         background: @btnTruenthPrimaryHoverColor;
+        color: #FFF;
         .figure {
             color: #FFF;
         }
@@ -2475,6 +2476,11 @@ span.right-button a  {
         .collapsible-content, .collapse {
             padding: 12px 20px;
             border: 1px solid @HRColor;
+        }
+        .collapsible-content td,
+        .collapse td {
+            text-align: left;
+            width: auto;
         }
     }
     .box-modal.modal-content {
