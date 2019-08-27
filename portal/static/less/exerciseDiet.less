@@ -27,8 +27,8 @@
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
 @cellBorderColor: #868e99;
-@cellCaptionHeaderColor: #3a4b51;
-@cellHeaderColor: #3a4b51;
+@cellCaptionHeaderColor: #4f6168;
+@cellHeaderColor: #4f6168;
 @modalCellBackgroundColor: rgba(210,209,197,.3);
 @modalCellBorderColor: #c7cace;
 //@cellBackgroundColor: rgba(59,68,73,.8);
@@ -1482,6 +1482,12 @@ img.recipe-table-image {
     }
     td {
         cursor: pointer;
+        &.filler-cell {
+            cursor: auto;
+        }
+        &.filler-cell:hover {
+            background-color: @cellBackgroundColor;
+        }
     }
 }
 #avoid-foods-table {
@@ -2728,7 +2734,7 @@ span.right-button a  {
     // }
     cursor: pointer;
     &:hover {
-        background: darken(@infoButtonBackgroundColor, 10%);
+        background: darken(@infoButtonBackgroundColor, 15%);
     }
 }
 
