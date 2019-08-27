@@ -2,7 +2,7 @@
 @mainBackgroundColor: #304040;
 @lightBlueBackgroundColor:  #4a6161;
 @lightGreenBackgroundColor: #44504f;
-
+@HRColor: #ececec;
 @alternativeBackgroundColor: #253534;
 @bodyTextColor: #4a4a4a;
 @navbarBorderColor: #d7dde0;
@@ -285,6 +285,24 @@ h6, h6 span {
 @media (min-width: 768px) {
     h6, h6 span {
         font-size: @h6FontSize;
+    }
+}
+
+.collapsible-header {
+    position: relative;
+    padding-right: 42px !important;
+    cursor: pointer;
+    &:after {
+        content: "\f107";
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: 500;
+        display: block;
+        position: absolute;
+        bottom: 4px;
+        width: 10px;
+        right: 4.5%;
+        top: 25%;
     }
 }
 
@@ -2270,7 +2288,7 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
 /*.modal button */
 .modal-nav {
 	position: relative;
-	margin: 16px 8px 12px;
+	margin: 24px 8px 12px;
 	padding: 1rem;
 	text-align: center;
 	display: flex;
@@ -2374,7 +2392,8 @@ span.right-button a  {
        // border-top: 1px solid @sectionBorderColor;
        //display: none;
        border-top: 0;
-       margin-top: 12px;
+       margin-top: 8px;
+       padding: 8px 15px;
     }
     .modal-content {
         border-radius: 0;
@@ -2452,6 +2471,10 @@ span.right-button a  {
                 list-style-type: disc;
                 padding: 8px 24px;
             }
+        }
+        .collapsible-content, .collapse {
+            padding: 12px 20px;
+            border: 1px solid @HRColor;
         }
     }
     .box-modal.modal-content {
