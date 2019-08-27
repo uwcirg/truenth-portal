@@ -1,6 +1,6 @@
 //@mainBackgroundColor: #2e3e2e;
 @mainBackgroundColor: #304040;
-@lightBlueBackgroundColor: #4a6161;
+@lightBlueBackgroundColor:  #4a6161;
 @lightGreenBackgroundColor: #44504f;
 
 @alternativeBackgroundColor: #253534;
@@ -10,6 +10,7 @@
 //@navbarColor: #576E76;
 @navbarBackgroundColor: rgba(210,209,197,.2);
 @highlightColor: #f7debf;
+@darkenHighlightColor: #625748;
 @modalHighlightColor: #6a5944;
 @headerColor: #FFF;
 @tnthPrimaryColor: #7C959D;
@@ -25,14 +26,16 @@
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
 @iceboxSubheadColor: #a9b2b7;
-@cellBorderColor: #45494d;
-@cellCaptionHeaderColor: #212a2d;
-@cellHeaderColor: #334044;
+@cellBorderColor: #868e99;
+@cellCaptionHeaderColor: #3a4b51;
+@cellHeaderColor: #3a4b51;
+@modalCellBackgroundColor: rgba(210,209,197,.3);
+@modalCellBorderColor: #c7cace;
 //@cellBackgroundColor: rgba(59,68,73,.8);
 //@cellBackgroundColor: rgb(81, 97, 101);
 //@cellBackgroundColor: #2a3335;
-@cellBackgroundColor: #313b3e;
-@cellHoverColor: darken(rgba(59,68,73,.8), 10%);
+@cellBackgroundColor: #697e86;
+@cellHoverColor: darken(#697e86, 10%);
 @sectionBorderColor: #343;
 @sectionBorderColor: #3b4e4e;
 @modalHeaderBackgroundColor: #607277;
@@ -411,7 +414,7 @@ a, button, .btn, input {
         width: 96%;
     }
     .box__content {
-        width: 70%;
+        width: 65%;
     }
 }
 @media (min-width: 1200px) {
@@ -582,6 +585,9 @@ p {
         font-weight: 500;
         letter-spacing: 0;
     }
+    b.emphasis, strong.emphasis {
+        font-weight: 600;
+    }
 }
 h2 b, h3 b, h4 b {
     color: @headerColor;
@@ -627,7 +633,8 @@ td {
     }
     p, li {
         font-size: @mobileTableCellFontSize !important;
-        color: #FFF;
+        //color: #FFF;
+        color: #333;
     }
     &.image-cell {
         vertical-align: middle;
@@ -637,6 +644,9 @@ td {
     }
     &:hover {
         background-color: @cellHoverColor;
+    }
+    &.filter-cell:hover {
+        background-color: @cellBackgroundColor;
     }
 }
 @media (min-width: 768px) {
@@ -1204,19 +1214,19 @@ body.page-exercise-diet-portal {
 
 /* Intro page ul li */
 ul.intro-li {
-	padding: 4px 8px 8px;
+	padding: 4px 12px 8px;
     max-width: 100%;
-    width: 90%;
+    width: 100%;
     margin: auto;
     li {
         font-weight: 500;
         font-style: normal;
         font-size: @mobileContentFontSize;
-        line-height: 1.4em;
+        line-height: 1.45em;
         //letter-spacing: .02em;
         text-align: left;
         color: #FFF;
-        background-image: url('../img/green-triangle-bullet.png');
+        background-image: url('../img/white-triangle-bullet.png');
         background-repeat: no-repeat;
         background-position: left 12px;
         padding-left: 20px;
@@ -1242,7 +1252,7 @@ ul.intro-li {
 @media (min-width: 992px) {
     ul.intro-li li{
         margin: auto;
-        width: 675px;
+        width: 735px;
         max-width: 100%;
         position: relative;
         //left: 1.5em;
@@ -1965,7 +1975,7 @@ img.recipe-table-image {
 }
 @media (min-width: 992px) {
     #ED-Intro .section {
-        padding: 20px 18% 32px;
+        padding: 20px 10% 32px;
     }
 }
 
@@ -2012,6 +2022,14 @@ img.recipe-table-image {
             font-size: @contentFontSize;
             width: 780px;
             margin: 0px auto 10px;
+            padding: 0 28px;
+        }
+    }
+}
+@media (min-width: 992px) {
+    #ED-Intro {
+        #Intro-content p {
+            padding: 0 32px;
         }
     }
 }
@@ -2043,7 +2061,7 @@ img.recipe-table-image {
         display: block;
         width: 100%;
         height: 100%;
-        padding: 8px 4px 6px;
+        padding: 10px 4px 8px;
         &:hover {
             color: #fff;
         /* 	padding: 11px 41px; */
@@ -2368,17 +2386,23 @@ span.right-button a  {
         }
         td {
             color: #FFF;
-            background-color: light(@cellBackgroundColor, 10%);
+            color: #333;
+           // background-color: light(@cellBackgroundColor, 10%);
+            background-color: @modalCellBackgroundColor;
+            border: 1px solid @modalCellBorderColor;
             strong, b {
-                color: lighten(@modalHighlightColor, 40%);
+                //color: lighten(@modalHighlightColor, 40%);
+                color: @darkenHighlightColor;
                 font-weight: 500 !important;
                 font-style: normal;
                 text-transform: uppercase;
                 font-size: 16px;
-                letter-spacing: 1.2px;
+                letter-spacing: 0.5px;
             }
             &:hover {
-                background-color: @cellBackgroundColor;
+                //background-color: @cellBackgroundColor;
+                background-color: @modalCellBackgroundColor;
+                cursor: auto;
             }
         }
         p {
@@ -2405,7 +2429,7 @@ span.right-button a  {
         //margin-bottom: 20px;
         p, ul, ol, li, span {
             font-size: @modalBodyFontSize;
-            line-height: 1.5;
+            line-height: 1.55;
             &.smaller-text {
                 font-size: @smallerTextFontSize !important;
             }
