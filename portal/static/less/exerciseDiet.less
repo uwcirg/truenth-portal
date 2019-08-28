@@ -2764,8 +2764,8 @@ span.right-button a  {
     }
 }
 
-div#exercise-trainer.modal.fade.in h2,
-div#nutrition-resources.modal.fade.in h2 {
+#exercise-trainer.modal.fade.in h2,
+#nutrition-resources.modal.fade.in h2 {
     position: relative;
     margin: -42px -15px 15px -15px;
     display: block;
@@ -2865,13 +2865,13 @@ h6.lose {
 
 @media (max-width: 767px) {
     body.modal-open .modal.is-modal-active .modal-dialog,
-    div#exercise-works.modal.fade.in,
-    div#exercise-benefits.modal.fade.in {
+    #exercise-works.modal.fade.in,
+    #exercise-benefits.modal.fade.in {
         max-width: 100%;
     }
 }
-div#exercise-works.modal.fade.in table,
-div#exercise-benefits.modal.fade.in table {
+#exercise-works.modal.fade.in table,
+#exercise-benefits.modal.fade.in table {
     word-wrap: break-word;
     margin-top: 12px;
     margin-bottom: 12px;
@@ -2881,7 +2881,7 @@ div#exercise-benefits.modal.fade.in table {
     }
 }
 
-div#exercise-benefits.modal.fade.in table {
+#exercise-benefits.modal.fade.in table {
     table-layout: fixed;
 }
 
@@ -2902,23 +2902,23 @@ div#exercise-benefits.modal.fade.in table {
 }
 
 
-div#exercise-benefits.modal.fade.in h2,
-div#exercise-types.modal.fade.in h2,
-div#exercise-works.modal.fade.in h2,
-div#exercise-prescription.modal.fade.in h2,
-div#exercise-safety.modal.fade.in h2,
-div#exercise-partner.modal.fade.in h2 {
+#exercise-benefits.modal.fade.in h2,
+#exercise-types.modal.fade.in h2,
+#exercise-works.modal.fade.in h2,
+#exercise-prescription.modal.fade.in h2,
+#exercise-safety.modal.fade.in h2,
+#exercise-partner.modal.fade.in h2 {
 	position: relative;
     margin: -15px -15px 15px -15px;
     display: block;
     min-height: 45px;
 }
-div#exercise-benefits.modal.fade.in,
-div#exercise-types.modal.fade.in,
-div#exercise-works.modal.fade.in,
-div#exercise-prescription.modal.fade.in,
-div#exercise-safety.modal.fade.in,
-div#exercise-partner.modal.fade.in {
+#exercise-benefits.modal.fade.in,
+#exercise-types.modal.fade.in,
+#exercise-works.modal.fade.in,
+#exercise-prescription.modal.fade.in,
+#exercise-safety.modal.fade.in,
+#exercise-partner.modal.fade.in {
     h4 b, h4 strong {
         font-size: @modalBodyFontSize;
         font-weight: 700;
@@ -2930,30 +2930,30 @@ div#exercise-partner.modal.fade.in {
 
 /*M O D A L s  D I E T  T A B L E */
 
-div#healthy-fats.modal.fade.in h2,
-div#nuts.modal.fade.in h2,
-div#vegetables.modal.fade.in h2,
-div#tomatoes.modal.fade.in h2,
-div#fish.modal.fade.in h2,
-div#processed-meats.modal.fade.in h2,
-div#poultry.modal.fade.in h2,
-div#whole-milk.modal.fade.in h2,
-div#supplements.modal.fade.in h2 {
+#healthy-fats.modal.fade.in h2,
+#nuts.modal.fade.in h2,
+#vegetables.modal.fade.in h2,
+#tomatoes.modal.fade.in h2,
+#fish.modal.fade.in h2,
+#processed-meats.modal.fade.in h2,
+#poultry.modal.fade.in h2,
+#whole-milk.modal.fade.in h2,
+#supplements.modal.fade.in h2 {
 	position: relative;
     margin: 0px -15px 15px -15px;
     display: block;
     min-height: 45px;
 }
-div#healthy-fats.modal.fade.in,
-div#nuts.modal.fade.in,
-div#vegetables.modal.fade.in,
-div#tomatoes.modal.fade.in,
-div#fish.modal.fade.in,
-div#processed-meats.modal.fade.in,
-div#poultry.modal.fade.in,
-div#whole-milk.modal.fade.in,
-div#supplements.modal.fade.in,
-div#recipe-modal.fade.in {
+#healthy-fats.modal.fade.in,
+#nuts.modal.fade.in,
+#vegetables.modal.fade.in,
+#tomatoes.modal.fade.in,
+#fish.modal.fade.in,
+#processed-meats.modal.fade.in,
+#poultry.modal.fade.in,
+#whole-milk.modal.fade.in,
+#supplements.modal.fade.in,
+#recipe-modal.fade.in {
     h4 b, h4 strong {
         font-size: 1em;
         font-weight: 700;
@@ -2970,15 +2970,18 @@ div#recipe-modal.fade.in {
     border: 0;
     outline: 0;
 }
-#recipe-modal img {
-	padding: 0px;
-	z-index: 1;
-	width: 100%;
-    margin: -280px auto 0;
-    position: relative;
-}
 
 #recipe-modal {
+    img {
+        padding: 0px;
+        z-index: 1;
+        width: 100%;
+        margin: -280px auto 0;
+        position: relative;
+        &.big-image {
+            margin: -560px auto 0;
+        }
+    }
     .veggie-table {
         td {
             vertical-align: middle;
@@ -2996,19 +2999,19 @@ div#recipe-modal.fade.in {
     }
 }
 
-div#recipe-modal.modal.fade.in h2 {
+#recipe-modal.modal.fade.in h2 {
 	position: relative;
     margin: 0px -15px 15px -15px;
     display: block;
     min-height: 35px;
 }
-div#recipe-modal.modal.fade.in h2.shopping {
+#recipe-modal.modal.fade.in h2.shopping {
 	position: relative;
     margin: -40px -15px 15px -15px;
     display: block;
     min-height: 35px;
 }
-div#recipe-modal.modal.fade.in ol li {
+#recipe-modal.modal.fade.in ol li {
     font-weight: 500;
     font-style: normal;
     line-height: 1.4em;
@@ -3022,7 +3025,7 @@ div#recipe-modal.modal.fade.in ol li {
     list-style-position: outside;
     list-style-type: decimal;
 } 
-div#recipe-modal.modal.fade.tip.in {
+#recipe-modal.modal.fade.tip.in {
     h2 b {
         position: relative;
         font-size: @modalHeadingSize;
