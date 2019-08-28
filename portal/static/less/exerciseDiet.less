@@ -100,6 +100,9 @@ body {
     color: black;
     background-image: url(../../../../gil/static/img/logo-base.png);
 }
+.main {
+    top: 55px;
+}
 main .module-assets {
     overflow: auto;
     p {
@@ -146,7 +149,7 @@ main {
 }
 @media (min-width: 992px) {
     .page-intro {
-        padding: 160px 30px 60px;
+        padding: 140px 30px 60px;
     }
 }
 
@@ -677,6 +680,7 @@ td {
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        flex-wrap: wrap;
         .title {
             height: 100%;
             display: inline-block;
@@ -1549,6 +1553,20 @@ img.recipe-table-image {
         &.filler-cell:hover {
             background-color: @cellBackgroundColor;
         }
+        .filler-item {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}
+@media (min-width: 699px) {
+    #diet-table,
+    #avoid-foods-table {
+        td {
+            .filler-item {
+                width: 30%;
+            }
+        }
     }
 }
 #avoid-foods-table {
@@ -1818,9 +1836,9 @@ img.recipe-table-image {
             z-index: 10;
         }
         &:after {
-            -moz-animation: bounce 2s 4;
-            -webkit-animation: bounce 2s 4;
-            animation: bounce 2s 4;
+            -moz-animation: bounce 2s 5;
+            -webkit-animation: bounce 2s 5;
+            animation: bounce 2s 5;
             animation-delay: 1.75s;
         }
         &:before,
@@ -1899,6 +1917,17 @@ img.recipe-table-image {
         text-align: center;
         padding: 0 20px;
     }
+    h3.content {
+        margin-bottom: 0;
+    }
+}
+@media (min-width: 699px) {
+    #ED-Exercise #Intro-content {
+        h3.content {
+            margin-bottom: 40px;
+        }
+
+    }
 }
 @media (min-width: 768px) {
     #ED-Exercise #Intro-content {
@@ -1906,6 +1935,9 @@ img.recipe-table-image {
             width: 85%;
             margin: 16px auto 20px;
             padding: 20px 0;
+        }
+        h3.content {
+            margin-bottom: 20px;
         }
 
     }
@@ -1972,9 +2004,6 @@ img.recipe-table-image {
             width: 880px;
             margin: auto;
             margin-bottom: 36px;
-        }
-        h3.content {
-            margin-bottom: 0;
         }
     }
     #ED-Recipes #Intro-content {
@@ -3183,14 +3212,14 @@ div#recipe-modal.modal.fade.tip.in {
         max-width: 768px;
         width: 100%;
     }
-    #ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+    #ED-Intro, #ED-Exercise, #ED-Recipes {
         position: relative;
         margin: 0 auto 0;
         padding: 0;
     }
 
     #ED-Diet {
-        padding: 10px 0;
+        padding: 40px 0 0;
     }
 
     .navbar-toggle {
@@ -3245,6 +3274,11 @@ div#recipe-modal.modal.fade.tip.in {
         width: 100%;
         max-width: 100%;
     }
+
+    #ED-Diet {
+        padding: 20px 0.1em 0;
+    }
+
     .page-intro__content {
         max-width: 100%;
         padding-top: 8px;
@@ -3258,6 +3292,6 @@ div#recipe-modal.modal.fade.tip.in {
         padding: 0 1em;
     }
     #ED-Diet {
-        padding: 0 1em;
+        padding: 20px 1em 0;
     }
 }
