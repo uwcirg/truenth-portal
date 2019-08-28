@@ -769,17 +769,16 @@ export default { /*global $ */
             }
             var qList = [];
             (data.entry).forEach(function(item) {
-                if (!item.resource || !item.resource.questionnaires) {
+                if (!item.resource && !item.resource.identifier) {
                     return true;
                 }
-                (item.resource.questionnaires).forEach(function(q) {
+                (item.resource.identifier).forEach(function(q) {
                     /*
                         * add instrument name to instruments array
                         * NOTE: inArray returns -1 if the item is NOT in the array
                         */
-                    let reference = q.questionnaire.reference.split("=")[1];
-                    if (reference === SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM && $.inArray(q.questionnaire.display, qList) === -1) {
-                        qList.push(q.questionnaire.display);
+                    if (q.system === SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM && $.inArray(q.value, qList) === -1) {
+                        qList.push(q.value);
                     }
                 });
             });
