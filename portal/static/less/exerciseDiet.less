@@ -40,7 +40,7 @@
 @sectionBorderColor: #3b4e4e;
 @modalHeaderBackgroundColor: #607277;
 @modalHeadingColor: #4b5e6f;
-@modalSubHeadingColor: #303d48;
+@modalSubHeadingColor: #4a4c4d;
 @modalHeadingBorderColor: #cfd5d8;
 @inputBackgroundColor: #f1efec;
 @resourceLinkColor: #bedfea;
@@ -63,7 +63,7 @@
 @contentPromptFontSize: 30px;
 @mobileContentFontSize: 20px;
 @buttonFontSize: 18px;
-@tableCellFontSize: 18px;
+@tableCellFontSize: 17px;
 @mobileTableCellFontSize: 14px;
 @mobileTableCellFontSize: 16px;
 @smallerTextFontSize: 16px;
@@ -339,9 +339,9 @@ hr.objective {
 }
 
 a {
-    color: @btnTruenthPrimaryColor;
+    color: darken(@btnTruenthPrimaryColor, 10%);
     &:hover {
-        color: @btnTruenthPrimaryHoverColor;
+        color: darken(@btnTruenthPrimaryHoverColor, 10%);
     }
 
 }
@@ -618,7 +618,7 @@ a, button, .btn, input {
 }
 @media (min-width: 992px) {
     #mainNavbar {
-        margin-bottom: -42px;
+        margin-bottom: -46px;
         ul {
             a {
                 min-width: 225px;
@@ -626,11 +626,6 @@ a, button, .btn, input {
         }
     }
 }
-// @media (min-width: 1200px) {
-//     #mainNavbar {
-//         margin-bottom: -42px;
-//     }
-// }
 .navbar-nav {
     overflow: hidden;
 }
@@ -1766,7 +1761,7 @@ img.recipe-table-image {
 
 @media (min-width: 1400px) {
     .Hero-image, .Hero.image {
-        height: 650px;
+        height: 750px;
     }
 }
 
@@ -1799,7 +1794,7 @@ img.recipe-table-image {
 }
 @media (min-width: 1400px) {
     .Hero-title {
-        margin: 12% auto;
+        margin: 15% auto;
     }
 }
 .Hero-title h2 {
@@ -2281,6 +2276,9 @@ img.recipe-table-image {
 .modal-open .modal.ED__modal.is-modal-active {
     display: block !important;
 }
+body.modal-open {
+    overflow: hidden;
+}
 body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
     width: 100%;
     max-width: 100%;
@@ -2294,7 +2292,8 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
 /*.modal button */
 .modal-nav {
 	position: relative;
-	margin: 24px 8px 12px;
+    //margin: 24px 8px 8px;
+    margin: 32px 8px 0;
 	padding: 1rem;
 	text-align: center;
 	display: flex;
@@ -2321,7 +2320,7 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
     min-width: 200px;
     min-height: 32px;
     flex: 0 0 45%;
-    padding: 12px 16px 12px;
+    padding: 16px 16px 16px;
     margin-bottom: 12px;
     line-height: 1.4 !important;
     color: #FFF;
@@ -2425,6 +2424,10 @@ span.right-button a  {
         strong, b {
             color: @modalHighlightColor;
             font-weight: 600;
+        }
+        .insert-blob {
+            margin-top: 16px;
+            margin-bottom: 16px;
         }
         td {
             color: #333;
@@ -2610,7 +2613,7 @@ span.right-button a  {
         li {
             font-weight: 500;
             font-style: normal;
-            line-height: 1.5;
+            line-height: 1.4;
             text-align: left;
             background-image: url('../img/green-triangle-bullet.png');
             background-repeat: no-repeat;
@@ -2637,15 +2640,18 @@ span.right-button a  {
         text-align: left;
         border-bottom: 1px solid @modalHeadingBorderColor;
         padding: 4px 0px;
-        margin: 12px auto 12px;
+        margin: 12px auto 8px;
         b {
             color: @modalSubHeadingColor;
         }
     }
     
     &.modal.fade.in ul {
-        padding: 4px 0px 4px;
+        padding: 4px 0px 0px;
         margin-bottom: 0px;
+        &.negative-bottom {
+            margin-bottom: -4px;
+        }
     }
 }
 #ED-Intro {
@@ -2869,6 +2875,10 @@ div#exercise-benefits.modal.fade.in table {
     word-wrap: break-word;
     margin-top: 12px;
     margin-bottom: 12px;
+    &.insert-blob {
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
 }
 
 div#exercise-benefits.modal.fade.in table {
@@ -2968,11 +2978,22 @@ div#recipe-modal.fade.in {
     position: relative;
 }
 
-#recipe-modal img.veggie {
-    padding: 0px;
-    width: 90%;
-    position: relative;
-    margin: 1px auto 1px;
+#recipe-modal {
+    .veggie-table {
+        td {
+            vertical-align: middle;
+        }
+    }
+    img.veggie {
+        padding: 0px;
+        width: 90%;
+        position: relative;
+        margin: 1px auto 1px;
+        &.two-cols {
+            width: 45%;
+            display: block;
+        }
+    }
 }
 
 div#recipe-modal.modal.fade.in h2 {
