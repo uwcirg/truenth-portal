@@ -395,6 +395,7 @@ a, button, .btn, input {
     font-size: @miniBoxHeaderFontSize;
     color: @miniBoxHeaderColor;
     letter-spacing: 1.2px;
+    text-align: center !important;
 }
 .minibox__content {
     font-size: @miniBoxFontSize;
@@ -412,7 +413,7 @@ a, button, .btn, input {
 }
 .box__content {
     background: @defaultBoxBackgroundColor;
-    padding: 20px 12px 24px;
+    padding: 20px 12px 32px;
     margin: 12px auto;
     width: 100%;
     max-width: 100%;
@@ -448,9 +449,10 @@ a, button, .btn, input {
         width: 96%;
     }
     .box__content {
-        width: 65%;
+        width: 75%;
     }
 }
+
 @media (min-width: 1200px) {
     .box__content--container {
         .box__content {
@@ -1761,7 +1763,7 @@ img.recipe-table-image {
 
 @media (min-width: 1400px) {
     .Hero-image, .Hero.image {
-        height: 750px;
+        height: 720px;
     }
 }
 
@@ -2192,13 +2194,14 @@ img.recipe-table-image {
         background-color: transparent;
         border: 0;
         color: #FFF;
-        padding: 10px 16px 8px;
+        padding: 12px 16px 10px;
         font-size: 16px;
         font-weight: 400;
         letter-spacing: 2px;
         text-transform: uppercase;
         display: inline-block;
         position: relative;
+        margin-right: 16px;
         &:hover {
             background-color: @btnTruenthPrimaryHoverColor;
             border: 0;
@@ -2220,6 +2223,7 @@ img.recipe-table-image {
         font-style: normal;
         color: #FFF;
         padding: 0 1em;
+        text-align: center;
         a {
             margin: 0px;
             font-size: 1em;
@@ -2232,25 +2236,24 @@ img.recipe-table-image {
         &.mini__head {
             font-size: @miniBoxTitleFontSize;
             margin: 8px 0 12px;
-            text-align: left;
+            text-align: center;
         }
     }
     .btn-primary {
         color: #fff;
-        background: @btnTruenthPrimaryColor;
+        background: #7c959d;
         border: none;
-        margin: 24px 20px 12px;
-        padding: 16px 20px 14px;
+        margin: 24px auto 12px;
+        padding: 12px 20px 12px;
         text-transform: uppercase;
         letter-spacing: 2px;
         font-size: 16px;
         font-weight: 400;
-        line-height: 90%;
         text-shadow: none;
         border-radius: 0;
-        vertical-align: middle;
-        display: inline-block;
-        position: relative;
+        text-align: center;
+        width: 150px;
+        display: block;
         &:hover {
             color: #fff;
             background: @btnTruenthPrimaryHoverColor;
@@ -2695,6 +2698,7 @@ span.right-button a  {
     flex-direction: column;
     min-height: 200px;
     justify-content: space-between;
+    align-items: center;
     h3 {
         font-size: @miniBoxTitleFontSize !important;
         font-weight: 500 !important;
@@ -2715,6 +2719,7 @@ span.right-button a  {
     }
     .minibox__content {
         flex-grow: 1.5;
+        text-align: center;
     }
 }
 @media (min-width: 992px) {
