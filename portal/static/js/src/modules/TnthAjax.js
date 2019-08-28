@@ -756,7 +756,7 @@ export default { /*global $ */
     },
     "getInstrumentsList": function(sync, callback) { //return instruments list by organization(s)
         callback = callback || function() {};
-        this.sendRequest("api/questionnaire_bank", "GET", null, {
+        this.sendRequest("api/questionnaire", "GET", null, {
             sync: sync
         }, function(data) {
             if (!data || data.error) {
