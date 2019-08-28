@@ -52,6 +52,7 @@
 @ExerciseOverlayBackgroundColor: #13120f;
 @RecipieOverlayBackgroundColor: #323535;
 @calloutTextColor: #FFF;
+@calloutTextHoverColor: #ccd7dd;
 @mobileMainNavFontSize: 12px;
 @mainNavFontSize: 13px;
 @mobileMainNavCellHeight: 52px;
@@ -1884,16 +1885,13 @@ img.recipe-table-image {
 
 @keyframes bounce {
     0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0);
-      color: #FFF;
+      transform: translateY(0) scale(1);
     }
     40% {
-      transform: translateY(15px);
-      color: darken(#FFF, 10%);
+      transform: translateY(15px) scale(1.1);
     }
     60% {
-      transform: translateY(15px);
-      color: darken(#FFF, 10%);
+      transform: translateY(15px) scale(1.1);
     }
 }
 
