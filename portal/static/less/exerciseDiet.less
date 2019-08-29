@@ -55,6 +55,7 @@
 @contentPromptFontSize: 30px;
 @mobileContentFontSize: 20px;
 @buttonFontSize: 18px;
+@startButtonFontSize: 19px;
 @tableCellFontSize: 17px;
 @mobileTableCellFontSize: 14px;
 @mobileTableCellFontSize: 16px;
@@ -2124,7 +2125,7 @@ img.recipe-table-image {
         display: block;
         width: 100%;
         height: 100%;
-        padding: 10px 4px 8px;
+        padding: 12px 4px 10px;
         &:hover {
             color: #fff;
             background-color: @btnTruenthPrimaryHoverColor;
@@ -2134,7 +2135,7 @@ img.recipe-table-image {
 }
 @media (min-width: 768px) {
     .start-button {
-        font-size: @buttonFontSize;
+        font-size: @startButtonFontSize;
     }
 }
 
@@ -2147,6 +2148,12 @@ img.recipe-table-image {
      max-width: 100%;
      margin: 0 auto 0;
      padding: 16px 40px 60px;
+    .YMCA-resource-container {
+         margin-top: 4px;
+        .prompt {
+            margin-bottom: 8px;
+        }
+    }
     hr {
         display: none;
     }
@@ -2270,6 +2277,7 @@ img.recipe-table-image {
         }
     }
 }
+
 .modal-open .modal.ED__modal.is-modal-active {
     display: block !important;
 }
@@ -2665,7 +2673,7 @@ span.right-button a  {
 }
 @media (min-width: 768px) {
     #ED-Intro h3 {
-        font-size: 35px;
+        font-size: 36px;
         padding: 40px 0 12px;
     }
 }
