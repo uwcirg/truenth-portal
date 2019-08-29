@@ -18,7 +18,8 @@ before_script:
 
 # test templates
 .test_template: &test_definition
-  image: python:3.5
+  # track debian stable version of python3
+  image: python:3.7
   script: tox
   stage: test
 
