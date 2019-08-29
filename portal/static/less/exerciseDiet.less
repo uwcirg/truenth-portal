@@ -2327,7 +2327,7 @@ body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
     background: @btnTruenthPrimaryColor;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    min-width: 200px;
+    min-width: 176px;
     min-height: 32px;
     flex: 0 0 45%;
     padding: 16px 16px 16px;
@@ -2602,18 +2602,21 @@ span.right-button a  {
         cursor: pointer;
         z-index: 10;
         position: relative;
-        margin: 20px 0px 0px 8px;
+        margin: 4px 0 8px;
+        display: inline-block;
         font-size: 20px;
         padding: 8px;
         opacity: 0.8;
+        &.white-theme {
+            color: @btnTruenthPrimaryHoverColor;
+            background: #FFF;
+        }
     }
     .modal-body button.btn.btn-secondary-top:hover,
     .modal-body button.btn.btn-secondary-top span:hover,
     .modal-body button.btn.btn-secondary-top b:hover  {
        background: @btnTruenthPrimaryHoverColor;
-    }
-    .modal-body button.btn.btn-secondary-top span:hover {
-        color: #FFF;
+       color: #FFF;
     }
 }
 .ED__modal {
@@ -2996,6 +2999,7 @@ h6.lose {
         td {
             vertical-align: middle;
             text-align: center;
+            background: #FFF;
         }
     }
     img.veggie {
