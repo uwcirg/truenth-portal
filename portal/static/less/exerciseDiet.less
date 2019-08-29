@@ -407,7 +407,7 @@ a, button, .btn, input {
 }
 .box__content {
     background: @defaultBoxBackgroundColor;
-    padding: 24px 24px 32px;
+    padding: 24px 28px 32px;
     margin: 12px auto;
     width: 100%;
     max-width: 100%;
@@ -532,6 +532,7 @@ a, button, .btn, input {
         &:hover {
             a {
                 color: darken(@btnTruenthPrimaryHoverColor, 10%);
+                background: lighten(@navbarBackgroundColor, 5%);
                 cursor: pointer;
             }
         }
