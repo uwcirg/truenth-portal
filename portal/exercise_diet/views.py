@@ -163,26 +163,31 @@ def recipe(heading, item):
             prev_asset_recipe_type = assets[prev_heading][prev_item_index][2]
         next_item_index = item + 1
         next_heading = heading
-        next_asset_title = '<span>' + assets[heading][item + 1][0] + '&nbsp;</span><span class="figure">&rarr;</span>'
+        next_asset_title = '<span>' + assets[heading][item + 1][0] + \
+            '&nbsp;</span><span class="figure">&rarr;</span>'
         next_asset_recipe_type = assets[heading][item + 1][2]
     elif item == current_heading_item_count - 1:
         if ordered_headings.index(heading) + 2 <= len(ordered_headings):
             next_item_index = 0
             next_heading_index = ordered_headings.index(heading) + 1
             next_heading = ordered_headings[next_heading_index]
-            next_asset_title = '<span>' + assets[next_heading][0][0] + '&nbsp;</span><span class="figure">&rarr;</span>'
+            next_asset_title = ('<span>' + assets[next_heading][0][0] + \
+                                '&nbsp;</span><span class="figure">&rarr;</span>')
             next_asset_recipe_type = assets[next_heading][0][2]
         prev_heading = heading
         prev_item_index = item - 1
-        prev_asset_title = '<span class="figure">&larr;</span><span>&nbsp;' + assets[heading][item - 1][0] + '</span>'
+        prev_asset_title = ('<span class="figure">&larr;</span><span>&nbsp;' + \
+                            assets[heading][item - 1][0] + '</span>')
         prev_asset_recipe_type = assets[heading][item - 1][2]
     else:
         next_heading = heading
         prev_heading = heading
         prev_item_index = item - 1
         next_item_index = item + 1
-        prev_asset_title = '<span class="figure">&larr;</span><span>&nbsp;' + assets[heading][prev_item_index][0] + '</span>'
-        next_asset_title = '<span>' + assets[heading][next_item_index][0] + '&nbsp;</span><span class="figure">&rarr;</span>'
+        prev_asset_title = ('<span class="figure">&larr;</span><span>&nbsp;' + \
+                            assets[heading][prev_item_index][0] + '</span>')
+        next_asset_title = ('<span>' + assets[heading][next_item_index][0] + \
+                            '&nbsp;</span><span class="figure">&rarr;</span>')
         next_asset_recipe_type = assets[heading][next_item_index][2]
         prev_asset_recipe_type = assets[heading][prev_item_index][2]
 
