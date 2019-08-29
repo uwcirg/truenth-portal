@@ -33,7 +33,8 @@ function show_recipe(heading, item, recipe_type) {
     $(".modal-body" ).load( "recipe/" + heading + "/" + item, function() {
         setTimeout(function() {
             $(".modal-body").removeClass("load");
-        }, 500);
+            $("#recipe-modal").animate({ scrollTop: 0 }, "slow");
+        }, 750);
     });
 }
 function setActiveMenuLink() {
@@ -105,6 +106,8 @@ $(function(){
     setAccordionElementsEvent();
     //Resources 
     setResourcesSubmitEvent();
+    //down arrow link event - element seen on top of Hero image
     setScrollToLinkEvent();
+    //allow content to load before showing content
     setInitVis();
 });
