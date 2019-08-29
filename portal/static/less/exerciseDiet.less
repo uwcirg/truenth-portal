@@ -127,7 +127,7 @@ main .module-assets {
     top: 0em;
     padding-top: 5em;
     padding-bottom: 0;
-    margin-bottom: -2.25em;
+    //margin-bottom: -2.25em;
     position: relative;
 }
 .is-upper-banner-closed {
@@ -139,6 +139,13 @@ main .module-assets {
     .is-upper-banner-closed {
         .main.exercise-diet {
             padding-top: 2.5em;
+        }
+    }
+}
+@media (min-width: 900px) {
+    .is-upper-banner-closed {
+        .main.exercise-diet {
+            padding-top: 1em;
         }
     }
 }
@@ -154,7 +161,7 @@ main {
         display: block;
         background: #FFF;
         opacity: 0.8;
-        z-index: 9999;
+        z-index: 999999;
         transform: translateY(0);
         transition: all 350ms ease;
         overflow-x: hidden;
@@ -848,20 +855,30 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 }
 
 //acknowledgment section
+
 #Exercise-Diet_Acknowledgement {
     background: #3B4449;
-    padding: 28px 0 68px;
+    padding: 48px 0 52px;
 }
-@media (min-width: 699px) {
+
+.is-upper-banner-closed {
     #Exercise-Diet_Acknowledgement {
         background: #3B4449;
-        padding: 48px 0 68px;
+        padding: 42px 0 60px;
+    }
+}
+@media (min-width: 1400px) {
+    .is-upper-banner-closed {
+        #Exercise-Diet_Acknowledgement {
+            background: #3B4449;
+            padding: 28px 0 60px;
+        }
     }
 }
 
 body.page-exercise-diet-portal {
     #Exercise-Diet_Acknowledgement {
-        padding: 40px 0 70px;
+        padding: 52px 0 70px;
     }
 }
 
@@ -884,7 +901,7 @@ body.page-exercise-diet-portal {
 
 #Exercise-Diet_Acknowledgement {
     .accent-heading {
-        margin-top: 60px;
+        margin-top: 0;
         color: #D2D1C5;
     }
     .objective-content {
@@ -938,6 +955,20 @@ body.page-exercise-diet-portal {
     }
     .accent-heading--no-border {
         padding-bottom: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading {
+            margin-top: 32px;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading {
+            margin-top: 48px;
+        }
     }
 }
 @media (min-width: 992px) {
@@ -1942,9 +1973,9 @@ img.recipe-table-image {
             z-index: 10;
         }
         &:after {
-            -moz-animation: bounce 2s 5;
-            -webkit-animation: bounce 2s 5;
-            animation: bounce 2s 5;
+            -moz-animation: bounce 2s 10;
+            -webkit-animation: bounce 2s 10;
+            animation: bounce 2s 10;
             animation-delay: 1.75s;
         }
         &:before,
@@ -3376,7 +3407,7 @@ h6.lose {
     }
 
     #ED-Diet {
-        padding: 20px 0 0;
+        padding: 0;
     }
 
     .navbar-toggle {
@@ -3433,7 +3464,7 @@ h6.lose {
     }
 
     #ED-Diet {
-        padding: 12px 0.1em 0;
+        padding: 0 0.1em 0;
     }
 
     .page-intro__content {
