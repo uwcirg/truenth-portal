@@ -78,6 +78,9 @@ function setInitVis() {
     if ($("#Exercise-Diet-Portal").length > 0) {
         $("body").addClass("page-exercise-diet-portal");
     }
+    if (!$("#upperBanner").length || !$("#upperBanner").is(":visible")) {
+        $("html").addClass("is-upper-banner-closed");
+    }
     setTimeout(function() {
         $("main").addClass("active");
     }, 750);

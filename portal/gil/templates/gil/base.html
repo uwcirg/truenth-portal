@@ -111,7 +111,7 @@
   {% endblock %} <!-- end block nav-->
   {% block upperbanner %}
       {% if not user %}
-      <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">{{_("Click here to join us")}}
+      <div id="upperBanner" class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">{{_("Click here to join us")}}
           <figure></figure></a><a class="upper-banner__close js-close-upper-banner">
           <figure></figure></a></div>
       {% endif %}

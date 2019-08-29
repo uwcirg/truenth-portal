@@ -98,6 +98,18 @@ body {
 .main {
     top: 55px;
 }
+.is-upper-banner-closed {
+    .main {
+        top: 32px;
+    }
+}
+@media (min-width: 900px) {
+    .is-upper-banner-closed {
+        .main {
+            top: 0;
+        }
+    }
+}
 main .module-assets {
     overflow: auto;
     p {
@@ -116,6 +128,18 @@ main .module-assets {
     padding-bottom: 0;
     margin-bottom: -2.25em;
     position: relative;
+}
+.is-upper-banner-closed {
+    .main.exercise-diet {
+        padding-top: 0;
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        .main.exercise-diet {
+            padding-top: 2.5em;
+        }
+    }
 }
 main {
     position: relative;
@@ -141,6 +165,18 @@ main {
 }
 .page-intro {
     padding: 120px 30px 70px;
+}
+.is-upper-banner-closed {
+    .page-intro {
+        padding: 72px 30px 70px;
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        .page-intro {
+            padding: 160px 30px 70px;
+        }
+    }
 }
 @media (min-width: 992px) {
     .page-intro {
@@ -471,7 +507,7 @@ a, button, .btn, input {
 }
 @media (min-width: 1400px) {
     .box__content--container {
-        width: 1050px;
+        width: 1100px;
     }
 }
 .mobile-view {
@@ -763,20 +799,20 @@ table b, table strong {
     }
 }
 .watermark {
-    top: 0;
-    padding: 0;
-    z-index: 3000;
-    width: 100%;
-    color: #603b00;
-    min-height: 16px;
-    background: #EEAB50;
-    font-size: 9px;
+    top: 0 !important;
+    padding: 0 !important;
+    z-index: 3000 !important;
+    width: 100% !important;
+    color: #603b00 !important;
+    min-height: 16px !important;
+    background: #EEAB50 !important;
+    font-size: 9px !important;
 }
 @media (min-width: 992px) {
     .watermark {
-        padding: 4px 0 0;
-        min-height: 26px;
-        font-size: 12px;
+        padding: 4px 0 0 !important;
+        min-height: 26px !important;
+        font-size: 12px !important;
     }
 }
 
@@ -813,14 +849,38 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 //acknowledgment section
 #Exercise-Diet_Acknowledgement {
     background: #3B4449;
-    padding: 42px 0 90px;
+    padding: 28px 0 68px;
+}
+@media (min-width: 699px) {
+    #Exercise-Diet_Acknowledgement {
+        background: #3B4449;
+        padding: 48px 0 68px;
+    }
 }
 
 body.page-exercise-diet-portal {
     #Exercise-Diet_Acknowledgement {
-        padding: 90px 0;
+        padding: 40px 0 70px;
     }
 }
+
+.is-upper-banner-closed {
+    body.page-exercise-diet-portal {
+        #Exercise-Diet_Acknowledgement {
+            padding: 0 0 70px;
+        }
+    }
+}
+@media (min-width: 699px) {
+    .is-upper-banner-closed {
+        body.page-exercise-diet-portal {
+            #Exercise-Diet_Acknowledgement {
+                padding: 20px 0 70px;
+            }
+        }
+    }
+}
+
 #Exercise-Diet_Acknowledgement {
     .accent-heading {
         margin-top: 60px;
@@ -927,7 +987,7 @@ body.page-exercise-diet-portal {
         padding: 1em 2.5em;
     }
     .intro-content {
-        padding-top: 3.75em;
+        padding-top: 4em;
     }
     .start-button-intro {
         position: relative;
@@ -953,6 +1013,24 @@ body.page-exercise-diet-portal {
         z-index: 0;
         border: none;
         border: 0;
+    }
+}
+.is-upper-banner-closed {
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 5em;
+        }
+
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        #Exercise-Diet-Portal {
+            .intro-content {
+                padding-top: 7em;
+            }
+    
+        }
     }
 }
 
@@ -981,10 +1059,25 @@ body.page-exercise-diet-portal {
     #Exercise-Diet-Portal h2 {
         font-size: @h2FontSize;
     }
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 2em;
+        }
+
+    }
 }
+@media (min-width: 768px) {
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 2em;
+        }
+
+    }
+}
+
 @media (min-width: 900px) {
     #Exercise-Diet-Portal .intro-content {
-        padding-top: 8em;
+        padding-top: 7.5em;
         margin-top: 5em;
     }
 }
@@ -1298,8 +1391,11 @@ body.page-exercise-diet-portal {
     max-height: 100%;
 }
 
-.middle-content {
-	margin-right: 50px;
+
+@media (min-width: 500px) {
+    .middle-content {
+        margin-right: 50px;
+    }
 }
 
 /* Intro page ul li */
@@ -1674,11 +1770,11 @@ img.recipe-table-image {
 #Intro-Hero {
 	width: 100%;
     padding: 0;
-    padding: 60px 0 0;
+    padding: 40px 0 0;
     height: 100%;
 }
 #ED-Exercise #Intro-Hero {
-    padding: 72px 0 0;
+    padding: 64px 0 0;
 }
 @media (min-width: 768px) {
     #Intro-Hero, 
@@ -1787,14 +1883,17 @@ img.recipe-table-image {
     right: 0;
     z-index: 5;
 }
+
 @media (min-width: 699px) {
     .Hero-title {
-        margin: 20% auto;
+        //margin: 20% auto;
+        margin: 12.5% auto;
     }
 }
 @media (min-width: 768px) {
     .Hero-title {
-        margin: 17% auto;
+        //margin: 17% auto;
+        margin: 15% auto;
     }
 }
 @media (min-width: 1400px) {
@@ -1804,7 +1903,7 @@ img.recipe-table-image {
 }
 .Hero-title h2 {
     border: none;
-    font-size: 30px;
+    font-size: 29px;
     line-height: 1.3em;
     padding: 0 15px;
     padding: 0 30px;
@@ -1820,7 +1919,7 @@ img.recipe-table-image {
         font-size: @h2MobileFontSize;
     }
 }
-@media (min-width: 768px) {
+@media (min-width: 699px) {
     .Hero-title h2 {
         height: 212px;
         font-size: @heroTitleFontSize;
@@ -2267,8 +2366,10 @@ img.recipe-table-image {
         border-radius: 0;
         text-align: center;
         width: 286px;
-        max-width: 300px;
+        max-width: 100%;
         display: block;
+        white-space: normal;
+        word-wrap: break-word;
         &:hover {
             color: #fff;
             background: @btnTruenthPrimaryHoverColor;
@@ -3217,6 +3318,11 @@ h6.lose {
     .page-intro__content {
         padding-top: 214px;
     }
+    .is-upper-banner-closed {
+        .page-intro__content {
+            padding-top: 184px;
+        }
+    }
 }
 
 @media  (min-width: 992px) {
@@ -3252,7 +3358,7 @@ h6.lose {
 
 @media (min-width: 1400px) {
     .exercise-button-container {
-        padding: 60px 14%;
+        padding: 60px 16%;
     }
 }
 
@@ -3269,7 +3375,7 @@ h6.lose {
     }
 
     #ED-Diet {
-        padding: 40px 0 0;
+        padding: 20px 0 0;
     }
 
     .navbar-toggle {
@@ -3326,7 +3432,7 @@ h6.lose {
     }
 
     #ED-Diet {
-        padding: 20px 0.1em 0;
+        padding: 12px 0.1em 0;
     }
 
     .page-intro__content {
@@ -3340,8 +3446,5 @@ h6.lose {
     #ED-Intro #Intro-content,
     #ED-Exercise #Intro-content {
         padding: 0 1em;
-    }
-    #ED-Diet {
-        padding: 20px 1em 0;
     }
 }
