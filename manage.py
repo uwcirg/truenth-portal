@@ -414,7 +414,8 @@ def update_qnr_authored(qnr_id, authored, actor):
         raise ValueError("email for acting user <{}> not found".format(actor))
     qnr = QuestionnaireResponse.query.get(qnr_id)
     if not qnr:
-        raise ValueError(f"Questionnaire Response {qnr_id} not found")
+        raise ValueError(
+            "Questionnaire Response {qnr_id} not found".format(qnr_id))
 
     acting_user.check_role(permission='edit', other_id=qnr.subject_id)
 
@@ -436,7 +437,10 @@ def update_qnr_authored(qnr_id, authored, actor):
     invalidate_users_QBT(qnr.subject_id)
 
     message = (
-        f"Updated QNR {qnr_id} authored from {old_authored} to {new_authored}")
+        "Updated QNR {qnr_id} authored from {old_authored} to "
+        "{new_authored}".format(
+            qnr_id=qnr_id, old_authored=old_authored,
+            new_authored=new_authored))
     auditable_event(
         message=message,
         context="assessment",
