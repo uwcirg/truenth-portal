@@ -65,6 +65,7 @@
 @miniBoxFontSize: 18px; //
 @modalBodyFontSize: 18px;
 @modalHeadingSize: 24px;
+@heroTitleFontSize: 38px;
 @h2FontSize: 37px;
 @h2MobileFontSize: 30px;
 @h3FontSize: 30px;
@@ -1813,7 +1814,7 @@ img.recipe-table-image {
 @media (min-width: 768px) {
     .Hero-title h2 {
         height: 212px;
-        font-size: @h2FontSize;
+        font-size: @heroTitleFontSize;
         &:after,
         &:before {
             content: "\EA03";
@@ -2131,6 +2132,10 @@ img.recipe-table-image {
             background-color: @btnTruenthPrimaryHoverColor;
             text-decoration: none;
         }
+    }
+    .figure {
+        position: relative;
+        top: -1px;
     }
 }
 @media (min-width: 768px) {
