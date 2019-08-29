@@ -1,4 +1,3 @@
-//@mainBackgroundColor: #2e3e2e;
 @mainBackgroundColor: #304040;
 @lightBlueBackgroundColor:  #4a6161;
 @lightGreenBackgroundColor: #44504f;
@@ -7,7 +6,6 @@
 @bodyTextColor: #4a4a4a;
 @navbarBorderColor: #d7dde0;
 @navbarColor: darken(#7c959e, 5%);
-//@navbarColor: #576E76;
 @navbarBackgroundColor: rgba(210,209,197,.3);
 @highlightColor: #f7ddbd;
 @darkenHighlightColor: #625748;
@@ -18,10 +16,8 @@
 @btnTruenthArrowColor: #4c5e6e;
 @btnTruenthPrimaryHoverColor: #576E76;
 @miniBoxContainerBackgroundColor: #5f676e;
-//@miniBoxContainerBackgroundColor: #3b4449;
 @defaultBoxBackgroundColor: rgba(51,54,56,.8);
 @miniBoxBackgroundColor: rgba(51,54,56,.8);
-//@miniBoxBackgroundColor: rgba(59,68,73,.5);
 @miniBoxHeaderColor: #dccab2;
 @miniBoxHeaderFontSize: 18px;
 @miniBoxHeaderFontWeight: 500;
@@ -31,9 +27,6 @@
 @cellHeaderColor: #5a6d75;
 @modalCellBackgroundColor: hsla(113, 16%, 91%, 0.4);
 @modalCellBorderColor: #caced4;
-//@cellBackgroundColor: rgba(59,68,73,.8);
-//@cellBackgroundColor: rgb(81, 97, 101);
-//@cellBackgroundColor: #2a3335;
 @cellBackgroundColor: #697e86;
 @cellHoverColor: darken(#697e86, 10%);
 @sectionBorderColor: #343;
@@ -44,7 +37,6 @@
 @modalHeadingBorderColor: #cfd5d8;
 @inputBackgroundColor: #f1efec;
 @resourceLinkColor: #bedfea;
-//@resourceBackgroundColor: rgba(51,54,56,.8);
 @resourceBackgroundColor: rgba(59,68,73,.5);
 @infoButtonBackgroundColor: #8f9385;
 @figureBackgroundColor: #4c5e6e;
@@ -413,7 +405,7 @@ a, button, .btn, input {
 }
 .box__content {
     background: @defaultBoxBackgroundColor;
-    padding: 20px 12px 32px;
+    padding: 24px 12px 32px;
     margin: 12px auto;
     width: 100%;
     max-width: 100%;
@@ -428,6 +420,7 @@ a, button, .btn, input {
         display: flex;
         align-items: center;
         flex-direction: column;
+        width: 90%;
     }
 }
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -449,7 +442,12 @@ a, button, .btn, input {
         width: 96%;
     }
     .box__content {
-        width: 75%;
+        width: 80%;
+    }
+}
+@media (min-width: 992px) {
+    .box__content {
+        width: 67.5%;
     }
 }
 
@@ -547,7 +545,6 @@ a, button, .btn, input {
             letter-spacing: 3px;
             font-size: @mobileMainNavFontSize;
             font-weight: 500;
-            //max-width: 250px;
             width: 100%;
             height: @mobileMainNavCellHeight;
             text-align: center;
@@ -838,10 +835,8 @@ body.page-exercise-diet-portal {
         margin: 0 auto 16px;
     }
     .mini-box {
-        //padding: 30px 40px;
         padding: 24px 12px 12px;
-        //override GIL css
-        background: transparent;
+        background: transparent; //overriding GIL
     }
     .mini-box__copy {
         padding: 0 12px 8px;
@@ -864,7 +859,6 @@ body.page-exercise-diet-portal {
         align-items: center;
     }
     .mini-mini-box__item {
-        //margin-right: 24px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -895,8 +889,7 @@ body.page-exercise-diet-portal {
         }
     }
 }
-//exercise diet portal
-#Exercise-Diet-Portal {
+#Exercise-Diet-Portal { //exercise diet portal
 	position: relative;
 	display: block;
     margin: 0px auto;
@@ -1520,7 +1513,6 @@ td.collapse.in a:focus {
     text-decoration: none;
 }
 
-/*   new styling change id?  */
 img.recipe-table-image {
     -webkit-transition: transform 300ms ease-in-out;
     -o-transition: transform 300ms ease-in-out;
@@ -1897,7 +1889,7 @@ img.recipe-table-image {
     margin: 0px auto;
 }
 #ED-Exercise #Intro-content {
-    padding: 0 12px;
+    padding: 0;
     margin: 0px auto;
 }
 #ED-Intro #Intro-content {
@@ -2364,13 +2356,11 @@ span.left-button:hover, span.right-button:hover {
     color: #FFF;
 }
 span.left-button {
-  //  margin-right: 4px;
     .figure {
         float: left;
     }
 }
 span.right-button {
-   // margin-left: 4px;
     .figure {
         float: right;
     }
