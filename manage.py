@@ -3,6 +3,8 @@
 FLASK_APP=manage.py flask --help
 
 """
+import copy
+from datetime import datetime
 import json
 import os
 import sys
@@ -17,6 +19,7 @@ from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event
+from portal.date_tools import FHIR_datetime
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
@@ -30,6 +33,8 @@ from portal.models.i18n_utils import (
 )
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
+from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.url_token import (
@@ -389,3 +394,52 @@ def healthcheck():
 
     # Healthcheck failed. Return a failing status code
     return sys.exit(result.status_code)
+
+
+@click.option('--qnr_id', help="Questionnaire Response ID")
+@click.option(
+    '--authored',
+    help="new datetime for qnr authored, format example: 2019-04-09 15:14:43")
+@click.option(
+    '--actor',
+    help='email address of user taking this action, for audit trail'
+)
+@app.cli.command()
+def update_qnr_authored(qnr_id, authored, actor):
+    """Modify authored date on given Questionnaire Response ID"""
+    try:
+        acting_user = User.query.filter(
+            func.lower(User.email) == actor.lower()).one()
+    except NoResultFound:
+        raise ValueError("email for acting user <{}> not found".format(actor))
+    qnr = QuestionnaireResponse.query.get(qnr_id)
+    if not qnr:
+        raise ValueError(f"Questionnaire Response {qnr_id} not found")
+
+    acting_user.check_role(permission='edit', other_id=qnr.subject_id)
+
+    new_authored = FHIR_datetime.parse(authored)
+    old_authored = qnr.authored
+
+    qnr.authored = new_authored
+    document = copy.deepcopy(qnr.document)
+    document['authored'] = datetime.strftime(new_authored, "%Y-%m-%d %H:%M:%S")
+    qnr.document = document
+
+    # Must clear the qb_id and iteration in case this authored date
+    # change moves the QNR to a different visit.
+    qnr.questionnaire_bank_id = None
+    qnr.qb_id = None
+    db.session.commit()
+
+    # Invalidate timeline as this probably altered the status
+    invalidate_users_QBT(qnr.subject_id)
+
+    message = (
+        f"Updated QNR {qnr_id} authored from {old_authored} to {new_authored}")
+    auditable_event(
+        message=message,
+        context="assessment",
+        user_id=acting_user.id,
+        subject_id=qnr.subject_id)
+    print(message)
