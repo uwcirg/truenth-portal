@@ -452,12 +452,20 @@ a, button, .btn, input {
         width: 65%;
     }
 }
+@media (min-width: 1200px) {
+    .box__content {
+        width: 68.75%;
+    }
+}
 
 @media (min-width: 1200px) {
     .box__content--container {
         .box__content {
-            min-height: 260px;
+            min-height: 280px;
             width: 47.5%;
+        }
+        .box__content.wide {
+            width: 97.5%;
         }
     }
 }
