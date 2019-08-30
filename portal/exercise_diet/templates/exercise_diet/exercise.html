@@ -24,17 +24,16 @@
                     <div class="modal-nav">
                         {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
                         <span class="left-button">
-                            <a href="javascript:show_exercise('{{ loop.previtem[0] }}','{{ id }}');"><span class="figure">&larr;</span><span>&nbsp;{{ loop.previtem[1][0]|safe }}</span></a>
+                            <a class="exercise-navlink" data-currentItem='{{id}}' data-newItem='{{ loop.nextitem[0] }}'><span class="figure">&larr;</span><span>&nbsp;{{ loop.previtem[1][0]|safe }}</span></a>
                         </span>
                         {% endif %}
                         {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}
                         <span class="right-button">
-                            <a href="javascript:show_exercise('{{ loop.nextitem[0] }}','{{ id }}');"><span>{{ loop.nextitem[1][0]|safe }}&nbsp;</span><span class="figure">&rarr;</span></a>
+                            <a class="exercise-navlink" data-currentItem='{{id}}' data-newItem='{{ loop.nextitem[0] }}'><span>{{ loop.nextitem[1][0]|safe }}&nbsp;</span><span class="figure">&rarr;</span></a>
                         </span>
                         {% endif %}
                     </div>
                     {% endif %}
-
                     <div class="modal-footer">
                         {% trans %}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>close</b><span>X</span></button>

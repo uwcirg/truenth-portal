@@ -96,6 +96,13 @@ function setModalElementsEvent() {
             $(target).modal("show");
         }, 50);
     });
+    //exercise modal nav link
+    $(".exercise-navlink").on("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        show_exercise($(this).attr("data-newItem"), $(this).attr("data-currentItem"));
+        return false;
+    });
 }
 
 $(function(){
