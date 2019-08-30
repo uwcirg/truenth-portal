@@ -158,7 +158,7 @@ def recipe(heading, item):
         if prev_heading_index >= 0:
             prev_heading = ordered_headings[prev_heading_index]
             prev_item_index = len(assets[prev_heading]) - 1
-            prev_asset_title = ('<span class="figure">&larr;</span>' + 
+            prev_asset_title = ('<span class="figure">&larr;</span>' +
                                 '<span>&nbsp;' +
                                 assets[prev_heading][prev_item_index][0] +
                                 '</span>')
