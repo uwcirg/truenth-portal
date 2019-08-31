@@ -13,7 +13,7 @@
     {{super()}}
     {% for id, content in modals.items() %}
         <!-- Modal -->
-        <div class="ED__modal modal fade" id={{ id }} aria-hidden="true">
+        <div class="ED__modal modal fade" id="{{ id }}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
@@ -24,7 +24,7 @@
                     <div class="modal-nav">
                         {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
                         <span class="left-button">
-                            <a class="exercise-navlink" data-currentItem='{{id}}' data-newItem='{{ loop.nextitem[0] }}'><span class="figure">&larr;</span><span>&nbsp;{{ loop.previtem[1][0]|safe }}</span></a>
+                            <a class="exercise-navlink" data-currentItem='{{id}}' data-newItem='{{ loop.previtem[0] }}'><span class="figure">&larr;</span><span>&nbsp;{{ loop.previtem[1][0]|safe }}</span></a>
                         </span>
                         {% endif %}
                         {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}
