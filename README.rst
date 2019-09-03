@@ -20,7 +20,7 @@ Install required packages
 
 .. code:: bash
 
-    $ sudo apt-get install postgresql python-virtualenv python-dev
+    $ sudo apt-get install postgresql python3-venv python3-dev
     $ sudo apt-get install libffi-dev libpq-dev build-essential redis-server
 
 Clone the Project
@@ -41,7 +41,7 @@ installed anywhere, using the nested 'env' pattern here.
 
 .. code:: bash
 
-    $ virtualenv $PROJECT_HOME/env
+    $ python3 -m venv $PROJECT_HOME/env
 
 .. _activate-venv:
 
