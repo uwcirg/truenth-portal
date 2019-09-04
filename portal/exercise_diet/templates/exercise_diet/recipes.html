@@ -6,8 +6,8 @@
     {{ recipe_intro|safe }}
     <div id="Recipe-Accordions">
         <div class="healthy-fats-accordion">
-            <h4>
-                <a data-toggle="collapse" href="#healthy-fats" aria-expanded="false" class="collapsed" aria-controls="healthy-fats">{% trans %}Healthy Fats from Oils and Nuts{% endtrans %}</a>
+            <h4 data-toggle="collapse" href="#healthy-fats" aria-expanded="false" class="collapsed" aria-controls="healthy-fats">
+                <a>{% trans %}Healthy Fats from Oils and Nuts{% endtrans %}</a>
             </h4>
         </div>
         <div id="healthy-fats" class="collapse" role="tabpanel" aria-labelledby="heading1" style="height: 0px;">
@@ -29,8 +29,8 @@
         </div><!-- END class="healthy-fats-accordion" -->
 
         <div class="vegetables-accordion">
-            <h4>
-                <a data-toggle="collapse" href="#vegetables" aria-expanded="false" class="collapsed" aria-controls="vegetables">{% trans %}Vegetables{% endtrans %}</a>
+            <h4 data-toggle="collapse" href="#vegetables" aria-expanded="false" class="collapsed" aria-controls="vegetables">
+                <a>{% trans %}Vegetables{% endtrans %}</a>
             </h4>
         </div>
         <div id="vegetables" class="collapse" role="tabpanel" aria-labelledby="heading1" style="height: 0px;">
@@ -52,8 +52,8 @@
         </div><!-- END class="vegetables-accordion" -->
 
         <div class="tomatoes-accordion">
-            <h4>
-                <a data-toggle="collapse" href="#tomatoes" aria-expanded="false" class="collapsed" aria-controls="tomatoes">{% trans %}Cooked tomatoes{% endtrans %}</a>
+            <h4 data-toggle="collapse" href="#tomatoes" aria-expanded="false" class="collapsed" aria-controls="tomatoes">
+                <a>{% trans %}Cooked tomatoes{% endtrans %}</a>
             </h4>
         </div>
         <div id="tomatoes" class="collapse" role="tabpanel" aria-labelledby="heading1" style="height: 0px;">
@@ -75,8 +75,8 @@
         </div><!-- END class="tomatoes-accordion" -->
 
         <div class="fish-accordion">
-            <h4>
-                <a data-toggle="collapse" href="#fish" aria-expanded="false" class="collapsed" aria-controls="fish">{% trans %}Fish{% endtrans %}</a>
+            <h4 data-toggle="collapse" href="#fish" aria-expanded="false" class="collapsed" aria-controls="fish">
+                <a>{% trans %}Fish{% endtrans %}</a>
             </h4>
         </div>
         <div id="fish" class="collapse" role="tabpanel" aria-labelledby="heading1" style="height: 0px;">
@@ -98,8 +98,8 @@
         </div><!-- END class="fish-accordion" -->
 
         <div class="alternatives-accordion">
-            <h4>
-                <a data-toggle="collapse" href="#alternatives_to_processed_meats" aria-expanded="false" class="collapsed" aria-controls="alternatives_to_processed_meats">{% trans %}Alternatives to Processed Meats{% endtrans %}</a>
+            <h4 data-toggle="collapse" href="#alternatives_to_processed_meats" aria-expanded="false" class="collapsed" aria-controls="alternatives_to_processed_meats"> 
+                <a>{% trans %}Alternatives to Processed Meats{% endtrans %}</a>
             </h4>
         </div>
         <div id="alternatives_to_processed_meats" class="collapse" role="tabpanel" aria-labelledby="heading1" style="height: 0px;">
@@ -125,10 +125,11 @@
 {% block modal %}
     {{super()}}
     <!-- Modal -->
-    <div class="modal fade" id="recipe-modal" aria-hidden="true">
+    <div class="ED__modal modal fade" id="recipe-modal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="loader">{{_("Loading...")}}</div>
                 </div>
             </div>
         </div>
