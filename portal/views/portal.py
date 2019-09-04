@@ -914,11 +914,7 @@ def research_dashboard():
     Only accessible to those with the Researcher role.
 
     """
-    return render_template(
-        'research.html',
-        user=current_user(),
-        instruments=Questionnaire.questionnaire_codes()
-    )
+    return render_template('research.html', user=current_user())
 
 
 @portal.route('/spec')
