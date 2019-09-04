@@ -117,7 +117,7 @@ deploy:
         # Only deploy from:
         # "develop", "master", and branches prefixed by "release/" or "test/"
         # branches that appear to be tags (TravisCI sets TRAVIS_BRANCH = TRAVIS_TAG)
-        - $GIT_BRANCH =~ ^(develop$|master$|release/|test/|v[0-9]{2}))
+        - $GIT_BRANCH =~ ^(develop$|master$|release/|test/|v))
     script:
       - ./bin/docker-push.sh
 
