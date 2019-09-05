@@ -2,9 +2,7 @@
 {% block title %}{{super()}} {{_("Exercise and Diet")}}{% endblock %}
 {% block head %}
 {{super()}}
-<link rel="stylesheet" type="text/css" href="https://sm.us.truenth.org/css/cpro.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/topnav.css') }}">
-<link rel="stylesheet" href="{{ url_for('.static', filename='css/styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('.static', filename='css/exerciseDiet.css') }}">
 {% endblock %}
 {% block main %}
     {{ super() }}
@@ -27,6 +25,11 @@
             </div>
         </div>
     {% endblock %}
+{% endblock %}
+{% block header %}
+        {{super()}}
+        {% set ed_home_url = url_for('.introduction') if user else url_for('.portal') %}
+        <a href="{{ed_home_url}}" class="menu button button--small mobile-view home-button">{{_("Home")}}</a>
 {% endblock %}
 {% block footnote %}
     <!-- content currently hardcoded can change to retrieval via LR if need to-->

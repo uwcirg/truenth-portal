@@ -1,0 +1,3552 @@
+@mainBackgroundColor: #304040;
+@lightBlueBackgroundColor:  #4a6161;
+@lightGreenBackgroundColor: #44504f;
+@HRColor: #ececec;
+@alternativeBackgroundColor: #253534;
+@bodyTextColor: #4a4a4a;
+@navbarBorderColor: #d7dde0;
+@navbarColor: darken(#7c959e, 5%);
+@navbarBackgroundColor: rgba(210,209,197,.3);
+@highlightColor: #f7ddbd;
+@darkenHighlightColor: #625748;
+@modalHighlightColor: #6a5944;
+@headerColor: #FFF;
+@tnthPrimaryColor: #7C959D;
+@btnTruenthPrimaryColor: #7C959D;
+@btnTruenthArrowColor: #4c5e6e;
+@btnTruenthPrimaryHoverColor: #576E76;
+@miniBoxContainerBackgroundColor: #5f676e;
+@defaultBoxBackgroundColor: rgba(51,54,56,.8);
+@miniBoxBackgroundColor: rgba(51,54,56,.8);
+@miniBoxHeaderColor: #dccab2;
+@miniBoxHeaderFontSize: 18px;
+@miniBoxHeaderFontWeight: 500;
+@iceboxSubheadColor: #a9b2b7;
+@cellBorderColor: #959eab;
+@cellCaptionHeaderColor: #5a6d75;
+@cellHeaderColor: #5a6d75;
+@modalCellBackgroundColor: hsla(113, 16%, 91%, 0.4);
+@modalCellBorderColor: #caced4;
+@cellBackgroundColor: #697e86;
+@cellHoverColor: darken(#697e86, 10%);
+@sectionBorderColor: #343;
+@sectionBorderColor: #3b4e4e;
+@modalHeaderBackgroundColor: #607277;
+@modalHeadingColor: #4b5e6f;
+@modalSubHeadingColor: #4a4c4d;
+@modalHeadingBorderColor: #cfd5d8;
+@inputBackgroundColor: #f1efec;
+@resourceLinkColor: #bedfea;
+@resourceBackgroundColor: rgba(59,68,73,.5);
+@infoButtonBackgroundColor: #8f9385;
+@figureBackgroundColor: #4c5e6e;
+@IntroOverlayBackgroundColor: #333;
+@ExerciseOverlayBackgroundColor: #313535;
+@RecipieOverlayBackgroundColor: #323535;
+@calloutTextColor: #FFF;
+@calloutTextHoverColor: #ccd7dd;
+@mobileMainNavFontSize: 12px;
+@mainNavFontSize: 13px;
+@mobileMainNavCellHeight: 52px;
+@mainNavCellHeight: 60px;
+@contentFontSize: 24px;
+@contentSubheadingFontSize: 32px;
+@mobileSubheadingFontSize: 24px;
+@contentPromptFontSize: 30px;
+@mobileContentFontSize: 20px;
+@buttonFontSize: 18px;
+@startButtonFontSize: 19px;
+@tableCellFontSize: 17px;
+@mobileTableCellFontSize: 14px;
+@mobileTableCellFontSize: 16px;
+@smallerTextFontSize: 16px;
+@mobileButtonFontSize: 16px;
+@miniBoxTitleFontSize: 16px;
+@miniBoxFontSize: 18px; //
+@modalBodyFontSize: 18px;
+@modalHeadingSize: 24px;
+@heroTitleFontSize: 38px;
+@h2FontSize: 37px;
+@h2MobileFontSize: 30px;
+@h3FontSize: 30px;
+@h3MobileFontSize: 26px;
+@h4FontSize: 22px;
+@h4MobileFontSize: 18px;
+@h6FontSize: 15px;
+@h6MobileFontSize: 12px;
+@referenceFontSize: 18px;
+
+@bodyFontFamily: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
+@modalHeaderFontWeight: 700;
+
+body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.35em;
+    letter-spacing: .02em;
+    font-weight: 500;
+    font-style: normal;
+    color: #333;
+    background-color: #FFF;
+    font-family: @bodyFontFamily;
+}
+.main {
+    top: 55px;
+}
+.is-upper-banner-closed {
+    .main {
+        top: 32px;
+    }
+}
+@media (min-width: 900px) {
+    .is-upper-banner-closed {
+        .main {
+            top: 0;
+            padding-bottom: 0;
+        }
+    }
+}
+main .module-assets {
+    overflow: auto;
+    p {
+        margin: 0 1.5em;
+    }
+}
+@media (min-width: 912px) {
+    main.exercise-diet .module-assets {
+        max-width: 100%; 
+        margin: -2em auto auto;
+    }
+}
+.main.exercise-diet {
+    top: 20px;
+    padding-top: 5em;
+    padding-bottom: 0;
+    //margin-bottom: -2.25em;
+    position: relative;
+}
+.is-upper-banner-closed {
+    .main.exercise-diet {
+        padding-top: 0;
+        top: 0;
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        .main.exercise-diet {
+            padding-top: 2.5em;
+        }
+    }
+}
+@media (min-width: 900px) {
+    .is-upper-banner-closed {
+        .main.exercise-diet {
+            padding-top: 1em;
+        }
+    }
+}
+main {
+    position: relative;
+    &:after {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        content: "";
+        display: block;
+        background: #FFF;
+        opacity: 0.8;
+        z-index: 999999;
+        transform: translateY(0);
+        transition: all 350ms ease;
+        overflow-x: hidden;
+    }
+    &.active:after {
+        opacity: 0;
+        transform: translateY(-500%);
+    }
+}
+.page-intro {
+   padding: 120px 30px 70px;
+}
+.is-upper-banner-closed {
+    .page-intro {
+        padding: 62px 30px 70px;
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        .page-intro {
+            padding: 160px 30px 70px;
+        }
+    }
+}
+// @media (min-width: 900px) {
+//     .is-upper-banner-closed {
+//         .page-intro {
+//             padding: 160px 30px 70px;
+//         }
+//     }
+// }
+@media (min-width: 992px) {
+    .page-intro {
+        padding: 140px 30px 60px;
+    }
+}
+
+em {
+	font-weight: 400;
+	font-style: normal;
+	letter-spacing: 1.2px;
+}
+.accent-heading em {
+    font-size: 9px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+p {
+	margin: 0;
+	padding: 0 0 10px;
+}
+ul {
+	margin: 0;
+	padding: 0;
+}
+.row-hover {
+	background-color: @cellHoverColor;
+}
+.cell-hover {
+    background-color: @cellHoverColor;
+}
+
+h1, h2, h3, h4 {
+    color: @headerColor;
+    line-height: 1.3;
+}
+h4, h5, h6 {
+    text-transform: uppercase;
+}
+
+h1 {
+	position: relative;
+	font-size: 2.4em;
+	line-height: 1.3;
+	font-weight: 700;
+    color: @headerColor;
+    text-align: center;
+    padding: 16px;
+    margin: 20px auto 20px;
+}
+h2 {
+	position: relative;
+    font-size: @h2MobileFontSize;
+    line-height: 1.35;
+    font-weight: 600;
+    color: @headerColor;
+    text-align: center;
+    border: none;
+    padding: 20px 16px;
+    margin: 10px 0px 10px;
+    a {
+        font-weight: 500;
+        color: @btnTruenthPrimaryColor;
+        background-color: white;
+        border: none;
+        border-radius: none;
+        font-weight: 500;
+        font-style: normal;
+        font-size: 11px;
+        line-height: 1.4em;
+        letter-spacing: .3em;
+        text-align: right;
+        padding: 0px 0px 0px 0px;
+        text-decoration: underline;
+    }
+}
+h2 a:hover {
+    color: @btnTruenthPrimaryHoverColor;
+}
+@media (min-width: 992px) {
+    h2 {
+        font-size: @h2FontSize;
+    }
+}
+h3 {
+    font-size: @h3MobileFontSize;
+    line-height: 1.35;
+	font-weight: 600;
+	letter-spacing: .03em;
+    color: @headerColor;
+    text-align: center;
+    padding: 5px 20px;
+    margin-top: 0px;
+}
+@media (min-width: 768px) {
+    h3 {
+        font-size: @h3FontSize;
+    }
+}
+h3 a {
+	letter-spacing: .01em;
+    color: @highlightColor;
+    text-align: center;
+    padding: 5px 0;
+    margin-top: 0px;
+    &:hover {
+        color: #FFF;
+        text-decoration: underline;
+    }
+}
+h3.module__head {
+    color: #FFF;
+}
+h4 {
+    font-size: @h4MobileFontSize;
+}
+@media (min-width: 768px) {
+    h4 {
+        font-size: @h4FontSize;
+    }
+}
+h6, h6 span {
+	font-size: @h6MobileFontSize;
+    line-height: 1.35;
+    letter-spacing: 1.2px;
+    font-style: normal;
+    font-weight: 500;
+    color: #FFF;
+    text-align: center;
+    vertical-align: top;
+    width: auto;
+    margin: 0px 2px 3px;
+}
+@media (min-width: 768px) {
+    h6, h6 span {
+        font-size: @h6FontSize;
+    }
+}
+
+.collapsible-header {
+    position: relative;
+    padding-right: 42px !important;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    &:hover,
+    &:hover b {
+        color: @btnTruenthPrimaryHoverColor !important;
+    }
+    &:after {
+        content: "\f107";
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: 500;
+        display: block;
+        position: absolute;
+        bottom: 4px;
+        width: 10px;
+        right: 2.5%;
+        top: 12.5%;
+        font-size: 24px;
+        cursor: pointer;
+    }
+}
+
+img {
+    max-width: 100%;
+}
+
+hr {
+    border-top: 1px solid @sectionBorderColor;
+}
+hr.objective {
+	margin: 10px auto 30px;
+	padding: 0px 0px 0px 0px;
+	background: rgba(255, 255, 255, 0.5);
+    display: block;
+    height: .05px;
+    width: 233px;
+}
+
+.clearfix {
+    clear:both;
+}
+
+.objective-content p:last-child {
+	padding: 0px 0px 100px;
+}
+
+a {
+    color: darken(@btnTruenthPrimaryColor, 10%);
+    &:hover {
+        color: darken(@btnTruenthPrimaryHoverColor, 10%);
+    }
+
+}
+
+a, button, .btn, input {
+    outline: none;
+    text-decoration:none;
+    &:hover,
+    &:focus,
+    &:visited {
+        outline: none !important;
+        text-decoration: none;
+        box-shadow: none;
+        cursor: pointer;
+    }
+}
+.home-button {
+    position: fixed;
+    right: 12px;
+    z-index: 9999;
+    top: 24px;
+}
+.is-scrolled {
+    .home-button {
+        background: rgba(210,209,197,.2);
+        color: #7c959e;
+    }
+}
+
+.button-container {
+    position: relative;
+    &:after {
+        content: "\2192";
+        font-family: symbol;
+        font-style: normal;
+        font-weight: normal;
+        display: inline-block;
+        margin-left: 8px;
+        color: @btnTruenthArrowColor;
+    }
+}
+.figure {
+    color: @figureBackgroundColor;
+    display: inline-block !important;
+    min-height: 1em !important;
+    &:hover {
+        color: #FFF;
+    }
+}
+.minibox__header {
+    font-size: @miniBoxHeaderFontSize;
+    color: @miniBoxHeaderColor;
+    letter-spacing: 1.2px;
+    text-align: center !important;
+}
+.minibox__content {
+    font-size: @miniBoxFontSize;
+}
+.icon-box__subhead {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 2.9px;
+    text-transform: uppercase;
+    margin: 8px 12px 8px;
+    color: @iceboxSubheadColor;
+    font-style: normal;
+    font-size: 12px;
+}
+.box__content {
+    background: @defaultBoxBackgroundColor;
+    padding: 24px 28px 32px;
+    margin: 12px auto;
+    width: 100%;
+    max-width: 100%;
+}
+.box__content--container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 12px auto;
+    max-width: 100%;
+    .box__content {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 90%;
+    }
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .box__content--container {
+        .box__content {
+            align-items: stretch;
+        }
+    }
+}
+@supports (-ms-accelerator:true) {
+    .box__content--container {
+        .box__content {
+            align-items: stretch;
+        }
+    }
+}
+@media(min-width: 768px) {
+    .box__content--container {
+        width: 96%;
+    }
+    .box__content {
+        width: 80%;
+    }
+}
+@media (min-width: 992px) {
+    .box__content {
+        width: 65%;
+    }
+}
+@media (min-width: 1200px) {
+    .box__content {
+        width: 68.75%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .box__content--container {
+        .box__content {
+            min-height: 280px;
+            width: 47.5%;
+        }
+        .box__content.wide {
+            width: 97.5%;
+            padding: 24px 40px 32px;
+        }
+    }
+}
+@media (min-width: 1400px) {
+    .box__content--container {
+        width: 1100px;
+    }
+}
+.mobile-view {
+    display: block;
+}
+@media (min-width: 768px) {
+    .mobile-view {
+        display: none;
+    }
+}
+.container {
+	position: relative;
+    max-width: 1000px;
+    min-width: 320px;
+    width: 100%;
+    min-height: auto;
+    background-color: transparent;
+    padding: 0;
+    margin: 0 auto;
+    overflow: visible;
+}
+.navbar-toggle {
+    display: none;
+}
+.navbar {
+    margin:8px -15px;
+}
+#mainNavContainer {
+    background-color:white;
+}
+#mainNav {
+    display:flex;
+    align-content:center;
+    margin:0;
+    background-image:none;
+    border:0;
+    border-radius:0;
+    margin-top:45px;
+    margin-bottom:30px;
+}
+
+#mainNavbar {
+    background-color:white;
+    border:0;
+    z-index: 2;
+    &.collapse {
+        padding: 12px 0 24px;
+    }
+    ul {
+        display:flex;
+        justify-content:center;
+        list-style-type: none;
+        min-height:@mobileMainNavCellHeight;
+    }
+    li {
+        display:flex;
+        justify-content: center;
+        margin-left: 5px;
+        margin-right: 5px;
+        cursor: pointer;
+        position: relative;
+        width: 25%;
+        &:first-of-type {
+            margin-left: 0;
+        }
+        &:last-of-type {
+            margin-right: 0;
+        }
+        &:hover {
+            a {
+                color: darken(@btnTruenthPrimaryHoverColor, 10%);
+                background: lighten(@navbarBackgroundColor, 5%);
+                cursor: pointer;
+            }
+        }
+        &.disabled {
+            display: none;
+        }
+        a {
+            display: flex;
+            justify-content: center;
+            color: @navbarColor;
+            background-color: @navbarBackgroundColor;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: @mobileMainNavFontSize;
+            font-weight: 500;
+            width: 100%;
+            height: @mobileMainNavCellHeight;
+            text-align: center;
+            padding: 6px 36px 4px 36px;
+            align-items: center;
+            border: 0;
+            &:visited, &:focused, &:hover {
+                text-decoration: none;
+                cursor: pointer;
+                border: 0;
+            }
+        
+        }
+        &.active  a {
+            font-weight: 600;
+            color: #FFF;
+            background: @navbarColor;
+            background-image: none;
+            z-index: 999;
+            box-shadow: none;
+        }
+    }
+}
+.is-scrolled {
+    #mainNavbar {
+        display: none;
+    }
+}
+@media (min-width: 992px) {
+    #mainNavbar {
+        ul {
+            min-height:@mainNavCellHeight;
+        }
+        li {
+            a {
+                font-size: @mainNavFontSize;
+                height: @mainNavCellHeight;
+            
+            }
+        }
+    }
+}
+.navbar-nav {
+    overflow: hidden;
+    ul {
+        display: flex;
+        justify-content: center;
+        list-style-type: none;
+    }
+}
+@media (min-width: 768px) {
+    #mainNavContainer {
+    background-color:white;
+    }
+    #mainNav {
+        display:flex;
+        align-content:center;
+        margin:0;
+        background-image:none;
+        border:0;
+        border-radius:0;
+        margin-top:45px;
+        margin-bottom:30px;
+    }
+}
+@media (min-width: 768px) {
+    #mainNavbar {
+        margin-bottom: -40px;
+    }
+    .is-upper-banner-closed {
+        #mainNavbar {
+            margin-bottom: -42px;
+        }
+    }
+}
+@media (min-width: 992px) {
+    .is-upper-banner-closed {
+        #mainNavbar {
+            margin-bottom: -64px;
+        }
+    }
+    #mainNavbar {
+        margin-bottom: -56px;
+        ul {
+            a {
+                min-width: 225px;
+            }
+        }
+    }
+}
+.navbar-nav {
+    overflow: hidden;
+}
+strong {
+    font-size: 1em;
+    font-weight: 600;
+    font-style: normal;
+    margin: 20px auto;
+    vertical-align: top;
+}
+b, strong {
+	color: @highlightColor;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+p {
+    b, strong {
+        font-weight: 500;
+        letter-spacing: 0;
+    }
+    b.emphasis, strong.emphasis {
+        font-weight: 600;
+    }
+}
+h2 b, h3 b, h4 b {
+    color: @headerColor;
+}
+
+table {
+	width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 10px;
+    margin-bottom: 20px;
+    .title {
+        text-align: center;
+    }
+}
+
+td {
+	padding: 12px 8px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+    font-size: @mobileTableCellFontSize !important;
+    background-color: @cellBackgroundColor;
+    word-break: break-word;
+    line-height: 1.5;
+    &.filler-cell {
+        border: 0;
+    }
+    .filler-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        .title {
+            height: 100%;
+            display: inline-block;
+            padding-right: 24px;
+            color: @highlightColor;
+            margin-bottom: 8px;
+        }
+    }
+    li {
+        line-height: 1.3 !important;
+    }
+    p, li {
+        font-size: @mobileTableCellFontSize !important;
+        color: #333;
+    }
+    &.image-cell {
+        vertical-align: middle;
+        img {
+            margin-top: 8px;
+        }
+    }
+    &:hover {
+        background-color: @cellHoverColor;
+    }
+    &.filter-cell:hover {
+        background-color: @cellBackgroundColor;
+    }
+}
+@media (min-width: 768px) {
+    td {
+        word-break: normal;
+        font-size: @tableCellFontSize !important;
+        p, li {
+            font-size: @tableCellFontSize !important;
+        }
+    }
+}
+
+tr {
+	padding: 3px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+}
+
+table b, table strong {
+    font-weight: 500;
+    font-style: normal;
+    color: lighten(@highlightColor, 10%);
+}
+.mini__head, p.mini__head {
+    font-size: @miniBoxTitleFontSize;
+    text-transform: uppercase;
+    letter-spacing: 1.2px !important;
+    font-weight: 500;
+    b {
+        letter-spacing: 1.2px !important;
+    }
+}
+.sub__heading {
+    display: block;
+    font-size: @mobileSubheadingFontSize;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 12px auto 20px;
+}
+@media (min-width: 768px) {
+    .sub__heading {
+        font-size: @contentSubheadingFontSize;
+    }
+}
+.watermark {
+    top: 0 !important;
+    padding: 0 !important;
+    z-index: 3000 !important;
+    width: 100% !important;
+    color: #603b00 !important;
+    min-height: 16px !important;
+    background: #EEAB50 !important;
+    font-size: 9px !important;
+}
+@media (min-width: 992px) {
+    .watermark {
+        padding: 4px 0 0 !important;
+        min-height: 26px !important;
+        font-size: 12px !important;
+    }
+}
+
+.light-blue-theme {
+    background-color: @lightBlueBackgroundColor;
+}
+.light-green-theme {
+    background-color: @lightGreenBackgroundColor;
+}
+@media (min-width: 992px) {
+    .module-wrap.module-wrap--theme-gray {
+        .module__head{
+            width: 850px;
+            margin: 0 auto 40px;
+        }
+    }
+}
+.page-intro__content {
+    max-width: 100%;
+    padding-top: 0;
+}
+body.page-exercise-diet-portal footer {
+    margin: 0 1em;
+}
+@media (min-width: 401px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 1.35em;
+    }
+}
+
+@media (min-width: 900px) {
+    body.page-exercise-diet-portal footer {
+        margin: 0 2em;
+    }
+}
+
+body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
+    margin-top: 2em;
+}
+
+//acknowledgment section
+
+#Exercise-Diet_Acknowledgement {
+    background: #3B4449;
+    padding: 48px 0 52px;
+}
+
+.is-upper-banner-closed {
+    #Exercise-Diet_Acknowledgement {
+        background: #3B4449;
+        padding: 32px 0 60px;
+    }
+}
+@media (min-width: 1400px) {
+    .is-upper-banner-closed {
+        #Exercise-Diet_Acknowledgement {
+            background: #3B4449;
+            padding: 28px 0 60px;
+        }
+    }
+}
+
+body.page-exercise-diet-portal {
+    #Exercise-Diet_Acknowledgement {
+        padding: 54px 0 70px;
+    }
+}
+
+.is-upper-banner-closed {
+    body.page-exercise-diet-portal {
+        #Exercise-Diet_Acknowledgement {
+            padding: 32px 0 70px;
+        }
+    }
+}
+@media (min-width: 699px) {
+    .is-upper-banner-closed {
+        body.page-exercise-diet-portal {
+            #Exercise-Diet_Acknowledgement {
+                padding: 20px 0 70px;
+            }
+        }
+    }
+}
+
+#Exercise-Diet_Acknowledgement {
+    .accent-heading {
+        margin-top: 24px;
+        color: #D2D1C5;
+    }
+    .objective-content {
+        margin: 0px auto;
+        padding-left: 2em;
+        padding-right: 2em;
+        z-index: 100;
+        text-align: center;
+        width: 100%;
+        max-width: 100%;
+        font-size: 20px;
+        line-height: 1.4;
+        color: #FFF;
+    }
+    .module__body {
+        font-size: @mobileContentFontSize;
+        text-align: center;
+        max-width: 100%;
+        line-height: 1.55;
+        margin: 0 auto 16px;
+        padding: 0 40px;
+    }
+    .mini-box {
+        padding: 24px 12px 12px;
+        background: transparent; //overriding GIL
+    }
+    .mini-box__copy {
+        padding: 0 12px 8px;
+    }
+    .mini-box__copy,
+    .mini-box__head {
+        text-align: center;
+        font-size: @mobileContentFontSize;
+    }
+    .mini-box__head {
+        font-size: 18px;
+    }
+    .mini-box__head {
+        margin: 0 0 16px;
+    }
+    .mini-mini-box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .mini-mini-box__item {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .accent-heading--no-border {
+        padding-bottom: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading {
+            margin-top: 32px;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading {
+            margin-top: 48px;
+        }
+    }
+}
+@media (min-width: 992px) {
+    #Exercise-Diet_Acknowledgement {
+        .accent-heading--no-border {
+            padding-bottom: 40px;
+        }
+        .objective-content {
+            width: 800px;
+            padding-right: 0.25em;
+            padding-left: 0.25em;
+        }
+        .mini-box__head {
+            font-size: 19px;
+        }
+        .mini-box__copy {
+            font-size: 22px;
+        }
+        .module__body {
+            font-size: @contentFontSize;
+        }
+    }
+}
+#Exercise-Diet-Portal { //exercise diet portal
+	position: relative;
+	display: block;
+    margin: 0px auto;
+    h1 {
+        position: relative;
+        display: block;
+        margin: 0px auto 12px;
+        font-weight: 600;
+        color: #fff;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: 28px;
+        line-height: 40px;
+        text-align: center;
+        padding: 100px 10px 0px;
+        max-width: 740px;
+        border: 0;
+    }
+    .intro-content,
+    .objective-content
+    {
+        width: 780px;
+        max-width: 100%;
+        padding: 1em 2.5em;
+    }
+    .intro-content {
+        padding-top: 4em;
+    }
+    .start-button-intro {
+        position: relative;
+        margin: 0px 0px 10px;
+        font-weight: 400;
+        color: rgb(255, 255, 255);
+        background: @tnthPrimaryColor;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: 18px;
+        line-height: 26px;
+        letter-spacing: 5px;
+        display: inline-block;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 26px 25px 20px;
+        width: 250px;
+        margin-top: 40px;
+    }
+    img {
+        margin: 0px auto;
+        width: 100%;
+        z-index: 0;
+        border: none;
+        border: 0;
+    }
+}
+.is-upper-banner-closed {
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 5em;
+        }
+
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        #Exercise-Diet-Portal {
+            .intro-content {
+                padding-top: 7em;
+            }
+    
+        }
+    }
+}
+
+#Exercise-Diet-Portal h2 {
+	position: relative;
+	display: block;
+	margin: 0px auto 25px;
+    font-weight: 600;
+    color: #fff;
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: 28px;
+    line-height: 1.35;
+    text-align: center;
+    padding: 1px 10px 1px;
+    max-width: 740px;
+}
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: @h2MobileFontSize;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal h1,
+    #Exercise-Diet-Portal h2 {
+        font-size: @h2FontSize;
+    }
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 2em;
+        }
+
+    }
+}
+@media (min-width: 768px) {
+    #Exercise-Diet-Portal {
+        .intro-content {
+            padding-top: 2em;
+        }
+
+    }
+}
+
+@media (min-width: 900px) {
+    #Exercise-Diet-Portal .intro-content {
+        padding-top: 7.5em;
+        margin-top: 5em;
+    }
+}
+
+
+@media (min-width: 400px) {
+    #Exercise-Diet-Portal .start-button-intro {
+        font-size: 20px;
+    }
+}
+@media (min-width: 699px) {
+    #Exercise-Diet-Portal {
+        .start-button-intro {
+            font-size: 22px;
+        }
+        .watch-button-video {
+            font-size: 22px;
+            top: 60%;
+            left: 50%;
+        }
+    }
+}
+
+#Exercise-Diet-Portal {
+    .watch-button-video {
+        margin: 0 0 10px;
+        font-weight: 400;
+        color: #fff;
+        background: @btnTruenthPrimaryColor;
+        font-style: normal;
+        font-size: 20px;
+        line-height: 26px;
+        letter-spacing: 5px;
+        display: inline-block;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 25px;
+        width: 250px;
+        margin-top: 40px;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -125px;
+        margin-top: -37px;
+        height: 74px;
+    }
+    p {
+        position: relative;
+        display: block;
+        margin: 0px auto;
+        font-weight: 500;
+        color: #fff;
+        font-family: helvetica, arial, sans-serif;
+        font-style: normal;
+        font-size: @mobileContentFontSize;
+        line-height: 1.5;
+        letter-spacing: .03em;
+        text-align: left;
+        padding: 20px 12px;
+    }
+    h6.accent-heading {
+        color: rgb(169, 178, 183);
+        color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.7;
+        padding-bottom: 25px;
+        letter-spacing: 2.9px;
+        display: inline-block;
+        width: 100%;
+        clear: both;
+        margin: 50px auto 0;
+    }
+    ul {
+        margin: 0px auto;
+        padding: 0px;
+        padding-left: 1em;
+        width: 768px;
+        max-width: 100%;
+        li {
+            position: relative;
+            display: block;
+            font-weight: 500;
+            color: #fff;
+            font-style: normal;
+            font-size: @mobileContentFontSize;
+            line-height: 1.3em;
+            letter-spacing: .03em;
+            text-align: left;
+            background-image: url('../img/white-triangle-bullet.png');
+            background-repeat: no-repeat;
+            background-position: left 10px;
+            padding-left: 20px;
+            padding-bottom: 5px;
+            margin-left: 0;
+            list-style-position: outside;
+            list-style-type: none;
+        }
+    }
+}
+
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal p {
+        font-size: @contentFontSize;
+    }
+}
+@media (min-width: 600px) {
+    #Exercise-Diet-Portal ul li {
+        font-size: @contentFontSize;
+    }
+}
+
+.intro-module.intro-intro  {
+    position: relative;
+    margin-top: -4em;
+    height: 100%;
+}
+@media (min-width: 500px) {
+    height: 700px;
+}
+@media (min-width: 900px) {
+    .intro-module.intro-intro  {
+        margin-top: -6em;
+    }
+}
+.video-module.video-testimonial-hero {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-position: top center;
+    overflow: hidden;
+}
+.video-module iframe {
+    position: absolute;
+    left: 20px;
+    width: calc(100% - 40px);
+    height: 100%;
+    top: 0;
+}
+@media (min-width: 900px) {
+    .video-module iframe {
+        position: absolute;
+        left: 28px;
+        width: calc(100% - 56px);
+        height: 100%;
+        top: 0;
+    }
+}
+
+.video-module img {
+    visibility: hidden !important;
+    width: calc(100% - 50px) !important;
+    position: relative;
+    margin: 0;
+    top: 0;
+    padding: 0;
+}
+@media (min-width: 699px) {
+    .video-module img {
+        width: calc(100% - 65px) !important;
+    }
+}
+@media (min-width: 900px) {
+    .video-module img {
+        width: calc(100% - 87px) !important;
+    }
+}
+@media (min-width: 1100px) {
+    .video-module.video-testimonial-hero {
+        background-position: 100%;
+    }
+}
+
+@media (min-width: 1376px) {
+    .video-module img {
+        width: calc(100% - 97px) !important;
+    }
+}
+
+.intro-module, .video-module, .objective-module {
+	margin: 0px auto;
+	z-index: 0;
+	text-align: center;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: top center;
+    border: none;
+    padding: 0px 0px 40px 0px;
+	width: 100%;
+}
+.intro-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.video-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.objective-content {
+	margin: 0px auto;
+	z-index: 100;
+	text-align: center;
+}
+.toolbox {
+	position: relative;
+	width: 97%;
+    max-width: 100%;
+	height: 14em;
+    background: rgba(57, 56, 51, 0.8);
+	padding: 10px;
+	margin: 10px auto;
+    display: flex;
+    justify-content: flex-end;
+}
+@media (min-width: 585px) {
+    .toolbox {
+        height: 170px;
+        padding: 10px 24px;
+    }
+}
+.toolbox h5 {
+    color: #fff;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: @miniBoxFontSize;
+    line-height: 28px;
+    letter-spacing: .05em;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+.toolbox h6 {
+    color: rgb(169, 178, 183);
+    color: #7d959d;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    clear: both;
+    margin: 10px auto 10px;
+}
+.toolbox h6 em {
+    font-size: 6px;
+    line-height: 1;
+    font-style: normal;
+    position: relative;
+    top: 1px;
+    vertical-align: super;
+}
+
+.toolbox h6 span {
+    color: rgb(169, 178, 183);
+    color: #bcc2a7;
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 2.9px;
+    display: block;
+    margin: 10px auto 10px;
+}
+
+.toolbox-start-button {
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    background: @btnTruenthPrimaryColor;
+    font-family: helvetica, arial, sans-serif;
+    font-style: normal;
+    font-size: @mobileButtonFontSize;
+    line-height: 26px;
+    letter-spacing: 5px;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 1em 6px;
+    width: 210px;
+    margin: 20px 10px 20px;
+    height: 70px;
+    &:hover {
+        background: @btnTruenthPrimaryHoverColor;
+    }
+}
+@media (min-width: 518px) {
+    .toolbox-start-button {
+        font-size: @buttonFontSize;
+        padding: 25px;
+    }
+}
+
+.toolbox .icon-box {
+    background: #333638;
+    color: #fff;
+    display: block;
+    padding: 20px 20px 20px 135px;
+    margin: 0 10px 0 0;
+    position: relative;
+    min-height: 130px;
+    max-height: 100%;
+}
+
+
+@media (min-width: 500px) {
+    .middle-content {
+        margin-right: 50px;
+    }
+}
+ul.intro-li { /* Intro page ul li */
+	padding: 4px 12px 8px;
+    max-width: 100%;
+    width: 100%;
+    margin: auto;
+    li {
+        font-weight: 500;
+        font-style: normal;
+        font-size: @mobileContentFontSize;
+        line-height: 1.45em;
+        text-align: left;
+        color: #FFF;
+        background-image: url('../img/white-triangle-bullet.png');
+        background-repeat: no-repeat;
+        background-position: left 12px;
+        padding-left: 20px;
+        padding-bottom: 5px;
+        margin-left: 8px;
+        list-style-position: outside;
+        list-style-type: none;
+        position: relative;
+        left: 0;
+        b {
+            font-weight: 500 !important;
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    ul.intro-li li{
+        font-size: @contentFontSize;
+    }
+}
+
+@media (min-width: 992px) {
+    ul.intro-li li{
+        margin: auto;
+        width: 735px;
+        max-width: 100%;
+        position: relative;
+    }
+}
+#Recipe-Accordions {
+	position: relative;
+    margin: -4px auto 0;
+    padding: 0 20px 68px;
+    background-color: @lightGreenBackgroundColor;
+    table {
+        h6 {
+            text-transform: uppercase;
+            color: @highlightColor;
+            letter-spacing: 1.2px;
+            margin: auto;
+            text-align: center;
+            min-height: 80px;
+        }
+    }
+    .healthy-fats-accordion,
+    .vegetables-accordion,
+    .fish-accordion,
+    .tomatoes-accordion,
+    .alternatives-accordion,
+    [role='tabpanel']
+     {
+        &.collapse {
+            padding: 0 20px 0;
+        }
+        position: relative;
+        max-width: 100%;
+        border-radius: 0;
+        table {
+            margin-bottom: 0;
+        }
+        h4 {
+            display: block;
+            position: relative;
+            padding: 18px 12px 16px;
+            margin-bottom: 4px;
+            &:after {
+                content: "\f107";
+                font-family: FontAwesome;
+                font-style: normal;
+                font-weight: normal;
+                display: block;
+                position: absolute;
+                bottom: 4px;
+                width: 10px;
+                right: 4.5%;
+                top: 25%;
+            }
+            a {
+                display: block;
+                width: 100%;
+                height: 100%;
+                padding: 0px 20px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-radius: 0;
+            }
+        }
+    }
+}
+@media (min-width: 699px) {
+    #Recipe-Accordions {
+        padding: 0 40px 68px;
+    }
+}
+@media (min-width: 768px) {
+    #Recipe-Accordions {
+        .healthy-fats-accordion,
+        .vegetables-accordion,
+        .fish-accordion,
+        .tomatoes-accordion,
+        .alternatives-accordion,
+        [role='tabpanel'] {
+            max-width: 650px;
+        }
+    }
+}
+
+#Recipe-Accordions [role='tabpanel'] {
+    opacity: 0.1;
+    transition: opacity 350ms ease;
+}
+#Recipe-Accordions [role='tabpanel'].visited {
+    opacity: 1;
+}
+
+.healthy-fats-accordion, .vegetables-accordion, .tomatoes-accordion, .fish-accordion, .alternatives-accordion {
+	position: relative;
+	margin: 1px auto 4px;
+	padding: 0 20px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.healthy-fats-accordion h4, .vegetables-accordion h4, .tomatoes-accordion h4, .fish-accordion h4, .alternatives-accordion h4 {
+	position: relative;
+	display: block;
+	margin: 1px auto 0px;
+	padding: 0px;
+	font-size: @mobileContentFontSize;
+	font-weight: 600;
+	letter-spacing: .03em;
+	background-color: @btnTruenthPrimaryColor;
+	color: #fff;
+	padding: 18px 20px 16px 12px;
+	margin: 0px 0px 0px -0px;
+	min-height: 30px;
+	border-radius: 0;
+    text-align: center;
+    cursor:pointer;
+}
+@media (min-width: 992px) {
+    .healthy-fats-accordion h4, .vegetables-accordion h4, .tomatoes-accordion h4, .fish-accordion h4, .alternatives-accordion h4 {
+        font-size: @contentFontSize;
+    }
+}
+.healthy-fats-accordion h4:hover, .vegetables-accordion h4:hover, .tomatoes-accordion h4:hover, .fish-accordion h4:hover, .alternatives-accordion h4:hover {
+	background-color: @btnTruenthPrimaryHoverColor;
+}
+
+.healthy-fats-accordion h4 a, 
+.vegetables-accordion h4 a, .tomatoes-accordion h4 a, .fish-accordion h4 a, .alternatives-accordion h4 a {
+	color: #fff;
+}
+.collapse {
+	padding: 12px 20px 12px;
+	margin: 0px auto 10px;
+	border-top: none;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+    -webkit-transition: margin 200ms, padding 200ms;
+    transition: margin 200ms, padding 200ms;
+}
+.collapse td {
+    font-weight: 500;
+    line-height: 1.2em;
+    font-size: 14px;
+    letter-spacing: .01em;
+    font-style: normal;
+    color: @btnTruenthPrimaryColor;
+    text-align: center;
+    vertical-align: middle;
+    margin: 0px 2px 3px;
+    text-decoration: none;
+    width: auto;
+    width: 33%;
+}
+.collapse td a {
+    outline: none;
+    outline-offset: 0;
+    text-decoration: none;
+    font-weight: 600;
+    line-height: 1.2em;
+    font-size: 15px;
+    letter-spacing: .01em;
+    font-style: normal;
+    color: @btnTruenthPrimaryColor;
+    text-align: center;
+    vertical-align: middle;
+    width: auto;
+    margin: 0px;
+    text-decoration: none;
+}
+
+.collapse.in td a {
+    color: #FFF;
+}
+
+td.collapse.in a:focus {
+    outline: none;
+    outline-offset: 0;
+    text-decoration: none;
+}
+
+img.recipe-table-image {
+    -webkit-transition: transform 300ms ease-in-out;
+    -o-transition: transform 300ms ease-in-out;
+    -moz-transition: transform 300ms ease-in-out;
+    transition: transform 300ms ease-in-out;
+}
+#healthy-fats.collapse.in img.recipe-table-image,
+#vegetables.collapse.in img.recipe-table-image,
+#tomatoes.collapse.in img.recipe-table-image,
+#fish.collapse.in img.recipe-table-image,
+#alternatives_to_processed_meats.collapse.in img.recipe-table-image {
+	position: relative;
+    border: 1px solid transparent;
+    display: block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 4px;
+    width: 90%;
+    height: auto;
+}
+
+#diet-table,
+#avoid-foods-table {
+    table-layout: fixed;
+    p {
+        margin: 0 5px 0;
+    }
+    td {
+        cursor: pointer;
+        &.filler-cell {
+            cursor: auto;
+        }
+        &.filler-cell:hover {
+            background-color: @cellBackgroundColor;
+        }
+        .filler-item {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}
+@media (min-width: 699px) {
+    #diet-table,
+    #avoid-foods-table {
+        td {
+            .filler-item {
+                width: 30%;
+            }
+        }
+    }
+}
+#avoid-foods-table {
+    td {
+        vertical-align: middle;
+    }
+}
+#diet-table img,
+#avoid-foods-table img {
+	margin: 8px 2px 2px;
+	padding: 0;
+	width: 100%;
+	max-width:90px;
+	height: auto;
+	border: none;
+}
+
+#diet-table ul {
+	padding: 3px 3px 10px;
+	padding: 3px 0px 10px;
+    margin-bottom: 0px;
+    li {
+        font-weight: 500;
+        font-style: normal;
+        line-height: 1.2em;
+        letter-spacing: .02em;
+        text-align: left;
+        color: #FFF;
+        background-image: url('../img/green-triangle-bullet.png');
+        background-repeat: no-repeat;
+        background-position: left 4px;
+        padding-left: 16px;
+        padding-bottom: 5px;
+        margin-left: 12px;
+        list-style-position: outside;
+        list-style-type: none;
+    }
+}
+
+#healthy-fats img,
+#nuts img,
+#vegetables img,
+#tomatoes img,
+#fish img,
+#processed-meats img,
+#poultry img,
+#whole-milk img,
+#supplements img {
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+	padding: 0px;
+	z-index: 1;
+	width: 100%;
+	margin: -90px auto 0;
+    position: relative;
+}
+.modal-copy {
+    #processed-meats,
+    #poultry,
+    #whole-milk,
+    #supplements {
+        b, strong {
+            color: @modalHighlightColor;
+            font-weight: 600;
+            letter-spacing: .01em;
+        }
+    }
+}
+
+#healthy-fats.cell-hover, #vegetables.cell-hover, #tomatoes.cell-hover, #fish.cell-hover, #alternatives_to_processed_meats.cell-hover {
+    background-color: @cellHoverColor;
+}
+
+
+#ED-Intro, #ED-Exercise, #ED-Diet, #ED-Recipes {
+	position: relative;
+	padding: 0px;
+    margin: 0px auto;
+	width: 100%;
+    max-width: 100%;
+    background-color: @mainBackgroundColor;
+    &.light-blue-theme {
+        background-color: @lightBlueBackgroundColor;
+    }
+    &.light-green-theme {
+        background-color: @lightGreenBackgroundColor;
+    }
+    p {
+        color: #FFF;
+    }
+}
+
+#ED-Intro {
+    padding: 40px 0 0;
+}
+@media (min-width: 992px) {
+    #ED-Intro, #ED-Exercise, #ED-Recipes {
+        padding: 0 20px;
+        max-width: 925px;
+    }
+}
+#Intro-Hero {
+	width: 100%;
+    padding: 0;
+    padding: 40px 0 0;
+    height: 100%;
+}
+@media (min-width: 481px) {
+    #ED-Intro #Intro-Hero {
+        padding: 40px 0 0;
+    }
+    .is-upper-banner-closed {
+        #ED-Intro #Intro-Hero {
+            padding: 0 0 0;
+        }
+    }
+   
+}
+
+#ED-Exercise #Intro-Hero {
+    padding: 64px 0 0;
+}
+@media (min-width: 768px) {
+    #Intro-Hero,
+    #ED-Intro #Intro-Hero,
+    #ED-Exercise #Intro-Hero {
+       padding: 0;
+    }
+}
+
+.Hero-image, .Hero.image {
+	position: relative;
+    z-index: 0;
+    width: 100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center 22%;
+}
+#ED-Exercise {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: @ExerciseOverlayBackgroundColor;
+            z-index: 2;
+            opacity: 0.3;
+        }
+    }
+    .content__chunk {
+        width: 100%;
+        max-width: 100%;
+        margin: auto;
+    }
+    .sub__heading, .content__chunk {
+        margin-bottom: 24px;
+    }
+}
+
+#ED-Recipes {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: @RecipieOverlayBackgroundColor;
+            z-index: 2;
+            opacity: 0.5;
+        }
+    }
+}
+
+#ED-Intro {
+    .Hero-image, .Hero.image {
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: @IntroOverlayBackgroundColor;
+            z-index: 2;
+            opacity: 0.2;
+        }
+    }
+}
+
+@media (min-width: 1400px) {
+    .Hero-image, .Hero.image {
+        height: 712px;
+    }
+}
+
+#Intro-Hero img {
+    width: 100%;
+}
+
+.Hero-title  {
+    position: absolute;
+	width: 100%;
+    text-align: center;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    margin: 15% auto;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+}
+
+@media (min-width: 699px) {
+    .Hero-title {
+        //margin: 20% auto;
+        margin: 12.5% auto;
+    }
+}
+@media (min-width: 768px) {
+    .Hero-title {
+        //margin: 17% auto;
+        margin: 15% auto;
+    }
+}
+@media (min-width: 1400px) {
+    .Hero-title {
+        margin: 15% auto;
+    }
+}
+.Hero-title h2 {
+    border: none;
+    font-size: 29px;
+    line-height: 1.3em;
+    padding: 12px 30px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: .03em;
+    margin: 0;
+    position: relative;
+    height: 50px;
+}
+@media (min-width: 699px) {
+    .Hero-title h2 {
+        font-size: @h2MobileFontSize;
+    }
+}
+@media (min-width: 699px) {
+    .Hero-title h2 {
+        height: 212px;
+        font-size: @heroTitleFontSize;
+        &:after,
+        &:before {
+            content: "\EA03";
+            display: inline-block;
+            font-family: symbols;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            font-size: 0.75em;
+            color: @calloutTextColor;
+            z-index: 10;
+        }
+        &:after {
+            -moz-animation: bounce 2s 10;
+            -webkit-animation: bounce 2s 10;
+            animation: bounce 2s 10;
+            animation-delay: 1.75s;
+        }
+        &:before,
+        .callout-text {
+            content: "Learn More";
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+            color: @calloutTextColor;
+            margin-top: 0px;
+            text-transform: uppercase;
+            letter-spacing: 2.9px;
+            text-align: center;
+            margin: auto;
+            font-family: @bodyFontFamily;
+            left: 50.25%;
+            bottom: 64px;
+            width: 140px;
+            margin-left: -62.5px;
+            z-index: 1;
+        }
+        &:hover:before,
+        &:hover:after {
+            cursor: pointer;
+            color: darken(#FFF, 10%);
+        }
+    }
+    #ED-Intro {
+        .Hero-title h2 {
+            &:before,
+            &:after {
+                color: #FFF;
+            }
+        }
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    40% {
+      transform: translateY(15px) scale(1.1);
+    }
+    60% {
+      transform: translateY(15px) scale(1.1);
+    }
+}
+
+#ED-Intro #Intro-content {
+    padding: 0 40px;
+    margin: 0px auto;
+}
+#ED-Exercise #Intro-content {
+    padding: 0;
+    margin: 0px auto;
+}
+#ED-Intro #Intro-content {
+    padding: 0 20px;
+}
+@media (min-width: 699px) {
+    #ED-Intro #Intro-content {
+        padding: 0;
+    }
+}
+#ED-Exercise #Intro-content {
+    position: relative;
+    .content {
+        width: 100%;
+        margin: 24px auto 48px;
+        max-width: 100%;
+        text-align: center;
+        padding: 0 28px;
+    }
+    h3.content {
+        margin-bottom: 0;
+    }
+}
+@media (min-width: 699px) {
+    #ED-Exercise #Intro-content {
+        h3.content {
+            margin-bottom: 40px;
+        }
+
+    }
+}
+@media (min-width: 768px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 85%;
+            margin: 16px auto 20px;
+            padding: 20px 0;
+        }
+        h3.content {
+            margin-bottom: 20px;
+        }
+
+    }
+}
+@media (min-width: 992px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 780px;
+            margin: 8px auto 40px;
+        }
+    }
+}
+@media (min-width: 1200px) {
+    #ED-Exercise #Intro-content {
+        .content {
+            width: 880px;
+        }
+    }
+}
+#ED-Recipes #Intro-Hero {
+    position: relative;
+}
+
+#ED-Diet #Intro-content {
+    padding: 0 12px;
+	position: relative;
+    margin: 0px auto;
+    max-width: 100%;
+}
+@media (min-width: 699px) {
+    #ED-Diet #Intro-content {
+        padding: 0 40px 24px;
+    }
+}
+
+#ED-Recipes #Intro-content {
+    padding: 0 20px;
+	position: relative;
+    margin: 0px auto;
+    max-width: 100%;
+}
+
+#ED-Recipes #Intro-content {
+    padding: 32px 32px;
+    padding-bottom: 42px;
+    h3 {
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+}
+
+@media (min-width: 768px) {
+    #ED-Recipes #Intro-content {
+        max-width: 80%;
+    }
+}
+@media (min-width: 992px) {
+    #ED-Exercise #Intro-content {
+        padding: 20px 0 0;
+        max-width: 100%;
+    }
+    #ED-Diet #Intro-content {
+        .content {
+            width: 880px;
+            margin: auto;
+            margin-bottom: 42px;
+        }
+    }
+    #ED-Recipes #Intro-content {
+        margin: 0 auto;
+    }
+}
+@media (min-width: 1200px) {
+    #ED-Recipes #Intro-content {
+        width: 880px;
+    }
+}
+#ED-Intro .section {
+    padding: 20px 20px 32px;
+    text-align: center;
+    &.resources {
+        background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll bottom center;
+        background-size: cover;
+        padding: 20px 40px 72px;
+        position: relative;
+        z-index: 1;
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: #262A22;
+            opacity: 0.5;
+            z-index: -1;
+        }
+    }
+    &:first-of-type,
+    &:last-of-type {
+        border-top: 0;
+    }
+}
+@media (min-width: 699px) {
+    #ED-Intro .section {
+        padding: 20px 32px 32px;
+    }
+}
+@media (min-width: 992px) {
+    #ED-Intro .section {
+        padding: 20px 20px 32px;
+    }
+}
+
+#Intro-content {
+    p {
+        position: relative;
+        padding: 0px 16px;
+        margin: 0px 5px 10px;
+        line-height: 1.5;
+        font-size: @mobileContentFontSize;
+        width: 100%;
+        max-width: 100%;
+    }
+    p.content {
+        font-size: @contentFontSize;
+    }
+    p.sub__heading {
+        font-size: @mobileSubheadingFontSize;
+    }
+}
+#ED-Intro {
+    #Intro-content {
+        p {
+            line-height: 1.65;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Intro-content {
+        p {
+            font-size: @contentFontSize;
+            padding: 0 12px;
+            &.content {
+                font-size: @contentPromptFontSize;
+            }
+            &.sub__heading {
+                font-size: @contentSubheadingFontSize;
+                line-height: 1.4;
+            }
+        }
+    }
+    #ED-Intro {
+        #Intro-content p {
+            font-size: @contentFontSize;
+            width: 780px;
+            margin: 0px auto 10px;
+            padding: 0 28px;
+        }
+    }
+}
+@media (min-width: 992px) {
+    #ED-Intro {
+        #Intro-content p {
+            padding: 0 32px;
+        }
+    }
+}
+.start-button {
+    font-size: @mobileButtonFontSize;
+    line-height: 2.75em;
+    letter-spacing: 5px;
+    display: block;
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff;
+    width: 325px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 32px 0 40px;
+    &:hover {
+        .figure {
+            color: #FFF;
+        }
+    }
+    a {
+        color:	#fff;
+        background-color: @btnTruenthPrimaryColor;
+        text-decoration: none;
+        transition: all 0.3s ease-out;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 12px 4px 10px;
+        &:hover {
+            color: #fff;
+            background-color: @btnTruenthPrimaryHoverColor;
+            text-decoration: none;
+        }
+    }
+    .figure {
+        position: relative;
+        top: -1px;
+    }
+}
+@media (min-width: 768px) {
+    .start-button {
+        font-size: @startButtonFontSize;
+    }
+}
+
+#Resources {
+    background: transparent url(/exercise-and-diet/exercise_diet/static/img/objective-background.jpg) no-repeat scroll center center;
+    background-size: cover;
+    position: relative;
+    z-index: 6;
+     max-width: 100%;
+     margin: 0 auto 0;
+     padding: 20px 40px 40px;
+    .YMCA-resource-container {
+         margin-top: 4px;
+        .prompt {
+            margin-bottom: 12px;
+        }
+    }
+    hr {
+        display: none;
+    }
+    input { //text input
+        text-align: center;
+    }
+    input[type="text"] {
+        display: inline-block;
+        color: @bodyTextColor;
+        background: @inputBackgroundColor;
+        height: 48px;
+        padding: 5px;
+        border: 2px solid @inputBackgroundColor;
+        min-width: 150px;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .button-container {
+        min-width: 130px;
+        display: inline-block;
+        background: @btnTruenthPrimaryColor;
+        color: #FFF;
+        &:after {
+            position: absolute;
+            top: 25%;
+            right: 9%;
+        }
+        &:hover {
+            background-color: @btnTruenthPrimaryHoverColor;
+           
+        }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+    input[type='submit'] {
+        background-color: transparent;
+        border: 0;
+        color: #FFF;
+        padding: 12px 16px 10px;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: inline-block;
+        position: relative;
+        margin-right: 16px;
+        &:hover {
+            background-color: @btnTruenthPrimaryHoverColor;
+            border: 0;
+        }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+   
+    h3 {
+        text-transform: capitalize;
+        text-align: center;
+    }
+    p {
+        margin: 0px;
+        font-size: @miniBoxFontSize;
+        line-height: 1.65;
+        letter-spacing: .02em;
+        font-weight: 500;
+        font-style: normal;
+        color: #FFF;
+        padding: 0 0.5em;
+        text-align: center;
+        a {
+            margin: 0px;
+            font-size: 1em;
+            line-height: 1.4em;
+            letter-spacing: .02em;
+            font-weight: 500;
+            font-style: normal;
+            color: @resourceLinkColor;
+        }
+        &.mini__head {
+            font-size: @miniBoxTitleFontSize;
+            margin: 10px 0 12px;
+            text-align: center;
+        }
+    }
+    .btn-primary {
+        color: #fff;
+        background: #7c959d;
+        border: none;
+        margin: 24px auto 12px;
+        padding: 14px 20px 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 16px;
+        font-weight: 400;
+        text-shadow: none;
+        border-radius: 0;
+        text-align: center;
+        width: 286px;
+        max-width: 100%;
+        display: block;
+        white-space: normal;
+        word-wrap: break-word;
+        &:hover {
+            color: #fff;
+            background: @btnTruenthPrimaryHoverColor;
+            border: none;
+        }
+        &:hover:after {
+            color: #FFF;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #Resources {
+        margin: auto;
+        padding: 4% 5% 6%;
+    }
+    #ED-Diet {
+        #Resources {
+            width: 100%;
+            margin: 20px auto 0;
+        }
+    }
+}
+
+.modal-open .modal.ED__modal.is-modal-active {
+    display: block !important;
+}
+body.modal-open {
+    overflow: hidden;
+}
+body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
+    width: 100%;
+    max-width: 100%;
+}
+@media (min-width: 699px) {
+    body.modal-open .modal.ED__modal.is-modal-active .modal-dialog {
+        width: 624px;
+    }
+}
+.modal-nav { /*.modal button */
+	position: relative;
+    margin: 32px 8px 0;
+	padding: 1rem;
+	text-align: center;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-between;
+}
+.modal-nav span {
+	height: auto;
+}
+.modal-nav span span {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-nav span span a {
+    flex: 0 0 100%;
+}
+
+.left-button, .right-button {
+    background: @btnTruenthPrimaryColor;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    min-width: 176px;
+    min-height: 32px;
+    flex: 0 0 45%;
+    padding: 16px 16px 16px;
+    margin-bottom: 12px;
+    line-height: 1.4 !important;
+    color: #FFF;
+    a:hover {
+        background: @btnTruenthPrimaryHoverColor !important;
+        color: #FFF !important;
+    }
+    &:hover {
+        background: @btnTruenthPrimaryHoverColor;
+        color: #FFF;
+        .figure {
+            color: #FFF;
+        }
+    }
+    .figure {
+        float: left;
+        margin-top: 0;
+        margin-left: 8px;
+        margin-right: 8px;
+        position: relative;
+        top: -1px;
+    }
+    a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    a,span {
+        color: #FFF;
+        font-size: 15px !important;
+    }
+}
+
+span.left-button:hover, span.right-button:hover {
+    background: @btnTruenthPrimaryHoverColor;
+    color: #FFF;
+}
+span.left-button {
+    .figure {
+        float: left;
+    }
+}
+span.right-button {
+    .figure {
+        float: right;
+    }
+}
+span.left-button a,
+span.right-button a  {
+    color: #FFF;
+    text-decoration: none;
+    font-size: 16px !important;
+}
+.ED__modal {
+    .modal-open .modal {
+        overflow-x: hidden;
+        overflow-y: auto;
+        margin: 0 auto;
+    }
+    .modal-footer {
+       border-top: 0;
+       margin-top: 8px;
+       padding: 8px 15px 15px;
+    }
+    .modal-content {
+        border-radius: 0;
+        text-align: right;
+        h2 {
+            font-size: @modalHeadingSize;
+            font-weight: @modalHeaderFontWeight;
+            text-align: center;
+            color: @modalHeadingColor;
+            padding: 28px 11.5% 20px;
+            &:after {
+                content: " ";
+                display: block;
+                width: 104px;
+                margin-top: 24px;
+                height: 1px;
+                background: @modalHeadingColor;
+                margin: 20px auto 0;
+                opacity: 0.5;
+            }
+            em {
+                font-weight: @modalHeaderFontWeight;
+                letter-spacing: 0;
+            }
+        }
+        a {
+            overflow-wrap: break-word;
+            &:hover {
+                text-decoration: none;
+                color: @btnTruenthPrimaryHoverColor;
+            }
+        }
+        h3, h4 {
+            text-transform: none;
+        }
+        strong, b {
+            color: @modalHighlightColor;
+            font-weight: 600;
+        }
+        .insert-blob {
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+        td {
+            color: #333;
+            background-color: @modalCellBackgroundColor;
+            border: 1px solid @modalCellBorderColor;
+            line-height: 1.45;
+            padding: 12px;
+            strong, b {
+                color: @darkenHighlightColor;
+                font-weight: 600 !important;
+                font-style: normal;
+                text-transform: uppercase;
+                font-size: 16px;
+                letter-spacing: 0.5px;
+            }
+            &:hover {
+                background-color: @modalCellBackgroundColor;
+                cursor: auto;
+            }
+        }
+        p {
+            padding: 0;
+            line-height: 1.5;
+        }
+        ol {
+            padding-left: 24px;
+            &.references {
+                list-style-type: disc;
+                padding: 8px 24px;
+            }
+        }
+        .collapsible-content, .collapse {
+            padding: 12px 20px;
+            border: 1px solid @HRColor;
+        }
+        .collapsible-content td,
+        .collapse td {
+            text-align: left;
+            width: auto;
+        }
+    }
+    .box-modal.modal-content {
+        text-align: center;
+    }
+    .modal-body {
+        position: relative;
+        border-radius: 0;
+        text-align: right;
+        padding: 0px;
+        font-size: @modalBodyFontSize;
+        p, ul, ol, li, span {
+            font-size: @modalBodyFontSize;
+            line-height: 1.55;
+            &.smaller-text {
+                font-size: @smallerTextFontSize !important;
+            }
+        }
+        &.load:before { //before modal content loads
+            position: absolute;
+            content: "";
+            display: block;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            background: #FFF;
+            opacity: 0.7;
+            z-index: 10;
+        }
+        &.load:after {
+            position: absolute;
+            content: "Loading...";
+            display: block;
+            left: 45%;
+            top: 25%;
+            z-index: 11;
+        }
+        .loader {
+            background: #FFF;
+            min-height: 10vh;
+            text-align: center;
+            padding: 24px;
+            opacity: 1;
+            transition: opacity ease 500ms;
+        }
+        &.load {
+            .loader {
+                opacity: 0;
+            }
+        }
+    }
+    
+    .modal-body img {
+        border-radius: 0;
+        display: inline-block;
+        padding: 0;
+        z-index: 1;
+        width: 100%;
+    }
+    
+    #modal-copy {
+        text-align: left;
+        padding: 0 24px;
+    }
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-secondary b {
+        color: @btnTruenthPrimaryColor;
+        background-color: white;
+        border: none;
+        border-radius: none;
+        font-weight: 500 !important;
+        font-style: normal;
+        font-size: 16px !important;
+        line-height: 1.4em;
+        letter-spacing: 1.2px;
+        text-align: right;
+        text-transform: uppercase;
+        padding: 0px 4px 0px 0px;
+    }
+
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-secondary:hover,
+    .modal-footer .btn-secondary b:hover {
+        color: @btnTruenthPrimaryHoverColor;
+    }
+    .modal-footer .btn-secondary span {
+        font-weight: 500 !important;
+        color: @btnTruenthPrimaryColor;
+        padding: 4px;
+        letter-spacing: 1.2px;
+        cursor: pointer;
+    }
+    .modal-footer .btn-secondary span:hover {
+        color: @btnTruenthPrimaryHoverColor;
+    }
+    
+    .modal-body button.btn.btn-secondary-top b {
+        color: lighten(@btnTruenthPrimaryColor, 20%);
+        background-color: transparent;
+        border: none;
+        font-weight: 500 !important;
+        font-style: normal;
+        font-size: 16px !important;
+        letter-spacing: 1.2px;
+        text-align: right;
+        text-transform: uppercase;
+        padding: 0px 0px 0px 0px;
+        z-index: 10;
+        position: absolute;
+        margin: 4px -56px;
+        display: none;
+    }
+
+    .modal-body button.btn.btn-secondary-top {
+        background: transparent;
+    }
+    
+    .modal-body button.btn.btn-secondary-top span {
+        font-weight: 500 !important;
+        background: @btnTruenthPrimaryColor;
+        color: #FFF;
+        border: none;
+        letter-spacing: .2px;
+        cursor: pointer;
+        z-index: 10;
+        position: relative;
+        margin: 4px 0 8px;
+        display: inline-block;
+        font-size: 24px;
+        width: 36px;
+        height: 36px;
+        //padding: 8px;
+        opacity: 0.7;
+        &.white-theme {
+            color: @btnTruenthPrimaryHoverColor;
+            background: #FFF;
+        }
+    }
+    .modal-body button.btn.btn-secondary-top span:hover {
+       background: @btnTruenthPrimaryHoverColor;
+       color: #FFF;
+    }
+}
+.ED__modal {
+    &.modal.fade.in {
+        li {
+            font-weight: 500;
+            font-style: normal;
+            line-height: 1.4;
+            text-align: left;
+            background-image: url('../img/green-triangle-bullet.png');
+            background-repeat: no-repeat;
+            background-position: left 8px;
+            padding-left: 16px;
+            padding-bottom: 5px;
+            margin-left: 12px;
+            list-style-position: outside;
+            list-style-type: none;
+        }
+        td {
+            li {
+                margin-left: 0;
+            }
+        }
+    }
+    
+    &.modal.fade.in h3 {
+        position: relative;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: .02em;
+        color: @modalSubHeadingColor;
+        text-align: left;
+        border-bottom: 1px solid @modalHeadingBorderColor;
+        padding: 4px 0px;
+        margin: 12px auto 8px;
+        b {
+            color: @modalSubHeadingColor;
+        }
+    }
+    
+    &.modal.fade.in ul {
+        padding: 4px 0px 0px;
+        margin-bottom: 0px;
+        &.negative-bottom {
+            margin-bottom: -4px;
+        }
+    }
+}
+#ED-Intro {
+    h3 {
+        font-size: @h3MobileFontSize;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: @highlightColor;
+        text-align: center;
+        padding: 28px 0 5px;
+        margin-top: 0px;
+    }
+    .clearfix {
+        height: 0;
+    }
+}
+@media (min-width: 768px) {
+    #ED-Intro h3 {
+        font-size: 36px;
+        padding: 40px 0 12px;
+    }
+}
+.exercise-button-container {
+    position: relative;
+    z-index: 10;
+    background-color: @miniBoxContainerBackgroundColor;
+	border: 0;
+    padding: 46px 48px 56px;
+	margin: 15px auto 0;
+	width: 100%;
+	height: auto;
+    max-width: 766px;
+}
+.exercise-button {
+	padding: 16px 32px 20px;
+    width: 100%;
+    max-width: 100%;
+	margin: 12px auto 4px;
+	background-color: @miniBoxBackgroundColor;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    justify-content: space-between;
+    align-items: center;
+    h3 {
+        font-size: @miniBoxTitleFontSize !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+        color: @miniBoxHeaderColor !important;
+        text-transform: uppercase;
+        padding: 8px 8px 12px !important;
+    }
+    p {
+        padding: 0 8px !important;
+        font-size: @miniBoxFontSize !important;
+        line-height: 1.2em;
+        letter-spacing: .02em;
+        font-weight: 500;
+        font-style: normal;
+        color: #FFF;
+        margin: 0 0 10px !important;
+    }
+    .minibox__content {
+        flex-grow: 1.5;
+        text-align: center;
+    }
+}
+@media (min-width: 992px) {
+    .exercise-button {
+        width: 49.25%;
+        min-height: 264px;
+        &:nth-child(odd) {
+            margin-left: 0;
+        }
+        &:nth-child(even) {
+            margin-right: 0;
+        }
+    }
+}
+@media (min-width: 1200px) {
+    .exercise-button {
+        min-height: 232px;
+    }
+}
+.exercise-read-more {
+	font-size: 1.1em;
+	line-height: 1.3em;
+	font-weight: 500;
+	letter-spacing: .05em;
+    color: #FFF;
+    text-align: center;
+    border-top: none;
+    padding: 0;
+    margin: 16px 8px 8px;
+    text-transform: uppercase;
+    position: relative;
+    background: @infoButtonBackgroundColor;
+    width: 154px;
+    padding: 12px 12px 10px;
+    cursor: pointer;
+    &:hover {
+        background: darken(@infoButtonBackgroundColor, 15%);
+    }
+}
+
+#exercise-trainer {
+    #modal-copy {
+        margin-top: 48px;
+    }
+    .btn-secondary-top {
+        display: none;
+    }
+}
+
+#exercise-trainer.modal.fade.in h2,
+#nutrition-resources.modal.fade.in h2 {
+    position: relative;
+    margin: -42px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+}
+
+#diet-table,
+#avoid-foods-table {
+    td {
+        padding: 12px 4px;
+    }
+}
+
+@media (min-width: 992px) {
+    #diet-table, #avoid-foods-table {
+        width: 825px;
+        margin: 28px auto 0;
+    }
+    #avoid-foods-table {
+        margin: auto;
+    }
+}
+
+#diet-table tr,
+#avoid-foods-table tr {
+	padding: 3px;
+	vertical-align: top;
+	border: 1px solid @cellBorderColor;
+}
+
+
+.head-choose th,
+.head-lose th {
+	font-size: 20px;
+    line-height: 1.2em;
+    font-style: normal;
+    font-weight: 600;
+    padding: 12px;
+    color: #fff;
+    background-color:@cellCaptionHeaderColor;
+    height: 70px;
+    text-align: center;
+    letter-spacing: 1.14px;
+    vertical-align: middle;
+    border-bottom: 1px solid @cellBorderColor;
+    word-break: break-word;
+}
+
+.head-lose th span {
+	font-size: 20px;
+    line-height: 1em;
+    font-style: normal;
+    font-weight: 500;
+    color: #fff;
+    background-color: @cellCaptionHeaderColor;
+    text-align: center;
+    letter-spacing: .1em;
+    vertical-align: middle;
+    text-decoration: none;
+}
+
+
+th.categories-choose {
+	font-size: @mobileTableCellFontSize;
+    line-height: 1.5em;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 500;
+    color: #fff;
+    background-color: darken(@cellHeaderColor, 5%);
+    height: 40px;
+    text-align: center;
+    vertical-align: middle;
+    width: auto;
+    border-right: 1px solid @cellBorderColor;
+    word-break: break-word;
+}
+@media (min-width: 768px) {
+    th.categories-choose {
+        font-size: @tableCellFontSize;
+    }
+}
+h6.choose,
+h6.lose {
+    color: @highlightColor;
+    span {
+        color: @highlightColor;
+    }
+}
+h6.lose {
+    min-height: 60px;
+    padding-top: 2px;
+}
+// M O D A L s    E X E R C I S E 
+@media (max-width: 767px) {
+    body.modal-open .modal.is-modal-active .modal-dialog,
+    #exercise-works.modal.fade.in,
+    #exercise-benefits.modal.fade.in {
+        max-width: 100%;
+    }
+}
+#exercise-works.modal.fade.in table,
+#exercise-benefits.modal.fade.in table {
+    word-wrap: break-word;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    &.insert-blob {
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+}
+
+#exercise-benefits.modal.fade.in table {
+    table-layout: fixed;
+}
+
+#exercise-benefits img,
+#exercise-types img,
+#exercise-works img,
+#exercise-prescription img,
+#exercise-safety img,
+#exercise-partner img {
+    display: inline-block;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    padding: 0px;
+    z-index: 1;
+    width: 100%;
+    margin: -62px auto 15px;
+    position: relative;
+}
+
+
+#exercise-benefits.modal.fade.in h2,
+#exercise-types.modal.fade.in h2,
+#exercise-works.modal.fade.in h2,
+#exercise-prescription.modal.fade.in h2,
+#exercise-safety.modal.fade.in h2,
+#exercise-partner.modal.fade.in h2 {
+	position: relative;
+    margin: -15px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+#exercise-benefits.modal.fade.in,
+#exercise-types.modal.fade.in,
+#exercise-works.modal.fade.in,
+#exercise-prescription.modal.fade.in,
+#exercise-safety.modal.fade.in,
+#exercise-partner.modal.fade.in {
+    h4 b, h4 strong {
+        font-size: @modalBodyFontSize;
+        font-weight: 700;
+        font-style: normal;
+        line-height: 1.3em;
+        margin: 20px auto;
+    }
+}
+
+/*M O D A L s  D I E T  T A B L E */
+#healthy-fats.modal.fade.in h2,
+#nuts.modal.fade.in h2,
+#vegetables.modal.fade.in h2,
+#tomatoes.modal.fade.in h2,
+#fish.modal.fade.in h2,
+#processed-meats.modal.fade.in h2,
+#poultry.modal.fade.in h2,
+#whole-milk.modal.fade.in h2,
+#supplements.modal.fade.in h2 {
+	position: relative;
+    margin: 0px -15px 15px -15px;
+    display: block;
+    min-height: 45px;
+}
+#healthy-fats.modal.fade.in,
+#nuts.modal.fade.in,
+#vegetables.modal.fade.in,
+#tomatoes.modal.fade.in,
+#fish.modal.fade.in,
+#processed-meats.modal.fade.in,
+#poultry.modal.fade.in,
+#whole-milk.modal.fade.in,
+#supplements.modal.fade.in,
+#recipe-modal.fade.in {
+    h4 b, h4 strong {
+        font-size: 1em;
+        font-weight: 700;
+        font-style: normal;
+        line-height: 1.3em;
+        margin: 10px auto;
+    }
+}
+
+/* M O D A L s  R E C I P E S and T I P S */
+#recipe-modal .btn.btn-secondary-top {
+    position: relative;
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+#recipe-modal {
+    img {
+        padding: 0px;
+        z-index: 1;
+        width: 100%;
+        margin: -280px auto 0;
+        position: relative;
+        &.big-image {
+            margin: -560px auto 0;
+        }
+    }
+    .veggie-table {
+        td {
+            vertical-align: middle;
+            text-align: center;
+            background: #FFF;
+        }
+    }
+    img.veggie {
+        padding: 0px;
+        width: 90%;
+        position: relative;
+        margin: 1px auto 8px;
+        &.two-cols {
+            width: 45%;
+            display: block;
+        }
+    }
+}
+
+#recipe-modal.modal.fade.in h2 {
+	position: relative;
+    margin: 0px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+}
+#recipe-modal.modal.fade.in h2.shopping {
+	position: relative;
+    margin: -40px -15px 15px -15px;
+    display: block;
+    min-height: 35px;
+}
+#recipe-modal.modal.fade.in ol li {
+    font-weight: 500;
+    font-style: normal;
+    line-height: 1.4em;
+    letter-spacing: .02em;
+    text-align: left;
+    color: #404141;
+    background-image: none;
+	padding-left: 4px;
+    padding-bottom: 5px;
+    margin-left: 12px;
+    list-style-position: outside;
+    list-style-type: decimal;
+} 
+#recipe-modal.modal.fade.tip.in {
+    h2 b {
+        position: relative;
+        font-size: @modalHeadingSize;
+        font-weight: 600;
+        letter-spacing: .03em;
+        background-color: @modalHeaderBackgroundColor;
+        color: #fff;
+        text-align: left;
+        padding: 10px 10px 10px;
+        margin: -15px -15px 15px -15px;
+        display: block;
+        min-height: 45px;
+    }
+    h3 b {
+        position: relative;
+        font-size: 20px;
+        letter-spacing: .01em;
+        color: @modalSubHeadingColor;
+        text-align: left;
+        border-bottom: 1px solid @modalSubHeadingColor;
+        padding: 5px 0px;
+        margin: 20px auto 10px;
+        font-weight: 600;
+    }
+    ul {
+        padding: 3px 0px 0;
+        margin-bottom: 10px;
+        margin-bottom: 0px;
+    }
+    h4 {
+        b, strong {
+            font-size: @modalBodyFontSize;
+            font-weight: 600;
+            font-style: oblique;
+            line-height: 1.5;
+            margin: 4px auto;
+        }
+    }
+} 
+
+#ED-Intro,
+#ED-Exercise,
+#ED-Diet {
+    overflow: hidden;
+}
+
+#ED-Diet {
+    padding: 80px 20px 40px;
+    margin: 12px auto 0;
+}
+.is-upper-banner-closed {
+    #ED-Diet {
+        margin: 4px auto 0;
+    }
+}
+@media (min-width: 699px) {
+    .page-intro__content {
+        padding-top: 64px;
+    }
+}
+
+
+@media  (min-width: 768px) {
+    .container {
+        position: relative;
+        max-width: 768px;
+
+        width: 100%;
+    }
+    .is-scrolled {
+        .page-intro__content {
+            padding-top: 122px;
+        }
+    }
+    #ED-Intro, #ED-Exercise, #ED-Recipes {
+        position: relative;
+        margin: 0 auto;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    #ED-Exercise {
+        margin: 12px auto 0;
+    }
+
+    #ED-Recipe {
+        padding: 0 40px;
+        margin: -1em auto 0;
+    }
+    #ED-Diet {
+        padding: 20px 20px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .navbar-toggle {
+        display: none;
+    }
+
+    main .module-assets {
+        margin-top: -2em;
+        padding: 0 20px;
+    }
+
+    .navbar-collapse {
+        overflow-x: visible;
+        padding-right: 0px;
+        padding-left: 0px;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+        margin-right: 0px;
+        margin-left: 0px;
+    }
+
+    #ED-Exercise h3 {
+        font-size: @h3FontSize;
+        line-height: 1.35em;
+        font-weight: 600;
+        letter-spacing: .03em;
+        color: #FFF;
+        text-align: left;
+        border-top: none;
+        padding: 8px 8px 12px;
+        margin: 0;
+    }
+    .exercise-button-container {
+        background-color: @miniBoxContainerBackgroundColor;
+        padding: 58px 10% 72px;
+        margin: 15px auto 0;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        h3 {
+            color: @miniBoxHeaderColor !important;
+            font-size: @miniBoxTitleFontSize !important;
+            font-weight: @miniBoxHeaderFontWeight !important;
+        }
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 10px;
+    }
+
+    #Resources h3 {
+        letter-spacing: 1px;
+        color: @headerColor;
+        text-align: center;
+        padding: 16px 0;
+        margin-top: 8px;
+    }
+
+}
+
+@media (min-width: 900px) {
+    .page-intro__content {
+        padding-top: 214px;
+    }
+    .is-upper-banner-closed {
+        .page-intro__content {
+            padding-top: 184px;
+        }
+    }
+    #ED-Diet {
+        margin: 32px auto 0;
+    }
+    .is-upper-banner-closed {
+        #ED-Diet {
+            margin: 0 auto 0;
+        }
+    }
+}
+
+@media  (min-width: 992px) {
+    .page-intro__content {
+        padding-top: 204px;
+    }
+
+    .container {
+        position: relative;
+        max-width: 768px;
+    }
+
+    #ED-Intro, #ED-Exercise, #ED-Recipes {
+        position: relative;
+        margin: 32px auto 0;
+        padding: 0;
+        max-width: 100%;
+    }
+    #ED-Recipes {
+        margin: 8px auto 0;
+    }
+    .exercise-button-container {
+        padding: 52px 5% 60px;
+    }
+    .is-upper-banner-closed {
+        #ED-Diet {
+            margin: 32px auto 0;
+        }
+    }
+
+}
+@media  (min-width: 1200px) {
+    .container {
+        position: relative;
+        max-width: 768px;
+    }
+
+    #ED-Intro, #ED-Exercise {
+        position: relative;
+        margin: 38px auto 0;
+        padding: 0;
+    }
+    #ED-Recipes {
+        margin: 8px auto 0;
+    }
+    .exercise-button-container {
+        padding: 62px 7.5% 80px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .exercise-button-container {
+        padding: 72px 15.5% 80px;
+    }
+}
+
+@media  (max-width: 768px) {
+    .container {
+        position: relative;
+        max-width: 768px;
+        width: 100%;
+    }
+    #ED-Exercise, #ED-Recipes {
+        position: relative;
+        margin: 0 auto 0;
+        padding: 0;
+    }
+
+    .navbar-toggle {
+        display: none;
+    }
+
+    .page-intro__content,
+    .page-intro {
+        margin-top: -50px;
+        padding-top: 0;
+    }
+    
+    .page-intro {
+        margin-top: -120px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 10px;
+    }
+    .is-upper-banner-closed {
+        #ED-Diet {
+            padding: 48px 20px 32px;
+        }
+    }
+
+    #ED-Exercise h3 {
+        font-size: @h3MobileFontSize;
+        line-height: 1.2em;
+        font-weight: 600;
+        letter-spacing: .03em;
+        text-align: left;
+        border-top: none;
+        padding: 10px 0;
+        margin: 0;
+    }
+
+    #Resources h3 {
+        font-size: @h3MobileFontSize;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: @headerColor;
+        text-align: center;
+        //border-top: 1px dotted #829d64;
+        padding: 24px 0 16px;
+        margin-top: 0px;
+    }
+
+}
+@media  (max-width: 480px) {
+    #ED-Intro, #ED-Exercise, #ED-Diet {
+        position: relative;
+        margin: 0 auto;
+        padding: 0 0.1em;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #ED-Diet {
+        padding: 40px 20px 0;
+    }
+
+    .page-intro__content {
+        max-width: 100%;
+        padding-top: 8px;
+    }
+
+    #ED-Intro #Intro-content,
+    #ED-Exercise #Intro-content {
+        padding: 0 1em;
+    }
+    #ED-Intro {
+        position: relative;
+        margin: 48px auto 0;
+        padding: 0;
+        #Intro-Hero {
+            padding: 32px 0 0;
+        }
+    }
+    .is-upper-banner-closed {
+        #ED-Intro {
+            position: relative;
+            margin: 0 auto 0;
+            padding: 0;
+        }
+    }
+}
+
+@media  (max-width: 410px) {
+    #ED-Intro #Intro-content,
+    #ED-Exercise #Intro-content {
+        padding: 0 1em;
+    }
+}

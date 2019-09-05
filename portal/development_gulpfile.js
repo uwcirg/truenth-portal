@@ -11,6 +11,7 @@
 const {series, parallel, watch, src, dest} = require("gulp");
 const sourcemaps = require("gulp-sourcemaps");
 const rootPath = "./";
+const EDPath = rootPath + "/exercise_diet/";
 const GILPath = rootPath + "/gil/";
 const EPROMSPath = rootPath + "/eproms/";
 const lessPath = rootPath + "static/less";
@@ -24,6 +25,7 @@ const EPROMS = "eproms";
 const TOPNAV = "topnav";
 const PSATRACKER = "psaTracker";
 const ORGTREEVIEW = "orgTreeView";
+const ED = "exerciseDiet";
 const cleancss = require("clean-css");
 const postCSS = require("gulp-clean-css"); //gulp wrapper around clean-css to minify css
 
@@ -194,6 +196,28 @@ const orgTreeViewLess = function(callback) {
 exports.orgTreeViewLess = series(orgTreeViewLess);
 
 /*
+ * transforming exercise diet less to css
+ */
+const exerciseDietLess = function(callback) {
+    console.log("Compiling Exercise & Diet Less...");
+    src(lessPath + "/" + ED + ".less")
+        .pipe(sourcemaps.init({
+            sources: [lessPath + "/" + ED + ".less"]
+        }))
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(postCSS())
+        .pipe(sourcemaps.write(rootPath+"../maps")) /* note to write external source map files, pass a path relative to the destination */
+        .pipe(dest(EDPath + cssPath))
+        .on("end", function() {
+            replaceStd(ED + ".css.map");
+        });
+    callback();
+};
+exports.exerciseDietLess = series(exerciseDietLess);
+
+/*
  * the following tasks watch for less file changes and recompile css for each
  */
 //portal
@@ -220,7 +244,13 @@ const watchTopNavLess = () => {
 };
 exports.watchTopNavLess = series(watchTopNavLess);
 
+//watch exercise diet
+const watchExerciseDietLess = () => {
+    watch(lessPath + "/" + ED + ".less", {delay: 200}, exerciseDietLess);
+};
+exports.watchExerciseDietLess = series(watchExerciseDietLess);
+
 /*
  * compile all portal less files 
  */
-exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess));
+exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess));

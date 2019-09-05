@@ -13,27 +13,29 @@
     {{super()}}
     {% for id, content in modals.items() %}
         <!-- Modal -->
-        <div class="modal fade" id="{{ id }}" role="dialog" tabindex="-1" aria-labelledby="{{id}}Label" aria-hidden="true">
+        <div class="ED__modal modal fade" id="{{ id }}" role="dialog" tabindex="-1" aria-labelledby="{{id}}Label" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
 
                     <div class="modal-body">
                         {% trans %}
-                        <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><b>close</b><span>X</span></button>
+                        <button type="button" class="btn btn-secondary-top" data-dismiss="modal"><span>X</span></button>
                         {% endtrans %}
-                        {{ content[2]|safe }}
+                        <div class="content">
+                            {{ content[2]|safe }}
+                        </div>
                     </div>
                     {% if content[1] > 0 %}
 
                     <div class="modal-nav">
                         {% if (loop.previtem is defined) and (loop.previtem[1][1] > 0) %}
                         <span class="left-button">
-                            <a href="javascript:show_diet('{{ loop.previtem[0] }}','{{ id }}');">&larr;&nbsp;{{ loop.previtem[1][0]|safe }}</a>
+                            <a href="javascript:show_diet('{{ loop.previtem[0] }}','{{ id }}');"><span class="figure">&larr;</span>&nbsp;{{ loop.previtem[1][0]|safe }}</a>
                         </span>
                         {% endif %}
                         {% if (loop.nextitem is defined) and (loop.nextitem[1][1] > 0) %}
                         <span class="right-button">
-                            <a href="javascript:show_diet('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}&nbsp;&rarr;</a>
+                            <a href="javascript:show_diet('{{ loop.nextitem[0] }}','{{ id }}');">{{ loop.nextitem[1][0]|safe }}&nbsp;<span class="figure">&rarr;</span></a>
                         </span>
                         {% endif %}
                     </div>

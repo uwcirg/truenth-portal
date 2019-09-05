@@ -982,6 +982,51 @@
         }
       ],
       "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "dsp_add"
+        }
+      ],
+      "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "dsp_care_prefs"
+        }
+      ],
+      "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "dsp_decision_prefs"
+        }
+      ],
+      "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "dsp_demographics"
+        }
+      ],
+      "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "dsp_factors"
+        }
+      ],
+      "resourceType": "Questionnaire"
     }
   ],
   "id": "SitePersistence v0.2",
