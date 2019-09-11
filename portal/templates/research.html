@@ -2,10 +2,10 @@
 {% block main %}
   <h4 class="tnth-headline">{{_("Research Data")}}</h4>
   <hr/>
-  {% if config.STAFF_BULK_DATA_ACCESS %}
+  {% if False %}
     <div id="researchContentContainer"></div>
   {% else %}
-    <span class="muted">Content to be determined</span>
+    <span class="muted">Service temporarily unavailable, contact support for assistance.</span>
   {% endif %}
 {% endblock %}
 {%- block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/research.bundle.js') }}"></script>{% endblock -%}
