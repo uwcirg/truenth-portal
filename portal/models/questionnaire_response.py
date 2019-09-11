@@ -449,12 +449,15 @@ class QNR_indef_results(QNR_results):
                 encounter_id=qnr.encounter_id))
 
 
-def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
+def aggregate_responses(
+        instrument_ids, current_user, patch_dstu2=False, celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
+    :param patch_dstu2: set to make bundle DSTU2 compliant
+    :param celery_task: if defined, send occasional progress updates
 
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
@@ -480,6 +483,9 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
 
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+    if celery_task:
+        current, total = 0, questionnaire_responses.count()
+
     for questionnaire_response in questionnaire_responses:
         document = questionnaire_response.document_answered.copy()
         subject = questionnaire_response.subject
@@ -519,6 +525,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             }
 
         annotated_questionnaire_responses.append(document)
+
+        if celery_task:
+            current += 1
+            if current % 25 == 0:
+                celery_task.update_state(
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
 
     return bundle_results(elements=annotated_questionnaire_responses)
 

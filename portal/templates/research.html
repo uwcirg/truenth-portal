@@ -2,7 +2,7 @@
 {% block main %}
   <h4 class="tnth-headline">{{_("Research Data")}}</h4>
   <hr/>
-  {% if False %}
+  {% if config.STAFF_BULK_DATA_ACCESS %}
     <div id="researchContentContainer"></div>
   {% else %}
     <span class="muted">Service temporarily unavailable, contact support for assistance.</span>
