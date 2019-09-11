@@ -4,6 +4,7 @@ export default {
     exportLabel: i18next.t("Export"),
     dataTypesPromptLabel: i18next.t("Data type:"),
     instrumentsPromptLabel: i18next.t("Instrument(s) to export data from:"),
+    retryLabel: i18next.t("Retry"),
     dataTypes: [
         {
             id: "csv_dataType",
@@ -21,5 +22,7 @@ export default {
         dataType: "csv",
         selected: "",
         message: ""
-    }
+    },
+    exportReportTimeoutID: 0,
+    arrExportReportTimeoutID: []
 };

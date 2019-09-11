@@ -1774,7 +1774,8 @@ div.footer-wrapper.right-panel {
     top: 94%;
   }
 }
-.exportReport__popovercontent {
+.exportReport__popovercontent,
+#dataDownloadModal {
   top: 4px;
   padding-bottom: 20px;
   position: relative;
@@ -1794,6 +1795,7 @@ div.footer-wrapper.right-panel {
   .exportReport__status {
     display: inline-block;
     position: relative;
+    padding-top: 4px;
     padding-bottom: 4px;
   }
   .exportReport__status.active:before {
@@ -1809,6 +1811,22 @@ div.footer-wrapper.right-panel {
     background: darken(@btnDefaultBorderColor, 5%);
     border-radius: 100%;
     opacity: 0.6;
+  }
+  .exportReport__error {
+    .message {
+      color: @errorMessageColor;
+    }
+  }
+}
+#dataDownloadModal {
+  .exportReport__display-container {
+    display: none;
+    &.active {
+      display: block;
+    }
+  }
+  .exportReport__status.active:before {
+    top: 28px;
   }
 }
 @keyframes borderLoader {
