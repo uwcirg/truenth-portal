@@ -561,5 +561,3 @@ class TestCase(Base):
         if include_task_path:
             return task_path, results
         return results
-
-
