@@ -1782,25 +1782,29 @@ div.footer-wrapper.right-panel {
 }
 .exportReport__popovercontent,
 #dataDownloadModal {
-  .exportReport__display-container {
+  .exportReport__display-container,
+  .export__display-container {
     margin-top: 1em;
     .exportReport__retry{
       padding: 0.5em 0.7em;
       margin-top: 1em;
     }
   }
-  .exportReport__loader {
+  .exportReport__loader,
+  .export__loader {
     margin-right: 8px;
     position: relative;
     top: 4px;
   }
-  .exportReport__status {
+  .exportReport__status,
+  .export__status {
     display: inline-block;
     position: relative;
     padding-top: 4px;
     padding-bottom: 4px;
   }
-  .exportReport__status.active:before {
+  .exportReport__status.active:before, 
+  .export__status.active:before {
     position: absolute;
     animation: borderLoader 750ms infinite linear;
     display: block;
@@ -1814,21 +1818,24 @@ div.footer-wrapper.right-panel {
     border-radius: 100%;
     opacity: 0.6;
   }
-  .exportReport__error {
+  .exportReport__error,
+  .export__error {
     .message {
       color: @errorMessageColor;
     }
   }
 }
 #dataDownloadModal {
-  .exportReport__display-container {
+  .exportReport__display-container,
+  .export__display-container {
     display: none;
     margin-top: 0;
     &.active {
       display: block;
     }
   }
-  .exportReport__status.active:before {
+  .exportReport__status.active:before,
+  .export__status.active:before {
     top: 28px;
   }
 }

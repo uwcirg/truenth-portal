@@ -23,6 +23,6 @@ export default {
         selected: "",
         message: ""
     },
-    exportReportTimeoutID: 0,
-    arrExportReportTimeoutID: []
+    requestSubmittedDisplay: i18next.t("Export request submitted"),
+    failedRequestDisplay: i18next.t("Request to export report data failed.")
 };

@@ -25,15 +25,9 @@
                                 </label>
                             </div>
                         </div>
-                        <br/>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
-                        <div class="text-center exportReport__display-container">
-                            <span class="exportReport__status"></span>
-                            <span class="exportReport__percentage"></span>
-                            <span class="exportReport__result"></span>
-                            <div class="exportReport__error"><div class="message"></div></div>
-                            <div class="exportReport__retry"></div>
-                        </div>
+                        <!-- display export status -->
+                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()"></ExportDataLoader>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
@@ -50,6 +44,7 @@
 <script>
     import tnthAjax from "../modules/TnthAjax.js";
     import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
+    import ExportDataLoader from "./asyncExportDataLoader.vue";
     export default { /*global i18next */
         props: {
             instrumentsList: {
@@ -57,14 +52,17 @@
                 required: false
             }
         },
+        components: {ExportDataLoader},
         data: function() {
             return ExportInstrumentsData;
         },
         mounted: function() {
             this.getInstrumentList();
-            this.initExportUIEvent();
         },
         methods: {
+            getInitElementId: function() {
+                return "patientsDownloadButton";
+            }, 
             getInstrumentList: function () {
                 if (this.instrumentsList && this.instrumentsList.length) {
                     this.setInstrumentsListContent(this.instrumentsList);
@@ -110,10 +108,6 @@
                     $("#patientsInstrumentList").addClass("ready");
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
-                $("#dataDownloadModal").on("hide.bs.modal", function() {
-                    //reset export vis
-                    self.clearExportReportUI();
-                });
             },
             setDataType: function (event) {
                 this.instruments.showMessage = false;
@@ -121,117 +115,6 @@
             },
             getExportUrl: function() {
                 return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
-            },
-            clearExportReportTimeoutID: function() {
-                if (!this.arrExportReportTimeoutID.length) {
-                    return false;
-                }
-                let self = this;
-                for (var index=0; index < self.arrExportReportTimeoutID.length; index++) {
-                    clearTimeout(self.arrExportReportTimeoutID[index]);
-                }
-            },
-            //TODO refactor these methods so they can be re-used
-            clearExportReportUI: function() {
-                $(".exportReport__display-container").removeClass("active");
-                $(".exportReport__error .message").html("");
-                $(".exportReport__retry").addClass("tnth-hide");
-            },
-            onBeforeExportReportData: function() {
-                $("#patientsDownloadButton").attr("disabled", true);
-                $(".exportReport__display-container").addClass("active");
-                $(".exportReport__status").addClass("active");
-            },
-            onAfterExportReportData: function(options) {
-                options = options || {};
-                $("#patientsDownloadButton").attr("disabled", false);
-                $(".exportReport__status").removeClass("active");
-                if (options.error) {
-                    this.updateProgressDisplay("", "");
-                    $(".exportReport__error .message").html("Request to export report data failed.");
-                    $(".exportReport__retry").removeClass("tnth-hide");
-                    return;
-                }
-                $(".exportReport__error .message").html("");
-                $(".exportReport__retry").addClass("tnth-hide");
-            },
-            initExportUIEvent: function() {
-                const DELAY_INTERVAL = 50;
-                let self = this;
-                $("#patientsDownloadButton").on("click", function(e) {
-                    e.stopPropagation();
-                    let dataType = $(this).attr("data-type");
-                    let reportUrl = self.getExportUrl();
-                    self.updateProgressDisplay("", "");
-                    setTimeout(function() {
-                        self.onBeforeExportReportData();
-                    }, DELAY_INTERVAL);
-                    $.ajax({
-                        type: 'GET',
-                        url: reportUrl,
-                        success: function(data, status, request) {
-                            let statusUrl= request.getResponseHeader("Location");
-                            self.updateExportProgress(statusUrl, function(data) {
-                                self.onAfterExportReportData(data);
-                            });
-                        },
-                        error: function(xhr) {
-                            self.onAfterExportReportData({error: true});
-                        }
-                    });
-                });
-            },
-            updateProgressDisplay: function(status, percentage, showLoader) {
-                $(".exportReport__percentage").text(percentage);
-                $(".exportReport__status").text(status);
-                if (showLoader) {
-                    $(".exportReport__loader").removeClass("tnth-hide");
-                } else {
-                    $(".exportReport__loader").addClass("tnth-hide")
-                }
-            },
-            updateExportProgress: function(statusUrl, callback) {
-                callback = callback || function() {};
-                if (!statusUrl) {
-                    callback({error: true});
-                    return;
-                }
-                let self = this;
-                // send GET request to status URL
-                let rqId = $.getJSON(statusUrl, function(data) {
-                    if (!data) {
-                        callback({error: true});
-                        return;
-                    }
-                    let percent = "0%", exportStatus = data["state"].toUpperCase();
-                    if (data["current"] && data["total"] && parseInt(data["total"]) > 0) {
-                        percent = parseInt(data['current'] * 100 / data['total']) + "%";
-                    }
-                    //update status and percentage displays
-                    self.updateProgressDisplay(exportStatus, percent, true);
-                    let arrIncompleteStatus = ["PENDING", "PROGRESS", "STARTED"];
-                    if (arrIncompleteStatus.indexOf(exportStatus) === -1) {
-                        if (exportStatus === "SUCCESS") {
-                            setTimeout(function() {
-                                let resultUrl = statusUrl.replace("/status", "");
-                                window.location.assign(resultUrl);
-                            }.bind(self), 50); //wait a bit before retrieving results
-                        }
-                        self.updateProgressDisplay(data["state"], "");
-                        setTimeout(function() {
-                            callback();
-                        }, 300);
-                    }
-                    else {
-                        // rerun in 2 seconds
-                        self.exportReportTimeoutID = setTimeout(function() {
-                            self.updateExportProgress(statusUrl, callback);
-                        }.bind(self), 2000); //each update invocation should be assigned a unique timeoutid
-                        (self.arrExportReportTimeoutID).push(self.exportReportTimeoutID);
-                    }
-                }).fail(function() {
-                    callback({error: true});
-                });
             },
             hasInstrumentsSelection: function () {
                 return this.instruments.selected !== "" && this.instruments.dataType !== "";
