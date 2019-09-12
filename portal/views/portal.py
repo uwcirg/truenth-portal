@@ -1133,7 +1133,9 @@ def format_task_output(result):
             'Content-type': "text/csv"})
 
     elif response_format == 'json':
-        return jsonify(bundle_results(elements=data))
+        if data.get('resourceType', None) != 'Bundle':
+            return jsonify(bundle_results(elements=data))
+        return jsonify(data)
     else:
         abort(400, "unsupported response_format: '{}'".format(
             response_format))

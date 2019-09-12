@@ -639,6 +639,8 @@ def generate_qnr_csv(qnr_bundle):
     def strip_tags(html):
         """Strip HTML tags from strings. Inserts whitespace if necessary."""
 
+        if html is None:
+            return
         s = HTMLStripper()
         s.feed(html)
         stripped = s.get_data()
