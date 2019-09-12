@@ -19,7 +19,11 @@ from .questionnaire_response import aggregate_responses
 from .qb_status import QB_Status
 from .qb_timeline import qb_status_visit_name
 from .questionnaire_bank import visit_name
-from .questionnaire_response import QNR_results
+from .questionnaire_response import (
+    QNR_results,
+    qnr_csv_column_headers,
+    generate_qnr_csv,
+)
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import latest_consent
@@ -176,16 +180,14 @@ def research_report(
     })
 
     results = {
-        'data': bundle,
         'response_format': response_format,
         'required_roles': [ROLE.RESEARCHER.value]}
     if response_format == 'csv':
+        results['column_headers'] = qnr_csv_column_headers()
+        results['data'] = [i for i in generate_qnr_csv(bundle)]
         results['filename_prefix'] = 'qnr-data'
-        results['column_headers'] = [
-            "identifier", "status", "study_id", "site_id", "site_name",
-            "truenth_subject_id", "author_id", "author_role", "entry_method",
-            "authored", "timepoint", "instrument", "question_code",
-            "answer_code", "option_text", "other_text"]
+    else:
+        results['data'] = bundle
 
     return results
 

@@ -597,10 +597,29 @@ def consolidate_answer_pairs(answers):
     return filtered_answers
 
 
+def qnr_csv_column_headers():
+    return (
+        'identifier',
+        'status',
+        'study_id',
+        'site_id',
+        'site_name',
+        'truenth_subject_id',
+        'author_id',
+        'author_role',
+        'entry_method',
+        'authored',
+        'timepoint',
+        'instrument',
+        'question_code',
+        'answer_code',
+        'option_text',
+        'other_text',
+    )
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
-
-    csv_null_value = r"\N"
 
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
@@ -649,7 +668,6 @@ def generate_qnr_csv(qnr_bundle):
         except (KeyError, IndexError):
             return None, None
 
-
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
         if (
@@ -669,26 +687,6 @@ def generate_qnr_csv(qnr_bundle):
         else:
             return 'Site Resource'
 
-    columns = (
-        'identifier',
-        'status',
-        'study_id',
-        'site_id',
-        'site_name',
-        'truenth_subject_id',
-        'author_id',
-        'author_role',
-        'entry_method',
-        'authored',
-        'timepoint',
-        'instrument',
-        'question_code',
-        'answer_code',
-        'option_text',
-        'other_text',
-    )
-
-    yield ','.join('"' + column + '"' for column in columns) + '\n'
     for qnr in qnr_bundle['entry']:
         site_id, site_name = get_site(qnr)
         row_data = {
@@ -715,41 +713,23 @@ def generate_qnr_csv(qnr_bundle):
             'author_role': author_role(row_data, qnr),
         })
         for question in qnr['group']['question']:
-            row_data.update({
-                'question_code': question['linkId'],
-                'answer_code': None,
-                'option_text': None,
-                'other_text': None,
-            })
-
-            answers = consolidate_answer_pairs(question['answer']) or ({},)
-
-            for answer in answers:
+            row_data['question_code'] = question['linkId']
+            for answer in consolidate_answer_pairs(
+                    question['answer']) or ({},):
+                row_data.pop('answer_code', None)
+                row_data.pop('option_text', None)
+                row_data.pop('other_text', None)
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'other_text': list(answer.values())[0]}
+                    if list(answer.keys())[0] != 'valueCoding':
+                        row_data['other_text'] = list(answer.values())[0]
 
                     # ...unless nested code (ie valueCode)
-                    if list(answer.keys())[0] == 'valueCoding':
-                        answer_data.update({
-                            'answer_code': answer['valueCoding']['code'],
+                    else:
+                        row_data['answer_code'] = answer['valueCoding']['code']
 
-                            # Add supplementary text added earlier
-                            # Todo: lookup option text in stored Questionnaire
-                            'option_text': strip_tags(
-                                answer['valueCoding'].get('text', None)),
-                            'other_text': None,
-                        })
-                    row_data.update(answer_data)
-
-                row = []
-                for column_name in columns:
-                    column = row_data.get(column_name)
-                    column = csv_null_value if column is None else column
-
-                    # Handle JSON column escaping/enclosing
-                    if not isinstance(column, str):
-                        column = json.dumps(column).replace('"', '""')
-                    row.append('"' + column + '"')
-
-                yield ','.join(row) + '\n'
+                        # Add supplementary text added earlier
+                        # Todo: lookup option text in stored Questionnaire
+                        row_data['option_text'] = strip_tags(
+                            answer['valueCoding'].get('text', None))
+                yield {k: v for k, v in row_data.items() if v is not None}
