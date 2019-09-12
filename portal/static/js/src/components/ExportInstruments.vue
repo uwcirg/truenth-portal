@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" :aria-label="closeLabel"><span aria-hidden="true">&times;</span></button>
@@ -88,7 +88,7 @@
             setInstrumentsListContent: function(list) {
                 let content = "";
                 (list).forEach(function(code) {
-                    content += `<div class="checkbox instrument-container" id="${code}_container"><label><input type="checkbox" name="instrument" value="${code}">${code.replace(/_/g, " ").toUpperCase()}</label>`;
+                    content += `<div class="checkbox instrument-container" id="${code}_container"><label><input type="checkbox" name="instrument" value="${code}">${code.replace(/_/g, " ").toUpperCase()}</label></div>`;
                 });
                 document.querySelector("#patientsInstrumentList").innerHTML = content;
                 document.querySelector("#patientsInstrumentList").classList.add("ready");

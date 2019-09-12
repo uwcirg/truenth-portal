@@ -1774,12 +1774,14 @@ div.footer-wrapper.right-panel {
     top: 94%;
   }
 }
-.exportReport__popovercontent,
-#dataDownloadModal {
+.exportReport__popovercontent {
   top: 4px;
   padding-bottom: 20px;
   position: relative;
   overflow: hidden;
+}
+.exportReport__popovercontent,
+#dataDownloadModal {
   .exportReport__display-container {
     margin-top: 1em;
     .exportReport__retry{
@@ -1821,6 +1823,7 @@ div.footer-wrapper.right-panel {
 #dataDownloadModal {
   .exportReport__display-container {
     display: none;
+    margin-top: 0;
     &.active {
       display: block;
     }
@@ -2411,6 +2414,15 @@ div.footer-wrapper.right-panel {
 #patientsInstrumentList {
   opacity: 0;
   transition: opacity 250ms ease-in;
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  .instrument-container {
+    margin: 4px 0;
+  }
   &.ready {
     opacity: 1;
     & + #instrumentListLoad {
