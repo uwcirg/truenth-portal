@@ -734,32 +734,23 @@ def get_assessments():
       - OAuth2AuthzFlow: []
 
     """
-    # Rather than call current_user.check_role() for every patient
-    # in the bundle, delegate that responsibility to aggregate_responses()
-    bundle = aggregate_responses(
-        instrument_ids=request.args.getlist('instrument_id'),
-        current_user=current_user(),
-        patch_dstu2=request.args.get('patch_dstu2'),
-    )
-    bundle.update({
-        'link': {
-            'rel': 'self',
-            'href': request.url,
-        },
-    })
+    from ..tasks import research_report_task
 
-    # Default to JSON output if format unspecified
-    if request.args.get('format', 'json') == 'json':
-        return jsonify(bundle)
+    # This frequently takes over a minute to produce.  Generate a serializable
+    # form of all args for reliable hand off to a background task.
+    kwargs = {
+        'instrument_ids': request.args.getlist('instrument_id'),
+        'acting_user_id': current_user().id,
+        'patch_dstu2': request.args.get('patch_dstu2'),
+        'request_url': request.url,
+        'response_format': request.args.get('format', 'json').lower()
+    }
 
-    return Response(
-        generate_qnr_csv(bundle),
-        mimetype='text/csv',
-        headers={
-            "Content-Disposition":
-                "attachment;filename=qnr_data-%s.csv" % FHIR_datetime.now()
-        }
-    )
+    # Hand the task off to the job queue, and return 202 with URL for
+    # checking the status of the task
+    task = research_report_task.apply_async(kwargs=kwargs)
+    return jsonify({}), 202, {'Location': url_for(
+        'portal.task_status', task_id=task.id, _external=True)}
 
 
 @assessment_engine_api.route(

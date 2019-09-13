@@ -29,6 +29,7 @@ from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
     adherence_report,
     generate_and_send_summaries,
+    research_report,
 )
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
@@ -98,6 +99,13 @@ def adherence_report_task(self, **kwargs):
     logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return adherence_report(**kwargs)
+
+
+@celery.task(bind=True, track_started=True)
+def research_report_task(self, **kwargs):
+    logger.debug("launch research report task: %s", self.request.id)
+    kwargs['celery_task'] = self
+    return research_report(**kwargs)
 
 
 @celery.task(name="tasks.post_request", bind=True)
