@@ -419,6 +419,6 @@ class TestAssessmentEngine(TestCase):
         csv_string = download_response.get_data(as_text=True)
         # First line should match expected headers
         lines = csv_string.split('\n')
-        assert lines[0] == ','.join(qnr_csv_column_headers())
+        assert lines[0] == ','.join(qnr_csv_column_headers)
         assert len(csv_string.split("\n")) > 1
         # Todo: use csv module for more robust test

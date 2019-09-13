@@ -183,7 +183,7 @@ def research_report(
         'response_format': response_format,
         'required_roles': [ROLE.RESEARCHER.value]}
     if response_format == 'csv':
-        results['column_headers'] = qnr_csv_column_headers()
+        results['column_headers'] = qnr_csv_column_headers
         results['data'] = [i for i in generate_qnr_csv(bundle)]
         results['filename_prefix'] = 'qnr-data'
     else:

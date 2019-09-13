@@ -597,25 +597,24 @@ def consolidate_answer_pairs(answers):
     return filtered_answers
 
 
-def qnr_csv_column_headers():
-    return (
-        'identifier',
-        'status',
-        'study_id',
-        'site_id',
-        'site_name',
-        'truenth_subject_id',
-        'author_id',
-        'author_role',
-        'entry_method',
-        'authored',
-        'timepoint',
-        'instrument',
-        'question_code',
-        'answer_code',
-        'option_text',
-        'other_text',
-    )
+qnr_csv_column_headers = (
+    'identifier',
+    'status',
+    'study_id',
+    'site_id',
+    'site_name',
+    'truenth_subject_id',
+    'author_id',
+    'author_role',
+    'entry_method',
+    'authored',
+    'timepoint',
+    'instrument',
+    'question_code',
+    'answer_code',
+    'option_text',
+    'other_text',
+)
 
 
 def generate_qnr_csv(qnr_bundle):
@@ -718,9 +717,12 @@ def generate_qnr_csv(qnr_bundle):
             row_data['question_code'] = question['linkId']
             for answer in consolidate_answer_pairs(
                     question['answer']) or ({},):
+
+                # Clear keys potentially added on previous loop
                 row_data.pop('answer_code', None)
                 row_data.pop('option_text', None)
                 row_data.pop('other_text', None)
+
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
                     if list(answer.keys())[0] != 'valueCoding':
