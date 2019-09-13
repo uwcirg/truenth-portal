@@ -5,7 +5,8 @@
     font-weight: 400;
     font-style: normal
 }
-
+@homeItemContentFontSize: 17px;
+@homeItemContentMobileFontSize: 16px;
 .s,
 .more-arrow figure,
 .button-callout figure,
@@ -5720,7 +5721,7 @@ only screen and (min-resolution:2dppx) {
 }
 
 .icon-box__lowhead {
-    color: #BCC2A6;
+    color: #dccab2;
     font-size: 12px;
     line-height: 17px;
     text-transform: uppercase;
@@ -5856,7 +5857,15 @@ only screen and (min-resolution:2dppx) {
     display: flex;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
-    width: 100%
+    width: 100%;
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+}
+@media (min-width: 768px) {
+    .icon-box-group {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 @media (max-width:899px) {
@@ -7408,7 +7417,7 @@ figure.nav-overlay {
 
 .module {
     color: #FFF;
-    padding: 90px 0
+    padding: 82px 0
 }
 
 @media (max-width:767px) {
@@ -7468,7 +7477,6 @@ figure.nav-overlay {
     .accent-heading {
         font-size: 14px;
         letter-spacing: 2px;
-        padding: 2em
     }
     .module__heading {
         font-size: 2em;
@@ -7542,6 +7550,9 @@ figure.nav-overlay {
     [class*="--accent"] {
         color: #BFC0BD
     }
+    .more-arrow {
+        padding: 32px 0 18px;
+    }
     .more-arrow>a {
         color: #FFF
     }
@@ -7574,6 +7585,30 @@ figure.nav-overlay {
     .next-down figure {
         color: #BFC0BD;
         opacity: .5
+    }
+}
+aside {
+    .accent-heading {
+        padding-top: 50px;
+    }
+    .module {
+        color: #fff;
+        padding: 82px 8px 53px;
+    }
+}
+.footnote-container {
+    aside {
+        .module {
+            color: #fff;
+            padding: 28px 8px 53px;
+        }
+    }
+}
+.page-exercise-diet-portal {
+    .module-wrap--theme-gray {
+        .accent-heading {
+            padding-top: 0;
+        }
     }
 }
 .module-wrap--theme-gray-light {
@@ -7667,6 +7702,13 @@ figure.nav-overlay {
         opacity: .5
     }
 }
+@media (min-width: 1200px) {
+    .module-wrap--theme-blue {
+        .module {
+            padding: 72px 0 88px;
+        }
+    }
+}
 
 .module-wrap--theme-brown {
     background: #5E5B56;
@@ -7688,6 +7730,9 @@ figure.nav-overlay {
     .next-down figure {
         color: #D2D1C5;
         opacity: .5
+    }
+    &.module-wrap--has-border {
+        padding-bottom: 16px;
     }
 }
 
@@ -8391,7 +8436,7 @@ aside .module--flex {
 }
 
 .footer__logo-area {
-    padding: 35px 0;
+    padding: 64px 0 42px;
     float: left;
     width: 100%
 }
@@ -8403,12 +8448,11 @@ aside .module--flex {
     padding-left: 7.5px;
     padding-right: 7.5px;
     width: 100%;
-    margin: 6px 0 20px
+    margin: 8px 0 16px
 }
 
 .nav-list:last-of-type {
     margin-bottom: 0;
-    margin-top: -2px;
 }
 
 .nav-list__item {
@@ -8423,8 +8467,8 @@ aside .module--flex {
         text-align: center;
         font-size: 1.8em;
         display: block;
-        margin-top: .3em;
-        margin-bottom: .3em
+        margin-top: 12px;
+        margin-bottom: 16px;
     }
 }
 
@@ -8441,7 +8485,7 @@ aside .module--flex {
 @media (max-width:767px) {
     .nav-list__item {
         font-size: 14px;
-        line-height: 18px;
+        line-height: 1.7;
         display: block;
         margin: 0 0 10px
     }
@@ -8796,7 +8840,7 @@ aside .module--flex {
     height: 100%;
     position: relative;
     margin: 0 auto;
-    top: 170px;
+    top: 60px;
     left: 0;
     bottom: 0;
     right: 0;
@@ -8813,6 +8857,11 @@ aside .module--flex {
     overflow: auto;
     z-index: 1
 }
+@media (min-width: 900px) {
+    .home--container {
+        top: 170px;
+    }
+}
 
 .home--header {
     border-width: 0;
@@ -8823,18 +8872,40 @@ aside .module--flex {
     font-family: 'Arial';
     font-weight: 400;
     font-style: normal;
-    font-size: 1.5em;
+    font-size: 1.55em;
     color: #FFF;
     text-align: center;
     position: relative;
     padding: 1em 0;
     line-height: 1.35;
+    .page-intro__sub {
+        margin-bottom: 8px;
+    }
 }
 
 .home--items-wrapper {
     position: relative;
-    top: 236px;
-    background-color: rgba(95, 103, 110, 1)
+    top: 194px;
+    background-color: rgba(95, 103, 110, 1);
+    padding-left: 24px;
+    padding-right: 24px;
+}
+@media (min-width: 500px) {
+    .home--items-wrapper {
+        top: 124px;
+    }
+}
+@media (min-width: 699px) {
+    .home--items-wrapper {
+        top: 208px;
+    }
+}
+@media (min-width: 768px) {
+    .home--items-wrapper {
+        padding-left: 36px;
+        padding-right: 36px;
+        top: 232px;
+    }
 }
 
 .home--item-container,
@@ -8844,9 +8915,6 @@ aside .module--flex {
     background: inherit;
     background-color: #43484d;
     box-sizing: border-box;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgba(121, 121, 121, 1);
     border-radius: 0;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -8864,9 +8932,9 @@ aside .module--flex {
 }
 
 .home--item-container {
-    margin: 5% auto;
+    margin: 2.5% auto;
     position: relative;
-    padding: 3em 1.25em;
+    padding: 2.75em 3em;
     text-align: center;
     transition: all 0.5s ease-in;
     display: flex;
@@ -8874,32 +8942,31 @@ aside .module--flex {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 340px;
+    min-height: 400px;
     max-width: 100%;
     overflow-y: hidden;
     figure {
         top: -2px !important;
     }
 }
+@media (min-width: 400px) {
+    .home--item-container {
+        min-height: auto;
+    }
+}
 @media (min-width: 992px) {
     .home--item-container {
         margin: 1em auto;
-        width: 90%;
+        padding: 2.75em 1.25em;
+        width: 47.25%;
         height: auto;
     }
 }
 @media (min-width: 1200px) {
     .home--item-container {
-        width: 400px;
+        margin: 1em;
+        padding: 2.5em 0.25em;
     }
-    // .home--item-container,
-    // .home--registration-container,
-    // .home--item-container-full {
-    //     width: 90%;
-    //     max-width: 100%;
-    //     margin: 1em auto;
-    // }
-
 }
 
 .home--item-container-full {
@@ -8916,33 +8983,45 @@ aside .module--flex {
 
 #portalMain {
     .page-intro {
-        padding: 1.2em
+        padding: 1.2em 1.5em;
     }
     .button-callout {
         padding: .5em 0!important;
         margin: .1em 0!important
     }
     .icon-box__button span {
-        font-size: 17px;
+        font-size: 16px;
         padding-left: 12px;
+        max-width: 100%;
     }
     .icon-box__lowhead {
-        font-size: 1.25em
+        font-size: 16px;
     }
     .page-intro__main {
         margin-bottom: 0;
-        line-height: 1.35;
+        line-height: 1.3;
     }
 
 }
-
-.home--footer-container {
-    margin-top: 25em;
-    overflow: hidden;
-    position: relative;
-    top: 2.2em
+@media (min-width: 699px) {
+    #portalMain {
+        .icon-box__button span {
+            min-width: 300px;
+        }
+    }
 }
 
+.home--footer-container {
+    margin-top: 11em;
+    overflow: hidden;
+    position: relative;
+    //top: 2.2em
+}
+@media (min-width: 699px) {
+    .home--footer-container {
+        margin-top: 21em;
+    }
+}
 .home--registraion-wrapper {
     margin-top: 1.3em
 }
@@ -8973,7 +9052,7 @@ aside .module--flex {
 .home--items-wrapper {
     .icon-box__button {
         line-height: 26px;
-        padding: 20px
+        padding: 16px 20px;
     }
     .link-container {
         max-width: 800px;
@@ -9025,7 +9104,7 @@ aside .module--flex {
 }
 
 .home--registration-container p {
-    font-size: 1.1em;
+    font-size: @homeItemContentMobileFontSize;
     padding: 1em 0;
     font-weight: 400
 }
@@ -9039,12 +9118,20 @@ div.modal.fade::-webkit-scrollbar {
 
 .home--item-text {
     font-weight: 400;
-    font-size: 17px;
+    font-size: @homeItemContentMobileFontSize;
     margin: 0 0 1em 0;
-    padding: 0.5em 2em;
+    padding: 0.75em 2em 0.75em;
     min-height: 50%;
+    width: 90%;
+    max-width: 100%;
     overflow: hidden;
     line-height: 1.55;
+}
+@media (min-width: 768px) {
+    .home--item-text {
+        width: 100%;
+        padding: 0.75em 2.75em 0.75em;
+    }
 }
 
 a.home--modal-link {
@@ -9053,13 +9140,27 @@ a.home--modal-link {
 }
 
 .home--item-text * {
-    font-size: 17px;
+    font-size: @homeItemContentMobileFontSize;
     line-height: 1.55;
+}
+
+@media (min-width: 699px) {
+    .home--item-text,
+    .home--item-text *,
+    .home--registration-container p {
+        font-size: @homeItemContentFontSize;
+    }
 }
 
 #portalScrollArrow {
     cursor: pointer;
-    margin: 1em 0!important
+    margin: 1em 0!important;
+    display: none;
+}
+@media (min-width: 699px) {
+    #portalScrollArrow {
+        display: block;
+    }
 }
 
 .access-code-container {
@@ -9185,7 +9286,7 @@ a.home--modal-link {
 }
 
 .copyright {
-    margin-top: -2em;
+    margin-top: -2.5em;
     padding-left: 2em;
     padding-right: 2em;
     max-width: 100%;
@@ -9317,11 +9418,6 @@ a.home--modal-link {
             font-size: 1em
         }
     }
-    .home--item-container {
-        width: 542px;
-        max-width: 100%;
-        margin: 1em
-    }
 }
 
 @media (max-width:1199px) {
@@ -9333,7 +9429,7 @@ a.home--modal-link {
 @media (max-width:990px) {
     .home--item-text {
         padding: .25em .75em;
-        min-height: 25%;
+        min-height: 30%;
         & * {
             overflow: hidden;
             text-overflow-multiline: ellipsis;
@@ -9373,33 +9469,36 @@ a.home--modal-link {
 @media (max-width:680px) {
     #portalMain {
         .page-intro__main {
-            font-size: .9em
+            font-size: 1.35em
         }
         .page-intro__sub {
-            font-size: .85em
+            font-size: .95em
         }
         .icon-box__button {
-            font-size: .9em;
+            font-size: 1em;
             padding: 1.5em 1em 1em 1em
         }
         .icon-box__button span {
-            font-size: .9em
+            font-size: 1em
         }
         .icon-box__button--main {
-            height: 54px;
-            line-height: 1.5em
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.5em;
+            padding: 1.25em 1em;
         }
     }
     .home--registration-container {
         padding: .5em 3em;
-        font-size: .9em;
+        font-size: 1em;
         height: 300px
     }
     .home--item-container,
     .home--item-container h4,
     .home--item-text * {
-        font-size: 1em!important;
-        padding: .5em
+        font-size: 16px;
+        padding: .5em .75em 0;
     }
     #modal-register {
         p, .button {
@@ -9407,7 +9506,6 @@ a.home--modal-link {
         }
     }
     .home--items-wrapper {
-        top: 170px;
         .link-box {
             width: 100%;
             max-width: 100%;

@@ -182,13 +182,6 @@ main {
         }
     }
 }
-// @media (min-width: 900px) {
-//     .is-upper-banner-closed {
-//         .page-intro {
-//             padding: 160px 30px 70px;
-//         }
-//     }
-// }
 @media (min-width: 992px) {
     .page-intro {
         padding: 140px 30px 60px;
@@ -875,26 +868,37 @@ body.page-exercise-diet-portal footer {
 }
 
 body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
-    margin-top: 2em;
+    margin-top: 3.75em;
 }
 
 //acknowledgment section
 
 #Exercise-Diet_Acknowledgement {
     background: #3B4449;
-    padding: 48px 0 52px;
+    padding: 72px 0 52px;
+}
+@media (min-width: 768px) {
+    #Exercise-Diet_Acknowledgement {
+        padding: 48px 0 52px;
+    }
 }
 
 .is-upper-banner-closed {
     #Exercise-Diet_Acknowledgement {
         background: #3B4449;
-        padding: 32px 0 60px;
+        padding: 60px 0 60px;
+    }
+}
+@media (min-width: 768px) {
+    .is-upper-banner-closed {
+        #Exercise-Diet_Acknowledgement {
+            padding: 32px 0 60px;
+        }
     }
 }
 @media (min-width: 1400px) {
     .is-upper-banner-closed {
         #Exercise-Diet_Acknowledgement {
-            background: #3B4449;
             padding: 28px 0 60px;
         }
     }
@@ -902,22 +906,29 @@ body.page-exercise-diet-portal .module-wrap--theme-gray .accent-heading {
 
 body.page-exercise-diet-portal {
     #Exercise-Diet_Acknowledgement {
-        padding: 54px 0 70px;
+        padding: 72px 0 52px;
     }
 }
 
-.is-upper-banner-closed {
+@media (min-width: 768px) {
     body.page-exercise-diet-portal {
         #Exercise-Diet_Acknowledgement {
-            padding: 32px 0 70px;
+            padding: 54px 0 70px;
         }
     }
 }
-@media (min-width: 699px) {
+.is-upper-banner-closed {
+    body.page-exercise-diet-portal {
+        #Exercise-Diet_Acknowledgement {
+            padding: 62px 0 70px;
+        }
+    }
+}
+@media (min-width: 768px) {
     .is-upper-banner-closed {
         body.page-exercise-diet-portal {
             #Exercise-Diet_Acknowledgement {
-                padding: 20px 0 70px;
+                padding: 32px 0 70px;
             }
         }
     }
@@ -1359,8 +1370,8 @@ body.page-exercise-diet-portal {
 }
 @media (min-width: 585px) {
     .toolbox {
-        height: 170px;
-        padding: 10px 24px;
+        height: 168px;
+        padding: 28px 24px 16px;
     }
 }
 .toolbox h5 {
