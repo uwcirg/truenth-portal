@@ -262,7 +262,6 @@ def password_reset(email, password, actor):
 @app.cli.command()
 def purge_user(email, actor):
     """Purge the given user from the system"""
-    # import ipdb; ipdb.set_trace()
     permanently_delete_user(email, actor=actor)
 
 
@@ -446,4 +445,110 @@ def update_qnr_authored(qnr_id, authored, actor):
         context="assessment",
         user_id=acting_user.id,
         subject_id=qnr.subject_id)
+    print(message)
+
+
+@click.option('--src_id', help="Source Patient ID (WILL BE DELETED!)")
+@click.option('--tgt_id', help="Target Patient ID")
+@click.option(
+    '--actor',
+    help='email address of user taking this action, for audit trail'
+)
+@app.cli.command()
+def merge_users(src_id, tgt_id, actor):
+    """Copy useful portion of source to target user and delete source"""
+    from flask import current_app
+    from portal.models.audit import Audit
+    from portal.models.user import internal_identifier_systems
+    from portal.models.tou import ToU
+
+    try:
+        acting_user = User.query.filter(
+            func.lower(User.email) == actor.lower()).one()
+    except NoResultFound:
+        raise ValueError("email for acting user <{}> not found".format(actor))
+
+    acting_user.check_role(permission='edit', other_id=src_id)
+    acting_user.check_role(permission='edit', other_id=tgt_id)
+
+    src_user = User.query.get(src_id)
+    tgt_user = User.query.get(tgt_id)
+
+    if not all((src_user, tgt_user)) or (
+            src_user.birthdate != tgt_user.birthdate):
+        raise ValueError("Birth dates don't match; can't continue")
+    if src_user.auth_providers.count() > 0:
+        raise ValueError("extend to include auth_providers")
+    
+    if src_user.identifiers != tgt_user.identifiers and (
+            click.confirm("Add identifiers \n\t{} \nto \n\t{}".format(
+                "\n\t".join((str(i) for i in src_user.identifiers if
+                             i.system not in internal_identifier_systems)),
+                "\n\t".join((str(i) for i in tgt_user.identifiers if
+                             i.system not in internal_identifier_systems))))):
+        tgt_user.merge_others_relationship(src_user, '_identifiers')
+
+    if src_user.organizations != tgt_user.organizations and (
+            click.confirm("Add organizations \n\t{} \nto \n\t{}".format(
+                "\n\t".join((str(i) for i in src_user.organizations)),
+                "\n\t".join((str(i) for i in tgt_user.organizations))))):
+        tgt_user.merge_others_relationship(src_user, 'organizations')
+
+    if src_user.roles != tgt_user.roles:
+        only_on_tgt = [r for r in tgt_user.roles if r not in src_user.roles]
+        if all((i for i in only_on_tgt if i.name in current_app.config['PRE_REGISTERED_ROLES'])):
+            if click.confirm("Remove role(s) `{}` only found on target user".format(
+                    ",".join((j.name for j in only_on_tgt)))):
+                tgt_user.remove_pre_registered_roles()
+        else:
+            raise ValueError("mismatch on roles beyond pre-registered")
+
+    if src_user.valid_consents != tgt_user.valid_consents and (
+            click.confirm("Add consents \n\t{} \nto \n\t{}".format(
+                "\n\t".join((str(i) for i in src_user.valid_consents)),
+                "\n\t".join((str(i) for i in tgt_user.valid_consents))))):
+        tgt_user.merge_other_relationship(src_user, '_consents')
+
+    src_tous = ToU.query.join(Audit).filter(Audit.subject_id == src_user.id)
+    tgt_tous = ToU.query.join(Audit).filter(Audit.subject_id == tgt_user.id)
+    if src_tous.count() and (
+            click.confirm("Add ToUs \n\t{} \nto \n\t{}".format(
+                "\n\t".join((str(i) for i in src_tous)),
+                "\n\t".join((str(i) for i in tgt_tous))))):
+        for tou in src_tous:
+            tou.audit.subject_id = tgt_user.id
+
+    if src_user.questionnaire_responses.count() and (
+            click.confirm("Add questionnaire_responses \n\t{} \nto \n\t{}".format(
+                "\n\t".join((str(i) for i in src_user.questionnaire_responses)),
+                "\n\t".join((str(i) for i in tgt_user.questionnaire_responses))))):
+        tgt_user.merge_others_relationship(src_user, 'questionnaire_responses')
+        invalidate_users_QBT(tgt_user.id)
+
+    src_email = src_user.email  # capture, as it changes on delete
+    replace_email = False
+    if click.confirm("Replace email {} with {}?".format(
+            tgt_user.email, src_email)):
+        # must wait till delete_user masks existing
+        replace_email = True
+    if click.confirm("Replace first name {} with {}".format(
+            tgt_user.first_name, src_user.first_name)):
+        tgt_user.first_name = src_user.first_name
+    if click.confirm("Replace last name {} with {}".format(
+            tgt_user.last_name, src_user.last_name)):
+        tgt_user.last_name = src_user.last_name
+    if click.confirm("Replace password {} with {}".format(
+            tgt_user.password, src_user.password)):
+        tgt_user.password = src_user.password
+
+    src_user.delete_user(acting_user=acting_user)
+    if replace_email:
+        tgt_user.email = src_email
+
+    message = "Merged user {} into {} ".format(src_id, tgt_id)
+    auditable_event(
+        message=message,
+        context="account",
+        user_id=acting_user.id,
+        subject_id=tgt_id)
     print(message)
