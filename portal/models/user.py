@@ -1465,6 +1465,26 @@ class User(db.Model, UserMixin):
         return [prop.key for prop in class_mapper(cls).iterate_properties
                 if isinstance(prop, ColumnProperty)]
 
+    def merge_others_relationship(self, other_user, relationship):
+        self_entity = getattr(self, relationship)
+        other_entity = getattr(other_user, relationship)
+        if relationship == 'roles':
+            # We don't copy over the roles used to mark the weak account
+            append_list = [
+                item for item in other_entity
+                if item not in self_entity and item.name not in
+                   current_app.config['PRE_REGISTERED_ROLES']]
+        elif relationship == '_identifiers':
+            # Don't copy internal identifiers
+            append_list = [item for item in other_entity if item not in
+                           self_entity and item.system not in
+                           internal_identifier_systems]
+        else:
+            append_list = [item for item in other_entity if item not in
+                           self_entity]
+        for item in append_list:
+            self_entity.append(item)
+
     def merge_with(self, other_id):
         """merge details from other user into self
 
@@ -1495,24 +1515,7 @@ class User(db.Model, UserMixin):
                              'observations', 'relationships', 'roles',
                              'races', 'ethnicities', 'groups',
                              'questionnaire_responses', '_identifiers'):
-            self_entity = getattr(self, relationship)
-            other_entity = getattr(other, relationship)
-            if relationship == 'roles':
-                # We don't copy over the roles used to mark the weak account
-                append_list = [
-                    item for item in other_entity
-                    if item not in self_entity and item.name not in
-                    current_app.config['PRE_REGISTERED_ROLES']]
-            elif relationship == '_identifiers':
-                # Don't copy internal identifiers
-                append_list = [item for item in other_entity if item not in
-                               self_entity and item.system not in
-                               internal_identifier_systems]
-            else:
-                append_list = [item for item in other_entity if item not in
-                               self_entity]
-            for item in append_list:
-                self_entity.append(item)
+            self.merge_others_relationship(other, relationship)
 
         # If other user has an external (3rd party) auth_provider, reassign
         # to self
