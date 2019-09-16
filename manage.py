@@ -479,7 +479,7 @@ def merge_users(src_id, tgt_id, actor):
         raise ValueError("Birth dates don't match; can't continue")
     if src_user.auth_providers.count() > 0:
         raise ValueError("extend to include auth_providers")
-    
+
     if src_user.identifiers != tgt_user.identifiers and (
             click.confirm("Add identifiers \n\t{} \nto \n\t{}".format(
                 "\n\t".join((str(i) for i in src_user.identifiers if
@@ -496,8 +496,11 @@ def merge_users(src_id, tgt_id, actor):
 
     if src_user.roles != tgt_user.roles:
         only_on_tgt = [r for r in tgt_user.roles if r not in src_user.roles]
-        if all((i for i in only_on_tgt if i.name in current_app.config['PRE_REGISTERED_ROLES'])):
-            if click.confirm("Remove role(s) `{}` only found on target user".format(
+        if all((
+                i for i in only_on_tgt if i.name in
+                current_app.config['PRE_REGISTERED_ROLES'])):
+            if click.confirm(
+                    "Remove role(s) `{}` only found on target user".format(
                     ",".join((j.name for j in only_on_tgt)))):
                 tgt_user.remove_pre_registered_roles()
         else:
@@ -519,9 +522,13 @@ def merge_users(src_id, tgt_id, actor):
             tou.audit.subject_id = tgt_user.id
 
     if src_user.questionnaire_responses.count() and (
-            click.confirm("Add questionnaire_responses \n\t{} \nto \n\t{}".format(
-                "\n\t".join((str(i) for i in src_user.questionnaire_responses)),
-                "\n\t".join((str(i) for i in tgt_user.questionnaire_responses))))):
+            click.confirm(
+                "Add questionnaire_responses \n\t{} \nto \n\t{}".format(
+                    "\n\t".join(
+                        (str(i) for i in src_user.questionnaire_responses)),
+                    "\n\t".join(
+                        (str(i) for i in tgt_user.questionnaire_responses))
+                ))):
         tgt_user.merge_others_relationship(src_user, 'questionnaire_responses')
         invalidate_users_QBT(tgt_user.id)
 

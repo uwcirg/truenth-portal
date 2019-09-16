@@ -1471,17 +1471,16 @@ class User(db.Model, UserMixin):
         if relationship == 'roles':
             # We don't copy over the roles used to mark the weak account
             append_list = [
-                item for item in other_entity
-                if item not in self_entity and item.name not in
-                   current_app.config['PRE_REGISTERED_ROLES']]
+                item for item in other_entity if item not in self_entity and
+                item.name not in current_app.config['PRE_REGISTERED_ROLES']]
         elif relationship == '_identifiers':
             # Don't copy internal identifiers
-            append_list = [item for item in other_entity if item not in
-                           self_entity and item.system not in
-                           internal_identifier_systems]
+            append_list = [
+                item for item in other_entity if item not in self_entity and
+                item.system not in internal_identifier_systems]
         else:
-            append_list = [item for item in other_entity if item not in
-                           self_entity]
+            append_list = [
+                item for item in other_entity if item not in self_entity]
         for item in append_list:
             self_entity.append(item)
 
