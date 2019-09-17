@@ -1,8 +1,5 @@
 {% macro footerHTML(custom_class) -%}
      <footer class="footer{%if custom_class%} {{custom_class}}{%endif%}">
-        <div class="footer__logo-area">
-          <figure class="footer__logo--truenth"></figure>
-        </div>
         <ul class="nav-list">
           <li class="nav-list__item"><a href="{{url_for('gil.landing')}}">{{_("Home")}}</a></li>
           <li class="nav-list__item"><a href="{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
@@ -18,7 +15,9 @@
           <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i>{{_("Twitter")}}</a></li>
         </ul>
         <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
-            <figure class="footer__logo--movember"></figure></a></div>
+            <figure class="footer__logo--truenth"></figure>
+            <figure class="footer__logo--movember"></figure></a>
+          </div>
         <div class="footer__logo-area copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
       </footer>
 {%- endmacro %}
