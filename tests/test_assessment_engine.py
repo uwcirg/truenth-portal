@@ -1,4 +1,5 @@
 """Unit test module for Assessment Engine API"""
+from datetime import datetime
 import json
 import os
 
@@ -7,6 +8,7 @@ from flask_swagger import swagger
 from flask_webtest import SessionScope
 import jsonschema
 import pytest
+from sqlalchemy.exc import StatementError
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -298,6 +300,22 @@ class TestAssessmentEngine(TestCase):
             test_user.questionnaire_responses[0].questionnaire_bank_id
             is None)
         assert test_user.questionnaire_responses[0].qb_iteration is None
+
+    def test_submit_future_assessment(self):
+        """Submit assessment with future date should fail"""
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        # bump authored to future value
+        data['authored'] = FHIR_datetime.as_fhir(
+            datetime.utcnow() + relativedelta(days=1))
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        with pytest.raises(StatementError) as exc:
+            self.client.post(
+                '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+            assert "future" in str(exc.value)
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)

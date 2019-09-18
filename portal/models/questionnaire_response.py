@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime
 from html.parser import HTMLParser
 import json
 
@@ -27,8 +28,12 @@ class QuestionnaireResponse(db.Model):
         return context.current_parameters['document']['status']
 
     def default_authored(context):
-        return FHIR_datetime.parse(
+        # Don't allow future authored dates
+        authored = FHIR_datetime.parse(
             context.current_parameters['document']['authored'])
+        if authored > datetime.utcnow():
+            raise ValueError("future authored dates forbidden")
+        return authored
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
