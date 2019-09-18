@@ -1,0 +1,32 @@
+{% extends "gil/base.html" %}
+{% block title %}{{_("Contact")}} {{super()}}{% endblock %}
+{% block head %}{{super()}}{% endblock %}
+{% block main %}
+    <main class="main" data-section="contact">
+      {{super()}}
+       {% block header %}
+        <header class="header header--white {%if user%}no-banner{%endif%}">
+          <div class="header__menu">
+            <a class="menu button button--small button--white js-nav-menu-toggle">
+                <figure></figure><span>{{_("Menu")}}</span>
+            </a>
+          </div>
+          <a class="logo" href="/"></a>
+          {% if not user %}
+            <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
+          {% endif %}
+        </header>
+      {% endblock %}
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('.static', filename='img/Contact-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">{{_("Sexual Wellness")}}</h1>
+          <p class="page-intro__sub">{{_("Coming soon")}}</p>
+          <div class="button-callout">
+            <!--
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+            -->
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
