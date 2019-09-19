@@ -691,13 +691,16 @@ def generate_qnr_csv(qnr_bundle):
     for qnr in qnr_bundle['entry']:
         site_id, site_name = get_site(qnr)
         row_data = {
-            'identifier': qnr['identifier']['value'],
+            'identifier': (
+                qnr['identifier']['value'] if 'identifier' in qnr else None),
             'status': qnr['status'],
             'truenth_subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
             ),
-            'author_id': qnr['author']['reference'].split('/')[-1],
+            'author_id': (
+                qnr['author']['reference'].split('/')[-1]
+                if 'author' in qnr else None),
             'site_id': site_id,
             'site_name': site_name,
             # Todo: correctly pick external study of interest
