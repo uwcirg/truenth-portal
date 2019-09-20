@@ -17,7 +17,7 @@
 #tnthBottomNavWrapper .nav-list__item a.disabled {opacity: 0.6;}
 #tnthBottomNavWrapper .hr {border-top: 1px solid #252525; margin-top: 12px; margin-bottom: 12px;width: 96.5%; margin-right: auto; margin-left: auto; }
 #tnthBottomNavWrapper .copyright {color: #FFF;opacity: 0.9; font-size: 14px;}
-#tnthBottomNavWrapper .footer__logo-area { padding-left: 24px; padding-right: 24px; width: 100%;display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+#tnthBottomNavWrapper .footer__logo-area { padding-left: 24px; padding-right: 24px; width: 100%;display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
 #tnthBottomNavWrapper .footer__logo-area .nav-list-secondary__item { margin: 12px 12px 12px 0; display: inline-block; color: #FFF;} 
 #tnthBottomNavWrapper .footer__logo-area .nav-list-secondary__item a { color: #FFF; }
 #tnthBottomNavWrapper .footer__logo-area .item { margin-bottom: 12px; }
@@ -33,17 +33,18 @@
       <ul class="nav-list">
         <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
         <li class="nav-list__item"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
         <li class="nav-list__item"><a href="{{PORTAL}}/about">{{_("About")}}</a></li>
         <li class="nav-list__item"><a href="{{PORTAL}}/contact" >{{_("Contact Us")}}</a></li>
       </ul>
       <ul class="nav-list">
         <li class="nav-list__item heading">{{_("Tools")}}</li>
-        <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
+        <!-- note link url is being populated dynamically-->
+        <li class="nav-list__item"><a class="decision-support-link" href="">{{_("Decision Support")}}</a></li>
         {% if user %}
           <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}">{{_("PSA Tracker")}}</a></li>
         {% endif %}
-        <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
+         <!-- note link url is being populated dynamically-->
+        <li class="nav-list__item"><a class="symptom-tracker-link" href="">{{_("Symptom Tracker")}}</a></li>  
       </ul>
       <ul class="nav-list">
         <li class="nav-list__item heading">{{_("Socials")}}</li>
@@ -89,6 +90,7 @@ $(document).ready(function(){
                     $("#tnthBottomNavWrapper .decision-support-link").each(function() {
                         $(this).removeAttr("href");
                         $(this).addClass("disabled");
+                        $(this).closest(".nav-list__item").hide();
                     });
                   };
               } else if (sm.test(d) || sm2.test(n)) {
@@ -101,6 +103,7 @@ $(document).ready(function(){
                   $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
                       $(this).removeAttr("href");
                       $(this).addClass("disabled");
+                      $(this).closest(".nav-list__item").hide();
                   });
                 };
               };
