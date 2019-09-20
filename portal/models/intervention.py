@@ -340,6 +340,7 @@ def intervention_restrictions(user):
 
 
 STATIC_INTERVENTIONS = {
+    'analytics': 'Analytics',
     'assessment_engine': 'Assessment Engine',
     'care_plan': 'Care Plan',
     'community_of_wellness': 'Community of Wellness',

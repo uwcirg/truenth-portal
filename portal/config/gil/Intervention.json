@@ -131,6 +131,13 @@
       "public_access": false,
       "subscribed_events": 1,
       "resourceType": "Intervention"
+    },
+    {
+      "description": "Analytics",
+      "name": "analytics",
+      "public_access": false,
+      "subscribed_events": 1,
+      "resourceType": "Intervention"
     }
   ],
   "id": "SitePersistence v0.2",

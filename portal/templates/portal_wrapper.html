@@ -79,6 +79,11 @@
                             <li><a href="{{PORTAL}}/scheduled_jobs">{{ _("Scheduled Jobs") }}</a></li>
                             <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                             {% endif %}
+                            <!-- fixme use the new 'analytics' intervention's 'link_url' -->
+                            <!-- fixme consider intervention.display_for_user(user) ? -->
+                            {% if user and (user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.STAFF_ADMIN.value)  or user.has_role(ROLE.ANALYST.value) or user.has_role(ADMIN.value)) %}
+                            <li class="resources-menu-item"><a href="{{PORTAL}}/?fixme=intervention_link_url">{{ _("Analytics") }}</a></li>
+                            {% endif %}
                             {% if user and user.has_role(ROLE.RESEARCHER.value) %}
                             <li><a href="{{PORTAL}}/research">{{ _("Research Data") }}</a></li>
                             {% endif %}
