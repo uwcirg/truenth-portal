@@ -1796,7 +1796,8 @@ export default (function() {
                             $("#meSubmit").attr("disabled", true);
                             return;
                         }
-                        var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        //add true boolean flag to check for future date entry
+                        var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
                         if (errorMessage) {
                             self.manualEntry.errorMessage = errorMessage;
                             return false;
