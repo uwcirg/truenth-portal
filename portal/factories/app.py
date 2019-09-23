@@ -24,6 +24,7 @@ from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
 from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
+from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
 from ..views.assessment_engine import assessment_engine_api
 from ..views.audit import audit_api
@@ -176,6 +177,7 @@ def configure_dogpile(app):
 def configure_jinja(app):
     app.jinja_env.globals.update(app_text=app_text)
     app.jinja_env.globals.update(ROLE=ROLE)
+    app.jinja_env.globals.update(INTERVENTION=INTERVENTION)
 
 
 def configure_extensions(app):
