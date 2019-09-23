@@ -2,7 +2,7 @@
     <!--TODO remove this and use API to call portal footer instead -->
      <footer class="footer{%if custom_class%} {{custom_class}}{%endif%}">
         <div class="main-nav-list">
-          <div class="nav-image"><a href="http://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a></div>
+          <div class="nav-image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a></div>
           <ul class="nav-list">
             <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
             <li class="nav-list__item"><a href="{{url_for('gil.landing')}}">{{_("Home")}}</a></li>
@@ -31,7 +31,7 @@
               <span class="nav-list-secondary__item"><a href="{{url_for('gil.privacy')}}">{{_("Privacy Policty")}}</a></span>
               <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
           </div>
-          <div class="image"><a href="http://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
+          <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
         </div>
       </footer>
 {%- endmacro %}
