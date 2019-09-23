@@ -5023,10 +5023,10 @@ only screen and (min-width:901px) and (min-resolution:2dppx) {
 .logo-footer-truenth,
 .footer__logo--truenth {
     background-image: url(/static/img/TrueNTH-Footer-Logo.png);
-    background-size: 89px 101px;
+    background-size: 99px 111px;
     background-repeat: no-repeat;
-    width: 89px;
-    height: 101px;
+    width: 99px;
+    height: 111px;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio:2),
@@ -5045,10 +5045,10 @@ only screen and (min-resolution:2dppx) {
 .logo-footer-movember,
 .footer__logo--movember {
     background-image: url(/static/img/Movember-Footer-Logo.png);
-    background-size: 76px 76px;
+    background-size: 72px 72px;
     background-repeat: no-repeat;
-    width: 76px;
-    height: 76px;
+    width: 72px;
+    height: 72px;
     position: relative;
     top: 2px;
 }
@@ -5061,7 +5061,7 @@ only screen and (min-resolution:2dppx) {
     .logo-footer-movember,
     .footer__logo--movember {
         background-image: url(/static/img/Movember-Footer-Logo@2x.png);
-        background-size: 76px 76px;
+        background-size: 72px 72px;
         background-repeat: no-repeat;
     }
 }
@@ -8433,7 +8433,7 @@ aside .module--flex {
 }
 
 .footer {
-    padding: 38px 28px 12px;
+    padding: 46px 28px 12px;
     background: #000;
     a {
         color: #FFF;
@@ -8447,10 +8447,10 @@ aside .module--flex {
         justify-content: center;
         flex-wrap: wrap;
         align-items: center;
-        margin-bottom: 40px;
+        margin-bottom: 28px;
     }
     figure {
-        margin: 0 12px 8px;
+        margin: 0 8px 8px;
         display: inline-block
     }
     .nav-image {
@@ -8531,20 +8531,28 @@ aside .module--flex {
     }
     .item {
         margin-bottom: 12px;
-    }
-    .image {
-        width: 100%;
-        figure {
-            float: right;
+        &.links {
+            width: 50%;
+            max-width: 100%;
+            .copyright {
+                margin-top: 12px;
+            }
         }
     }
 }
-@media(min-width: 804px) {
+@media(min-width: 619px) {
+    .footer {
+        .main-nav-list {
+            margin-bottom: 44px;
+        }
+    }
     .footer__logo-area {
-        .image {
-            width: auto;
-            figure {
-                float: none;
+        .item.links {
+            width: 80%;
+            padding-left: 8px;
+            padding-right: 8px;
+            .copyright {
+                margin-top: 0;
             }
         }
     }
