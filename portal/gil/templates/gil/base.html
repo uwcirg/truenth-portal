@@ -146,7 +146,7 @@
     </aside>
   {% endblock %}
   {% block footer %}
-    {{footerHTML()}}
+    {{footerHTML(user=user)}}
   {% endblock %}
   {% block version %}
     {% if config.metadata.version %}

@@ -1,23 +1,37 @@
-{% macro footerHTML(custom_class) -%}
+{% macro footerHTML(custom_class, user) -%}
+    <!--TODO remove this and use API to call portal footer instead -->
      <footer class="footer{%if custom_class%} {{custom_class}}{%endif%}">
-        <ul class="nav-list">
-          <li class="nav-list__item"><a href="{{url_for('gil.landing')}}">{{_("Home")}}</a></li>
-          <li class="nav-list__item"><a href="{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-          <li class="nav-list__item"><a href="{{url_for('gil.about')}}">{{_("About")}}</a></li>
-        </ul>
-        <ul class="nav-list">
-          <li class="nav-list__item"><a href="{{url_for('gil.terms_and_conditions')}}">{{_("Terms")}}</a></li>
-          <li class="nav-list__item"><a href="{{url_for('gil.privacy')}}">{{_("Privacy")}}</a></li>
-        </ul>
-        <ul class="nav-list nav-list--lower icon-list">
-          <li class="nav-list__item"><a href="{{url_for('gil.contact')}}" ><i class="fa fa-envelope fa-2x" aria-hidden="true"></i>{{_("Contact Us")}}</a></li>
-          <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank"><i class="fa fa-facebook-square fa-2x" aria-hidden="true"></i>{{_("Facebook")}}</a></li>
-          <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i>{{_("Twitter")}}</a></li>
-        </ul>
-        <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
-            <figure class="footer__logo--truenth"></figure>
-            <figure class="footer__logo--movember"></figure></a>
+        <div class="main-nav-list">
+          <div class="nav-image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a></div>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
+            <li class="nav-list__item"><a href="{{url_for('gil.landing')}}">{{_("Home")}}</a></li>
+            <li class="nav-list__item"><a href="{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+            <li class="nav-list__item"><a href="{{url_for('gil.about')}}">{{_("About")}}</a></li>
+            <li class="nav-list__item"><a href="{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Tools")}}</li>
+            <li class="nav-list__item"><a href="{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
+            {% if user %}
+              <li class="nav-list__item"><a href="{{url_for('portal.psa_tracker')}}">{{_("PSA Tracker")}}</a></li>
+            {% endif %}
+            <li class="nav-list__item"><a href="{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Socials")}}</li>
+            <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
+            <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
+          </ul>
+        </div>
+        <hr class="hr">
+        <div class="footer__logo-area">
+          <div class="item links">
+              <span class="nav-list-secondary__item"><a href="{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
+              <span class="nav-list-secondary__item"><a href="{{url_for('gil.privacy')}}">{{_("Privacy Policty")}}</a></span>
+              <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
           </div>
-        <div class="footer__logo-area copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
+          <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
+        </div>
       </footer>
 {%- endmacro %}
