@@ -11,7 +11,7 @@
       <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
     </div>
     <br/>
-    {% set allowReactivate = user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.STAFF_ADMIN.value) %}
+    {% set allowReactivate = user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value) %}
     <div id="adminTableContainer" class="staff-view admin-table table-responsive medium-text" data-export-prefix="{{_('StaffList_')}}">
         <div id="adminTableToolbar" class="admin-toolbar">{{deletedUsersFilter()}}</div>
         <table id="adminTable"

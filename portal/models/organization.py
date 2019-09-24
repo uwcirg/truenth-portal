@@ -949,8 +949,7 @@ def org_restriction_by_role(user, requested_orgs):
     :returns: None if no org restrictions apply, or a list of org_ids
 
     """
-    if (user.has_role(ROLE.ADMIN.value) or
-            user.has_role(ROLE.INTERVENTION_STAFF.value)):
+    if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value):
         # admins and intervention_staff aren't generally restricted by
         # organization - only apply a restriction if they've set a filter
         return requested_orgs

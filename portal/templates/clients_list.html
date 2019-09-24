@@ -9,7 +9,7 @@
         <a class="btn-tnth-primary btn" href="{{ url_for('.client_reg') }}">{{ _("Create A New TrueNTH Client Application") }}</a>
     </div>
 
-    {% if current_user.has_role('admin')%}
+    {% if current_user.has_role(ROLE.ADMIN.value)%}
         <h4>{{ _("Current Applications") }}</h4>
     {% else %}
         <h4>{{ _("Your Current Applications") }}</h4>
@@ -32,7 +32,7 @@
                     client.lookup_service_token().expires.strftime('%b %d, %Y') }})
                 {% endif %}
 
-                {% if current_user.has_role('admin')%}
+                {% if current_user.has_role(ROLE.ADMIN.value)%}
                     <br /> {{ _("Created By") }}:
                     {{ client.user.display_name }}
                 {% endif %}

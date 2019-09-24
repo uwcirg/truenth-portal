@@ -104,7 +104,7 @@
         </div>
     </div>
   {%- endif %}
-  {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.STAFF.value) or current_user.has_role(ROLE.INTERVENTION_STAFF.value)) %}
+  {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
       <div class="row">
           <div class="col-md-12 col-xs-12">
               {% call profile_macro.profileSection(editable=False) -%}
@@ -115,4 +115,3 @@
       </div>
   {%- endif %}
 {% endblock %}
-

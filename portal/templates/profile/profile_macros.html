@@ -77,7 +77,7 @@
                     {% if person.id == current_user.id -%}
                         {{_("My Detail")}}
                     {%- else %}
-                        {% if person.has_role('patient') %}
+                        {% if person.has_role(ROLE.PATIENT.value) %}
                             {{_("Patient Detail")}}
                         {%else%}
                             {{_("User Detail")}}
@@ -382,7 +382,7 @@
                               </div>
                             </div>
                         {%- endif %}
-                        {% if current_user and (current_user.has_role(ROLE.STAFF.value) or current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.INTERVENTION_STAFF.value)) %}
+                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
                          <div class="tab">
                           <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
@@ -533,8 +533,8 @@
                 <label>{{_("Clinics")}} <span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>{% endif %}
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
-                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT.value) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-                {%- if (person and (person.has_role(ROLE.STAFF.value) or person.has_role(ROLE.STAFF_ADMIN.value))) -%}
+                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT.value) and person.id == current_user.id %}patient_view="true"{%endif%}></div>
+                {%- if person and person.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
                     <!-- nothing to do -->
                 {%- else -%}
                     <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
@@ -815,7 +815,7 @@
 </div>
 {%- endmacro %}
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.STAFF.value) or current_user.has_role(ROLE.INTERVENTION_STAFF.value)) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar" data-profile-section-id="auditlog"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
@@ -824,7 +824,7 @@
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value) and not person.has_role(ROLE.SERVICE.value) %}
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
