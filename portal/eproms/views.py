@@ -98,7 +98,7 @@ def home():
         return next_after_login()
 
     # All checks passed - present appropriate view for user role
-    if user.has_role((ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value)):
+    if user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
@@ -147,7 +147,7 @@ def terms_and_conditions():
     if user:
         organization = user.first_top_organization()
         role = None
-        if user.has_role((ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)):
+        if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value):
             role = ROLE.STAFF.value
         elif user.has_role(ROLE.PATIENT.value):
             role = ROLE.PATIENT.value

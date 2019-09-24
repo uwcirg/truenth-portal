@@ -1176,10 +1176,10 @@ class User(db.Model, UserMixin):
 
             """
             if (
-                not acting_user.has_role((
-                    ROLE.ADMIN.value, ROLE.APPLICATION_DEVELOPER.value))
-                and acting_user.has_role((
-                    ROLE.STAFF.value, ROLE.STAFF_ADMIN.value))
+                not acting_user.has_role(
+                    ROLE.ADMIN.value, ROLE.APPLICATION_DEVELOPER.value)
+                and acting_user.has_role(
+                    ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
                 and user.id == acting_user.id
             ):
                 raise ValueError(
@@ -1618,7 +1618,7 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if (self.has_role((ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)) and
+        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) and
                 other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
@@ -1670,11 +1670,9 @@ class User(db.Model, UserMixin):
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
-    def has_role(self, role_name_or_list):
-        """Given role (or list of) returns true if user has at least one"""
-        if isinstance(role_name_or_list, str):
-            return role_name_or_list in [r.name for r in self.roles]
-        for item in role_name_or_list:
+    def has_role(self, *roles):
+        """Given one or my roles by name, true if user has at least one"""
+        for item in roles:
             if item in [r.name for r in self.roles]:
                 return True
 

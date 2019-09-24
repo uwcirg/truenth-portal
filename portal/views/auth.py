@@ -624,7 +624,7 @@ def login_as(user_id, auth_method='staff_authenticated'):
     target_user = get_user_or_abort(user_id)
 
     # Guard against abuse
-    if not target_user.has_role((ROLE.PATIENT.value, ROLE.PARTNER.value)):
+    if not target_user.has_role(ROLE.PATIENT.value, ROLE.PARTNER.value):
         abort(401, 'not authorized to assume identity of requested user')
 
     auditable_event("assuming identity of user {}".format(user_id),

@@ -309,9 +309,9 @@ class OrgData(CoredataPoint):
     def required(self, user, **kwargs):
         if SR_user(user) or CP_user(user):
             return False
-        if user.has_role((
+        if user.has_role(
                 ROLE.PATIENT.value, ROLE.STAFF.value,
-                ROLE.STAFF_ADMIN.value)):
+                ROLE.STAFF_ADMIN.value):
             return True
         return False
 

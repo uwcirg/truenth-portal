@@ -11,7 +11,7 @@
       <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
     </div>
     <br/>
-    {% set allowReactivate = user.has_role((ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value)) %}
+    {% set allowReactivate = user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value) %}
     <div id="adminTableContainer" class="staff-view admin-table table-responsive medium-text" data-export-prefix="{{_('StaffList_')}}">
         <div id="adminTableToolbar" class="admin-toolbar">{{deletedUsersFilter()}}</div>
         <table id="adminTable"
@@ -49,7 +49,7 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in staff_list %}
-              <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if user.has_role((ROLE.TEST.value)) %}data-test-role="true"{% endif %}>  <!-- setting css class for test patient rows, allow distinction from others -->
+              <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if user.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}>  <!-- setting css class for test patient rows, allow distinction from others -->
                   <td>{{user.id}}</td>
                   <td>
                     {% if user.deleted %}
@@ -65,7 +65,7 @@
                   <td class="text-center">
                     <div class="check-role-container">
                       <div id="loadingIndicator_{{user.id}}" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
-                      <input type="checkbox" name="chkRole" data-user-id="{{user.id}}" data-role="staff_admin" {%if user.has_role((ROLE.STAFF_ADMIN.value))%}checked="checked"{%endif%} />
+                      <input type="checkbox" name="chkRole" data-user-id="{{user.id}}" data-role="staff_admin" {%if user.has_role(ROLE.STAFF_ADMIN.value)%}checked="checked"{%endif%} />
                     </div>
                   </td>
                   {{deletedUserCell(user, allowReactivate=allowReactivate)}}

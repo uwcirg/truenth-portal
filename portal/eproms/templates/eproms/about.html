@@ -5,7 +5,7 @@
   <h3 class="tnth-headline">{{ _("About TrueNTH") }}</h3>
   <div id="aboutTruenthContainer" class="LREditContainer"><p>{{ about_tnth|safe }}</p></div>
   <!-- TODO logic check for role move to frontend -->
-  <input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role((ROLE.CONTENT_MANAGER.value)) | lower }}"/>
+  <input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }}"/>
   {% if config.metadata.version %}
   <br />
     {% if config.metadata.git_hash %}

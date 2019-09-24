@@ -36,7 +36,7 @@
                     {% if person.id == current_user.id -%}
                         {{_("My Information")}}
                     {% else %}
-                        {% if person.has_role((ROLE.PATIENT.value)) -%}
+                        {% if person.has_role(ROLE.PATIENT.value) -%}
                             {{_("Patient Information") }}
                         {%- else%}
                             {{_("User Information") }}
@@ -48,8 +48,8 @@
                         <tr><td class="text-muted">{{_("Name")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.fullName" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.displayBirthDate" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
                         <tr><td class="text-muted">{{_("Email")}}</td><td id="email_view">{% raw %}<section-view v-bind:data="demo.data.email" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
-                        {% if person.has_role((ROLE.PATIENT.value)) and not current_user.has_role((ROLE.PATIENT.value)) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td>{%raw%}<section-view v-bind:data="demo.data.studyId" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>{% endif %}
-                        {% if person.has_role((ROLE.PATIENT.value)) and not current_user.has_role((ROLE.PATIENT.value)) %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td>{%raw%}<section-view v-bind:data="demo.data.siteId" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>{% endif %}
+                        {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td>{%raw%}<section-view v-bind:data="demo.data.studyId" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>{% endif %}
+                        {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td>{%raw%}<section-view v-bind:data="demo.data.siteId" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.cellPhone" v-bind:nodatatext="notProvidedText()"></section-view>{% endraw %}</td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.homePhone" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
                    </table>
@@ -58,8 +58,8 @@
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {{profileEmail(person)}}
-                    {% if person.has_role((ROLE.PATIENT.value)) and not current_user.has_role((ROLE.PATIENT.value)) %} {{profileStudyID(person)}} {% endif %}
-                    {% if person.has_role((ROLE.PATIENT.value)) and not current_user.has_role((ROLE.PATIENT.value)) %} {{profileSiteID(person)}} {% endif %}
+                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileStudyID(person)}} {% endif %}
+                    {% if person.has_role(ROLE.PATIENT.value) and not current_user.has_role(ROLE.PATIENT.value) %} {{profileSiteID(person)}} {% endif %}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 {% endcall %}
@@ -77,7 +77,7 @@
                     {% if person.id == current_user.id -%}
                         {{_("My Detail")}}
                     {%- else %}
-                        {% if person.has_role((ROLE.PATIENT.value)) %}
+                        {% if person.has_role(ROLE.PATIENT.value) %}
                             {{_("Patient Detail")}}
                         {%else%}
                             {{_("User Detail")}}
@@ -276,7 +276,7 @@
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section data-update-on-validated" id="emailGroup" data-error-field="erroremail" data-loader-container="true" data-profile-section-id="email">
         <label for="email">{{_("Email Address")}}</label>
-        <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role((ROLE.PATIENT.value))%}data-optional="true"{% else %}required{% endif %} />
+        <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" {% if person and person.has_role(ROLE.PATIENT.value)%}data-optional="true"{% else %}required{% endif %} />
         <div class="help-block with-errors" id="erroremail"></div>
         {{saveLoaderDiv("emailGroup")}}
     </div>
@@ -358,7 +358,7 @@
     {%- endif -%}
 {%- endmacro %}
 {% macro profileCommunications(person, current_user) -%}
-    {%- if person and person.has_role((ROLE.PATIENT.value)) -%}
+    {%- if person and person.has_role(ROLE.PATIENT.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
@@ -382,7 +382,7 @@
                               </div>
                             </div>
                         {%- endif %}
-                        {% if current_user and current_user.has_role((ROLE.STAFF.value, ROLE.ADMIN.value,ROLE.INTERVENTION_STAFF.value)) %}
+                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value,ROLE.INTERVENTION_STAFF.value) %}
                          <div class="tab">
                           <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
@@ -395,7 +395,7 @@
                 </div>
             </div>
         </div>
-    {%- elif person and person.has_role((ROLE.STAFF.value)) and current_user and current_user.has_role((ROLE.STAFF_ADMIN.value))-%}
+    {%- elif person and person.has_role(ROLE.STAFF.value)) and current_user and current_user.has_role((ROLE.STAFF_ADMIN.value)-%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
@@ -490,7 +490,7 @@
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
                <p class="prompt">
-                {% if  current_user and current_user.has_role((ROLE.STAFF.value)) %}
+                {% if  current_user and current_user.has_role(ROLE.STAFF.value) %}
                     {{_("In what state is the patient currently receiving prostate cancer care?")}}
                 {% else %}
                     {{_("In what state are you currently receiving prostate cancer care?")}}
@@ -499,7 +499,7 @@
                <div class="state-selector-container selector-show">
                     <select id="stateSelector" class="form-control"></select>
                 </div>
-               <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role((ROLE.PATIENT.value)) and person.id == current_user.id %}patient_view="true"{%endif%}>
+               <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT.value) and person.id == current_user.id %}patient_view="true"{%endif%}>
                    <p class="clinic-prompt prompt selector-show">{{_("What is your main clinic for prostate cancer care?")}}</p>
                    <div class="main-state-container selector-show"></div>
                </div>
@@ -529,12 +529,12 @@
     {% call editSection() %}
         <div id="clinics" data-profile-section-id="orgs" data-save-container-id="clinics">
             <div class="form-group profile-section standard" id="userOrgs">
-                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES and person.has_role((ROLE.PATIENT.value)) %}<p class="text-muted">{{_("Main clinic for prostate cancer care")}}</p>{%else%}
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES and person.has_role(ROLE.PATIENT.value)) %}<p class="text-muted">{{_("Main clinic for prostate cancer care"}}</p>{%else%}
                 <label>{{_("Clinics")}} <span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>{% endif %}
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
-                <div id="fillOrgs" {% if person and person.has_role((ROLE.PATIENT.value)) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-                {%- if person and person.has_role((ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)) -%}
+                <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT.value)) and (person.id == current_user.id %}patient_view="true"{%endif%}></div>
+                {%- if person and person.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
                     <!-- nothing to do -->
                 {%- else -%}
                     <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{_("None of the Above")}}</span></label></div>
@@ -815,7 +815,7 @@
 </div>
 {%- endmacro %}
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role((ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value)) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar" data-profile-section-id="auditlog"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
@@ -824,7 +824,7 @@
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role((ROLE.ADMIN.value)) and not person.has_role((ROLE.SERVICE.value)) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value)) and not person.has_role((ROLE.SERVICE.value) %}
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
@@ -1174,7 +1174,7 @@
                 {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
                 {% call editSection() -%}
                     <p class="title-text text-muted">
-                        {%-if current_user and current_user.has_role((ROLE.STAFF.value))-%}
+                        {%-if current_user and current_user.has_role(ROLE.STAFF.value)-%}
                             {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
                         {%-elif person and current_user and (person.id == current_user.id) -%}
                             {{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact

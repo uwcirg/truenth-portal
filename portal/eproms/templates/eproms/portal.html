@@ -10,7 +10,7 @@
     </div>
 {%- endif -%}
 #}
-{%- if config.get("SHOW_WELCOME") and user.has_role((ROLE.WRITE_ONLY.value)) -%}
+{%- if config.get("SHOW_WELCOME") and user.has_role(ROLE.WRITE_ONLY.value) -%}
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Welcome to TrueNTH") }}</h2>
         {{ _("Tools for navigating the prostate cancer journey") }}
