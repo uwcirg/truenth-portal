@@ -395,7 +395,7 @@
                 </div>
             </div>
         </div>
-    {%- elif person and person.has_role(ROLE.STAFF.value)) and current_user and current_user.has_role((ROLE.STAFF_ADMIN.value)-%}
+    {%- elif person and person.has_role(ROLE.STAFF.value) and current_user and current_user.has_role(ROLE.STAFF_ADMIN.value)-%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
@@ -824,7 +824,7 @@
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value)) and not person.has_role((ROLE.SERVICE.value) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value) and not person.has_role(ROLE.SERVICE.value) %}
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
