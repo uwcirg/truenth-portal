@@ -524,7 +524,7 @@ def next_after_login():
         if preserve_next_across_sessions:
             session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
-        assert (not invited_user.has_role(role_name=ROLE.WRITE_ONLY.value))
+        assert (not invited_user.has_role(ROLE.WRITE_ONLY.value))
         user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
@@ -624,8 +624,7 @@ def login_as(user_id, auth_method='staff_authenticated'):
     target_user = get_user_or_abort(user_id)
 
     # Guard against abuse
-    if not (target_user.has_role(role_name=ROLE.PATIENT.value) or
-            target_user.has_role(role_name=ROLE.PARTNER.value)):
+    if not target_user.has_role((ROLE.PATIENT.value, ROLE.PARTNER.value)):
         abort(401, 'not authorized to assume identity of requested user')
 
     auditable_event("assuming identity of user {}".format(user_id),
@@ -635,7 +634,7 @@ def login_as(user_id, auth_method='staff_authenticated'):
     logout(prevent_redirect=True, reason="forced from login_as")
     session['login_as_id'] = user_id
 
-    if target_user.has_role(role_name=ROLE.WRITE_ONLY.value):
+    if target_user.has_role(ROLE.WRITE_ONLY.value):
         target_user.mask_email()  # necessary in case registration is attempted
     login_user(target_user, auth_method)
     return next_after_login()
