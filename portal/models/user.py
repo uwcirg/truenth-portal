@@ -1672,8 +1672,9 @@ class User(db.Model, UserMixin):
 
     def has_role(self, *roles):
         """Given one or my roles by name, true if user has at least one"""
+        users_roles = set((r.name for r in self.roles))
         for item in roles:
-            if item in [r.name for r in self.roles]:
+            if item in users_roles:
                 return True
 
     def staff_html(self):
