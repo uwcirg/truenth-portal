@@ -13,7 +13,7 @@
         vieweable only by admin staff
     -->
     {{profile_macro.profileDemo(user, current_user)}}
-    {%-if user and user.has_role(ROLE.PATIENT.value) %}
+    {%-if user and user.has_role((ROLE.PATIENT.value)) %}
         {{profile_macro.profileDemoDetail(user, current_user)}}
     {%- endif %}
     {{profile_macro.profileCommunications(user, current_user)}}
@@ -26,7 +26,7 @@
             {%- endcall %}
         </div>
     </div>
-    {%- if user and (user.has_role(ROLE.PATIENT.value) or user.has_role(ROLE.PARTNER.value))%}
+    {%- if user and user.has_role((ROLE.PATIENT.value, ROLE.PARTNER.value)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
@@ -37,34 +37,25 @@
         </div>
     {%- endif %}
 
-    {%- if user and (user.has_role(ROLE.PATIENT.value)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF.value) %}
+    {%- if user and user.has_role((ROLE.PATIENT.value)) and current_user and current_user.has_role((ROLE.INTERVENTION_STAFF.value)) %}
         {{profile_macro.profileInterventions(user_interventions) | show_macro('interventions')}}
     {%- endif %}
 
-    {%- if user and user.has_role(ROLE.PATIENT.value)%}
+    {%- if user and user.has_role((ROLE.PATIENT.value)) %}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
-                    {% call profile_macro.titleSection(id="proAssessmentsLoc") -%}{% if current_user and current_user.has_role(ROLE.PATIENT.value) %}{{_("My Questionnaires")}}{% else %}{{_("PRO Questionnaires")}}{% endif %}{%- endcall %}
+                    {% call profile_macro.titleSection(id="proAssessmentsLoc") -%}{% if current_user and current_user.has_role((ROLE.PATIENT.value)) %}{{_("My Questionnaires")}}{% else %}{{_("PRO Questionnaires")}}{% endif %}{%- endcall %}
                     {{profile_macro.profileSessionList(user, current_user)}}
                 {%- endcall %}
             </div>
         </div>
     {%- endif %}
 
-    {%- if user and user.has_role(ROLE.PATIENT.value) %}
+    {%- if user and user.has_role((ROLE.PATIENT.value)) %}
         {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
-    {%- endif %}
-
-    {%- if user and user.has_role(ROLE.PATIENT.value) %}
         {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
-    {%- endif %}
-
-    {%- if user and user.has_role(ROLE.PATIENT.value) %}
         {{profile_macro.profileInterventionReports(user) | show_macro('intervention_reports')}}
-    {%- endif %}
-
-    {%- if (user and current_user) and user.has_role(ROLE.PATIENT.value) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
@@ -73,14 +64,12 @@
                 {%- endcall %}
             </div>
         </div>
-    {%- endif %}
-    {%- if (user and current_user) and user.has_role(ROLE.PATIENT.value) %}
         {{profile_macro.profileDeceased(user, current_user)}}
     {%- endif %}
     <div class="row">
         <div class="col-md-12 col-xs-12">{{profile_macro.profileLocaleTimeZone(user)}}</div>
     </div>
-    {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value) and not user.has_role(ROLE.SERVICE.value) %}
+    {%- if (user and current_user) and current_user.has_role((ROLE.ADMIN.value)) and not user.has_role((ROLE.SERVICE.value)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
@@ -91,7 +80,7 @@
         </div>
     {%- endif %}
 
-    {%- if (user and current_user) and (current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.STAFF.value) or current_user.has_role(ROLE.INTERVENTION_STAFF.value)) %}
+    {%- if (user and current_user) and current_user.has_role((ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}

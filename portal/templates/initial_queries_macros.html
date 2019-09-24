@@ -419,7 +419,7 @@
     {%-if consent_agreements -%}
         {%- for org in consent_agreements -%}
            {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url if consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER.value) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url if consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role((ROLE.CONTENT_MANAGER.value)) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
             {%- endif -%}
         {%- endfor -%}
     {%-endif-%}

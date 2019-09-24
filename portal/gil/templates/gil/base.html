@@ -66,23 +66,23 @@
         <h3 class="side-nav__heading">{{_("Navigation")}}</h3>
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="/">{{_("Home")}}</a></li>
-          {% if user and (user.has_role(ROLE.STAFF.value) or user.has_role(ROLE.INTERVENTION_STAFF.value)) %}
+          {% if user and user.has_role((ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value)) %}
               <li class="side-nav-items__item"><a href="{{url_for('patients.patients_root')}}">{{_("Patients")}}</a></li>
           {% endif %}
           {% if user %}
               <li class="side-nav-items__item"><a href="{{url_for('portal.profile')}}">{{_("My TrueNTH Profile")}}</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--about"><a href="{{url_for('gil.about')}}">{{_("About TrueNTH")}}</a></li>
-          {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
+          {% if user and user.has_role((ROLE.APPLICATION_DEVELOPER.value)) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('client.clients_list')}}">{{_("Client Applications")}}</a></li>
           {% endif %}
-          {% if user and user.has_role(ROLE.RESEARCHER.value) %}
+          {% if user and user.has_role((ROLE.RESEARCHER.value)) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('portal.research_dashboard')}}">{{_("Research Data")}}</a></li>
           {% endif %}
-          {% if user and user.has_role(ROLE.STAFF_ADMIN.value) %}
+          {% if user and user.has_role((ROLE.STAFF_ADMIN.value)) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('staff.staff_index')}}">{{_("Staff List")}}</a></li>
           {% endif %}
-          {% if user and user.has_role(ROLE.ADMIN.value) %}
+          {% if user and user.has_role((ROLE.ADMIN.value)) %}
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
               <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('scheduled_job_api.jobs_list')}}">{{_("Scheduled Jobs")}}</a></li>
               <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>

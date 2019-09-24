@@ -5,13 +5,13 @@
   <div id="patientList">
     <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
     <div id="patientListOptions">
-      {%- if user.has_role(ROLE.STAFF.value) -%}
+      {%- if user.has_role((ROLE.STAFF.value)) -%}
       <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
       {%- endif -%}
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
-    {% set account_deactivation_enabled = user.has_role(ROLE.STAFF_ADMIN.value) and config.ALLOW_PATIENT_ACCOUNT_DEACTIVATION %}
+    {% set account_deactivation_enabled = user.has_role((ROLE.STAFF_ADMIN.value)) and config.ALLOW_PATIENT_ACCOUNT_DEACTIVATION %}
    <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
@@ -68,7 +68,7 @@
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
-                  {%- if user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.INTERVENTION_STAFF.value) -%}
+                  {%- if user.has_role((ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value)) -%}
                     <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th>
                   {%- endif -%}
                   {% if account_deactivation_enabled %}
@@ -79,7 +79,7 @@
           </thead>
           <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
+                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role((ROLE.TEST.value)) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
@@ -110,7 +110,7 @@
                       {%-endif-%}
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
-                      {%- if user.has_role(ROLE.ADMIN.value) or user.has_role(ROLE.INTERVENTION_STAFF.value) -%}
+                      {%- if user.has_role((ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value)) -%}
                         <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
                       {%- endif -%}
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}

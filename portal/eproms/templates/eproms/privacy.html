@@ -5,7 +5,7 @@
     <h1 class="tnth-headline">{{ _("Privacy") }}</h1>
     <br/>
 	<div id="privacyContentContainer" class="LREditContainer"><p>{{ content|safe }}</p></div>
-	<input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }}"/>
+	<input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role((ROLE.CONTENT_MANAGER.value)) | lower }}"/>
 {%- endblock %}
 {% block footer -%}
 	{{footer(user=user)}}

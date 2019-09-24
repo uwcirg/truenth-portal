@@ -60,35 +60,6 @@
 <span class="glyphicon glyphicon-home" data-toggle="tooltip" data-placement="top" title="back to home"></span></a>
 {%- endmacro %}
 
-
-{% macro left_nav(current_user) -%}
-<div class="col-sm-3 hidden-xs">
-
-    <div class="list-group tnth-nav-list">
-        <a class="list-group-item" href="{{PORTAL}}/">{{ _("Home") }}</a>
-        {% if current_user.roles %}
-        <a class="list-group-item" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a>
-        <a class="list-group-item" href="{{PORTAL}}/invite">{{ _("Send an Invite") }}</a>
-        {% endif %}
-        <a class="list-group-item" href="#">{{ _("TrueBLOG") }}</a>
-        <a class="list-group-item" href="http://www.movember.com">{{ _("Movember.com") }}</a>
-    </div>
-    {% if current_user.roles %}
-    <br />
-    {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
-    <div class="list-group tnth-nav-list">
-        {% if current_user.has_roles('admin') %}
-        <a class="list-group-item" href="{{PORTAL}}/admin">{{ _("User Administration") }}</a>
-        {% endif %}
-        {% if current_user.has_roles('application_developer') %}
-        <a class="list-group-item" href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a>
-        {% endif %}
-    </div>
-    {% endif %}
-    {% endif %}
-
-</div>
-{%- endmacro %}
 {% macro footer(splash_style=false, white_theme=False, user=None) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block profile_content %}
     {{profile_macro.profileDemo(user, current_user)}}
-    {% if user and user.has_role(ROLE.PATIENT.value) %}
+    {% if user and user.has_role((ROLE.PATIENT.value)) %}
         {{profile_macro.profileDemoDetail(user, current_user)}}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
@@ -15,19 +15,17 @@
                 {% endcall %}
             </div>
         </div>
-        {%- if user and user.has_role(ROLE.PATIENT.value) %}
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    {% call profile_macro.profileSection(editable=False) %}
-                        {% call profile_macro.titleSection(id="patientReportsLoc") -%}{{_("My Reports")}}{%- endcall%}
-                        {{profile_macro.patientReports(user)}}
-                    {% endcall %}
-                </div>
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                {% call profile_macro.profileSection(editable=False) %}
+                    {% call profile_macro.titleSection(id="patientReportsLoc") -%}{{_("My Reports")}}{%- endcall%}
+                    {{profile_macro.patientReports(user)}}
+                {% endcall %}
             </div>
-        {%- endif %}
+        </div>
         {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
         {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
-        {%-if user.has_role(ROLE.PATIENT.value) and ROLE.PATIENT.value in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+        {%-if ROLE.PATIENT.value in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
             <div class="row">
                 <div class="col-md-12 col-xs-12">
                     {% call profile_macro.profileSection(data_sections="org") %}
@@ -39,7 +37,7 @@
         {%-else-%}
              <div class="row">
                 <div class="col-md-12 col-xs-12">
-                    <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN.value) %}editable{% endif %}" data-sections="org">
+                    <div class="profile-item-container" data-sections="org">
                         {{profile_macro.profileEditButton()}}
                         {% call profile_macro.titleSection() -%}{{ _("My Clinic") }}{%- endcall %}
                         {{profile_macro.profileOrg(person=user,consent_agreements=consent_agreements, current_user=current_user)}}
@@ -58,7 +56,7 @@
     {% else %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container {% if user and user.has_role(ROLE.ADMIN.value) %}editable{% endif %}" data-sections="org">
+                <div class="profile-item-container {% if user and user.has_role((ROLE.ADMIN.value)) %}editable{% endif %}" data-sections="org">
                     {{profile_macro.profileEditButton()}}
                     {% call profile_macro.titleSection(id="orgsLoc") -%}{{_("My Clinic")}}{%- endcall%}
                     {{profile_macro.profileOrg(person=user,consent_agreements=consent_agreements, current_user=current_user)}}
@@ -71,7 +69,7 @@
            {{profile_macro.profileLocaleTimeZone(user)}}
         </div>
     </div>
-    {% if user and user.has_role(ROLE.ADMIN.value) and not user.has_role(ROLE.SERVICE.value) %}
+    {% if user and user.has_role((ROLE.ADMIN.value)) and not user.has_role((ROLE.SERVICE.value)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection() -%}

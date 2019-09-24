@@ -4,7 +4,7 @@
   {{ back_btn(PORTAL, _('Home')) }}
     <h1 class="tnth-headline">{{ _("General Terms") }}</h1>
 	<div id = "termsConditionsContainer" class="LREditContainer"><p>{{ content|safe }}</p></div>
-	<input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role(ROLE.CONTENT_MANAGER.value) | lower }}"/>
+	<input type="hidden" id="LREditUrl" value="{{editorUrl}}" data-show="{{ user and user.has_role((ROLE.CONTENT_MANAGER.value)) | lower }}"/>
 {% endblock %}
 {% block footer -%}
 	{{footer(user=user)}}

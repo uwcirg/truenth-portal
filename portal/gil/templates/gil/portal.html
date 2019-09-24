@@ -9,7 +9,7 @@
     <section class="page-intro page-intro--dark home--header">
         <h3 class="page-intro__main">{{_("Welcome to your TrueNTH Dashboard")}}{% if user.first_name %}, {{user.first_name}}{% endif %}</h3>
         <br/>
-        {% if user.has_role(ROLE.PARTNER.value) %}
+        {% if user.has_role((ROLE.PARTNER.value)) %}
             <p class="page-intro__sub">{{_("More tools for you will be available as TrueNTH develops.")}}</p>
             <p class="page-intro__sub">{{_("For now, learn more about TrueNTH:")}}</p>
         {% else %}
@@ -23,7 +23,7 @@
 
     {# present each intervention in turn if configured for user #}
      <section class="icon-box-group__wrapper home--items-wrapper">
-        {% if user.has_role(ROLE.PARTNER.value) %}
+        {% if user.has_role((ROLE.PARTNER.value)) %}
             <div class="icon-box-group link-container">
                 <div class="link-box">
                   <h4><a href="{{url_for('gil.about')}}">{{_("About TrueNTH")}}</a></h4>
