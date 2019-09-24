@@ -16,7 +16,7 @@
             _paq.push(["setCustomDimension", 1, "Test"]);
         {% elif user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.RESEARCHER.value, ROLE.ANALYST.value, ROLE.ADMIN.value) %}
             _paq.push(["setCustomDimension", 1, "Staff"]);
-        {% elif user.has_role(ROLE.PATIENT.value)) %}
+        {% elif user.has_role(ROLE.PATIENT.value) %}
             _paq.push(["setCustomDimension", 1, "Patient"]);
         {% endif %}
         {% if user.organizations %}
@@ -82,7 +82,7 @@
                             {% if user and user.has_role(ROLE.RESEARCHER.value) %}
                             <li><a href="{{PORTAL}}/research">{{ _("Research Data") }}</a></li>
                             {% endif %}
-                            {% if user and user.has_role(ROLE.STAFF.value,ROLE.STAFF_ADMIN.value) %}
+                            {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>

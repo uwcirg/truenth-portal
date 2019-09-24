@@ -382,7 +382,7 @@
                               </div>
                             </div>
                         {%- endif %}
-                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value,ROLE.INTERVENTION_STAFF.value) %}
+                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
                          <div class="tab">
                           <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
@@ -529,7 +529,7 @@
     {% call editSection() %}
         <div id="clinics" data-profile-section-id="orgs" data-save-container-id="clinics">
             <div class="form-group profile-section standard" id="userOrgs">
-                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES and person.has_role(ROLE.PATIENT.value)) %}<p class="text-muted">{{_("Main clinic for prostate cancer care"}}</p>{%else%}
+                {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES and person.has_role(ROLE.PATIENT.value) %}<p class="text-muted">{{_("Main clinic for prostate cancer care"}}</p>{%else%}
                 <label>{{_("Clinics")}} <span class="text-muted smaller-text optional-display-text">({{_("Optional")}})</span></label>{% endif %}
                 <div class="indent">
                 <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">

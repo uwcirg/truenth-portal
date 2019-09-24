@@ -45,7 +45,7 @@
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
-                    {% call profile_macro.titleSection(id="proAssessmentsLoc") -%}{% if current_user and current_user.has_role(ROLE.PATIENT.value)) %}{{_("My Questionnaires")}}{% else %}{{_("PRO Questionnaires"}}{% endif %}{%- endcall %}
+                    {% call profile_macro.titleSection(id="proAssessmentsLoc") -%}{% if current_user and current_user.has_role(ROLE.PATIENT.value) %}{{_("My Questionnaires")}}{% else %}{{_("PRO Questionnaires"}}{% endif %}{%- endcall %}
                     {{profile_macro.profileSessionList(user, current_user)}}
                 {%- endcall %}
             </div>
