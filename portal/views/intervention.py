@@ -238,7 +238,7 @@ def user_intervention_set(intervention_name):
     """
     try:
         intervention = getattr(INTERVENTION, intervention_name)
-    except ValueError:
+    except AttributeError:
         abort(404, 'no such intervention {}'.format(intervention_name))
 
     # service account being used must belong to the intervention owner
