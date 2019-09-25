@@ -394,7 +394,7 @@ class _NamedInterventions(object):
         try:
             value = self.__dict__[attr.lower()].__call__(self)
         except NoResultFound:
-            raise AttributeError("Intervetion {} not fount".format(attr))
+            raise AttributeError("Intervention {} not found".format(attr))
         except KeyError:
             query = Intervention.query.filter_by(name=attr)
             if not query.count():
