@@ -1187,7 +1187,7 @@ class TestIntervention(TestCase):
         assert INTERVENTION.newbee == db.session.merge(newbee)
 
     def test_bogus_intervention_access(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(AttributeError):
             INTERVENTION.phoney
 
         self.login()

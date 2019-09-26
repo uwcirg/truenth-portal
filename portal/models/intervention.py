@@ -3,6 +3,7 @@ from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest
 
 from ..database import db
@@ -340,6 +341,7 @@ def intervention_restrictions(user):
 
 
 STATIC_INTERVENTIONS = {
+    'analytics': 'Analytics',
     'assessment_engine': 'Assessment Engine',
     'care_plan': 'Care Plan',
     'community_of_wellness': 'Community of Wellness',
@@ -391,10 +393,12 @@ class _NamedInterventions(object):
         # (i.e. not from static list)
         try:
             value = self.__dict__[attr.lower()].__call__(self)
+        except NoResultFound:
+            raise AttributeError("Intervention {} not found".format(attr))
         except KeyError:
             query = Intervention.query.filter_by(name=attr)
             if not query.count():
-                raise ValueError(
+                raise AttributeError(
                     "Intervention {} not found".format(attr))
             value = query.one()
         return value
@@ -403,7 +407,18 @@ class _NamedInterventions(object):
         for attr in dir(self):
             if attr.startswith('_'):
                 continue
-            yield getattr(self, attr)
+            try:
+                yield getattr(self, attr)
+            except AttributeError:
+                # Intervention from static list not found in db, skip
+                continue
+
+    def __contains__(self, item):
+        try:
+            self.__getattribute__(item)
+            return True
+        except AttributeError:
+            return False
 
 
 """INTERVENTION behaves like a static accessor for all interventions.
