@@ -13,9 +13,7 @@
           <ul class="nav-list">
             <li class="nav-list__item heading">{{_("Tools")}}</li>
             <li class="nav-list__item"><a href="{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
-            {% if user %}
-              <li class="nav-list__item"><a href="{{url_for('portal.psa_tracker')}}">{{_("PSA Tracker")}}</a></li>
-            {% endif %}
+            <li class="nav-list__item"><a href="#" data-toggle="modal" data-target="#modal-register" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
             <li class="nav-list__item"><a href="{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>
           </ul>
           <ul class="nav-list">

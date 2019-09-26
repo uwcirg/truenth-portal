@@ -252,6 +252,9 @@ module.exports = NavToggle = (function() {
       e.preventDefault();
       target = $(this).attr("data-target");
       $("html").removeClass(navExpandedClass);
+      if ($(this).attr("data-link-identifier")) {
+        $("main").attr("data-link-identifier", $(this).attr("data-link-identifier"));
+      }
       return setTimeout(function() {
         return $(target).modal("show");
       }, 500);
@@ -442,7 +445,11 @@ var InterventionSessionObj;
 
 module.exports = InterventionSessionObj = (function() {
   return function () {
-    this.setInterventionSession = function() {
+    this.setInterventionSession = function(dataLinkIdentifier) {
+        if (dataLinkIdentifier) {
+          sessionStorage.setItem(dataLinkIdentifier+"InSession", "true");
+          return;
+        }
         var dataSectionId = $("main").attr("data-link-identifier");
         if (dataSectionId) {
           if (typeof sessionStorage !== "undefined") {
@@ -1026,20 +1033,21 @@ module.exports = OrgTool = (function() {
   var menuObj;
   module.exports = menuObj = (function() {
       return function () {
-          this.init = function(currentUserId) {
-
-            if (window.app.global.checkRole("patient") || window.app.global.checkRole("partner")) {
-              this.filterMenu(currentUserId);
-            } else {
-              window.app.visObj.hideLoader();
-            }
+          this.init = function(currentUserId, callback) {
+            callback = callback || function() {};
             this.setSelectedNavItem($(".side-nav-items__item--" + $("main").attr("data-section")));
             this.handleDisabledLinks();
             if ($("main").attr("data-section") === "about") {
               $("#repoVersion").show();
             }
+            if (window.app.global.checkRole("patient") || window.app.global.checkRole("partner")) {
+              //window.app.visObj.showLoader();
+              this.filterMenu(currentUserId, callback);
+            } else {
+              window.app.visObj.hideLoader();
+              callback();
+            }
           };
-
           this.handleDisabledLinks = function() {
             if (window.app.utilObj.getUrlParameter("disableLinks")) {
               $("nav.side-nav li.side-nav-items__item, footer .nav-list__item").each(function() {
@@ -1068,32 +1076,44 @@ module.exports = OrgTool = (function() {
               return;
             });
           };
-
-          this.handleItemRedirect = function(userId, itemName, enable) {
+          this.disableInterventionLink = function(itemName) {
+            $("." + itemName + "-link").each(function() {
+              $(this).removeAttr("href");
+              $(this).addClass("icon-box__button--disabled");
+            });
+            $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
+            window.app.interventionSessionObj.clearSession(itemName);
+            return false;
+          },
+          this.handleItemRedirect = function(userId, itemName) {
             var visObj = window.app.visObj;
-            if (!enable) {
-              $("." + itemName + "-link").each(function() {
-                $(this).removeAttr("href");
-                $(this).addClass("icon-box__button--disabled");
-              });
-              $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
+            window.app.orgTool.handleNoOrgs(userId);
+            if (!window.app.interventionSessionObj.getSession(itemName)) {
+              return false;
+            }
+            var l =  $("#intervention_item_" + itemName + " a");
+            var la = l.attr("href");
+            if (l.length > 0 && window.app.utilObj.validateUrl(la)) {
               window.app.interventionSessionObj.clearSession(itemName);
-            } else {
-              window.app.orgTool.handleNoOrgs(userId);
-              if (window.app.interventionSessionObj.getSession(itemName)) {
-                var l =  $("#intervention_item_" + itemName + " a");
-                var la = l.attr("href");
-                if (l.length > 0 && window.app.utilObj.validateUrl(la)) {
-                  window.app.interventionSessionObj.clearSession(itemName);
-                  visObj.setRedirect();
-                  setTimeout(function() { location.replace(l.attr("href")); }, 0);
-                  return true;
-                };
-              };
-            };
+              visObj.setRedirect();
+              setTimeout(function() {
+                location.replace(l.attr("href"));
+              }, 0);
+              return true;
+            }
+            return false;
           };
+          this.resetLinkElement = function(linkElement) {
+            if (!linkElement) {
+              return false;
+            }
+            linkElement.removeAttr("data-toggle");
+            linkElement.removeAttr("data-target");
+            linkElement.unbind("click");
+          },
           this.setItemVis = function(item, itemLink, vis) {
             if (item) {
+              this.resetLinkElement(item);
               switch(vis) {
                 case "disabled":
                   item.removeAttr("href");
@@ -1103,6 +1123,18 @@ module.exports = OrgTool = (function() {
                   item.attr("href", itemLink);
                   item.removeClass("icon-box__button--disabled");
               }
+            }
+          };
+          this.setDashboardMenuItem = function(domain) {
+            domain = domain || "";
+            var db = $(".side-nav-items__item--dashboard");
+            if (! (db.length === 0)) {
+              return;
+            }
+            $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + domain + '/home">' + i18next.t("My Dashboard") + '</a></li>');
+            if ($("#portalMain").length) { //currently at the patient portal page
+              this.setSelectedNavItem($(".side-nav-items__item--dashboard"));
+              $(".side-nav-items__item--home").hide(); 
             }
           };
           this.handleInterventionItemLinks = function(interventionItem, customName){
@@ -1127,12 +1159,15 @@ module.exports = OrgTool = (function() {
                     self.setItemVis($(this), link, "disabled");
                   });
                   $(".icon-box-" + itemName).addClass("icon-box--theme-inactive");
+                  this.disableInterventionLink(itemName);
                 }
               }
             }
           };
-          this.filterMenu = function (userId) {
+          this.filterMenu = function (userId, callback) {
+            callback = callback || function() {};
             if (!userId) {
+              callback({error: true});
               return false;
             }
             var self = this;
@@ -1143,45 +1178,47 @@ module.exports = OrgTool = (function() {
               async: false,
               cache: false
             }).done(function(data) {
-              var found_decision_support = false, found_symptom_tracker = false;
-              if (data.interventions) {
-                if (data.interventions.length > 0) {
-                  var db = $(".side-nav-items__item--dashboard");
-                  if (db.length === 0) {
-                    $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">' + i18next.t("My Dashboard") + '</a></li>');
-                    if ($("#portalMain").length > 0) {
-                      self.setSelectedNavItem($(".side-nav-items__item--dashboard"));
-                    }
-                  }
-                  $(".side-nav-items__item--home").hide();
-                }
-                (data.interventions).forEach(function(item) {
-                  var itemDescription = item.description;
-                  var itemLink = item.link_url;
-                  var itemName = item.name.replace(/\_/g, " ");
-                  var disabled = item.link_url == "disabled";
-                  var dm = /decision\s?support/gi;
-                  var sm = /symptom\s?tracker/gi;
-                  var sm2 = /self[_\s]?management/gi;
-                  if (dm.test(itemDescription) || dm.test(itemName)) {
-                    if (!disabled) {
-                      found_decision_support = true;
-                    }
-                    self.handleInterventionItemLinks(item, "decision-support");
-                  } else if (sm.test(itemDescription) || sm2.test(itemName)) {
-                    if (!disabled) {
-                      found_symptom_tracker = true;
-                    }
-                    self.handleInterventionItemLinks(item, "symptom-tracker");
-                  } else if ($.trim(itemDescription) !== "") {
-                    self.handleInterventionItemLinks(item);
-                  };
-              });
-              self.handleItemRedirect(userId, "decision-support", found_decision_support);
-              self.handleItemRedirect(userId, "symptom-tracker", found_symptom_tracker);
-            };
+              var found_decision_support = false, found_symptom_tracker = false, found_psatracker = false;
+              if (!data.interventions || !(data.interventions.length)) {
+                callback({error: true});
+                return false;
+              }
+              //add patient dashboard home link if not already present
+              self.setDashboardMenuItem(__PORTAL);
+              const DECISION_SUPPORT_ID = "decision-support";
+              const SYMPTOM_TRACKER_ID = "symptom-tracker";
+              const PSA_TRACKER_ID = "psa-tracker";
+              (data.interventions).forEach(function(item) {
+                var itemDescription = item.description;
+                var itemName = item.name.replace(/\_/g, " ");
+                var disabled = item.link_url == "disabled";
+                var dm = /decision\s?support/gi;
+                var sm = /symptom\s?tracker/gi;
+                var sm2 = /self[_\s]?management/gi;
+                var psam = /psa\s?tracker/gi; //PSA Tracker
+                if (dm.test(itemDescription) || dm.test(itemName)) {
+                  found_decision_support = !disabled;
+                  self.handleInterventionItemLinks(item, DECISION_SUPPORT_ID);
+                } else if (sm.test(itemDescription) || sm2.test(itemName)) {
+                  found_symptom_tracker = !disabled;
+                  self.handleInterventionItemLinks(item, SYMPTOM_TRACKER_ID);
+                } else if (psam.test(itemDescription) || psam.test(itemName)) {
+                  found_psatracker = !disabled;
+                  self.handleInterventionItemLinks(item, PSA_TRACKER_ID);
+                } else if ($.trim(itemDescription) !== "") {
+                  self.handleInterventionItemLinks(item);
+                };
+            });
+            if (self.handleItemRedirect(userId, DECISION_SUPPORT_ID, found_decision_support) ||
+                self.handleItemRedirect(userId, SYMPTOM_TRACKER_ID, found_symptom_tracker) ||
+                self.handleItemRedirect(userId, PSA_TRACKER_ID, found_psatracker)
+            ) {
+              return true;
+            }
+            callback();
             window.app.utilObj.setVis(false);
           }).fail(function() {
+            callback({error: true});
             window.app.utilObj.setVis(false);
           });
         };
@@ -1305,7 +1342,13 @@ module.exports = utilObj = (function() {
     };
     //this test for full URL - "https://stg-sm.us.truenth.org" etc.
     this.validateUrl = function(val) {
-        return  val && $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
+      if (!val) {
+        return false;
+      }
+      if (val.indexOf('://') > 0 || val.indexOf('//') === 0) { //check absolute path url
+        return  $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
+      }
+      return $.trim(val) !== "#"; 
     };
 
     this.getUrlParameter = function (name) {
@@ -1433,9 +1476,9 @@ $(document).ready(function(){
   window.app.upperBanner.handleAccess();
   window.app.upperBanner.handleWatermark();
   window.app.accessCodeObj.handleEvents();
-  window.app.menuObj.init(currentUserId);
-  window.app.interventionSessionObj.clearSession($("main").attr("data-link-identifier"));
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
-  setTimeout(function() { window.app.utilObj.setVis(false); }, 0);
+  window.app.menuObj.init(currentUserId, function() { //enable/disabled menu items depending on user roles
+    window.app.utilObj.setVis(false);
+  });
 });
 
