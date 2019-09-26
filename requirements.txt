@@ -13,7 +13,7 @@ chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.3
 decorator==4.4.0          # via validators
-dogpile.cache==0.7.1      # via flask-dogpile-cache
+dogpile.cache==0.8.0      # via flask-dogpile-cache
 enum34==1.1.6
 flask-babel==0.12.2
 flask-dance[sqla]==1.4.0
