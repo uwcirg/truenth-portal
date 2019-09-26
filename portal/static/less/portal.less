@@ -55,6 +55,7 @@
 @linkColor:       #4d4e50;
 @linkHover:       #576e76;
 @btnColor:        #606a73;
+@btnDefaultBorderColor: #bdb9b9;
 @inputBorderColor: #bdb9b9;
 @featureBtnColor: #333;
 @featureBtnHoverColor: #FFF;
@@ -1792,6 +1793,7 @@ div.pull-right {
   }
   div.checkbox label{
     font-size: @modalInputSize;
+    margin-bottom: 2px;
   }
   label.radio-inline {
     font-size: @modalInputSize;
@@ -1799,7 +1801,10 @@ div.pull-right {
   input[type="radio"] {
     position: relative;
     top: -1px;
-    left: -1px;
+    left: 4px;
+  }
+  input[type=checkbox] {
+    margin-right: 8px;
   }
 }
 #_downloadMessage {
@@ -1807,7 +1812,7 @@ div.pull-right {
 }
 #patientsInstrumentListWrapper {
   position: relative;
-  padding: 0.6em 0 0.3em 0;
+  padding: 0 0 0.3em 0;
 }
 #patientsInstrumentList {
   opacity: 0;
@@ -1828,6 +1833,60 @@ div.pull-right {
   opacity: 1;
   transition: opacity 250ms ease-out;
   z-index: 1;
+}
+#dataDownloadModal {
+  .export__display-container {
+    display: none;
+    margin-top: 1.5em;
+    &.active {
+      display: block;
+    }
+    .exportReport__retry{
+      padding: 0.5em 0.7em;
+      margin-top: 1em;
+    }
+  }
+  .export__loader {
+    margin-right: 8px;
+    position: relative;
+    top: 4px;
+  }
+  .export__status {
+    display: inline-block;
+    position: relative;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .export__status.active:before {
+    position: absolute;
+    animation: borderLoader 750ms infinite linear;
+    display: block;
+    content: " ";
+    bottom: 0;
+    left: 0;
+    top: 28px;
+    width: 10px;
+    height: 10px;
+    background: darken(@btnDefaultBorderColor, 5%);
+    border-radius: 100%;
+    opacity: 0.6;
+  }
+  .export__error {
+    .message {
+      color: @errorMessageColor;
+    }
+  }
+}
+@keyframes borderLoader {
+  0% {
+      left: 0;
+  }
+  50% {
+      left: 50%;
+  }
+  100% {
+      left: 100%;
+  }
 }
 #patientsDownloadTypeList {
   margin-top: 0.5em;

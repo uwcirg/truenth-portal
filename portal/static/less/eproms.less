@@ -1779,24 +1779,32 @@ div.footer-wrapper.right-panel {
   padding-bottom: 20px;
   position: relative;
   overflow: hidden;
-  .exportReport__display-container {
+}
+.exportReport__popovercontent,
+#dataDownloadModal {
+  .exportReport__display-container,
+  .export__display-container {
     margin-top: 1em;
     .exportReport__retry{
       padding: 0.5em 0.7em;
       margin-top: 1em;
     }
   }
-  .exportReport__loader {
+  .exportReport__loader,
+  .export__loader {
     margin-right: 8px;
     position: relative;
     top: 4px;
   }
-  .exportReport__status {
+  .exportReport__status,
+  .export__status {
     display: inline-block;
     position: relative;
+    padding-top: 4px;
     padding-bottom: 4px;
   }
-  .exportReport__status.active:before {
+  .exportReport__status.active:before, 
+  .export__status.active:before {
     position: absolute;
     animation: borderLoader 750ms infinite linear;
     display: block;
@@ -1809,6 +1817,26 @@ div.footer-wrapper.right-panel {
     background: darken(@btnDefaultBorderColor, 5%);
     border-radius: 100%;
     opacity: 0.6;
+  }
+  .exportReport__error,
+  .export__error {
+    .message {
+      color: @errorMessageColor;
+    }
+  }
+}
+#dataDownloadModal {
+  .exportReport__display-container,
+  .export__display-container {
+    display: none;
+    margin-top: 0;
+    &.active {
+      display: block;
+    }
+  }
+  .exportReport__status.active:before,
+  .export__status.active:before {
+    top: 28px;
   }
 }
 @keyframes borderLoader {
@@ -2393,6 +2421,15 @@ div.footer-wrapper.right-panel {
 #patientsInstrumentList {
   opacity: 0;
   transition: opacity 250ms ease-in;
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  .instrument-container {
+    margin: 4px 0;
+  }
   &.ready {
     opacity: 1;
     & + #instrumentListLoad {

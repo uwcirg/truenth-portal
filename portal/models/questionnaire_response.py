@@ -1,4 +1,5 @@
 from collections import namedtuple
+from datetime import datetime
 from html.parser import HTMLParser
 import json
 
@@ -27,8 +28,12 @@ class QuestionnaireResponse(db.Model):
         return context.current_parameters['document']['status']
 
     def default_authored(context):
-        return FHIR_datetime.parse(
+        # Don't allow future authored dates
+        authored = FHIR_datetime.parse(
             context.current_parameters['document']['authored'])
+        if authored > datetime.utcnow():
+            raise ValueError("future authored dates forbidden")
+        return authored
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
@@ -449,12 +454,15 @@ class QNR_indef_results(QNR_results):
                 encounter_id=qnr.encounter_id))
 
 
-def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
+def aggregate_responses(
+        instrument_ids, current_user, patch_dstu2=False, celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
+    :param patch_dstu2: set to make bundle DSTU2 compliant
+    :param celery_task: if defined, send occasional progress updates
 
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
@@ -480,6 +488,9 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
 
     patient_fields = ("careProvider", "identifier")
     system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+    if celery_task:
+        current, total = 0, questionnaire_responses.count()
+
     for questionnaire_response in questionnaire_responses:
         document = questionnaire_response.document_answered.copy()
         subject = questionnaire_response.subject
@@ -519,6 +530,13 @@ def aggregate_responses(instrument_ids, current_user, patch_dstu2=False):
             }
 
         annotated_questionnaire_responses.append(document)
+
+        if celery_task:
+            current += 1
+            if current % 25 == 0:
+                celery_task.update_state(
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
 
     return bundle_results(elements=annotated_questionnaire_responses)
 
@@ -584,10 +602,28 @@ def consolidate_answer_pairs(answers):
     return filtered_answers
 
 
+qnr_csv_column_headers = (
+    'identifier',
+    'status',
+    'study_id',
+    'site_id',
+    'site_name',
+    'truenth_subject_id',
+    'author_id',
+    'author_role',
+    'entry_method',
+    'authored',
+    'timepoint',
+    'instrument',
+    'question_code',
+    'answer_code',
+    'option_text',
+    'other_text',
+)
+
+
 def generate_qnr_csv(qnr_bundle):
     """Generate a CSV from a bundle of QuestionnaireResponses"""
-
-    csv_null_value = r"\N"
 
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
@@ -607,6 +643,8 @@ def generate_qnr_csv(qnr_bundle):
     def strip_tags(html):
         """Strip HTML tags from strings. Inserts whitespace if necessary."""
 
+        if html is None:
+            return
         s = HTMLStripper()
         s.feed(html)
         stripped = s.get_data()
@@ -636,7 +674,6 @@ def generate_qnr_csv(qnr_bundle):
         except (KeyError, IndexError):
             return None, None
 
-
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
         if (
@@ -656,36 +693,19 @@ def generate_qnr_csv(qnr_bundle):
         else:
             return 'Site Resource'
 
-    columns = (
-        'identifier',
-        'status',
-        'study_id',
-        'site_id',
-        'site_name',
-        'truenth_subject_id',
-        'author_id',
-        'author_role',
-        'entry_method',
-        'authored',
-        'timepoint',
-        'instrument',
-        'question_code',
-        'answer_code',
-        'option_text',
-        'other_text',
-    )
-
-    yield ','.join('"' + column + '"' for column in columns) + '\n'
     for qnr in qnr_bundle['entry']:
         site_id, site_name = get_site(qnr)
         row_data = {
-            'identifier': qnr['identifier']['value'],
+            'identifier': (
+                qnr['identifier']['value'] if 'identifier' in qnr else None),
             'status': qnr['status'],
             'truenth_subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
             ),
-            'author_id': qnr['author']['reference'].split('/')[-1],
+            'author_id': (
+                qnr['author']['reference'].split('/')[-1]
+                if 'author' in qnr else None),
             'site_id': site_id,
             'site_name': site_name,
             # Todo: correctly pick external study of interest
@@ -702,41 +722,26 @@ def generate_qnr_csv(qnr_bundle):
             'author_role': author_role(row_data, qnr),
         })
         for question in qnr['group']['question']:
-            row_data.update({
-                'question_code': question['linkId'],
-                'answer_code': None,
-                'option_text': None,
-                'other_text': None,
-            })
+            row_data['question_code'] = question['linkId']
+            for answer in consolidate_answer_pairs(
+                    question['answer']) or ({},):
 
-            answers = consolidate_answer_pairs(question['answer']) or ({},)
+                # Clear keys potentially added on previous loop
+                row_data.pop('answer_code', None)
+                row_data.pop('option_text', None)
+                row_data.pop('other_text', None)
 
-            for answer in answers:
                 if answer:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_data = {'other_text': list(answer.values())[0]}
+                    if list(answer.keys())[0] != 'valueCoding':
+                        row_data['other_text'] = list(answer.values())[0]
 
                     # ...unless nested code (ie valueCode)
-                    if list(answer.keys())[0] == 'valueCoding':
-                        answer_data.update({
-                            'answer_code': answer['valueCoding']['code'],
+                    else:
+                        row_data['answer_code'] = answer['valueCoding']['code']
 
-                            # Add supplementary text added earlier
-                            # Todo: lookup option text in stored Questionnaire
-                            'option_text': strip_tags(
-                                answer['valueCoding'].get('text', None)),
-                            'other_text': None,
-                        })
-                    row_data.update(answer_data)
-
-                row = []
-                for column_name in columns:
-                    column = row_data.get(column_name)
-                    column = csv_null_value if column is None else column
-
-                    # Handle JSON column escaping/enclosing
-                    if not isinstance(column, str):
-                        column = json.dumps(column).replace('"', '""')
-                    row.append('"' + column + '"')
-
-                yield ','.join(row) + '\n'
+                        # Add supplementary text added earlier
+                        # Todo: lookup option text in stored Questionnaire
+                        row_data['option_text'] = strip_tags(
+                            answer['valueCoding'].get('text', None))
+                yield {k: v for k, v in row_data.items() if v is not None}

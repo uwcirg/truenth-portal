@@ -15,10 +15,15 @@ from .communication import load_template_args
 from .message import EmailMessage
 from .organization import Organization, OrgTree
 from .overall_status import OverallStatus
+from .questionnaire_response import aggregate_responses
 from .qb_status import QB_Status
 from .qb_timeline import qb_status_visit_name
 from .questionnaire_bank import visit_name
-from .questionnaire_response import QNR_results
+from .questionnaire_response import (
+    QNR_results,
+    qnr_csv_column_headers,
+    generate_qnr_csv,
+)
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import latest_consent
@@ -135,6 +140,54 @@ def adherence_report(
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method', 'site',
             'consent']
+
+    return results
+
+
+def research_report(
+        instrument_ids, acting_user_id, patch_dstu2, request_url,
+        response_format, celery_task):
+    """Generates the research report
+
+    Designed to be executed in a background task - all inputs and outputs are
+    easily serialized (executing celery_task parent an obvious exception).
+
+    :param acting_user_id: id of user evoking request, for permission check
+    :param instrument_ids: list of instruments to include
+    :param patch_dstu2: set to make bundle dstu2 compliant
+    :param request_url: original request url, for inclusion in FHIR bundle
+    :param response_format: 'json' or 'csv'
+    :param celery_task: used to update status when run as a celery task
+    :return: dictionary of results, easily stored as a task output, including
+       any details needed to assist the view method
+
+    """
+    acting_user = User.query.get(acting_user_id)
+
+    # Rather than call current_user.check_role() for every patient
+    # in the bundle, delegate that responsibility to aggregate_responses()
+    bundle = aggregate_responses(
+        instrument_ids=instrument_ids,
+        current_user=acting_user,
+        patch_dstu2=patch_dstu2,
+        celery_task=celery_task
+    )
+    bundle.update({
+        'link': {
+            'rel': 'self',
+            'href': request_url,
+        },
+    })
+
+    results = {
+        'response_format': response_format,
+        'required_roles': [ROLE.RESEARCHER.value]}
+    if response_format == 'csv':
+        results['column_headers'] = qnr_csv_column_headers
+        results['data'] = [i for i in generate_qnr_csv(bundle)]
+        results['filename_prefix'] = 'qnr-data'
+    else:
+        results['data'] = bundle
 
     return results
 

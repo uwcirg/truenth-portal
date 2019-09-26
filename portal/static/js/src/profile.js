@@ -1796,7 +1796,8 @@ export default (function() {
                             $("#meSubmit").attr("disabled", true);
                             return;
                         }
-                        var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val());
+                        //add true boolean flag to check for future date entry
+                        var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
                         if (errorMessage) {
                             self.manualEntry.errorMessage = errorMessage;
                             return false;
@@ -1911,7 +1912,7 @@ export default (function() {
                         return false;
                     }
                     var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80)), errorMessage="";
-                    (data.audits).forEach(function(item) {
+                    (data.audits).forEach(function(item, itemIndex) {
                         item.by = item.by.reference || "-";
                         var r = /\d+/g;
                         var m = r.exec(String(item.by));
@@ -1919,14 +1920,14 @@ export default (function() {
                             item.by = m[0];
                         }
                         item.lastUpdated = self.modules.tnthDates.formatDateString(item.lastUpdated, "iso");
-                        item.comment = item.comment ? self.escapeHtml(item.comment) : "";
+                        item.comment = item.comment ? String(item.comment) : "";
                         var c = String(item.comment);
                         try {
                             c = decodeURIComponent(c);
                         } catch(e) { //catch error, output to console e.g. URI malformed error. output error to console for debugging purpose
                             console.log("Error decoding auditing comment " + c);
                             console.log(e);
-                            errorMessage = e.message + "" + e.stack;
+                            errorMessage = "Audit record #" + itemIndex + " " + e.message + "" + e.stack;
                         }
                         item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +

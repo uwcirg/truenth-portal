@@ -42,14 +42,14 @@ oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, reques
 passlib==1.7.1            # via flask-user
 polib==1.1.0
 pycparser==2.19           # via cffi
-pycryptodome==3.8.2       # via flask-user
+pycryptodome==3.9.0       # via flask-user
 python-dateutil==2.8.0
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2019.2              # via babel, celery
 pyyaml==5.1.2              # via flask-swagger, swagger-spec-validator
-redis==3.2.1
+redis==3.3.8
 requests-cache==0.5.2
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
 requests==2.22.0          # via flask-recaptcha, requests-cache, requests-oauthlib, sphinx

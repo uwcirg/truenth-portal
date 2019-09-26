@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" :aria-label="closeLabel"><span aria-hidden="true">&times;</span></button>
@@ -25,11 +25,12 @@
                                 </label>
                             </div>
                         </div>
-                        <br/>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
+                        <!-- display export status -->
+                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()"></ExportDataLoader>
                     </div>
                     <div class="modal-footer">
-                        <a :href="getExportUrl()" class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></a>
+                        <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
                         <button type="button" class="btn btn-default" data-dismiss="modal" v-text="closeLabel"></button>
                     </div>
                 </div>
@@ -43,6 +44,7 @@
 <script>
     import tnthAjax from "../modules/TnthAjax.js";
     import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
+    import ExportDataLoader from "./asyncExportDataLoader.vue";
     export default { /*global i18next */
         props: {
             instrumentsList: {
@@ -50,6 +52,7 @@
                 required: false
             }
         },
+        components: {ExportDataLoader},
         data: function() {
             return ExportInstrumentsData;
         },
@@ -57,6 +60,9 @@
             this.getInstrumentList();
         },
         methods: {
+            getInitElementId: function() {
+                return "patientsDownloadButton";
+            }, 
             getInstrumentList: function () {
                 if (this.instrumentsList && this.instrumentsList.length) {
                     this.setInstrumentsListContent(this.instrumentsList);
@@ -80,7 +86,7 @@
             setInstrumentsListContent: function(list) {
                 let content = "";
                 (list).forEach(function(code) {
-                    content += `<div class="checkbox instrument-container" id="${code}_container"><label><input type="checkbox" name="instrument" value="${code}">${code.replace(/_/g, " ").toUpperCase()}</label>`;
+                    content += `<div class="checkbox instrument-container" id="${code}_container"><label><input type="checkbox" name="instrument" value="${code}">${code.replace(/_/g, " ").toUpperCase()}</label></div>`;
                 });
                 document.querySelector("#patientsInstrumentList").innerHTML = content;
                 document.querySelector("#patientsInstrumentList").classList.add("ready");

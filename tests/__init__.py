@@ -10,6 +10,7 @@ options:
 """
 
 from datetime import datetime
+from time import sleep
 
 from flask import url_for
 from flask_testing import TestCase as Base
@@ -536,3 +537,27 @@ class TestCase(Base):
             if attr.startswith('_lazy'):
                 delattr(INTERVENTION, attr)
         OrgTree.invalidate_cache()
+
+    def results_from_async_call(
+            self, url, timeout=5, include_task_path=False, query_string=None):
+        """Wrap task of obtaining results from an async request"""
+        response = self.client.get(url, query_string=query_string)
+        # expect 202 response with location of status
+        assert response.status_code == 202
+        status_url = response.headers.get('Location')
+
+        # Give task a number of one second pauses to complete
+        for i in range(0, timeout):
+            response = self.client.get(status_url)
+            if response.json['state'] == 'SUCCESS':
+                break
+            sleep(1)
+
+        assert response.json['state'] == 'SUCCESS'
+
+        # done, now pull result (chop /status from status url for task result)
+        task_path = status_url[:-len('/status')]
+        results = self.client.get(task_path)
+        if include_task_path:
+            return task_path, results
+        return results

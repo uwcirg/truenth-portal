@@ -219,8 +219,7 @@ def account():
       - OAuth2AuthzFlow: []
     """
     acting_user = current_user()
-    if (acting_user.has_role(ROLE.ADMIN.value) or
-            acting_user.has_role(ROLE.SERVICE.value)):
+    if acting_user.has_role(ROLE.ADMIN.value, ROLE.SERVICE.value):
         adequate_perms = True
     else:
         adequate_perms = False

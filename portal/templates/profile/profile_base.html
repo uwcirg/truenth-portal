@@ -12,7 +12,7 @@
           <div id="profileHeader" class="profile-header"><h4 class="tnth-headline">{% block profile_title %}{{_("TrueNTH Profile")}}{% endblock %}</h4></div>
         </div>
         <div id="profileErrorMessage" class="error-message"></div>
-        <div id="profileMainContent" class="{%if user.has_role(ROLE.PATIENT)%}patient-view{%endif %}">{% block profile_content %}{% endblock %}</div>
+        <div id="profileMainContent" class="{%if user.has_role(ROLE.PATIENT.value)%}patient-view{%endif %}">{% block profile_content %}{% endblock %}</div>
         <br/><br/>
       </div>
     </div>

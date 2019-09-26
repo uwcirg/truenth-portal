@@ -23,10 +23,10 @@ snowballstemmer==1.2.1    # via sphinx
 sphinx-rtd-theme==0.4.3
 sphinx==2.2.0
 sphinxcontrib-websupport==1.1.2  # via sphinx
-tox==3.13.2
+tox==3.14.0
 typing==3.7.4.1             # via sphinx
-virtualenv==16.6.1        # via tox
-waitress==1.3.0           # via webtest
+virtualenv==16.7.5        # via tox
+waitress==1.3.1           # via webtest
 webob==1.8.5              # via webtest
 webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9

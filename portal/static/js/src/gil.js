@@ -1035,7 +1035,6 @@ module.exports = OrgTool = (function() {
             }
             this.setSelectedNavItem($(".side-nav-items__item--" + $("main").attr("data-section")));
             this.handleDisabledLinks();
-            $("footer a[href='/" + $("main").attr("data-link-identifier") + "']").hide();
             if ($("main").attr("data-section") === "about") {
               $("#repoVersion").show();
             }

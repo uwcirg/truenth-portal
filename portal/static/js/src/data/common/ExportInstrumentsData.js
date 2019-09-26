@@ -21,5 +21,7 @@ export default {
         dataType: "csv",
         selected: "",
         message: ""
-    }
+    },
+    requestSubmittedDisplay: i18next.t("Export request submitted"),
+    failedRequestDisplay: i18next.t("Request to export data failed.")
 };

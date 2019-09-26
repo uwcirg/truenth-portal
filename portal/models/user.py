@@ -1176,10 +1176,10 @@ class User(db.Model, UserMixin):
 
             """
             if (
-                not (acting_user.has_role(ROLE.ADMIN.value) or
-                     acting_user.has_role(ROLE.APPLICATION_DEVELOPER.value))
-                and (acting_user.has_role(ROLE.STAFF.value)
-                     or acting_user.has_role(ROLE.STAFF_ADMIN.value))
+                not acting_user.has_role(
+                    ROLE.ADMIN.value, ROLE.APPLICATION_DEVELOPER.value)
+                and acting_user.has_role(
+                    ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
                 and user.id == acting_user.id
             ):
                 raise ValueError(
@@ -1465,6 +1465,25 @@ class User(db.Model, UserMixin):
         return [prop.key for prop in class_mapper(cls).iterate_properties
                 if isinstance(prop, ColumnProperty)]
 
+    def merge_others_relationship(self, other_user, relationship):
+        self_entity = getattr(self, relationship)
+        other_entity = getattr(other_user, relationship)
+        if relationship == 'roles':
+            # We don't copy over the roles used to mark the weak account
+            append_list = [
+                item for item in other_entity if item not in self_entity and
+                item.name not in current_app.config['PRE_REGISTERED_ROLES']]
+        elif relationship == '_identifiers':
+            # Don't copy internal identifiers
+            append_list = [
+                item for item in other_entity if item not in self_entity and
+                item.system not in internal_identifier_systems]
+        else:
+            append_list = [
+                item for item in other_entity if item not in self_entity]
+        for item in append_list:
+            self_entity.append(item)
+
     def merge_with(self, other_id):
         """merge details from other user into self
 
@@ -1495,24 +1514,7 @@ class User(db.Model, UserMixin):
                              'observations', 'relationships', 'roles',
                              'races', 'ethnicities', 'groups',
                              'questionnaire_responses', '_identifiers'):
-            self_entity = getattr(self, relationship)
-            other_entity = getattr(other, relationship)
-            if relationship == 'roles':
-                # We don't copy over the roles used to mark the weak account
-                append_list = [
-                    item for item in other_entity
-                    if item not in self_entity and item.name not in
-                    current_app.config['PRE_REGISTERED_ROLES']]
-            elif relationship == '_identifiers':
-                # Don't copy internal identifiers
-                append_list = [item for item in other_entity if item not in
-                               self_entity and item.system not in
-                               internal_identifier_systems]
-            else:
-                append_list = [item for item in other_entity if item not in
-                               self_entity]
-            for item in append_list:
-                self_entity.append(item)
+            self.merge_others_relationship(other, relationship)
 
         # If other user has an external (3rd party) auth_provider, reassign
         # to self
@@ -1616,8 +1618,7 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if (any(self.has_role(r) for r in (
-                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)) and
+        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) and
                 other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
@@ -1669,8 +1670,12 @@ class User(db.Model, UserMixin):
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
-    def has_role(self, role_name):
-        return role_name in [r.name for r in self.roles]
+    def has_role(self, *roles):
+        """Given one or my roles by name, true if user has at least one"""
+        users_roles = set((r.name for r in self.roles))
+        for item in roles:
+            if item in users_roles:
+                return True
 
     def staff_html(self):
         """Helper used from templates to display any custom staff/provider text

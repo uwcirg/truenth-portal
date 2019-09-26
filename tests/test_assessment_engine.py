@@ -1,4 +1,5 @@
 """Unit test module for Assessment Engine API"""
+from datetime import datetime
 import json
 import os
 
@@ -7,6 +8,7 @@ from flask_swagger import swagger
 from flask_webtest import SessionScope
 import jsonschema
 import pytest
+from sqlalchemy.exc import StatementError
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -17,7 +19,10 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
 )
-from portal.models.questionnaire_response import QuestionnaireResponse
+from portal.models.questionnaire_response import (
+    QuestionnaireResponse,
+    qnr_csv_column_headers,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
@@ -296,6 +301,22 @@ class TestAssessmentEngine(TestCase):
             is None)
         assert test_user.questionnaire_responses[0].qb_iteration is None
 
+    def test_submit_future_assessment(self):
+        """Submit assessment with future date should fail"""
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        # bump authored to future value
+        data['authored'] = FHIR_datetime.as_fhir(
+            datetime.utcnow() + relativedelta(days=1))
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        with pytest.raises(StatementError) as exc:
+            self.client.post(
+                '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+            assert "future" in str(exc.value)
+
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
@@ -321,6 +342,8 @@ class TestAssessmentEngine(TestCase):
         self.login()
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.RESEARCHER.value)
+        self.add_system_user()
 
         # Upload incomplete QNR
         in_progress_response = self.client.post(
@@ -336,9 +359,10 @@ class TestAssessmentEngine(TestCase):
         assert update_qnr_response.json['ok']
         assert update_qnr_response.json['valid']
 
-        updated_qnr_response = self.client.get(
-            '/api/patient/assessment?instrument_id={}'.format(instrument_id))
-        assert update_qnr_response.status_code == 200
+        updated_qnr_response = self.results_from_async_call(
+            '/api/patient/assessment',
+            query_string={instrument_id: instrument_id})
+        assert updated_qnr_response.status_code == 200
         assert (
             updated_qnr_response.json['entry'][0]['group']
             == completed_qnr['group'])
@@ -372,15 +396,18 @@ class TestAssessmentEngine(TestCase):
         self.login()
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.STAFF.value)
+        self.promote_user(role_name=ROLE.RESEARCHER.value)
+        self.add_system_user()
 
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             json=example_data)
         assert upload.status_code == 200
 
-        response = self.client.get(
+        response = self.results_from_async_call(
             '/api/patient/assessment',
             query_string={'instrument_id': instrument_id})
+        assert response.status_code == 200
         response = response.json
 
         assert response['total'] == len(response['entry'])
@@ -395,16 +422,21 @@ class TestAssessmentEngine(TestCase):
             -1]
 
         self.promote_user(role_name=ROLE.PATIENT.value)
+        self.promote_user(role_name=ROLE.RESEARCHER.value)
+        self.add_system_user()
         self.login()
         upload_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             json=example_data)
         assert upload_response.status_code == 200
 
-        download_response = self.client.get(
+        download_response = self.results_from_async_call(
             '/api/patient/assessment',
             query_string={'format': 'csv', 'instrument_id': instrument_id}
         )
         csv_string = download_response.get_data(as_text=True)
+        # First line should match expected headers
+        lines = csv_string.split('\n')
+        assert lines[0] == ','.join(qnr_csv_column_headers)
         assert len(csv_string.split("\n")) > 1
         # Todo: use csv module for more robust test
