@@ -2,7 +2,7 @@
 @psaTrackerBorderColor: #eff0f1;
 @psaTrackerTableHeaderBgColor: #496470;
 @psaTrackerStrokeColor: #656F76;
-@psaTrackerHoverBgColor: #D7DBE0;
+@psaTrackerHoverBgColor: #e6e7ea;
 @legendTextColor: #333;
 @selectedColor: #777;
 @hoverColor: #FFF;
@@ -63,6 +63,9 @@
     margin-top: 2em;
     margin-bottom: 2em;
 }
+.markers-container {
+    display: none;
+}
 .focused {
     cursor: pointer;
 }
@@ -93,13 +96,13 @@ option.select-option {
     padding: 0.75em 1em 0.5em;
     letter-spacing: 1px;
     .body {
-        font-weight: 200;
+        font-weight: 300;
         letter-spacing: 1px;
     }
     .heading {
         margin: 0.5em 0 1em;
         border-bottom: 1px solid darken(@psaTrackerBorderColor, 50%);
-        padding-bottom: 2px;
+        padding-bottom: 6px;
         letter-spacing: 2px;
     }
 }
@@ -173,7 +176,7 @@ option.select-option {
         & a {
             color: @editLinkColor;
             text-decoration: none;
-            font-weight: 200;
+            font-weight: 400;
             letter-spacing: 1px;
             font-size: 12px;
             margin-right: 4px;
@@ -182,7 +185,7 @@ option.select-option {
         .edit-icon {
             display: inline-block;
             background: @linkBgColor;
-            padding: 4px;
+            padding: 8px;
             color: #FFF;
         }
         a:hover {
@@ -193,7 +196,6 @@ option.select-option {
             background-color:@contentColor;
             cursor: pointer;
         }
-        width: 120px;
         padding: 4px;
         position: absolute;
         right: 1%;
@@ -233,20 +235,20 @@ option.select-option {
     }
     TR.result-row {
         border: 1px solid @cellBorderColor;
-        &:hover {
-            cursor: pointer;
-        }
+        color: #FFF;
         .edit-icon {
             display: none;
             position: absolute;
             top: 35%;
             left: 6%;
-            color: @selectedColor;
         }
-        &.edit {
+        &.edit,
+        &:hover {
             .edit-icon {
                 display: block;
             }
+            color: @hoverColor;
+            cursor: pointer;
         }
     }
     TR.result-row.selected,
@@ -272,6 +274,7 @@ option.select-option {
             display: block;
             width: 100px;
             &:hover {
+                color: inherit;
                 cursor:pointer;
             }
         }
@@ -289,7 +292,6 @@ option.select-option {
             text-align: center;
             margin-left: 0.2em;
             background-color: @linkBgColor;
-            color: #FFF;
             &:hover {
                 cursor:pointer;
                 background-color: @contentColor;
@@ -381,17 +383,17 @@ option.select-option {
     margin-bottom: 1em;
     color: @noResultColor;
     border: 1px solid @borderColor;
-    min-height: 10em;
-    padding: 4.25em 1em;
+    min-height: 5em;
+    padding: 3.25em 1em;
     font-size: 1.3em;
     font-style: italic;
     letter-spacing: 0.5px;
     text-align: center;
     -webkit-font-smoothing: antialiased;
     position: relative;
-    -webkit-box-shadow: 10px 9px 5px -8px @borderColor;
-    -moz-box-shadow: 10px 9px 5px -8px @borderColor;
-    box-shadow: 10px 9px 5px -8px @borderColor;
+    -webkit-box-shadow: 2px 2px 4px -1px @borderColor;
+    -moz-box-shadow: 2px 2px 4px -1px @borderColor;
+    box-shadow: 2px 2px 4px -1px @borderColor;
 }
 #psaTrackerButtonsContainer {
     padding: 1em 0;
@@ -401,11 +403,11 @@ option.select-option {
     display: inline-block;
     button {
         margin-left: 0.25em;
-        -webkit-animation: scaler 1200ms linear;
-        -moz-animation: scaler 700ms linear;
-        -ms-animation: scaler 700ms linear;
-        -o-animation: scaler 700ms linear;
-        animation: scaler 700ms linear;
+        // -webkit-animation: scaler 1200ms linear;
+        // -moz-animation: scaler 700ms linear;
+        // -ms-animation: scaler 700ms linear;
+        // -o-animation: scaler 700ms linear;
+        // animation: scaler 700ms linear;
     }
 }
 @-webkit-keyframes scaler {

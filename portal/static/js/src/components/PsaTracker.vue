@@ -3,7 +3,7 @@
         <section class="psa-tracker-title">
             <h2 class="tnth-header heading">{{intro.header}}</h2>
             <div class="body">{{intro.body}}</div>
-            <div id="psaTrackerButtonsContainer"><button id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</button></div>
+            <div id="psaTrackerButtonsContainer"><a id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</a></div>
         </section>
         <section>
             <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">
@@ -123,7 +123,7 @@
                 </div>
             </div>
         </div>
-        <svg width="300" height="200">
+        <svg width="300" height="200" class="markers-container">
             <defs>
                 <path id="arrow" d="M2,2 L10,6 L2,10 L6,6 L2,2" class="marker" transform="rotate(90)" stroke-width="4"></path>
                 <rect id="marker" width="4" height="4" stroke-width="1" class="marker"></rect>
@@ -206,15 +206,24 @@
                     }
                 }
                 sessionStorage.removeItem(this.userIdKey);
-                this.getData(true);
-                this.getProcedure();
-                setTimeout(function() {
-                    self.checkTreatmentCoreData();
-                    self.initElementsEvents();
-                }, 300);
+                if (this.getCurrentUserId()) {
+                    this.getData(true);
+                    this.getProcedure();
+                    setTimeout(function() {
+                        self.checkTreatmentCoreData();
+                        self.initElementsEvents();
+                    }, 300);
+                } else {
+                    this.setAddNewLogin();
+                    return false;
+                }
             },
             isActedOn: function() {
                 return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
+            },
+            setAddNewLogin: function() {
+                $("#psaTrackerBtnAddNew").removeAttr("data-toggle").removeAttr("data-target");
+                $("#psaTrackerBtnAddNew").attr("href", this.loginURL);
             },
             restoreVis: function() {
                 var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
@@ -381,8 +390,11 @@
                 });
             },
             getProcedure: function() {
-                var self = this;
-                this.tnthAjax.getProc(this.getCurrentUserId(), false, function(data) {
+                var self = this, userId = this.getCurrentUserId();
+                if (!userId) {
+                    return;
+                }
+                this.tnthAjax.getProc(userId, false, function(data) {
                     if (!data) { return false; }
                     data.entry = data.entry || [];
                     var treatmentData = $.grep(data.entry, function(item) {
@@ -405,9 +417,12 @@
                 return this.treatment.data.length > 0;
             },
             getData: function() {
-                var self = this;
+                var self = this, userId = this.getCurrentUserId();
                 this.loading = true;
-                this.tnthAjax.getClinical(this.getCurrentUserId(), {data: {patch_dstu2: true}}, function(data) {
+                if (!userId) {
+                    return false;
+                }
+                this.tnthAjax.getClinical(userId, {data: {patch_dstu2: true}}, function(data) {
                     if(data.error) {
                         $("#psaTrackerErrorMessageContainer").html(self.serverErrorMessage);
                         self.loading = false;
@@ -772,7 +787,7 @@
                     .style("stroke-width", "0.5");
 
                 //add div for tooltip
-                var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+                var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style({"opacity": 0,"display": "none"});
 
                 //treatment line
                 var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 7));
@@ -841,7 +856,7 @@
                         element.style("fill", CIRCLE_STROKE_COLOR)
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
-                        tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
+                        tooltipContainer.transition().duration(200).style({"opacity": .9, "display": "block"}); //show tooltip for each data point
                         tooltipContainer.html("<b>" + self.PSALabel + "</b> " + d.display + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
@@ -856,7 +871,7 @@
                         element.style("stroke", CIRCLE_STROKE_COLOR)
                             .style("fill", "#FFF")
                             .classed("focused", false);
-                        tooltipContainer.transition().duration(500).style("opacity", 0);
+                        tooltipContainer.transition().duration(500).style({"opacity": 0, "display": "none"});
                     });
 
                 // Add text labels
@@ -892,7 +907,7 @@
 
                 //add axis legends
                 var xlegend = graphArea.append("g")
-                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 5) + ")");
+                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 8) + ")");
 
                 xlegend.append("text")
                     .text(self.xLegendText)

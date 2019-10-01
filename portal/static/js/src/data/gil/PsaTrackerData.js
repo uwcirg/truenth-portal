@@ -4,6 +4,7 @@ export default {
     clinicalCode: "666",
     clinicalDisplay: "psa",
     clinicalSystem: "http://us.truenth.org/clinical-codes",
+    loginURL: "/user/sign-in?next=/psa-tracker",
     loading: false,
     savingInProgress: false,
     addErrorMessage: "",
