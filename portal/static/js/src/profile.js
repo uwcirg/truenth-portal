@@ -1104,10 +1104,15 @@ export default (function() {
                         $("#profileEmailLogTable").bootstrapTable(this.setBootstrapTableConfig({
                             data: data.messages,
                             classes: "table table-responsive profile-email-log",
-                            sortName: "sent_at",
+                            sortName: "id",
                             sortOrder: "desc",
                             toolbar: "#emailLogTableToolBar",
-                            columns: [{
+                            columns: [
+                            { 
+                                field: "id",
+                                visible: false
+                            },
+                            {
                                 field: "sent_at",
                                 title: i18next.t("Date (GMT), Y-M-D"),
                                 searchable: true,
@@ -1128,16 +1133,24 @@ export default (function() {
                         }));
                         setTimeout(function() {
                             $("#lbEmailLog").addClass("active");
-                            $("#profileEmailLogTable a.item-link").on("click", function() {
-                                self.getEmailContent($(this).attr("data-user-id"), $(this).attr("data-item-id"));
-                            });
+                            self.setEmailContentLinkEvent();
                         }, 150);
+                        //dealing with pagination, events dynamically attached to elements will need to be re-initiated
+                        $("#profileEmailLogTable").on("reset-view.bs.table", function () {
+                            self.setEmailContentLinkEvent();
+                        });
                     } else {
                         $("#emailLogContent").html("<span class='text-muted'>" + i18next.t("No email log entry found.") + "</span>");
                     }
                 } else {
                     $("#emailLogMessage").text(data.error);
                 }
+            },
+            setEmailContentLinkEvent: function() {
+                let self = this;
+                $("#profileEmailLogTable a.item-link").on("click", function() {
+                    self.getEmailContent($(this).attr("data-user-id"), $(this).attr("data-item-id"));
+                });
             },
             initPatientEmailFormSection: function() {
                 var self = this;
