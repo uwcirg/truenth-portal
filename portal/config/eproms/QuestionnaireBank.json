@@ -1,6 +1,17 @@
 {
   "entry": [
     {
+      "name": "none of the above",
+      "comment": "Marker for Questionnaire Responses w/o an appropriate QB",
+      "classification": "other",
+      "intervention": {
+        "display": "default",
+        "reference": "api/intervention/default"
+      },
+      "start": "{\"days\": 0}",
+      "resourceType": "QuestionnaireBank"
+    },
+    {
       "classification": "baseline",
       "expired": "{\"days\": 91}",
       "name": "CRV_baseline",
