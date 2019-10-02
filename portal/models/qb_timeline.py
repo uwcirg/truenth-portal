@@ -598,14 +598,15 @@ class QB_StatusCacheKey(object):
         """
         now = datetime.utcnow()
         value = self.redis.get(self.key)
-        try:
-            value = FHIR_datetime.parse(value)
-            if value + self.valid_duration > now:
-                return value
-        except BadRequest:
-            if value is not None:
-                current_app.logger.warning(
-                    "Can't parse as datetime {}".format(value))
+        if value:
+            try:
+                value = FHIR_datetime.parse(value)
+                if value + self.valid_duration > now:
+                    return value
+            except BadRequest:
+                if value is not None:
+                    current_app.logger.warning(
+                        "Can't parse as datetime {}".format(value))
         return self.update(now)
 
     def update(self, value):
