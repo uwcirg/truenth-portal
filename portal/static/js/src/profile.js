@@ -1915,10 +1915,10 @@ export default (function() {
                 $("#profileAuditLogTable .loading-message-indicator").show();
                 this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
                     if (data.error) {
-                        errorMessage = i18next.t("Problem retrieving audit log from server.");
+                        errorMessage = i18next.t("Error retrieving data from server");
                     }
                     if (!data.audits || data.audits.length === 0) {
-                        errorMessage = i18next.t("No audit log item found.");
+                        errorMessage = i18next.t("no data returned");
                     }
                     if (errorMessage) {
                         $("#profileAuditLogTable").html("");
