@@ -1178,7 +1178,7 @@ module.exports = OrgTool = (function() {
               async: false,
               cache: false
             }).done(function(data) {
-              var found_decision_support = false, found_symptom_tracker = false, found_psatracker = false;
+              var found_decision_support = false, found_symptom_tracker = false;
               if (!data.interventions || !(data.interventions.length)) {
                 callback({error: true});
                 return false;
@@ -1187,7 +1187,6 @@ module.exports = OrgTool = (function() {
               self.setDashboardMenuItem(__PORTAL);
               const DECISION_SUPPORT_ID = "decision-support";
               const SYMPTOM_TRACKER_ID = "symptom-tracker";
-              const PSA_TRACKER_ID = "psa-tracker";
               (data.interventions).forEach(function(item) {
                 var itemDescription = item.description;
                 var itemName = item.name.replace(/\_/g, " ");
@@ -1195,23 +1194,18 @@ module.exports = OrgTool = (function() {
                 var dm = /decision\s?support/gi;
                 var sm = /symptom\s?tracker/gi;
                 var sm2 = /self[_\s]?management/gi;
-                var psam = /psa\s?tracker/gi; //PSA Tracker
                 if (dm.test(itemDescription) || dm.test(itemName)) {
                   found_decision_support = !disabled;
                   self.handleInterventionItemLinks(item, DECISION_SUPPORT_ID);
                 } else if (sm.test(itemDescription) || sm2.test(itemName)) {
                   found_symptom_tracker = !disabled;
                   self.handleInterventionItemLinks(item, SYMPTOM_TRACKER_ID);
-                } else if (psam.test(itemDescription) || psam.test(itemName)) {
-                  found_psatracker = !disabled;
-                  self.handleInterventionItemLinks(item, PSA_TRACKER_ID);
                 } else if ($.trim(itemDescription) !== "") {
                   self.handleInterventionItemLinks(item);
                 };
             });
             if (self.handleItemRedirect(userId, DECISION_SUPPORT_ID, found_decision_support) ||
-                self.handleItemRedirect(userId, SYMPTOM_TRACKER_ID, found_symptom_tracker) ||
-                self.handleItemRedirect(userId, PSA_TRACKER_ID, found_psatracker)
+                self.handleItemRedirect(userId, SYMPTOM_TRACKER_ID, found_symptom_tracker)
             ) {
               return true;
             }

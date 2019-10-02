@@ -7,6 +7,9 @@
         </section>
         <section>
             <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">
+                <div class="icon-group">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </div>
                 {{noResultMessage}}
                 <span v-if="isActedOn()">
                     <refresh-icon v-on:refresh="refresh" v-bind:title="getRefreshMessage()"></refresh-icon>
@@ -82,11 +85,11 @@
                             <table id="psaTrackerAddTable" v-bind:class="{ 'tnth-hide': modalLoading }">
                                 <tr>
                                     <td class="field-label" v-html="fields.resultLabel"></td>
-                                    <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder" /></td>
+                                    <td class="input-field"><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder" /></td>
                                 </tr>
                                 <tr>
                                     <td class="field-label" v-html="fields.dateLabel"></td>
-                                    <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder" /></td>
+                                    <td class="input-field"><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder" /></td>
                                 </tr>
                             </table>
                             <br/>
@@ -206,17 +209,16 @@
                     }
                 }
                 sessionStorage.removeItem(this.userIdKey);
-                if (this.getCurrentUserId()) {
-                    this.getData(true);
-                    this.getProcedure();
-                    setTimeout(function() {
-                        self.checkTreatmentCoreData();
-                        self.initElementsEvents();
-                    }, 300);
-                } else {
+                if (!this.getCurrentUserId()) {
                     this.setAddNewLogin();
                     return false;
                 }
+                this.getData(true);
+                this.getProcedure();
+                setTimeout(function() {
+                    self.checkTreatmentCoreData();
+                    self.initElementsEvents();
+                }, 300);
             },
             isActedOn: function() {
                 return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
@@ -334,13 +336,26 @@
             getCurrentUserId: function() {
                 var self = this;
                 if(!sessionStorage.getItem(this.userIdKey)) {
-                    this.tnthAjax.sendRequest("/api/me", "GET", "", { sync: true }, function(data) {
-                        if(!data.error) {
-                            sessionStorage.setItem(self.userIdKey, data.id);
-                        } else {
-                            sessionStorage.setItem(self.userIdKey, $("#psaTracker_currentUser").val());
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/me",
+                        async: false,
+                        success: function(data) {
+                            if(data && data.id) {
+                                sessionStorage.setItem(self.userIdKey, data.id);
+                            }
+                        },
+                        error: function(response) {
+                            sessionStorage.setItem(self.userIdKey, "");
                         }
                     });
+                    // this.tnthAjax.sendRequest("/api/me", "GET", "", { sync: true }, function(data) {
+                    //     if(!data.error) {
+                    //         sessionStorage.setItem(self.userIdKey, data.id);
+                    //     } else {
+                    //         sessionStorage.setItem(self.userIdKey, $("#psaTracker_currentUser").val());
+                    //     }
+                    // });
                 }
                 return sessionStorage.getItem(this.userIdKey);
             },
@@ -449,6 +464,7 @@
                     results = $.grep(results, function(item) {
                         return item.display.toLowerCase() === "psa";
                     });
+                    
                     // sort from newest to oldest
                     results = results.sort(function(a, b) {
                         return new Date(b.date) - new Date(a.date);
@@ -743,7 +759,7 @@
                     .attr("x", 7)
                     .attr("dy", ".35em")
                     .attr("class", "axis-stroke")
-                    .style("letter-spacing", "1px")
+                    .style("letter-spacing", "0.5px")
                     .style("text-anchor", "start");
 
                 // add the X gridlines
