@@ -349,13 +349,6 @@
                             sessionStorage.setItem(self.userIdKey, "");
                         }
                     });
-                    // this.tnthAjax.sendRequest("/api/me", "GET", "", { sync: true }, function(data) {
-                    //     if(!data.error) {
-                    //         sessionStorage.setItem(self.userIdKey, data.id);
-                    //     } else {
-                    //         sessionStorage.setItem(self.userIdKey, $("#psaTracker_currentUser").val());
-                    //     }
-                    // });
                 }
                 return sessionStorage.getItem(this.userIdKey);
             },
