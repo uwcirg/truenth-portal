@@ -8,12 +8,11 @@ Create Date: 2019-10-01 15:31:47.918164
 from alembic import op
 import sqlalchemy as sa
 
+from portal.models.questionnaire_bank import classification_types
 
 # revision identifiers, used by Alembic.
 revision = 'da6506c5899a'
 down_revision = '9c6788e6db2f'
-
-from portal.models.questionnaire_bank import classification_types
 
 new_enum = sa.Enum(*classification_types, name='classification_enum')
 tmp_enum = sa.Enum(*classification_types, name='_classification_enum')
@@ -30,7 +29,8 @@ def upgrade():
     tmp_enum.create(op.get_bind(), checkfirst=False)
     op.execute(
         'ALTER TABLE questionnaire_banks ALTER COLUMN classification TYPE '
-        '_classification_enum USING classification::text::_classification_enum')
+        '_classification_enum USING '
+        'classification::text::_classification_enum')
 
     old_enum.drop(op.get_bind(), checkfirst=False)
 
@@ -59,7 +59,8 @@ def downgrade():
     tmp_enum.create(op.get_bind(), checkfirst=False)
     op.execute(
         'ALTER TABLE questionnaire_banks ALTER COLUMN classification TYPE '
-        '_classification_enum USING classification::text::_classification_enum')
+        '_classification_enum USING '
+        'classification::text::_classification_enum')
 
     new_enum.drop(op.get_bind(), checkfirst=False)
 
