@@ -23,7 +23,7 @@ class QB_Status(object):
             setattr(self, "_{}_date".format(state.name), None)
         self._overall_status = None
         self._sync_timeline()
-        self._indef_stats()
+        self._indef_init()
 
     def _sync_timeline(self):
         """Sync QB timeline and obtain status"""
@@ -172,7 +172,7 @@ class QB_Status(object):
                 QBT.status).first()
             yield self.__ordered_qbs[index], str(status[0])
 
-    def _indef_stats(self):
+    def _indef_init(self):
         """Lookup stats for indefinite case - requires special handling"""
         qbs = ordered_qbs(self.user, classification='indefinite')
         self._current_indef = None
@@ -180,6 +180,23 @@ class QB_Status(object):
             if self._current_indef is not None:
                 raise RuntimeError("unexpected second indef qb")
             self._current_indef = q
+
+    def indef_status(self):
+        """Return indef QBD and status"""
+        if not self.enrolled_in_classification(classification='indefinite'):
+            return None, None
+
+        qbd = next(ordered_qbs(self.user, classification='indefinite'))
+        self._response_lookup()
+        if self.overall_status == OverallStatus.withdrawn:
+            status = OverallStatus.withdrawn
+        elif self._partial_indef:
+            status = OverallStatus.in_progress
+        elif self._completed_indef.issuperset(self._required_indef):
+            status = OverallStatus.completed
+        elif self._required_indef:
+            status = OverallStatus.due
+        return qbd, str(status)
 
     def _response_lookup(self):
         """Lazy init - only lookup associated QNRs if needed"""
