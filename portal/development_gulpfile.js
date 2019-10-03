@@ -259,4 +259,4 @@ exports.watchPsaTrackerLess = series(watchPsaTrackerLess);
 /*
  * compile all portal less files 
  */
-exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess, watchPsaTrackerLess));
+exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess));
