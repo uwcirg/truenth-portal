@@ -37,6 +37,7 @@ from portal.models.organization import (
 from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.questionnaire_bank import add_static_questionnaire_bank
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
@@ -505,6 +506,7 @@ class TestCase(Base):
             add_static_concepts(only_quick=True)
             add_static_interventions()
             add_static_organization()
+            add_static_questionnaire_bank()
             add_static_relationships()
             add_static_roles()
             db.session.commit()

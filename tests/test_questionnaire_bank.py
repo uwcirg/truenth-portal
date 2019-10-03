@@ -256,6 +256,7 @@ class TestQuestionnaireBank(TestCase):
         self.setup_org_qbs()
         qbs = QuestionnaireBank.query.all()
         expected = {
+            'None Of The Above',
             'Crv Baseline V2',
             'Crv Recurring 3Mo Period V2',
             'Crv Recurring 6Mo Period V2'}
@@ -605,7 +606,9 @@ class TestQuestionnaireBank(TestCase):
 
         resp = self.client.get('/api/questionnaire_bank')
         assert resp.status_code == 200
-        assert len(resp.json['entry'][0]['resource']['questionnaires']) == 3
+        assert resp.json['entry'][0]['resource']['name'] == 'none of the above'
+        assert resp.json['entry'][1]['resource']['name'] == 'CRV'
+        assert len(resp.json['entry'][1]['resource']['questionnaires']) == 3
 
     def test_visit_baseline(self):
         crv = self.setup_org_qbs()

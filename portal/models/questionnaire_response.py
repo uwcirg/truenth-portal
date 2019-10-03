@@ -124,7 +124,7 @@ class QuestionnaireResponse(db.Model):
                 "Can't locate QB for patient {}'s questionnaire_response "
                 "with reference to given instrument {}".format(
                     self.subject_id, qn_name))
-            self.questionnaire_bank_id = None
+            self.questionnaire_bank_id = 0  # none of the above
             self.qb_iteration = None
 
         if self.questionnaire_bank_id != initial_qb_id or (

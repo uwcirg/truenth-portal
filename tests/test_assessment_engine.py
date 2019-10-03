@@ -298,7 +298,7 @@ class TestAssessmentEngine(TestCase):
         assert test_user.questionnaire_responses.count() == 1
         assert (
             test_user.questionnaire_responses[0].questionnaire_bank_id
-            is None)
+            == 0)
         assert test_user.questionnaire_responses[0].qb_iteration is None
 
     def test_submit_future_assessment(self):

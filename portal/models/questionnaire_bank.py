@@ -10,7 +10,7 @@ from ..date_tools import RelativeDelta
 from ..trace import trace
 from .clinical_constants import CC
 from .fhir import bundle_results
-from .intervention import Intervention
+from .intervention import Intervention, INTERVENTION
 from .intervention_strategies import observation_check
 from .procedure_codes import latest_treatment_started_date
 from .qbd import QBD
@@ -20,7 +20,7 @@ from .reference import Reference
 from .research_protocol import ResearchProtocol
 from .user_consent import latest_consent
 
-classification_types = ('baseline', 'recurring', 'indefinite')
+classification_types = ('baseline', 'recurring', 'indefinite', 'other')
 classification_types_enum = ENUM(
     *classification_types, name='classification_enum', create_type=False)
 
@@ -540,3 +540,15 @@ def visit_name(qbd):
         total = clm * qbd.iteration + sm
         return _('Month %(month_total)d', month_total=total)
     return _(qbd.questionnaire_bank.classification.title())
+
+
+def add_static_questionnaire_bank():
+    """Insert special `none of the above` at index 0"""
+    existing = QuestionnaireBank.query.get(0)
+    if not existing:
+        db.session.add(QuestionnaireBank(
+            id=0,
+            name='none of the above',
+            classification='other',
+            start="{'days': 0}",
+            intervention_id=INTERVENTION.DEFAULT.id))

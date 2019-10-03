@@ -34,6 +34,7 @@ from portal.models.i18n_utils import (
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.questionnaire_bank import add_static_questionnaire_bank
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
@@ -136,6 +137,7 @@ def seed(keep_unmentioned=False):
 
     add_static_interventions()
     add_static_organization()
+    add_static_questionnaire_bank()
     add_static_relationships()
     add_static_roles()
     db.session.commit()

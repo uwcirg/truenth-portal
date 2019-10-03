@@ -254,7 +254,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         assert qbstatus.overall_status == OverallStatus.due
         assert (0 == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
-            QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
+            QuestionnaireResponse.questionnaire_bank_id != 0).count())
 
     def test_qb_post_consent_change(self):
         # Basic w/ one complete QB followed by consent change
