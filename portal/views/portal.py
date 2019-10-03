@@ -764,9 +764,10 @@ def contact_sent(message_id):
 
 
 @portal.route('/psa-tracker')
-@roles_required(ROLE.PATIENT.value)
-@oauth.require_oauth()
 def psa_tracker():
+    user = current_user()
+    if user:
+        user.check_role("edit", other_id=user.id)
     return render_template('psa_tracker.html', user=current_user())
 
 
