@@ -1910,22 +1910,25 @@ export default (function() {
                 self.initUserRoles();
             },
             initAuditLogSection: function() {
-                var self = this;
+                var self = this, errorMessage = "";
                 $("#profileAuditLogTable").html(Utility.getLoaderHTML());
                 $("#profileAuditLogTable .loading-message-indicator").show();
                 this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
                     if (data.error) {
-                        $("#profileAuditLogTable").html("");
-                        $("#profileAuditLogErrorMessage").text(i18next.t("Problem retrieving audit log from server."));
-                        return false;
+                        errorMessage = i18next.t("Error retrieving data from server");
                     }
                     if (!data.audits || data.audits.length === 0) {
+                        errorMessage = i18next.t("no data returned");
+                    }
+                    if (errorMessage) {
                         $("#profileAuditLogTable").html("");
-                        $("#profileAuditLogErrorMessage").text(i18next.t("No audit log item found."));
+                        $("#profileAuditLogErrorMessage").text(errorMessage);
+                        //report error if loading audit log results in error
+                        self.modules.tnthAjax.reportError(self.subjectId, "/api/user/" + self.subjectId + "/audit", errorMessage);
                         return false;
                     }
                     var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80)), errorMessage="";
-                    (data.audits).forEach(function(item, itemIndex) {
+                    (data.audits).forEach(function(item) {
                         item.by = item.by.reference || "-";
                         var r = /\d+/g;
                         var m = r.exec(String(item.by));
@@ -1934,14 +1937,8 @@ export default (function() {
                         }
                         item.lastUpdated = self.modules.tnthDates.formatDateString(item.lastUpdated, "iso");
                         item.comment = item.comment ? String(item.comment) : "";
+                        //noting here that comment is already escaped.  just need to display it as is, no need to decode it
                         var c = String(item.comment);
-                        try {
-                            c = decodeURIComponent(c);
-                        } catch(e) { //catch error, output to console e.g. URI malformed error. output error to console for debugging purpose
-                            console.log("Error decoding auditing comment " + c);
-                            console.log(e);
-                            errorMessage = "Audit record #" + itemIndex + " " + e.message + "" + e.stack;
-                        }
                         item.comment = c.length > len ? (c.substring(0, len + 1) + "<span class='second hide'>" + (c.substr(len + 1)) + "</span><br/><sub onclick='{showText}' class='pointer text-muted'>" + i18next.t("More...") + "</sub>") : item.comment;
                         item.comment = (item.comment).replace("{showText}", "(function (obj) {" +
                             "if (obj) {" +
@@ -1953,10 +1950,6 @@ export default (function() {
                         );
                         fData.push(item);
                     });
-                    if (errorMessage) {
-                        //report error if rendering audit log generates runtime JS error
-                        self.modules.tnthAjax.reportError(self.subjectId, "/api/user/" + self.subjectId + "/audit", errorMessage);
-                    }
                     $("#profileAuditLogTable").html("");
                     $("#profileAuditLogTable").bootstrapTable(self.setBootstrapTableConfig({
                         data: fData,
