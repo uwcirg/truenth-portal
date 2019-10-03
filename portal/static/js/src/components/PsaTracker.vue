@@ -132,6 +132,22 @@
                 <rect id="marker" width="4" height="4" stroke-width="1" class="marker"></rect>
             </defs>
         </svg>
+        <div class="modal fade" id="psaLoginRegisterModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content box-modal">
+                <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" :aria-label="closeText"></a>
+                    <h3 class="box-modal__title" v-text="loginLabel"></h3>
+                    <a :href="loginURL" class="button button-large button--teal button--login--register" v-text="loginLabel"></a>
+                    <div class="divider">
+                         <div class="or">or</div>
+                    </div>
+                    <h3 class="box-modal__title" v-text="joinUsText"></h3>
+                    <p class="box-modal__copy" v-text="createAccountIntroText"></p>
+                    <a :href="registerURL" class="button button-large button--teal button--register" v-text="createAccountText"></a>
+                </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 <script>
@@ -210,6 +226,7 @@
                 }
                 sessionStorage.removeItem(this.userIdKey);
                 if (!this.getCurrentUserId()) {
+                    this.initLoginRegisterModal();
                     this.setAddNewLogin();
                     return false;
                 }
@@ -225,7 +242,10 @@
             },
             setAddNewLogin: function() {
                 $("#psaTrackerBtnAddNew").removeAttr("data-toggle").removeAttr("data-target");
-                $("#psaTrackerBtnAddNew").attr("href", this.loginURL);
+                $("#psaTrackerBtnAddNew").on("click", function() {
+                    $("#psaLoginRegisterModal").modal("show");
+                });
+                
             },
             restoreVis: function() {
                 var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
@@ -268,6 +288,9 @@
                     this.addErrorMessage = "";
                 }
                 return isValid;
+            },
+            initLoginRegisterModal: function() {
+                $("#psaLoginRegisterModal").modal({show: false, backdrop: "static"});
             },
             formatDateString: function(date, format) {
                 return this.tnthDates.formatDateString(date, format);

@@ -17,6 +17,8 @@
 @noResultColor: #B1B1B1;
 @cellBorderColor: #E5E5E5;
 @borderColor: #ececec;
+@btnBgColor: #7c959e;
+@modalTitleColor: #4b5e6f;
 
 .filter-control {
     -webkit-appearance: none;
@@ -59,6 +61,12 @@
 #mainPsaApp {
     margin-top: 1em;
     min-height: 60vh;
+    a.button, a.btn {
+        &:hover {
+            color: #FFF;
+            text-decoration: none;
+        }
+    }
 }
 #mainPsaApp section {
     margin-top: 2em;
@@ -373,6 +381,134 @@ option.select-option {
         .modal-dialog {
             width: 520px;
         }
+    }
+}
+#psaLoginRegisterModal {
+    .box-modal {
+        color: #4b5e6f;
+        position: relative;
+    }
+    .box-modal__title {
+        font-size: 28px;
+        line-height: 33px;
+        color: @modalTitleColor;
+        position: relative;
+        padding: 0 0 20px;
+        margin: 0 0 25px;
+        font-weight: 700;
+        &:after {
+            opacity: .5;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            margin-left: -64px;
+            background: @modalTitleColor;
+            content: '';
+            display: block;
+            height: 1px;
+            width: 128px;
+        }
+    }
+    .modal-content {
+        border-radius: 0;
+        text-align: center;
+        width: 460px;
+        margin: auto;
+        max-width: 100%;
+        background-clip: padding-box;
+        outline: 0;
+    }
+    .box-modal__inner {
+        padding: 40px 40px 52px;
+    }
+    form button, .button--teal {
+        background: @btnBgColor;
+        color: #fff;
+        border-radius: 0;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        &:hover {
+            color: #FFF !important;
+            text-decoration: none !important;
+            background: darken(@btnBgColor, 10%);
+        }
+    }
+    div.or {
+        background-color: #a0abaf;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        height: 28px;
+        text-align: center;
+        text-transform: uppercase;
+        width: 28px;
+        margin: 4.5em auto;
+        position: relative;
+        z-index: 5;
+        letter-spacing: 2px;
+        border-radius: 100%;
+        padding-left: 2px;
+        padding-top: 1px;
+
+    }
+    .divider {
+        width: 100%;
+        position: relative;
+        &:after {
+            content: "";
+            display: block;
+            height: 1px;
+            background: #ebebeb;
+            width: 90%;
+            position: absolute;
+            top: 50%;
+            z-index: 4;
+            left: 5%;
+            right: 5%;
+        }
+    }
+    .box-modal__copy {
+        margin-bottom: 24px;
+    }
+    .box-modal__close {
+        cursor: pointer;
+        font-size: 30px;
+        line-height: 1;
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        color: @btnBgColor;
+        z-index: 500;
+        &:before {
+            content: "\EA06";
+            display: inline-block;
+            font-family: symbols;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    }
+    .button-large {
+        display: inline-block;
+        width: 100%;
+        margin: 0 auto;
+        overflow: hidden;
+        height: 68px;
+        font-size: 17px;
+        line-height: 1;
+        padding: 27px 15px;
+        &:hover {
+            color: #FFF !important;
+            text-decoration: none !important;
+        }
+    }
+}
+@media (min-width: 768px) {
+    #psaLoginRegisterModal .modal-content {
+        box-shadow: 0 5px 15px rgba(0,0,0,.5);
     }
 }
 .psaTrackerLoader {
