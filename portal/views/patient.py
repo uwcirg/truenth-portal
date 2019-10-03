@@ -363,6 +363,11 @@ def patient_timeline(patient_id):
         status['in-progress'] = qbstatus.instruments_in_progress()
         status['completed'] = qbstatus.instruments_completed()
 
+    indef_qbd, indef_status = qbstatus.indef_status()
+    if indef_qbd:
+        status['indefinite QBD'] = indef_qbd.as_json()
+        status['indefinite status'] = indef_status
+
     if trace:
         return jsonify(
             status=status,
