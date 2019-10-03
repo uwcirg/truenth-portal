@@ -8,7 +8,7 @@ flask-testing==0.7.1
 flask-webtest==0.0.9
 imagesize==1.1.0          # via sphinx
 mock==3.0.5
-packaging==19.0           # via sphinx, tox
+packaging==19.2           # via sphinx, tox
 page-objects==1.1.0
 pluggy==0.13.0             # via tox
 # use pre-compiled binary for testing, build from source for prod
