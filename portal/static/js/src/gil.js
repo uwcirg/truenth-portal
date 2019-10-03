@@ -1339,7 +1339,7 @@ module.exports = utilObj = (function() {
         return false;
       }  
       //this test for full URL - "https://stg-sm.us.truenth.org" etc.
-      if (val.indexOf('://') > 0 || val.indexOf('//') === 0) {
+      if (val.indexOf('http') > 0 || val.indexOf('https') > 0) {
         return  $.trim(val) !== "#" && /^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
       }
       return $.trim(val) !== "#"; 
