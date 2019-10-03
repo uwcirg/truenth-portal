@@ -245,7 +245,6 @@
                 $("#psaTrackerBtnAddNew").on("click", function() {
                     $("#psaLoginRegisterModal").modal("show");
                 });
-                
             },
             restoreVis: function() {
                 var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
