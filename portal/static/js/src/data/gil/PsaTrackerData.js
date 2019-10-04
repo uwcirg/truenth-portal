@@ -77,6 +77,7 @@ export default {
     },
     PSALabel: i18next.t("PSA"),
     loginLabel: i18next.t("Login"),
+    loginPrompt: i18next.t("<a data-toggle='modal' data-target='#psaLoginRegisterModal'>Login or Register</a> now to track and store your PSA"),
     joinUsText: i18next.t("Join Us"),
     createAccountText: i18next.t("Create Account"),
     createAccountIntroText: i18next.t("It’s going to take a group effort to improve the prostate cancer experience for future generations."),
