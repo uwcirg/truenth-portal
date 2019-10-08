@@ -163,7 +163,7 @@
                         // rerun in 2 seconds
                         self.exportDataTimeoutID = setTimeout(function() {
                             self.updateExportProgress(statusUrl, callback);
-                        }.bind(self), 5000); //each update invocation should be assigned a unique timeoutid
+                        }.bind(self), 3000); //each update invocation should be assigned a unique timeoutid
                         (self.arrExportDataTimeoutID).push(self.exportDataTimeoutID);
                     }
                 }).fail(function() {
