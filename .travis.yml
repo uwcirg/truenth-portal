@@ -58,6 +58,8 @@ before_install:
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
   # Only create DB if postgres configured in job addons
+  # testing DB must be created manually when using a non-docker psql service
+  # postgres docker image creates DB specified by env vars, as necessary, on startup
   - if [ "$TOXENV" = ui ]; then
       createdb
         --owner "$PGUSER"
