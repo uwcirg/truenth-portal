@@ -3,6 +3,7 @@
         <section class="psa-tracker-title">
             <h2 class="tnth-header heading">{{intro.header}}</h2>
             <div class="body">{{intro.body}}</div>
+            <div id="psaTrackerLoginPrompt" class="tnth-hide" v-html="loginPrompt"></div>
             <div id="psaTrackerButtonsContainer"><a id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</a></div>
         </section>
         <section>
@@ -226,6 +227,7 @@
                 }
                 sessionStorage.removeItem(this.userIdKey);
                 if (!this.getCurrentUserId()) {
+                    this.showLoginPrompt();
                     this.initLoginRegisterModal();
                     this.setAddNewLogin();
                     return false;
@@ -239,6 +241,9 @@
             },
             isActedOn: function() {
                 return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
+            },
+            showLoginPrompt: function() {
+                $("#psaTrackerLoginPrompt").removeClass("tnth-hide");
             },
             setAddNewLogin: function() {
                 $("#psaTrackerBtnAddNew").removeAttr("data-toggle").removeAttr("data-target");
