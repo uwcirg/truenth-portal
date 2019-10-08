@@ -57,15 +57,10 @@ before_install:
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-  # Create a database for each py.test worker if TEST_JOB_COUNT set
-  - if [ -n "$TEST_JOB_COUNT" ]; then
-      for ((i=0; i<$TEST_JOB_COUNT; i++)); do
-        createdb
-          --owner "$PGUSER"
-          --username "$PGUSER"
-        "${PGDATABASE}${i}" ;
-      done ;
-    else
+  # Only create DB if postgres configured in job addons
+  # testing DB must be created manually when using a non-docker psql service
+  # postgres docker image creates DB specified by env vars, as necessary, on startup
+  - if [ "$TOXENV" = ui ]; then
       createdb
         --owner "$PGUSER"
         --username "$PGUSER"
