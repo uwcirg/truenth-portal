@@ -87,6 +87,9 @@
                     e.stopPropagation();
                     let exportDataUrl = self.getExportUrl();
                     self.updateProgressDisplay("", "");
+                    /*
+                     * clear UI and any impending requests and start anew
+                     */
                     self.onBeforeExportData();
                     $.ajax({
                         type: "GET",
