@@ -61,6 +61,7 @@
             },
             onBeforeExportData: function() {
                 this.clearExportDataTimeoutID();
+                this.clearExportDataUI();
                 $("#" + this.initElementId).attr("disabled", true);
                 $(".export__display-container").addClass("active");
                 $(".export__status").addClass("active");
@@ -75,21 +76,21 @@
                 }.bind(this), 5000);
                 if (options.error) {
                     this.updateProgressDisplay("", "");
-                    $(".export__error .message").html(this.failedRequestDisplay);
+                    $(".export__error .message").html(this.failedRequestDisplay + (options.message? "<br/>"+options.message: ""));
                     return;
                 }
                 $(".export__error .message").html("");
             },
             initExportUIEvent: function() {
-                const DELAY_INTERVAL = 50;
                 let self = this;
                 $("#" + this.initElementId).on("click", function(e) {
                     e.stopPropagation();
                     let exportDataUrl = self.getExportUrl();
                     self.updateProgressDisplay("", "");
-                    setTimeout(function() {
-                        self.onBeforeExportData();
-                    }, DELAY_INTERVAL);
+                    /*
+                     * clear UI and any impending requests and start anew
+                     */
+                    self.onBeforeExportData();
                     $.ajax({
                         type: "GET",
                         url: exportDataUrl,
@@ -131,8 +132,18 @@
                         return;
                     }
                     let percent = "0%", exportStatus = data["state"].toUpperCase();
+                    /*
+                     * for some reason the export status is not returned, has the celery job timed out?
+                     */
+                    if (!exportStatus) {
+                        //return a specific message here so we know that the status is not being returned
+                        callback({error: true, message: "no export status available."});
+                        return;
+                    }
                     if (data["current"] && data["total"] && parseInt(data["total"]) > 0) {
                         percent = parseInt(data['current'] * 100 / data['total']) + "%";
+                    } else {
+                        percent = " -- %";
                     }
                     //update status and percentage displays
                     self.updateProgressDisplay(exportStatus, percent, true);
@@ -152,7 +163,7 @@
                         // rerun in 2 seconds
                         self.exportDataTimeoutID = setTimeout(function() {
                             self.updateExportProgress(statusUrl, callback);
-                        }.bind(self), 2000); //each update invocation should be assigned a unique timeoutid
+                        }.bind(self), 3000); //each update invocation should be assigned a unique timeoutid
                         (self.arrExportDataTimeoutID).push(self.exportDataTimeoutID);
                     }
                 }).fail(function() {
