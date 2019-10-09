@@ -110,7 +110,9 @@
                 });
             },
             initExportEvent: function() {
-                console.log("export event initiated");
+                /*
+                 * custom UI events associated with exporting data
+                 */
                 let self = this;
                  $("#dataDownloadModal").on("hide.bs.modal", function () {
                     $("#"+self.getInitElementId()).removeAttr("data-export-in-progress");

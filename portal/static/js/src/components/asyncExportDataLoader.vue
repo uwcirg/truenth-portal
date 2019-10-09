@@ -31,7 +31,7 @@
                 exportTimeElapsed: 0,
                 statusDisplayTimeoutID: 0,
                 arrExportDataTimeoutID: [],
-                maximumPendingTime: 45000,
+                maximumPendingTime: 45000, //allow 45 seconds of PENDING status
                 arrIncompleteStatus: ["PENDING", "PROGRESS", "STARTED"],
                 requestSubmittedDisplay: ExportInstrumentsData["requestSubmittedDisplay"],
                 failedRequestDisplay: ExportInstrumentsData["failedRequestDisplay"]
