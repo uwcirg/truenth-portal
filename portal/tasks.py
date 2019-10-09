@@ -156,7 +156,7 @@ def test_args(*args, **kwargs):
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
-@celery.task(name="tasks.cache_assessment_status", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def cache_assessment_status(**kwargs):
     """Populate assessment status cache
@@ -169,7 +169,7 @@ def cache_assessment_status(**kwargs):
     update_patient_loop(update_cache=True, queue_messages=False, as_task=True)
 
 
-@celery.task(name="tasks.prepare_communications", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def prepare_communications(**kwargs):
     """Move any ready communications into prepared state """
@@ -233,7 +233,7 @@ def update_patients(patient_list, update_cache, queue_messages):
         db.session.commit()
 
 
-@celery.task(name="tasks.send_queued_communications", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def send_queued_communications(**kwargs):
     """Look for communication objects ready to send"""
@@ -304,7 +304,7 @@ def send_user_messages(user, force_update=False):
     return message
 
 
-@celery.task(name="tasks.send_questionnaire_summary", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
@@ -315,7 +315,7 @@ def send_questionnaire_summary(**kwargs):
                 '{}'.format(', '.join(error_emails)))
 
 
-@celery.task(name="tasks.update_tous_task", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def update_tous_task(**kwargs):
     """Job to manage updates for various ToUs
@@ -326,7 +326,7 @@ def update_tous_task(**kwargs):
     return update_tous(**kwargs)
 
 
-@celery.task(name="tasks.token_watchdog", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def token_watchdog(**kwargs):
     """Clean up stale tokens and alert service sponsors if nearly expired"""
