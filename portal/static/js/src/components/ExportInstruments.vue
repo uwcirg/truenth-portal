@@ -27,7 +27,7 @@
                         </div>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
                         <!-- display export status -->
-                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()"></ExportDataLoader>
+                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
@@ -107,6 +107,15 @@
                     self.instruments.dataType = "csv";
                     $("#patientsInstrumentList").addClass("ready");
                     $(this).find("[name='instrument']").prop("checked", false);
+                });
+            },
+            initExportEvent: function() {
+                /*
+                 * custom UI events associated with exporting data
+                 */
+                let self = this;
+                 $("#dataDownloadModal").on("hide.bs.modal", function () {
+                    $("#"+self.getInitElementId()).removeAttr("data-export-in-progress");
                 });
             },
             setDataType: function (event) {
