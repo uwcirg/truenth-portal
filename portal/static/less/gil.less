@@ -8218,12 +8218,20 @@ aside {
         padding-top: 7%;
         padding-bottom: 0;
         background-position: 55%;
-        transition: all 150ms ease-in
+        transition: all 150ms ease-in;
     }
 }
 main.home + aside {
     .home-button {
         display: none;
+    }
+    .module--flex {
+        .button-callout {
+            a {
+                min-width: 345px !important;
+                max-width: 100%;
+            }
+        }
     }
 }
 @media (min-width:450px) {
