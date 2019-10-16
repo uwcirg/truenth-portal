@@ -138,6 +138,7 @@
                 <div class="modal-content box-modal">
                 <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" :aria-label="closeText"></a>
                     <h3 class="box-modal__title" v-text="loginLabel"></h3>
+                    <p class="title" v-text="loginRegisterTitle"></p>
                     <a :href="loginURL" class="button button-large button--teal button--login--register" v-text="loginLabel"></a>
                     <div class="divider">
                          <div class="or">or</div>
