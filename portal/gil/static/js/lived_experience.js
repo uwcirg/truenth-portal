@@ -16,7 +16,4 @@ $(document).ready(function() {
           }
       });
     }
-    if ($("main").attr("data-section") === "livedexperience") {
-      $("#lnReadMoreStory").hide();
-    }
 });
