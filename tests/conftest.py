@@ -45,9 +45,9 @@ def celery_worker_parameters():
 
 @pytest.fixture(scope='session')
 def celery_app(app):
-    # change default queue to low
-    #app.config['CELERY_TASK_DEFAULT_QUEUE'] = 'low_priority'
     celery = create_celery(app)
-    # for use celery_worker fixture
+
+    # bring celery_worker fixture into scope
     from celery.contrib.testing import tasks  # NOQA
+
     return celery
