@@ -596,6 +596,7 @@ export default (function() {
                         }
                         triggerEvent = triggerEvent + " change";
                         if ($(this).attr("type") === "text") {
+                            $(this).attr("data-lpignore", true); //prevent lasspass icon be drawn inside of input field
                             $(this).on("keypress", function(e) {
                                 e.stopPropagation();
                                 if (e.keyCode === 13) { //account for hitting enter key when updating text field
@@ -966,6 +967,9 @@ export default (function() {
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
+                setTimeout(function() { //enable field once data loaded and initialized
+                    $("#email").removeAttr("disabled");
+                }, 500);
             },
             updateEmailVis: function() {
                 var hasError = $("#emailGroup").hasClass("has-error");
