@@ -3,10 +3,14 @@
         <section class="psa-tracker-title">
             <h2 class="tnth-header heading">{{intro.header}}</h2>
             <div class="body">{{intro.body}}</div>
-            <div id="psaTrackerButtonsContainer"><button id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</button></div>
+            <div id="psaTrackerLoginPrompt" class="tnth-hide" v-html="loginPrompt"></div>
+            <div id="psaTrackerButtonsContainer"><a id="psaTrackerBtnAddNew" class="btn btn-tnth-primary" data-toggle="modal" data-target="#addPSAModal">{{intro.addText}}</a></div>
         </section>
         <section>
             <div id="psaTrackerNoResultContainer" class="text-warning" v-if="!items.length">
+                <div class="icon-group">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </div>
                 {{noResultMessage}}
                 <span v-if="isActedOn()">
                     <refresh-icon v-on:refresh="refresh" v-bind:title="getRefreshMessage()"></refresh-icon>
@@ -82,11 +86,11 @@
                             <table id="psaTrackerAddTable" v-bind:class="{ 'tnth-hide': modalLoading }">
                                 <tr>
                                     <td class="field-label" v-html="fields.resultLabel"></td>
-                                    <td><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder" /></td>
+                                    <td class="input-field"><input id="psaResult" type="text" v-model.trim="newItem.result" class="form-control" v-bind:placeholder="fields.resultPlaceholder" /></td>
                                 </tr>
                                 <tr>
                                     <td class="field-label" v-html="fields.dateLabel"></td>
-                                    <td><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder" /></td>
+                                    <td class="input-field"><input id="psaDate" type="text" v-model.trim="newItem.date" class="form-control" v-bind:placeholder="fields.datePlaceholder" /></td>
                                 </tr>
                             </table>
                             <br/>
@@ -123,12 +127,29 @@
                 </div>
             </div>
         </div>
-        <svg width="300" height="200">
+        <svg width="300" height="200" class="markers-container">
             <defs>
                 <path id="arrow" d="M2,2 L10,6 L2,10 L6,6 L2,2" class="marker" transform="rotate(90)" stroke-width="4"></path>
                 <rect id="marker" width="4" height="4" stroke-width="1" class="marker"></rect>
             </defs>
         </svg>
+        <div class="modal fade" id="psaLoginRegisterModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content box-modal">
+                <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" :aria-label="closeText"></a>
+                    <h3 class="box-modal__title" v-text="loginLabel"></h3>
+                    <p class="title" v-text="loginRegisterTitle"></p>
+                    <a :href="loginURL" class="button button-large button--teal button--login--register" v-text="loginLabel"></a>
+                    <div class="divider">
+                         <div class="or">or</div>
+                    </div>
+                    <h3 class="box-modal__title" v-text="joinUsText"></h3>
+                    <p class="box-modal__copy" v-text="createAccountIntroText"></p>
+                    <a :href="registerURL" class="button button-large button--teal button--register" v-text="createAccountText"></a>
+                </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 <script>
@@ -206,6 +227,12 @@
                     }
                 }
                 sessionStorage.removeItem(this.userIdKey);
+                if (!this.getCurrentUserId()) {
+                    this.showLoginPrompt();
+                    this.initLoginRegisterModal();
+                    this.setAddNewLogin();
+                    return false;
+                }
                 this.getData(true);
                 this.getProcedure();
                 setTimeout(function() {
@@ -215,6 +242,15 @@
             },
             isActedOn: function() {
                 return this.showRefresh && (this.filters.selectedFilterYearValue !== "" || this.filters.selectedFilterResultRange !== "");
+            },
+            showLoginPrompt: function() {
+                $("#psaTrackerLoginPrompt").removeClass("tnth-hide");
+            },
+            setAddNewLogin: function() {
+                $("#psaTrackerBtnAddNew").removeAttr("data-toggle").removeAttr("data-target");
+                $("#psaTrackerBtnAddNew").on("click", function() {
+                    $("#psaLoginRegisterModal").modal("show");
+                });
             },
             restoreVis: function() {
                 var loadingElement = document.getElementById("loadingIndicator"), mainElement = document.getElementById("mainHolder");
@@ -257,6 +293,9 @@
                     this.addErrorMessage = "";
                 }
                 return isValid;
+            },
+            initLoginRegisterModal: function() {
+                $("#psaLoginRegisterModal").modal({show: false, backdrop: "static"});
             },
             formatDateString: function(date, format) {
                 return this.tnthDates.formatDateString(date, format);
@@ -325,11 +364,17 @@
             getCurrentUserId: function() {
                 var self = this;
                 if(!sessionStorage.getItem(this.userIdKey)) {
-                    this.tnthAjax.sendRequest("/api/me", "GET", "", { sync: true }, function(data) {
-                        if(!data.error) {
-                            sessionStorage.setItem(self.userIdKey, data.id);
-                        } else {
-                            sessionStorage.setItem(self.userIdKey, $("#psaTracker_currentUser").val());
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/me",
+                        async: false,
+                        success: function(data) {
+                            if(data && data.id) {
+                                sessionStorage.setItem(self.userIdKey, data.id);
+                            }
+                        },
+                        error: function(response) {
+                            sessionStorage.setItem(self.userIdKey, "");
                         }
                     });
                 }
@@ -381,8 +426,11 @@
                 });
             },
             getProcedure: function() {
-                var self = this;
-                this.tnthAjax.getProc(this.getCurrentUserId(), false, function(data) {
+                var self = this, userId = this.getCurrentUserId();
+                if (!userId) {
+                    return;
+                }
+                this.tnthAjax.getProc(userId, false, function(data) {
                     if (!data) { return false; }
                     data.entry = data.entry || [];
                     var treatmentData = $.grep(data.entry, function(item) {
@@ -405,9 +453,12 @@
                 return this.treatment.data.length > 0;
             },
             getData: function() {
-                var self = this;
+                var self = this, userId = this.getCurrentUserId();
                 this.loading = true;
-                this.tnthAjax.getClinical(this.getCurrentUserId(), {data: {patch_dstu2: true}}, function(data) {
+                if (!userId) {
+                    return false;
+                }
+                this.tnthAjax.getClinical(userId, {data: {patch_dstu2: true}}, function(data) {
                     if(data.error) {
                         $("#psaTrackerErrorMessageContainer").html(self.serverErrorMessage);
                         self.loading = false;
@@ -434,6 +485,7 @@
                     results = $.grep(results, function(item) {
                         return item.display.toLowerCase() === "psa";
                     });
+                    
                     // sort from newest to oldest
                     results = results.sort(function(a, b) {
                         return new Date(b.date) - new Date(a.date);
@@ -728,7 +780,7 @@
                     .attr("x", 7)
                     .attr("dy", ".35em")
                     .attr("class", "axis-stroke")
-                    .style("letter-spacing", "1px")
+                    .style("letter-spacing", "0.5px")
                     .style("text-anchor", "start");
 
                 // add the X gridlines
@@ -772,7 +824,7 @@
                     .style("stroke-width", "0.5");
 
                 //add div for tooltip
-                var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+                var tooltipContainer = d3.select("body").append("div").attr("class", "tooltip").style({"opacity": 0,"display": "none"});
 
                 //treatment line
                 var treatmentDate = self.__handleTreatmentDate(minDate, maxDate, self.getInterval(minDate, maxDate, 7));
@@ -841,7 +893,7 @@
                         element.style("fill", CIRCLE_STROKE_COLOR)
                             .classed("focused", true);
                         var TOOLTIP_WIDTH = (String(d.date).length*8 + 10);
-                        tooltipContainer.transition().duration(200).style("opacity", .9); //show tooltip for each data point
+                        tooltipContainer.transition().duration(200).style({"opacity": .9, "display": "block"}); //show tooltip for each data point
                         tooltipContainer.html("<b>" + self.PSALabel + "</b> " + d.display + "<br/><span class='small-text'>" + d.date + "</span>")
                             .style("width", TOOLTIP_WIDTH + "px")
                             .style("height", 35 + "px")
@@ -856,7 +908,7 @@
                         element.style("stroke", CIRCLE_STROKE_COLOR)
                             .style("fill", "#FFF")
                             .classed("focused", false);
-                        tooltipContainer.transition().duration(500).style("opacity", 0);
+                        tooltipContainer.transition().duration(500).style({"opacity": 0, "display": "none"});
                     });
 
                 // Add text labels
@@ -892,7 +944,7 @@
 
                 //add axis legends
                 var xlegend = graphArea.append("g")
-                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 5) + ")");
+                    .attr("transform", "translate(" + (width / 2 - margin.left + margin.right - 20) + "," + (height + margin.bottom - margin.bottom / 8) + ")");
 
                 xlegend.append("text")
                     .text(self.xLegendText)

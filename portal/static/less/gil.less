@@ -6590,7 +6590,7 @@ a:hover {
     padding-top: 30px;
     padding-bottom: 30px;
     position: relative;
-    z-index: 1
+    z-index: 1;
 }
 
 @media (max-width:767px) {
@@ -6635,7 +6635,7 @@ a:hover {
     padding: 25px 80px;
     position: fixed;
     top: 0;
-    height: 132px;
+    height: 108px;
     background: #fff;
     z-index: 1500
 }
@@ -8155,7 +8155,7 @@ aside {
     .module-wrap--background .module--shift__right,
     .module-wrap--background .module--shift__left {
         z-index: 2;
-        padding: 4% 1% 4% 1%
+        padding: 4% 1.5% 4% 1.5%
     }
 }
 
@@ -8218,10 +8218,22 @@ aside {
         padding-top: 7%;
         padding-bottom: 0;
         background-position: 55%;
-        transition: all 150ms ease-in
+        transition: all 150ms ease-in;
     }
 }
-
+main.home + aside {
+    .home-button {
+        display: none;
+    }
+    .module--flex {
+        .button-callout {
+            a {
+                min-width: 345px !important;
+                max-width: 100%;
+            }
+        }
+    }
+}
 @media (min-width:450px) {
     aside .module-wrap--background {
         padding-top: 5%
@@ -8264,7 +8276,7 @@ aside .module-wrap--background .module__head {
 
 aside .module--flex {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     max-width: 100%;
     margin: 0 auto;
     flex-wrap: wrap

@@ -88,15 +88,12 @@
               <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{url_for('gil.decision_support')}}">
-              <svg width="32" height="32">
-                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#DS-Icon-Nav"></use>
-              </svg>{{_("Decision Support")}}</a></li>
+              {{_("Decision Support")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{url_for('gil.symptom_tracker')}}">
-              <svg width="32" height="32">
-                <use xlink:href="{{url_for('gil.static', filename='img/GIL.svg')}}#ST-Icon-Nav"></use>
-              </svg>{{_("Symptom Tracker")}}</a></li>
+              {{_("Symptom Tracker")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{url_for('exercise_diet.portal')}}">{{_("Exercise and Diet")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{url_for('gil.lived_experience')}}">{{_("Lived Experience")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--psatracker"><a href="{{url_for('portal.psa_tracker')}}" class="psa-tracker-link" data-link-identifier="psa-tracker">{{_("PSA Tracker")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{url_for('gil.contact')}}">{{_("Contact")}}</a></li>
           {% if not user %}

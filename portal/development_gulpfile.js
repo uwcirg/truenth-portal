@@ -250,6 +250,12 @@ const watchExerciseDietLess = () => {
 };
 exports.watchExerciseDietLess = series(watchExerciseDietLess);
 
+//watch psa tracker
+const watchPsaTrackerLess = () => {
+    watch(lessPath + "/" + PSATRACKER + ".less", {delay: 200}, psaTrackerLess);
+};
+exports.watchPsaTrackerLess = series(watchPsaTrackerLess);
+
 /*
  * compile all portal less files 
  */

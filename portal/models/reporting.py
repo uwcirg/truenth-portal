@@ -126,6 +126,21 @@ def adherence_report(
                 historic.pop('entry_method', None)
             data.append(historic)
 
+        # if user is eligible for indefinite QB, add status
+        qbd, status = qb_stats.indef_status()
+        if qbd:
+            indef = row.copy()
+            indef['status'] = status
+            indef['qb'] = qbd.questionnaire_bank.name
+            indef['visit'] = "Indefinite"
+            entry_method = QNR_results(
+                patient, qbd.qb_id, qbd.iteration).entry_method()
+            if entry_method:
+                indef['entry_method'] = entry_method
+            else:
+                indef.pop('entry_method', None)
+            data.append(indef)
+
     results = {
         'data': data,
         'response_format': response_format,
