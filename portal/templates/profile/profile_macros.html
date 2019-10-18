@@ -174,7 +174,7 @@
 {% macro profileName(person, isFocus=False) -%}
     <div class="form-group profile-name-label"><label>{{ _("Name") }}</label></div>
     <div class="row profile-section name-section" data-profile-section-id="name">
-        <div id="firstNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 first-name-container" data-loader-container="true">
+        <div id="firstNameContainer" class="col-lg-5 col-md-5 col-sm-4 col-xs-10 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required and must not contain invalid characters.') }}" class="form-control float-text" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off" data-htmltags="true" data-error-field="errorfirstname" v-model.lazy="demo.data.name.given"/>
                 <div class="help-block with-errors"></div>
@@ -182,7 +182,7 @@
             </div>
             {{saveLoaderDiv("firstNameContainer")}}
         </div>
-        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
+        <div id="lastNameContainer" class="col-lg-5 col-md-5 col-sm-4 col-xs-10 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required and must not contain invalid characters.') }}" class="form-control float-text" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off" data-error-field="errorlastname" data-htmltags="true" v-model.lazy="demo.data.name.family"/>
                 <div class="help-block with-errors"></div>

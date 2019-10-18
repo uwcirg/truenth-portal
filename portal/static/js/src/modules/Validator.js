@@ -37,10 +37,12 @@ var ValidatorObj = { /*global  $ i18next */
                 }
                 if (data.unique) {
                     $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                    $("#erroremail").removeClass("with-errors");
                     update($el);
                     return true;
                 }
                 $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
+                return false;
             });
         }
         return emailReg.test(emailVal);
@@ -91,7 +93,7 @@ var ValidatorObj = { /*global  $ i18next */
         $("form.to-validate[data-toggle=validator] [data-birthday]").attr("novalidate", true).on(VALIDATION_EVENTS,function() {
             return self.birthdayValidation($("#month").val(), $("#date").val(), $("#year").val(), "errorbirthday"); /* applied to month, day and year fields of birthday group elements */
         });
-        $("form.to-validate[data-toggle=validator] [data-customemail]").attr("novalidate", true).on(VALIDATION_EVENTS, function() {
+        $("form.to-validate[data-toggle=validator] [data-customemail]").attr("novalidate", true).on("change", function() {
             return self.emailValidation($(this));
         });
         $("form.to-validate[data-toggle=validator] [data-htmltags]").attr("novalidate", true).on(VALIDATION_EVENTS, function() {

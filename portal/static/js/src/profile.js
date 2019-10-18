@@ -986,14 +986,14 @@ export default (function() {
                     e.stopPropagation();
                     $("#erroremail").html("");
                 });
-                $("#email").on("postEventUpdate", function() {
+                $("#profileForm").on("postEventUpdate", "#email", function(e) {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
             },
             updateEmailVis: function() {
-                var hasError = $("#emailGroup").hasClass("has-error");
+                var hasError = $("#emailGroup").hasClass("has-error") || $("#erroremail").hasClass("with-errors");
                 var emailValue = $("#email").val();
                 if (!hasError) {
                     this.demo.data.email = emailValue;
