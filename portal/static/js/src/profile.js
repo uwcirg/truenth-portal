@@ -573,7 +573,10 @@ export default (function() {
                         if (!container.hasClass("edit")) {
                             self.fillSectionView(container.attr("data-sections"));
                             self.handleOptionalCoreData();
+                            self.disableInputTextFields();
+                            return;
                         }
+                        self.enableInputTextField(container.find("input[type='text']"));
                     });
                 });
             },
@@ -631,11 +634,32 @@ export default (function() {
                     });
                 });
             },
+            enableInputTextField: function(fields) {
+                if (!fields) {
+                    return false;
+                }
+                let self = this;
+                fields.each(function() {
+                    if (self.isDisableField($(this).attr("data-protected-group"))) {
+                        return true;
+                    }
+                    $(this).attr("disabled", false);
+                });
+            },
+            disableInputTextFields: function(fields) {
+                if (!fields) {
+                    return false;
+                }
+                fields.each(function() {
+                    $(this).attr("disabled", true);
+                });
+            },
             initSections: function(callback) {
                 var self = this, sectionsInitialized = {}, initCount = 0;
                 $("#mainDiv [data-profile-section-id]").each(function() {
                     var sectionId = $(this).attr("data-profile-section-id");
                     if (!sectionsInitialized[sectionId]) {
+                        self.disableInputTextFields($(this).find("input[type='text']"));
                         setTimeout(function() {
                             self.initSection(sectionId);
                         }, initCount += 20);
@@ -967,9 +991,6 @@ export default (function() {
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
-                setTimeout(function() { //enable field once data loaded and initialized
-                    $("#email").removeAttr("disabled");
-                }, 500);
             },
             updateEmailVis: function() {
                 var hasError = $("#emailGroup").hasClass("has-error");
