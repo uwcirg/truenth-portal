@@ -16,6 +16,11 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session")
 def app(request):
+    """Fixture to use as parameter in any test needing app access
+
+    NB - use of pytest-flask ``client`` fixture is more common
+
+    """
     app_ = create_app()
     ctx = app_.app_context()
     ctx.push()
@@ -45,6 +50,7 @@ def celery_worker_parameters():
 
 @pytest.fixture(scope='session')
 def celery_app(app):
+    """Fixture to use as parameter in any test needing celery"""
     celery = create_celery(app)
 
     # bring celery_worker fixture into scope
