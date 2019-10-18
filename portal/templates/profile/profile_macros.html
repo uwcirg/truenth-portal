@@ -124,7 +124,7 @@
     <div class="form-group profile-section" id="bdGroup" data-profile-section-id="birthday">
         <label id="birthdateLabel" class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" data-birthday="true" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" v-bind:disabled="isDisableField('dob')" v-bind:required="!isDisableField('dob')"  data-protected-group="dob" />
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true"><input class="form-control bd-element" id="date" aria-label="{{_('Birth Date')}}" name="birthdayDate" placeholder="DD" data-birthday="true" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" data-trigger-event="change" v-model.lazy="demo.data.birthDay" v-bind:disabled="isDisableField('dob')" v-bind:required="!isDisableField('dob')"  data-protected-fieldid="dob" />
             {{saveLoaderDiv("bdDateContainer")}}
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
@@ -146,7 +146,7 @@
                 {{saveLoaderDiv("bdMonthContainer")}}
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" data-birthday="true" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear" v-bind:disabled="isDisableField('dob')" v-bind:required="!isDisableField('dob')" data-protected-group="dob"/>
+                <input class="form-control bd-element" id="year" name="birthdayYear" aria-label="{{_('Birth Year')}}" placeholder="YYYY" pattern = "(19|20)\d{2}" data-birthday="true" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" data-trigger-event="change" autocomplete="off" v-model.lazy="demo.data.birthYear" v-bind:disabled="isDisableField('dob')" v-bind:required="!isDisableField('dob')" data-protected-fieldid="dob"/>
                 {{saveLoaderDiv("bdYearContainer")}}
             </div>
         </div>
@@ -1025,7 +1025,7 @@
 {% macro profileStudyID(user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true" data-profile-section-id="identifier">
         <label class="text-muted">{{_("Study ID")}} <span class="text-muted smaller-text optional-display-text">({{ _("Optional") }})</span></label>
-        <input type="text" id="profileStudyId" data-identifier="true" data-systemtype="external_study_id" data-userid="{{user.id if user}}" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('study_id')" data-protected-group="study_id"/>
+        <input type="text" id="profileStudyId" data-identifier="true" data-systemtype="external_study_id" data-userid="{{user.id if user}}" class="form-control" v-model.lazy="demo.data.studyId" v-bind:disabled="isDisableField('study_id')" data-protected-fieldid="study_id"/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
         {{saveLoaderDiv("profileStudyIDContainer")}}

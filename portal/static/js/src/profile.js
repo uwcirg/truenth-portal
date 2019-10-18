@@ -640,7 +640,8 @@ export default (function() {
                 }
                 let self = this;
                 fields.each(function() {
-                    if (self.isDisableField($(this).attr("data-protected-group"))) {
+                    //do not enable fields that are designated to be disabled (e.g. protected fields as those from MedidataRave)
+                    if (self.isDisableField($(this).attr("data-protected-fieldid"))) {
                         return true;
                     }
                     $(this).attr("disabled", false);
