@@ -3,7 +3,6 @@ from datetime import datetime
 
 from flask import (
     Blueprint,
-    Response,
     abort,
     current_app,
     flash,
@@ -27,13 +26,11 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
-from ..models.qb_status import QB_Status
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
+    NoFutureDates,
     QuestionnaireResponse,
-    aggregate_responses,
-    generate_qnr_csv,
 )
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
@@ -814,11 +811,13 @@ def assessment_update(patient_id):
 
     try:
         QuestionnaireResponse.validate_document(updated_qnr)
-    except jsonschema.ValidationError as e:
+        QuestionnaireResponse.validate_authored(
+            FHIR_datetime.parse(updated_qnr.get('authored')))
+    except (jsonschema.ValidationError, NoFutureDates) as e:
         return jsonify({
             'ok': False,
-            'message': e.message,
-            'reference': e.schema,
+            'message': str(e),
+            'reference': getattr(e, 'schema', ''),
         }), 400
     else:
         response.update({
@@ -830,7 +829,7 @@ def assessment_update(patient_id):
     try:
         identifier = Identifier.from_fhir(updated_qnr.get('identifier'))
     except ValueError as e:
-        response['message'] = e.message
+        response['message'] = str(e)
         return jsonify(response), 400
     existing_qnr = QuestionnaireResponse.by_identifier(identifier)
     if not existing_qnr:
@@ -1478,11 +1477,13 @@ def assessment_add(patient_id):
 
     try:
         QuestionnaireResponse.validate_document(request.json)
-    except jsonschema.ValidationError as e:
+        QuestionnaireResponse.validate_authored(
+            FHIR_datetime.parse(request.json.get('authored')))
+    except (jsonschema.ValidationError, NoFutureDates) as e:
         response = {
             'ok': False,
-            'message': e.message,
-            'reference': e.schema,
+            'message': str(e),
+            'reference': getattr(e, 'schema', ''),
         }
         return jsonify(response), 400
 
