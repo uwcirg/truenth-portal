@@ -2,12 +2,12 @@
 from flask import url_for
 
 
-def test_simple_request(client):
+def test_simple_request(client, initialized_db):
     """Not a celery test - just a trite example of using the client fixture"""
     assert client.get('/').status_code == 200
 
 
-def test_celery_add(celery_app, celery_worker, client):
+def test_celery_add(celery_app, celery_worker, client, initialized_db):
     """Test a task in the default queue"""
     x = 151
     y = 99
