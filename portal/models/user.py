@@ -1525,6 +1525,10 @@ class User(db.Model, UserMixin):
         """Promote a weakly authenticated account to a registered one"""
         assert self.id != registered_user.id
 
+        if registered_user.deleted is not None:
+            # Avoid strange state from double UI clicks; see TN-1885
+            raise ValueError("account already deleted, can't promote")
+
         # Ensure the registered user is not a power user
         # https://jira.movember.com/browse/TN-1408
         restricted_roles = \
