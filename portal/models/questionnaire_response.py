@@ -1,5 +1,6 @@
 from collections import namedtuple
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from html.parser import HTMLParser
 import json
 
@@ -22,17 +23,21 @@ from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
+class NoFutureDates(ValueError):
+    """Raised on data validation failures where future dates are verboten"""
+    pass
+
+
 class QuestionnaireResponse(db.Model):
 
     def default_status(context):
         return context.current_parameters['document']['status']
 
     def default_authored(context):
-        # Don't allow future authored dates
+        # Includes a call to validate_authored - exception raised if not valid
         authored = FHIR_datetime.parse(
             context.current_parameters['document']['authored'])
-        if authored > datetime.utcnow():
-            raise ValueError("future authored dates forbidden")
+        QuestionnaireResponse.validate_authored(authored)
         return authored
 
     __tablename__ = 'questionnaire_responses'
@@ -189,6 +194,17 @@ class QuestionnaireResponse(db.Model):
                 QuestionnaireResponse.document['identifier']['value']
                 == json.dumps(identifier.value))
         return found.order_by(QuestionnaireResponse.id.desc()).all()
+
+    @staticmethod
+    def validate_authored(authored):
+        """Validate the authored value is current or in the past
+
+        Don't allow future authored dates (but allow for up to 60 second
+        drift from external services)
+
+        """
+        if authored > datetime.utcnow() + relativedelta(seconds=60):
+            raise NoFutureDates("future authored dates forbidden")
 
     @staticmethod
     def validate_document(document):

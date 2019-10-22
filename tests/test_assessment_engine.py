@@ -312,10 +312,25 @@ class TestAssessmentEngine(TestCase):
 
         self.promote_user(role_name=ROLE.PATIENT.value)
         self.login()
-        with pytest.raises(StatementError) as exc:
-            self.client.post(
-                '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
-            assert "future" in str(exc.value)
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 400
+        assert "future" in response.json.get('message')
+
+    def test_submit_nearfuture_assessment(self):
+        """Submit assessment within a min in future should be allowed"""
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+
+        # bump authored to future value within 1 min buffer
+        data['authored'] = FHIR_datetime.as_fhir(
+            datetime.utcnow() + relativedelta(seconds=52))
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 200
 
     def test_update_assessment(self):
         swagger_spec = swagger(self.app)
