@@ -34,7 +34,8 @@ def app(request):
 
 
 @pytest.fixture(scope='session')
-def initialized_db():
+def initialized_db(app):
+    """Create database schema"""
     db.create_all()
 
 
