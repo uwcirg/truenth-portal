@@ -5536,12 +5536,29 @@ only screen and (min-resolution:2dppx) {
                     display: block;
                     left: 50%;
                     content: " ";
-                    height: 1px;
+                    height: 3px;
                     background: rgba(255,255,255,.5);
-                    width: 50%;
-                    left: 25%;
-                    bottom: -12px;
+                    width: 80%;
+                    left: 10%;
+                    bottom: -4px;
                 }
+                // &:before {
+                //     content: "\f0d7";
+                //     font-size: 28px!important;
+                //     font-family: FontAwesome!important;
+                //     font-style: normal!important;
+                //     font-weight: 400!important;
+                //     text-decoration: inherit;
+                //     text-rendering: auto;
+                //     -webkit-font-smoothing: antialiased;
+                //     display: block;
+                //     left: 47.5%;
+                //     bottom: -61.6%;
+                //     position: absolute;
+                //     color: rgba(255,255,255,.5);
+                //     border: 0;
+                //     border-radius: 0;
+                // }
             }
         }
     }
@@ -7844,12 +7861,19 @@ aside {
         cursor: pointer;
     }
     .content {
-        margin-top: -118px;
+        margin-top: -132px;
         line-height: 1.5;
         text-align: left;
         font-size: 20px;
         .content__item {
             display: none;
+            .title {
+                margin-left: 1em;
+                margin-bottom: 1em;
+                font-size: 22px;
+                font-weight: 600;
+                letter-spacing: .1rem;
+            }
         }
     }
     .module {
