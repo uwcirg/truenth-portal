@@ -5425,7 +5425,12 @@ only screen and (min-resolution:2dppx) {
 
 .button-callout {
     padding: 40px 0;
-    text-align: center
+    text-align: center;
+    a:hover,
+    a:focus {
+        color: #FFF;
+        text-decoration: none;
+    }
 }
 
 .button-callout>strong {
@@ -5487,7 +5492,68 @@ only screen and (min-resolution:2dppx) {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-wrap: wrap;
-    flex-wrap: wrap
+    flex-wrap: wrap;
+    .item {
+        cursor: pointer;
+        .title {
+            font-weight: 500;
+            letter-spacing: 0.1rem;
+            font-size: 22px;
+            color: rgba(255,255,255,.8);
+            padding-bottom: 4px;
+            position: relative;
+            margin-top: 16px;
+            cursor: pointer;
+            &:hover {
+                color: #FFF;
+            }
+            &:after {
+                //position: absolute;
+                //display: block;
+                position: relative;
+                display: inline-block;
+                z-index: 0;
+                //left: 50%;
+                left: 16px;
+                //bottom: -28px;
+                content: "\f0d7";
+                font-size: 24px !important;
+                font-family: "FontAwesome" !important;
+                font-style: normal !important;
+                font-weight: normal !important;
+                text-decoration: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+            }
+        }
+        &.active {
+            .title {
+                //border-bottom: 2px solid;
+                font-weight: 600;
+                color: #FFF;
+                &:after {
+                    position: absolute;
+                    display: block;
+                    left: 50%;
+                    content: " ";
+                    height: 1px;
+                    background: rgba(255,255,255,.5);
+                    width: 50%;
+                    left: 25%;
+                    bottom: -12px;
+                }
+            }
+        }
+    }
+}
+@media (min-width: 768px) {
+    .mini-boxes {
+        .item {
+            .title {
+                font-size: 28px;
+            }
+        }
+    }
 }
 
 .mini-boxes--full-width {
@@ -6635,7 +6701,7 @@ a:hover {
     padding: 25px 80px;
     position: fixed;
     top: 0;
-    height: 108px;
+    height: 102px;
     background: #fff;
     z-index: 1500
 }
@@ -7399,7 +7465,7 @@ figure.nav-overlay {
 
 .page-intro__content {
     font-size: 22px;
-    line-height: 1.5;
+    line-height: 1.7;
     margin: 0 auto;
     max-width: 780px;
     margin: 0 auto;
@@ -7605,7 +7671,7 @@ aside {
     }
     .module {
         color: #fff;
-        padding: 92px 8px 56px;
+        padding: 100px 8px 56px;
     }
 }
 .footnote-container {
@@ -7747,7 +7813,131 @@ aside {
         padding-bottom: 16px;
     }
 }
-
+.module-wrap--them-brown-medium {
+    position: relative;
+    background: #656565;
+    background-size: cover;
+    background-position: top center;
+    color: #FFF;
+    z-index: 1;
+    &.page-intro:after {
+        position: absolute;
+        background: #333;
+        opacity: 0.2;
+        top: 0; 
+        bottom: 0;
+        right: 0;
+        left: 0;
+        content: " ";
+        display: block;
+        z-index: -1;
+    }
+    .button-callout > strong,
+    .button-callout > figure {
+       // color: #aeaaaa;
+        cursor: pointer;
+        &:hover {
+            color: #FFF;
+        }
+    }
+    .item__link {
+        cursor: pointer;
+    }
+    .content {
+        margin-top: -118px;
+        line-height: 1.5;
+        text-align: left;
+        font-size: 20px;
+        .content__item {
+            display: none;
+        }
+    }
+    .module {
+        padding-left: 32px;
+        padding-right: 32px;
+        &.mini-boxes {
+            padding: 52px 12px 72px !important;
+        }
+        ul {
+            display: flex;
+            margin: 0 16px;
+            padding: 32px 16px 16px;
+            // flex-direction: column;
+            // max-height: 248px;
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            //justify-content: flex-start;
+            align-items: flex-start;
+            list-style-type: none;
+            background: hsla(0, 0%, 35%, 0.4);
+            li {
+                position: relative;
+                //padding-right: 24px;
+                margin-bottom: 20px;
+                margin-left: 8px;
+                margin-right: 8px;
+                width: 100%;
+            }
+            li:after {
+                display: inline-block;
+                content: "\f105";
+                margin-left: 16px;
+                // position: absolute;
+                // right: 12px;
+                // top: 4px;
+                font-family: "FontAwesome" !important;
+                font-style: normal !important;
+                font-weight: 300 !important;
+                text-decoration: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                color: rgba(255,255,255,.5);
+                line-height: 1.5;
+                position: relative;
+                top: 2px;
+            }
+        }
+    }
+}
+@media (min-width: 768px) {
+    .module-wrap--them-brown-medium {
+        .content {
+            font-size: 22px;
+        }
+        .module {
+            padding-left: 0;
+            padding-right: 0;
+            ul {
+                //flex-direction: column;
+                //max-height: 228px;
+                //justify-content: flex-start;
+                padding: 32px 0 16px;
+                margin: 0 1em;
+                li {
+                    width: 42.5%;
+                    max-width: 100%;
+                    margin-right: 16px;
+                    margin-left: 16px;
+                    &:after {
+                        right: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+.button--brown-medium {
+    background: #969696;
+    color: #FFF;
+    &:hover {
+        background: darken(#969696, 10%);
+        cursor: pointer;
+        a {
+            color: #FFF;
+        }
+    }
+}
 .module-wrap--theme-brown-light {
     background: #4D4E4C;
     color: #FFF;
@@ -8285,7 +8475,7 @@ aside .module--flex {
 .module-wrap--watch {
     .module-wrap--inner {
         position: absolute;
-        top: 50%;
+        top: 47.5%;
         left: 50%;
         margin-left: -109px;
         margin-top: -36px

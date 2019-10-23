@@ -17,16 +17,70 @@
           {% endif %}
         </header>
       {% endblock %}
-      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('.static', filename='img/Contact-Background.jpg') }})">
+      <div class="page-intro module-wrap--them-brown-medium" style="background-image: url(/gil/static/img/PCF2-Background.jpg)">
         <div class="page-intro__content">
           <h1 class="page-intro__main">{{_("Sexual Wellness")}}</h1>
-          <p class="page-intro__sub">{{_("Coming soon")}}</p>
-          <div class="button-callout">
-            <!--
-            <figure class="js-scroll-down" data-target=".page-intro"></figure>
-            -->
+          <p class="page-intro__sub">{{_("Some resources available for you to help manage sexual experiences after prostate cancer treatment.")}}</p>
+          <div class="button-callout"><strong class="js-scroll-down" data-target="js-video-toggle">Learn More</strong>
+            <figure class="js-scroll-down" data-target=".js-video-toggle"></figure>
           </div>
+          <!-- <div class="button-callout">
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+          </div> -->
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}" alt="{{_('Learn More')}}">
+        <div class="module-wrap--inner">
+          <div class="button-callout"><a class="button button--large button--brown-medium" href="#">{{_("Watch")}}</a></div>
+        </div>
+      </div>
+      <div class="module-wrap--them-brown-medium mini-boxes">
+        <div class="module mini-boxes">
+          <div class="item module__body item__link active" data-group="sexualwellbeing">
+            <div class="title">{{_("Sexual wellbeing")}}</div>
+          </div>
+          <div class="item module__body item__link" data-group="medicaldevices">
+              <div class="title">{{_("Medication and devices")}}</div>
+          </div>
+          <div class="item module__body item__link" data-group="partners">
+              <div class="title">{{_("For partners")}}</div>
+          </div>
+        </div>
+        <div class="module content">
+            <div class="content__item" data-group="sexualwellbeing">
+              <ul>
+                <li>{{_("Surgery and its effect on sex life")}}</li>
+                <li>{{_("Hormone therapy and its effect on sex life")}}</li>
+                <li>{{_("Erectile dysfunction & penile rehabilitation")}}</li>
+                <li>{{_("Talking with your healthcare provider")}}</li>
+                <li>{{_("Radiation and its effect on sex life")}}</li>
+                <li>{{_("Combination therapy and its effect on sex life")}}</li>
+                <li>{{_("Sex after prostate cancer")}}</li>
+                <li>{{_("The emotional work")}}</li>
+              </ul>
+            </div>
+            <div class="content__item" data-group="medicaldevices">
+                <ul>
+                  <li>{{_("Pills for treating erectile dysfunction")}}</li>
+                  <li>{{_("Vacuum erection devices (VEDs)")}}</li>
+                  <li>{{_("Penile injections")}}</li>
+                  <li>{{_("Urethral suppositories")}}</li>
+                  <li>{{_("Penile implants")}}</li>
+                  <li>{{_("Sexual function aids for women")}}</li>
+                </ul>
+            </div>
+            <div class="content__item" data-group="partners">
+                <ul>
+                  <li>{{_("Sexual side effects: Heterosexual men")}}</li>
+                  <li>{{_("Sexual side effects: Bisexual men")}}</li>
+                  <li>{{_("Sensation focus exercise")}}</li>
+                  <li>{{_("Sexual function aids for women")}}</li>
+                </ul>
+            </div>
         </div>
       </div>
     </main>
+{% endblock %}
+{% block document_ready %}
+  <script src="{{url_for('.static', filename='js/sexual_wellness.js')}}"></script>
 {% endblock %}
