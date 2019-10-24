@@ -7935,14 +7935,18 @@ aside {
                 .content__item--links {
                     display: flex;
                 }
-                .title:before {
+                .title-text {
+                    display: inline-block;
+                    position: relative;
+                }
+                .title-text:before {
                     position: absolute;
                     display: block;
                     content: " ";
                     height: 2px;
                     background: rgba(255,255,255,.5);
-                    width: 30%;
-                    left: 0%;
+                    width: 80%;
+                    left: 10%;
                     bottom: -8px;
                 }
             }
