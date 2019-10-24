@@ -1561,7 +1561,8 @@ class User(db.Model, UserMixin):
         details = StringIO()
         dict_match(newd=after, oldd=before, diff_stream=details)
         db.session.add(Audit(
-            comment="registered invited user, {}".format(details.getvalue()),
+            comment="registered invited user <{}>, {}".format(
+                self._email, details.getvalue()),
             user_id=self.id, subject_id=self.id,
             context='account'))
 
