@@ -272,9 +272,10 @@ def account():
                        "{}".format(request.json.get('roles')))
 
     db.session.commit()
-    auditable_event("new account generated for {}".format(user),
-                    user_id=current_user().id, subject_id=user.id,
-                    context='account')
+    auditable_event(
+        "new account generated for {} <{}>".format(user, user._email),
+        user_id=current_user().id, subject_id=user.id,
+        context='account')
     if not adequate_perms:
         # Make sure acting user has permission to edit the newly
         # created user, or generate a 400 and purge the user.
