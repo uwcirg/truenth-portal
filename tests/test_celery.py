@@ -1,4 +1,5 @@
 """Unit test module for portal views"""
+import pytest
 from flask import url_for
 
 
@@ -22,6 +23,7 @@ def test_celery_add(celery_app, celery_worker, client, initialized_db):
     assert response.json['result'] == x + y
 
 
+@pytest.mark.skip(reason="locking up with celery fixtures")
 def test_celery_info(celery_app, celery_worker):
     """Test a task in the low-priority queue"""
     from portal.tasks import info
