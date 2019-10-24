@@ -1,6 +1,7 @@
 """Model classes for message data"""
 
 from datetime import datetime
+from sqlalchemy.ext.hybrid import hybrid_property
 from textwrap import fill
 
 from flask_mail import Message, email_dispatched
@@ -81,13 +82,33 @@ class EmailMessage(db.Model):
     __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255), nullable=False)
-    recipients = db.Column(db.Text, nullable=False)
+    _recipients = db.Column("recipients", db.Text, nullable=False)
     sender = db.Column(db.String(255), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
     # nullable as anonymous support requests won't have associated users
     user_id = db.Column(
         db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    recipient_id = db.Column(
+        db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+
+    @hybrid_property
+    def recipients(self):
+        return self._recipients
+
+    @recipients.setter
+    def recipients(self, value):
+        """Set recipients_id if a user is found w/ matching email"""
+
+        # As the schema only tracks a single recipient_id, capture abuse;
+        # don't allow comma in recipients till schema can capture
+        if ',' in value:
+            raise ValueError("schema only supports single recipient")
+
+        recipient_user = User.query.filter_by(email=value).first()
+        if recipient_user:
+            self.recipient_id = recipient_user.id
+        self._recipients = value
 
     @staticmethod
     def style_message(body):
