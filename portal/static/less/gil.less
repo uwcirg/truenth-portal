@@ -7840,6 +7840,9 @@ aside {
     background-position: top center;
     color: #FFF;
     z-index: 1;
+    .module-wrap--watch .module-wrap--inner {
+        top: 25%;
+    }
     &.page-intro:after {
         position: absolute;
         background: #333;
@@ -7863,20 +7866,85 @@ aside {
     .item__link {
         cursor: pointer;
     }
+    // .dropdown-list.mobile {
+    //     .item__link {
+    //         .title {
+    //             display: inline-block;
+    //             position: relative;
+    //             padding-right: 24px;
+    //         }
+    //         .title:after {
+    //             content: "\f0d7";
+    //             font-size: 20px !important;
+    //             font-family: "FontAwesome" !important;
+    //             font-style: normal !important;
+    //             font-weight: normal !important;
+    //             text-decoration: inherit;
+    //             text-rendering: auto;
+    //             -webkit-font-smoothing: antialiased;
+    //             display: inline-block;
+    //             position: absolute;
+    //             right: 0;
+    //         }
+    //     }
+    // }
     .content {
-        margin-top: -132px;
+        margin-top: 0;
         line-height: 1.5;
         text-align: left;
         font-size: 20px;
         .content__item {
-            display: none;
+            display: block;
             margin-bottom: 24px;
+            .content__item--links {
+                display: none;
+            }
             .title {
                 margin-left: 1em;
                 margin-bottom: 1em;
                 font-size: 22px;
                 font-weight: 600;
                 letter-spacing: .1rem;
+                position: relative;
+                &:hover {
+                    color: darken(#FFF, 5%);
+                    cursor: pointer;
+                    //text-decoration: underline;
+                }
+                &:after {
+                    //position: absolute;
+                    //display: block;
+                    position: relative;
+                    display: inline-block;
+                    z-index: 0;
+                    //left: 50%;
+                    left: 16px;
+                    //bottom: -28px;
+                    content: "\f0d7";
+                    font-size: 24px !important;
+                    font-family: "FontAwesome" !important;
+                    font-style: normal !important;
+                    font-weight: normal !important;
+                    text-decoration: inherit;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                }
+                
+            }
+            &.active {
+                .content__item--links {
+                    display: flex;
+                }
+                .title:before {
+                    position: absolute;
+                    display: block;
+                    content: " ";
+                    height: 2px;
+                    background: rgba(255,255,255,.5);
+                    width: 30%;
+                    left: 0%;
+                    bottom: -8px;
+                }
             }
         }
     }
@@ -7928,10 +7996,24 @@ aside {
         }
     }
 }
+@media (min-width: 699px) {
+    .module-wrap--them-brown-medium {
+        .module-wrap--watch .module-wrap--inner {
+            top: 47.5%;
+        }
+    }
+}
 @media (min-width: 768px) {
     .module-wrap--them-brown-medium {
         .content {
+            margin-top: -120px;
             font-size: 22px;
+            .content__item {
+                display: none;
+                &.active {
+                    display: block;
+                }
+            }
         }
         .module {
             padding-left: 0;
@@ -7953,6 +8035,20 @@ aside {
                 }
             }
         }
+    }
+}
+.desktop-view {
+    display: none;
+}
+.mobile-view {
+    display: block;
+}
+@media (min-width: 768px) {
+    .desktop-view {
+        display: block;
+    }
+    .mobile-view {
+        display: none;
     }
 }
 .button--brown-medium {

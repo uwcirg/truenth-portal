@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="module-wrap--them-brown-medium">
-          <div class="module module-header">
+          <div class="module module-header desktop-view">
             <div class="mini-boxes">
                 <div class="item module__body item__link active" data-group="sexualwellbeing">
                   <div class="title">{{_("Sexual wellbeing")}}</div>
@@ -47,10 +47,24 @@
                     <div class="title">{{_("For partners")}}</div>
                 </div>
             </div>
+            <!--
+            <div class="dropdown-list mobile">
+                <div class="item module__body item__link active" data-group="sexualwellbeing">
+                    <div class="title">{{_("Sexual wellbeing")}}</div>
+                </div>
+                <div class="item module__body item__link" data-group="medicaldevices">
+                    <div class="title">{{_("Medication and devices")}}</div>
+                </div>
+                <div class="item module__body item__link" data-group="partners">
+                    <div class="title">{{_("For partners")}}</div>
+                </div>
+            </div>
+          -->
         </div>
         <div class="module content">
             <div class="content__item" data-group="sexualwellbeing">
-              <ul>
+              <div class="title mobile-view">{{_("Sexual wellbeing")}}</div>
+              <ul class="content__item--links">
                 <li>{{_("Surgery and its effect on sex life")}}</li>
                 <li>{{_("Hormone therapy and its effect on sex life")}}</li>
                 <li>{{_("Erectile dysfunction & penile rehabilitation")}}</li>
@@ -62,7 +76,8 @@
               </ul>
             </div>
             <div class="content__item" data-group="medicaldevices">
-                <ul>
+                <div class="title mobile-view">{{_("Medical devices")}}</div>
+                <ul class="content__item--links">
                   <li>{{_("Pills for treating erectile dysfunction")}}</li>
                   <li>{{_("Vacuum erection devices (VEDs)")}}</li>
                   <li>{{_("Penile injections")}}</li>
@@ -72,7 +87,8 @@
                 </ul>
             </div>
             <div class="content__item" data-group="partners">
-                <ul>
+                <div class="title mobile-view">{{_("Partners")}}</div>
+                <ul class="content__item--links">
                   <li>{{_("Sexual side effects: Heterosexual men")}}</li>
                   <li>{{_("Sexual side effects: Bisexual men")}}</li>
                   <li>{{_("Sensation focus exercise")}}</li>
