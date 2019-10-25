@@ -7712,7 +7712,14 @@ aside {
                     }
                     &:hover {
                         cursor: pointer;
-                        color: darken(#FFF, 10%);
+                        text-decoration: underline;
+                        .figure {
+                            display: inline-block;
+                            text-decoration: none;
+                        }
+                        .focus {
+                            text-decoration: none;
+                        }
                     }
                 }
             }
