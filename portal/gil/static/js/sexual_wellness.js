@@ -13,4 +13,7 @@ $(function() {
         $(".content__item").removeClass("active");
         $(this).closest(".content__item").toggleClass("active");
     });
+    $(".content__item--links li").on("click", function() {
+        $(this).find("a")[0].click();
+    });
 });
