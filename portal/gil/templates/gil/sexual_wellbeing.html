@@ -24,9 +24,6 @@
           <div class="button-callout"><strong class="js-scroll-down" data-target="js-video-toggle">Learn More</strong>
             <figure class="js-scroll-down" data-target=".js-video-toggle"></figure>
           </div>
-          <!-- <div class="button-callout">
-            <figure class="js-scroll-down" data-target=".page-intro"></figure>
-          </div> -->
         </div>
       </div>
       <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}" alt="{{_('Learn More')}}">
@@ -34,69 +31,7 @@
           <div class="button-callout"><a class="button button--large button--brown-medium" href="#">{{_("Watch")}}</a></div>
         </div>
       </div>
-      <div class="module-wrap--them-brown-medium">
-          <div class="module module-header desktop-view">
-            <div class="mini-boxes">
-                <div class="item module__body item__link active" data-group="sexualwellbeing">
-                  <div class="title">{{_("Sexual wellbeing")}}</div>
-                </div>
-                <div class="item module__body item__link" data-group="medicaldevices">
-                    <div class="title">{{_("Medication and devices")}}</div>
-                </div>
-                <div class="item module__body item__link" data-group="partners">
-                    <div class="title">{{_("For partners")}}</div>
-                </div>
-            </div>
-            <!--
-            <div class="dropdown-list mobile">
-                <div class="item module__body item__link active" data-group="sexualwellbeing">
-                    <div class="title">{{_("Sexual wellbeing")}}</div>
-                </div>
-                <div class="item module__body item__link" data-group="medicaldevices">
-                    <div class="title">{{_("Medication and devices")}}</div>
-                </div>
-                <div class="item module__body item__link" data-group="partners">
-                    <div class="title">{{_("For partners")}}</div>
-                </div>
-            </div>
-          -->
-        </div>
-        <div class="module content">
-            <div class="content__item" data-group="sexualwellbeing">
-              <div class="title mobile-view"><span class="title-text">{{_("Sexual wellbeing")}}</span></div>
-              <ul class="content__item--links">
-                <li>{{_("Surgery and its effect on sex life")}}</li>
-                <li>{{_("Hormone therapy and its effect on sex life")}}</li>
-                <li>{{_("Erectile dysfunction & penile rehabilitation")}}</li>
-                <li>{{_("Talking with your healthcare provider")}}</li>
-                <li>{{_("Radiation and its effect on sex life")}}</li>
-                <li>{{_("Combination therapy and its effect on sex life")}}</li>
-                <li>{{_("Sex after prostate cancer")}}</li>
-                <li>{{_("The emotional work")}}</li>
-              </ul>
-            </div>
-            <div class="content__item" data-group="medicaldevices">
-                <div class="title mobile-view"><span class="title-text">{{_("Medical devices")}}</span></div>
-                <ul class="content__item--links">
-                  <li>{{_("Pills for treating erectile dysfunction")}}</li>
-                  <li>{{_("Vacuum erection devices (VEDs)")}}</li>
-                  <li>{{_("Penile injections")}}</li>
-                  <li>{{_("Urethral suppositories")}}</li>
-                  <li>{{_("Penile implants")}}</li>
-                  <li>{{_("Sexual function aids for women")}}</li>
-                </ul>
-            </div>
-            <div class="content__item" data-group="partners">
-                <div class="title mobile-view"><span class="title-text">{{_("Partners")}}</span></div>
-                <ul class="content__item--links">
-                  <li>{{_("Sexual side effects: Heterosexual men")}}</li>
-                  <li>{{_("Sexual side effects: Bisexual men")}}</li>
-                  <li>{{_("Sensation focus exercise")}}</li>
-                  <li>{{_("Sexual function aids for women")}}</li>
-                </ul>
-            </div>
-        </div>
-      </div>
+      {{ asset|safe }}
     </main>
 {% endblock %}
 {% block document_ready %}
