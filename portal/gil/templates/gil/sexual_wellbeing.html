@@ -17,22 +17,10 @@
           {% endif %}
         </header>
       {% endblock %}
-      <div class="page-intro module-wrap--them-brown-medium" style="background-image: url(/gil/static/img/PCF2-Background.jpg)">
-        <div class="page-intro__content">
-          <h1 class="page-intro__main">{{_("Sexual Wellness")}}</h1>
-          <p class="page-intro__sub">{{_("Some resources available for you to help manage sexual experiences after prostate cancer treatment.")}}</p>
-          <div class="button-callout"><strong class="js-scroll-down" data-target="js-video-toggle">Learn More</strong>
-            <figure class="js-scroll-down" data-target=".js-video-toggle"></figure>
-          </div>
-        </div>
-      </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}" alt="{{_('Learn More')}}">
-        <div class="module-wrap--inner">
-          <div class="button-callout"><a class="button button--large button--brown-medium" href="#">{{_("Watch")}}</a></div>
-        </div>
-      </div>
       {{ asset|safe }}
     </main>
+{% endblock %}
+{% block footnote %}
 {% endblock %}
 {% block document_ready %}
   <script src="{{url_for('.static', filename='js/sexual_wellness.js')}}"></script>

@@ -300,7 +300,7 @@ def lived_experience():
 
 @gil.route('/sexual-wellbeing')
 def sexual_wellbeing():
-    data = get_any_tag_data('sexualwellbeing_links_content')
+    data = get_any_tag_data('sexualwellbeing_main_content')
     asset = get_asset(data['results'][0]['uuid'])
     return render_template('gil/sexual_wellbeing.html',
                             user=current_user(), asset=asset)
