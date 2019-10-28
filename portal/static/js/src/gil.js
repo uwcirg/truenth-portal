@@ -317,10 +317,10 @@ module.exports = Video = (function() {
   }
 
   Video.prototype.build = function() {
-    $(".js-video-toggle a").on("click", function(e) {
+    $("body").on("click", ".js-video-toggle a", function(e) {
       return e.preventDefault();
     });
-    return $(".js-video-toggle").on("click", function(e) {
+    return $("body").on("click",".js-video-toggle", function(e) {
       var $div, src;
       e.preventDefault();
       $("html").addClass("is-video-active");
@@ -328,6 +328,17 @@ module.exports = Video = (function() {
       src = $div.data("iframe-src");
       return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass("is-js-video-active");
     });
+    // $(".js-video-toggle a").on("click", function(e) {
+    //   return e.preventDefault();
+    // });
+    // return $(".js-video-toggle").on("click", function(e) {
+    //   var $div, src;
+    //   e.preventDefault();
+    //   $("html").addClass("is-video-active");
+    //   $div = $(this);
+    //   src = $div.data("iframe-src");
+    //   return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass("is-js-video-active");
+    // });
   };
 
   return Video;
@@ -342,6 +353,9 @@ module.exports = Resize = (function() {
   function Resize() {
     var $intro;
     $intro = $(".intro");
+    if (!$intro.length) {
+      return;
+    }
     $intro.imagesLoaded(function() {
       return $(window).on("resize.setElements", _.debounce(function(e) {
         var imgHeight;

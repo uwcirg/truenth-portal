@@ -300,11 +300,16 @@ def lived_experience():
 
 @gil.route('/sexual-wellbeing')
 def sexual_wellbeing():
-    data = get_any_tag_data('sexualwellbeing_main_content')
-    asset = get_asset(data['results'][0]['uuid'])
     return render_template('gil/sexual_wellbeing.html',
-                            user=current_user(), asset=asset)
+                            user=current_user())
 
+@gil.route('/api/sexual-wellbeing')
+def sexual_wellbeing_content():
+    data = get_any_tag_data('sexualwellbeing_main_content')
+    if not data['results'] or not len(data['results']):
+        abort(404, 'Content not found')
+
+    return get_asset(data['results'][0]['uuid'])
 
 @gil.route('/stories/<string:page_name>')
 def stories(page_name):
