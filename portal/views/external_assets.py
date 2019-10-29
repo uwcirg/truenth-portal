@@ -12,12 +12,21 @@ asset_api = Blueprint('asset', __name__)
 def by_tag(tag):
     url = "{}/c/portal/truenth/asset/query".format(
         current_app.config["LR_ORIGIN"])
+    params = {
+        'allTags': tag,
+        'returnFirst': True,
+        'version': 'latest',
+    }
     return requests.get(
-        url, params={'allTags': tag, 'returnFirst': True}).json()['asset']
+        url, params=params).json()['asset']
 
 
 @asset_api.route('/api/asset/uuid/<uuid>', methods=('GET',))
 def by_uuid(uuid):
     url = "{}/c/portal/truenth/asset/detailed".format(
         current_app.config["LR_ORIGIN"])
-    return requests.get(url, params={'uuid': uuid}).json()['asset']
+    params = {
+        'uuid': uuid,
+        'version': 'latest',
+    }
+    return requests.get(url, params=params).json()['asset']
