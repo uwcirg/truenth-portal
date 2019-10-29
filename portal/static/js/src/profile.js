@@ -573,7 +573,10 @@ export default (function() {
                         if (!container.hasClass("edit")) {
                             self.fillSectionView(container.attr("data-sections"));
                             self.handleOptionalCoreData();
+                            self.disableInputTextFields();
+                            return;
                         }
+                        self.enableInputTextField(container.find("input[type='text']"));
                     });
                 });
             },
@@ -596,6 +599,7 @@ export default (function() {
                         }
                         triggerEvent = triggerEvent + " change";
                         if ($(this).attr("type") === "text") {
+                            $(this).attr("data-lpignore", true); //prevent lasspass icon be drawn inside of input field
                             $(this).on("keypress", function(e) {
                                 e.stopPropagation();
                                 if (e.keyCode === 13) { //account for hitting enter key when updating text field
@@ -630,11 +634,33 @@ export default (function() {
                     });
                 });
             },
+            enableInputTextField: function(fields) {
+                if (!fields) {
+                    return false;
+                }
+                let self = this;
+                fields.each(function() {
+                    //do not enable fields that are designated to be disabled (e.g. protected fields as those from MedidataRave)
+                    if (self.isDisableField($(this).attr("data-protected-fieldid"))) {
+                        return true;
+                    }
+                    $(this).attr("disabled", false);
+                });
+            },
+            disableInputTextFields: function(fields) {
+                if (!fields) {
+                    return false;
+                }
+                fields.each(function() {
+                    $(this).attr("disabled", true);
+                });
+            },
             initSections: function(callback) {
                 var self = this, sectionsInitialized = {}, initCount = 0;
                 $("#mainDiv [data-profile-section-id]").each(function() {
                     var sectionId = $(this).attr("data-profile-section-id");
                     if (!sectionsInitialized[sectionId]) {
+                        self.disableInputTextFields($(this).find("input[type='text']"));
                         setTimeout(function() {
                             self.initSection(sectionId);
                         }, initCount += 20);
@@ -961,14 +987,14 @@ export default (function() {
                     e.stopPropagation();
                     $("#erroremail").html("");
                 });
-                $("#email").on("postEventUpdate", function() {
+                $("#profileForm").on("postEventUpdate", "#email", function(e) {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
             },
             updateEmailVis: function() {
-                var hasError = $("#emailGroup").hasClass("has-error");
+                var hasError = $("#emailGroup").hasClass("has-error") || $("#erroremail").hasClass("with-errors");
                 var emailValue = $("#email").val();
                 if (!hasError) {
                     this.demo.data.email = emailValue;
