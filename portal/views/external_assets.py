@@ -5,10 +5,10 @@ Primarily LifeRay content access - via exposed APIs for portal side caching
 from flask import Blueprint, current_app
 import requests
 
-external_assets = Blueprint('external_assets', __name__)
+assets_api = Blueprint('assets', __name__)
 
 
-@external_assets.route('/api/external/tag/<tag>', methods=('GET',))
+@assets_api.route('/api/external/tag/<tag>', methods=('GET',))
 def by_tag(tag):
     url = "{}/c/portal/truenth/asset/query".format(
         current_app.config["LR_ORIGIN"])
