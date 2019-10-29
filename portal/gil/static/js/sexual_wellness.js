@@ -1,4 +1,4 @@
-$(function() {
+(function() {
     var requestAttempt = 0;
     var getContent = function() {
         $.ajax ({
@@ -55,8 +55,10 @@ $(function() {
                 $(".pre-loader").hide();
             }
         }, 30);
-    }
-    getContent();
-    handleTimeOut();
-    
-});
+    };
+    $(function() {
+        getContent();
+        handleTimeOut();
+    });
+})();
+
