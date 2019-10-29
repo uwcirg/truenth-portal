@@ -1,64 +1,72 @@
 (function() {
-    var requestAttempt = 0;
-    var getContent = function() {
-        $.ajax ({
-            type: "GET",
-            //TODO, hardcode uuid here, will change once the API has been modified to accept tag
-            url: "/api/asset/uuid/1c57de26-727f-c77a-775d-5d2c27e02455",
-            timeout: 10000
-        }).done(function(data) {
-            requestAttempt++;
-            $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
-            initLinksEvent();
-            $(".pre-loader").hide();
-    
-        }).fail(function(xhr, status, error) {
-            if (requestAttempt <= 3) {
-                setTimeout(function() { getContent;}, 3000);
-            } else {
-                $("#sexualWellbeingMainContent").html(error).addClass("error-message");
+    var SWObject = function() {
+        this.requestAttempt = 0;
+        this.initStartTime = new Date();
+        this.initIntervalId = 0;
+         //TODO, hardcode uuid here, will change once the API has been modified to accept tag
+        this.contentURL = "/api/asset/uuid/1c57de26-727f-c77a-775d-5d2c27e02455";
+        this.init = function() {
+            this.getContent();
+        };
+        this.getContent = function() {
+            var self = this;
+            this.requestAttempt++;
+            $.ajax ({
+                type: "GET",
+                url: self.contentURL,
+                timeout: 10000
+            }).done(function(data) {
+                $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
+                self.initLinksEvent();
                 $(".pre-loader").hide();
-                requestAttempt = 0;
-            }
-        });
-    };
-    var initLinksEvent = function() {
-        $(".item__link").on("click", function() {
-            $(".item__link").removeClass("active");
-            $(this).addClass("active");
-            $(".content__item").removeClass("active");
-            $(".content__item[data-group="+ $(this).attr("data-group") + "]").addClass("active");
-        });
-        var activeItemLinkGroup = $(".item__link.active").attr("data-group");
-        if (activeItemLinkGroup) {
-            $(".content__item[data-group="+activeItemLinkGroup+"]").addClass("active");
-        }
-        $(".content__item .title").on("click", function() {
-            $(".content__item").removeClass("active");
-            $(this).closest(".content__item").toggleClass("active");
-        });
-        $(".content__item--links li").on("click", function() {
-            $(this).find("a")[0].click();
-        });
-    };
-    var initStartTime = new Date();
-    var handleTimeOut = function() {
-        var initIntervalId = setInterval(function() { //wait for ajax calls to finish
-            var initEndTime = new Date();
-            var elapsedTime = initEndTime - initStartTime;
-            elapsedTime /= 1000;
-            if (elapsedTime >= 35) { //35 second elapsed and no content returned
-                clearInterval(initIntervalId);
-                if (!$("#sexualWellbeingMainContent").text()) {
-                    $("#sexualWellbeingMainContent").html("Timed out retrieving content.").addClass("error-message");
+        
+            }).fail(function(xhr, status, error) {
+                if (self.requestAttempt <= 3) {
+                    setTimeout(function() { self.getContent();}, 3000);
+                } else {
+                    $("#sexualWellbeingMainContent").html(error).addClass("error-message");
+                    $(".pre-loader").hide();
+                    self.requestAttempt = 0;
                 }
-                $(".pre-loader").hide();
+            }).always(function() {
+                self.handleTimeOut();
+            });
+        };
+        this.initLinksEvent = function() {
+            $(".item__link").on("click", function() {
+                $(".item__link").removeClass("active");
+                $(this).addClass("active");
+                $(".content__item").removeClass("active");
+                $(".content__item[data-group="+ $(this).attr("data-group") + "]").addClass("active");
+            });
+            var activeItemLinkGroup = $(".item__link.active").attr("data-group");
+            if (activeItemLinkGroup) {
+                $(".content__item[data-group="+activeItemLinkGroup+"]").addClass("active");
             }
-        }, 30);
+            $(".content__item .title").on("click", function() {
+                $(".content__item").removeClass("active");
+                $(this).closest(".content__item").toggleClass("active");
+            });
+            $(".content__item--links li").on("click", function() {
+                $(this).find("a")[0].click();
+            });
+        };
+        this.handleTimeOut = function() {
+            this.initIntervalId = setInterval(function() { //after ajax call, check if content is actually returned
+                var initEndTime = new Date();
+                var elapsedTime = initEndTime - this.initStartTime;
+                elapsedTime /= 1000;
+                if (elapsedTime >= 35) { //35 second elapsed and no content returned
+                    clearInterval(this.initIntervalId);
+                    if (!$("#sexualWellbeingMainContent").text()) {
+                        $("#sexualWellbeingMainContent").html("Timed out retrieving content.").addClass("error-message");
+                    }
+                    $(".pre-loader").hide();
+                }
+            }.bind(this), 30);
+        };
     };
     $(function() {
-        getContent();
-        handleTimeOut();
+        (new SWObject()).init();
     });
 })();
-
