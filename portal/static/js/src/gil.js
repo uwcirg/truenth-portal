@@ -328,17 +328,6 @@ module.exports = Video = (function() {
       src = $div.data("iframe-src");
       return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass("is-js-video-active");
     });
-    // $(".js-video-toggle a").on("click", function(e) {
-    //   return e.preventDefault();
-    // });
-    // return $(".js-video-toggle").on("click", function(e) {
-    //   var $div, src;
-    //   e.preventDefault();
-    //   $("html").addClass("is-video-active");
-    //   $div = $(this);
-    //   src = $div.data("iframe-src");
-    //   return $div.append("<iframe src='" + src + "' allowfullscreen frameborder='0' />").addClass("is-js-video-active");
-    // });
   };
 
   return Video;

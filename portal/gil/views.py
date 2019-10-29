@@ -300,16 +300,9 @@ def lived_experience():
 
 @gil.route('/sexual-wellbeing')
 def sexual_wellbeing():
-    return render_template('gil/sexual_wellbeing.html',
-                            user=current_user())
+    return render_template(
+        'gil/sexual_wellbeing.html', user=current_user())
 
-@gil.route('/api/sexual-wellbeing')
-def sexual_wellbeing_content():
-    # data = get_any_tag_data('sexualwellbeing_main_content')
-    # if not data['results'] or not len(data['results']):
-    #     abort(404, 'Content not found')
-    # hardcode UUID here, will remove once the LR api is modified to return asset content along with UUID
-    return get_asset('1c57de26-727f-c77a-775d-5d2c27e02455')
 
 @gil.route('/stories/<string:page_name>')
 def stories(page_name):
