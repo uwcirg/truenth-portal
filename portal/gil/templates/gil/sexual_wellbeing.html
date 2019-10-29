@@ -3,21 +3,8 @@
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
   <div class="loading-indicator-placeholder pre-loader"></div>
-  <main  class="main" data-section="sexualwellbeing">
+  <main  class="main theme--white" data-section="sexualwellbeing">
     {{super()}}
-      {% block header %}
-      <header class="header header--white {%if user%}no-banner{%endif%}">
-        <div class="header__menu">
-          <a class="menu button button--small button--white js-nav-menu-toggle">
-              <figure></figure><span>{{_("Menu")}}</span>
-          </a>
-        </div>
-        <a class="logo" href="/"></a>
-        {% if not user %}
-          <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
-        {% endif %}
-      </header>
-    {% endblock %}
     <div id="sexualWellbeingMainContent" class="main-content module-wrap--theme-blue error-message"></div>
     <!-- {{ asset|safe }} -->
   </main>
