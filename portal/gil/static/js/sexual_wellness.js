@@ -17,6 +17,7 @@
                 timeout: 10000
             }).done(function(data) {
                 $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
+                $(".js-video-toggle").hide();
                 self.initLinksEvent();
                 $(".pre-loader").hide();
         
