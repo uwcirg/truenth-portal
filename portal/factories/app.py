@@ -42,7 +42,7 @@ from ..views.extend_flask_user import (
     LockoutLoginForm,
     reset_password_view_function,
 )
-from ..views.external_assets import assets_api
+from ..views.external_assets import asset_api
 from ..views.fhir import fhir_api
 from ..views.filters import filters_blueprint
 from ..views.group import group_api
@@ -71,7 +71,7 @@ from ..views.user import user_api
 
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
-    assets_api,
+    asset_api,
     audit_api,
     auth,
     client_api,
