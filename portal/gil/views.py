@@ -303,7 +303,6 @@ def sexual_wellbeing():
     return render_template(
         'gil/sexual_wellbeing.html', user=current_user())
 
-
 @gil.route('/stories/<string:page_name>')
 def stories(page_name):
     try:
