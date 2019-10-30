@@ -1366,7 +1366,6 @@ module.exports = utilObj = (function() {
           contentType:"text/plain"
       }, "html")
       .done(function(data) {
-        console.log("Data", data)
           $("#portalWrapperNav")
           // Embed data returned by AJAX call into container element
           .html(data);
@@ -1424,9 +1423,9 @@ $(document).ready(function(){
     window.app.utilObj.handleLoginAsUser();
     window.app.orgTool.getOrgs(currentUserId);
   } else {
-    window.app.utilObj.initSessionMonitor();
     window.app.utilObj.handlePostLogout();
   }
+  window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {
     $("#modal-login-register").modal("hide");
