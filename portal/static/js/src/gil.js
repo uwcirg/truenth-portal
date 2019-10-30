@@ -1366,6 +1366,7 @@ module.exports = utilObj = (function() {
           contentType:"text/plain"
       }, "html")
       .done(function(data) {
+        console.log("Data", data)
           $("#portalWrapperNav")
           // Embed data returned by AJAX call into container element
           .html(data);
@@ -1420,10 +1421,10 @@ $(document).ready(function(){
   var currentUserId = $("#currentUserId").val();
   // Configure and start the session timeout monitor
   if (currentUserId !== "") {
-    window.app.utilObj.initSessionMonitor();
     window.app.utilObj.handleLoginAsUser();
     window.app.orgTool.getOrgs(currentUserId);
   } else {
+    window.app.utilObj.initSessionMonitor();
     window.app.utilObj.handlePostLogout();
   }
 
