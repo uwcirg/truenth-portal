@@ -1,6 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
 import pytest
+from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
 
@@ -30,6 +31,12 @@ def app(request):
 
     request.addfinalizer(teardown)
     return app_
+
+
+@pytest.fixture(scope='session')
+def initialized_db(app):
+    """Create database schema"""
+    db.create_all()
 
 
 @pytest.fixture(scope='session')
