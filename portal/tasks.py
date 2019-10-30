@@ -38,6 +38,10 @@ from .models.user import User, UserRoles
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug
+# or for tasks in the low_priority queue:
+#   celery worker -A portal.celery_worker.celery -Q low_priority \
+#       --loglevel=debug
+#
 # Import rdb and use like pdb:
 #   from celery.contrib import rdb
 #   rdb.set_trace()
@@ -46,6 +50,7 @@ from .models.user import User, UserRoles
 logger = get_task_logger(__name__)
 
 celery = create_celery(create_app())
+LOW_PRIORITY = 'low_priority'
 
 
 def scheduled_task(func):
@@ -87,21 +92,21 @@ def add(x, y):
     return x + y
 
 
-@celery.task(name="tasks.info")
+@celery.task(name="tasks.info", queue=LOW_PRIORITY)
 def info():
     return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
         current_app.config.get('BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
 
 
-@celery.task(bind=True, track_started=True)
+@celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def adherence_report_task(self, **kwargs):
     logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return adherence_report(**kwargs)
 
 
-@celery.task(bind=True, track_started=True)
+@celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def research_report_task(self, **kwargs):
     logger.debug("launch research report task: %s", self.request.id)
     kwargs['celery_task'] = self
@@ -110,7 +115,7 @@ def research_report_task(self, **kwargs):
 
 @celery.task(name="tasks.post_request", bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
-    """Wrap requests.post for asyncronous posts - includes timeout & retry"""
+    """Wrap requests.post for asynchronous posts - includes timeout & retry"""
     logger.debug("task: %s retries:%s", self.request.id, self.request.retries)
 
     s = Session()
@@ -151,7 +156,7 @@ def test_args(*args, **kwargs):
     return "{}|{}".format(",".join(args), json.dumps(kwargs))
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def cache_assessment_status(**kwargs):
     """Populate assessment status cache
@@ -164,7 +169,7 @@ def cache_assessment_status(**kwargs):
     update_patient_loop(update_cache=True, queue_messages=False, as_task=True)
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def prepare_communications(**kwargs):
     """Move any ready communications into prepared state """
@@ -204,7 +209,7 @@ def update_patient_loop(
             update_patients(**kwargs)
 
 
-@celery.task(name="tasks.update_patients_task")
+@celery.task(name="tasks.update_patients_task", queue=LOW_PRIORITY)
 def update_patients_task(patient_list, update_cache, queue_messages):
     """Task form - wraps call to testable function `update_patients` """
     update_patients(patient_list, update_cache, queue_messages)
@@ -228,7 +233,7 @@ def update_patients(patient_list, update_cache, queue_messages):
         db.session.commit()
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def send_queued_communications(**kwargs):
     """Look for communication objects ready to send"""
@@ -251,7 +256,7 @@ def send_messages(as_task=False):
             send_communication(communication_id)
 
 
-@celery.task(name="tasks.send_communication_task")
+@celery.task(name="tasks.send_communication_task", queue=LOW_PRIORITY)
 def send_communication_task(communication_id):
     send_communication(communication_id)
 
@@ -299,7 +304,7 @@ def send_user_messages(user, force_update=False):
     return message
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
@@ -310,7 +315,7 @@ def send_questionnaire_summary(**kwargs):
                 '{}'.format(', '.join(error_emails)))
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def update_tous_task(**kwargs):
     """Job to manage updates for various ToUs
@@ -321,7 +326,7 @@ def update_tous_task(**kwargs):
     return update_tous(**kwargs)
 
 
-@celery.task
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def token_watchdog(**kwargs):
     """Clean up stale tokens and alert service sponsors if nearly expired"""
