@@ -18,7 +18,9 @@
             }).done(function(data) {
                 $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
                 self.initLinksEvent();
-                $(".pre-loader").hide();
+                setTimeout(function() {
+                    $(".pre-loader").hide();
+                }, 300);
         
             }).fail(function(xhr, status, error) {
                 if (self.requestAttempt <= 3) {
@@ -54,11 +56,7 @@
             $(".content__item--links li").on("click", function(e) {
                 e.stopImmediatePropagation();
                 var refLocation = $(this).find("a").attr("href");
-                setTimeout(function() {
-                    window.open(refLocation, '_blank');
-                }, 0);
-
-               
+                window.open(refLocation, "_blank");
             });
         };
         this.handleTimeOut = function() {
