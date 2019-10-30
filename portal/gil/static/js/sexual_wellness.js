@@ -32,14 +32,6 @@
                 self.handleTimeOut();
             });
         };
-        this.reportDownload = function(referenceURL) {
-            if (!referenceURL) {
-                return;
-            }
-            if (typeof _paq !== "undefined") {
-                _paq.push(['trackLink', referenceURL , 'download']);
-            }
-        }
         this.initLinksEvent = function() {
             var self = this;
             $(".item__link").on("click", function() {
@@ -58,12 +50,10 @@
             });
             $(".content__item--links li a").on("click", function(e) {
                 e.stopPropagation();
-                //self.reportDownload($(this).attr("href"));
             });
             $(".content__item--links li").on("click", function(e) {
                 e.stopImmediatePropagation();
                 var refLocation = $(this).find("a").attr("href");
-                //self.reportDownload(refLocation);
                 setTimeout(function() {
                     window.open(refLocation, '_blank');
                 }, 0);
