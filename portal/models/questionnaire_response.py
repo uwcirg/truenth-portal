@@ -529,7 +529,8 @@ def aggregate_responses(
                 providers.append(org_ref)
             document["subject"]["careProvider"] = providers
 
-        _, timepoint = qb_status_visit_name(subject.id, encounter.start_time)
+        _, timepoint = qb_status_visit_name(
+            subject.id, questionnaire_response.authored)
         document["timepoint"] = timepoint
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
