@@ -17,7 +17,6 @@
                 timeout: 10000
             }).done(function(data) {
                 $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
-                $(".js-video-toggle").hide();
                 self.initLinksEvent();
                 $(".pre-loader").hide();
         
@@ -48,8 +47,13 @@
                 $(".content__item").removeClass("active");
                 $(this).closest(".content__item").toggleClass("active");
             });
-            $(".content__item--links li").on("click", function() {
-                $(this).find("a")[0].click();
+            $(".content__item--links li a").on("click", function(e) {
+                e.stopPropagation();
+            });
+            $(".content__item--links li").on("click", function(e) {
+                e.stopImmediatePropagation();
+                var refLocation = $(this).find("a").attr("href");
+                window.open(refLocation, '_blank');
             });
         };
         this.handleTimeOut = function() {
