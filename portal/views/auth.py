@@ -234,9 +234,9 @@ def login_user_with_provider(request, provider):
             db.session.commit()
 
             auditable_event(
-                "registered new user {0} via provider {1} "
-                "from input {2}".format(
-                    user.id,
+                "registered new user {} <{}> via provider {} "
+                "from input {}".format(
+                    user.id, user._email,
                     provider.name,
                     json.dumps(user_info.__dict__),
                 ),
@@ -411,8 +411,8 @@ def flask_user_password_failed_event(app, user, **extra):
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event(
-        "local user registered", user_id=user.id, subject_id=user.id,
-        context='account')
+        "local user registered <{}>".format(user._email),
+        user_id=user.id, subject_id=user.id, context='account')
 
 
 def flask_user_changed_password(app, user, **extra):
