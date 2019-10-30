@@ -37,7 +37,6 @@
                 return;
             }
             if (typeof _paq !== "undefined") {
-                console.log("HERE")
                 _paq.push(['trackLink', referenceURL , 'download']);
             }
         }
@@ -59,12 +58,12 @@
             });
             $(".content__item--links li a").on("click", function(e) {
                 e.stopPropagation();
-                self.reportDownload($(this).attr("href"));
+                //self.reportDownload($(this).attr("href"));
             });
             $(".content__item--links li").on("click", function(e) {
                 e.stopImmediatePropagation();
                 var refLocation = $(this).find("a").attr("href");
-                self.reportDownload(refLocation);
+                //self.reportDownload(refLocation);
                 setTimeout(function() {
                     window.open(refLocation, '_blank');
                 }, 0);
