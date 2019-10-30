@@ -167,8 +167,7 @@
   "Server error occurred checking questionnaire window": "",
   "Invalid completion date. Date of completion is outside the days allowed.": "",
   "All available questionnaires have been completed.": "",
-  "Problem retrieving audit log from server.": "",
-  "No audit log item found.": "",
+  "Error retrieving data from server": "",
   "More...": "",
   "Less...": "",
   "Comment": "",
@@ -211,7 +210,7 @@
   "Added!": "",
   "You haven't entered any management option yet.": "",
   "error occurred retrieving user procedures": "",
-  "(data entered by %actor on %date)": "",
+  "(data entered by {actor} on {date})": "",
   "REMOVE": "",
   "The procedure date must be valid and in required format.": "",
   "success": "",
@@ -230,7 +229,6 @@
   "Server error occurred retrieving demographics information.": "",
   "Server error occurred setting demographics information.": "",
   "Server error occurred retrieving locale information.": "",
-  "Error retrieving data from server": "",
   "Server error occurred saving procedure/treatment information.": "",
   "Server error occurred removing procedure/treatment information.": "",
   "Server error occurred retrieving roles information.": "",
@@ -289,5 +287,7 @@
   "Data type:": "",
   "Instrument(s) to export data from:": "",
   "CSV": "",
-  "JSON": ""
+  "JSON": "",
+  "Export request submitted": "",
+  "Request to export data failed.": ""
 }

@@ -1,7 +1,7 @@
 """User model """
 
 
-from cgi import escape
+from html import escape
 from datetime import datetime, timedelta
 from io import StringIO
 import re

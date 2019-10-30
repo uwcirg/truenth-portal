@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2019-05-03T22:36:26.957Z\n"
-"PO-Revision-Date: 2019-05-03T22:36:26.957Z\n"
+"POT-Creation-Date: 2019-10-26T22:04:32.284Z\n"
+"PO-Revision-Date: 2019-10-26T22:04:32.284Z\n"
 
 msgid "Server error occurred updating data."
 msgstr ""
@@ -516,10 +516,7 @@ msgstr ""
 msgid "All available questionnaires have been completed."
 msgstr ""
 
-msgid "Problem retrieving audit log from server."
-msgstr ""
-
-msgid "No audit log item found."
+msgid "Error retrieving data from server"
 msgstr ""
 
 msgid "More..."
@@ -656,7 +653,7 @@ msgstr ""
 msgid "error occurred retrieving user procedures"
 msgstr ""
 
-msgid "(data entered by %actor on %date)"
+msgid "(data entered by {actor} on {date})"
 msgstr ""
 
 msgid "REMOVE"
@@ -711,9 +708,6 @@ msgid "Server error occurred setting demographics information."
 msgstr ""
 
 msgid "Server error occurred retrieving locale information."
-msgstr ""
-
-msgid "Error retrieving data from server"
 msgstr ""
 
 msgid "Server error occurred saving procedure/treatment information."
@@ -891,4 +885,10 @@ msgid "CSV"
 msgstr ""
 
 msgid "JSON"
+msgstr ""
+
+msgid "Export request submitted"
+msgstr ""
+
+msgid "Request to export data failed."
 msgstr ""

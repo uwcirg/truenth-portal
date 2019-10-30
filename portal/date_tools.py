@@ -65,7 +65,7 @@ class FHIR_datetime(object):
             dt = parser.parse(data)
         except (TypeError, ValueError) as e:
             msg = "Unable to parse {}: {}".format(error_subject, e)
-            current_app.logger.warn(msg)
+            current_app.logger.warning(msg)
             abort(400, msg)
         if dt.tzinfo:
             # Convert to UTC if necessary

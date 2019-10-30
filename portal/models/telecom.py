@@ -77,18 +77,18 @@ class Telecom(object):
             value = item.get('value')
             use = item.get('use')
             if system not in cp_sys_list:
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "FHIR contains unexpected telecom system {system}"
                     " ignoring {value}".format(**item))
             elif use and use not in cp_use_list:
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "FHIR contains unexpected telecom use {use}"
                     " ignoring {value}".format(**item))
             elif any(
                 (cp.system == system and cp.use == use)
                 for cp in telecom.contact_points
             ):
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "FHIR contains multiple telecom entries for "
                     "{system} ignoring {value}".format(**item))
             else:
