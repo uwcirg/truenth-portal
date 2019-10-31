@@ -144,13 +144,13 @@ class Intervention(db.Model):
         # for prod -> staging, warn if seen on any other system
         if 'link_url' in data and self.link_url != data['link_url']:
             if current_app.config.get("SYSTEMT_TYPE", '').lower() != 'staging':
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "IMPORTING non-portable intervention({}) link_url: '{}'"
                     "".format(self.name, data['link_url']))
             self.link_url = data['link_url']
         if 'client_id' in data and self.client_id != data['client_id']:
             if current_app.config.get("SYSTEMT_TYPE", '').lower() != 'staging':
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "IMPORTING non-portable intervention({}) client_id: '{}'"
                     "".format(self.name, data['client_id']))
             self.client_id = data['client_id']
