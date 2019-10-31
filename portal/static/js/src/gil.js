@@ -132,7 +132,7 @@ module.exports = Global = (function() {
   };
 
   Global.prototype.bindEvents = function() {
-    return $(".js-scroll-down").on("click", function(e) {
+    return $("body").on("click", ".js-scroll-down", function(e) {
       var $target, position;
       e.preventDefault();
       $target = $($(this).attr("data-target"));
