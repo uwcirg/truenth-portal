@@ -46,9 +46,11 @@
             if (activeItemLinkGroup) {
                 $(".content__item[data-group="+activeItemLinkGroup+"]").addClass("active");
             }
-            $(".content__item .title").on("click", function() {
+            $(".content__item .title").on("click", function(e) { //mobile view
+                e.stopImmediatePropagation();
                 $(".content__item").removeClass("active");
                 $(this).closest(".content__item").toggleClass("active");
+                $("html, body").animate({ scrollTop: $(this).offset().top - $(this).outerHeight() }, 0);
             });
             $(".content__item--links li a").on("click", function(e) {
                 e.stopPropagation();
