@@ -1,0 +1,894 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2019-05-03T22:36:26.957Z\n"
+"PO-Revision-Date: 2019-05-03T22:36:26.957Z\n"
+
+msgid "Server error occurred updating data."
+msgstr ""
+
+msgid "Invalid user id: %d"
+msgstr ""
+
+msgid "Account created. Redirecting to profile..."
+msgstr ""
+
+msgid "[Processing error] "
+msgstr ""
+
+msgid "Email is already in use."
+msgstr ""
+
+msgid "An organization must be selected."
+msgstr ""
+
+msgid "no data returned"
+msgstr ""
+
+msgid "Error occurred retrieving clinics data."
+msgstr ""
+
+msgid "No clinics data available."
+msgstr ""
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} users"
+msgstr ""
+
+msgid "{pageNumber} records per page"
+msgstr ""
+
+msgid "Toggle"
+msgstr ""
+
+msgid "Columns"
+msgstr ""
+
+msgid "All rows"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "No matching records found"
+msgstr ""
+
+msgid "Export data"
+msgstr ""
+
+msgid "Export patient list"
+msgstr ""
+
+msgid "User Id is required"
+msgstr ""
+
+msgid "Error occurred retrieving roles for user"
+msgstr ""
+
+msgid "Error occurred updating user roles"
+msgstr ""
+
+msgid "Are you sure you want to deactivate this account?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Enter Text"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Error occurred retrieving patient report"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Patient Reports"
+msgstr ""
+
+msgid "Patient Report"
+msgstr ""
+
+msgid "No report data found."
+msgstr ""
+
+msgid "User id is required."
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "Deactivate"
+msgstr ""
+
+msgid "Error occurred retrieving subject ID"
+msgstr ""
+
+msgid "Error occurred - unable to reach destination"
+msgstr ""
+
+msgid "Unable to set session variable for organization modal viewed."
+msgstr ""
+
+msgid "Error retrieving demographics information for user."
+msgstr ""
+
+msgid "Error occurred updating user organization."
+msgstr ""
+
+msgid "Error updating organization"
+msgstr ""
+
+msgid "My Dashboard"
+msgstr ""
+
+msgid ""
+"Thank you, your access code {shortcut_alias} indicates you are located at "
+"the {org_name}. Proceeding to registration ..."
+msgstr ""
+
+msgid "You have entered an invalid access code.  Please try again"
+msgstr ""
+
+msgid "System was unable to process your request."
+msgstr ""
+
+msgid "Edit in Liferay"
+msgstr ""
+
+msgid ""
+"You must agree to the terms and conditions by checking the provided "
+"checkboxes."
+msgstr ""
+
+msgid "Try Again"
+msgstr ""
+
+msgid "Missing information for consent agreement.  Unable to complete request."
+msgstr ""
+
+msgid "Error occurred deleting notification"
+msgstr ""
+
+msgid "Alabama"
+msgstr ""
+
+msgid "Alaska"
+msgstr ""
+
+msgid "American Samoa"
+msgstr ""
+
+msgid "Arizona"
+msgstr ""
+
+msgid "Arkansas"
+msgstr ""
+
+msgid "California"
+msgstr ""
+
+msgid "Colorado"
+msgstr ""
+
+msgid "Connecticut"
+msgstr ""
+
+msgid "Delaware"
+msgstr ""
+
+msgid "District Of Columbia"
+msgstr ""
+
+msgid "Federated States Of Micronesia"
+msgstr ""
+
+msgid "Florida"
+msgstr ""
+
+msgid "Georgia"
+msgstr ""
+
+msgid "Guam"
+msgstr ""
+
+msgid "Hawaii"
+msgstr ""
+
+msgid "Idaho"
+msgstr ""
+
+msgid "Illinois"
+msgstr ""
+
+msgid "Indiana"
+msgstr ""
+
+msgid "Iowa"
+msgstr ""
+
+msgid "Kansas"
+msgstr ""
+
+msgid "Kentucky"
+msgstr ""
+
+msgid "Louisiana"
+msgstr ""
+
+msgid "Maine"
+msgstr ""
+
+msgid "Marshall Islands"
+msgstr ""
+
+msgid "Maryland"
+msgstr ""
+
+msgid "Massachusetts"
+msgstr ""
+
+msgid "Michigan"
+msgstr ""
+
+msgid "Minnesota"
+msgstr ""
+
+msgid "Mississippi"
+msgstr ""
+
+msgid "Missouri"
+msgstr ""
+
+msgid "Montana"
+msgstr ""
+
+msgid "Nebraska"
+msgstr ""
+
+msgid "Nevada"
+msgstr ""
+
+msgid "New Hampshire"
+msgstr ""
+
+msgid "New Jersey"
+msgstr ""
+
+msgid "New Mexico"
+msgstr ""
+
+msgid "New York"
+msgstr ""
+
+msgid "North Carolina"
+msgstr ""
+
+msgid "North Dakota"
+msgstr ""
+
+msgid "Northern Mariana Islands"
+msgstr ""
+
+msgid "Ohio"
+msgstr ""
+
+msgid "Oklahoma"
+msgstr ""
+
+msgid "Oregon"
+msgstr ""
+
+msgid "Palau"
+msgstr ""
+
+msgid "Pennsylvania"
+msgstr ""
+
+msgid "Puerto Rico"
+msgstr ""
+
+msgid "Rhode Island"
+msgstr ""
+
+msgid "South Carolina"
+msgstr ""
+
+msgid "South Dakota"
+msgstr ""
+
+msgid "Tennessee"
+msgstr ""
+
+msgid "Texas"
+msgstr ""
+
+msgid "Utah"
+msgstr ""
+
+msgid "Vermont"
+msgstr ""
+
+msgid "Virgin Islands"
+msgstr ""
+
+msgid "Virginia"
+msgstr ""
+
+msgid "Washington"
+msgstr ""
+
+msgid "West Virginia"
+msgstr ""
+
+msgid "Wisconsin"
+msgstr ""
+
+msgid "Wyoming"
+msgstr ""
+
+msgid "Organization"
+msgstr ""
+
+msgid "Consent Status"
+msgstr ""
+
+msgid "Agreement"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Registration Date"
+msgstr ""
+
+msgid "GMT"
+msgstr ""
+
+msgid "Consent Date"
+msgstr ""
+
+msgid "Last Updated"
+msgstr ""
+
+msgid "( GMT, Y-M-D )"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Consented"
+msgstr ""
+
+msgid "Consented / Enrolled"
+msgstr ""
+
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr ""
+
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr ""
+
+msgid "Purged / Removed"
+msgstr ""
+
+msgid "Replaced"
+msgstr ""
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} records"
+msgstr ""
+
+msgid "not provided"
+msgstr ""
+
+msgid "Unable to set user settings."
+msgstr ""
+
+msgid "Unable to set current user orgs"
+msgstr ""
+
+msgid "DONE"
+msgstr ""
+
+msgid "EDIT"
+msgstr ""
+
+msgid "No information available"
+msgstr ""
+
+msgid "Unable to properly set session storage variable for login-as. "
+msgstr ""
+
+msgid "Subject id is required"
+msgstr ""
+
+msgid "Invalid field value."
+msgstr ""
+
+msgid "Validation error."
+msgstr ""
+
+msgid "Date (GMT), Y-M-D"
+msgstr ""
+
+msgid "Subject"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "No email log entry found."
+msgstr ""
+
+msgid "{emailType} email will be sent to {email}"
+msgstr ""
+
+msgid "Url for email content is unavailable."
+msgstr ""
+
+msgid "Unable to send email. Missing content."
+msgstr ""
+
+msgid "failed request to get email invite url"
+msgstr ""
+
+msgid "Error occurred while sending invite email."
+msgstr ""
+
+msgid "{emailType} email sent to {emailAddress}"
+msgstr ""
+
+msgid "Error occurred retreving email content via API."
+msgstr ""
+
+msgid "your clinic"
+msgstr ""
+
+msgid "Hello, this is an invitation to complete your registration."
+msgstr ""
+
+msgid "Verify your account to complete registration"
+msgstr ""
+
+msgid "Registration invite from {clinicName}"
+msgstr ""
+
+msgid "invite email sent to {email}"
+msgstr ""
+
+msgid "Password reset email sent to {email}"
+msgstr ""
+
+msgid "Unable to send email."
+msgstr ""
+
+msgid "Error occurred suspending consent for subject."
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Report Name"
+msgstr ""
+
+msgid "Generated (GMT)"
+msgstr ""
+
+msgid "Document Type"
+msgstr ""
+
+msgid "No reports available."
+msgstr ""
+
+msgid "Problem retrieving reports from server."
+msgstr ""
+
+msgid "No questionnaire data found."
+msgstr ""
+
+msgid "Problem retrieving session data from server."
+msgstr ""
+
+msgid "Click to view report"
+msgstr ""
+
+msgid "No affiliated clinic"
+msgstr ""
+
+msgid "The user does not have a valid assessment link."
+msgstr ""
+
+msgid "Server error occurred checking questionnaire window"
+msgstr ""
+
+msgid "Invalid completion date. Date of completion is outside the days allowed."
+msgstr ""
+
+msgid "All available questionnaires have been completed."
+msgstr ""
+
+msgid "Problem retrieving audit log from server."
+msgstr ""
+
+msgid "No audit log item found."
+msgstr ""
+
+msgid "More..."
+msgstr ""
+
+msgid "Less..."
+msgstr ""
+
+msgid "Comment"
+msgstr ""
+
+msgid "Date/Time <span class='gmt'>{gmt}</span>"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Sharing information with clinics"
+msgstr ""
+
+msgid "expired"
+msgstr ""
+
+msgid "TrueNTH USA"
+msgstr ""
+
+msgid "Agreed to {documentType}"
+msgstr ""
+
+msgid "Agreed to terms"
+msgstr ""
+
+msgid "{projectName} Terms of Use"
+msgstr ""
+
+msgid "Error occurred retrieving consent list content."
+msgstr ""
+
+msgid "Error occurred setting user roles"
+msgstr ""
+
+msgid "Error occurred setting user organizations"
+msgstr ""
+
+msgid "Date must in the valid format."
+msgstr ""
+
+msgid "Hour must be in valid format, range 0 to 23."
+msgstr ""
+
+msgid "Minute must be in valid format, range 0 to 59."
+msgstr ""
+
+msgid "Second must be in valid format, range 0 to 59."
+msgstr ""
+
+msgid "You must enter a date/time"
+msgstr ""
+
+msgid "Error processing data.  Make sure the date is in the correct format."
+msgstr ""
+
+msgid "Consent to share information"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Unable to set default consent agreement"
+msgstr ""
+
+msgid "Error loading portal wrapper"
+msgstr ""
+
+msgid ""
+"&copy; {year} Movember Foundation. All rights reserved. A registered "
+"501(c)3 non-profit organization (Movember Foundation)."
+msgstr ""
+
+msgid ""
+"&copy; {year} Movember Foundation. All rights reserved. Movember Foundation "
+"is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr ""
+
+msgid ""
+"&copy; {year} Movember Foundation. All rights reserved. Movember Foundation "
+"is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr ""
+
+msgid ""
+"&copy; {year} Movember Foundation (Movember Foundation). All rights "
+"reserved."
+msgstr ""
+
+msgid "User id is required"
+msgstr ""
+
+msgid "Error occurred retrieving notification."
+msgstr ""
+
+msgid "No organizations available"
+msgstr ""
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "error occurred setting current user id"
+msgstr ""
+
+msgid "no data found"
+msgstr ""
+
+msgid "you"
+msgstr ""
+
+msgid "this patient"
+msgstr ""
+
+msgid "staff member"
+msgstr ""
+
+msgid "Added!"
+msgstr ""
+
+msgid "You haven't entered any management option yet."
+msgstr ""
+
+msgid "error occurred retrieving user procedures"
+msgstr ""
+
+msgid "(data entered by %actor on %date)"
+msgstr ""
+
+msgid "REMOVE"
+msgstr ""
+
+msgid "The procedure date must be valid and in required format."
+msgstr ""
+
+msgid "success"
+msgstr ""
+
+msgid "Unable to update. System/Server Error."
+msgstr ""
+
+msgid "unable to get needed core data"
+msgstr ""
+
+msgid "unable to get required core data"
+msgstr ""
+
+msgid "Unable to retrieve portal footer html"
+msgstr ""
+
+msgid "No data found"
+msgstr ""
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr ""
+
+msgid "Server error occurred retrieving consent information."
+msgstr ""
+
+msgid "User id and parameters are required"
+msgstr ""
+
+msgid "Server error occurred setting consent status."
+msgstr ""
+
+msgid "Server error occurred removing consent."
+msgstr ""
+
+msgid "User id and organization id are required."
+msgstr ""
+
+msgid "Error occurred setting suspended consent status."
+msgstr ""
+
+msgid "Server error occurred retrieving demographics information."
+msgstr ""
+
+msgid "Server error occurred setting demographics information."
+msgstr ""
+
+msgid "Server error occurred retrieving locale information."
+msgstr ""
+
+msgid "Error retrieving data from server"
+msgstr ""
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr ""
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr ""
+
+msgid "Server error occurred retrieving roles information."
+msgstr ""
+
+msgid "Server error occurred retrieving user role information."
+msgstr ""
+
+msgid "User Id is required."
+msgstr ""
+
+msgid "Server error occurred setting user role information."
+msgstr ""
+
+msgid "Server error occurred deleting user role."
+msgstr ""
+
+msgid "Server error occurred retrieving clinical data."
+msgstr ""
+
+msgid "Server error occurred updating clinical data."
+msgstr ""
+
+msgid "no url returned"
+msgstr ""
+
+msgid "Server error occurred retrieving tou url."
+msgstr ""
+
+msgid "Server error"
+msgstr ""
+
+msgid "error retrieving instruments list"
+msgstr ""
+
+msgid "Server error occurred retrieving tou data."
+msgstr ""
+
+msgid "Server error occurred saving terms of use information."
+msgstr ""
+
+msgid "Error occurred retrieving access url."
+msgstr ""
+
+msgid "Invite data are required."
+msgstr ""
+
+msgid "Error occurred sending password reset request."
+msgstr ""
+
+msgid "Error occurred retrieving assessment status."
+msgstr ""
+
+msgid "Questionnaire response data is required."
+msgstr ""
+
+msgid "Error occurred retrieving assessment list."
+msgstr ""
+
+msgid "User id and instrument Id are required."
+msgstr ""
+
+msgid "Error occurred retrieving assessment report."
+msgstr ""
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr ""
+
+msgid "Error occurred retrieving patient report."
+msgstr ""
+
+msgid "Error occurred setting table preference."
+msgstr ""
+
+msgid "Error occurred retrieving email audit entries."
+msgstr ""
+
+msgid "Error occurred retrieving audit log."
+msgstr ""
+
+msgid "configuration key is required."
+msgstr ""
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr ""
+
+msgid "Error occurred deactivating user."
+msgstr ""
+
+msgid "Error occurred reactivating user."
+msgstr ""
+
+msgid "configuration variable name is required."
+msgstr ""
+
+msgid "Invalid date. Please try again."
+msgstr ""
+
+msgid "Date must not be in the future. Please try again."
+msgstr ""
+
+msgid "Date must not be before 1900. Please try again."
+msgstr ""
+
+msgid "Year must be after 1900"
+msgstr ""
+
+msgid "The date must not be in the future."
+msgstr ""
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr ""
+
+msgid "Missing value."
+msgstr ""
+
+msgid "Url is required."
+msgstr ""
+
+msgid "Error occurred processing request"
+msgstr ""
+
+msgid "Hi there."
+msgstr ""
+
+msgid "Thanks for your patience while we upgrade our site."
+msgstr ""
+
+msgid "Error occurred when verifying the uniqueness of email"
+msgstr ""
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr ""
+
+msgid "Invalid characters in text."
+msgstr ""
+
+msgid "Identifier value must be unique"
+msgstr ""
+
+msgid "Question"
+msgstr ""
+
+msgid "Response"
+msgstr ""
+
+msgid "Server Error occurred retrieving report data"
+msgstr ""
+
+msgid "No data returned from server"
+msgstr ""
+
+msgid "Unable to load report data"
+msgstr ""
+
+msgid "Export questionnaire data"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Data type:"
+msgstr ""
+
+msgid "Instrument(s) to export data from:"
+msgstr ""
+
+msgid "CSV"
+msgstr ""
+
+msgid "JSON"
+msgstr ""
