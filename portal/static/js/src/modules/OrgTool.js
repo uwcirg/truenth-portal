@@ -185,6 +185,22 @@ export default (function() { /*global i18next $ */
         }
         return org.name;
     };
+    /*
+     * return the immediate parent organization ID for a given organization Id
+     */
+    OrgTool.prototype.getParentOrgId = function(orgId){
+        var org = this.orgsList[orgId];
+        if (!org) {
+            return "";
+        }
+        return org.parentOrgId;
+    };
+    /*
+     * return the UI element associated with a organization ID
+     */
+    OrgTool.prototype.getElementByOrgId = function(orgId) {
+        return $("#userOrgs input[name='organization'][value='" + orgId + "']");
+    };
     OrgTool.prototype.populateOrgsList = function(items) {
         if (Object.keys(this.orgsList).length > 0) {
             return this.orgsList;

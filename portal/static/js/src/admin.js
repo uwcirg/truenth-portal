@@ -328,11 +328,11 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 self.showMain();
                 setTimeout(function () {
                     $("body").removeClass("vis-on-callback");
-                    $("#loadingIndicator").fadeOut();
+                    $("#loadingIndicator").fadeOut().css("visibility", "hidden");
                 }, 150);
             },
             showLoader: function () {
-                $("#loadingIndicator").show();
+                $("#loadingIndicator").show().css("visibility", "visible");
             },
             preConfig: function (callback) {
                 var self = this,
@@ -399,9 +399,11 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 return $.extend({}, this.tableConfig, options);
             },
             initRoleBasedEvent: function() {
+                let self = this;
                 if (this.isAdminUser()) { /* turn on test account toggle checkbox if admin user */
                     $("#frmTestUsersContainer").removeClass("tnth-hide");
                     $("#include_test_role").on("click", function() {
+                        self.showLoader();
                         $("#frmTestUsers").submit();
                     });
                 }
@@ -707,6 +709,25 @@ import CurrentUser from "./mixins/CurrentUser.js";
                             childOrgs.forEach(function (org) {
                                 $("#userOrgs input[name='organization'][value='" + org + "']").prop("checked", isChecked);
                             });
+                        }
+                        if (!isChecked) {
+                            var ot = self.getOrgTool();
+                            var currentOrgId = $(this).val();
+                            var parentOrgId = ot.getParentOrgId($(this).val());
+                            if (parentOrgId) {
+                                /*
+                                 * if all child node(s) are unchecked under a parent org, uncheck it as well
+                                 */
+                                var cn = ot.getHereBelowOrgs([parentOrgId]);
+                                var hasCheckedChilds = cn.filter(function(item) {
+                                    return parseInt(item) != parseInt(currentOrgId) && 
+                                        (parseInt(item) != parseInt(parentOrgId)) &&
+                                        (ot.getElementByOrgId(item).prop("checked") == true);
+                                });
+                                if (!hasCheckedChilds.length) {
+                                    ot.getElementByOrgId(parentOrgId).prop("checked", false);
+                                }
+                            }
                         }
                         self.setOrgsSelector({
                             selectAll: false,
