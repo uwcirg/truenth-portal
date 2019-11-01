@@ -716,13 +716,13 @@ import CurrentUser from "./mixins/CurrentUser.js";
                             var parentOrgId = ot.getParentOrgId($(this).val());
                             if (parentOrgId) {
                                 /*
-                                 * if all child node(s) are unchecked under a parent org, uncheck it as well
+                                 * if all child organizations(s) are unchecked under a parent org, uncheck that parent org as well
                                  */
                                 var cn = ot.getHereBelowOrgs([parentOrgId]);
                                 var hasCheckedChilds = cn.filter(function(item) {
-                                    return parseInt(item) != parseInt(currentOrgId) && 
-                                        (parseInt(item) != parseInt(parentOrgId)) &&
-                                        (ot.getElementByOrgId(item).prop("checked") == true);
+                                    return parseInt(item) !== parseInt(currentOrgId) && 
+                                        (parseInt(item) !== parseInt(parentOrgId)) &&
+                                        (ot.getElementByOrgId(item).prop("checked"));
                                 });
                                 if (!hasCheckedChilds.length) {
                                     ot.getElementByOrgId(parentOrgId).prop("checked", false);
