@@ -196,7 +196,7 @@ export default (function() { /*global i18next $ */
         return org.parentOrgId;
     };
     /*
-     * return the UI element associated with a organization ID
+     * return the UI element associated with an organization ID
      */
     OrgTool.prototype.getElementByOrgId = function(orgId) {
         return $("#userOrgs input[name='organization'][value='" + orgId + "']");
