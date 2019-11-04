@@ -30,6 +30,7 @@ from flask_user.signals import (
     user_reset_password,
 )
 import requests
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
@@ -211,7 +212,8 @@ def login_user_with_provider(request, provider):
         # This is the user's first time logging in with this provider
         # Check to see if a db entry already exists for the user's email
         # address.
-        user_query = User.query.filter_by(email=user_info.email)
+        user_query = User.query.filter(
+            func.lower(User.email) == user_info.email.lower())
         user = user_query.first()
 
         if user:
