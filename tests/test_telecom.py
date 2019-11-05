@@ -1,9 +1,9 @@
-"""Unit test module for telecom model"""
+"""pytest module for telecom model"""
 
 from portal.models.telecom import ContactPoint, Telecom
 
 
-def test_telecom_from_fhir(app):
+def test_telecom_from_fhir(app_logger):
     data = [
             {
                 "system": "phone",
