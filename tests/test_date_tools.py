@@ -47,6 +47,7 @@ def test_rd_param_collision():
     with pytest.raises(ValueError):
         RelativeDelta(json.dumps(d), months=4)
 
+
 def test_int_date(app_logger):
     # integer value shouldn't generate parser error
     acceptance_date = 1394413200000

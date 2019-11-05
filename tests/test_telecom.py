@@ -26,11 +26,13 @@ def test_telecom_from_fhir(app_logger):
     assert len(tc.contact_points) == 3
     assert tc.email == "hq@HL7.org"
 
+
 def test_telecom_as_fhir():
     cp = ContactPoint(system='phone', use='work', value='123-4567')
     tc = Telecom(email='hq@HL7.org', contact_points=[cp])
     data = tc.as_fhir()
     assert len(data) == 2
+
 
 def test_telecom_cp_dict():
     cp = ContactPoint(system='phone', use='work', value='123-4567')
@@ -38,6 +40,7 @@ def test_telecom_cp_dict():
     data = tc.cp_dict()
     assert len(data) == 1
     assert data.get(('phone', 'work')) == '123-4567'
+
 
 def test_contactpoint_from_fhir():
     data = {
@@ -49,6 +52,7 @@ def test_contactpoint_from_fhir():
     cp = ContactPoint.from_fhir(data)
     assert cp.system == "phone"
     assert cp.value == "867-5309"
+
 
 def test_contactpoint_as_fhir():
     cp = ContactPoint(system='phone', use='work', value='867-5309')

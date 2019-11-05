@@ -32,10 +32,12 @@ def app(request):
     request.addfinalizer(teardown)
     return app_
 
+
 @pytest.fixture(scope="session")
 def app_logger(app):
-    """fixture to use for functions requiring current_app.logger and nothing else in app"""
+    """fixture for functions requiring current_app.logger"""
     return app.logger
+
 
 @pytest.fixture(scope='session')
 def initialized_db(app):

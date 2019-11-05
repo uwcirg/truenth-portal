@@ -2,6 +2,7 @@
 
 from portal.models.address import Address
 
+
 def test_from_fhir():
     data = {
         "line": ["3300 Washtenaw Avenue", "Suite 227"],
@@ -16,6 +17,7 @@ def test_from_fhir():
     assert addr.state == data['state']
     assert addr.postalCode == data['postalCode']
     assert 'Suite 227' in str(addr)
+
 
 def test_as_fhir():
     addr = Address(city='Seattle', state='WA', postalCode='98101')
