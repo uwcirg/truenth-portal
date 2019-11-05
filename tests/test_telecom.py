@@ -8,20 +8,20 @@ def test_telecom_from_fhir(app_logger):
             {
                 "system": "phone",
                 "value": "(+1) 734-677-7777"
-                },
+            },
             {
                 "system": "fax",
                 "value": "(+1) 734-677-6622"
-                },
+            },
             {
                 "system": "email",
                 "value": "hq@HL7.org"
-                },
+            },
             {
                 "system": "email",
                 "value": "second_email@HL7.org"
-                }
-            ]
+            }
+    ]
     tc = Telecom.from_fhir(data)
     assert len(tc.contact_points) == 3
     assert tc.email == "hq@HL7.org"
