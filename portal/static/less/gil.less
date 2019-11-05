@@ -7989,7 +7989,7 @@ aside {
             }
             .title {
                 margin-left: 1em;
-                margin-bottom: 0.25em;
+                margin-bottom: 1em;
                 font-size: 22px;
                 font-weight: 600;
                 letter-spacing: .1rem;
@@ -8033,6 +8033,9 @@ aside {
     .module {
         padding-left: 32px;
         padding-right: 32px;
+        &.prompt {
+            padding-bottom: 0;
+        }
         &.mini-boxes {
             padding: 52px 12px 72px !important;
         }
@@ -8138,6 +8141,10 @@ aside {
 }
 @media (min-width: 992px) {
     .module-wrap--theme-columns {
+        .module-header {
+           padding-left: 12px;
+           padding-right: 12px;
+        }
         .module {
             ul {
                 li {
