@@ -2250,6 +2250,62 @@
       "resourceType": "Organization"
     },
     {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146119,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-119"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Velindre Cancer Centre",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146120,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-120"
+        }
+      ],
+      "language": "en_GB",
+      "name": "University Hospitals of Morecambe Bay NHS Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
       "id": 30000,
       "identifier": [
         {
