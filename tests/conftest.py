@@ -33,6 +33,12 @@ def app(request):
     return app_
 
 
+@pytest.fixture(scope="session")
+def app_logger(app):
+    """fixture for functions requiring current_app.logger"""
+    return app.logger
+
+
 @pytest.fixture(scope='session')
 def initialized_db(app):
     """Create database schema"""
