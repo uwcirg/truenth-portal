@@ -132,7 +132,7 @@ module.exports = Global = (function() {
   };
 
   Global.prototype.bindEvents = function() {
-    return $(".js-scroll-down").on("click", function(e) {
+    return $("body").on("click", ".js-scroll-down", function(e) {
       var $target, position;
       e.preventDefault();
       $target = $($(this).attr("data-target"));
@@ -317,10 +317,10 @@ module.exports = Video = (function() {
   }
 
   Video.prototype.build = function() {
-    $(".js-video-toggle a").on("click", function(e) {
+    $("body").on("click", ".js-video-toggle a", function(e) {
       return e.preventDefault();
     });
-    return $(".js-video-toggle").on("click", function(e) {
+    return $("body").on("click",".js-video-toggle", function(e) {
       var $div, src;
       e.preventDefault();
       $("html").addClass("is-video-active");
@@ -342,6 +342,9 @@ module.exports = Resize = (function() {
   function Resize() {
     var $intro;
     $intro = $(".intro");
+    if (!$intro.length) {
+      return;
+    }
     $intro.imagesLoaded(function() {
       return $(window).on("resize.setElements", _.debounce(function(e) {
         var imgHeight;
@@ -1417,12 +1420,12 @@ $(document).ready(function(){
   var currentUserId = $("#currentUserId").val();
   // Configure and start the session timeout monitor
   if (currentUserId !== "") {
-    window.app.utilObj.initSessionMonitor();
     window.app.utilObj.handleLoginAsUser();
     window.app.orgTool.getOrgs(currentUserId);
   } else {
     window.app.utilObj.handlePostLogout();
   }
+  window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {
     $("#modal-login-register").modal("hide");

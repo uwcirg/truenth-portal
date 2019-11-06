@@ -30,6 +30,7 @@ from ..models.user import current_user, get_user_or_abort
 from ..system_uri import SHORTCUT_ALIAS
 from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
+from ..views.portal import get_any_tag_data, get_asset
 
 gil = Blueprint(
     'gil', __name__, template_folder='templates', static_folder='static',
@@ -296,6 +297,11 @@ def exercise_and_diet():
 def lived_experience():
     return render_template('gil/lived-experience.html', user=current_user())
 
+
+@gil.route('/sexual-wellbeing')
+def sexual_wellbeing():
+    return render_template(
+        'gil/sexual_wellbeing.html', user=current_user())
 
 @gil.route('/stories/<string:page_name>')
 def stories(page_name):
