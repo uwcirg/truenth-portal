@@ -1,6 +1,10 @@
 <!-- retrieving and populating footer HTML via ajax -->
 {% macro getFooterViaAjax(custom_class, user) -%}
     <footer class="{%if custom_class%} {{custom_class}}{%endif%}"></footer>
+    <!--
+   needing inline script here, browser CORS policy seems to strip out any external script, resulting in script not being executed
+   not sure the best way to resolve it yet
+    -->
     <script>
         (function() {
             /*
@@ -64,6 +68,9 @@
   <style>.no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
     display: none;
   }</style>
+  <!--
+  ok to enclose external stylesheet here.
+  -->
   <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
   <script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
   <div id="tnthBottomNavWrapper" class="footer">
@@ -104,6 +111,10 @@
       </div>
   </div>
   <script>
+  /*
+   needing inline script here, browser CORS policy seems to strip out any external script, resulting in script not being executed
+   not sure the best way to resolve it yet
+   */
   $(document).ready(function(){
     {% if user %}
         $.ajax({
@@ -158,5 +169,3 @@
   {% endif %}
 {%- endmacro %}
 {{footerContent(user=user, useDefault=False)}}
-
-
