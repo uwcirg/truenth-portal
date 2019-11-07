@@ -1354,41 +1354,6 @@ module.exports = utilObj = (function() {
       var results = regex.exec(location.search);
       return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
-    this.getPortalFooter = function() {
-      /*
-       * get portal footer HTML content
-       */
-      $.ajax({
-        url: "/api/portal-footer-html/",
-        type: "GET",
-        contentType:"text/plain"
-    }, "html")
-    .done(function(data) {
-        $("footer")
-        // Embed data returned by AJAX call into container element
-        .html(data);
-    })
-    .fail(function(xhr) {
-        /*
-         * report error
-         */
-        var params = {};
-        params.subject_id = $("#currentUserId").val() ? $("#currentUserId").val() : 0;
-        params.page_url = window.location.href;
-        //don't think we want to translate message sent back to the server here
-        params.message = "In GIL, error loading nav elements from portal - " + ("status code: "+ xhr.status) + "\nresponse: " + (xhr.responseText?xhr.responseText:"empty");
-
-        $.ajax ({
-            type: "GET",
-            url: "/report-error",
-            contentType: "application/json; charset=utf-8",
-            cache: false,
-            async: true,
-            data: params
-        }).done(function(data) {
-        });
-    });
-    };
     this.initSessionMonitor = function() {
       /*
        * get portal wrapper nav content
@@ -1459,7 +1424,6 @@ $(document).ready(function(){
   } else {
     window.app.utilObj.handlePostLogout();
   }
-  //window.app.utilObj.getPortalFooter();
   window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {
