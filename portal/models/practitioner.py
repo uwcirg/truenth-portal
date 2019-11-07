@@ -1,5 +1,5 @@
 """Practitioner module"""
-from cgi import escape
+from html import escape
 
 from sqlalchemy import UniqueConstraint
 

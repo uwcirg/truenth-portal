@@ -1,7 +1,7 @@
 """User model """
 
 
-from cgi import escape
+from html import escape
 from datetime import datetime, timedelta
 from io import StringIO
 import re
@@ -1525,6 +1525,10 @@ class User(db.Model, UserMixin):
         """Promote a weakly authenticated account to a registered one"""
         assert self.id != registered_user.id
 
+        if registered_user.deleted is not None:
+            # Avoid strange state from double UI clicks; see TN-1885
+            raise ValueError("account already deleted, can't promote")
+
         # Ensure the registered user is not a power user
         # https://jira.movember.com/browse/TN-1408
         restricted_roles = \
@@ -1557,7 +1561,8 @@ class User(db.Model, UserMixin):
         details = StringIO()
         dict_match(newd=after, oldd=before, diff_stream=details)
         db.session.add(Audit(
-            comment="registered invited user, {}".format(details.getvalue()),
+            comment="registered invited user <{}>, {}".format(
+                self._email, details.getvalue()),
             user_id=self.id, subject_id=self.id,
             context='account'))
 

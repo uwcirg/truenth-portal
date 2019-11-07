@@ -429,7 +429,12 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
             user = User.query.get(user_id)
             if not user.has_role(ROLE.PATIENT.value):
-                raise ValueError("QB time line only applies to patients")
+                # Make it easier to find bogus use, by reporting user
+                # and their roles in exception
+                raise ValueError(
+                    "{} with roles {} doesn't have timeline, only "
+                    "patients".format(
+                        user, str([r.name for r in user.roles])))
 
             # Create time line for user, from initial trigger date
             qb_generator = ordered_qbs(user)

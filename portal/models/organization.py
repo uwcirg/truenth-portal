@@ -806,7 +806,7 @@ class OrgTree(object):
             # Strange race condition - if this org id is found, reload
             # the lookup_table
             if Organization.query.get(organization_id):
-                current_app.logger.warn(
+                current_app.logger.warning(
                     "existing org not found in OrgTree. "
                     "lookup_table size {}".format(len(self.lookup_table)))
                 self.__reset_cache()
