@@ -1,4 +1,4 @@
-{%- from "gil/macros.html" import footerHTML -%}
+{%- from "portal_footer.html" import getFooterViaAjax -%}
 <!DOCTYPE html>
 <html class="no-js" lang="en">
    <head>
@@ -144,7 +144,7 @@
     </aside>
   {% endblock %}
   {% block footer %}
-    <footer><!--content populated dynamically--></footer>
+    {{getFooterViaAjax(user=user)}}
   {% endblock %}
   {% block version %}
     {% if config.metadata.version %}
@@ -256,7 +256,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>  
     <div id="timeout-modal" class="modal fade">
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">

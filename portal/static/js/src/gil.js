@@ -1459,7 +1459,7 @@ $(document).ready(function(){
   } else {
     window.app.utilObj.handlePostLogout();
   }
-  window.app.utilObj.getPortalFooter();
+  //window.app.utilObj.getPortalFooter();
   window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {

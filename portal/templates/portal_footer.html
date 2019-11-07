@@ -1,104 +1,162 @@
-{% if not config.GIL %}
-  {% from "flask_user/_macros.html" import footer %}
-  <!-- default footer HTML -->
-  {{footer(user=user)}}
-{% else %}
-<!-- 
-  footer content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible in EPROMS blueprint
-  For information: details regarding blueprint registration are in factories/app.py
--->
-<style>.no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
-  display: none;
-}</style>
-<link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
-<script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
-<div id="tnthBottomNavWrapper" class="footer">
-    <div class="main-nav-list">
-      <div class="nav-image">
-          <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+<!-- retrieving and populating footer HTML via ajax -->
+{% macro getFooterViaAjax(custom_class, user) -%}
+    <footer class="{%if custom_class%} {{custom_class}}{%endif%}"></footer>
+    <script>
+        (function() {
+            /*
+            * get portal footer HTML content
+            */
+            requestAttempts = 0;
+            var newHttpRequest = function(url, callBack) {
+                requestAttempts++;
+                var xmlhttp;
+                callBack = callBack || function() {};
+                if (window.XDomainRequest) { /*global XDomainRequest */
+                    xmlhttp = new XDomainRequest();
+                    xmlhttp.onload = function() {
+                        callBack(xmlhttp.responseText);
+                    };
+                } else if (window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); /*global ActiveXObject */
+                }
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState === 4) {
+                        if (xmlhttp.status === 200) {
+                            console.log(xmlhttp.responseText)
+                            callBack(xmlhttp.responseText);
+                            requestAttempts = 0;
+                            return;
+                        }
+                        if (self.requestAttempts < 3) {
+                            setTimeout(function() {
+                                newHttpRequest(url, callBack);
+                            }, 3000);
+                        } else {
+                            callBack({error: xmlhttp.responseText});
+                            requestAttempts = 0;
+                        }
+                    }
+                };
+                xmlhttp.open("GET", url, true);
+                xmlhttp.send();
+            }
+            newHttpRequest("/api/portal-footer-html/", function(content) {
+                // Embed data returned by AJAX call into container element
+                document.querySelector("footer").innerHTML = content;
+                    
+            });
+        })();
+    </script>
+{%- endmacro %}
+<!-- footer HTML content -->
+{% macro footerContent(user, useDefault=True) -%}
+  {% if useDefault or not config.GIL  %}
+    {% from "flask_user/_macros.html" import footer %}
+    <!-- default footer HTML -->
+    {{footer(user=user)}}
+  {% else %}
+  <!-- 
+    footer content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible in EPROMS blueprint
+    For information: details regarding blueprint registration are in factories/app.py
+  -->
+  <style>.no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
+    display: none;
+  }</style>
+  <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
+  <script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
+  <div id="tnthBottomNavWrapper" class="footer">
+      <div class="main-nav-list">
+        <div class="nav-image">
+            <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+        </div>
+        <ul class="nav-list">
+          <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
+          <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
+        </ul>
+        <ul class="nav-list">
+          <li class="nav-list__item heading">{{_("Tools")}}</li>
+          <!-- note link url is being populated dynamically-->
+          <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
+          <!-- note link url is being populated dynamically-->
+          <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
+        </ul>
+        <ul class="nav-list">
+          <li class="nav-list__item heading">{{_("Socials")}}</li>
+          <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
+          <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
+        </ul>
       </div>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
-        <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
-      </ul>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("Tools")}}</li>
-        <!-- note link url is being populated dynamically-->
-        <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
-        <!-- note link url is being populated dynamically-->
-        <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
-      </ul>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("Socials")}}</li>
-        <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
-        <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
-      </ul>
-    </div>
-    <hr class="hr">
-    <div class="footer__logo-area">
-      <div class="item links">
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.terms')}}">{{_("Terms & Conditions")}}</a></span>
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
-          <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
+      <hr class="hr">
+      <div class="footer__logo-area">
+        <div class="item links">
+            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.terms')}}">{{_("Terms & Conditions")}}</a></span>
+            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
+            <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
+        </div>
+        <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
       </div>
-      <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
-    </div>
-</div>
-<script>
-$(document).ready(function(){
-   {% if user %}
-      $.ajax({
-        url: "{{PORTAL}}/gil-interventions-items/{{user.id}}",
-        crossDomain: true,
-        context: document.body,
-        cache: false
-      }).done(function(data) {
-          if (data.interventions) {
-            (data.interventions).forEach(function(item) {
-              var d = item.description;
-              var b = item.link_url;
-              var n = item.name.replace(/\_/g, " ")
-              var disabled = item.link_url == "disabled";
-              var dm = /decision\s?support/gi;
-              var sm = /symptom\s?tracker/gi;
-              var sm2 = /self[_\s]?management/gi;
-              if (dm.test(d) || dm.test(n)) {
-                  if (!disabled) {
+  </div>
+  <script>
+  $(document).ready(function(){
+    {% if user %}
+        $.ajax({
+          url: "{{PORTAL}}/gil-interventions-items/{{user.id}}",
+          crossDomain: true,
+          context: document.body,
+          cache: false
+        }).done(function(data) {
+            if (data.interventions) {
+              (data.interventions).forEach(function(item) {
+                var d = item.description;
+                var b = item.link_url;
+                var n = item.name.replace(/\_/g, " ")
+                var disabled = item.link_url == "disabled";
+                var dm = /decision\s?support/gi;
+                var sm = /symptom\s?tracker/gi;
+                var sm2 = /self[_\s]?management/gi;
+                if (dm.test(d) || dm.test(n)) {
+                    if (!disabled) {
+                        $("#tnthBottomNavWrapper .decision-support-link").each(function() {
+                          $(this).attr("href", b);
+                          $(this).removeClass("disabled");
+                        });
+                    } else {
                       $("#tnthBottomNavWrapper .decision-support-link").each(function() {
-                        $(this).attr("href", b);
-                        $(this).removeClass("disabled");
+                          $(this).removeAttr("href");
+                          $(this).addClass("disabled");
+                          $(this).closest(".nav-list__item").hide();
                       });
+                    };
+                } else if (sm.test(d) || sm2.test(n)) {
+                  if (!disabled) {
+                    $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
+                        $(this).attr("href", b)
+                        $(this).removeClass("disabed");
+                    });
                   } else {
-                    $("#tnthBottomNavWrapper .decision-support-link").each(function() {
+                    $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
                         $(this).removeAttr("href");
                         $(this).addClass("disabled");
                         $(this).closest(".nav-list__item").hide();
                     });
                   };
-              } else if (sm.test(d) || sm2.test(n)) {
-                if (!disabled) {
-                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                      $(this).attr("href", b)
-                      $(this).removeClass("disabed");
-                  });
-                } else {
-                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                      $(this).removeAttr("href");
-                      $(this).addClass("disabled");
-                      $(this).closest(".nav-list__item").hide();
-                  });
                 };
-              };
-            });
-          };
-      }).fail(function() {});
-   {% endif %}
-});
-</script>
-<script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
-{% endif %}
+              });
+            };
+        }).fail(function() {});
+    {% endif %}
+  });
+  </script>
+  <script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
+  {% endif %}
+{%- endmacro %}
+{{footerContent(user=user, useDefault=False)}}
+
+
