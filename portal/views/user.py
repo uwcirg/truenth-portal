@@ -272,9 +272,10 @@ def account():
                        "{}".format(request.json.get('roles')))
 
     db.session.commit()
-    auditable_event("new account generated for {}".format(user),
-                    user_id=current_user().id, subject_id=user.id,
-                    context='account')
+    auditable_event(
+        "new account generated for {} <{}>".format(user, user._email),
+        user_id=current_user().id, subject_id=user.id,
+        context='account')
     if not adequate_perms:
         # Make sure acting user has permission to edit the newly
         # created user, or generate a 400 and purge the user.
@@ -2220,8 +2221,8 @@ def invite(user_id):
 def get_user_messages(user_id):
     """Returns simple JSON defining user email messages
 
-    Returns JSON of all messages where the receipient's email matches
-    the given user.
+    Returns JSON of all messages where the receipient_id matches the given
+    user.
     ---
     tags:
       - User
@@ -2271,19 +2272,13 @@ def get_user_messages(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    current_user().check_role(permission='view', other_id=user_id)
     messages = []
+    for em in EmailMessage.query.filter(
+            EmailMessage.recipient_id == user_id):
+        messages.append(em.as_json())
 
-    # need to cycle through EmailMessages individually for proper validation
-    for em in EmailMessage.query.all():
-        recips = em.recipients.split()
-        if user.email in recips:
-            messages.append(em)
-
-    return jsonify(messages=[m.as_json() for m in messages])
+    return jsonify(messages=messages)
 
 
 @user_api.route('/user/<int:user_id>/questionnaire_bank')

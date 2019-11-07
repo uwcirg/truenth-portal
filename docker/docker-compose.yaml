@@ -27,6 +27,7 @@ services:
       - db
       - redis
       - celeryworker
+      - celeryworkerslow
       - celerybeat
     volumes:
       - source: user-documents
@@ -45,6 +46,16 @@ services:
     depends_on:
       - redis
 
+  celeryworkerslow:
+    <<: *service_base
+    command:
+      celery worker
+        --app portal.celery_worker.celery
+        --queue low_priority
+        --loglevel debug
+    depends_on:
+      - redis
+
   celerybeat:
     <<: *service_base
     command: bash -c '
@@ -58,6 +69,7 @@ services:
       '
     depends_on:
       - celeryworker
+      - celeryworkerslow
 
   redis:
     image: redis

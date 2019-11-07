@@ -48,11 +48,9 @@ def test_rd_param_collision():
         RelativeDelta(json.dumps(d), months=4)
 
 
-class TestDateTools(TestCase):
-
-    def test_int_date(self):
-        # integer value shouldn't generate parser error
-        acceptance_date = 1394413200000
-        with pytest.raises(BadRequest) as e:
-            dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
-        assert 'acceptance date' in str(e)
+def test_int_date(app_logger):
+    # integer value shouldn't generate parser error
+    acceptance_date = 1394413200000
+    with pytest.raises(BadRequest) as e:
+        dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
+    assert 'acceptance date' in str(e)

@@ -30,6 +30,7 @@ from flask_user.signals import (
     user_reset_password,
 )
 import requests
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
@@ -211,7 +212,8 @@ def login_user_with_provider(request, provider):
         # This is the user's first time logging in with this provider
         # Check to see if a db entry already exists for the user's email
         # address.
-        user_query = User.query.filter_by(email=user_info.email)
+        user_query = User.query.filter(
+            func.lower(User.email) == user_info.email.lower())
         user = user_query.first()
 
         if user:
@@ -234,9 +236,9 @@ def login_user_with_provider(request, provider):
             db.session.commit()
 
             auditable_event(
-                "registered new user {0} via provider {1} "
-                "from input {2}".format(
-                    user.id,
+                "registered new user {} <{}> via provider {} "
+                "from input {}".format(
+                    user.id, user._email,
                     provider.name,
                     json.dumps(user_info.__dict__),
                 ),
@@ -411,8 +413,8 @@ def flask_user_password_failed_event(app, user, **extra):
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event(
-        "local user registered", user_id=user.id, subject_id=user.id,
-        context='account')
+        "local user registered <{}>".format(user._email),
+        user_id=user.id, subject_id=user.id, context='account')
 
 
 def flask_user_changed_password(app, user, **extra):
