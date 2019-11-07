@@ -3,7 +3,10 @@
   <!-- default footer HTML -->
   {{footer(user=user)}}
 {% else %}
-<!-- footer specific for TrueNTH USA, containing GIL specific endpoints - not accessible in EPROMS blueprint -->
+<!-- 
+  footer content specific for TrueNTH USA, containing GIL specific endpoints that not accessible in EPROMS blueprint
+  see blueprint registrations in factories/app.py
+-->
 <style>.no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
   display: none;
 }</style>
@@ -16,11 +19,11 @@
       </div>
       <ul class="nav-list">
         <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
+        <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
         <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
         <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/about">{{_("About")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/contact" >{{_("Contact Us")}}</a></li>
+        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
+        <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
       </ul>
       <ul class="nav-list">
         <li class="nav-list__item heading">{{_("Tools")}}</li>
@@ -39,8 +42,8 @@
     <hr class="hr">
     <div class="footer__logo-area">
       <div class="item links">
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}/terms">{{_("Terms & Conditions")}}</a></span>
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}/privacy">{{_("Privacy Policy")}}</a></span>
+          <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.terms')}}">{{_("Terms & Conditions")}}</a></span>
+          <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
           <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
       </div>
       <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
@@ -99,4 +102,3 @@ $(document).ready(function(){
 </script>
 <script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
 {% endif %}
-

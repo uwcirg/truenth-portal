@@ -8903,9 +8903,7 @@ aside .module--flex {
     z-index: 1
 }
 
-.no-fouc {
-    display: none;
-}
+.no-fouc {display: none;}
 #tnthBottomNavWrapper { 
     background: #000; 
     display: block;
@@ -9297,6 +9295,9 @@ aside .module--flex {
     -webkit-transition: visibility 0.5s, opacity 0.5s ease-in;
     transition: visibility 0.5s, opacity 0.5s ease-in
 }
+/*
+* portal elements
+*/
 #mainDiv.portal-main {
     .text-muted {
         color: #777;
@@ -9308,6 +9309,9 @@ aside .module--flex {
     }
     .btn-tnth-primary {
         padding: 12px 16px;
+        &:hover {
+            color: #FFF;
+        }
     }
     .form-control {
         border-radius: 0;
