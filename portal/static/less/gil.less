@@ -8903,6 +8903,23 @@ aside .module--flex {
     z-index: 1
 }
 
+.no-fouc {
+    display: none;
+}
+#tnthBottomNavWrapper { 
+    background: #000; 
+    display: block;
+    font-size: 14px;
+    line-height: 1.42857;
+    color: #4A4A4A;
+    width:100%;
+    overflow: hidden;
+}
+#tnthBottomNavWrapper::before {
+    content: " ";
+    display: table;
+}
+
 .footer {
     padding: 46px 28px 12px;
     background: #000;
@@ -9279,6 +9296,29 @@ aside .module--flex {
     opacity: 0;
     -webkit-transition: visibility 0.5s, opacity 0.5s ease-in;
     transition: visibility 0.5s, opacity 0.5s ease-in
+}
+#mainDiv.portal-main {
+    .text-muted {
+        color: #777;
+    }
+    .btn {
+        padding: 8px 12px 6px;
+        border-radius: 0;
+        height: auto;
+    }
+    .btn-tnth-primary {
+        padding: 12px 16px;
+    }
+    .form-control {
+        border-radius: 0;
+        height: 38px;
+        font-size: 16px;
+    }
+}
+@media (min-width: 699px) {
+    #mainDiv.portal-main {
+        font-size: 16px;
+    }
 }
 
 #loadingIndicator,
@@ -9948,10 +9988,12 @@ a.home--modal-link {
     }
 }
 
-#tnthNavWrapper {
-    display: none;
-    .portal-wrapper-content {
-        display: none
+#mainHolder {
+    #tnthNavWrapper {
+        display: none;
+        .portal-wrapper-content {
+            display: none
+        }
     }
 }
 
