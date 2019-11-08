@@ -53,4 +53,4 @@ def test_int_date(app_logger):
     acceptance_date = 1394413200000
     with pytest.raises(BadRequest) as e:
         dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
-    assert 'acceptance date' in str(e)
+    assert 'acceptance date' in str(e.value)
