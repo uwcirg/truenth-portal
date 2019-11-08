@@ -25,11 +25,6 @@ from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 class TestAuth(TestCase):
     """Auth API tests"""
 
-    def test_require_tld(self):
-        """we need the require_tld arg in validators.url for localhost"""
-        import validators
-        assert validators.url('http://localhost', require_tld=False)
-
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
         response = self.client.get('/logout')
