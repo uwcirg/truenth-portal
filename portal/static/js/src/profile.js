@@ -576,6 +576,9 @@ export default (function() {
                             self.disableInputTextFields();
                             return;
                         }
+                        /*  
+                         * enable input text field when in edit view
+                         */
                         self.enableInputTextField(container.find("input[type='text']"));
                     });
                 });
@@ -652,7 +655,12 @@ export default (function() {
                     return false;
                 }
                 fields.each(function() {
-                    $(this).attr("disabled", true);
+                    /*
+                     *  will not disable input field if marked as exempt from disabling
+                     */
+                    if (!$(this).attr("data-exempt-from-disabling")) {
+                        $(this).attr("disabled", true);
+                    }
                 });
             },
             initSections: function(callback) {
@@ -660,6 +668,9 @@ export default (function() {
                 $("#mainDiv [data-profile-section-id]").each(function() {
                     var sectionId = $(this).attr("data-profile-section-id");
                     if (!sectionsInitialized[sectionId]) {
+                        /*
+                         * disabling input text fields within each section
+                         */
                         self.disableInputTextFields($(this).find("input[type='text']"));
                         setTimeout(function() {
                             self.initSection(sectionId);
