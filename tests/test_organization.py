@@ -545,7 +545,7 @@ class TestOrganization(TestCase):
         self.shallow_org_tree()
         with pytest.raises(ValueError) as context:
             OrgTree().all_leaves_below_id(0)  # none of the above
-        assert 'not found' in str(context)
+        assert 'not found' in str(context.value)
 
         nodes = OrgTree().all_leaves_below_id(101)
         assert 1 == len(nodes)
