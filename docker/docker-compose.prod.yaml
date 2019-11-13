@@ -48,6 +48,7 @@ services:
       nice -n 15
         celery worker
           --app portal.celery_worker.celery
+          --queue low_priority
           --loglevel debug
 
   celerybeat:
