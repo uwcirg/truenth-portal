@@ -1,64 +1,8 @@
-<!-- retrieving and populating footer HTML via ajax -->
-{% macro getFooterViaAjax(custom_class, user) -%}
-    <footer class="{%if custom_class%} {{custom_class}}{%endif%}"></footer>
-    <!--
-   needing inline script here, browser CORS policy seems to strip out any external script, resulting in script not being executed
-   not sure the best way to resolve it yet
-    -->
-    <script>
-        (function() {
-            /*
-            * get portal footer HTML content
-            */
-            requestAttempts = 0;
-            var newHttpRequest = function(url, callBack) {
-                requestAttempts++;
-                var xmlhttp;
-                callBack = callBack || function() {};
-                if (window.XDomainRequest) { /*global XDomainRequest */
-                    xmlhttp = new XDomainRequest();
-                    xmlhttp.onload = function() {
-                        callBack(xmlhttp.responseText);
-                    };
-                } else if (window.XMLHttpRequest) {
-                    xmlhttp = new XMLHttpRequest();
-                } else {
-                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP"); /*global ActiveXObject */
-                }
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState === 4) {
-                        if (xmlhttp.status === 200) {
-                            console.log(xmlhttp.responseText)
-                            callBack(xmlhttp.responseText);
-                            requestAttempts = 0;
-                            return;
-                        }
-                        if (self.requestAttempts < 3) {
-                            setTimeout(function() {
-                                newHttpRequest(url, callBack);
-                            }, 3000);
-                        } else {
-                            callBack({error: xmlhttp.responseText});
-                            requestAttempts = 0;
-                        }
-                    }
-                };
-                xmlhttp.open("GET", url, true);
-                xmlhttp.send();
-            }
-            newHttpRequest("/api/portal-footer-html/", function(content) {
-                // Embed data returned by AJAX call into container element
-                document.querySelector("footer").innerHTML = content;
-                    
-            });
-        })();
-    </script>
-{%- endmacro %}
 <!-- footer HTML content -->
-{% macro footerContent(user, useDefault=True) -%}
-  {% if useDefault or not config.GIL  %}
+{% macro footerContent(user, useDefault=(not config.GIL)) -%}
+  {% if useDefault %}
     {% from "flask_user/_macros.html" import footer %}
-    <!-- default footer HTML -->
+    <!-- default portal footer HTML -->
     {{footer(user=user)}}
   {% else %}
   <!-- 
@@ -110,61 +54,6 @@
         <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
       </div>
   </div>
-  <script>
-  /*
-   needing inline script here, browser CORS policy seems to strip out any external script, resulting in script not being executed
-   not sure the best way to resolve it yet
-   */
-  $(document).ready(function(){
-    {% if user %}
-        $.ajax({
-          url: "{{PORTAL}}/gil-interventions-items/{{user.id}}",
-          crossDomain: true,
-          context: document.body,
-          cache: false
-        }).done(function(data) {
-            if (data.interventions) {
-              (data.interventions).forEach(function(item) {
-                var d = item.description;
-                var b = item.link_url;
-                var n = item.name.replace(/\_/g, " ")
-                var disabled = item.link_url == "disabled";
-                var dm = /decision\s?support/gi;
-                var sm = /symptom\s?tracker/gi;
-                var sm2 = /self[_\s]?management/gi;
-                if (dm.test(d) || dm.test(n)) {
-                    if (!disabled) {
-                        $("#tnthBottomNavWrapper .decision-support-link").each(function() {
-                          $(this).attr("href", b);
-                          $(this).removeClass("disabled");
-                        });
-                    } else {
-                      $("#tnthBottomNavWrapper .decision-support-link").each(function() {
-                          $(this).removeAttr("href");
-                          $(this).addClass("disabled");
-                          $(this).closest(".nav-list__item").hide();
-                      });
-                    };
-                } else if (sm.test(d) || sm2.test(n)) {
-                  if (!disabled) {
-                    $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                        $(this).attr("href", b)
-                        $(this).removeClass("disabed");
-                    });
-                  } else {
-                    $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                        $(this).removeAttr("href");
-                        $(this).addClass("disabled");
-                        $(this).closest(".nav-list__item").hide();
-                    });
-                  };
-                };
-              });
-            };
-        }).fail(function() {});
-    {% endif %}
-  });
-  </script>
   <script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
   {% endif %}
 {%- endmacro %}

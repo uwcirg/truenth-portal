@@ -197,6 +197,7 @@ var Utility = (function() {
             return false;
         });
     };
+    Utility
     UtilityObj.prototype.pad = function(n) {
         n = parseInt(n);
         return (!isNaN(n) && n < 10) ? "0" + n : n;

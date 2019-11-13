@@ -1,4 +1,5 @@
 import Utility from "./modules/Utility.js";
+import tnthAjax from "./modules/TnthAjax.js";
 import __i18next from "./modules/I18nextConfig.js";
 $.ajaxSetup({
   beforeSend: function(xhr, settings) {
@@ -1391,6 +1392,13 @@ module.exports = utilObj = (function() {
       });
     };
 
+    this.setFooter = function(currentUserId) {
+      tnthAjax.getPortalFooter("", false,  false, function(data) {
+        $("footer").html(data);
+        window.app.menuObj.filterMenu(currentUserId);
+      });
+    };
+
     this.handleLoginAsUser = function() {
       var __LOGIN_AS_PATIENT = (typeof sessionStorage !== "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
       if (__LOGIN_AS_PATIENT) {
@@ -1424,6 +1432,7 @@ $(document).ready(function(){
   } else {
     window.app.utilObj.handlePostLogout();
   }
+  window.app.utilObj.setFooter(currentUserId);
   window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {

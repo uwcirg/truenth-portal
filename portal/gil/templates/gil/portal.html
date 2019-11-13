@@ -1,4 +1,3 @@
-{%- from "portal_footer.html" import getFooterViaAjax -%}
 {%- extends "gil/base.html" -%}
 {% block title %}{{super()}} {{_("Dashboard")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
@@ -65,7 +64,7 @@
     </section>
     <br class="clearfix"/>
     <br/>
-    {{getFooterViaAjax(custom_class="home--footer-container", user=user)}}
+    <footer class="home--footer-container"></footer>
 </main>
 {% endblock %}
 {% block footer %}
