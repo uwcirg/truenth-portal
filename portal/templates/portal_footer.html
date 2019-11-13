@@ -1,24 +1,24 @@
-<!-- footer HTML content -->
+<!-- footer HTML content in a reusable macro -->
 {% macro footerContent(user, useDefault=(not config.GIL)) -%}
   {% if useDefault %}
     {% from "flask_user/_macros.html" import footer %}
     <!-- default portal footer HTML -->
     {{footer(user=user)}}
   {% else %}
+    {% from "flask_user/_macros.html" import copyrightText %}
   <!-- 
     footer content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible in EPROMS blueprint
     For information: details regarding blueprint registration are in factories/app.py
   -->
-  <style>.no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
+  <style>.js .no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
     display: none;
   }</style>
   <!--
-  ok to enclose external stylesheet here.
-  Note: specific filtering of footer link item will be done when added to a GIL page see gil.js for detail
+  Enclose external stylesheet to style content
   -->
   <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
-  <script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
-  <div id="tnthBottomNavWrapper" class="footer">
+  <script>document.querySelector("#tnthBottomNavWrapper").classList.add("js");</script>
+  <div id="tnthBottomNavWrapper" class="footer no-fouc">
       <div class="main-nav-list">
         <div class="nav-image">
             <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
@@ -48,14 +48,17 @@
       <hr class="hr">
       <div class="footer__logo-area">
         <div class="item links">
-            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.terms')}}">{{_("Terms & Conditions")}}</a></span>
-            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
-            <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
+            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
+            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
+            <div class="copyright">{{copyrightText()}}</div>
         </div>
         <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
       </div>
   </div>
-  <script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
+  <script>window.onLoad = function() {
+    //only display content when page has been loaded
+    document.querySelector("#tnthBottomNavWrapper").classList("js").remove();
+  }</script>
   {% endif %}
 {%- endmacro %}
 {{footerContent(user=user)}}
