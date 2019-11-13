@@ -33,10 +33,10 @@
           </ul>
           <ul class="nav-list">
             <li class="nav-list__item heading">{{_("Tools")}}</li>
-            <!-- note link url is being populated dynamically-->
+            <!-- note link url is being populated dynamically, i.e. intervention url, when user is authenticated see gil.js -->
             <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
             <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
-            <!-- note link url is being populated dynamically-->
+            <!-- note link url is being populated dynamically, i.e. intervention url, when user is authenticated see gil.js -->
             <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
           </ul>
           <ul class="nav-list">
