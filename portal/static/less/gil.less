@@ -9099,7 +9099,11 @@ aside .module--flex {
 }
 
 .nav-list__item a.icon-box__button--disabled {
-    opacity: .4
+    opacity: .4;
+    &:hover {
+        text-decoration: none;
+        cursor: auto;
+    }
 }
 
 .nav-list__item a:hover {
