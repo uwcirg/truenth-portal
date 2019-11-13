@@ -1432,7 +1432,7 @@ $(document).ready(function(){
   } else {
     window.app.utilObj.handlePostLogout();
   }
-  window.app.utilObj.setFooter(currentUserId);
+  window.app.utilObj.setFooter(currentUserId); 
   window.app.utilObj.initSessionMonitor();
 
   $(".button--login--register").on("click", function () {

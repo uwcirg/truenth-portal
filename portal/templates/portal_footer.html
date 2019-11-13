@@ -6,59 +6,59 @@
     {{footer(user=user)}}
   {% else %}
     {% from "flask_user/_macros.html" import copyrightText %}
-  <!-- 
-    footer content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible in EPROMS blueprint
-    For information: details regarding blueprint registration are in factories/app.py
-  -->
-  <style>.js .no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
-    display: none;
-  }</style>
-  <!--
-  Enclose external stylesheet to style content
-  -->
-  <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
-  <script>document.querySelector("#tnthBottomNavWrapper").classList.add("js");</script>
-  <div id="tnthBottomNavWrapper" class="footer no-fouc">
-      <div class="main-nav-list">
-        <div class="nav-image">
-            <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+    <style>.js .no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
+      display: none;
+    }</style>
+    <!--
+    Enclose external stylesheet to style content
+    -->
+    <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
+    <script>document.querySelector("#tnthBottomNavWrapper").classList.add("js");</script>
+    <!-- 
+      footer HTML content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible when in EPROMS, i.e. different registered
+      For information: details regarding blueprint registration here: factories/app.py
+    -->
+    <div id="tnthBottomNavWrapper" class="footer no-fouc">
+        <div class="main-nav-list">
+          <div class="nav-image">
+              <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
+            <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Tools")}}</li>
+            <!-- note link url is being populated dynamically-->
+            <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
+            <!-- note link url is being populated dynamically-->
+            <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Socials")}}</li>
+            <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
+            <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
+          </ul>
         </div>
-        <ul class="nav-list">
-          <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
-          <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
-        </ul>
-        <ul class="nav-list">
-          <li class="nav-list__item heading">{{_("Tools")}}</li>
-          <!-- note link url is being populated dynamically-->
-          <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
-          <!-- note link url is being populated dynamically-->
-          <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
-        </ul>
-        <ul class="nav-list">
-          <li class="nav-list__item heading">{{_("Socials")}}</li>
-          <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
-          <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
-        </ul>
-      </div>
-      <hr class="hr">
-      <div class="footer__logo-area">
-        <div class="item links">
-            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
-            <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
-            <div class="copyright">{{copyrightText()}}</div>
+        <hr class="hr">
+        <div class="footer__logo-area">
+          <div class="item links">
+              <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
+              <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
+              <div class="copyright">{{copyrightText()}}</div>
+          </div>
+          <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
         </div>
-        <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
-      </div>
-  </div>
-  <script>window.onLoad = function() {
-    //only display content when page has been loaded
-    document.querySelector("#tnthBottomNavWrapper").classList("js").remove();
-  }</script>
+    </div>
+    <script>window.onLoad = function() {
+      //only display content when page has been loaded
+      document.querySelector("#tnthBottomNavWrapper").classList("js").remove();
+    }</script>
   {% endif %}
 {%- endmacro %}
 {{footerContent(user=user)}}
