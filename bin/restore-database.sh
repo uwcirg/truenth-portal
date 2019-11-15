@@ -36,7 +36,7 @@ restore_sqldump() {
     local sqldump_path="$1"
 
     echo "Stopping services..."
-    docker-compose stop web celeryworker celerybeat
+    docker-compose stop web celeryworker celeryworkerslow celerybeat
 
     echo "Dropping existing DB..."
     docker-compose exec db \
