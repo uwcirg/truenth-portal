@@ -15,6 +15,8 @@ asset_api = Blueprint('asset', __name__)
         parameters to the requested URL
 
 """
+
+
 def get_request(url, params=None):
 
     error_msg = ''
