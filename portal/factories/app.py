@@ -11,7 +11,7 @@ from healthcheck import HealthCheck
 from pkg_resources import get_distribution
 import redis
 import requests_cache
-from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 # Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..audit import configure_audit_log
