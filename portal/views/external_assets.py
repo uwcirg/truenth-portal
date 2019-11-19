@@ -8,13 +8,14 @@ from ..models.app_text import localize_url, time_request
 
 asset_api = Blueprint('asset', __name__)
 
- """helper for fetching response data from requested URL
+"""helper for fetching response data from requested URL
 
-        :param url: the URL to pull content from
-        :param params: optional, if provided, use as
-            parameters to the requested URL
+    :param url: the URL to pull content from
+    :param params: optional, if provided, use as
+        parameters to the requested URL
 
 """
+
 def get_request(url, params=None):
     error_msg = ''
     try:
@@ -27,9 +28,9 @@ def get_request(url, params=None):
                 "Could not retrieve remote content - " "{} {}".format(
                     response.status_code, response.reason))
     except ConnectionError:
-            error_msg = (
-            "Could not retrieve remove content - Server could not be "
-            "reached")
+        error_msg = (
+                    "Could not retrieve remove content - Server could not be "
+                    "reached")
     if error_msg:
         current_app.logger.error(error_msg + ": {}".format(url))
     return response, error_msg
@@ -47,7 +48,7 @@ def by_tag(tag):
         'version': 'latest',
     }
     response, error_msg = get_request(url, params)
-    if error_msg: 
+    if error_msg:
         return error_msg
     if isinstance(response, dict):
         if not response['results'] or not len(response['results']):
