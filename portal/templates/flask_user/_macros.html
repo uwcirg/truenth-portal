@@ -78,7 +78,7 @@
 {%- endmacro %}
 {% macro linksHTML(user)-%}
     <p><small class="links"><a href="{{PORTAL}}/about">{{_("About")}}</a> | <a href="{{PORTAL}}/contact">{{_("Contact")}}</a>{%- if user -%}&nbsp;| <a href="{{PORTAL}}/privacy">{{_("Privacy")}}</a>{%- endif -%}{% if user or config.SHOW_PUBLIC_TERMS %}&nbsp;| <a href="{{PORTAL}}/terms">{{_("Terms")}}</a></small></p>{%- endif -%}
-    <p><small class="copyright text-muted">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</small></p>
+    <p><small class="copyright text-muted">{{copyrightText()}}</small></p>
 {%- endmacro %}
 {% macro logo(white_theme=False) -%}
     <a href="{%-if config.TRUENTH_LINK_URL-%}{{config.TRUENTH_LINK_URL}}{%-endif-%}" title="{{ _('Movember') }}" class="logo-link" target="_blank">{%-if white_theme -%}<img id="footerLogo" src="{{PORTAL}}{{url_for('static',filename='img/logo_white.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/truenth_logo.jpg')}}" alt="{{_('Movember logo')}}" />{%-endif-%}
@@ -87,4 +87,6 @@
     <a href="{%-if config.MOVEMER_LINK_URL-%}{{config.MOVEMER_LINK_URL}}{%-endif-%}" class="logo-link" title="{{ _('Movember') }}" target="_blank">
     {%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" alt="{{_('Movember Logo')}}" />{%-else-%}<img src="{{PORTAL}}{{url_for('static',filename='img/movember_logo.jpg')}}" alt="Movember Logo"/>{%-endif-%}</a>
 {%- endmacro %}
-
+{% macro copyrightText() -%}
+<span>&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</span>
+{%- endmacro %}
