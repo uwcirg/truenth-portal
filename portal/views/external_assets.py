@@ -17,6 +17,7 @@ asset_api = Blueprint('asset', __name__)
 """
 
 def get_request(url, params=None):
+    
     error_msg = ''
     try:
         response = time_request(url, params).json()
