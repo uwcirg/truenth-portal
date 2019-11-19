@@ -3,8 +3,8 @@
         this.requestAttempt = 0;
         this.initStartTime = new Date();
         this.initIntervalId = 0;
-         //TODO, hardcode uuid here, will change once the API has been modified to accept tag
-        this.contentURL = "/api/asset/uuid/1c57de26-727f-c77a-775d-5d2c27e02455";
+        //reference UUID: 1c57de26-727f-c77a-775d-5d2c27e02455, via /api/asset/uuid/1c57de26-727f-c77a-775d-5d2c27e02455
+        this.contentURL = "/api/asset/tag/sexualwellbeing";
         this.init = function() {
             this.getContent();
         };
