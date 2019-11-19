@@ -10,7 +10,7 @@ asset_api = Blueprint('asset', __name__)
 
  """helper for fetching response data from requested URL
 
-        :param url: the URL to pull details and asset from
+        :param url: the URL to pull content from
         :param params: optional, if provided, use as
             parameters to the requested URL
 
