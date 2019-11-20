@@ -1,5 +1,5 @@
 """Auth related model classes """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from smtplib import SMTPRecipientsRefused
 
 from flask import current_app, url_for
@@ -211,7 +211,7 @@ def load_grant(client_id, code):
 @oauth.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
     # decide the expires time yourself
-    expires = datetime.utcnow() + timedelta(seconds=100)
+    expires = datetime.now(tz=timezone.utc) + timedelta(seconds=100)
     grant = Grant(
         client_id=client_id,
         code=code['code'],
@@ -244,7 +244,7 @@ def save_token(token, request, *args, **kwargs):
         db.session.delete(t)
 
     expires_in = token.get('expires_in')
-    expires = datetime.utcnow() + timedelta(seconds=expires_in)
+    expires = datetime.now(tz=timezone.utc) + timedelta(seconds=expires_in)
 
     tok = Token(
         access_token=token['access_token'],
@@ -311,13 +311,13 @@ def token_janitor():
 
     """
     # Delete expired tokens
-    Token.query.filter(Token.expires < datetime.utcnow()).delete()
+    Token.query.filter(Token.expires < datetime.now(tz=timezone.utc)).delete()
     db.session.commit()
 
     # Look up all service tokens and warn any sponsors via email if about
     # to expire
     error_emails = set()
-    threshold = datetime.utcnow() + timedelta(weeks=6)
+    threshold = datetime.now(tz=timezone.utc) + timedelta(weeks=6)
     results = Token.query.join(
         UserRoles, Token.user_id == UserRoles.user_id).join(
         Role, UserRoles.role_id == Role.id).filter(
