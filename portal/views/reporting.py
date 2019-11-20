@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime
+from datetime import datetime, timezone
 from io import StringIO
 from time import strftime
 
@@ -96,7 +96,7 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
 def generate_numbers():
 
     def overdue(qstats):
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         overdue = qstats.overdue_date
         if not overdue:
             return "No overdue date"
@@ -112,7 +112,7 @@ def generate_numbers():
 
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
-        a_s = QB_Status(user, as_of_date=datetime.utcnow())
+        a_s = QB_Status(user, as_of_date=datetime.now(tz=timezone.utc))
         email = (
             user.email.encode('ascii', 'ignore') if user.email else None)
         od = overdue(a_s)
