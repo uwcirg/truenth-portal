@@ -1,6 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pprint import pformat
 from time import strftime
 from urllib.parse import urlencode
@@ -714,7 +714,7 @@ def patient_reminder_email(user_id):
             name_key = UserReminderEmail_ATMA.name_key()
 
         # If the user has a pending questionnaire bank, include for due date
-        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qstats = QB_Status(user, as_of_date=datetime.now(tz=timezone.utc))
         qbd = qstats.current_qbd()
         if qbd:
             qb_id, qb_iteration = qbd.qb_id, qbd.iteration

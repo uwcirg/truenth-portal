@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 from flask import (
@@ -325,7 +325,7 @@ def client_edit(client_id):
         # Trigger a callback for client editors to test
         data = {
             'event': 'test callback',
-            'UTC server time': FHIR_datetime.as_fhir(datetime.utcnow())
+            'UTC server time': FHIR_datetime.as_fhir(datetime.now(tz=timezone.utc))
         }
         client.notify(data)
 
