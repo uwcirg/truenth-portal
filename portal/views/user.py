@@ -1,5 +1,5 @@
 """User API view functions"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from flask import (
@@ -289,7 +289,7 @@ def account():
 
     # Force a renewal of the visit / qb_status cache so the new user has
     # accurate info.  Pad by a second to get around microsecond floor problems
-    now = datetime.utcnow() + relativedelta(seconds=1)
+    now = datetime.now(tz=timezone.utc) + relativedelta(seconds=1)
     QB_StatusCacheKey().update(now)
     return jsonify(user_id=user.id)
 
@@ -706,7 +706,7 @@ def set_user_consents(user_id):
                    "HEADER 'Content-Type: application/json'")
     if ('acceptance_date' in request.json
             and FHIR_datetime.parse(request.json['acceptance_date'])
-            > datetime.utcnow()):
+            > datetime.now(tz=timezone.utc)):
         abort(400, "Future `acceptance_date` not permitted")
 
     request.json['user_id'] = user_id
@@ -818,7 +818,7 @@ def withdraw_user_consent(user_id):
     acceptance_date = None
     if 'acceptance_date' in request.json:
         acceptance_date = FHIR_datetime.parse(request.json['acceptance_date'])
-        if acceptance_date > datetime.utcnow():
+        if acceptance_date > datetime.now(tz=timezone.utc):
             abort(400, "Future `acceptance_date` not permitted")
 
     current_app.logger.debug('withdraw user consent called for user {} '
@@ -838,7 +838,7 @@ def withdraw_consent(user, org_id, acceptance_date, acting_user):
             user.id, org_id))
     try:
         if not acceptance_date:
-            acceptance_date = datetime.utcnow()
+            acceptance_date = datetime.now(tz=timezone.utc)
         suspended = UserConsent(
             user_id=user.id, organization_id=org_id, status='suspended',
             acceptance_date=acceptance_date, agreement_url=uc.agreement_url)
@@ -2330,7 +2330,7 @@ def get_current_user_qb(user_id):
 
     date = request.args.get('as_of_date')
     # allow date and time info to be available
-    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
+    date = FHIR_datetime.parse(date) if date else datetime.now(tz=timezone.utc)
 
     qstats = QB_Status(user=user, as_of_date=date)
     qbd = qstats.current_qbd()
