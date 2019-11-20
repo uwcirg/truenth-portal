@@ -272,7 +272,7 @@ exports.watchTopNavLess = series(watchTopNavLess);
 const watchPortalFooterLess = () => {
     watch(lessPath + "/" + PORTAL_FOOTER + ".less", {delay: 200}, portalFooterLess);
 };
-exports.watchPortalFooterLess = series(watchTopNavLess);
+exports.watchPortalFooterLess = series(watchPortalFooterLess);
 
 //watch exercise diet
 const watchExerciseDietLess = () => {
