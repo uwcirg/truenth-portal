@@ -1,5 +1,5 @@
 """Module for additional datetime tools/utilities"""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 import json
 
 from dateutil import parser
@@ -85,7 +85,7 @@ class FHIR_datetime(object):
     @staticmethod
     def now():
         """Generates a FHIR compliant datetime string for current moment"""
-        return datetime.utcnow().isoformat() + 'Z'
+        return datetime.now(tz=timezone.utc).isoformat() + 'Z'
 
 
 class RelativeDelta(relativedelta):
@@ -101,7 +101,7 @@ class RelativeDelta(relativedelta):
             constructors and the like function as base class.
 
         :returns instance for use in date math such as:
-            tomorrow = `utcnow() + RelativeDelta('{"days":1}')`
+            tomorrow = `now(tz=timezone.utc) + RelativeDelta('{"days":1}')`
 
         """
         if paramstring:
@@ -155,7 +155,7 @@ def localize_datetime(dt, user):
 
 
 def utcnow_sans_micro():
-    """Returns datetime.utcnow() with 0 microseconds
+    """Returns datetime.now(tz=timezone.utc) with 0 microseconds
 
     This is used by clients that don't need the microsecond accuracy,
     and found it problematic in practice.
@@ -170,5 +170,5 @@ def utcnow_sans_micro():
     compare as expected.
 
     """
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     return now.replace(microsecond=0)
