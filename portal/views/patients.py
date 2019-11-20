@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import (
     Blueprint,
@@ -60,7 +60,7 @@ def patients_root():
     include_test_role = request.args.get('include_test_role')
 
     if request.form.get('reset_cache'):
-        QB_StatusCacheKey().update(datetime.utcnow())
+        QB_StatusCacheKey().update(datetime.now(tz=timezone.utc))
 
     user = current_user()
     query = patients_query(
