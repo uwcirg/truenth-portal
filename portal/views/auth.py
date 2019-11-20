@@ -769,7 +769,7 @@ def token_status():
     token = Token.query.filter_by(access_token=access_token).first()
     if not token:
         abort(404, "token not found")
-    expires_in = token.expires - datetime.now(timezone.utc)
+    expires_in = token.expires - datetime.now(tz=timezone.utc)
     return jsonify(
         access_token=access_token,
         refresh_token=token.refresh_token, token_type=token_type,
