@@ -85,7 +85,7 @@ class FHIR_datetime(object):
     @staticmethod
     def now():
         """Generates a FHIR compliant datetime string for current moment"""
-        return datetime.now(tz=timezone.utc).isoformat() + 'Z'
+        return datetime.now(tz=timezone.utc).isoformat()
 
 
 class RelativeDelta(relativedelta):
