@@ -1,7 +1,7 @@
 """Communication model"""
 
 from collections import MutableMapping
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 from smtplib import SMTPRecipientsRefused
 from string import Formatter
@@ -327,7 +327,7 @@ class Communication(db.Model):
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
 
-        qb_status, _ = qb_status_visit_name(self.user_id, datetime.utcnow())
+        qb_status, _ = qb_status_visit_name(self.user_id, datetime.now(tz=timezone.utc))
         if qb_status == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
