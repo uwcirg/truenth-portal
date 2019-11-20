@@ -1,114 +1,64 @@
-<!--needing inline style here, browser CORS policy seems to strip out any external stylingsheet, resulting in content not being rendered correctly-->
-<style type="text/css">
-.no-fouc {display: none;}
-#tnthBottomNavWrapper { background: #000; display: block;font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;font-size: 14px;line-height: 1.42857;color: #4A4A4A;width:100%; overflow: hidden;}
-#tnthBottomNavWrapper::before {content: " ";display: table;}
-#tnthBottomNavWrapper .footer__logo-area {padding: 25px 0;width: 100%;}
-#tnthBottomNavWrapper { padding: 48px 28px 12px; }
-#tnthBottomNavWrapper .main-nav-list { display: flex; justify-content: center; flex-wrap: wrap; align-items: center; margin-bottom: 40px;}
-#tnthBottomNavWrapper .nav-image {min-width: 25%;max-width: 100%;text-align: center;padding-top: 2%;padding-bottom: 2%;}
-#tnthBottomNavWrapper figure {margin: 0 12px 8px;display: inline-block;}
-#tnthBottomNavWrapper .logo-footer-truenth, .footer__logo--truenth {background-image: url({{PORTAL}}{{ url_for('static', filename='img/TrueNTH-Footer-Logo.png') }});background-size:89px 101px;width: 89px;height: 101px;margin: 0 auto;}
-#tnthBottomNavWrapper .footer__logo--movember {background-image: url({{PORTAL}}{{ url_for('static', filename='img/Movember-Footer-Logo.png') }});background-size: 76px 76px;width: 76px;height: 76px;margin: 0 auto; position: relative; top: 4px;}
-#tnthBottomNavWrapper .nav-list {padding-inline-start: 0; position: relative;min-height: 2;width: 100%;}
-#tnthBottomNavWrapper .nav-list__item {font-size: 16px;line-height: 2.75;display: block; text-align: center; text-transform: capitalize ; padding-left: 12px;padding-right: 12px;}
-#tnthBottomNavWrapper .nav-list__item.heading { color: #777; }
-#tnthBottomNavWrapper .nav-list__item a {color: #FFF;text-decoration: none;}
-#tnthBottomNavWrapper .nav-list__item a:hover {color: #FFF; text-decoration: underline}
-#tnthBottomNavWrapper .nav-list__item a.disabled {opacity: 0.6;}
-#tnthBottomNavWrapper .hr {border-top: 1px solid #252525; margin-top: 12px; margin-bottom: 12px;width: 96.5%; margin-right: auto; margin-left: auto; }
-#tnthBottomNavWrapper .copyright {color: #FFF;opacity: 0.9; font-size: 14px; line-height: 1.75}
-#tnthBottomNavWrapper .footer__logo-area { padding-left: 24px; padding-right: 24px; width: 100%;display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
-#tnthBottomNavWrapper .footer__logo-area .nav-list-secondary__item { margin: 12px 12px 12px 0; display: inline-block; color: #FFF;} 
-#tnthBottomNavWrapper .footer__logo-area .nav-list-secondary__item a { color: #FFF; }
-#tnthBottomNavWrapper .footer__logo-area .item { margin-bottom: 12px; }
-@media (min-width: 992px) { #tnthBottomNavWrapper .main-nav-list { justify-content: space-between; align-items: flex-start;} #tnthBottomNavWrapper .main-nav-list { flex-wrap: nowrap; } #tnthBottomNavWrapper .nav-list__item { text-align: left; } }
-@media (min-width: 1200px) { #tnthBottomNavWrapper .nav-list__item { padding-left: 24px; padding-right: 24px;} }
-</style>
-<script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
-<div id="tnthBottomNavWrapper" class="footer">
-    <div class="main-nav-list">
-      <div class="nav-image">
-          <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
-      </div>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/about">{{_("About")}}</a></li>
-        <li class="nav-list__item"><a href="{{PORTAL}}/contact" >{{_("Contact Us")}}</a></li>
-      </ul>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("Tools")}}</li>
-        <!-- note link url is being populated dynamically-->
-        <li class="nav-list__item"><a class="decision-support-link" href="">{{_("Decision Support")}}</a></li>
-         <!-- note link url is being populated dynamically-->
-        <li class="nav-list__item"><a class="symptom-tracker-link" href="">{{_("Symptom Tracker")}}</a></li>  
-      </ul>
-      <ul class="nav-list">
-        <li class="nav-list__item heading">{{_("Socials")}}</li>
-        <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
-        <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
-      </ul>
+<!-- footer HTML content in a reusable macro -->
+{% macro footerContent(user, useDefault=(not config.GIL)) -%}
+  {% if useDefault %}
+    {% from "flask_user/_macros.html" import footer %}
+    <!-- default portal footer HTML -->
+    {{footer(user=user)}}
+  {% else %}
+    {% from "flask_user/_macros.html" import copyrightText %}
+    <style>.js .no-fouc { /* inline style for hiding HTML content until it is loaded to prevent FOUC */
+      display: none;
+    }</style>
+    <!--
+    Enclose external stylesheet to style content
+    -->
+    <link rel="stylesheet" href="{{PORTAL}}{{url_for('gil.static', filename='css/gil.css')}}">
+    <script>document.querySelector("#tnthBottomNavWrapper").classList.add("js");</script>
+    <!-- 
+      footer HTML content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible when in EPROMS, i.e. different registered
+      For information: details regarding blueprint registration here: factories/app.py
+    -->
+    <div id="tnthBottomNavWrapper" class="footer no-fouc">
+        <div class="main-nav-list">
+          <div class="nav-image">
+              <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+          </div>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
+            <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.sexual_wellbeing')}}">{{_("Sexual Wellbeing")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.about')}}">{{_("About")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('gil.contact')}}" >{{_("Contact Us")}}</a></li>
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Tools")}}</li>
+            <!-- note link url is being populated dynamically, i.e. intervention url, when user is authenticated see gil.js -->
+            <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('gil.decision_support')}}">{{_("Decision Support")}}</a></li>
+            <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.psa_tracker')}}" data-link-identifier="psa-tracker" class="psa-tracker-link">{{_("PSA Tracker")}}</a></li>
+            <!-- note link url is being populated dynamically, i.e. intervention url, when user is authenticated see gil.js -->
+            <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('gil.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>  
+          </ul>
+          <ul class="nav-list">
+            <li class="nav-list__item heading">{{_("Socials")}}</li>
+            <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank">{{_("Facebook")}}</a></li>
+            <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
+          </ul>
+        </div>
+        <hr class="hr">
+        <div class="footer__logo-area">
+          <div class="item links">
+              <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
+              <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.privacy')}}">{{_("Privacy Policy")}}</a></span>
+              <div class="copyright">{{copyrightText()}}</div>
+          </div>
+          <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
+        </div>
     </div>
-    <hr class="hr">
-    <div class="footer__logo-area">
-      <div class="item">
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}/terms">{{_("Terms")}}</a></span>
-          <span class="nav-list-secondary__item"><a href="{{PORTAL}}/privacy">{{_("Privacy")}}</a></span>
-          <div class="copyright">&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</div>
-      </div>
-      <div class="image"><a href="https://www.movember.com" target="_blank"><figure class="footer__logo--movember"></figure></a></div>
-    </div>
-</div>
-<script>
-$(document).ready(function(){
-   {% if user %}
-      $.ajax({
-        url: "{{PORTAL}}/gil-interventions-items/{{user.id}}",
-        crossDomain: true,
-        context: document.body,
-        cache: false
-      }).done(function(data) {
-          if (data.interventions) {
-            (data.interventions).forEach(function(item) {
-              var d = item.description;
-              var b = item.link_url;
-              var n = item.name.replace(/\_/g, " ")
-              var disabled = item.link_url == "disabled";
-              var dm = /decision\s?support/gi;
-              var sm = /symptom\s?tracker/gi;
-              var sm2 = /self[_\s]?management/gi;
-              if (dm.test(d) || dm.test(n)) {
-                  if (!disabled) {
-                      $("#tnthBottomNavWrapper .decision-support-link").each(function() {
-                        $(this).attr("href", b);
-                        $(this).removeClass("disabled");
-                      });
-                  } else {
-                    $("#tnthBottomNavWrapper .decision-support-link").each(function() {
-                        $(this).removeAttr("href");
-                        $(this).addClass("disabled");
-                        $(this).closest(".nav-list__item").hide();
-                    });
-                  };
-              } else if (sm.test(d) || sm2.test(n)) {
-                if (!disabled) {
-                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                      $(this).attr("href", b)
-                      $(this).removeClass("disabed");
-                  });
-                } else {
-                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
-                      $(this).removeAttr("href");
-                      $(this).addClass("disabled");
-                      $(this).closest(".nav-list__item").hide();
-                  });
-                };
-              };
-            });
-          };
-      }).fail(function() {});
-   {% endif %}
-});
-</script>
-<script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
+    <script>window.onLoad = function() {
+      //only display content when page has been loaded
+      document.querySelector("#tnthBottomNavWrapper").classList("js").remove();
+    }</script>
+  {% endif %}
+{%- endmacro %}
+{{footerContent(user=user)}}

@@ -2,7 +2,7 @@
 
 """
 
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from portal.factories.app import create_app
 
