@@ -8,22 +8,23 @@ from ..models.app_text import localize_url, time_request
 
 asset_api = Blueprint('asset', __name__)
 
-"""helper for fetching response data from requested URL
+def get_request(url, params=None):
+
+    """helper for fetching response data from requested URL
 
     :param url: the URL to pull content from
     :param params: optional, if provided, use as
         parameters to the requested URL
 
-"""
-
-
-def get_request(url, params=None):
+    """
 
     error_msg = ''
     try:
         response = time_request(url, params).json()
     except ValueError:  # raised when no json is available in response
         if response.status_code == 200:
+            current_app.logger.warning(
+                "Request did not return json: {}".format(url))
             return response.text
         else:
             error_msg = (
@@ -53,7 +54,7 @@ def by_tag(tag):
     if error_msg:
         return error_msg
     if isinstance(response, dict):
-        if not response['results'] or not len(response['results']):
+        if 'results' not in response or not len(response['results']):
             abort(404, 'Remote content not found for tag {}'.format(tag))
         return response['results'][0]['content']
     # response is text string, just return it
@@ -73,7 +74,7 @@ def by_uuid(uuid):
     if error_msg:
         return error_msg
     if isinstance(response, dict):
-        if not response['asset']:
+        if 'asset' not in response:
             abort(404, 'Remote content not found for uuid {}'.format(uuid))
         return response['asset']
     # response is text string, just return it
