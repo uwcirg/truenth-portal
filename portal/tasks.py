@@ -216,7 +216,7 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 
 
 def update_patients(patient_list, update_cache, queue_messages):
-    now = datetime.now(tz-timezone.utc)
+    now = datetime.now(tz=timezone.utc)
     for user_id in patient_list:
         if update_cache:
             update_users_QBT(user_id)
