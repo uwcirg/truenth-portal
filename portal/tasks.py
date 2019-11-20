@@ -7,7 +7,7 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-from datetime import datetime,timezone
+from datetime import datetime, timezone
 from functools import wraps
 import json
 from traceback import format_exc
@@ -286,7 +286,7 @@ def send_user_messages(user, force_update=False):
     if force_update:
         invalidate_users_QBT(user_id=user.id)
         qbd = QB_Status(
-                  user=user, 
+                  user=user,
                   as_of_date=datetime.now(tz=timezone.utc)
                 ).current_qbd()
         if qbd:
