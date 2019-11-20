@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
@@ -25,7 +25,7 @@ def celery_beat_ping():
     rs.setex(
         name='last_celery_beat_ping',
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
-        value=str(datetime.utcnow()),
+        value=str(datetime.now(tz=timezone.utc)),
     )
     return 'PONG'
 
