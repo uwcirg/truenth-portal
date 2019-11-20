@@ -7,7 +7,7 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 import json
 from traceback import format_exc
@@ -216,7 +216,7 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 
 
 def update_patients(patient_list, update_cache, queue_messages):
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.now)
     for user_id in patient_list:
         if update_cache:
             update_users_QBT(user_id)
@@ -285,7 +285,7 @@ def send_user_messages(user, force_update=False):
 
     if force_update:
         invalidate_users_QBT(user_id=user.id)
-        qbd = QB_Status(user=user, as_of_date=datetime.utcnow()).current_qbd()
+        qbd = QB_Status(user=user, as_of_date=datetime.now(tz=timezone.utc)).current_qbd()
         if qbd:
             queue_outstanding_messages(
                 user=user,
@@ -346,5 +346,5 @@ def celery_beat_health_check(**kwargs):
     return rs.setex(
         name='last_celery_beat_ping',
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
-        value=str(datetime.utcnow()),
+        value=str(datetime.now(tz=timezone.now)),
     )
