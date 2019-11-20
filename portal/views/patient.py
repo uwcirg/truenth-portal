@@ -4,7 +4,7 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 from flask import Blueprint, abort, jsonify, request
@@ -345,7 +345,7 @@ def patient_timeline(patient_id):
         } for qnr in qnrs]
 
     qbstatus = QB_Status(
-        user=User.query.get(patient_id), as_of_date=datetime.utcnow())
+        user=User.query.get(patient_id), as_of_date=datetime.now(tz=timezone.utc))
     prev_qbd = qbstatus.prev_qbd
     current = qbstatus.current_qbd()
     next_qbd = qbstatus.next_qbd
