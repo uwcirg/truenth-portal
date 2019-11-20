@@ -8,8 +8,8 @@ from ..models.app_text import localize_url, time_request
 
 asset_api = Blueprint('asset', __name__)
 
-def get_request(url, params=None):
 
+def get_request(url, params=None):
     """helper for fetching response data from requested URL
 
     :param url: the URL to pull content from
@@ -17,7 +17,6 @@ def get_request(url, params=None):
         parameters to the requested URL
 
     """
-
     error_msg = ''
     try:
         response = time_request(url, params).json()
