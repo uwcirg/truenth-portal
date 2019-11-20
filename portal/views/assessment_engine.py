@@ -1,5 +1,5 @@
 """Assessment Engine API view functions"""
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import (
     Blueprint,
@@ -1561,7 +1561,7 @@ def present_needed():
 
     Takes the same attributes as present_assessment.
 
-    If `authored` date is different from utcnow(), any instruments found to be
+    If `authored` date is different from datetime.now(tz=timezone.utc), any instruments found to be
     in an `in_progress` state will be treated as if they haven't been started.
 
     """
@@ -1575,7 +1575,7 @@ def present_needed():
     as_of_date = FHIR_datetime.parse(
         request.args.get('authored'), none_safe=True)
     if not as_of_date:
-        as_of_date = datetime.utcnow()
+        as_of_date = datetime.now(tz=timezone.utc)
     assessment_status = QB_Status(subject, as_of_date=as_of_date)
     if assessment_status.overall_status == 'Withdrawn':
         abort(400, 'Withdrawn; no pending work found')
@@ -1875,7 +1875,7 @@ def batch_assessment_status():
         if not acting_user.check_role('view', user.id):
             continue
         details = []
-        status, _ = qb_status_visit_name(user.id, datetime.utcnow())
+        status, _ = qb_status_visit_name(user.id, datetime.now(tz=timezone.utc))
         for consent in user.all_consents:
             details.append(
                 {'consent': consent.as_json(),
@@ -1905,7 +1905,7 @@ def patient_assessment_status(patient_id):
         format: int64
       - name: as_of_date
         in: query
-        description: Optional UTC datetime for times other than ``utcnow``
+        description: Optional UTC datetime for times other than ``now(tz=timezone.utc)``
         required: false
         type: string
         format: date-time
@@ -1936,7 +1936,7 @@ def patient_assessment_status(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
 
     date = request.args.get('as_of_date')
-    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
+    date = FHIR_datetime.parse(date) if date else datetime.now(tz=timezone.utc)
 
     trace = request.args.get('trace', False)
     if trace:
