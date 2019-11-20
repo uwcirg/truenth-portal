@@ -1,4 +1,4 @@
-from datetime import MAXYEAR, datetime
+from datetime import MAXYEAR, datetime, timezone
 from time import sleep
 
 from dateutil.relativedelta import relativedelta
@@ -586,7 +586,7 @@ class QB_StatusCacheKey(object):
         :returns: approximate number of minutes since renewal of cache key
 
         """
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         delta = relativedelta(now, self.current())
         return delta.hours * 60 + delta.minutes
 
@@ -601,7 +601,7 @@ class QB_StatusCacheKey(object):
           a new, if the old has expired or was not found.
 
         """
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         value = self.redis.get(self.key)
         if value:
             try:
@@ -618,7 +618,7 @@ class QB_StatusCacheKey(object):
         """Updates the cache key to given value"""
         if not isinstance(value, datetime):
             raise ValueError('expected datetime for key value')
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         if value + self.valid_duration < now:
             raise ValueError('expect valid datetime - {} too old'.format(
                 value))
