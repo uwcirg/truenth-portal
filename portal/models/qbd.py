@@ -1,5 +1,6 @@
 """QBD (Questionnaire Bank Details) Module"""
 from ..date_tools import FHIR_datetime
+import pytz
 
 
 class QBD(object):
@@ -28,7 +29,8 @@ class QBD(object):
             raise ValueError("expect *either* recur itself or id, not both")
         if questionnaire_bank and qb_id:
             raise ValueError("expect *either* QB itself or id, not both")
-        self.relative_start = relative_start
+        tz = pytz.timezone('UTC')
+        self.relative_start = tz.localize(relative_start)
         self.iteration = iteration
         self._recur = recur
         self.recur_id = recur.id if recur else recur_id
