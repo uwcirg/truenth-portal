@@ -39,7 +39,6 @@ def by_tag(tag):
         'version': 'latest',
     }
     response = get_request(url, params)
-    
     # Exception will result if no matching key or content
     return response['results'][0]['content']
 
@@ -54,7 +53,5 @@ def by_uuid(uuid):
         'version': 'latest',
     }
     response = get_request(url, params)
-
     # This will fail noisily if no matching key
     return response['asset']
-
