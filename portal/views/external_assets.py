@@ -3,7 +3,6 @@
 Primarily LifeRay content access - via exposed APIs for portal side caching
 """
 from flask import Blueprint, current_app, request
-from requests.exceptions import ConnectionError
 from ..models.app_text import localize_url, time_request
 
 asset_api = Blueprint('asset', __name__)
