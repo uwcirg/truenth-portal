@@ -10,32 +10,21 @@ asset_api = Blueprint('asset', __name__)
 
 
 def get_request(url, params=None):
-    """helper for fetching response data from requested URL
+    """helper for returning response data from requested URL in JSON
 
     :param url: the URL to pull content from
     :param params: optional, if provided, use as
         parameters to the requested URL
 
     """
-    error_msg = ''
     try:
         response = time_request(url, params).json()
     except ValueError:  # raised when no json is available in response
-        if response.status_code == 200:
-            current_app.logger.warning(
-                "Request did not return json: {}".format(url))
-            return response.text
-        else:
-            error_msg = (
-                "Could not retrieve remote content - " "{} {}".format(
-                    response.status_code, response.reason))
-    except ConnectionError:
-        error_msg = (
-                    "Could not retrieve remove content - Server could not be "
-                    "reached")
-    if error_msg:
-        current_app.logger.error(error_msg + ": {}".format(url))
-    return response, error_msg
+        current_app.logger.error(
+            "Request did not return json: {}".format(url))
+        raise
+
+    return response
 
 
 @asset_api.route('/api/asset/tag/<tag>', methods=('GET',))
@@ -49,15 +38,10 @@ def by_tag(tag):
         'content': 'true',
         'version': 'latest',
     }
-    response, error_msg = get_request(url, params)
-    if error_msg:
-        return error_msg
-    if isinstance(response, dict):
-        if 'results' not in response or not len(response['results']):
-            abort(404, 'Remote content not found for tag {}'.format(tag))
-        return response['results'][0]['content']
-    # response is text string, just return it
-    return response
+    response = get_request(url, params)
+    
+    # Exception will result if no matching key or content
+    return response['results'][0]['content']
 
 
 @asset_api.route('/api/asset/uuid/<uuid>', methods=('GET',))
@@ -69,12 +53,8 @@ def by_uuid(uuid):
         'uuid': uuid,
         'version': 'latest',
     }
-    response, error_msg = get_request(url, params)
-    if error_msg:
-        return error_msg
-    if isinstance(response, dict):
-        if 'asset' not in response:
-            abort(404, 'Remote content not found for uuid {}'.format(uuid))
-        return response['asset']
-    # response is text string, just return it
-    return response
+    response = get_request(url, params)
+
+    # This will fail noisily if no matching key
+    return response['asset']
+

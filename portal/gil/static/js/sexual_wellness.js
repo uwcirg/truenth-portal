@@ -16,6 +16,12 @@
                 url: self.contentURL,
                 timeout: 10000
             }).done(function(data) {
+                self.requestAttempt = 0; //reset request attempt count
+                if (!data) {
+                    $("#sexualWellbeingMainContent").html("no data returned").addClass("error-message");
+                    $(".pre-loader").hide();
+                    return;
+                }
                 $("#sexualWellbeingMainContent").html(data).removeClass("error-message");
                 self.initLinksEvent();
                 setTimeout(function() {
