@@ -285,7 +285,10 @@ def send_user_messages(user, force_update=False):
 
     if force_update:
         invalidate_users_QBT(user_id=user.id)
-        qbd = QB_Status(user=user, as_of_date=datetime.now(tz=timezone.utc)).current_qbd()
+        qbd = QB_Status(
+                    user=user,
+                    as_of_date=datetime.now(tz=timezone.utc)
+                ).current_qbd()
         if qbd:
             queue_outstanding_messages(
                 user=user,
