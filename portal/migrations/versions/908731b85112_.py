@@ -27,6 +27,7 @@ factors_q1_code_map = {
     "A lot of influence": "dsp_factors.1.4",
 }
 
+
 def fixup_dsp_factors(questionnaire_response_json):
     """Fix erroneously created responses"""
     # exit early if preconditions not met
@@ -63,8 +64,6 @@ def upgrade():
 
     for qnr in questionnaire_responses:
         qnr_json = fixup_dsp_factors(qnr.document)
-        instrument_id = qnr.document["questionnaire"]["reference"].split("/")[-1]
-
         # "Reset" QNR to save updated data
         # Todo: fix JSONB mutation detection
         # See https://bugs.launchpad.net/fuel/+bug/1482658
