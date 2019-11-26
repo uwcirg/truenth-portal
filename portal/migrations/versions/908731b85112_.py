@@ -1,17 +1,15 @@
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker
-
-from portal.models.questionnaire_response import QuestionnaireResponse
-
-
-"""empty message
+"""Fixup answers to dsp_factors.1
 
 Revision ID: 908731b85112
 Revises: 677b8b841cb3
 Create Date: 2019-11-21 21:34:41.092472
 
 """
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+
+from portal.models.questionnaire_response import QuestionnaireResponse
 
 # revision identifiers, used by Alembic.
 revision = '908731b85112'
