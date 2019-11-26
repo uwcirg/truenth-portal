@@ -5,6 +5,8 @@ Revises: 677b8b841cb3
 Create Date: 2019-11-21 21:34:41.092472
 
 """
+import copy
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
@@ -41,7 +43,10 @@ def fixup_dsp_factors(questionnaire_response_json):
     if len(questionnaire_response_json['group']['question'][0]['answer']) <= 2:
         return questionnaire_response_json
 
-    qnr_json_copy = dict(questionnaire_response_json)
+    # JSONB mutation detection work around
+    # See https://bugs.launchpad.net/fuel/+bug/1482658
+    qnr_json_copy = copy.deepcopy(questionnaire_response_json)
+
     target_question = qnr_json_copy['group']['question'][0]
     # broken set of answers to first question
     empty_answer, selected_answer, null_answer = target_question['answer']
@@ -76,12 +81,6 @@ def upgrade():
 
     for qnr in questionnaire_responses:
         qnr_json = fixup_dsp_factors(qnr.document)
-        # "Reset" QNR to save updated data
-        # Todo: fix JSONB mutation detection
-        # See https://bugs.launchpad.net/fuel/+bug/1482658
-        qnr.document = {}
-        session.add(qnr)
-        session.commit()
 
         qnr.document = qnr_json
         session.add(qnr)
