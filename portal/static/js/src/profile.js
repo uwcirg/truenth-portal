@@ -1563,13 +1563,25 @@ export default (function() {
                         }
                         var authoredDate = String(entry.authored);
                         var reportLink = "/patients/session-report/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var getStatusString  = function(status) {
+                            if (!status) {
+                                return "";
+                            }
+                            return i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " ")));
+                        };
+                        var extensionStatus = entry.extension && entry.extension.length ? entry.extension[0]["status"]: "";
+                        /*
+                         *  status as indicated in extension field should take precedence over regular status field
+                         */
+                        var visitStatus = extensionStatus ? extensionStatus: entry.status;
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
                             display: i18next.t(entry.questionnaire.display),
                             //title case the status to allow it to be translated correctly
-                            status: i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " "))),
+                            status: getStatusString(visitStatus),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
+                            visit: entry.extension && entry.extension.length ? entry.extension[0]["visit_name"]: "",
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
                     });
