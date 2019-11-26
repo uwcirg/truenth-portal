@@ -671,4 +671,3 @@ def expires(user_id, qbd):
     if qbt and qbt.status in (
             OverallStatus.partially_completed, OverallStatus.expired):
         return qbt.at
-
