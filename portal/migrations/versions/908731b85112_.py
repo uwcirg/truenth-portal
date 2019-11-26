@@ -81,6 +81,8 @@ def upgrade():
 
     for qnr in questionnaire_responses:
         qnr_json = fixup_dsp_factors(qnr.document)
+        if qnr_json == qnr.document:
+            continue
 
         qnr.document = qnr_json
         session.add(qnr)
