@@ -41,8 +41,10 @@ def fixup_dsp_factors(questionnaire_response_json):
 
     corrected_answers = (
         {'valueString': selected_answer['valueString']},
-        # lookup answer code from valueString
-        {'valueCoding': factors_q1_code_map[selected_answer['valueString']]},
+        {'valueCoding':
+            # lookup answer code from valueString
+            {'code': factors_q1_code_map[selected_answer['valueString']]}
+        },
     )
 
     target_question['answer'] = corrected_answers
