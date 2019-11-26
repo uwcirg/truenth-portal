@@ -25,6 +25,13 @@ factors_q1_code_map = {
     "A lot of influence": "dsp_factors.1.4",
 }
 
+def get_system(questionnaire_response_json):
+    """Find and return first valueCoding.system"""
+    for question in questionnaire_response_json['group']['question']:
+        for answer in question['answer']:
+            system = answer.get('valueCoding', {}).get('system')
+            if system:
+                return system
 
 def fixup_dsp_factors(questionnaire_response_json):
     """Fix erroneously created responses"""
@@ -39,11 +46,16 @@ def fixup_dsp_factors(questionnaire_response_json):
     # broken set of answers to first question
     empty_answer, selected_answer, null_answer = target_question['answer']
 
+    system = get_system(questionnaire_response_json)
     corrected_answers = (
         {'valueString': selected_answer['valueString']},
         {'valueCoding':
-            # lookup answer code from valueString
-            {'code': factors_q1_code_map[selected_answer['valueString']]}
+            {
+                'text': selected_answer['valueString'],
+                # lookup answer code from valueString
+                'code': factors_q1_code_map[selected_answer['valueString']],
+                'system': system,
+            }
         },
     )
 
