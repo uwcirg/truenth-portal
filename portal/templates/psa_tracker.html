@@ -1,10 +1,15 @@
 {% extends "layout.html" %}
+{% from "portal_footer.html" import footerContent %}
 {% block head %}
 	{{super()}}
 	 <link rel="stylesheet" href="{{ url_for('static', filename='css/psaTracker.css') }}">
 {% endblock %}
 {% block main %}
 <main id="mainPsaApp"></main>
+{% endblock %}
+{% block footer %}
+<!-- use footer HTML macro from portal footer template -->
+{{footerContent(user)}}
 {% endblock %}
 {% block additional_scripts %}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.0/d3.min.js"></script>
