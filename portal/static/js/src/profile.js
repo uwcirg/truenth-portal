@@ -1569,7 +1569,17 @@ export default (function() {
                             }
                             return i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " ")));
                         };
-                        var extensionStatus = entry.extension && entry.extension.length ? entry.extension[0]["status"]: "";
+                        var extensionStatus = "", visitName = "";
+                        if (entry.extension && entry.extension.length) {
+                            entry.extension.forEach(function(item) {
+                                if (item.status) {
+                                    extensionStatus = item.status;
+                                }
+                                if (item.visit_name) {
+                                    visitName = item.visit_name;
+                                }
+                            });
+                        } 
                         /*
                          *  status as indicated in extension field should take precedence over regular status field
                          */
@@ -1581,7 +1591,7 @@ export default (function() {
                             //title case the status to allow it to be translated correctly
                             status: getStatusString(visitStatus),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
-                            visit: entry.extension && entry.extension.length ? entry.extension[0]["visit_name"]: "",
+                            visit: visitName,
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
                     });
