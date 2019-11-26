@@ -668,6 +668,6 @@ def expires(user_id, qbd):
         QBT.qb_id == qbd.qb_id).filter(
         QBT.qb_iteration == qbd.iteration).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
-    if qbt.status == OverallStatus.expired:
+    if qbt.status in (OverallStatus.partially_completed, OverallStatus.expired):
         return qbt.at
 

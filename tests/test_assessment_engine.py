@@ -253,6 +253,12 @@ class TestAssessmentEngine(TestCase):
         assert 1 == len(visit)
         assert visit[0]['visit_name'] == 'Baseline'
 
+        status = [
+            e for e in extensions
+            if e.get('url') == TRUENTH_STATUS_EXTENSION]
+        assert 1 == len(status)
+        assert status[0]['status'] == 'partially_completed'
+
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']

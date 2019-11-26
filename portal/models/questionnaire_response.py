@@ -295,7 +295,7 @@ class QuestionnaireResponse(db.Model):
             if (expires_at and expires_at < datetime.utcnow() and
                     self.status == 'in-progress'):
                 results.append({
-                    'status': OverallStatus.partially_completed.value,
+                    'status': OverallStatus.partially_completed.name,
                     'url': TRUENTH_STATUS_EXTENSION
                 })
 
