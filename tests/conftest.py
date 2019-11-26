@@ -6,6 +6,12 @@ from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
 
+from flask_webtest import SessionScope
+from portal.models.client import Client
+from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.role import ROLE, Role, add_static_roles
+from portal.models.user import User, UserRoles, get_user
+
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -71,3 +77,75 @@ def celery_app(app):
     from celery.contrib.testing import tasks  # NOQA
 
     return celery
+
+
+@pytest.fixture(scope="session")
+def test_user(app):
+
+    DEFAULT_PASSWORD = 'fakePa$$'
+
+    TEST_USERNAME = 'test@example.com'
+    FIRST_NAME = '✓'
+    LAST_NAME = 'Last'
+    IMAGE_URL = 'http://examle.com/photo.jpg'
+
+    test_user = User(
+        username=TEST_USERNAME, first_name=FIRST_NAME,
+        last_name=LAST_NAME, image_url=IMAGE_URL, 
+        password=DEFAULT_PASSWORD)
+    with SessionScope(db):
+        db.session.add(test_user)
+        db.session.commit()
+    test_user = db.session.merge(test_user)
+    invalidate_users_QBT(test_user.id)
+    return test_user
+
+#@pytest.fixture(scope="session")
+#def promote_user():
+#    user = None
+#    role_name = ROLE.APPLICATION_DEVELOPER.value
+#    if not user:
+#        user = test_user
+#
+#
+#@pytest.fixture(scope="session")
+#def add_client(promote_user):
+#    client_id = 'test_client'
+#    client = Client(
+#        client_id=client_id, _redirect_uris='http://localhost',
+#        client_secret='tc_secret', user_id=TEST_USER_ID)
+#    with SessionScope(db):
+#        db.session.add(client)
+#        db.session.commit()
+#    return db.session.merge(client)
+#
+#
+#@pytest.fixture(scope="session")
+#def login():
+#    TEST_USER_ID = 1
+#    oauth_info = None
+#    follow_redirects = True
+#    
+#    if not oauth_info:
+#        oauth_info = {'user_id': TEST_USER_ID}
+#
+#    return client.get(
+#            'test/oauth',
+#            query_string=oauth_info,
+#            follow_redirects=follow_redirects
+#    )
+#
+#
+#@pytest.fixture(scope="session")
+#def add_service_user():
+#    sponser = None
+#
+#    if not sponsor:
+#        sponsor = self.test_user
+#    if sponsor not in db.session:
+#        sponsor = db.session.merge(sponsor)
+#    service_user = sponsor.add_service_account()
+#    with SessionScope(db):
+#        db.session.add(service_user)
+#        db.session.commit()
+#    return db.session.merge(service_user)
