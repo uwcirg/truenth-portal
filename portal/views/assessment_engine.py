@@ -626,6 +626,15 @@ def assessment(patient_id, instrument_id):
                 'fullUrl': request.url,
             }
 
+        # No place within the FHIR spec to associate 'visit name' nor a
+        # 'status' as per business rules (i.e. 'in-progress' becomes
+        # 'partially completed' once the associated QB expires).
+        # Use FHIR `extension`s to pass these fields to clients.
+        extensions = qnr.extensions()
+        if extensions:
+            assert('extension' not in qnr.document)  # catch any future data collisions
+            qnr.document['extension'] = extensions
+
         documents.append(qnr.document)
 
     link = {'rel': 'self', 'href': request.url}

@@ -12,12 +12,18 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from ..system_uri import (
+    TRUENTH_EXTERNAL_STUDY_SYSTEM,
+    TRUENTH_STATUS_EXTENSION,
+    TRUENTH_VISIT_NAME_EXTENSION,
+)
 from .audit import Audit
 from .encounter import Encounter
 from .fhir import bundle_results
+from .overall_status import OverallStatus
+from .qbd import QBD
 from .questionnaire import Questionnaire
-from .questionnaire_bank import trigger_date
+from .questionnaire_bank import QuestionnaireBank, trigger_date, visit_name
 from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
@@ -260,6 +266,40 @@ class QuestionnaireResponse(db.Model):
             question['answer'] = text_and_coded_answers
 
         return document
+
+    def extensions(self):
+        """Return list of FHIR extensions
+
+        No place within the FHIR spec to associate 'visit name' nor a
+        'status' as per business rules (i.e. 'in-progress' becomes
+        'partially completed' once the associated QB expires).  Use FHIR
+        `extension`s to pass these fields to clients like the front end
+
+        @returns list of FHIR extensions for this instance, typically one for `visit_name`
+        """
+        from .qb_timeline import expires  # avoid cycle
+        results = []
+        if self.questionnaire_bank_id is not None:
+            qb = QuestionnaireBank.query.get(self.questionnaire_bank_id)
+            recur_id = None
+            for r in qb.recurs:
+                recur_id = r.id
+            qbd = QBD(
+                relative_start=None, iteration=self.qb_iteration,
+                recur_id=recur_id, qb_id=self.questionnaire_bank_id)
+            results.append({
+                'visit_name': visit_name(qbd),
+                'url': TRUENTH_VISIT_NAME_EXTENSION})
+
+            expires_at = expires(self.subject_id, qbd)
+            if (expires_at and expires_at < datetime.utcnow() and
+                    self.status == 'in-progress'):
+                results.append({
+                    'status': OverallStatus.partially_completed.value,
+                    'url': TRUENTH_STATUS_EXTENSION
+                })
+
+        return results
 
 
 QNR = namedtuple('QNR', [
