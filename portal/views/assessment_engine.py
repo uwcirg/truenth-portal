@@ -632,7 +632,7 @@ def assessment(patient_id, instrument_id):
         # Use FHIR `extension`s to pass these fields to clients.
         extensions = qnr.extensions()
         if extensions:
-            assert('extension' not in qnr.document)  # catch any future data collisions
+            assert('extension' not in qnr.document)  # catch future collisions
             qnr.document['extension'] = extensions
 
         documents.append(qnr.document)
