@@ -232,7 +232,10 @@ const exerciseDietLess = function(callback) {
             plugins: [cleancss]
         }))
         .pipe(postCSS())
-        .pipe(sourcemaps.write(rootPath+"../maps")) /* note to write external source map files, pass a path relative to the destination */
+         /* note to write external source map files, pass a path relative to the destination
+            in this case, relative to the css directory for exercise and diet
+         */
+        .pipe(sourcemaps.write(rootPath+"../../../"+mapPath))
         .pipe(dest(EDPath + cssPath))
         .on("end", function() {
             replaceStd(ED + ".css.map");
