@@ -942,7 +942,10 @@ def delete_user_consents(user_id):
         comment="Deleted consent agreement", context='consent')
     remove_uc.status = 'deleted'
     # The deleted consent may have altered the cached assessment
-    # status - invalidate this user's data at this time.
+    # status, even the qb assignments - invalidate this user's data at this time.
+    QuestionnaireResponse.purge_qb_relationship(
+        subject_id=user_id, acting_user_id=current_user().id)
+
     invalidate_users_QBT(user_id=user_id)
     db.session.commit()
 
