@@ -1567,15 +1567,15 @@ export default (function() {
                             if (!status) {
                                 return "";
                             }
-                            return i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " ")));
+                            return i18next.t(Utility.capitalize(String(status).replace(/[\-\_]/g, " ")));
                         };
                         var extensionStatus = "", visitName = "";
                         if (entry.extension && entry.extension.length) {
                             entry.extension.forEach(function(item) {
-                                if (item.status) {
+                                if (!extensionStatus && item.status) {
                                     extensionStatus = item.status;
                                 }
-                                if (item.visit_name) {
+                                if (!visitName && item.visit_name) {
                                     visitName = item.visit_name;
                                 }
                             });
