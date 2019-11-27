@@ -742,6 +742,8 @@ def withdraw_user_consent(user_id):
     deleted, and a matching consent (with new status/option values) will be
     created in its place.
 
+    NB Invalid to request a withdrawal date prior to current consent.
+
     ---
     tags:
       - User
@@ -839,6 +841,9 @@ def withdraw_consent(user, org_id, acceptance_date, acting_user):
     try:
         if not acceptance_date:
             acceptance_date = datetime.utcnow()
+        if acceptance_date <= uc.acceptance_date:
+            raise ValueError(
+                "Can't suspend with acceptance date prior to existing consent")
         suspended = UserConsent(
             user_id=user.id, organization_id=org_id, status='suspended',
             acceptance_date=acceptance_date, agreement_url=uc.agreement_url)
