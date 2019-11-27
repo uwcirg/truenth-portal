@@ -9,6 +9,7 @@ from portal.factories.celery import create_celery
 from flask_webtest import SessionScope
 from portal.models.client import Client
 from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.user import User, UserRoles, get_user
 
@@ -20,6 +21,19 @@ def pytest_addoption(parser):
         default=False,
         help="run selenium ui tests",
     )
+
+
+#def setUp():
+#    db.drop_all()
+#    db.create_all()
+#    with SessionScope(db):
+#        add_static_concepts(only_quick=True)
+#        add_static_interventions()
+#        add_static_organization()
+#        add_static_questionnaire_bank()
+#        add_static_relationships()
+#        add_static_roles()
+#        db.session.commit()
 
 
 @pytest.fixture(scope="session")
@@ -81,7 +95,8 @@ def celery_app(app):
 
 @pytest.fixture(scope="session")
 def test_user(app):
-
+    db.drop_all()
+    db.create_all()
     DEFAULT_PASSWORD = 'fakePa$$'
 
     TEST_USERNAME = 'test@example.com'
@@ -94,11 +109,50 @@ def test_user(app):
         last_name=LAST_NAME, image_url=IMAGE_URL, 
         password=DEFAULT_PASSWORD)
     with SessionScope(db):
+        #User.query.filter_by(username=TEST_USERNAME).delete()
         db.session.add(test_user)
         db.session.commit()
     test_user = db.session.merge(test_user)
     invalidate_users_QBT(test_user.id)
-    return test_user
+
+    yield test_user
+
+    db.session.remove()
+    db.engine.dispose()
+
+@pytest.fixture
+def add_service_user(test_user):
+    def add_service_user(sponsor=None):
+        add_static_roles()
+        add_static_relationships()
+        if not sponsor:
+            sponsor = test_user
+        if sponsor not in db.session:
+            sponsor = db.session.merge(sponsor)
+        service_user = sponsor.add_service_account()
+        with SessionScope(db):
+            db.session.add(service_user)
+            db.session.commit()
+    
+        return db.session.merge(service_user)
+    return add_service_user
+
+
+@pytest.fixture
+def login(app, client):
+    def login(user_id=1):
+        follow_redirects = True
+        
+        oauth_info = {'user_id': user_id}
+    
+        return client.get(
+                'test/oauth',
+                query_string=oauth_info,
+                follow_redirects=follow_redirects
+        )
+
+    return login
+
 
 #@pytest.fixture(scope="session")
 #def promote_user():
