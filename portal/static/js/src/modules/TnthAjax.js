@@ -237,10 +237,6 @@ export default { /*global $ */
     },
     "getPortalFooter": function(userId, sync, containerId, callback) {
         callback = callback || function() {};
-        if (!userId) {
-            callback("<div class='error-message'>" + i18next.t("User Id is required") + "</div>");
-            return false;
-        }
         this.sendRequest("/api/portal-footer-html/", "GET", userId, {sync: sync,cache: true,"dataType": "html"}, function(data) {
             if (data) {
                 if (!data.error) {

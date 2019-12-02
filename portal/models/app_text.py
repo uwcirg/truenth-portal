@@ -23,10 +23,10 @@ from requests.exceptions import ConnectionError, InvalidURL, MissingSchema
 from ..database import db
 
 
-def time_request(url):
+def time_request(url, params=None):
     """Wrap the requests.get(url) and log the timing"""
     start = timeit.default_timer()
-    response = requests.get(url)
+    response = requests.get(url, params)
     duration = timeit.default_timer() - start
     message = ('TIME {duration:.4f} seconds to GET {url}'.format(
         url=url, duration=duration))

@@ -23,6 +23,7 @@ const GIL = "gil";
 const PORTAL = "portal";
 const EPROMS = "eproms";
 const TOPNAV = "topnav";
+const PORTAL_FOOTER = "portalFooter";
 const PSATRACKER = "psaTracker";
 const ORGTREEVIEW = "orgTreeView";
 const ED = "exerciseDiet";
@@ -154,6 +155,29 @@ const topnavLess = function(callback) {
 };
 exports.topnavLess = series(topnavLess);
 
+
+/*
+ * transforming portal footer less to css
+ */
+const portalFooterLess = function(callback) {
+    console.log("Compiling portal footer less...");
+    src(lessPath + "/" + PORTAL_FOOTER + ".less")
+        .pipe(sourcemaps.init())
+        .pipe(less({
+            plugins: [cleancss]
+        }))
+        .pipe(postCSS())
+        .pipe(sourcemaps.write(rootPath+"../maps")) /* note to write external source map files, pass a path relative to the destination */
+        .pipe(dest(cssPath))
+        .on("end", function() {
+            replaceStd(PORTAL_FOOTER + ".css.map");
+        });
+    callback();
+
+};
+exports.portalFooterLess = series(portalFooterLess);
+
+
 /*
  * transforming PSA tracker less to css
  */
@@ -208,7 +232,10 @@ const exerciseDietLess = function(callback) {
             plugins: [cleancss]
         }))
         .pipe(postCSS())
-        .pipe(sourcemaps.write(rootPath+"../maps")) /* note to write external source map files, pass a path relative to the destination */
+         /* note to write external source map files, pass a path relative to the destination
+            in this case, relative to the css directory for exercise and diet
+         */
+        .pipe(sourcemaps.write(rootPath+"../../../"+mapPath))
         .pipe(dest(EDPath + cssPath))
         .on("end", function() {
             replaceStd(ED + ".css.map");
@@ -244,6 +271,12 @@ const watchTopNavLess = () => {
 };
 exports.watchTopNavLess = series(watchTopNavLess);
 
+//watch portal footer less
+const watchPortalFooterLess = () => {
+    watch(lessPath + "/" + PORTAL_FOOTER + ".less", {delay: 200}, portalFooterLess);
+};
+exports.watchPortalFooterLess = series(watchPortalFooterLess);
+
 //watch exercise diet
 const watchExerciseDietLess = () => {
     watch(lessPath + "/" + ED + ".less", {delay: 200}, exerciseDietLess);
@@ -259,4 +292,4 @@ exports.watchPsaTrackerLess = series(watchPsaTrackerLess);
 /*
  * compile all portal less files 
  */
-exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess));
+exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, portalFooterLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess));

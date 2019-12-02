@@ -110,7 +110,7 @@ class ClientEditForm(FlaskForm):
         """Custom validation to handle multiple, space delimited URLs"""
         origins = field.data.split()
         for url in origins:
-            if not url_validation(url, require_tld=False):
+            if not url_validation(url):
                 raise validators.ValidationError("Invalid URL")
 
     def validate_callback_url(form, field):

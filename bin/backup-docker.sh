@@ -62,4 +62,4 @@ docker-compose exec --user postgres db bash -c '\
         --no-owner \
         --encoding utf8 '\
 > "${BACKUPS_DIR}/${dump_filename}.sql"
-echo "Backup complete"
+echo "Backup written to ${BACKUPS_DIR}/${dump_filename}.sql"
