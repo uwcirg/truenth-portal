@@ -6,8 +6,16 @@ from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
 
+from portal.config.config import TestConfig
 from flask_webtest import SessionScope
 from portal.models.client import Client
+from portal.models.clinical_constants import CC, add_static_concepts
+from portal.models.intervention import INTERVENTION, add_static_interventions
+from portal.models.organization import (
+    Organization,
+    OrgTree,
+    add_static_organization,
+)
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
@@ -117,14 +125,15 @@ def test_user(app):
 
     yield test_user
 
-    db.session.remove()
-    db.engine.dispose()
 
 @pytest.fixture
 def add_service_user(test_user):
     def add_service_user(sponsor=None):
-        add_static_roles()
+        add_static_concepts(only_quick=True)
+        add_static_interventions()
         add_static_relationships()
+        add_static_roles()
+        db.session.commit()
         if not sponsor:
             sponsor = test_user
         if sponsor not in db.session:
@@ -141,7 +150,10 @@ def add_service_user(test_user):
 @pytest.fixture
 def login(app, client):
     def login(user_id=1):
+        add_static_organization()
         follow_redirects = True
+
+        app.config.from_object(TestConfig)
         
         oauth_info = {'user_id': user_id}
     
@@ -152,6 +164,8 @@ def login(app, client):
         )
 
     return login
+    db.session.remove()
+    db.engine.dispose()
 
 
 #@pytest.fixture(scope="session")
