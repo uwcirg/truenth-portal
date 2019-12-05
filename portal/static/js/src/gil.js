@@ -675,20 +675,12 @@ module.exports = OrgTool = (function() {
     };
     this.getOrgs = function(userId, sync, callback) {
         var self = this;
-        $.ajax ({
-            type: "GET",
-            url: "/api/organization",
-            async: sync? false : true
-        }).done(function(data) {
-
+        callback = callback || function() {};
+        //use common ajax function, which will retry and report error with detail
+        tnthAjax.getOrgs(userId, {sync: sync}, function(data) {
           $("#fillOrgs").attr("userId", userId);
-
           (self.populateOrgsList).apply(self, [data.entry]);
           self.populateUI();
-          if (callback) {
-            callback();
-          }
-
           $("#modal-org").on("hide.bs.modal", function(e) {
             if (typeof sessionStorage !== "undefined") {
               sessionStorage.setItem("noOrgModalViewed", "true");
@@ -745,11 +737,7 @@ module.exports = OrgTool = (function() {
                   };
               });
           });
-        }).fail(function(xhr) {
-          window.app.global.reportError(userId, "/api/organization", xhr.responseText);
-          if (callback) {
-            callback();
-          }
+          callback(data);
         });
     },
     this.updateOrg = function(userId, callback) {

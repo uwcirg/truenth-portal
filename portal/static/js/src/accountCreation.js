@@ -490,8 +490,11 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             let self = this;
             CurrentUserObj.initCurrentUser(function() {
                 OT.init(function() {
-                    self.getOrgs(self.populateOrgsByRole);
-                    self.handleMedidataRave(CurrentUserObj.topLevelOrgs, CurrentUserObj.isAdminUser());
+                    setTimeout(function() {
+                        //delay a bit to call orgs api after current user info is loaded
+                        this.getOrgs(this.populateOrgsByRole);
+                        this.handleMedidataRave(CurrentUserObj.topLevelOrgs, CurrentUserObj.isAdminUser());
+                    }.bind(self), 150);
                 });
             });
         };
