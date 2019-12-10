@@ -9,7 +9,6 @@ from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob
 from portal.tasks import test as test_task
-from sqlalchemy.orm import session
 from tests import TestCase
 
 
@@ -176,4 +175,4 @@ class TestScheduledJob(TestCase):
         resp = self.client.post('/api/scheduled_job/{}/trigger'.format(job.id))
         assert resp.status_code == 200
 
-        session.close_all_sessions()
+        db.session.close_all()
