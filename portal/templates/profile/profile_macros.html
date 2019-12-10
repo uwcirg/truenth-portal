@@ -1120,10 +1120,10 @@
                                                     <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" data-exempt-from-disabling="true" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" v-model="manualEntry.todayObj.displayYear" required />
                                                 </div>
                                             </div>
-                                        </div>
                                         {% raw %}
-                                            <div id="manualEntryMessageContainer" class="error-message">{{manualEntry.errorMessage}}</div>
+                                            <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
