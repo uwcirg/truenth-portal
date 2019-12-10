@@ -10,9 +10,7 @@ from tests import TestCase
 def test_create_account_via_api(app, client, add_service_user, login):
     # use APIs to create account w/ special role
     service_user = add_service_user()
-    print(service_user.id)
-    loginInfo = login(user_id=service_user.id)
-    print(loginInfo)
+    login(user_id=service_user.id)
     response = client.post(
         '/api/account',
         data=json.dumps({}),
