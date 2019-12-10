@@ -130,6 +130,7 @@ def add_service_user(test_user):
     def add_service_user(sponsor=None):
         add_static_concepts(only_quick=True)
         add_static_interventions()
+        add_static_organization()
         add_static_relationships()
         add_static_roles()
         db.session.commit()
@@ -149,7 +150,6 @@ def add_service_user(test_user):
 @pytest.fixture
 def login(app, client):
     def login(user_id=1):
-        add_static_organization()
         follow_redirects = True
 
         app.config.from_object(TestConfig)
