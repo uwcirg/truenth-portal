@@ -340,41 +340,15 @@ class QNR_results(object):
             ).filter(
                 QuestionnaireResponse.qb_iteration == self.qb_iteration)
         self._qnrs = []
-        requery = False
         for qnr in query:
-            if qnr.instrument_id is None:
-                current_app.logger.warning(
-                    "QNR {} query returned no instrument".format(qnr.id))
-                instrument = None
-                requery = True
-            else:
-                instrument = qnr.instrument_id.split('/')[-1]
             self._qnrs.append(QNR(
                 qnr_id=qnr.id,
                 qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
-                instrument=instrument,
+                instrument=qnr.instrument_id.split('/')[-1],
                 authored=qnr.authored,
                 encounter_id=qnr.encounter_id))
-
-        if requery:
-            # Ugly workaround till we figure out why this is happening
-            # see TN-2417
-            for i, qnr in enumerate(self._qnrs):
-                if qnr.instrument is None:
-                    doc = QuestionnaireResponse.query.filter(
-                        QuestionnaireResponse.id == qnr.qnr_id).with_entities(
-                        QuestionnaireResponse.document).first()
-                    if doc is None:
-                        current_app.logger.warning(
-                            "doc still None on second try for "
-                            "qnr {}".format(qnr.qnr_id))
-                    else:
-                        self._qnrs[i] = qnr._replace(
-                            instrument=
-                            doc[0]['questionnaire']['reference'].split(
-                                '/')[-1])
         return self._qnrs
 
     def assign_qb_relationships(self, qb_generator):
