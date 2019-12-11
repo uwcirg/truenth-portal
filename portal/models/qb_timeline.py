@@ -650,3 +650,25 @@ def qb_status_visit_name(user_id, as_of_date):
     if qbt:
         return qbt.status, visit_name(qbt.qbd())
     return OverallStatus.expired, None
+
+
+def expires(user_id, qbd):
+    """Accessor to lookup 'expires' date for given user/qbd
+
+    :returns: the expires date for the given user/QBD; None if not found.
+
+    """
+    # should be cached, unless recently invalidated
+    update_users_QBT(user_id)
+
+    # We order by at (to get the latest status for a given QB) and
+    # secondly by id, as on rare occasions, the time (`at`) of
+    #  `due` == `completed`, but the row insertion defines priority
+    qbt = QBT.query.filter(QBT.user_id == user_id).filter(
+        QBT.qb_id == qbd.qb_id).filter(
+        QBT.qb_iteration == qbd.iteration).order_by(
+        QBT.at.desc(), QBT.id.desc()).first()
+    if qbt and qbt.status in (
+            OverallStatus.completed, OverallStatus.partially_completed,
+            OverallStatus.expired):
+        return qbt.at

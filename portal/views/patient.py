@@ -304,6 +304,12 @@ def patient_timeline(patient_id):
 
     purge = request.args.get('purge', False)
     try:
+        # If purge was given special 'all' value, also wipe out associated
+        # questionnaire_response : qb relationships.
+        if purge == 'all':
+            QuestionnaireResponse.purge_qb_relationship(
+                subject_id=patient_id, acting_user_id=current_user().id)
+
         update_users_QBT(patient_id, invalidate_existing=purge)
     except ValueError as ve:
         abort(500, ve.message)

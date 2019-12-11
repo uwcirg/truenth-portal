@@ -295,19 +295,20 @@ class TestUserConsent(TestCase):
         org = Organization.query.filter(Organization.id > 0).first()
         org_id = org.id
 
+        acceptance_date = FHIR_datetime.parse("2018-06-30 12:12:12")
+        suspend_date = FHIR_datetime.parse("2018-06-30 12:12:15")
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             organization_id=org_id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            acceptance_date=acceptance_date)
         with SessionScope(db):
             db.session.add(uc)
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         assert len(self.test_user.valid_consents) == 1
 
-        yesterday = datetime.utcnow() - timedelta(days=1)
-        yesterday = yesterday.replace(microsecond=0)
-        data = {'organization_id': org_id, 'acceptance_date': yesterday}
+        data = {'organization_id': org_id, 'acceptance_date': suspend_date}
         self.login()
         resp = self.client.post(
             '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
@@ -330,4 +331,32 @@ class TestUserConsent(TestCase):
             new_consent.staff_editable ==
             (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
-        assert new_consent.acceptance_date == yesterday
+        assert new_consent.acceptance_date == suspend_date
+
+    def test_withdraw_too_early(self):
+        """Avoid problems with withdrawals predating the existing consent"""
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id = org.id
+
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit)
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 1
+
+        yesterday = datetime.utcnow() - timedelta(days=1)
+        yesterday = yesterday.replace(microsecond=0)
+        data = {'organization_id': org_id, 'acceptance_date': yesterday}
+        self.login()
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 400
+        assert 1 == UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id).count()

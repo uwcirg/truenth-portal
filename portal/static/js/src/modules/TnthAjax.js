@@ -71,10 +71,12 @@ export default { /*global $ */
                     }, 3000); //retry after 3 seconds
                 })(self, url, method, userId, params, callback);
             } else {
-                params.attempts = 0;
                 fieldHelper.showError(targetField);
                 callback({"error": true, "data": xhr});
                 self.sendError(xhr, url, userId, params);
+                //reset attempts after reporting error so we know how many attempts have been made
+                //multiple attempts can signify server not being responsive or busy network
+                params.attempts = 0;
             }
         });
     },

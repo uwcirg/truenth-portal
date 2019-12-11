@@ -848,10 +848,11 @@
         <div id="assessmentListMessage" class="text-muted" v-show="assessment.assessmentListItems.length == 0"></div>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text" v-if="assessment.assessmentListItems.length > 0">
             <caption>{{_("Session History")}} <span class="text-muted smaller-text">({{_("click each row to review report")}})</span></caption>
-            <THEAD><th>{{_("Questionnaire Name")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></THEAD>
+            <THEAD><th>{{_("Questionnaire Name")}}</th><th>{{_("Visit")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></THEAD>
             {% raw %}
                 <tr v-for="item in assessment.assessmentListItems" v-bind:title="item.title" v-bind:class="item.class">
                     <td><a v-bind:href="item.link">{{item.display}}</a></td>
+                    <td><a v-bind:href="item.link">{{item.visit}}</a></td>
                     <td><a v-bind:href="item.link">{{item.status}}</a></td>
                     <td><a v-bind:href="item.link">{{item.date}}</a></td>
                 </tr>
@@ -1119,10 +1120,10 @@
                                                     <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" data-exempt-from-disabling="true" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" v-model="manualEntry.todayObj.displayYear" required />
                                                 </div>
                                             </div>
-                                        </div>
                                         {% raw %}
-                                            <div id="manualEntryMessageContainer" class="error-message">{{manualEntry.errorMessage}}</div>
+                                            <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">

@@ -1563,13 +1563,35 @@ export default (function() {
                         }
                         var authoredDate = String(entry.authored);
                         var reportLink = "/patients/session-report/" + sessionUserId + "/" + instrumentId + "/" + authoredDate;
+                        var getStatusString  = function(status) {
+                            if (!status) {
+                                return "";
+                            }
+                            return i18next.t(Utility.capitalize(String(status).replace(/[\-\_]/g, " ")));
+                        };
+                        var extensionStatus = "", visitName = "";
+                        if (entry.extension && entry.extension.length) {
+                            entry.extension.forEach(function(item) {
+                                if (!extensionStatus && item.status) {
+                                    extensionStatus = item.status;
+                                }
+                                if (!visitName && item.visit_name) {
+                                    visitName = item.visit_name;
+                                }
+                            });
+                        } 
+                        /*
+                         *  status as indicated in extension field should take precedence over regular status field
+                         */
+                        var visitStatus = extensionStatus ? extensionStatus: entry.status;
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
                             display: i18next.t(entry.questionnaire.display),
                             //title case the status to allow it to be translated correctly
-                            status: i18next.t(Utility.capitalize(String(entry.status).replace(/[\-\_]/g, " "))),
+                            status: getStatusString(visitStatus),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),
+                            visit: visitName,
                             date: self.modules.tnthDates.formatDateString(entry.authored, "iso")
                         });
                     });
@@ -1769,6 +1791,12 @@ export default (function() {
                     this.manualEntry.completionDate = this.manualEntry.consentDate;
                 }
             },
+            resetManualEntryFormValidationError: function() {
+                this.manualEntry.errorMessage = "";
+                //reset bootstrap form validation error
+                $("#manualEntryCompletionDateContainer").removeClass("has-error");
+                $("#manualEntryMessageContainer").html("").removeClass("with-errors");
+            },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
                 $(window).on("beforeunload", function() { //fix for safari
@@ -1781,8 +1809,8 @@ export default (function() {
                     self.manualEntry.initloading = true;
                 });
                 $("#manualEntryModal").on("shown.bs.modal", function() {
-                    self.manualEntry.errorMessage = "";
                     self.manualEntry.method = "";
+                    self.resetManualEntryFormValidationError();
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -1836,26 +1864,27 @@ export default (function() {
                 ["qCompletionDay", "qCompletionMonth", "qCompletionYear"].forEach(function(fn) {
                     var fd = $("#" + fn),
                         tnthDates = self.modules.tnthDates;
+
                     fd.on("change", function(e) {
                         e.stopImmediatePropagation();
+
+                        //reset error
+                        self.resetManualEntryFormValidationError();
+                        $("#meSubmit").attr("disabled", false);
+                    
                         var d = $("#qCompletionDay");
                         var m = $("#qCompletionMonth");
                         var y = $("#qCompletionYear");
-                        var isValid = d.val() !== "" && m.val() !== "" && y.val() !== "" && d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid;
-                        if (!isValid) {
-                            $("#meSubmit").attr("disabled", true);
-                            return;
-                        }
+
                         //add true boolean flag to check for future date entry
                         var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
-                        if (errorMessage) {
+                        if (errorMessage !== "") {
                             self.manualEntry.errorMessage = errorMessage;
+                            $("#manualEntryMessageContainer").html(errorMessage);
+                            $("#meSubmit").attr("disabled", true);
                             return false;
                         }
-
-                        //reset error
-                        self.manualEntry.errorMessage = "";
-
+            
                         var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
                         self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
 

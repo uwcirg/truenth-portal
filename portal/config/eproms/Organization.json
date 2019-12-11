@@ -2385,6 +2385,27 @@
     {
       "extension": [
         {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146124,
+      "language": "en_GB",
+      "name": "Lancashire Teaching Hospitals NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "research_protocols": [
 			{"name": "IRONMAN v3"}
           ],
@@ -2918,6 +2939,34 @@
       ],
       "language": "es_ES",
       "name": "Hospital Universitario 12 de Octubre",
+      "partOf": {
+        "reference": "api/organization/29000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Madrid",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146123,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-123"
+        }
+      ],
+      "language": "es_ES",
+      "name": "Hospital Provincial de Castellón",
       "partOf": {
         "reference": "api/organization/29000"
       },

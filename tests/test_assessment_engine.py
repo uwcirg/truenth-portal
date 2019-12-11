@@ -8,7 +8,6 @@ from flask_swagger import swagger
 from flask_webtest import SessionScope
 import jsonschema
 import pytest
-from sqlalchemy.exc import StatementError
 
 from portal.date_tools import FHIR_datetime
 from portal.extensions import db
@@ -27,6 +26,10 @@ from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import get_user
 from portal.models.user_consent import UserConsent
+from portal.system_uri import (
+    TRUENTH_STATUS_EXTENSION,
+    TRUENTH_VISIT_NAME_EXTENSION,
+)
 from tests import TEST_USER_ID, TestCase
 
 
@@ -182,6 +185,79 @@ class TestAssessmentEngine(TestCase):
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 400
+
+    def test_qnr_extensions(self):
+        """User with expired, in-process QNR should include extensions"""
+        swagger_spec = swagger(self.app)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+        data['status'] = 'in-progress'
+
+        rp = ResearchProtocol(name='proto')
+        with SessionScope(db):
+            db.session.add(rp)
+            db.session.commit()
+        rp = db.session.merge(rp)
+        rp_id = rp.id
+
+        qn = self.add_questionnaire(name='epic26')
+        org = Organization(name="testorg")
+        org.research_protocols.append(rp)
+        with SessionScope(db):
+            db.session.add(qn)
+            db.session.add(org)
+            db.session.commit()
+
+        qn, org = map(db.session.merge, (qn, org))
+        qb = QuestionnaireBank(
+            name='Test Questionnaire Bank',
+            classification='baseline',
+            research_protocol_id=rp_id,
+            start='{"days": 0}',
+            overdue='{"days": 7}',
+            expired='{"days": 90}')
+        qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
+        qb.questionnaires.append(qbq)
+
+        test_user = get_user(TEST_USER_ID)
+        test_user.organizations.append(org)
+        authored = FHIR_datetime.parse(data['authored'])
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org,
+            audit=audit, agreement_url='http://no.com',
+            acceptance_date=authored - relativedelta(days=30))
+
+        with SessionScope(db):
+            db.session.add(qb)
+            db.session.add(test_user)
+            db.session.add(audit)
+            db.session.add(uc)
+            db.session.commit()
+
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        response = self.client.post(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
+        assert response.status_code == 200
+
+        # request for the user's QNR bundle should include the one, with
+        # appropriate extensions
+        response = self.client.get(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID))
+        assert 1 == len(response.json['entry'])
+        assert 'extension' in response.json['entry'][0]
+        extensions = response.json['entry'][0]['extension']
+        visit = [
+            e for e in extensions
+            if e.get('url') == TRUENTH_VISIT_NAME_EXTENSION]
+        assert 1 == len(visit)
+        assert visit[0]['visit_name'] == 'Baseline'
+
+        status = [
+            e for e in extensions
+            if e.get('url') == TRUENTH_STATUS_EXTENSION]
+        assert 1 == len(status)
+        assert status[0]['status'] == 'partially_completed'
 
     def test_submit_assessment_for_qb(self):
         swagger_spec = swagger(self.app)
