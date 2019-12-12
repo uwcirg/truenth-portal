@@ -159,7 +159,7 @@ export default (function() {
                 consentDate: "",
                 completionDate: "",
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
-                errorMessage: ""
+                errorMessage: null
             },
             patientEmailForm: {
                 loading: false
@@ -1792,10 +1792,17 @@ export default (function() {
                 }
             },
             resetManualEntryFormValidationError: function() {
-                this.manualEntry.errorMessage = "";
+                //reset error message to null
+                this.manualEntry.errorMessage = null;
                 //reset bootstrap form validation error
                 $("#manualEntryCompletionDateContainer").removeClass("has-error");
                 $("#manualEntryMessageContainer").html("").removeClass("with-errors");
+            },
+            setManualEntryErrorMessage: function(message) {
+                if (!message) {
+                    return;
+                }
+                $("#manualEntryMessageContainer").html(message);
             },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
@@ -1848,7 +1855,7 @@ export default (function() {
                 });
 
                 $("input[name='entryMethod']").on("click", function() {
-                    self.manualEntry.errorMessage = "";
+                    self.resetManualEntryFormValidationError();
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
                         //if method is interview assisted, reset completion date to GMT date/time for today
@@ -1878,9 +1885,9 @@ export default (function() {
 
                         //add true boolean flag to check for future date entry
                         var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
-                        if (errorMessage !== "") {
+                        if (errorMessage) {
                             self.manualEntry.errorMessage = errorMessage;
-                            $("#manualEntryMessageContainer").html(errorMessage);
+                            self.setManualEntryErrorMessage(errorMessage);
                             $("#meSubmit").attr("disabled", true);
                             return false;
                         }
@@ -1927,17 +1934,18 @@ export default (function() {
                     self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
                         if (data.error) {
                             self.manualEntry.errorMessage = i18next.t("Server error occurred checking questionnaire window");
-                            self.manualEntryModalVis();
-                            return false;
                         }
                         //check questionnaire time windows
                         if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
                             self.manualEntry.errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
-                            self.manualEntryModalVis();
-                        } else {
-                            self.manualEntry.errorMessage = "";
-                            self.continueToAssessment(method, completionDate, linkUrl);
                         }
+                        if (self.manualEntry.errorMessage) {
+                            self.setManualEntryErrorMessage(self.manualEntry.errorMessage);
+                            self.manualEntryModalVis();
+                            return false;
+                        }
+                        self.resetManualEntryFormValidationError();
+                        self.continueToAssessment(method, completionDate, linkUrl);
                     });
                 });
 
