@@ -426,6 +426,17 @@ class QNR_results(object):
         associated = [qnr for qnr in self.qnrs if qnr.qb_id is not None]
         return len(self.qnrs) != len(associated)
 
+    def authored_during_period(self, start, end):
+        """Return the ordered list of QNRs with authored in [start, end)"""
+        results = []
+        for qnr in self.qnrs:
+            if qnr.authored < start:
+                continue
+            if qnr.authored >= end:
+                return results
+            results.append(qnr)
+        return results
+
     def earliest_result(self, qb_id, iteration):
         """Returns timestamp of earliest result for given params, or None"""
         for qnr in self.qnrs:
