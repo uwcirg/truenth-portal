@@ -419,7 +419,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         qb_name = "CRV_recurring_3mo_period v2"
         nineMo = QuestionnaireBank.query.filter(
             QuestionnaireBank.name == qb_name).one()
-        mock_qr('epic_26_v2', qb=nineMo, iteration=1)
+        mock_qr('epic26_v2', qb=nineMo, iteration=1, timestamp=nowish)
 
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user)
@@ -457,7 +457,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         qb_name = "CRV Baseline v2"
         baseline = QuestionnaireBank.query.filter(
             QuestionnaireBank.name == qb_name).one()
-        mock_qr('epic_26_v2', qb=baseline, iteration=None)
+        mock_qr('epic26_v2', qb=baseline, iteration=None, timestamp=back7)
 
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user)
