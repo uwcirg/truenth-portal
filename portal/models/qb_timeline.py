@@ -380,17 +380,18 @@ def ordered_qbs(user, classification=None):
                 # if however, the user has already posted QNRs for the
                 # currentRP one of two things needs to happen:
                 #
-                #   1. if *any* of the QNRs are for instruments which
-                #      deterministically (i.e over RPs {v2,v3}, "epic23" vs
-                #      "epic26" deterministically define the QB where as
-                #      "eortc" is non-deterministic, as it belongs to both)
-                #      demonstrate work on the current RP has begun, we
-                #      postpone the transition to the next RP till the
-                #      subsequent "visit" (i.e. next QB which will come
-                #      up in the next iteration)
-                #   2. if *all* the submissions for the currentRP are
-                #      non-deterministic, we transition now and update the
+                #   1. if any of the QNRs are for instruments which
+                #      deterministically* demonstrate work on the current
+                #      RP has begun, we postpone the transition to the next
+                #      RP till the subsequent "visit" (i.e. next QB which
+                #      will come up in the next iteration)
+                #   2. if all the submissions for the currentRP are
+                #      non-deterministic*, we transition now and update the
                 #      QNRs so they point to the QB of the nextRP
+                #
+                # * over RPs {v2,v3}, "epic23" vs "epic26" deterministically
+                #   define the QB whereas "eortc" is non-deterministic, as
+                #   it belongs to both
 
                 transition_now = False
                 qnrs_for_period = user_qnrs.authored_during_period(
