@@ -1742,9 +1742,16 @@ export default (function() {
             },
             manualEntryModalVis: function(hide) {
                 if (hide) {
+                    /*
+                     * TODO, need to find out why IE is raising vue error here
+                     */
                     this.manualEntry.loading = true;
+                    $("#manualEntryLoader").show();
+                    $("#manualEntryButtonsContainer").hide();
                 } else {
                     this.manualEntry.loading = false;
+                    $("#manualEntryLoader").hide();
+                    $("#manualEntryButtonsContainer").show();
                 }
             },
             continueToAssessment: function(method, completionDate, assessment_url) {
@@ -1774,7 +1781,7 @@ export default (function() {
                 setTimeout(function(callback) {
                     callback = callback || function() {};
                     if (callback) { callback(); }
-                }, 1000, self.manualEntryModalVis);
+                }, 5000, self.manualEntryModalVis);
             },
             setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
