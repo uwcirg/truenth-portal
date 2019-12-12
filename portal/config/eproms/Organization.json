@@ -1827,7 +1827,7 @@
     {
       "extension": [
         {
-          "timezone": "America/Denver",
+          "timezone": "America/Edmonton",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         },
         {
