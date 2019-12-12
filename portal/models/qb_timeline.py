@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import MAXYEAR, datetime
 from time import sleep
 
@@ -12,6 +13,7 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..dogpile_cache import dogpile_cache
+from ..set_tools import left_center_right
 from ..timeout_lock import TimeoutLock
 from ..trace import trace
 from .overall_status import OverallStatus
@@ -22,7 +24,7 @@ from .questionnaire_bank import (
     trigger_date,
     visit_name,
 )
-from .questionnaire_response import QNR_results
+from .questionnaire_response import QNR_results, QuestionnaireResponse
 from .research_protocol import ResearchProtocol
 from .role import ROLE
 from .user import User
@@ -266,6 +268,58 @@ def second_null_safe_datetime(x):
     return x[1]
 
 
+RPD = namedtuple("RPD", ['rp', 'retired', 'qbds'])
+
+
+def cur_next_rp_gen(user, classification, trigger_date):
+    """Generator to manage transitions through research protocols
+
+    Returns a *pair* of research protocol data (RPD) namedtuples,
+    one for current (active) RP data, one for the "next".
+
+    :param user: applicable patient
+    :param classification: None or 'indefinite' for special handling
+    :param trigger_date: patient's initial trigger date
+
+    :yields: cur_RPD, next_RPD
+
+    """
+    rps = ResearchProtocol.assigned_to(user)
+    sorted_rps = sorted(
+        list(rps), key=second_null_safe_datetime, reverse=True)
+
+    def qbds_for_rp(rp, classification, trigger_date):
+        if rp is None:
+            return None
+        if classification == 'indefinite':
+            return indef_qbs_by_rp(rp.id, trigger_date=trigger_date)
+        return ordered_rp_qbs(rp.id, trigger_date=trigger_date)
+
+    while sorted_rps:
+        # Start with oldest RP (current) till it's time to progress (next)
+        current_rp, current_retired = sorted_rps.pop()
+        if sorted_rps:
+            next_rp, next_retired = sorted_rps[-1]
+        else:
+            next_rp = None
+        trace("current RP {}, next RP {}".format(
+            current_rp.id, next_rp.id if next_rp else 'None'))
+
+        curRPD = RPD(
+            rp=current_rp,
+            retired=current_retired,
+            qbds=qbds_for_rp(current_rp, classification, trigger_date))
+        if next_rp:
+            nextRPD = RPD(
+                rp=next_rp,
+                retired=next_retired,
+                qbds=qbds_for_rp(next_rp, classification, trigger_date)
+            )
+        else:
+            nextRPD = None
+        yield curRPD, nextRPD
+
+
 def ordered_qbs(user, classification=None):
     """Generator to yield ordered qbs for a user
 
@@ -283,6 +337,17 @@ def ordered_qbs(user, classification=None):
         raise ValueError(
             "only 'indefinite' or default (None) classifications allowed")
 
+    def nextQBD(qbds_gen):
+        """Returns next qbd, user's start and expiration from generator"""
+        current_qbd = next(qbds_gen, None)
+        if current_qbd is None:
+            return None, None, None
+        users_start = calc_and_adjust_start(
+            user=user, qbd=current_qbd, initial_trigger=td)
+        users_expiration = calc_and_adjust_expired(
+            user=user, qbd=current_qbd, initial_trigger=td)
+        return current_qbd, users_start, users_expiration
+
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
     td = trigger_date(user=user)
@@ -295,72 +360,97 @@ def ordered_qbs(user, classification=None):
             trace("no trigger date therefore nothing from ordered_qbds()")
             return
 
-    # Zero to one RP makes things significantly easier - otherwise
-    # swap in a strategy that can work with the change.
-    rps = ResearchProtocol.assigned_to(user)
+    rp_walker = cur_next_rp_gen(user, classification, td)
+    curRPD, nextRPD = next(rp_walker, (None, None))
 
-    if len(rps) > 0:
-        # RP switch is delayed if user submitted any results for the then
-        # active QB on the RP active at that time.
+    if curRPD:
         user_qnrs = QNR_results(user)
-
-        # With multiple RPs, move in lock step, determine when to switch.
-        sorted_rps = sorted(
-            list(rps), key=second_null_safe_datetime, reverse=True)
-
-        # Start with oldest RP (current) till it's time to progress (next)
-        current_rp, current_retired = sorted_rps.pop()
-        if sorted_rps:
-            trace("multiple RPs found")
-            next_rp, next_retired = sorted_rps.pop()
-        else:
-            trace("single RP found")
-            next_rp = None
-
-        if sorted_rps:
-            raise ValueError("can't cope with > 2 RPs at this time")
-
-        if classification == 'indefinite':
-            current_qbds = indef_qbs_by_rp(current_rp.id, trigger_date=td)
-            next_rp_qbds = (
-                indef_qbs_by_rp(next_rp.id, trigger_date=td) if next_rp else
-                None)
-        else:
-            current_qbds = ordered_rp_qbs(current_rp.id, trigger_date=td)
-            next_rp_qbds = (
-                ordered_rp_qbs(next_rp.id, trigger_date=td) if next_rp else
-                None)
-
+        current_qbd, users_start, users_expiration = nextQBD(curRPD.qbds)
+        if not current_qbd:
+            trace("no current found in initial QBD lookup, bail")
+            return
+        if nextRPD:
+            next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
         while True:
-            # Advance both qb generators in sync while both RPs are defined
-            try:
-                current_qbd = next(current_qbds)
-            except StopIteration:
-                return
-            if next_rp_qbds:
-                try:
-                    next_rp_qbd = next(next_rp_qbds)
-                except StopIteration:
-                    return
-            users_start = calc_and_adjust_start(
-                user=user, qbd=current_qbd, initial_trigger=td)
-            users_expiration = calc_and_adjust_expired(
-                user=user, qbd=current_qbd, initial_trigger=td)
+            if nextRPD and curRPD.retired < users_expiration:
+                # if there's a nextRP and curRP is retired before the
+                # user's QB for the curRP expires, we look to transition
+                # the user to the nextRP.
+                #
+                # if however, the user has already posted QNRs for the
+                # currentRP one of two things needs to happen:
+                #
+                #   1. if any of the QNRs are for instruments which
+                #      deterministically* demonstrate work on the current
+                #      RP has begun, we postpone the transition to the next
+                #      RP till the subsequent "visit" (i.e. next QB which
+                #      will come up in the next iteration)
+                #   2. if all the submissions for the currentRP are
+                #      non-deterministic*, we transition now and update the
+                #      QNRs so they point to the QB of the nextRP
+                #
+                # * over RPs {v2,v3}, "epic23" vs "epic26" deterministically
+                #   define the QB whereas "eortc" is non-deterministic, as
+                #   it belongs to both
 
-            # if there's still a next and current gets retired before this
-            # QB's expiration, switch over *unless* user submitted a matching
-            # QNR on the current RP
-            if (next_rp_qbds and current_retired < users_expiration and
-                    not user_qnrs.earliest_result(
-                        qb_id=current_qbd.questionnaire_bank.id,
-                        iteration=current_qbd.iteration)):
-                current_qbds = next_rp_qbds
-                current_qbd, current_retired = next_rp_qbd, next_retired
-                next_rp_qbds, next_retired = None, None
-                users_start = calc_and_adjust_start(
-                    user=user, qbd=current_qbd, initial_trigger=td)
+                transition_now = False
+                qnrs_for_period = user_qnrs.authored_during_period(
+                    start=users_start, end=users_expiration)
+                if len(qnrs_for_period) == 0:
+                    transition_now = True
 
-            # done if user withdrew before the next start
+                curOnly, common, nextOnly = left_center_right(
+                    current_qbd.questionnaire_instruments,
+                    next_qbd.questionnaire_instruments)
+                period_instruments = set(
+                    [q.instrument for q in qnrs_for_period])
+                if not transition_now and period_instruments & curOnly:
+                    if period_instruments & nextOnly:
+                        raise ValueError(
+                            "Transition ERROR, {} has deterministic QNRs"
+                            "for multiple RPs {}:{} during same visit".format(
+                                user, curRPD.rp, nextRPD.rp))
+                    # Don't transition yet, as definitive work on the old
+                    # (current) RP has already been posted
+                    transition_now = False
+                else:
+                    # Safe to transition, but first update all the common,
+                    # existing QNRs to reference the *next* RP
+                    for q in qnrs_for_period:
+                        if q.instrument not in common:
+                            continue
+                        qnr = QuestionnaireResponse.query.get(q.qnr_id)
+                        qnr.qb_id = next_qbd.qb_id
+                        qnr.qb_iteration = next_qbd.iteration
+                    transition_now = True
+
+                if transition_now:
+                    if (users_start, users_expiration) != (
+                            next_start, next_expiration):
+                        raise ValueError(
+                            "RPs {}:{} not in lock-step; RPs need to maintain "
+                            "same schedule".format(curRPD.rp, nextRPD.rp))
+
+                    curRPD, nextRPD = next(rp_walker)
+                    current_qbd = next_qbd
+
+                    # Need to "catch-up" the fresh generators to match current
+                    start, expiration = users_start, users_expiration
+                    while True:
+                        # Fear not, won't loop forever as `nextQBD` will
+                        # quickly exhaust, thus raising an exception, in
+                        # the event of a config error where RPs somehow
+                        # change the start, expiration synchronization.
+                        current_qbd, users_start, users_expiration = nextQBD(
+                            curRPD.qbds)
+                        if nextRPD:
+                            next_qbd, next_start, next_expiration = nextQBD(
+                                nextRPD.qbds)
+                        if (start, expiration) == (
+                                users_start, users_expiration):
+                            break
+
+            # done if user withdrew before QB starts
             if withdrawal_date and withdrawal_date < users_start:
                 trace("withdrawn as of {}".format(withdrawal_date))
                 break
@@ -368,13 +458,21 @@ def ordered_qbs(user, classification=None):
             current_qbd.relative_start = users_start
             # sanity check - make sure we don't adjust twice
             if hasattr(current_qbd, 'already_adjusted'):
-                raise RuntimeError('already adjusted the qbd relative start')
+                raise RuntimeError(
+                    'already adjusted the qbd relative start')
             current_qbd.already_adjusted = True
             yield current_qbd
+
+            current_qbd, users_start, users_expiration = nextQBD(
+                curRPD.qbds)
+            if nextRPD:
+                next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
+            if not current_qbd:
+                return
     else:
         trace("no RPs found")
 
-        # Neither RP case hit, try intervention associated QBs
+        # No applicable RPs, try intervention associated QBs
         if classification == 'indefinite':
             iqbds = indef_intervention_qbs(user, trigger_date=td)
         else:
