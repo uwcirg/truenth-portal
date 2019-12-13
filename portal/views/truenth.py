@@ -16,6 +16,7 @@ from ..csrf import csrf
 from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.user import current_user
+from ..usage_monitor import mark_usage
 from .crossdomain import crossdomain
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
@@ -28,6 +29,7 @@ def ping():
     """POST request prolong session by reseting cookie timeout"""
     current_app.logger.debug("ping received")
     session.modified = True
+    mark_usage()
     return 'OK'
 
 

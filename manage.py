@@ -98,6 +98,19 @@ def flush_cache():
 
 
 @app.cli.command()
+def last_usage():
+    """Returns number of seconds since last usage was recorded
+
+    NB in the event of no recorded usage, such as after a redis flush
+    a value of -1 will be returned
+
+    """
+    from portal.usage_monitor import last_usage
+    seconds_old = last_usage() or -1
+    click.echo(seconds_old)
+
+
+@app.cli.command()
 def sync():
     """Synchronize database with latest schema and persistence data.
 
