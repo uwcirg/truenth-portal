@@ -149,7 +149,7 @@ class EmailMessage(db.Model):
         try:
             mail.send(message)
         except Exception as e:
-            exc = str(e)
+            exc = e
 
         user = User.query.filter_by(email='__system__').first()
         user_id = user.id if user else None
@@ -161,13 +161,17 @@ class EmailMessage(db.Model):
             audit_msg = ("EmailMessage '{0.subject}' sent to "
                          "{0.recipients} from {0.sender}".format(self))
             if exc:
-                audit_msg = "ERROR {}; {}".format(exc, audit_msg)
+                audit_msg = "ERROR {}; {}".format(str(exc), audit_msg)
             auditable_event(message=audit_msg, user_id=user_id,
                             subject_id=subject_id, context="user")
         else:
             # This should never happen, alert if it does
             current_app.logger.error(
                 "Unable to generate audit log for email {}".format(Message))
+        # If an exception was raised when attempting the send, reraise now
+        # for clients to manage
+        if exc:
+            raise exc
 
     def __str__(self):
         return "EmailMessage subj:{} sent_at:{}".format(
