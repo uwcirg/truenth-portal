@@ -1,6 +1,7 @@
 """Model classes for message data"""
 
 from datetime import datetime
+from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 from textwrap import fill
 
@@ -9,7 +10,7 @@ from flask_mail import Message, email_dispatched
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import mail
-from .user import User
+from .user import INVITE_PREFIX, User
 
 
 def log_message(message, app):
@@ -106,6 +107,10 @@ class EmailMessage(db.Model):
             raise ValueError("schema only supports single recipient")
 
         recipient_user = User.query.filter_by(email=value).first()
+        if not recipient_user:
+            # Capture email sent to a user prior to registration
+            recipient_user = User.query.filter_by(email="{}{}".format(
+                INVITE_PREFIX, value)).first()
         if recipient_user:
             self.recipient_id = recipient_user.id
         self._recipients = value
@@ -140,7 +145,11 @@ class EmailMessage(db.Model):
         body = self.style_message(self.body)
         message.html = fill(
             body, width=280, break_long_words=False, break_on_hyphens=False)
-        mail.send(message)
+        exc = None
+        try:
+            mail.send(message)
+        except Exception as e:
+            exc = e
 
         user = User.query.filter_by(email='__system__').first()
         user_id = user.id if user else None
@@ -151,8 +160,18 @@ class EmailMessage(db.Model):
         if user_id and subject_id:
             audit_msg = ("EmailMessage '{0.subject}' sent to "
                          "{0.recipients} from {0.sender}".format(self))
+            if exc:
+                audit_msg = "ERROR {}; {}".format(str(exc), audit_msg)
             auditable_event(message=audit_msg, user_id=user_id,
                             subject_id=subject_id, context="user")
+        else:
+            # This should never happen, alert if it does
+            current_app.logger.error(
+                "Unable to generate audit log for email {}".format(Message))
+        # If an exception was raised when attempting the send, reraise now
+        # for clients to manage
+        if exc:
+            raise exc
 
     def __str__(self):
         return "EmailMessage subj:{} sent_at:{}".format(
