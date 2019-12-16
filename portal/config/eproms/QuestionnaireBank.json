@@ -498,8 +498,8 @@
         }
       ],
       "research_protocol": {
-        "display": "IRONMAN v3",
-        "reference": "api/research_protocol/IRONMAN v3"
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -708,7 +708,7 @@
         {
           "cycle_length": "{\"years\": 1}",
           "start": "{\"months\": 12, \"days\": -15}",
-          "termination": "{\"years\": 3, \"months\": 3}"
+          "termination": "{\"years\": 5, \"months\": 3}"
         }
       ],
       "research_protocol": {
