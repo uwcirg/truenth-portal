@@ -7,6 +7,7 @@ from portal.database import db
 from portal.extensions import user_manager
 from tests import TestCase
 
+
 def test_create_account_via_api(app, client, add_service_user, login):
     # use APIs to create account w/ special role
     service_user = add_service_user()
@@ -25,6 +26,7 @@ def test_create_account_via_api(app, client, add_service_user, login):
         data=json.dumps(data),
         content_type='application/json')
     assert response.status_code == 200
+
 
 def test_access(client, add_user, promote_user, assert_redirects):
     # confirm exception on access w/o DOB
