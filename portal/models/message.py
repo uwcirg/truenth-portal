@@ -79,6 +79,18 @@ EMAIL_HEADER = (
 EMAIL_FOOTER = "</body></html>"
 
 
+def extra_headers():
+    """Function to deliver any configured extra_headers for outbound email
+
+    Returns an empty dict, or one including any desired extra_headers, such
+    as a ``List-Unsubscribe`` header.
+
+    """
+    # TN-2386 Include List-Unsubscribe header to improve spam scores
+    return {'List-Unsubscribe': "<mailto:{}?subject=unsubscribe>".format(
+        current_app.config['CONTACT_SENDTO_EMAIL'])}
+
+
 class EmailMessage(db.Model):
     __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
@@ -139,6 +151,7 @@ class EmailMessage(db.Model):
         """
         message = Message(
             subject=self.subject,
+            extra_headers=extra_headers(),
             recipients=self.recipients.split())
         if cc_address:
             message.cc.append(cc_address)
@@ -168,7 +181,7 @@ class EmailMessage(db.Model):
             # This should never happen, alert if it does
             current_app.logger.error(
                 "Unable to generate audit log for email {}".format(Message))
-        # If an exception was raised when attempting the send, reraise now
+        # If an exception was raised when attempting the send, re-raise now
         # for clients to manage
         if exc:
             raise exc
