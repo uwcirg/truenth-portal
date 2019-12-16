@@ -31,19 +31,6 @@ def pytest_addoption(parser):
     )
 
 
-#def setUp():
-#    db.drop_all()
-#    db.create_all()
-#    with SessionScope(db):
-#        add_static_concepts(only_quick=True)
-#        add_static_interventions()
-#        add_static_organization()
-#        add_static_questionnaire_bank()
-#        add_static_relationships()
-#        add_static_roles()
-#        db.session.commit()
-
-
 @pytest.fixture(scope="session")
 def app(request):
     """Fixture to use as parameter in any test needing app access
@@ -101,6 +88,16 @@ def celery_app(app):
     return celery
 
 
+#@pytest.fixture(scope="session")
+#def setUp():
+#    add_static_concepts(only_quick=True)
+#    add_static_interventions()
+#    add_static_organization()
+#    add_static_relationships()
+#    add_static_roles()
+#    db.session.commit()
+
+
 @pytest.fixture(scope="session")
 def test_user(app):
     db.drop_all()
@@ -127,6 +124,30 @@ def test_user(app):
 
 
 @pytest.fixture
+def add_user(app):
+    def add_user(
+            username, first_name="", last_name="", 
+            image_url=None, password="fakePa$$", email=None):
+        """Create a user and add to test db, and return it"""
+        # Hash the password
+        password = app.user_manager.hash_password(password)
+
+        test_user = User(
+            username=username, first_name=first_name, 
+            last_name=last_name, image_url=image_url, password=password)
+        if email is not None:
+            test_user.email = email
+        with SessionScope(db):
+            db.session.add(test_user)
+            db.session.commit()
+        test_user = db.session.merge(test_user)
+        # Avoid testing cached/stale data
+        invalidate_users_QBT(test_user.id)
+        return test_user
+    return add_user
+
+
+@pytest.fixture
 def add_service_user(test_user):
     def add_service_user(sponsor=None):
         add_static_concepts(only_quick=True)
@@ -135,6 +156,7 @@ def add_service_user(test_user):
         add_static_relationships()
         add_static_roles()
         db.session.commit()
+
         if not sponsor:
             sponsor = test_user
         if sponsor not in db.session:
@@ -168,14 +190,29 @@ def login(app, client):
     db.engine.dispose()
 
 
-#@pytest.fixture(scope="session")
-#def promote_user():
-#    user = None
-#    role_name = ROLE.APPLICATION_DEVELOPER.value
-#    if not user:
-#        user = test_user
-#
-#
+@pytest.fixture
+def promote_user(test_user):
+    def promote_user(user=None, role_name=None):
+        add_static_concepts(only_quick=True)
+        add_static_interventions()
+        add_static_organization()
+        add_static_relationships()
+        add_static_roles()
+        db.session.commit()
+    
+        """Bless a user with role needed for a test"""
+        if not user:
+            user = test_user
+        user = db.session.merge(user)
+        assert (role_name)
+        role_id = db.session.query(Role.id).filter(
+            Role.name == role_name).first()[0]
+        with SessionScope(db):
+            db.session.add(UserRoles(user_id=user.id, role_id=role_id))
+            db.session.commit()
+    return promote_user
+
+
 #@pytest.fixture(scope="session")
 #def add_client(promote_user):
 #    client_id = 'test_client'
