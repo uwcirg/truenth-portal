@@ -26,10 +26,10 @@ def test_create_account_via_api(app, client, add_service_user, login):
         content_type='application/json')
     assert response.status_code == 200
 
-def test_access(self):
+def test_access(client, add_user, promote_user):
     # confirm exception on access w/o DOB
-    weak_access_user = self.add_user(username='fake@org.com')
-    self.promote_user(weak_access_user, role_name='access_on_verify')
+    weak_access_user = add_user(username='fake@org.com')
+    promote_user(weak_access_user, role_name='access_on_verify')
     weak_access_user = db.session.merge(weak_access_user)
     assert not weak_access_user.birthdate
 
@@ -37,7 +37,7 @@ def test_access(self):
     access_url = url_for(
         'portal.access_via_token', token=token, _external=True)
 
-    response = self.client.get(access_url)
+    response = client.get(access_url)
     assert response.status_code == 400
 
     # add DOB & names and expect redirect to challenge
@@ -47,7 +47,7 @@ def test_access(self):
     with SessionScope(db):
         db.session.commit()
 
-    response = self.client.get(access_url)
+    response = client.get(access_url)
     self.assert_redirects(
         response,
         url_for('portal.challenge_identity', request_path=access_url))
