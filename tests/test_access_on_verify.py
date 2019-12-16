@@ -26,7 +26,7 @@ def test_create_account_via_api(app, client, add_service_user, login):
         content_type='application/json')
     assert response.status_code == 200
 
-def test_access(client, add_user, promote_user):
+def test_access(client, add_user, promote_user, assert_redirects):
     # confirm exception on access w/o DOB
     weak_access_user = add_user(username='fake@org.com')
     promote_user(weak_access_user, role_name='access_on_verify')
@@ -48,6 +48,6 @@ def test_access(client, add_user, promote_user):
         db.session.commit()
 
     response = client.get(access_url)
-    self.assert_redirects(
+    assert_redirects(
         response,
         url_for('portal.challenge_identity', request_path=access_url))

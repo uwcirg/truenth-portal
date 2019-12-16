@@ -21,6 +21,12 @@ from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.user import User, UserRoles, get_user
 
+try:
+    from urllib.parse import urlparse, urljoin
+except ImportError:
+    # Python 2 urlparse fallback
+    from urlparse import urlparse, urljoin
+
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -128,6 +134,9 @@ def add_user(app):
     def add_user(
             username, first_name="", last_name="", 
             image_url=None, password="fakePa$$", email=None):
+        db.drop_all()
+        db.create_all()
+
         """Create a user and add to test db, and return it"""
         # Hash the password
         password = app.user_manager.hash_password(password)
@@ -212,6 +221,31 @@ def promote_user(test_user):
             db.session.commit()
     return promote_user
 
+
+@pytest.fixture
+def assert_redirects(app):
+    def assertRedirects(response, location, message=None):
+        """
+        Checks if response is an HTTP redirect to the
+        given location.
+
+        :param response: Flask response
+        :param location: relative URL path to SERVER_NAME or an absolute URL
+        """
+        parts = urlparse(location)
+
+        if parts.netloc:
+            expected_location = location
+        else:
+            server_name = app.config.get('SERVER_NAME') or 'localhost'
+            expected_location = urljoin("http://%s" % server_name, location)
+
+        valid_status_codes = (301, 302, 303, 305, 307)
+        valid_status_code_str = ', '.join(str(code) for code in valid_status_codes)
+        not_redirect = "HTTP Status %s expected but got %d" % (valid_status_code_str, response.status_code)
+        assert(response.status_code in valid_status_codes, message or not_redirect)
+        assert(response.location == expected_location), message
+    return assertRedirects
 
 #@pytest.fixture(scope="session")
 #def add_client(promote_user):
