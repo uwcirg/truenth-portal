@@ -5,7 +5,6 @@ from flask_webtest import SessionScope
 
 from portal.database import db
 from portal.extensions import user_manager
-from tests import TestCase
 
 
 def test_create_account_via_api(app, client, add_service_user, login):
@@ -21,7 +20,7 @@ def test_create_account_via_api(app, client, add_service_user, login):
     # add role to account
     user_id = response.json['user_id']
     data = {'roles': [{'name': 'access_on_verify'}]}
-    response = self.client.put(
+    response = client.put(
         '/api/user/{user_id}/roles'.format(user_id=user_id),
         data=json.dumps(data),
         content_type='application/json')
