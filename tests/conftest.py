@@ -1,31 +1,20 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
+from flask_webtest import SessionScope
 import pytest
+from urllib.parse import urlparse, urljoin
+
 from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
-
-from portal.config.config import TestConfig
-from flask_webtest import SessionScope
-from portal.models.client import Client
-from portal.models.clinical_constants import CC, add_static_concepts
-from portal.models.intervention import INTERVENTION, add_static_interventions
-from portal.models.organization import (
-    Organization,
-    OrgTree,
-    add_static_organization,
-)
+from portal.models.clinical_constants import add_static_concepts
+from portal.models.intervention import add_static_interventions
+from portal.models.organization import add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
-from portal.models.role import ROLE, Role, add_static_roles
-from portal.models.user import User, UserRoles, get_user
-
-try:
-    from urllib.parse import urlparse, urljoin
-except ImportError:
-    # Python 2 urlparse fallback
-    from urlparse import urlparse, urljoin
+from portal.models.role import Role, add_static_roles
+from portal.models.user import User, UserRoles
 
 
 def pytest_addoption(parser):
@@ -37,8 +26,8 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture
-def initialize_static():
+@pytest.fixture(scope="session")
+def initialize_static(initialized_db):
     def initialize_static():
         add_static_concepts(only_quick=True)
         add_static_interventions()
@@ -236,9 +225,10 @@ def assert_redirects(app):
         valid_status_codes = (301, 302, 303, 305, 307)
         valid_status_code_str = ', '.join(
                 str(code) for code in valid_status_codes)
-        not_redirect = "HTTP Status %s expected but got %d" % (valid_status_code_str,
-                response.status_code)
-        assert(response.status_code in valid_status_codes,
+        not_redirect = "HTTP Status %s expected but got %d" % (
+            valid_status_code_str, response.status_code)
+        assert(
+            response.status_code in valid_status_codes), (
                 message or not_redirect)
         assert(response.location == expected_location), message
     return assertRedirects
