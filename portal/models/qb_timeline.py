@@ -394,14 +394,16 @@ def ordered_qbs(user, classification=None):
                 #   it belongs to both
 
                 transition_now = False
-                qnrs_for_period = user_qnrs.authored_during_period(
-                    start=users_start, end=users_expiration)
-                if len(qnrs_for_period) == 0:
-                    transition_now = True
-
                 curOnly, common, nextOnly = left_center_right(
                     current_qbd.questionnaire_instruments,
                     next_qbd.questionnaire_instruments)
+                combined_instruments = curOnly.union(common).union(nextOnly)
+                qnrs_for_period = user_qnrs.authored_during_period(
+                    start=users_start, end=users_expiration,
+                    restrict_to_instruments=combined_instruments)
+                if len(qnrs_for_period) == 0:
+                    transition_now = True
+
                 period_instruments = set(
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & curOnly:
