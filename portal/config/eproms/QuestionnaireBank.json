@@ -148,6 +148,56 @@
       "start": "{\"days\": 0}"
     },
     {
+      "classification": "baseline",
+      "expired": "{\"months\": 2, \"days\": 14}",
+      "name": "IRONMAN_v5_baseline",
+      "overdue": "{\"days\": 1}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 2
+        },
+        {
+          "questionnaire": {
+            "display": "epic26",
+            "reference": "api/questionnaire/epic26?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 3
+        },
+        {
+          "questionnaire": {
+            "display": "prems",
+            "reference": "api/questionnaire/prems?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 4
+        }
+      ],
+      "recurs": [],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
       "classification": "indefinite",
       "expired": "{\"years\": 50}",
       "name": "IRONMAN_indefinite",
@@ -185,6 +235,27 @@
       "research_protocol": {
         "display": "IRONMAN v3",
         "reference": "api/research_protocol/IRONMAN v3"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "indefinite",
+      "expired": "{\"years\": 50}",
+      "name": "IRONMAN_v5_indefinite",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "irondemog_v3",
+            "reference": "api/questionnaire/irondemog_v3?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ],
+      "recurs": [],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -257,6 +328,42 @@
       "research_protocol": {
         "display": "IRONMAN v3",
         "reference": "api/research_protocol/IRONMAN v3"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 0}",
+      "expired": "{\"months\": 3, \"days\": -2}",
+      "name": "IRONMAN_v5_recurring_3mo_pattern",
+      "overdue": "{\"days\": 16}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 1
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"months\": 6}",
+          "start": "{\"months\": 3, \"days\": -15}",
+          "termination": "{\"months\": 59}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -343,6 +450,99 @@
       "research_protocol": {
         "display": "IRONMAN v3",
         "reference": "api/research_protocol/IRONMAN v3"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 0}",
+      "expired": "{\"months\": 3, \"days\": -2}",
+      "name": "IRONMAN_v5_start6mo_yearly_end30mo",
+      "overdue": "{\"days\": 16}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 2
+        },
+        {
+          "questionnaire": {
+            "display": "physactivity",
+            "reference": "api/questionnaire/physactivity?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 3
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"months\": 6, \"days\": -15}",
+          "termination": "{\"months\": 33}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 0}",
+      "expired": "{\"months\": 3, \"days\": -2}",
+      "name": "IRONMAN_v5_start3.5years_yearly",
+      "overdue": "{\"days\": 16}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 2
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"months\": 42, \"days\": -15}",
+          "termination": "{\"months\": 62}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
@@ -457,6 +657,63 @@
       "research_protocol": {
         "display": "IRONMAN v3",
         "reference": "api/research_protocol/IRONMAN v3"
+      },
+      "resourceType": "QuestionnaireBank",
+      "start": "{\"days\": 0}"
+    },
+    {
+      "classification": "recurring",
+      "due": "{\"days\": 0}",
+      "expired": "{\"months\": 3, \"days\": -2}",
+      "name": "IRONMAN_v5_recurring_annual_pattern",
+      "overdue": "{\"days\": 16}",
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "eortc",
+            "reference": "api/questionnaire/eortc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        },
+        {
+          "questionnaire": {
+            "display": "ironmisc",
+            "reference": "api/questionnaire/ironmisc?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 1
+        },
+        {
+          "questionnaire": {
+            "display": "factfpsi",
+            "reference": "api/questionnaire/factfpsi?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 2
+        },
+        {
+          "questionnaire": {
+            "display": "epic26",
+            "reference": "api/questionnaire/epic26?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 3
+        },
+        {
+          "questionnaire": {
+            "display": "prems",
+            "reference": "api/questionnaire/prems?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 4
+        }
+      ],
+      "recurs": [
+        {
+          "cycle_length": "{\"years\": 1}",
+          "start": "{\"months\": 12, \"days\": -15}",
+          "termination": "{\"years\": 5, \"months\": 3}"
+        }
+      ],
+      "research_protocol": {
+        "display": "IRONMAN v5",
+        "reference": "api/research_protocol/IRONMAN v5"
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
