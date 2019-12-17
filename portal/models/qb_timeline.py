@@ -408,10 +408,14 @@ def ordered_qbs(user, classification=None):
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & cur_only:
                     if period_instruments & next_only:
-                        raise ValueError(
-                            "Transition ERROR, {} has deterministic QNRs"
-                            "for multiple RPs {}:{} during same visit".format(
-                                user, curRPD.rp, nextRPD.rp))
+                        current_app.logger.error(
+                            "Transition ERROR, {} has deterministic QNRs "
+                            "for multiple RPs '{}':'{}' during same visit; "
+                            "User submitted {}; cur_only {}, common {}, "
+                            "next_only {}".format(
+                                user, curRPD.rp.name, nextRPD.rp.name,
+                                str(period_instruments), str(cur_only),
+                                str(common), str(next_only)))
                     # Don't transition yet, as definitive work on the old
                     # (current) RP has already been posted
                     transition_now = False
@@ -434,7 +438,6 @@ def ordered_qbs(user, classification=None):
                             "same schedule".format(curRPD.rp, nextRPD.rp))
 
                     curRPD, nextRPD = next(rp_walker)
-                    current_qbd = next_qbd
 
                     # Need to "catch-up" the fresh generators to match current
                     start, expiration = users_start, users_expiration
