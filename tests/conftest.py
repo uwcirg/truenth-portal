@@ -37,6 +37,15 @@ def pytest_addoption(parser):
     )
 
 
+def setUp():
+    add_static_concepts(only_quick=True)
+    add_static_interventions()
+    add_static_organization()
+    add_static_relationships()
+    add_static_roles()
+    db.session.commit()
+
+
 @pytest.fixture(scope="session")
 def app(request):
     """Fixture to use as parameter in any test needing app access
@@ -94,20 +103,11 @@ def celery_app(app):
     return celery
 
 
-# @pytest.fixture(scope="session")
-# def setUp():
-#     add_static_concepts(only_quick=True)
-#     add_static_interventions()
-#     add_static_organization()
-#     add_static_relationships()
-#     add_static_roles()
-#     db.session.commit()
-
-
 @pytest.fixture(scope="session")
 def test_user(app):
     db.drop_all()
     db.create_all()
+
     DEFAULT_PASSWORD = 'fakePa$$'
 
     TEST_USERNAME = 'test@example.com'
@@ -202,13 +202,7 @@ def login(app, client):
 @pytest.fixture
 def promote_user(test_user):
     def promote_user(user=None, role_name=None):
-        add_static_concepts(only_quick=True)
-        add_static_interventions()
-        add_static_organization()
-        add_static_relationships()
-        add_static_roles()
-        db.session.commit()
-
+        setUp()
         """Bless a user with role needed for a test"""
         if not user:
             user = test_user
