@@ -442,7 +442,8 @@ class QNR_results(object):
                 continue
             if qnr.authored >= end:
                 return results
-            if restrict_to_instruments and qnr.instrument not in restrict_to_instruments:
+            if (restrict_to_instruments and
+                    qnr.instrument not in restrict_to_instruments):
                 continue
             results.append(qnr)
         return results
