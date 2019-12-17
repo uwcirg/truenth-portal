@@ -37,13 +37,16 @@ def pytest_addoption(parser):
     )
 
 
-def setUp():
-    add_static_concepts(only_quick=True)
-    add_static_interventions()
-    add_static_organization()
-    add_static_relationships()
-    add_static_roles()
-    db.session.commit()
+@pytest.fixture
+def initialize_static():
+    def initialize_static():
+        add_static_concepts(only_quick=True)
+        add_static_interventions()
+        add_static_organization()
+        add_static_relationships()
+        add_static_roles()
+        db.session.commit()
+    return initialize_static
 
 
 @pytest.fixture(scope="session")
@@ -157,14 +160,9 @@ def add_user(app):
 
 
 @pytest.fixture
-def add_service_user(test_user):
+def add_service_user(initialize_static, test_user):
     def add_service_user(sponsor=None):
-        add_static_concepts(only_quick=True)
-        add_static_interventions()
-        add_static_organization()
-        add_static_relationships()
-        add_static_roles()
-        db.session.commit()
+        initialize_static()
 
         if not sponsor:
             sponsor = test_user
@@ -200,9 +198,10 @@ def login(app, client):
 
 
 @pytest.fixture
-def promote_user(test_user):
+def promote_user(initialize_static, test_user):
     def promote_user(user=None, role_name=None):
-        setUp()
+        initialize_static()
+
         """Bless a user with role needed for a test"""
         if not user:
             user = test_user
