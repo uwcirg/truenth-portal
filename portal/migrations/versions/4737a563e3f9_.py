@@ -52,7 +52,7 @@ def upgrade():
     # invert dictionary to lookup code by answer
     comorb_codes = {v: k for k, v in comorb_q.questionnaire_code_map().items()}
 
-    questionnaire_responses = session.query(Que  stionnaireResponse).filter(
+    questionnaire_responses = session.query(QuestionnaireResponse).filter(
         QuestionnaireResponse.document[
             ("questionnaire", "reference")
         ].astext.endswith(instrument_id)
