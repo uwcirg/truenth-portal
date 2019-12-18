@@ -312,7 +312,7 @@ def patient_timeline(patient_id):
 
         update_users_QBT(patient_id, invalidate_existing=purge)
     except ValueError as ve:
-        abort(500, ve.message)
+        abort(500, str(ve))
 
     results = []
     # We order by at (to get the latest status for a given QB) and

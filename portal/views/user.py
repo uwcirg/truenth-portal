@@ -348,7 +348,7 @@ def delete_user(user_id):
     try:
         user.delete_user(acting_user=current_user())
     except ValueError as v:
-        return jsonify(message=v.message)
+        return jsonify(message=str(v))
     return jsonify(message="deleted")
 
 
