@@ -6,7 +6,7 @@ Create Date: 2019-12-16 17:45:06.516658
 
 """
 from alembic import op
-import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
 
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.questionnaire import Questionnaire
