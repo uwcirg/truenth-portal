@@ -31,9 +31,9 @@ def fixup_comorb(questionnaire_response_json, comorb_options):
     # See https://bugs.launchpad.net/fuel/+bug/1482658
     qnr_json_copy = copy.deepcopy(questionnaire_response_json)
 
-    target_answers = qnr_json_copy['group']['question'][0]['answer']
+    target_question = qnr_json_copy['group']['question'][0]
     coded_answers = []
-    for answer in target_answers:
+    for answer in target_question['answer']:
         coded_answer = {'valueCoding': {
             # lookup code from valueString
             'code': comorb_options[answer['valueString']],
@@ -41,7 +41,7 @@ def fixup_comorb(questionnaire_response_json, comorb_options):
         }}
         coded_answers.append(coded_answer)
 
-    target_answers = coded_answers
+    target_question['answer'] = coded_answers
     return qnr_json_copy
 
 
