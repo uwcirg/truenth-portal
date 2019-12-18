@@ -24,7 +24,7 @@ Session = sessionmaker()
 def fixup_comorb(questionnaire_response_json, comorb_options):
     """Replace valueString text with corresponding valueCoding"""
     # exit early if preconditions not met
-    if len(questionnaire_response_json['group']['question'][0]['answer']) > 0:
+    if len(questionnaire_response_json['group']['question'][0]['answer']) == 0:
         return questionnaire_response_json
 
     # JSONB mutation detection work around
