@@ -5,6 +5,8 @@ Revises: df233cc6fa8a
 Create Date: 2019-12-16 17:45:06.516658
 
 """
+import copy
+
 from alembic import op
 from sqlalchemy.orm import sessionmaker
 
