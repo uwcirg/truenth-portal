@@ -32,7 +32,7 @@ def fixup_comorb(questionnaire_response_json, comorb_options):
     target_answers = qnr_json_copy['group']['question'][0]['answer']
     coded_answers = []
     for answer in target_answers:
-        coded_answer = { 'valueCoding': {
+        coded_answer = {'valueCoding': {
             # lookup code from valueString
             'code': comorb_options[answer['valueString']],
             'system': 'https://eproms.truenth.org/api/codings/assessment',
@@ -50,16 +50,16 @@ def upgrade():
     instrument_id = 'comorb'
     comorb_q = Questionnaire.find_by_name(name=instrument_id)
     # invert dictionary to lookup code by answer
-    comorb_code_map = {v: k for k, v in comorb_q.questionnaire_code_map().items()}
+    comorb_codes = {v: k for k, v in comorb_q.questionnaire_code_map().items()}
 
-    questionnaire_responses = session.query(QuestionnaireResponse).filter(
+    questionnaire_responses = session.query(Que  stionnaireResponse).filter(
         QuestionnaireResponse.document[
             ("questionnaire", "reference")
         ].astext.endswith(instrument_id)
     ).order_by(QuestionnaireResponse.id)
 
     for qnr in questionnaire_responses:
-        qnr_json = fixup_comorb(qnr.document, comorb_options=comorb_code_map)
+        qnr_json = fixup_comorb(qnr.document, comorb_options=comorb_codes)
         if qnr_json == qnr.document:
             continue
 
