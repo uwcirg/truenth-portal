@@ -63,10 +63,14 @@ def app_logger(app):
 
 
 @pytest.fixture(scope='session')
-def initialized_db(app):
+def initialized_db(app, request):
     """Create database schema"""
     db.create_all()
 
+    def teardown():
+        db.drop_all()
+
+    request.addfinalizer(teardown)
 
 @pytest.fixture(scope='session')
 def celery_worker_parameters():
@@ -96,10 +100,7 @@ def celery_app(app):
 
 
 @pytest.fixture(scope="session")
-def test_user(app):
-    db.drop_all()
-    db.create_all()
-
+def test_user(app, initialized_db):
     DEFAULT_PASSWORD = 'fakePa$$'
 
     TEST_USERNAME = 'test@example.com'
@@ -122,13 +123,10 @@ def test_user(app):
 
 
 @pytest.fixture
-def add_user(app):
+def add_user(app, initialized_db):
     def add_user(
             username, first_name="", last_name="",
             image_url=None, password="fakePa$$", email=None):
-        db.drop_all()
-        db.create_all()
-
         """Create a user and add to test db, and return it"""
         # Hash the password
         password = app.user_manager.hash_password(password)
