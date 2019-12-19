@@ -51,6 +51,9 @@ def upgrade():
 
     instrument_id = 'comorb'
     comorb_q = Questionnaire.find_by_name(name=instrument_id)
+    # exit if Questionnaire not found
+    if not comorb_q:
+        return
     # invert dictionary to lookup code by answer
     comorb_codes = {v: k for k, v in comorb_q.questionnaire_code_map().items()}
 
