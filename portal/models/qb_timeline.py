@@ -315,6 +315,9 @@ def cur_next_rp_gen(user, classification, trigger_date):
                 retired=next_retired,
                 qbds=qbds_for_rp(next_rp, classification, trigger_date)
             )
+            if curRPD.retired == nextRPD.retired:
+                raise ValueError(
+                    "Invalid state: multiple RPs w/ same retire date")
         else:
             nextRPD = None
         yield curRPD, nextRPD
@@ -371,6 +374,7 @@ def ordered_qbs(user, classification=None):
             return
         if nextRPD:
             next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
+            skipped_next_start = None
         while True:
             if nextRPD and curRPD.retired < users_expiration:
                 # if there's a nextRP and curRP is retired before the
@@ -434,13 +438,18 @@ def ordered_qbs(user, classification=None):
                     if (users_start, users_expiration) != (
                             next_start, next_expiration):
                         raise ValueError(
-                            "RPs {}:{} not in lock-step; RPs need to maintain "
-                            "same schedule".format(curRPD.rp, nextRPD.rp))
+                            "Invalid state {}:{} not in lock-step; RPs need "
+                            "to maintain same schedule".format(
+                                curRPD.rp.name, nextRPD.rp.name))
 
                     curRPD, nextRPD = next(rp_walker)
 
                     # Need to "catch-up" the fresh generators to match current
-                    start, expiration = users_start, users_expiration
+                    # if we skipped ahead, only catch-up to the skipped_start
+                    start = users_start
+                    if skipped_next_start:
+                        assert skipped_next_start < start
+                        start = skipped_next_start
                     while True:
                         # Fear not, won't loop forever as `nextQBD` will
                         # quickly exhaust, thus raising an exception, in
@@ -451,9 +460,11 @@ def ordered_qbs(user, classification=None):
                         if nextRPD:
                             next_qbd, next_start, next_expiration = nextQBD(
                                 nextRPD.qbds)
-                        if (start, expiration) == (
-                                users_start, users_expiration):
+                        if start == users_start:
                             break
+
+                    # reset in case of another advancement
+                    skipped_next_start = None
 
             # done if user withdrew before QB starts
             if withdrawal_date and withdrawal_date < users_start:
@@ -472,6 +483,21 @@ def ordered_qbs(user, classification=None):
                 curRPD.qbds)
             if nextRPD:
                 next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
+                if users_start != next_start:
+                    # Valid when the RP being replaced doesn't have all the
+                    # visits defined in the next one (i.e. v3 doesn't have
+                    # months 27 or 33 and v5 does).  Look ahead for a match
+                    skipped_next_start = next_start
+                    next_qbd, next_start, next_expiration = nextQBD(
+                        nextRPD.qbds)
+                    if users_start != next_start:
+                        # Still no match means poorly defined RP QBs
+                        raise ValueError(
+                            "Invalid state {}:{} not in lock-step even on "
+                            "look ahead; RPs need to maintain same "
+                            "schedule {}, {}, {}".format(
+                                curRPD.rp.name, nextRPD.rp.name,
+                                users_start, next_start, skipped_next_start))
             if not current_qbd:
                 return
     else:
