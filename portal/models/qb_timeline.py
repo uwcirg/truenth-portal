@@ -365,7 +365,6 @@ class RP_flyweight(object):
 
     def next_qbd(self):
         """Advance to next qbd on applicable RPs"""
-        # Returns next qbd, user's start and expiration from generator"""
         self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
         if self.cur_rpd:
             self.cur_qbd = next(self.cur_rpd.qbds, None)
@@ -471,7 +470,7 @@ def ordered_qbs(user, classification=None):
             trace("no trigger date therefore nothing from ordered_qbds()")
             return
     else:
-        trace("trigger date {}".format(td))
+        trace("initial trigger date {}".format(td))
 
     rp_flyweight = RP_flyweight(
         user=user, trigger_date=td, classification=classification)
