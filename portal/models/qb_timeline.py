@@ -302,8 +302,9 @@ def cur_next_rp_gen(user, classification, trigger_date):
             next_rp, next_retired = sorted_rps[-1]
         else:
             next_rp = None
-        trace("current RP {}, next RP {}".format(
-            current_rp.id, next_rp.id if next_rp else 'None'))
+        trace("current RP '{}'({}), next RP '{}'({})".format(
+            current_rp.name, current_rp.id, next_rp.name
+            if next_rp else 'None', next_rp.id if next_rp else 'None'))
 
         curRPD = RPD(
             rp=current_rp,
@@ -323,6 +324,124 @@ def cur_next_rp_gen(user, classification, trigger_date):
         yield curRPD, nextRPD
 
 
+class RP_flyweight(object):
+    """maintains state for RPs as it transitions
+
+    Any number of Research Protocols may apply to a user.  This
+    class manages transitioning through the applicable as time
+    passes, maintaining a "current" and "next" as well as the ability
+    to continue marching forward.
+
+    """
+
+    def __init__(self, user, trigger_date, classification):
+        """Initialize flyweight state
+        :param user: the patient
+        :param trigger_date: the patient's initial trigger date
+        :param classification: `indefinite` or None
+        """
+        self.user = user
+        self.td = trigger_date
+        self.classification = classification
+        self.rp_walker = cur_next_rp_gen(
+            user=self.user, trigger_date=self.td,
+            classification=self.classification)
+        self.cur_rpd, self.nxt_rpd = next(self.rp_walker, (None, None))
+        self.skipped_nxt_start = None
+
+    def adjust_start(self):
+        """The QB start may need a minor adjustment, done once when ready"""
+        self.cur_qbd.relative_start = self.cur_start
+
+        # sanity check - make sure we don't adjust twice
+        if hasattr(self.cur_qbd, 'already_adjusted'):
+            raise RuntimeError(
+                'already adjusted the qbd relative start')
+        self.cur_qbd.already_adjusted = True
+
+    def consider_transition(self):
+        """Returns true only if state suggests it *may* be transtion time"""
+        return self.nxt_rpd and self.cur_rpd.retired < self.cur_exp
+
+    def next_qbd(self):
+        """Advance to next qbd on applicable RPs"""
+        # Returns next qbd, user's start and expiration from generator"""
+        self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
+        if self.cur_rpd:
+            self.cur_qbd = next(self.cur_rpd.qbds, None)
+        if self.cur_qbd:
+            self.cur_start = calc_and_adjust_start(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+            self.cur_exp = calc_and_adjust_expired(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+
+        self.nxt_qbd, self.nxt_start = None, None
+        if self.nxt_rpd:
+            self.nxt_qbd = next(self.nxt_rpd.qbds, None)
+        if self.nxt_qbd:
+            self.nxt_start = calc_and_adjust_start(
+                user=self.user, qbd=self.nxt_qbd, initial_trigger=self.td)
+            if self.cur_qbd is None:
+                trace("Finished cur RP with remaining QBs in next")
+                self.cur_start = self.nxt_start
+                self.transition()
+            elif self.cur_start != self.nxt_start:
+                # Valid only when the RP being replaced doesn't have all the
+                # visits defined in the next one (i.e. v3 doesn't have months
+                # 27 or 33 and v5 does). Look ahead for a match
+                self.skipped_nxt_start = self.nxt_start
+                self.nxt_start = None
+                self.nxt_qbd = next(self.nxt_rpd.qbds, None)
+                if self.nxt_qbd:
+                    self.nxt_start = calc_and_adjust_start(
+                        user=self.user, qbd=self.nxt_qbd,
+                        initial_trigger=self.td)
+                if self.cur_start != self.nxt_start:
+                    # Still no match means poorly defined RP QBs
+                    raise ValueError(
+                        "Invalid state {}:{} not in lock-step even on "
+                        "look ahead; RPs need to maintain same "
+                        "schedule {}, {}, {}".format(
+                            self.cur_rpd.rp.name, self.nxt_rpd.rp.name,
+                            self.cur_start, self.nxt_start,
+                            self.skipped_nxt_start))
+        if self.cur_qbd:
+            trace("advanced to next QB: {} w/ start {}".format(
+                self.cur_qbd.questionnaire_bank.name, self.cur_start))
+        else:
+            trace("out of QBs!")
+
+    def transition(self):
+        """Transition internal state to 'next' Research Protocol"""
+        trace("transitioning to the next RP w/ cur_start {}".format(
+            self.cur_start))
+        if self.cur_start != self.nxt_start:
+            raise ValueError(
+                "Invalid state {}:{} not in lock-step; RPs need "
+                "to maintain same schedule".format(
+                    self.cur_rpd.rp.name, self.nxt_rpd.rp.name))
+
+        self.cur_rpd, self.nxt_rpd = next(self.rp_walker)
+
+        # Need to "catch-up" the fresh generators to match current
+        # if we skipped ahead, only catch-up to the skipped_start
+        start = self.cur_start
+        if self.skipped_nxt_start:
+            assert self.skipped_nxt_start < start
+            start = self.skipped_nxt_start
+        while True:
+            # Fear not, won't loop forever as `next_qbd` will
+            # quickly exhaust, thus raising an exception, in
+            # the event of a config error where RPs somehow
+            # change the start, expiration synchronization.
+            self.next_qbd()
+            if start == self.cur_start:
+                break
+
+        # reset in case of another advancement
+        self.skipped_nxt_start = None
+
+
 def ordered_qbs(user, classification=None):
     """Generator to yield ordered qbs for a user
 
@@ -340,17 +459,6 @@ def ordered_qbs(user, classification=None):
         raise ValueError(
             "only 'indefinite' or default (None) classifications allowed")
 
-    def nextQBD(qbds_gen):
-        """Returns next qbd, user's start and expiration from generator"""
-        current_qbd = next(qbds_gen, None)
-        if current_qbd is None:
-            return None, None, None
-        users_start = calc_and_adjust_start(
-            user=user, qbd=current_qbd, initial_trigger=td)
-        users_expiration = calc_and_adjust_expired(
-            user=user, qbd=current_qbd, initial_trigger=td)
-        return current_qbd, users_start, users_expiration
-
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
     td = trigger_date(user=user)
@@ -362,21 +470,22 @@ def ordered_qbs(user, classification=None):
         else:
             trace("no trigger date therefore nothing from ordered_qbds()")
             return
+    else:
+        trace("trigger date {}".format(td))
 
-    rp_walker = cur_next_rp_gen(user, classification, td)
-    curRPD, nextRPD = next(rp_walker, (None, None))
+    rp_flyweight = RP_flyweight(
+        user=user, trigger_date=td, classification=classification)
 
-    if curRPD:
+    if rp_flyweight.cur_rpd:
         user_qnrs = QNR_results(user)
-        current_qbd, users_start, users_expiration = nextQBD(curRPD.qbds)
-        if not current_qbd:
+        rp_flyweight.next_qbd()
+
+        if not rp_flyweight.cur_qbd:
             trace("no current found in initial QBD lookup, bail")
             return
-        if nextRPD:
-            next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
-            skipped_next_start = None
+
         while True:
-            if nextRPD and curRPD.retired < users_expiration:
+            if rp_flyweight.consider_transition():
                 # if there's a nextRP and curRP is retired before the
                 # user's QB for the curRP expires, we look to transition
                 # the user to the nextRP.
@@ -399,11 +508,11 @@ def ordered_qbs(user, classification=None):
 
                 transition_now = False
                 cur_only, common, next_only = left_center_right(
-                    current_qbd.questionnaire_instruments,
-                    next_qbd.questionnaire_instruments)
+                    rp_flyweight.cur_qbd.questionnaire_instruments,
+                    rp_flyweight.nxt_qbd.questionnaire_instruments)
                 combined_instruments = cur_only.union(common).union(next_only)
                 qnrs_for_period = user_qnrs.authored_during_period(
-                    start=users_start, end=users_expiration,
+                    start=rp_flyweight.cur_start, end=rp_flyweight.cur_exp,
                     restrict_to_instruments=combined_instruments)
                 if len(qnrs_for_period) == 0:
                     transition_now = True
@@ -417,7 +526,8 @@ def ordered_qbs(user, classification=None):
                             "for multiple RPs '{}':'{}' during same visit; "
                             "User submitted {}; cur_only {}, common {}, "
                             "next_only {}".format(
-                                user, curRPD.rp.name, nextRPD.rp.name,
+                                user, rp_flyweight.cur_rpd.rp.name,
+                                rp_flyweight.nxt_rpd.rp.name,
                                 str(period_instruments), str(cur_only),
                                 str(common), str(next_only)))
                     # Don't transition yet, as definitive work on the old
@@ -430,75 +540,23 @@ def ordered_qbs(user, classification=None):
                         if q.instrument not in common:
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        qnr.qb_id = next_qbd.qb_id
-                        qnr.qb_iteration = next_qbd.iteration
+                        qnr.qb_id = rp_flyweight.nxt_qbd.qb_id
+                        qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
                     transition_now = True
 
                 if transition_now:
-                    if (users_start, users_expiration) != (
-                            next_start, next_expiration):
-                        raise ValueError(
-                            "Invalid state {}:{} not in lock-step; RPs need "
-                            "to maintain same schedule".format(
-                                curRPD.rp.name, nextRPD.rp.name))
-
-                    curRPD, nextRPD = next(rp_walker)
-
-                    # Need to "catch-up" the fresh generators to match current
-                    # if we skipped ahead, only catch-up to the skipped_start
-                    start = users_start
-                    if skipped_next_start:
-                        assert skipped_next_start < start
-                        start = skipped_next_start
-                    while True:
-                        # Fear not, won't loop forever as `nextQBD` will
-                        # quickly exhaust, thus raising an exception, in
-                        # the event of a config error where RPs somehow
-                        # change the start, expiration synchronization.
-                        current_qbd, users_start, users_expiration = nextQBD(
-                            curRPD.qbds)
-                        if nextRPD:
-                            next_qbd, next_start, next_expiration = nextQBD(
-                                nextRPD.qbds)
-                        if start == users_start:
-                            break
-
-                    # reset in case of another advancement
-                    skipped_next_start = None
+                    rp_flyweight.transition()
 
             # done if user withdrew before QB starts
-            if withdrawal_date and withdrawal_date < users_start:
+            if withdrawal_date and withdrawal_date < rp_flyweight.cur_start:
                 trace("withdrawn as of {}".format(withdrawal_date))
                 break
 
-            current_qbd.relative_start = users_start
-            # sanity check - make sure we don't adjust twice
-            if hasattr(current_qbd, 'already_adjusted'):
-                raise RuntimeError(
-                    'already adjusted the qbd relative start')
-            current_qbd.already_adjusted = True
-            yield current_qbd
+            rp_flyweight.adjust_start()
+            yield rp_flyweight.cur_qbd
 
-            current_qbd, users_start, users_expiration = nextQBD(
-                curRPD.qbds)
-            if nextRPD:
-                next_qbd, next_start, next_expiration = nextQBD(nextRPD.qbds)
-                if users_start != next_start:
-                    # Valid when the RP being replaced doesn't have all the
-                    # visits defined in the next one (i.e. v3 doesn't have
-                    # months 27 or 33 and v5 does).  Look ahead for a match
-                    skipped_next_start = next_start
-                    next_qbd, next_start, next_expiration = nextQBD(
-                        nextRPD.qbds)
-                    if users_start != next_start:
-                        # Still no match means poorly defined RP QBs
-                        raise ValueError(
-                            "Invalid state {}:{} not in lock-step even on "
-                            "look ahead; RPs need to maintain same "
-                            "schedule {}, {}, {}".format(
-                                curRPD.rp.name, nextRPD.rp.name,
-                                users_start, next_start, skipped_next_start))
-            if not current_qbd:
+            rp_flyweight.next_qbd()
+            if not rp_flyweight.cur_qbd:
                 return
     else:
         trace("no RPs found")
