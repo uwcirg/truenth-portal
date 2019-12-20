@@ -65,6 +65,12 @@ class TxStartedConstants(object):
     from different coding systems under the same codeable_concept
 
     """
+    __instance = None
+
+    def __new__(cls):
+        if TxStartedConstants.__instance is None:
+            TxStartedConstants.__instance = object.__new__(cls)
+        return TxStartedConstants.__instance
 
     def __iter__(self):
         for attr in dir(self):
@@ -210,6 +216,12 @@ class TxNotStartedConstants(object):
     codeable concept containing a known procedure started coding.
 
     """
+    __instance = None
+
+    def __new__(cls):
+        if TxNotStartedConstants.__instance is None:
+            TxNotStartedConstants.__instance = object.__new__(cls)
+        return TxNotStartedConstants.__instance
 
     def __iter__(self):
         for attr in dir(self):
