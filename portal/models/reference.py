@@ -164,7 +164,7 @@ class Reference(object):
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
             (re.compile('[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
              Questionnaire, 'identifier'),
-            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+)'),
+            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
              QuestionnaireBank, 'name'),
             (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'),
