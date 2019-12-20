@@ -20,7 +20,7 @@ USAGE
     exit 1
 }
 
-while getopts "bhn" option; do
+while getopts "bhnf" option; do
     case "${option}" in
         b)
             BACKUP=true
@@ -30,6 +30,9 @@ while getopts "bhn" option; do
             ;;
         n)
             NO_PULL=true
+            ;;
+        f)
+            FORCE=true
             ;;
         *)
             usage
@@ -58,6 +61,19 @@ if [ -z "$NO_PULL" ]; then
     echo "Updating images..."
     docker-compose pull
 fi
+
+if [ "$FORCE" != true ]; then
+    # how long a system must be inactive before deploying
+    # 15 minutes
+    min_inactivity_secs=$((15 * 60))
+    echo "Checking for activity..."
+    inactive_seconds="$(docker-compose --env LOG_LEVEL=info exec web flask last-usage)"
+    if [ $inactive_seconds -lt $min_inactivity_secs ]; then
+        echo "System activity detected; aborting deployment"
+        exit 1
+    fi
+fi
+
 
 echo "Starting containers..."
 # Capture stderr to check for restarted containers
