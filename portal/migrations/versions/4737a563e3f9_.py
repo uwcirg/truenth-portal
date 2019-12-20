@@ -34,6 +34,8 @@ def fixup_comorb(questionnaire_response_json, comorb_options):
     target_question = qnr_json_copy['group']['question'][0]
     coded_answers = []
     for answer in target_question['answer']:
+        if 'valueCoding' in answer:
+            return questionnaire_response_json
         coded_answer = {'valueCoding': {
             # lookup code from valueString
             'code': comorb_options[answer['valueString']],
