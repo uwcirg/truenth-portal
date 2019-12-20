@@ -2424,8 +2424,43 @@
         }
       ],
       "id": 146124,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-124"
+        }
+      ],
       "language": "en_GB",
       "name": "Lancashire Teaching Hospitals NHS Foundation Trust",
+      "partOf": {
+        "reference": "api/organization/26000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/London",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146131,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-131"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Sheffield Teaching Hospitals NHS Foundation Trust",
       "partOf": {
         "reference": "api/organization/26000"
       },
