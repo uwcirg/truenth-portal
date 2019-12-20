@@ -16,6 +16,12 @@ from .value_quantity import ValueQuantity
 
 
 class ClinicalConstants(object):
+    __instance = None
+
+    def __new__(cls):
+        if ClinicalConstants.__instance is None:
+            ClinicalConstants.__instance = object.__new__(cls)
+        return ClinicalConstants.__instance
 
     def __iter__(self):
         for attr in dir(self):
