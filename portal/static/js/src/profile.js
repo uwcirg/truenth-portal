@@ -204,6 +204,16 @@ export default (function() {
                 }
             }
         },
+        computed: {
+            propManualEntryErrorMessage: {
+                set: function(newValue) {
+                    this.manualEntry.message = newValue;
+                },
+                get: function() {
+                    return this.manualEntry.message;
+                }
+            }
+        },
         methods: {
             registerDependencies: function() {
                 var self = this;
@@ -1821,10 +1831,10 @@ export default (function() {
                 });
                 $("#manualEntryModal").on("show.bs.modal", function() {
                     self.manualEntry.initloading = true;
+                    self.resetManualEntryFormValidationError();
                 });
                 $("#manualEntryModal").on("shown.bs.modal", function() {
                     self.manualEntry.method = "";
-                    self.resetManualEntryFormValidationError();
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -1939,16 +1949,20 @@ export default (function() {
                     }
                     self.manualEntryModalVis(true);
                     self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
+                        var errorMessage = "";
                         if (data.error) {
-                            self.manualEntry.errorMessage = i18next.t("Server error occurred checking questionnaire window");
+                            errorMessage = i18next.t("Server error occurred checking questionnaire window");
                         }
                         //check questionnaire time windows
-                        if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
-                            self.manualEntry.errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
+                        if (!data.questionnaire_bank || !Object.keys(data.questionnaire_bank).length) {
+                            errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
                         }
-                        if (self.manualEntry.errorMessage) {
-                            self.setManualEntryErrorMessage(self.manualEntry.errorMessage);
+                        if (errorMessage) {
+                            self.setManualEntryErrorMessage(errorMessage);
                             self.manualEntryModalVis();
+                            //use computed property to assign value to error message here, 
+                            //IE is throwing error if it is not done this way, not exactly sure why still
+                            self.propManualEntryErrorMessage = errorMessage;
                             return false;
                         }
                         self.resetManualEntryFormValidationError();
