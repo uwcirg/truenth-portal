@@ -1960,7 +1960,7 @@ export default (function() {
                         if (errorMessage) {
                             self.setManualEntryErrorMessage(errorMessage);
                             self.manualEntryModalVis();
-                            //use computed method to assign value to error message here, IE is throwing error if it is not done this way, not exactly sure why still
+                            //use computed property to assign value to error message here, IE is throwing error if it is not done this way, not exactly sure why still
                             self.propManualEntryErrorMessage = errorMessage;
                             return false;
                         }
