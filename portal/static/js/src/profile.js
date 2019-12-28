@@ -1953,7 +1953,7 @@ export default (function() {
                         if (data.error) {
                             errorMessage = i18next.t("Server error occurred checking questionnaire window");
                         }
-                        // //check questionnaire time windows
+                        //check questionnaire time windows
                         if (!data.questionnaire_bank || !Object.keys(data.questionnaire_bank).length) {
                             errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
                         }
