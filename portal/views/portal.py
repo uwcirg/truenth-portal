@@ -214,7 +214,10 @@ def specific_clinic_entry():
 
     """
     if current_user():
-        return redirect(url_for('portal.home'))
+        if current_app.config.get('GIL'):
+            return redirect(url_for('gil.home'))
+        else:
+            return redirect(url_for('eproms.home'))
 
     form = ShortcutAliasForm(request.form)
 
