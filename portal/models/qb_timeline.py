@@ -519,19 +519,19 @@ def ordered_qbs(user, classification=None):
                 period_instruments = set(
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & cur_only:
+                    # Don't transition yet, as definitive work on the old
+                    # (current) RP has already been posted, UNLESS ...
                     if period_instruments & next_only:
-                        current_app.logger.error(
-                            "Transition ERROR, {} has deterministic QNRs "
+                        current_app.logger.warning(
+                            "Transition surprise, {} has deterministic QNRs "
                             "for multiple RPs '{}':'{}' during same visit; "
                             "User submitted {}; cur_only {}, common {}, "
-                            "next_only {}".format(
+                            "next_only {}.  Moving to newer RP".format(
                                 user, rp_flyweight.cur_rpd.rp.name,
                                 rp_flyweight.nxt_rpd.rp.name,
                                 str(period_instruments), str(cur_only),
                                 str(common), str(next_only)))
-                    # Don't transition yet, as definitive work on the old
-                    # (current) RP has already been posted
-                    transition_now = False
+                        transition_now = True
                 else:
                     # Safe to transition, but first update all the common,
                     # existing QNRs to reference the *next* RP
