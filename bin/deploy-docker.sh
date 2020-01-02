@@ -65,7 +65,13 @@ fi
 if [ "$FORCE" != true ]; then
     # how long a system must be inactive before deploying
     min_inactivity_seconds=$((15 * 60))
+
     inactive_seconds="$(docker-compose exec --env LOG_LEVEL=info web flask last-usage | tr -d '[[:space:]]')"
+    if ! echo "$inactive_seconds" | grep --quiet '^-*[[:digit:]]\+$'; then
+        echo "error reading inactivity time"
+        exit 1
+    fi
+
     if [ $inactive_seconds -lt $min_inactivity_seconds ]; then
         echo "System activity detected ${inactive_seconds} seconds ago; aborting deployment"
         exit 1
