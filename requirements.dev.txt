@@ -27,7 +27,7 @@ sphinxcontrib-websupport==1.1.2  # via sphinx
 tox==3.14.0
 typing==3.7.4.1             # via sphinx
 virtualenv==16.7.8        # via tox
-waitress==1.4.1           # via webtest
+waitress==1.4.2           # via webtest
 webob==1.8.5              # via webtest
 webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9
