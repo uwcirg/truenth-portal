@@ -574,6 +574,10 @@ class ResearchProtocolExtension(CCExtension):
                     retired_as_of=FHIR_datetime.parse(
                         rp.get('retired_as_of'), none_safe=True))
             else:
+                if existing not in remove_if_not_requested:
+                    raise ValueError(
+                        "duplicate RP names for org {}".format(
+                            self.organization.name))
                 remove_if_not_requested.remove(existing)
 
                 # Unfortunately, the association proxy requires

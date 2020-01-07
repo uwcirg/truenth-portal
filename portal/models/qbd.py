@@ -54,6 +54,10 @@ class QBD(object):
         self.qb_id = qb.id
         self._questionnaire_bank = qb
 
+    @property
+    def questionnaire_instruments(self):
+        return set(q.name for q in self.questionnaire_bank.questionnaires)
+
     def as_json(self):
         from ..models.questionnaire_bank import visit_name
 

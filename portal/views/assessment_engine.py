@@ -608,7 +608,11 @@ def assessment(patient_id, instrument_id):
 
     documents = []
     for qnr in questionnaire_responses:
-        for question in qnr.document_answered['group']['question']:
+        # NB, document_answered returns a (potentially) modified *copy* of
+        # the document, so changes aren't persisted or found in db session
+        # cached objects.  see TN-2417 for example side-effects
+        document = qnr.document_answered
+        for question in document['group']['question']:
             for answer in question['answer']:
                 # Hack: Extensions should be a list, correct in-place if need be
                 # todo: migrate towards FHIR spec in persisted data
@@ -621,8 +625,8 @@ def assessment(patient_id, instrument_id):
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant
         if request.args.get('patch_dstu2'):
-            qnr.document = {
-                'resource': qnr.document,
+            document = {
+                'resource': document,
                 'fullUrl': request.url,
             }
 
@@ -633,9 +637,9 @@ def assessment(patient_id, instrument_id):
         extensions = qnr.extensions()
         if extensions:
             assert('extension' not in qnr.document)  # catch future collisions
-            qnr.document['extension'] = extensions
+            document['extension'] = extensions
 
-        documents.append(qnr.document)
+        documents.append(document)
 
     link = {'rel': 'self', 'href': request.url}
     return jsonify(bundle_results(elements=documents, links=[link]))

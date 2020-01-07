@@ -42,8 +42,8 @@ def patient_search():
     Takes key=value pairs to look up.  Email, identifier searches supported.
 
     Example searches:
-        /api/patient?email=username@server.com
-        /api/patient?identifier=http://us.truenth.org/identity-codes/external-study-id|123-45-678
+        /api/patient/?email=username@server.com
+        /api/patient/?identifier=http://us.truenth.org/identity-codes/external-study-id|123-45-678
 
     Identifier search pattern:
         ?identifier=<system>|<value>
@@ -312,7 +312,7 @@ def patient_timeline(patient_id):
 
         update_users_QBT(patient_id, invalidate_existing=purge)
     except ValueError as ve:
-        abort(500, ve.message)
+        abort(500, str(ve))
 
     results = []
     # We order by at (to get the latest status for a given QB) and

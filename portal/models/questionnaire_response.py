@@ -1,4 +1,5 @@
 from collections import namedtuple
+import copy
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from html.parser import HTMLParser
@@ -230,19 +231,26 @@ class QuestionnaireResponse(db.Model):
 
     @property
     def document_answered(self):
-        """
-        Return a QuestionnaireResponse populated with text answers based on codes in valueCoding
-        """
-        instrument_id = self.document['questionnaire']['reference'].split('/')[-1]
-        questionnaire = Questionnaire.find_by_name(name=instrument_id)
+        """ Return a modified copy of self.document including answer text
 
-        # return original document if no reference Questionnaire available
+        QuestionnaireResponse populated with text answers based on codes
+        in valueCoding.  This always returns a *copy* of the document so
+        any local or subsequent mutations aren't persisted or found in db
+        session cached objects.
+
+        """
+        instrument_id = self.document['questionnaire']['reference'].split(
+            '/')[-1]
+        questionnaire = Questionnaire.find_by_name(name=instrument_id)
+        document = copy.deepcopy(self.document)
+
+        # return copy of original document if no reference Questionnaire
+        # available
         if not questionnaire:
-            return self.document
+            return document
 
         questionnaire_map = questionnaire.questionnaire_code_map()
 
-        document = self.document
         for question in document.get('group', {}).get('question', ()):
 
             combined_answers = consolidate_answer_pairs(question['answer'])
@@ -425,6 +433,20 @@ class QNR_results(object):
         """
         associated = [qnr for qnr in self.qnrs if qnr.qb_id is not None]
         return len(self.qnrs) != len(associated)
+
+    def authored_during_period(self, start, end, restrict_to_instruments=None):
+        """Return the ordered list of QNRs with authored in [start, end)"""
+        results = []
+        for qnr in self.qnrs:
+            if qnr.authored < start:
+                continue
+            if qnr.authored >= end:
+                return results
+            if (restrict_to_instruments and
+                    qnr.instrument not in restrict_to_instruments):
+                continue
+            results.append(qnr)
+        return results
 
     def earliest_result(self, qb_id, iteration):
         """Returns timestamp of earliest result for given params, or None"""

@@ -159,7 +159,7 @@ export default (function() {
                 consentDate: "",
                 completionDate: "",
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
-                errorMessage: ""
+                errorMessage: null
             },
             patientEmailForm: {
                 loading: false
@@ -201,6 +201,16 @@ export default (function() {
                     return {
                         css: {"background-color": (index % 2 !== 0 ? "#F9F9F9" : "#FFF")}
                     };
+                }
+            }
+        },
+        computed: {
+            propManualEntryErrorMessage: {
+                set: function(newValue) {
+                    this.manualEntry.message = newValue;
+                },
+                get: function() {
+                    return this.manualEntry.message;
                 }
             }
         },
@@ -1742,9 +1752,16 @@ export default (function() {
             },
             manualEntryModalVis: function(hide) {
                 if (hide) {
+                    /*
+                     * TODO, need to find out why IE is raising vue error here
+                     */
                     this.manualEntry.loading = true;
+                    $("#manualEntryLoader").show();
+                    $("#manualEntryButtonsContainer").hide();
                 } else {
                     this.manualEntry.loading = false;
+                    $("#manualEntryLoader").hide();
+                    $("#manualEntryButtonsContainer").show();
                 }
             },
             continueToAssessment: function(method, completionDate, assessment_url) {
@@ -1774,7 +1791,7 @@ export default (function() {
                 setTimeout(function(callback) {
                     callback = callback || function() {};
                     if (callback) { callback(); }
-                }, 1000, self.manualEntryModalVis);
+                }, 5000, self.manualEntryModalVis);
             },
             setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
@@ -1792,10 +1809,17 @@ export default (function() {
                 }
             },
             resetManualEntryFormValidationError: function() {
-                this.manualEntry.errorMessage = "";
+                //reset error message to null
+                this.manualEntry.errorMessage = null;
                 //reset bootstrap form validation error
                 $("#manualEntryCompletionDateContainer").removeClass("has-error");
                 $("#manualEntryMessageContainer").html("").removeClass("with-errors");
+            },
+            setManualEntryErrorMessage: function(message) {
+                if (!message) {
+                    return;
+                }
+                $("#manualEntryMessageContainer").html(message);
             },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
@@ -1807,10 +1831,10 @@ export default (function() {
                 });
                 $("#manualEntryModal").on("show.bs.modal", function() {
                     self.manualEntry.initloading = true;
+                    self.resetManualEntryFormValidationError();
                 });
                 $("#manualEntryModal").on("shown.bs.modal", function() {
                     self.manualEntry.method = "";
-                    self.resetManualEntryFormValidationError();
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -1848,7 +1872,7 @@ export default (function() {
                 });
 
                 $("input[name='entryMethod']").on("click", function() {
-                    self.manualEntry.errorMessage = "";
+                    self.resetManualEntryFormValidationError();
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
                         //if method is interview assisted, reset completion date to GMT date/time for today
@@ -1878,9 +1902,9 @@ export default (function() {
 
                         //add true boolean flag to check for future date entry
                         var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
-                        if (errorMessage !== "") {
+                        if (errorMessage) {
                             self.manualEntry.errorMessage = errorMessage;
-                            $("#manualEntryMessageContainer").html(errorMessage);
+                            self.setManualEntryErrorMessage(errorMessage);
                             $("#meSubmit").attr("disabled", true);
                             return false;
                         }
@@ -1925,19 +1949,24 @@ export default (function() {
                     }
                     self.manualEntryModalVis(true);
                     self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
+                        var errorMessage = "";
                         if (data.error) {
-                            self.manualEntry.errorMessage = i18next.t("Server error occurred checking questionnaire window");
-                            self.manualEntryModalVis();
-                            return false;
+                            errorMessage = i18next.t("Server error occurred checking questionnaire window");
                         }
                         //check questionnaire time windows
-                        if (!(data.questionnaire_bank && Object.keys(data.questionnaire_bank).length > 0)) {
-                            self.manualEntry.errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
-                            self.manualEntryModalVis();
-                        } else {
-                            self.manualEntry.errorMessage = "";
-                            self.continueToAssessment(method, completionDate, linkUrl);
+                        if (!data.questionnaire_bank || !Object.keys(data.questionnaire_bank).length) {
+                            errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
                         }
+                        if (errorMessage) {
+                            self.setManualEntryErrorMessage(errorMessage);
+                            self.manualEntryModalVis();
+                            //use computed property to assign value to error message here, 
+                            //IE is throwing error if it is not done this way, not exactly sure why still
+                            self.propManualEntryErrorMessage = errorMessage;
+                            return false;
+                        }
+                        self.resetManualEntryFormValidationError();
+                        self.continueToAssessment(method, completionDate, linkUrl);
                     });
                 });
 
