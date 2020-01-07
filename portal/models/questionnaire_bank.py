@@ -455,7 +455,7 @@ def qbs_by_intervention(user, classification):
     results = []
 
     # Some systems have zero intervention qbs - bail early if that's the case
-    # Dogpile caching requires sync with session
+    # potential query caching requires db.session merge
     iqbs = [db.session.merge(i, load=False)
             for i in intervention_qbs(classification)]
     if not iqbs:
