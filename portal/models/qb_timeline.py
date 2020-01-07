@@ -10,9 +10,9 @@ from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
-from ..dogpile_cache import dogpile_cache
 from ..set_tools import left_center_right
 from ..timeout_lock import TimeoutLock
 from ..trace import trace
@@ -741,6 +741,16 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
 
 class QB_StatusCacheKey(object):
+    """Maintains the recent enough ``as_of_date`` parameter
+
+    In order to leverage a cached value from ``qb_status_visit_name``,
+    the ``as_of_date`` parameter can't be constantly rolling forward
+    with the progress of ``now()``.
+
+    This class maintains a recent enough value for as_of_date, with
+    methods to reset and inform user how stale it is.
+
+    """
     redis = None
     region_name = 'assessment_cache_region'
     key = "{}_as_of_date".format(__name__)
@@ -777,7 +787,7 @@ class QB_StatusCacheKey(object):
         return delta.hours * 60 + delta.minutes
 
     def current(self):
-        """Returns current as_of_date value
+        """Returns current as_of_date value, as in recent enough for caching
 
         If a valid datetime value is found to be within the max configured
         duration, return it.  Otherwise, store utcnow (for subsequent use)
@@ -816,15 +826,18 @@ class QB_StatusCacheKey(object):
         return stringform
 
 
-@dogpile_cache.region('assessment_cache_region')
+@cache.memoize(timeout=60*60*2)
 def qb_status_visit_name(user_id, as_of_date):
     """Return (status, visit name) for current QB for user as of given date
 
-    If no data is available for the user, returns (expired, None)
+    NB to take advantage of caching, clients should use
+    ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
+    a new lookup with each passing moment.
 
+    If no data is available for the user, returns (expired, None)
     """
 
-    # should be cached, unless recently invalidated
+    # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id)
 
     # We order by at (to get the latest status for a given QB) and

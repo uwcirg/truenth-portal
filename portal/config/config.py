@@ -97,7 +97,8 @@ class BaseConfig(object):
         'CELERYD_MAX_TASKS_PER_CHILD') else None
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
-    DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
+    CACHE_TYPE = 'redis'
+    CACHED_REDIS_URL = REDIS_URL
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
         ('reporting_cache_region', 60*60*12)]
