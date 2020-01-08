@@ -322,10 +322,10 @@ def configure_metadata(app):
 
 def configure_cache(app):
     """Configure caching libraries"""
-    #flask-cache
+    # flask-cache
     cache.init_app(app)
 
-    #requests-cache
+    # requests-cache
     REQUEST_CACHE_URL = app.config.get("REQUEST_CACHE_URL")
 
     requests_cache.install_cache(
