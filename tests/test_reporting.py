@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 
-from portal.dogpile_cache import dogpile_cache
+from portal.cache import cache
 from portal.extensions import db
 from portal.models.encounter import EC
 from portal.models.organization import Organization
@@ -30,7 +30,7 @@ class TestReporting(TestCase):
         """Cache free access for testing"""
         from portal.models.reporting import overdue_stats_by_org
         if invalidate:
-            dogpile_cache.invalidate(overdue_stats_by_org)
+            cache.delete("overdue_stats_by_org")
         return overdue_stats_by_org()
 
     def test_overdue_stats(self):
