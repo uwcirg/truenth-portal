@@ -661,11 +661,9 @@ def consolidate_answer_pairs(answers):
 
     answer_types = [list(a.keys())[0] for a in answers]
 
-    # Exit early if assumptions not met
-    if (
-        len(answers) % 2 or
-        answer_types.count('valueCoding') != answer_types.count('valueString')
-    ):
+    # Exit early if assumptions not met, i.e. ordered pairs of
+    # 'valueString' followed by 'valueCoding' keys
+    if answer_types != ['valueString', 'valueCoding'] * int(len(answers)/2):
         return answers
 
     filtered_answers = []
