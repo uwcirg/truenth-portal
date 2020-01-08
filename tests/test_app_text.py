@@ -38,7 +38,7 @@ class Url(object):
     def __hash__(self): return hash(self.parts)
 
 
-def test_expansion(app):
+def test_expansion(app, initialized_db):
     with SessionScope(db):
         title = AppText(name='landing title')
         title.custom_text = '_expanded_'
@@ -48,7 +48,7 @@ def test_expansion(app):
         '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
     assert '_expanded_' in result
 
-def test_missing_arg():
+def test_missing_arg(initialized_db):
     with SessionScope(db):
         title = AppText(name='landing title')
         title.custom_text = '_expanded_ {0}'
@@ -75,7 +75,7 @@ def test_permanent_url(app):
         generic_url=sample, version=args['version'])
     assert Url(result) == Url(expected)
 
-def test_config_value_in_custom_text(app):
+def test_config_value_in_custom_text(app, initialized_db):
     app.config['CT_TEST'] = 'found!'
     with SessionScope(db):
         embed_config_value = AppText(
@@ -96,7 +96,7 @@ def test_fetch_elements_invalid_url():
     assert result.url == sample_url
     assert result.asset == sample_error
 
-def test_asset_variable_replacement():
+def test_asset_variable_replacement(initialized_db):
     test_user = User.query.get(TEST_USER_ID)
 
     test_url = "https://notarealwebsitebeepboop.com"

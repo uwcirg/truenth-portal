@@ -65,12 +65,9 @@ def app_logger(app):
 @pytest.fixture(scope='session')
 def initialized_db(app, request):
     """Create database schema"""
+    db.drop_all()
     db.create_all()
 
-    def teardown():
-        db.drop_all()
-
-    request.addfinalizer(teardown)
 
 @pytest.fixture(scope='session')
 def celery_worker_parameters():
