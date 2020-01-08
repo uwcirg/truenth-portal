@@ -10,7 +10,7 @@ from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
 from ..audit import auditable_event
-from ..cache import cache
+from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..set_tools import left_center_right
@@ -826,7 +826,7 @@ class QB_StatusCacheKey(object):
         return stringform
 
 
-@cache.memoize(timeout=60*60*2)
+@cache.memoize(timeout=TWO_HOURS)
 def qb_status_visit_name(user_id, as_of_date):
     """Return (status, visit name) for current QB for user as of given date
 
