@@ -105,7 +105,7 @@ class BaseConfig(object):
 
     LOG_CACHE_MISS = False
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
-    LOG_LEVEL = 'DEBUG'
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG').upper()
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
     DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout
