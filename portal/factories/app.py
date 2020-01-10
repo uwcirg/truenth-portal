@@ -233,6 +233,11 @@ def configure_blueprints(app, blueprints):
 
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
+    # Avoid duplicate logging.  Multiple handlers implies logging
+    # has already been configured
+    if len(app.logger.handlers) > 1:
+        return
+
     if app.config.get('LOG_SQL'):
         import portal.sql_logging
 
