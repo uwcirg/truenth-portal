@@ -2,9 +2,11 @@
 
 from flask import url_for
 from flask_babel import gettext as _
+from flask_sqlalchemy_caching import FromCache
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from ..cache import cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
@@ -516,7 +518,8 @@ def qbs_by_rp(rp_id, classification):
 
     """
     results = QuestionnaireBank.query.filter(
-        QuestionnaireBank.research_protocol_id == rp_id)
+        QuestionnaireBank.research_protocol_id == rp_id).options(
+        FromCache(cache))
     if classification:
         results = results.filter(
             QuestionnaireBank.classification == classification)
