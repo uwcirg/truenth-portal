@@ -20,6 +20,7 @@ from flask_babel import gettext
 import requests
 from requests.exceptions import ConnectionError, InvalidURL, MissingSchema
 
+from ..cache import FIVE_MINS, cache
 from ..database import db
 
 
@@ -672,8 +673,9 @@ class UndefinedAppText(Exception):
     pass
 
 
+@cache.memoize(timeout=FIVE_MINS)
 def app_text(name, *args):
-    """Look up and return cusomized application text string
+    """Look up and return customized application text string
 
     May be embedded directly in jinja2 templates.  Call `app_text()`
     with the 'name' to uniquely identify the custom string to lookup
