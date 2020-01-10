@@ -140,7 +140,11 @@ def add_user(app, initialized_db):
         # Avoid testing cached/stale data
         invalidate_users_QBT(test_user.id)
         return test_user
-    return add_user
+    yield add_user
+    db.session.remove()
+    db.engine.dispose()
+    db.drop_all()
+    db.create_all()
 
 
 @pytest.fixture
