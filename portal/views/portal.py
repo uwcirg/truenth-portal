@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pprint import pformat
-from time import strftime
+from time import strftime, time
 from urllib.parse import urlencode
 
 from celery.exceptions import TimeoutError
@@ -98,6 +98,7 @@ def no_script():
 
 @portal.before_app_request
 def assert_locale_selector():
+    g.start_request_time = time()
     # Confirm import & use of custom babel localeselector function.
     # Necessary to import get_locale to bring into the request scope to
     # prevent the default babel locale selector from being used.
@@ -136,6 +137,15 @@ def report_slow_queries(response):
         SQLALCHEMY_RECORD_QUERIES = True
 
     """
+    if current_app.config.get("LOG_SLOW_RESPONSES"):
+        duration = time() - g.start_request_time
+        if duration > 5.0:
+            current_app.logger.warning("{} took {}".format(
+                request.url, duration))
+        elif duration > 0.5:
+            current_app.logger.debug("{} took {}".format(
+                request.url, duration))
+
     threshold = current_app.config.get('DATABASE_QUERY_TIMEOUT')
     if threshold:
         for query in get_debug_queries():
