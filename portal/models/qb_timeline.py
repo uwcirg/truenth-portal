@@ -836,8 +836,8 @@ def qb_status_visit_name(user_id, as_of_date):
 
     If no data is available for the user, returns (expired, None)
     """
+
     assert isinstance(as_of_date, datetime)
-    current_app.logger.warning("cache miss {} {}".format(user_id, as_of_date))
     # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id)
 
