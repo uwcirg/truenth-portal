@@ -98,7 +98,7 @@ class BaseConfig(object):
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
     CACHE_TYPE = 'redis'
-    CACHED_REDIS_URL = REDIS_URL
+    CACHE_REDIS_URL = REDIS_URL
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
         ('reporting_cache_region', 60*60*12)]
