@@ -17,6 +17,7 @@ from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
 
+from portal.cache import cache
 from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
@@ -539,6 +540,9 @@ class TestCase(Base):
             if attr.startswith('_lazy'):
                 delattr(INTERVENTION, attr)
         OrgTree.invalidate_cache()
+
+        # Removed potentially cached data from other tests
+        cache.clear()
 
     def results_from_async_call(
             self, url, timeout=5, include_task_path=False, query_string=None):
