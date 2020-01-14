@@ -783,8 +783,7 @@ class QB_StatusCacheKey(object):
 
         """
         now = datetime.utcnow()
-        dt = FHIR_datetime.parse(self.current())
-        delta = relativedelta(now, dt)
+        delta = relativedelta(now, self.current())
         return delta.hours * 60 + delta.minutes
 
     def current(self):
@@ -794,31 +793,25 @@ class QB_StatusCacheKey(object):
         duration, return it.  Otherwise, store utcnow (for subsequent use)
         and return that.
 
-        :returns: ISO 8601 format string of valid (UTC) datetime, either
-          the current cached value or a new, if the old has expired or was
-          not found.
+        :returns: a valid (UTC) datetime, either the current cached value or
+          a new, if the old has expired or was not found.
 
         """
         now = datetime.utcnow()
-        stringform = self.redis.get(self.key)
-        if stringform:
+        value = self.redis.get(self.key)
+        if value:
             try:
-                dt = FHIR_datetime.parse(stringform)
-                if dt + self.valid_duration > now:
-                    return stringform
+                value = FHIR_datetime.parse(value)
+                if value + self.valid_duration > now:
+                    return value
             except BadRequest:
-                if stringform is not None:
+                if value is not None:
                     current_app.logger.warning(
-                        "Can't parse as datetime {}".format(stringform))
+                        "Can't parse as datetime {}".format(value))
         return self.update(now)
 
     def update(self, value):
-        """Updates the cache key to given value
-
-        :param: valid datetime object
-        :returns: ISO 8601 format string of given value
-
-        """
+        """Updates the cache key to given value"""
         if not isinstance(value, datetime):
             raise ValueError('expected datetime for key value')
         now = datetime.utcnow()
@@ -830,27 +823,21 @@ class QB_StatusCacheKey(object):
 
         stringform = FHIR_datetime.as_fhir(value)
         self.redis.set(self.key, stringform)
-        return stringform
+        return value
 
 
 @cache.memoize(timeout=TWO_HOURS)
 def qb_status_visit_name(user_id, as_of_date):
     """Return (status, visit name) for current QB for user as of given date
 
-    :param user_id: Patient to look up
-    :param as_of_date: Either a datetime instance or ISO 8601 representation
-      of a datetime.  Caching requires string form.
-
     NB to take advantage of caching, clients should use
     ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
-    a new lookup with each passing moment.  Be sure to pass serialized
-    form, as datetime objects don't create reliable cache keys.
+    a new lookup with each passing moment.
 
     If no data is available for the user, returns (expired, None)
     """
-    if not isinstance(as_of_date, datetime):
-        as_of_date = FHIR_datetime.parse(as_of_date)
-    current_app.logger.warning("cache miss {}".format(user_id))
+    assert isinstance(as_of_date, datetime)
+    current_app.logger.warning("cache miss {} {}".format(user_id, as_of_date))
     # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id)
 
