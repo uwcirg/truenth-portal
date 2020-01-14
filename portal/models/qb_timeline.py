@@ -823,7 +823,7 @@ class QB_StatusCacheKey(object):
 
         stringform = FHIR_datetime.as_fhir(value)
         self.redis.set(self.key, stringform)
-        return stringform
+        return value
 
 
 @cache.memoize(timeout=TWO_HOURS)
@@ -837,6 +837,7 @@ def qb_status_visit_name(user_id, as_of_date):
     If no data is available for the user, returns (expired, None)
     """
 
+    assert isinstance(as_of_date, datetime)
     # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id)
 

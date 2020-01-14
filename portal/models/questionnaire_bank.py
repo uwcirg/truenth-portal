@@ -2,9 +2,11 @@
 
 from flask import url_for
 from flask_babel import gettext as _
+from flask_sqlalchemy_caching import FromCache
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from ..cache import TWO_HOURS, cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
@@ -481,6 +483,7 @@ def qbs_by_intervention(user, classification):
     return results
 
 
+@cache.memoize(timeout=TWO_HOURS)
 def intervention_qbs(classification):
     """return all QBs associated with interventions
 
@@ -503,6 +506,7 @@ def intervention_qbs(classification):
     return query.all()
 
 
+@cache.memoize(timeout=TWO_HOURS)
 def qbs_by_rp(rp_id, classification):
     """return QBs associated with a given research protocol
 
@@ -516,7 +520,8 @@ def qbs_by_rp(rp_id, classification):
 
     """
     results = QuestionnaireBank.query.filter(
-        QuestionnaireBank.research_protocol_id == rp_id)
+        QuestionnaireBank.research_protocol_id == rp_id).options(
+        FromCache(cache))
     if classification:
         results = results.filter(
             QuestionnaireBank.classification == classification)

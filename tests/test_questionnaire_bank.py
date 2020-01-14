@@ -536,8 +536,8 @@ class TestQuestionnaireBank(TestCase):
         with SessionScope(db):
             db.session.add(intv)
             db.session.commit()
-        intv, epic26, eproms_add = map(
-            db.session.merge, (intv, epic26, eproms_add))
+        self.test_user, intv, epic26, eproms_add = map(
+            db.session.merge, (self.test_user, intv, epic26, eproms_add))
 
         bank = QuestionnaireBank(
             name='CRV', intervention_id=intv.id,

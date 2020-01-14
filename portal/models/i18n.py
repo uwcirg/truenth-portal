@@ -1,12 +1,12 @@
 """Module for i18n methods and functionality"""
 
-
 from collections import defaultdict
-import re
 
 from babel import negotiate_locale
 from flask import current_app, has_request_context, request, session
+from flask_sqlalchemy_caching import FromCache
 
+from ..cache import cache
 from ..extensions import babel
 from ..system_uri import IETF_LANGUAGE_TAG
 from .app_text import AppText
@@ -89,7 +89,8 @@ def get_locale():
                 l.replace('-', '_') for l in request.accept_languages.values()
             ),
             available=(
-                c.code for c in Coding.query.filter_by(system=IETF_LANGUAGE_TAG)
+                c.code for c in Coding.query.filter_by(
+                    system=IETF_LANGUAGE_TAG).options(FromCache(cache))
             ),
         )
         if browser_pref:
