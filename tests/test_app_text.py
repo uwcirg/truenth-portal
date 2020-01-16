@@ -48,6 +48,11 @@ def test_expansion(app, initialized_db):
         '<html></head><body>{{ app_text("landing title") }}<body/><html/>')
     assert '_expanded_' in result
 
+    db.session.remove()
+    db.engine.dispose()
+    db.drop_all()
+    db.create_all()
+
 def test_missing_arg(initialized_db):
     with SessionScope(db):
         title = AppText(name='landing title')
