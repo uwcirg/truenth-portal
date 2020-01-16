@@ -2507,7 +2507,7 @@
       "language": "en_AU",
       "name": "Royal Brisbane & Women's Hospital",
       "partOf": {
-        "reference": "api/organization/21700"
+        "reference": "api/organization/21300"
       },
       "resourceType": "Organization"
     },
