@@ -84,7 +84,7 @@
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
-                      <td>{{ patient.birthdate.strftime('%d-%h-%Y') if patient.birthdate }}</td>
+                      <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="btn btn-tnth-primary staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
