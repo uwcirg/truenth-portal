@@ -1,6 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
 import pytest
+from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
