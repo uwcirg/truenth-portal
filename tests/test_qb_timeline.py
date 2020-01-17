@@ -383,9 +383,13 @@ class TestQbTimeline(TestQuestionnaireBank):
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=14))
+        ahead36, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=-36))
         org = self.setup_org_qbs(rp_name='v2', retired_as_of=back14)
         org_id = org.id
-        self.setup_org_qbs(org=org, rp_name='v3')
+        self.setup_org_qbs(org=org, rp_name='v3', retired_as_of=ahead36)
+        org = db.session.merge(org)
+        self.setup_org_qbs(org=org, rp_name='v5')  # shouldn't hit v5
         self.consent_with_org(org_id=org_id, setdate=back7)
         user = db.session.merge(self.test_user)
         gen = ordered_qbs(user)
@@ -399,6 +403,36 @@ class TestQbTimeline(TestQuestionnaireBank):
             qbd = next(gen)
             assert visit_name(qbd) == 'Month {}'.format(n)
             assert qbd.questionnaire_bank.research_protocol.name == 'v3'
+
+        with pytest.raises(StopIteration):
+            next(gen)
+
+    def test_change_before_start_multiple_rps(self):
+        now = datetime.utcnow()
+        back1, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=1))
+        back7, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=7))
+        back14, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=14))
+        org = self.setup_org_qbs(rp_name='v2', retired_as_of=back14)
+        org_id = org.id
+        self.setup_org_qbs(org=org, rp_name='v3', retired_as_of=back7)
+        org = db.session.merge(org)
+        self.setup_org_qbs(org=org, rp_name='v5')
+        self.consent_with_org(org_id=org_id, setdate=back1)
+        user = db.session.merge(self.test_user)
+        gen = ordered_qbs(user)
+
+        # expect everything in v5
+        expect_baseline = next(gen)
+        assert visit_name(expect_baseline) == 'Baseline'
+        assert (
+            expect_baseline.questionnaire_bank.research_protocol.name == 'v5')
+        for n in (3, 6, 9, 15, 18, 21, 30):
+            qbd = next(gen)
+            assert visit_name(qbd) == 'Month {}'.format(n)
+            assert qbd.questionnaire_bank.research_protocol.name == 'v5'
 
         with pytest.raises(StopIteration):
             next(gen)
