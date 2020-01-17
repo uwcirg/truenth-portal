@@ -2469,23 +2469,6 @@
     {
       "extension": [
         {
-          "research_protocols": [
-			{"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
-        }
-      ],
-      "id": 21700,
-      "language": "en_AU",
-      "name": "Queensland University of Technology",
-      "partOf": {
-        "reference": "api/organization/21000"
-      },
-      "resourceType": "Organization"
-    },
-    {
-      "extension": [
-        {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         },
