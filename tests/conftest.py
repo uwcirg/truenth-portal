@@ -45,7 +45,7 @@ def app(request):
     NB - use of pytest-flask ``client`` fixture is more common
 
     """
-    app_ = create_app()
+    app_ = create_app(TestConfig)
     ctx = app_.app_context()
     ctx.push()
 
