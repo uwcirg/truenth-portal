@@ -69,6 +69,17 @@ def initialized_db(app, request):
     db.create_all()
 
 
+@pytest.fixture(autouse=True)
+def teardown_db(app, request):
+    def teardown():
+        db.session.remove()
+        db.engine.dispose()
+        db.drop_all()
+        db.create_all()
+
+    request.addfinalizer(teardown)
+
+
 @pytest.fixture(scope='session')
 def celery_worker_parameters():
     # type: () -> Mapping[str, Any]
@@ -141,10 +152,6 @@ def add_user(app, initialized_db):
         invalidate_users_QBT(test_user.id)
         return test_user
     yield add_user
-    db.session.remove()
-    db.engine.dispose()
-    db.drop_all()
-    db.create_all()
 
 
 @pytest.fixture

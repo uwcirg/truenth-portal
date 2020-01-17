@@ -9,7 +9,7 @@ from portal.models.role import ROLE
 from tests import TestCase
 
 
-def test_create_access_url(app, client, add_user, promote_user, login):
+def test_create_access_url(app, client, add_user, promote_user, login, teardown_db):
 
     music_org = Organization(
         name="Michigan Urological Surgery Improvement Collaborative"
@@ -38,7 +38,7 @@ def test_create_access_url(app, client, add_user, promote_user, login):
     assert not has_expired
     assert id == onetime.id
 
-def test_use_access_url(client, add_user, promote_user, assert_redirects):
+def test_use_access_url(client, add_user, promote_user, assert_redirects, teardown_db):
     """The current flow forces access to the challenge page"""
     onetime = add_user(
         'one@time.com', first_name='first', last_name='last')
