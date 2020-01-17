@@ -287,7 +287,7 @@ class User(db.Model, UserMixin):
                              backref=db.backref('users', lazy='dynamic'))
     interventions = db.relationship(
         'Intervention',
-        lazy='dynamic',
+        lazy='joined',
         secondary="user_interventions",
         backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',

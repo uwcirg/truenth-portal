@@ -13,6 +13,7 @@ from flask_user import roles_required
 from sqlalchemy import and_, exc
 
 from ..audit import auditable_event
+from ..cache import FIVE_MINS, cache, request_args_in_key
 from ..database import db
 from ..extensions import oauth
 from ..models.coding import Coding
@@ -30,6 +31,7 @@ org_api = Blueprint('org_api', __name__, url_prefix='/api')
 @org_api.route('/organization')
 @crossdomain()
 @oauth.require_oauth()
+@cache.cached(timeout=FIVE_MINS, key_prefix=request_args_in_key)
 def organization_search():
     """Obtain a bundle (list) of all matching organizations
 

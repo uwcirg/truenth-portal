@@ -26,7 +26,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
-from ..models.qb_timeline import invalidate_users_QBT
+from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
     NoFutureDates,
@@ -1884,11 +1884,12 @@ def batch_assessment_status():
     for uid in user_ids:
         check_int(uid)
     users = User.query.filter(User.id.in_(user_ids))
+    as_of_key = QB_StatusCacheKey().current()
     for user in users:
         if not acting_user.check_role('view', user.id):
             continue
         details = []
-        status, _ = qb_status_visit_name(user.id, datetime.utcnow())
+        status, _ = qb_status_visit_name(user.id, as_of_key)
         for consent in user.all_consents:
             details.append(
                 {'consent': consent.as_json(),
