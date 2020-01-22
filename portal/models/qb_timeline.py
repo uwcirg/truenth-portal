@@ -440,6 +440,11 @@ class RP_flyweight(object):
         # reset in case of another advancement
         self.skipped_nxt_start = None
 
+        # confirm the now current isn't already retired. rare situation that
+        # happens when an org has retired multiple RPs before a user's trigger
+        if self.consider_transition():
+            self.transition()
+
 
 def ordered_qbs(user, classification=None):
     """Generator to yield ordered qbs for a user
