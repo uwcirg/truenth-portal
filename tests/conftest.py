@@ -1,6 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
 import pytest
+from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
 from portal.factories.celery import create_celery
@@ -22,7 +23,7 @@ def app(request):
     NB - use of pytest-flask ``client`` fixture is more common
 
     """
-    app_ = create_app()
+    app_ = create_app(TestConfig)
     ctx = app_.app_context()
     ctx.push()
 
