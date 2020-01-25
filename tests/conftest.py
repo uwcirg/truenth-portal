@@ -174,12 +174,14 @@ def add_service_user(initialize_static, test_user):
 
 @pytest.fixture
 def login(app, client):
-    def login(user_id=1):
+    def login(
+            user_id=1, 
+            oauth_info= {'user_id': user_id}, 
+            follow_redirects=True
+    ):
         follow_redirects = True
 
         app.config.from_object(TestConfig)
-
-        oauth_info = {'user_id': user_id}
 
         return client.get(
                 'test/oauth',
