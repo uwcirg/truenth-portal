@@ -57,9 +57,8 @@
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
+                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input">{{ _("Date of Birth") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Email") }}</th>
-                  <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field" data-filter-control="input">{{ _("Cell") }}</th>
-                  <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field" data-filter-control="input">{{ _("Phone (Other)") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center" data-filter-control="input">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                   <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
@@ -85,9 +84,8 @@
                       <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
+                      <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
                       <td>{{ patient.email if patient.email }}</td>
-                      <td>{{ patient.phone if patient.phone}}</td>
-                      <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="btn btn-tnth-primary staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
                             {% if not patient.deleted and patient.documents %}
