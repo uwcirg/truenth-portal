@@ -56,7 +56,7 @@ def test_local_login_valid_username_and_password(add_user):
     assert response.status_code is 200
     assert user.password_verification_failures == 0
 
-def test_local_login_failure_increments_lockout():
+def test_local_login_failure_increments_lockout(add_user):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -74,7 +74,7 @@ def test_local_login_failure_increments_lockout():
     db.session.refresh(user)
     assert user.password_verification_failures == 1
 
-def test_local_login_valid_username_and_password_resets_lockout():
+def test_local_login_valid_username_and_password_resets_lockout(add_user):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -96,7 +96,7 @@ def test_local_login_valid_username_and_password_resets_lockout():
     db.session.refresh(user)
     assert user.password_verification_failures == 0
 
-def test_local_login_lockout_after_unsuccessful_attempts():
+def test_local_login_lockout_after_unsuccessful_attempts(add_user):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -122,7 +122,7 @@ def test_local_login_lockout_after_unsuccessful_attempts():
     db.session.refresh(user)
     assert user.is_locked_out
 
-def test_local_login_verify_lockout_resets_after_lockout_period():
+def test_local_login_verify_lockout_resets_after_lockout_period(add_user):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -147,7 +147,7 @@ def test_local_login_verify_lockout_resets_after_lockout_period():
     # Verify we are no longer locked out
     assert not user.is_locked_out
 
-def test_local_login_verify_cant_login_when_locked_out():
+def test_local_login_verify_cant_login_when_locked_out(add_user):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -452,7 +452,7 @@ def test_oauth_when_required_value_undefined(login):
     # Verify 500
     assert response.status_code == 500
 
-def test_oauth_with_invalid_token(login):
+def test_oauth_with_invalid_token(login, assertRedirects):
     # Set an invalid token
     oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
     oauth_info.pop('token', None)
@@ -464,7 +464,7 @@ def test_oauth_with_invalid_token(login):
     assertRedirects(response, oauth_info['next'])
 
 
-def add_user_from_oauth_info(oauth_info):
+def add_user_from_oauth_info(oauth_info, add_user):
     user_to_add = namedtuple('Mock', oauth_info.keys())(*oauth_info.values())
     user = add_user(user_to_add)
     db.session.commit()
