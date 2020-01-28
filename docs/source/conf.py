@@ -318,5 +318,5 @@ texinfo_documents = [(
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'werkzeug': ('http://werkzeug.pocoo.org/docs/latest', None),
+    'werkzeug': ('https://werkzeug.palletsprojects.com/', None),
 }
