@@ -4,6 +4,7 @@ from flask_webtest import SessionScope
 import pytest
 from urllib.parse import urlparse, urljoin
 
+from portal.cache import cache
 from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
@@ -74,6 +75,7 @@ def initialized_db(app, request):
 @pytest.fixture(autouse=True)
 def teardown_db(app, request):
     def teardown():
+        cache.clear()
         db.session.remove()
         db.engine.dispose()
         db.drop_all()
