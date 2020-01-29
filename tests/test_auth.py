@@ -38,7 +38,7 @@ def test_local_user_add(client):
     new_user = User.query.filter_by(username=data['email']).first()
     assert new_user.active is True
 
-def test_local_login_valid_username_and_password(add_user):
+def test_local_login_valid_username_and_password(add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -56,7 +56,7 @@ def test_local_login_valid_username_and_password(add_user):
     assert response.status_code is 200
     assert user.password_verification_failures == 0
 
-def test_local_login_failure_increments_lockout(add_user):
+def test_local_login_failure_increments_lockout(add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -74,7 +74,7 @@ def test_local_login_failure_increments_lockout(add_user):
     db.session.refresh(user)
     assert user.password_verification_failures == 1
 
-def test_local_login_valid_username_and_password_resets_lockout(add_user):
+def test_local_login_valid_username_and_password_resets_lockout(add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -96,7 +96,7 @@ def test_local_login_valid_username_and_password_resets_lockout(add_user):
     db.session.refresh(user)
     assert user.password_verification_failures == 0
 
-def test_local_login_lockout_after_unsuccessful_attempts(add_user):
+def test_local_login_lockout_after_unsuccessful_attempts(add_user, local_login):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -147,7 +147,7 @@ def test_local_login_verify_lockout_resets_after_lockout_period(add_user):
     # Verify we are no longer locked out
     assert not user.is_locked_out
 
-def test_local_login_verify_cant_login_when_locked_out(add_user):
+def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -205,7 +205,7 @@ def test_client_bad_add(promote_user, login, client):
         as_text=True)
     assert "Invalid URL" in response
 
-def test_client_edit(login):
+def test_client_edit(client, login, add_client):
     """Test editing a client application"""
     client = add_client()
     test_url = 'http://tryme.com'
@@ -235,7 +235,7 @@ def test_client_edit(login):
     client = Client.query.get('test_client')
     assert client.callback_url != invalid_url
 
-def test_callback_validation(login):
+def test_callback_validation(client, login, add_client):
     """Confirm only valid urls can be set"""
     client = add_client()
     login()
@@ -249,7 +249,7 @@ def test_callback_validation(login):
     client = Client.query.get('test_client')
     assert client.callback_url is None
 
-def test_service_account_creation():
+def test_service_account_creation(add_client):
     """Confirm we can create a service account and token"""
     client = add_client()
     test_user = User.query.get(TEST_USER_ID)
@@ -279,7 +279,7 @@ def test_service_account_creation():
     assert (token.expires > datetime.datetime.utcnow()
             + datetime.timedelta(days=364))
 
-def test_service_account_promotion():
+def test_service_account_promotion(add_client):
     """Confirm we can not promote a service account """
     add_client()
     test_user = User.query.get(TEST_USER_ID)
@@ -296,7 +296,7 @@ def test_service_account_promotion():
 
     assert len(service_user.roles) == 1
 
-def test_token_status(initialized_db, teardown_db):
+def test_token_status(client, initialized_db, teardown_db):
     with SessionScope(db):
         client = Client(
             client_id='test-id', client_secret='test-secret',
@@ -318,12 +318,12 @@ def test_token_status(initialized_db, teardown_db):
     data = response.json
     assert pytest.approx(30, 5) == data['expires_in']
 
-def test_token_status_wo_header():
+def test_token_status_wo_header(client):
     """Call for token_status w/o token should return 401"""
     response = client.get("/oauth/token-status")
     assert 401 == response.status_code
 
-def test_origin_validation(app):
+def test_origin_validation(app, client, add_client):
     client = add_client()
     client_url = client._redirect_uris
     local_url = "http://{}/home?test".format(
@@ -480,3 +480,4 @@ def add_auth_provider(oauth_info, user):
     db.session.add(auth_provider)
     db.session.commit()
     return auth_provider
+
