@@ -7,15 +7,17 @@ from urllib.parse import urlparse, urljoin
 from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
+from portal.models.client import Client
 from portal.factories.celery import create_celery
 from portal.models.clinical_constants import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
-from portal.models.role import Role, add_static_roles
+from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.user import User, UserRoles
 
+TEST_USER_ID = 1
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -173,12 +175,14 @@ def add_service_user(initialize_static, test_user):
 
 
 @pytest.fixture
-def login(app, client):
+def login(initialize_static, app, client):
     def login(
-            user_id=1,
+            user_id=TEST_USER_ID,
             oauth_info=None,
             follow_redirects=True
     ):
+        initialize_static()
+
         follow_redirects = True
 
         app.config.from_object(TestConfig)
@@ -195,6 +199,36 @@ def login(app, client):
     return login
     db.session.remove()
     db.engine.dispose()
+
+
+@pytest.fixture
+def local_login(client, initialize_static):
+    def local_login(email, password, follow_redirects=True):
+        url = url_for('user.login')
+        return client.post(
+            url,
+            data={
+                'email': email,
+                'password': password,
+            },
+            follow_redirects=follow_redirects
+        )
+    return local_login
+
+
+@pytest.fixture
+def add_client(promote_user):
+    def add_client():
+        promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
+        client_id = 'test_client'
+        client = Client(
+                client_id=client_id, _redirect_uris='http://localhost',
+                client_secret='tc_secret', user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(client)
+            db.session.commit()
+        return db.session.merge(client)
+    return add_client
 
 
 @pytest.fixture
@@ -243,45 +277,3 @@ def assert_redirects(app):
                 message or not_redirect)
         assert(response.location == expected_location), message
     return assertRedirects
-
-# @pytest.fixture(scope="session")
-# def add_client(promote_user):
-#     client_id = 'test_client'
-#     client = Client(
-#         client_id=client_id, _redirect_uris='http://localhost',
-#         client_secret='tc_secret', user_id=TEST_USER_ID)
-#     with SessionScope(db):
-#         db.session.add(client)
-#         db.session.commit()
-#     return db.session.merge(client)
-# 
-# 
-# @pytest.fixture(scope="session")
-# def login():
-#     TEST_USER_ID = 1
-#     oauth_info = None
-#     follow_redirects = True
-# 
-#     if not oauth_info:
-#         oauth_info = {'user_id': TEST_USER_ID}
-# 
-#     return client.get(
-#             'test/oauth',
-#             query_string=oauth_info,
-#             follow_redirects=follow_redirects
-#     )
-# 
-# 
-# @pytest.fixture(scope="session")
-# def add_service_user():
-#     sponser = None
-# 
-#     if not sponsor:
-#         sponsor = self.test_user
-#     if sponsor not in db.session:
-#         sponsor = db.session.merge(sponsor)
-#     service_user = sponsor.add_service_account()
-#     with SessionScope(db):
-#         db.session.add(service_user)
-#         db.session.commit()
-#     return db.session.merge(service_user)
