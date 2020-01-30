@@ -170,8 +170,6 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
                 'last_name': 'last_name',
                 'email': 'email',
                 'image_url': 'picture.data.url',
-                'gender': 'gender',
-                'birthdate': 'birthday',
             }
         )
 
@@ -187,7 +185,7 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
             '/me',
             params={
                 'fields':
-                    'id,email,birthday,first_name,last_name,gender,picture'
+                    'id,email,first_name,last_name,picture'
             }
         )
 
