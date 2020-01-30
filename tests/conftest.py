@@ -1,5 +1,6 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
+from flask import url_for
 from flask_webtest import SessionScope
 import pytest
 from urllib.parse import urlparse, urljoin
@@ -12,7 +13,7 @@ from portal.models.client import Client
 from portal.factories.celery import create_celery
 from portal.models.clinical_constants import add_static_concepts
 from portal.models.intervention import add_static_interventions
-from portal.models.organization import add_static_organization
+from portal.models.organization import Organization, add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
@@ -177,6 +178,19 @@ def add_service_user(initialize_static, test_user):
 
 
 @pytest.fixture
+def add_music_org():
+    def add_music_org():
+        music_org = Organization(
+            name="Michigan Urological Surgery Improvement Collaborative"
+                 " (MUSIC)")
+        with SessionScope(db):
+            db.session.add(music_org)
+            db.session.commit()
+        music_org = db.session.merge(music_org)
+    return add_music_org
+
+
+@pytest.fixture
 def login(initialize_static, app, client):
     def login(
             user_id=TEST_USER_ID,
@@ -206,6 +220,7 @@ def login(initialize_static, app, client):
 @pytest.fixture
 def local_login(client, initialize_static):
     def local_login(email, password, follow_redirects=True):
+        initialize_static()
         url = url_for('user.login')
         return client.post(
             url,

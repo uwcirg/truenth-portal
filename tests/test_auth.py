@@ -38,7 +38,8 @@ def test_local_user_add(client):
     new_user = User.query.filter_by(username=data['email']).first()
     assert new_user.active is True
 
-def test_local_login_valid_username_and_password(add_user, local_login):
+def test_local_login_valid_username_and_password(add_user, add_music_org, local_login):
+    add_music_org()
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -74,7 +75,8 @@ def test_local_login_failure_increments_lockout(add_user, local_login):
     db.session.refresh(user)
     assert user.password_verification_failures == 1
 
-def test_local_login_valid_username_and_password_resets_lockout(add_user, local_login):
+def test_local_login_valid_username_and_password_resets_lockout(add_user, add_music_org, local_login):
+    add_music_org()
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
