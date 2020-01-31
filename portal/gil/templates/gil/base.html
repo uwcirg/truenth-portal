@@ -190,6 +190,7 @@
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
              <form action="{{url_for('user.login')}}" method="POST" class="form">
+              <input type="hidden" name="next" value="/next-after-login" />
               <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>

@@ -8,8 +8,8 @@ from flask_babel import force_locale
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..date_tools import FHIR_datetime
-from ..dogpile_cache import dogpile_cache
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -230,7 +230,7 @@ def overdue_dates(user, as_of):
     return visit, a_s.due_date, a_s.expired_date
 
 
-@dogpile_cache.region('reporting_cache_region')
+@cache.cached(timeout=60*60*12, key_prefix='overdue_stats_by_org')
 def overdue_stats_by_org():
     """Generate cacheable overdue statistics
 

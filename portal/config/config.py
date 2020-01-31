@@ -97,7 +97,8 @@ class BaseConfig(object):
         'CELERYD_MAX_TASKS_PER_CHILD') else None
 
     LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
-    DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
+    CACHE_TYPE = 'redis'
+    CACHE_REDIS_URL = REDIS_URL
     DOGPILE_CACHE_REGIONS = [
         ('assessment_cache_region', 60*60*2),
         ('reporting_cache_region', 60*60*12)]
@@ -105,7 +106,7 @@ class BaseConfig(object):
 
     LOG_CACHE_MISS = False
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
-    LOG_LEVEL = 'DEBUG'
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG').upper()
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
     DEFAULT_INACTIVITY_TIMEOUT = 30 * 60  # default inactivity timeout

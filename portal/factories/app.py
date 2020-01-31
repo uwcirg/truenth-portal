@@ -15,11 +15,11 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 
 # Hack - workaround to cyclic imports/missing SQLA models for docker
 from ..audit import configure_audit_log
+from ..cache import cache
 from ..config.config import SITE_CFG, DefaultConfig, TestConfig
 from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
-from ..dogpile_cache import dogpile_cache
 from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
 from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
@@ -117,7 +117,6 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_app(app, config)
     configure_profiler(app)
     configure_csrf(app)
-    configure_dogpile(app)
     configure_jinja(app)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
@@ -162,18 +161,6 @@ def configure_csrf(app):
 
     """
     csrf.init_app(app)
-
-
-def configure_dogpile(app):
-    """Initialize dogpile cache with config values"""
-
-    # Bootstrap challenges with config values dependent on other
-    # configuration values, which may be set in different
-    # order depending on environment.
-
-    # Regardless of configuration location, this should now be set.
-    app.config['DOGPILE_CACHE_URLS'] = app.config['REDIS_URL']
-    dogpile_cache.init_app(app)
 
 
 def configure_jinja(app):
@@ -246,6 +233,11 @@ def configure_blueprints(app, blueprints):
 
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
+    # Avoid duplicate logging.  Multiple handlers implies logging
+    # has already been configured
+    if len(app.logger.handlers) > 1:
+        return
+
     if app.config.get('LOG_SQL'):
         import portal.sql_logging
 
@@ -334,7 +326,11 @@ def configure_metadata(app):
 
 
 def configure_cache(app):
-    """Configure requests-cache"""
+    """Configure caching libraries"""
+    # flask-cache
+    cache.init_app(app)
+
+    # requests-cache
     REQUEST_CACHE_URL = app.config.get("REQUEST_CACHE_URL")
 
     requests_cache.install_cache(

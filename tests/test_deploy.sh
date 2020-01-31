@@ -37,7 +37,8 @@ env | grep -e SECRET_KEY -e SERVER_NAME > "$PORTAL_ENV_FILE"
 docker-build.sh
 
 # deploy docker with locally-built docker image (ie don't pull latest image)
-deploy-docker.sh -n
+# use force (-f) to bypass inactivity check
+deploy-docker.sh -n -f
 
 # sleep until after first healthcheck occurs
 sleep 6m
