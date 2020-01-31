@@ -123,16 +123,6 @@ class FlaskDanceProvider:
             user_info.email = get_value_from_json('email')
             user_info.image_url = get_value_from_json('image_url')
 
-            # These properties may not be defined
-            user_info.gender = get_value_from_json(
-                'gender',
-                required=False
-            )
-            user_info.birthdate = get_value_from_json(
-                'birthdate',
-                required=False
-            )
-
             return user_info
         except Exception as err:
             current_app.logger.error(
@@ -170,8 +160,6 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
                 'last_name': 'last_name',
                 'email': 'email',
                 'image_url': 'picture.data.url',
-                'gender': 'gender',
-                'birthdate': 'birthday',
             }
         )
 
@@ -187,7 +175,7 @@ class FacebookFlaskDanceProvider(FlaskDanceProvider):
             '/me',
             params={
                 'fields':
-                    'id,email,birthday,first_name,last_name,gender,picture'
+                    'id,email,first_name,last_name,picture'
             }
         )
 
@@ -209,8 +197,6 @@ class GoogleFlaskDanceProvider(FlaskDanceProvider):
                 'last_name': 'family_name',
                 'email': 'email',
                 'image_url': 'picture',
-                'gender': 'gender',
-                'birthdate': 'birthday',
             }
         )
 
@@ -245,8 +231,6 @@ class MockFlaskDanceProvider(FlaskDanceProvider):
                 'last_name': 'last_name',
                 'email': 'email',
                 'image_url': 'picture.data.url',
-                'gender': 'gender',
-                'birthdate': 'birthdate',
             }
         )
 
@@ -309,6 +293,4 @@ class FlaskProviderUserInfo(object):
         self.first_name = None
         self.last_name = None
         self.email = None
-        self.birthdate = None
-        self.gender = None
         self.image_url = None

@@ -1805,8 +1805,6 @@ def add_user(user_info):
     user = User(
         first_name=user_info.first_name,
         last_name=user_info.last_name,
-        birthdate=user_info.birthdate,
-        gender=user_info.gender,
         email=user_info.email,
         image_url=user_info.image_url
     )
