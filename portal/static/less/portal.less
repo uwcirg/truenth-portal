@@ -89,6 +89,7 @@
 @disabledOpacity: 0.6;
 @profileItemBgColor: #e8e8e8;
 @inputHeight: 2.5em;
+@inputFocusBgColor: #f3f4f5;
 
 
 /**
@@ -526,6 +527,10 @@ a.btn {
   border-radius: 0;
   width: 400px;
   max-width: 100%;
+  &:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
 }
 
 #regForm input[type="submit"],
@@ -2442,6 +2447,20 @@ div.pull-right {
   width: 300px;
   max-width: 100%;
   padding: 1em 0;
+}
+#resetPasswordForm {
+  min-height: 40vh;
+  label {
+    color: darken(@labelColor, 10%);
+    font-weight: 400;
+  }
+  .item {
+    margin-bottom: 1.5em;
+  }
+  input:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
 }
 .deceased-date-container {
   margin-top:-18px
