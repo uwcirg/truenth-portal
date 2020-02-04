@@ -31,7 +31,7 @@ from .user_consent import latest_consent
 
 def adherence_report(
         requested_as_of_date, acting_user_id, include_test_role, org_id,
-        response_format, celery_task):
+        response_format, lock_key, celery_task):
     """Generates the adherence report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -42,6 +42,7 @@ def adherence_report(
     :param include_test_role: set to include test patients in results
     :param org_id: set to limit to patients belonging to a branch of org tree
     :param response_format: 'json' or 'csv'
+    :param lock_key: name of TimeoutLock key used to throttle requests
     :param celery_task: used to update status when run as a celery task
     :return: dictionary of results, easily stored as a task output, including
        any details needed to assist the view method
@@ -143,6 +144,7 @@ def adherence_report(
 
     results = {
         'data': data,
+        'lock_key': lock_key,
         'response_format': response_format,
         'required_user_id': acting_user_id}
     if response_format == 'csv':
@@ -161,7 +163,7 @@ def adherence_report(
 
 def research_report(
         instrument_ids, acting_user_id, patch_dstu2, request_url,
-        response_format, celery_task):
+        response_format, lock_key, celery_task):
     """Generates the research report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -172,6 +174,7 @@ def research_report(
     :param patch_dstu2: set to make bundle dstu2 compliant
     :param request_url: original request url, for inclusion in FHIR bundle
     :param response_format: 'json' or 'csv'
+    :param lock_key: name of TimeoutLock key used to throttle requests
     :param celery_task: used to update status when run as a celery task
     :return: dictionary of results, easily stored as a task output, including
        any details needed to assist the view method
@@ -195,6 +198,7 @@ def research_report(
     })
 
     results = {
+        'lock_key': lock_key,
         'response_format': response_format,
         'required_roles': [ROLE.RESEARCHER.value]}
     if response_format == 'csv':

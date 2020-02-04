@@ -34,6 +34,7 @@ from ..models.questionnaire_response import (
 )
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user_or_abort
+from ..timeout_lock import LockTimeout, guarded_task_launch
 from ..trace import dump_trace, establish_trace
 from ..type_tools import check_int
 from .crossdomain import crossdomain
@@ -753,14 +754,19 @@ def get_assessments():
         'acting_user_id': current_user().id,
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
+        'lock_key': "research_report_task_lock",
         'response_format': request.args.get('format', 'json').lower()
     }
 
-    # Hand the task off to the job queue, and return 202 with URL for
-    # checking the status of the task
-    task = research_report_task.apply_async(kwargs=kwargs)
-    return jsonify({}), 202, {'Location': url_for(
-        'portal.task_status', task_id=task.id, _external=True)}
+    try:
+        # Hand the task off to the job queue, and return 202 with URL for
+        # checking the status of the task
+        task = guarded_task_launch(research_report_task, **kwargs)
+        return jsonify({}), 202, {'Location': url_for(
+            'portal.task_status', task_id=task.id, _external=True)}
+    except LockTimeout:
+        return jsonify(
+            message="process locked; wait briefly and try again"), 502
 
 
 @assessment_engine_api.route(
