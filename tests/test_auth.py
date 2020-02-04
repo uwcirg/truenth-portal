@@ -38,8 +38,7 @@ def test_local_user_add(client):
     new_user = User.query.filter_by(username=data['email']).first()
     assert new_user.active is True
 
-def test_local_login_valid_username_and_password(add_user, add_music_org, local_login):
-    add_music_org()
+def test_local_login_valid_username_and_password(add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -75,8 +74,7 @@ def test_local_login_failure_increments_lockout(add_user, local_login):
     db.session.refresh(user)
     assert user.password_verification_failures == 1
 
-def test_local_login_valid_username_and_password_resets_lockout(add_user, add_music_org, local_login):
-    add_music_org()
+def test_local_login_valid_username_and_password_resets_lockout(add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -172,9 +170,10 @@ def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
     # Verify the user is still locked out
     assert user.is_locked_out
 
-def test_register_now(app, test_user, promote_user_login, assertRedirects, client):
+def test_register_now(app, promote_user, login, assert_redirects, client, test_user):
     """Initiate process to register exiting account"""
     app.config['NO_CHALLENGE_WO_DATA'] = False
+    db.session.add(test_user)
     test_user.password = None
     test_user.birthdate = '1998-01-31'
     promote_user(role_name=ROLE.ACCESS_ON_VERIFY.value)
@@ -183,7 +182,7 @@ def test_register_now(app, test_user, promote_user_login, assertRedirects, clien
     login()
 
     response = client.get('/api/user/register-now')
-    assertRedirects(response, url_for('user.register', email=email))
+    assert_redirects(response, url_for('user.register', email=email))
 
 def test_client_add(promote_user, login, client):
     """Test adding a client application"""
@@ -454,7 +453,7 @@ def test_oauth_when_required_value_undefined(login):
     # Verify 500
     assert response.status_code == 500
 
-def test_oauth_with_invalid_token(login, assertRedirects):
+def test_oauth_with_invalid_token(login, assert_redirects):
     # Set an invalid token
     oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
     oauth_info.pop('token', None)
@@ -463,7 +462,7 @@ def test_oauth_with_invalid_token(login, assertRedirects):
     response = login(oauth_info=oauth_info, follow_redirects=False)
 
     # Verify force reload
-    assertRedirects(response, oauth_info['next'])
+    assert_redirects(response, oauth_info['next'])
 
 
 def add_user_from_oauth_info(oauth_info, add_user):

@@ -7,8 +7,7 @@ from portal.database import db
 from portal.extensions import user_manager
 
 
-def test_create_account_via_api(app, client, add_service_user, add_music_org, login):
-    add_music_org()
+def test_create_account_via_api(app, client, add_service_user, login):
     # use APIs to create account w/ special role
     service_user = add_service_user()
     login(user_id=service_user.id)

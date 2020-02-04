@@ -121,15 +121,16 @@ def test_user(app, initialized_db):
     LAST_NAME = 'Last'
     IMAGE_URL = 'http://examle.com/photo.jpg'
 
+    password = app.user_manager.hash_password(DEFAULT_PASSWORD)
     test_user = User(
         username=TEST_USERNAME, first_name=FIRST_NAME,
         last_name=LAST_NAME, image_url=IMAGE_URL,
         password=DEFAULT_PASSWORD)
     with SessionScope(db):
-        # User.query.filter_by(username=TEST_USERNAME).delete()
         db.session.add(test_user)
         db.session.commit()
     test_user = db.session.merge(test_user)
+    # Avoid testing cached/stale data
     invalidate_users_QBT(test_user.id)
 
     yield test_user
@@ -179,19 +180,17 @@ def add_service_user(initialize_static, test_user):
 
 @pytest.fixture
 def add_music_org():
-    def add_music_org():
-        music_org = Organization(
-            name="Michigan Urological Surgery Improvement Collaborative"
-                 " (MUSIC)")
-        with SessionScope(db):
-            db.session.add(music_org)
-            db.session.commit()
-        music_org = db.session.merge(music_org)
-    return add_music_org
+    music_org = Organization(
+        name="Michigan Urological Surgery Improvement Collaborative"
+             " (MUSIC)")
+    with SessionScope(db):
+        db.session.add(music_org)
+        db.session.commit()
+    music_org = db.session.merge(music_org)
 
 
 @pytest.fixture
-def login(initialize_static, app, client):
+def login(initialize_static, app, client, add_music_org):
     def login(
             user_id=TEST_USER_ID,
             oauth_info=None,
@@ -218,7 +217,7 @@ def login(initialize_static, app, client):
 
 
 @pytest.fixture
-def local_login(client, initialize_static):
+def local_login(client, initialize_static, add_music_org):
     def local_login(email, password, follow_redirects=True):
         initialize_static()
         url = url_for('user.login')
