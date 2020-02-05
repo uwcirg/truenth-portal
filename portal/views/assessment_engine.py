@@ -765,8 +765,10 @@ def get_assessments():
         return jsonify({}), 202, {'Location': url_for(
             'portal.task_status', task_id=task.id, _external=True)}
     except LockTimeout:
-        return jsonify(
-            message="process locked; wait briefly and try again"), 502
+        abort(
+            502,
+            "The system is busy exporting a report for another user. "
+            "Please try again in a few minutes.")
 
 
 @assessment_engine_api.route(
