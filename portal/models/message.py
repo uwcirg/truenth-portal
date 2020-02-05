@@ -180,7 +180,8 @@ class EmailMessage(db.Model):
         else:
             # This should never happen, alert if it does
             current_app.logger.error(
-                "Unable to generate audit log for email {}".format(Message))
+                "Unable to generate audit log for email {}".format(
+                    str(Message)))
         # If an exception was raised when attempting the send, re-raise now
         # for clients to manage
         if exc:
