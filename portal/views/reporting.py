@@ -5,7 +5,6 @@ from time import strftime
 
 from flask import (
     Blueprint,
-    abort,
     jsonify,
     make_response,
     render_template,
@@ -210,7 +209,9 @@ def questionnaire_status():
         return jsonify({}), 202, {'Location': url_for(
             'portal.task_status', task_id=task.id, _external=True)}
     except LockTimeout:
-        abort(
-            502,
+        msg = (
             "The system is busy exporting a report for another user. "
             "Please try again in a few minutes.")
+        response = make_response(msg, 502)
+        response.mimetype = "text/plain"
+        return response

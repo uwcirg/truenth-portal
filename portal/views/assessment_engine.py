@@ -7,6 +7,7 @@ from flask import (
     current_app,
     flash,
     jsonify,
+    make_response,
     redirect,
     request,
     session,
@@ -765,10 +766,12 @@ def get_assessments():
         return jsonify({}), 202, {'Location': url_for(
             'portal.task_status', task_id=task.id, _external=True)}
     except LockTimeout:
-        abort(
-            502,
+        msg = (
             "The system is busy exporting a report for another user. "
             "Please try again in a few minutes.")
+        response = make_response(msg, 502)
+        response.mimetype = "text/plain"
+        return response
 
 
 @assessment_engine_api.route(
