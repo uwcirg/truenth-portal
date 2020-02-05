@@ -93,15 +93,17 @@ import Consent from "./modules/Consent.js";
                 });
             },
             "demographicsContainer": function() {
-                tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
+                tnthAjax.getDemo(self.userId, {useWorker:true}, function(data) {
                     self.setSectionDataLoadedFlag("demographicsContainer", true);
+                    self.populateDemoData(data);
                 });
+                tnthAjax.getRoles(self.userId, function(data) {
+                   self.populateRoleData(data);
+                },{useWorker:true})
             },
             "clinicalContainer": function() {
-                tnthAjax.getTreatment(self.userId, {useWorker:true}, function() {
-                    tnthAjax.getClinical(self.userId, {async:false}, function() {
-                        self.setSectionDataLoadedFlag("clinicalContainer", true);
-                    });
+                ClinicalQuestions.update(self.userId, function() {
+                    self.setSectionDataLoadedFlag("clinicalContainer", true);
                 });
             },
             "orgsContainer": function() {
@@ -140,6 +142,30 @@ import Consent from "./modules/Consent.js";
         });
     };
 
+    FieldsChecker.prototype.populateDemoData = function(data) {
+        if (!data) {
+            return;
+        }
+        if (data.name) {
+            $("#firstname").val(data.name.given? data.name.given: "");
+            $("#lastname").val(data.name.family? data.name.family: "");
+        }
+        if (!data.birthDate) {
+            return;
+        }
+        $("#birthday").val(data.birthDate);
+        ((data.birthDate).split("-")).map(function(dateItemValue, index) {
+            let fieldId = {
+                0:"year",
+                1:"month",
+                2:"date"
+            }[index];
+            if (fieldId) {
+                $("#"+fieldId).val(dateItemValue);
+            }
+        });
+    };
+
     FieldsChecker.prototype.postDemoData = function(targetField) {
         var demoArray = {}, tnthAjax = this.__getDependency("tnthAjax");
         demoArray.resourceType = "Patient";
@@ -152,6 +178,17 @@ import Consent from "./modules/Consent.js";
         var sectionId = this.getSectionContainerId(targetField);
         tnthAjax.putDemo(this.userId, demoArray, $("#"+sectionId));
         this.handlePostEvent(sectionId);
+    };
+
+    FieldsChecker.prototype.populateRoleData = function(data) {
+        if (!data || !data.roles || !data.roles.length) {
+            return;
+        }
+        var arrRoles = data.roles.map(function(item) {
+            return item.name;
+        });
+        $("#role_patient").prop("checked", arrRoles.indexOf("patient") !== -1);
+        $("#role_caregiver").prop("checked", arrRoles.indexOf("partner") !== -1);
     };
 
     FieldsChecker.prototype.setUserRoles = function(callback) {
