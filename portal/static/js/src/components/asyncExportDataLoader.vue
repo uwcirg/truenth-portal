@@ -97,10 +97,6 @@
                 $("#" + this.initElementId).attr("disabled", false);
                 $(".export__status").removeClass("active");
                 this.setInProgress();
-                //clear display when download has successfully completed
-                this.statusDisplayTimeoutID = setTimeout(function() {
-                    this.clearExportDataUI();
-                }.bind(this), delay);
                 if (options.error) {
                     this.updateProgressDisplay("", "");
                     this.setMessage(this.failedRequestDisplay + (options.message? "<br/>"+options.message: ""));

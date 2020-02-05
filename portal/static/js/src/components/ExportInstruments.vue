@@ -27,7 +27,7 @@
                         </div>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
                         <!-- display export status -->
-                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
+                        <ExportDataLoader ref="exportDataLoader" :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
@@ -94,6 +94,8 @@
             setInstrumentInputEvent: function() {
                 var self = this;
                 $("#patientsInstrumentList [name='instrument']").on("click", function(event) {
+                    //clear pre-existing error
+                    self.$refs.exportDataLoader.clearExportDataUI();
                     if (event.target.value && $(event.target).is(":checked")) {
                         self.instruments.selected = self.instruments.selected + (self.instruments.selected !== "" ? "&" : "") + "instrument_id=" + event.target.value;
                         return;
@@ -101,6 +103,10 @@
                     if ($("input[name=instrument]:checked").length === 0) {
                         self.instruments.selected = "";
                     }
+                });
+                $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
+                    //clear pre-existing error
+                    self.$refs.exportDataLoader.clearExportDataUI();
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
