@@ -128,7 +128,7 @@
                             });
                         },
                         error: function(xhr) {
-                            self.onAfterExportData({error: true});
+                            self.onAfterExportData({error: true, message: xhr.responseText});
                         }
                     });
                 });
