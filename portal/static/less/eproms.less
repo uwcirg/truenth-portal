@@ -1802,7 +1802,10 @@ div.footer-wrapper.right-panel {
     position: relative;
     padding-top: 4px;
     padding-bottom: 4px;
-    min-width: 50px;
+    &.active {
+      min-width: 50px;
+      min-height: 50px;
+    }
   }
   .exportReport__status.active:before, 
   .export__status.active:before {
@@ -1812,7 +1815,7 @@ div.footer-wrapper.right-panel {
     content: " ";
     bottom: 0;
     left: 0;
-    top: 20px;
+    top: 24px;
     width: 10px;
     height: 10px;
     background: darken(@btnDefaultBorderColor, 5%);

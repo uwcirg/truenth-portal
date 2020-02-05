@@ -94,8 +94,6 @@
             setInstrumentInputEvent: function() {
                 var self = this;
                 $("#patientsInstrumentList [name='instrument']").on("click", function(event) {
-                    //clear pre-existing error
-                    self.$refs.exportDataLoader.clearExportDataUI();
                     if (event.target.value && $(event.target).is(":checked")) {
                         self.instruments.selected = self.instruments.selected + (self.instruments.selected !== "" ? "&" : "") + "instrument_id=" + event.target.value;
                         return;
@@ -104,16 +102,20 @@
                         self.instruments.selected = "";
                     }
                 });
-                $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
+                $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
                     //clear pre-existing error
-                    self.$refs.exportDataLoader.clearExportDataUI();
+                    self.resetExportError();
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
                     self.instruments.dataType = "csv";
+                    self.resetExportError();
                     $("#patientsInstrumentList").addClass("ready");
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
+            },
+            resetExportError: function() {
+                this.$refs.exportDataLoader.clearExportDataUI();
             },
             initExportEvent: function() {
                 /*

@@ -7,7 +7,7 @@
         <span class="export__status"></span>
         <span class="export__percentage"></span>
         <span class="export__result"></span>
-        <div class="export__error"><div class="message"></div></div>
+        <div class="export__error text-left"><div class="message"></div></div>
     </div>
 </template>
 <script>
