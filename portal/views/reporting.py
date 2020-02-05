@@ -18,6 +18,7 @@ from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
+from ..timeout_lock import LockTimeout, guarded_task_launch
 
 reporting_api = Blueprint('reporting', __name__)
 
@@ -197,11 +198,20 @@ def questionnaire_status():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id'),
+        'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'json').lower()
     }
 
     # Hand the task off to the job queue, and return 202 with URL for
     # checking the status of the task
-    task = adherence_report_task.apply_async(kwargs=kwargs)
-    return jsonify({}), 202, {'Location': url_for(
-        'portal.task_status', task_id=task.id, _external=True)}
+    try:
+        task = guarded_task_launch(adherence_report_task, **kwargs)
+        return jsonify({}), 202, {'Location': url_for(
+            'portal.task_status', task_id=task.id, _external=True)}
+    except LockTimeout:
+        msg = (
+            "The system is busy exporting a report for another user. "
+            "Please try again in a few minutes.")
+        response = make_response(msg, 502)
+        response.mimetype = "text/plain"
+        return response
