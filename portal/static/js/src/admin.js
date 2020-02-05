@@ -175,7 +175,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 $(".exportReport__status").removeClass("active");
                 if (options.error) {
                     this.updateProgressDisplay("", "");
-                    $(".exportReport__error .message").html(`Request to export report data failed.${options.errorMessage?"<br/>"+options.errorMessage: ""}`);
+                    $(".exportReport__error .message").html(`Request to export report data failed.${options.message?"<br/>"+options.message: ""}`);
                     $(".exportReport__retry").removeClass("tnth-hide");
                     return;
                 } 
@@ -230,7 +230,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                                 });
                             },
                             error: function(xhr) {
-                                self.onAfterExportReportData({error: true, errorMessage: xhr.responseText});
+                                self.onAfterExportReportData({error: true, message: xhr.responseText});
                             }
                         });
                     });
