@@ -1,36 +1,35 @@
 {% extends 'flask_user/public_base.html' %}
 {% block mainclass %}class="register-form"{% endblock %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn, passwordPopover %}
 {% block content %}
-{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <form id="regForm" action="" method="POST" novalidate class="form to-validate">
     <div class="row">
         <div class="col-md-push-3 col-md-6 col-xs-12">
              <div class="btn-social-container">
                 <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
-                <p id="createAcctTxt" class="profile-item-title">{{ app_text('registration prompt') }}:</p>
                 {{ form.hidden_tag() }}
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
                 {% set email_label = gettext('Email address') %}
                 {% set email_data_error = gettext('Email address is required.') %}
-                {{ render_field(field, label=email_label, label_visible=false, tabindex=220, required="required", data_error=email_data_error, class="input-field" ) }}
+                {{ render_field(field, label=email_label, label_visible=false, tabindex=220, required="required", data_error=email_data_error, class="input-field", data_lpignore="true" ) }}
                 {% if user_manager.enable_email and user_manager.enable_username %}
                 {% set email_field_name = gettext('Email') %}
                 {{ render_field(form.email, label=email_field_name, label_visible=false, tabindex=230, data_customemail="true", class="input-field") }}
                 {% endif %}
+                <p id="createAcctTxt" class="profile-item-title">{{ app_text('registration prompt') }}:</p>
                 <div class="password-wrapper">
                 {% set password_label = gettext('Password') %}
                 {% set password_data_error = gettext('Oops, the password does not meet the minimum requirements.') %}
-                {{ render_field(form.password, label=password_label, label_visible=false, data_error=password_data_error, pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required", class="input-field") }}
+                {{ render_field(form.password, label=password_label, label_visible=false, data_error=password_data_error, pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required", class="input-field password-popover-field") }}
                 </div>
-
                 {% if user_manager.enable_retype_password %}
                 {% set retype_password_label = gettext('Retype Password') %}
                 {% set retype_data_match_error = gettext('Oops, the two password fields do not match.') %}
                 {% set retype_data_error = gettext('Please re-type your password.') %}
                 {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
-
+                <br/>
                 <div class="form___submit_container">
                     {{ render_submit_field(form.submit, _("Register"), tabindex=280) }}
                 </div>
@@ -68,21 +67,6 @@
     </div>
 </form>
 <br/>
-<div id="passwordPopover">
-    <div class="password-popover popover" role="tooltip">
-        <div class="arrow"></div>
-        <h3 class="popover-title"></h3>
-        <div class="popover-content">
-            <b>{{_("Password must have at least:")}}</b>
-            <ul id='pwdHintList'>
-                <li class='text-info eight-characters'>{{_("Eight characters")}}</li>
-                <li class='text-info lowercase-letter'>{{_("One lowercase letter")}}</li>
-                <li class='text-info uppercase-letter'>{{_("One uppercase letter")}}</li>
-                <li class='text-info one-number'>{{_("One number")}}</li>
-            </ul>
-        </div>
-    </div>
-</div>
 <div class="modal fade" id="accountModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -111,6 +95,7 @@
 {% block additional_scripts -%}
 {{super()}}
 <script src="{{ url_for('static', filename='js/flask_user/register.js') }}"></script>
+{{passwordPopover()}}
 {%- endblock %}
 
 

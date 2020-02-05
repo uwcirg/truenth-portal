@@ -84,6 +84,7 @@
 @labelColor: #777;
 @mutedColor: #777;
 @inputHeight: 2.5em;
+@inputFocusBgColor: #f3f4f5;
 @wellColor: #F7F7F7;
 @notificationBgColor: #EB1939;
 @notificationLinkHoverBgColor: #CC112D;
@@ -713,6 +714,23 @@ body.landing {
     width: 325px;
   }
 }
+#resetPasswordForm {
+  min-height: 40vh;
+  label {
+    color: darken(@labelColor, 10%);
+    font-weight: 400;
+  }
+  .item {
+    margin-bottom: 1.5em;
+  }
+  input {
+    outline: none;
+  }
+  input:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
+}
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #socialMediaLoginContainer .btn-social,
@@ -744,6 +762,12 @@ body.landing {
   margin: auto;
   display: block;
   box-shadow: none;
+  border: 1px solid lighten(@mutedColor, 15%);
+  outline: none;
+  &:focus {
+    outline: none;
+    background: @inputFocusBgColor;
+  }
 }
 
 #regForm input[type="submit"],
@@ -4479,7 +4503,7 @@ div.timezone-warning.text-warning {
     font-size:@baseFontSize;
   }
   .tnth-headline {
-    margin: 30px 0 20px;
+    margin: 32px 0 24px;
     font-size: @headlineSize;
     letter-spacing: 1px;
   }
