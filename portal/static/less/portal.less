@@ -923,6 +923,9 @@ div.right-panel {
   #userOrgs {
     label {
       font-size: @mobileOrgSize;
+      &.radio-inline {
+        margin-top: 8px;
+      }
     }
   }
   .prompt {
@@ -3148,7 +3151,6 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   }
   label input[type="radio"] {
     position: relative;
-    top: 0;
     margin-right: 0.5em;
   }
   .close {

@@ -107,6 +107,10 @@ import Consent from "./modules/Consent.js";
                 });
             },
             "orgsContainer": function() {
+                /*
+                 * ensure that content is generated for consent modal 
+                 */
+                self.initConsentModalContent();
                 tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
                     self.setSectionDataLoadedFlag("orgsContainer", true);
                 });
@@ -954,15 +958,21 @@ import Consent from "./modules/Consent.js";
         orgTool.populateOrgsStateSelector(self.userId, parentOrgsToDraw, callback);
     };
 
+    FieldsChecker.prototype.initConsentModalContent = function() {
+        var orgTool = this.getOrgTool();
+        $("#userOrgs input[name='organization']").each(function() {
+            Consent.getConsentModal(orgTool.getElementParentOrg(this));
+        });
+    };
+
     FieldsChecker.prototype.clinicsEvent = function() {
         var self = this, orgTool = this.getOrgTool();
         this.getConfiguration(this.userId, false, function(data) {
             self.getOrgsStateSelector(self.userId, [data.ACCEPT_TERMS_ON_NEXT_ORG], function() {
                 orgTool.handleOrgsEvent(self.userId, data.CONSENT_WITH_TOP_LEVEL_ORG);
-                Consent.initFieldEvents(self.userId);
                 $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
                     if ($(this).prop("checked")) {
-                        var parentOrg = $(this).attr("data-parent-id"), m = $("#consentContainer .modal, #defaultConsentContainer .modal");
+                        var m = $("#consentContainer .modal, #defaultConsentContainer .modal");
                         var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0);
                         if (requiringConsentViaModal) { //do nothing
                             return true;
@@ -977,8 +987,7 @@ import Consent from "./modules/Consent.js";
                     }
                     self.scrollTo($("#clinics .state-selector-container.selector-show"));
                 });
-                /*** event for consent popups **/
-                $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
+                $(Consent.getModalElementSelectors()).each(function() {
                     $(this).on("hidden.bs.modal", function() {
                         if ($(this).find("input[name='toConsent']:checked").length > 0) {
                             $("#userOrgs input[name='organization']").each(function() {
@@ -988,6 +997,7 @@ import Consent from "./modules/Consent.js";
                         }
                     });
                 });
+                Consent.initFieldEvents(self.userId);
             });
         });
     };
@@ -1007,10 +1017,8 @@ import Consent from "./modules/Consent.js";
                 tnthAjax: tnthAjax,
                 orgTool: new OrgTool()
             });
-            var DELAY_LOADING = false;
             fc.init(function() {
                 fc.startTime = new Date();
-                DELAY_LOADING = true; /*global DELAY_LOADING */
                 clearInterval(fc.intervalId);
                 fc.intervalId = setInterval(function() {
                     fc.endTime = new Date();
@@ -1027,7 +1035,7 @@ import Consent from "./modules/Consent.js";
                         fc.endTime = 0;
                         clearInterval(fc.intervalId);
                     }
-                }, 100);
+                }, 50);
             });
         }
     });
