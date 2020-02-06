@@ -93,18 +93,24 @@ import Consent from "./modules/Consent.js";
                 });
             },
             "demographicsContainer": function() {
-                tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
+                tnthAjax.getDemo(self.userId, {useWorker:true}, function(data) {
                     self.setSectionDataLoadedFlag("demographicsContainer", true);
+                    self.populateDemoData(data);
                 });
+                tnthAjax.getRoles(self.userId, function(data) {
+                   self.populateRoleData(data);
+                },{useWorker:true})
             },
             "clinicalContainer": function() {
-                tnthAjax.getTreatment(self.userId, {useWorker:true}, function() {
-                    tnthAjax.getClinical(self.userId, {async:false}, function() {
-                        self.setSectionDataLoadedFlag("clinicalContainer", true);
-                    });
+                ClinicalQuestions.update(self.userId, function() {
+                    self.setSectionDataLoadedFlag("clinicalContainer", true);
                 });
             },
             "orgsContainer": function() {
+                /*
+                 * ensure that content is generated for consent modal 
+                 */
+                self.initConsentModalContent();
                 tnthAjax.getDemo(self.userId, {useWorker:true}, function() {
                     self.setSectionDataLoadedFlag("orgsContainer", true);
                 });
@@ -140,6 +146,30 @@ import Consent from "./modules/Consent.js";
         });
     };
 
+    FieldsChecker.prototype.populateDemoData = function(data) {
+        if (!data) {
+            return;
+        }
+        if (data.name) {
+            $("#firstname").val(data.name.given? data.name.given: "");
+            $("#lastname").val(data.name.family? data.name.family: "");
+        }
+        if (!data.birthDate) {
+            return;
+        }
+        $("#birthday").val(data.birthDate);
+        ((data.birthDate).split("-")).map(function(dateItemValue, index) {
+            let fieldId = {
+                0:"year",
+                1:"month",
+                2:"date"
+            }[index];
+            if (fieldId) {
+                $("#"+fieldId).val(dateItemValue);
+            }
+        });
+    };
+
     FieldsChecker.prototype.postDemoData = function(targetField) {
         var demoArray = {}, tnthAjax = this.__getDependency("tnthAjax");
         demoArray.resourceType = "Patient";
@@ -152,6 +182,17 @@ import Consent from "./modules/Consent.js";
         var sectionId = this.getSectionContainerId(targetField);
         tnthAjax.putDemo(this.userId, demoArray, $("#"+sectionId));
         this.handlePostEvent(sectionId);
+    };
+
+    FieldsChecker.prototype.populateRoleData = function(data) {
+        if (!data || !data.roles || !data.roles.length) {
+            return;
+        }
+        var arrRoles = data.roles.map(function(item) {
+            return item.name;
+        });
+        $("#role_patient").prop("checked", arrRoles.indexOf("patient") !== -1);
+        $("#role_caregiver").prop("checked", arrRoles.indexOf("partner") !== -1);
     };
 
     FieldsChecker.prototype.setUserRoles = function(callback) {
@@ -917,15 +958,21 @@ import Consent from "./modules/Consent.js";
         orgTool.populateOrgsStateSelector(self.userId, parentOrgsToDraw, callback);
     };
 
+    FieldsChecker.prototype.initConsentModalContent = function() {
+        var orgTool = this.getOrgTool();
+        $("#userOrgs input[name='organization']").each(function() {
+            Consent.getConsentModal(orgTool.getElementParentOrg(this));
+        });
+    };
+
     FieldsChecker.prototype.clinicsEvent = function() {
         var self = this, orgTool = this.getOrgTool();
         this.getConfiguration(this.userId, false, function(data) {
             self.getOrgsStateSelector(self.userId, [data.ACCEPT_TERMS_ON_NEXT_ORG], function() {
                 orgTool.handleOrgsEvent(self.userId, data.CONSENT_WITH_TOP_LEVEL_ORG);
-                Consent.initFieldEvents(self.userId);
                 $("#userOrgs input[name='organization']").not("[type='hidden']").on("click", function() {
                     if ($(this).prop("checked")) {
-                        var parentOrg = $(this).attr("data-parent-id"), m = $("#consentContainer .modal, #defaultConsentContainer .modal");
+                        var m = $("#consentContainer .modal, #defaultConsentContainer .modal");
                         var requiringConsentViaModal = ($("#fillOrgs").attr("patient_view") && m.length > 0 && parseInt($(this).val()) !== 0);
                         if (requiringConsentViaModal) { //do nothing
                             return true;
@@ -940,8 +987,7 @@ import Consent from "./modules/Consent.js";
                     }
                     self.scrollTo($("#clinics .state-selector-container.selector-show"));
                 });
-                /*** event for consent popups **/
-                $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
+                $(Consent.getModalElementSelectors()).each(function() {
                     $(this).on("hidden.bs.modal", function() {
                         if ($(this).find("input[name='toConsent']:checked").length > 0) {
                             $("#userOrgs input[name='organization']").each(function() {
@@ -951,6 +997,7 @@ import Consent from "./modules/Consent.js";
                         }
                     });
                 });
+                Consent.initFieldEvents(self.userId);
             });
         });
     };
@@ -970,10 +1017,8 @@ import Consent from "./modules/Consent.js";
                 tnthAjax: tnthAjax,
                 orgTool: new OrgTool()
             });
-            var DELAY_LOADING = false;
             fc.init(function() {
                 fc.startTime = new Date();
-                DELAY_LOADING = true; /*global DELAY_LOADING */
                 clearInterval(fc.intervalId);
                 fc.intervalId = setInterval(function() {
                     fc.endTime = new Date();
@@ -990,7 +1035,7 @@ import Consent from "./modules/Consent.js";
                         fc.endTime = 0;
                         clearInterval(fc.intervalId);
                     }
-                }, 100);
+                }, 50);
             });
         }
     });
