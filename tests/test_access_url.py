@@ -10,15 +10,6 @@ from tests import TestCase
 
 
 def test_create_access_url(app, client, add_user, promote_user, login, teardown_db):
-
-    music_org = Organization(
-        name="Michigan Urological Surgery Improvement Collaborative"
-             " (MUSIC)")
-    with SessionScope(db):
-        db.session.add(music_org)
-        db.session.commit()
-    music_org = db.session.merge(music_org)
-
     onetime = add_user('one@time.com')
     promote_user(user=onetime, role_name=ROLE.WRITE_ONLY.value)
 
