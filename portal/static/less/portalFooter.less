@@ -29,7 +29,7 @@
 @footerBackgroundColor: #000;
 @linkColor: #FFF;
 @linkHoverColor: #FFF;
-@copyRightColor: #7A7B7A;
+@copyRightColor: #a3a9a3;
 
 #tnthBottomNavWrapper.no-fouc {
     display: none;
@@ -75,9 +75,9 @@
         width: 100%;
         max-width: 100%;
         text-align: center;
-        padding-top: 0.5em;
+        padding-top: 0.25em;
         padding-left: 2.25em;
-        padding-bottom: 1.5em;
+        padding-bottom: 1.25em;
     }
     @media(min-width: 992px) {
         .nav-image {
@@ -142,10 +142,11 @@
         color: @copyRightColor;
         opacity: .9;
         font-size: 14px;
+        line-height: 1.5;
     }
     .footer__logo-area {
-        padding-left: 24px;
-        padding-right: 24px;
+        padding-left: 32px;
+        padding-right: 32px;
         margin-bottom: 20px;
         width: 100%;
         display: flex;
@@ -173,35 +174,12 @@
     }
     .logo-footer-truenth,
     .footer__logo--truenth {
-        // background-image: @TrueNTHWhiteLogoPath;
-        // background-size: @TrueNTHFooterLogoMobileWidth @TrueNTHFooterLogoMobileHeight;
-        // background-repeat: no-repeat;
-        // width: @TrueNTHFooterLogoMobileWidth;
-        // height: @TrueNTHFooterLogoMobileHeight;
         @mobile_footer_logo();
     }
-
-    // @media only screen and (-webkit-min-device-pixel-ratio:2),
-    // only screen and (-moz-min-device-pixel-ratio:2),
-    // only screen and (min-device-pixel-ratio:2),
-    // only screen and (min-resolution:192dpi),
-    // only screen and (min-resolution:2dppx) {
-    //     .logo-footer-truenth,
-    //     .footer__logo--truenth {
-    //         background-image: @TrueNTHWhiteLogoPath;
-    //         background-size:  @TrueNTHFooterLogoWidth @TrueNTHFooterLogoHeight;
-    //         background-repeat: no-repeat;
-    //     }
-    // }
 
     @media (min-width: 992px) {
         .logo-footer-truenth,
         .footer__logo--truenth {
-            // background-image: @TrueNTHWhiteLogoPath;
-            // background-size: @TrueNTHFooterLogoWidth @TrueNTHFooterLogoHeight;
-            // background-repeat: no-repeat;
-            // width: @TrueNTHFooterLogoWidth;
-            // height: @TrueNTHFooterLogoHeight;
             @desktop_footer_logo();
         }    
     }
@@ -259,8 +237,8 @@
 @media(min-width: 619px) {
     #tnthBottomNavWrapper.footer {
         .main-nav-list {
-            margin-top: 32px;
-            margin-bottom: 28px;
+            margin-top: 28px;
+            margin-bottom: 24px;
         }
         .footer__logo-area {
             align-items: flex-start;

@@ -5024,17 +5024,6 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
     height: @TrueNTHLogoScrollHeight;
 }
 
-// @media only screen and (-webkit-min-device-pixel-ratio:2),
-// only screen and (-moz-min-device-pixel-ratio:2),
-// only screen and (min-device-pixel-ratio:2),
-// only screen and (min-resolution:192dpi),
-// only screen and (min-resolution:2dppx) {
-//     .is-scrolled .logo {
-//         background-image:  @TrueNTHLogoPath;
-//         background-size: @TrueNTHLogoMobileWidth @TrueNTHLogoMobileHeight;
-//     }
-// }
-
 @media (max-width:899px) {
     .header .logo {
         position: absolute;
@@ -5049,17 +5038,6 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
     }
 }
 
-// @media only screen and (max-width:899px) and (-webkit-min-device-pixel-ratio:2),
-// only screen and (max-width:899px) and (-moz-min-device-pixel-ratio:2),
-// only screen and (max-width:899px) and (min-device-pixel-ratio:2),
-// only screen and (max-width:899px) and (min-resolution:192dpi),
-// only screen and (max-width:899px) and (min-resolution:2dppx) {
-//     .logo {
-//         background-image:  @TrueNTHLogoPath;
-//         background-size: @TrueNTHLogoMobileWidth @TrueNTHLogoMobileHeight;
-//     }
-// }
-
 @media (min-width:901px) {
     :not(.is-scrolled) .theme--intro-light .logo {
         background-image: @TrueNTHWhiteLogoPath;
@@ -5070,69 +5048,6 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
         color: #FFF
     }
 }
-
-// @media only screen and (min-width:901px) and (-webkit-min-device-pixel-ratio:2),
-// only screen and (min-width:901px) and (-moz-min-device-pixel-ratio:2),
-// only screen and (min-width:901px) and (min-device-pixel-ratio:2),
-// only screen and (min-width:901px) and (min-resolution:192dpi),
-// only screen and (min-width:901px) and (min-resolution:2dppx) {
-//     :not(.is-scrolled) .theme--intro-light .logo {
-//         background-image: @TrueNTHWhiteLogoPath;
-//         background-size: @TrueNTHLogoWidth @TrueNTHLogoHeight;
-//     }
-// }
-
-// .logo-footer-truenth,
-// .footer__logo--truenth {
-//     background-image: @TrueNTHWhiteLogoPath;
-//     background-size: @TrueNTHFooterLogoWidth @TrueNTHFooterLogoHeight;
-//     background-repeat: no-repeat;
-//     width: @TrueNTHFooterLogoWidth;
-//     height: @TrueNTHFooterLogoHeight;
-// }
-
-// @media only screen and (-webkit-min-device-pixel-ratio:2),
-// only screen and (-moz-min-device-pixel-ratio:2),
-// only screen and (min-device-pixel-ratio:2),
-// only screen and (min-resolution:192dpi),
-// only screen and (min-resolution:2dppx) {
-//     .logo-footer-truenth,
-//     .footer__logo--truenth {
-//         background-image: @TrueNTHWhiteLogoPath;
-//         background-size: @TrueNTHFooterLogoMobileWidth @TrueNTHFooterLogoMobileHeight;
-//         background-repeat: no-repeat;
-//     }
-// }
-
-// .logo-footer-movember,
-// .footer__logo--movember {
-//     background-image: @WhiteMovemberLogoPath;
-//     background-size: @MovemberFooterLogoWidth @MovemberFooterLogoHeight;
-//     background-repeat: no-repeat;
-//     width: @MovemberFooterLogoWidth;
-//     height: @MovemberFooterLogoHeight;
-//     position: relative;
-//     top: 8px;
-// }
-// @media (min-width: 900px) {
-//     .logo-footer-movember,
-//     .footer__logo--movember {
-//         top: 1px;
-//     }
-// }
-
-// @media only screen and (-webkit-min-device-pixel-ratio:2),
-// only screen and (-moz-min-device-pixel-ratio:2),
-// only screen and (min-device-pixel-ratio:2),
-// only screen and (min-resolution:192dpi),
-// only screen and (min-resolution:2dppx) {
-//     .logo-footer-movember,
-//     .footer__logo--movember {
-//         background-image: @WhiteMovemberLogoPath;
-//         background-size: @MovemberFooterLogoWidth @MovemberFooterLogoHeight;
-//         background-repeat: no-repeat;
-//     }
-// }
 
 .cookie-disabled {
     position: relative;
@@ -7265,8 +7180,8 @@ figure.nav-overlay {
 
 @media (min-width:769px) {
     .home-intro {
-        padding-top: 120px;
-        margin-top: -120px;
+        padding-top: 112px;
+        margin-top: -112px;
     }
 }
 
@@ -9982,7 +9897,7 @@ a.home--modal-link {
     position: absolute;
     top: 0;
     right: 0;
-    color: #603b00;
+    color: #603b00 !important;
     z-index: 80;
     font-weight: 700;
     font-size: .9em;
@@ -9993,9 +9908,13 @@ a.home--modal-link {
     text-transform: capitalize;
     padding-top: .4em;
     padding-bottom: .2em;
-    height: 2em;
     overflow: hidden;
     text-overflow: ellipsis
+}
+@media(min-width: 641px) {
+    .watermark {
+        font-size: 14px !important;
+    }
 }
 
 .button--LR,
