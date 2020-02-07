@@ -3,6 +3,8 @@
  * Namespaced to avoid conflicts. Some styles based on Bootstrap
  */
 @defaultBackgroundColor: #6f7985;
+@watermarkTextColor: #603b00;
+@watermarkBgColor: #eeab50;
 /** Overall wrapper with defaults **/
 #tnthNavWrapper {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -36,7 +38,7 @@
 }
 .watermark, .watermark-nowrapper {
   position: absolute;
-  top: 7.5em;
+  top: 0;
   right: 0;
   z-index: 1000;
   font-weight: normal;
@@ -46,30 +48,32 @@
   font-size: 0.58em;
   letter-spacing: 1px;
   text-transform: capitalize;
-  padding: 1em;
-  background-color: transparent;
-  color: #FFF;
+  padding: 0;
+  background-color: @watermarkBgColor;
+  color: @watermarkTextColor;
 }
 .watermark-nowrapper {
   font-size: 0.7em;
   top: 0;
-  color: #603b00;
-  background-color: #eeab50;
+  color: @watermarkTextColor;
+  background-color: @watermarkBgColor;
   padding: 0.1em 0;
 }
 @media (min-width: 641px) {
    .watermark, .watermark-nowrapper {
       font-size: 0.7em;
-      top: 0;
+      // top: 0;
     }
-    .watermark {
-      width: 270px;
-    }
+    // .watermark {
+    //   width: 270px;
+    //   background: transparent;
+    //   color: #FFF;
+    // }
 }
 @media (min-width: 992px) {
   .watermark {
     color: #603b00;
-    background-color: #eeab50;
+    background-color: @watermarkBgColor;
     padding: 0;
     width: 100%;
     font-size: 0.85em;
@@ -127,7 +131,7 @@
   z-index: 1000;
   border: none;
   position: relative;
-  min-height: 80px;
+  min-height: 72px;
   overflow: hidden;
   &:after {
     clear: both;
@@ -160,6 +164,16 @@
       background-image: url('../img/fa_bars_333333.png');
       background-color: #fff;
     }
+  }
+}
+@media (min-width: 641px) {
+  #tnthNavXs {
+    min-height: 86px;
+  }
+}
+@media (min-width: 699px) {
+  #tnthNavXs {
+    min-height: 72px;
   }
 }
 
