@@ -198,8 +198,6 @@ def login(initialize_static, app, client, add_music_org):
     ):
         initialize_static()
 
-        follow_redirects = True
-
         app.config.from_object(TestConfig)
 
         if not oauth_info:

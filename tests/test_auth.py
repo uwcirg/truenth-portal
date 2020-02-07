@@ -173,7 +173,9 @@ def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
 def test_register_now(app, promote_user, login, assert_redirects, client, test_user):
     """Initiate process to register exiting account"""
     app.config['NO_CHALLENGE_WO_DATA'] = False
+    #added to avoid detached instance error
     db.session.add(test_user)
+
     test_user.password = None
     test_user.birthdate = '1998-01-31'
     promote_user(role_name=ROLE.ACCESS_ON_VERIFY.value)
@@ -208,23 +210,23 @@ def test_client_bad_add(promote_user, login, client):
 
 def test_client_edit(client, login, add_client):
     """Test editing a client application"""
-    client = add_client()
+    test_client = add_client()
     test_url = 'http://tryme.com'
-    origins = "{} {}".format(client.application_origins, test_url)
+    origins = "{} {}".format(test_client.application_origins, test_url)
     login()
     response = client.post(
-        '/client/{0}'.format(client.client_id),
+        '/client/{0}'.format(test_client.client_id),
         data=dict(
             callback_url=test_url, application_origins=origins,
             application_role=INTERVENTION.DEFAULT.name))
     assert 302 == response.status_code
 
-    client = Client.query.get('test_client')
-    assert client.callback_url == test_url
+    test_client = Client.query.get('test_client')
+    assert test_client.callback_url == test_url
 
     invalid_url = "http://invalid.org"
     response2 = client.post(
-        '/client/{0}'.format(client.client_id),
+        '/client/{0}'.format(test_client.client_id),
         data=dict(
             callback_url=invalid_url, application_origins=origins,
             application_role=INTERVENTION.DEFAULT.name))
@@ -233,35 +235,35 @@ def test_client_edit(client, login, add_client):
     error_text = 'URL host must match a provided Application Origin URL'
     assert error_text in response2.get_data(as_text=True)
 
-    client = Client.query.get('test_client')
-    assert client.callback_url != invalid_url
+    test_client = Client.query.get('test_client')
+    assert test_client.callback_url != invalid_url
 
 def test_callback_validation(client, login, add_client):
     """Confirm only valid urls can be set"""
-    client = add_client()
+    test_client = add_client()
     login()
     response = client.post(
-        '/client/{0}'.format(client.client_id),
+        '/client/{0}'.format(test_client.client_id),
         data=dict(
             callback_url='badprotocol.com',
-            application_origins=client.application_origins))
+            application_origins=test_client.application_origins))
     assert 200 == response.status_code
 
-    client = Client.query.get('test_client')
-    assert client.callback_url is None
+    test_client = Client.query.get('test_client')
+    assert test_client.callback_url is None
 
 def test_service_account_creation(add_client):
     """Confirm we can create a service account and token"""
-    client = add_client()
+    test_client = add_client()
     test_user = User.query.get(TEST_USER_ID)
     service_user = test_user.add_service_account()
 
     with SessionScope(db):
         db.session.add(service_user)
-        db.session.add(client)
+        db.session.add(test_client)
         db.session.commit()
     service_user = db.session.merge(service_user)
-    client = db.session.merge(client)
+    test_client = db.session.merge(test_client)
 
     # Did we get a service account with the correct roles and relationships
     assert len(service_user.roles) == 1
@@ -272,7 +274,7 @@ def test_service_account_creation(add_client):
     assert sponsorship.relationship.name == 'sponsor'
 
     # Can we get a usable Bearer Token
-    create_service_token(client=client, user=service_user)
+    create_service_token(client=test_client, user=service_user)
     token = Token.query.filter_by(user_id=service_user.id).first()
     assert token
 
@@ -297,17 +299,20 @@ def test_service_account_promotion(add_client):
 
     assert len(service_user.roles) == 1
 
-def test_token_status(client, initialized_db, teardown_db):
+def test_token_status(client, test_user):
     with SessionScope(db):
-        client = Client(
+        # added to prevent foreign key error
+        db.session.add(test_user)
+
+        test_client = Client(
             client_id='test-id', client_secret='test-secret',
             user_id=TEST_USER_ID)
         token = Token(
-            access_token='test-token', client=client, user_id=TEST_USER_ID,
+            access_token='test-token', client=test_client, user_id=TEST_USER_ID,
             token_type='bearer',
             expires=(datetime.datetime.utcnow() +
                      datetime.timedelta(seconds=30)))
-        db.session.add(client)
+        db.session.add(test_client)
         db.session.add(token)
         db.session.commit()
 
@@ -324,9 +329,9 @@ def test_token_status_wo_header(client):
     response = client.get("/oauth/token-status")
     assert 401 == response.status_code
 
-def test_origin_validation(app, client, add_client):
-    client = add_client()
-    client_url = client._redirect_uris
+def test_origin_validation(app, add_client):
+    test_client = add_client()
+    client_url = test_client._redirect_uris
     local_url = "http://{}/home?test".format(
         app.config.get('SERVER_NAME'))
     invalid_url = 'http://invalid.org'
@@ -465,7 +470,7 @@ def test_oauth_with_invalid_token(login, assert_redirects):
     assert_redirects(response, oauth_info['next'])
 
 
-def add_user_from_oauth_info(oauth_info, add_user):
+def add_user_from_oauth_info(oauth_info):
     user_to_add = namedtuple('Mock', oauth_info.keys())(*oauth_info.values())
     user = add_user(user_to_add)
     db.session.commit()
