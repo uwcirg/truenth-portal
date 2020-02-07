@@ -7,7 +7,7 @@
         <span class="export__status"></span>
         <span class="export__percentage"></span>
         <span class="export__result"></span>
-        <div class="export__error"><div class="message"></div></div>
+        <div class="export__error text-left"><div class="message"></div></div>
     </div>
 </template>
 <script>
@@ -97,10 +97,6 @@
                 $("#" + this.initElementId).attr("disabled", false);
                 $(".export__status").removeClass("active");
                 this.setInProgress();
-                //clear display when download has successfully completed
-                this.statusDisplayTimeoutID = setTimeout(function() {
-                    this.clearExportDataUI();
-                }.bind(this), delay);
                 if (options.error) {
                     this.updateProgressDisplay("", "");
                     this.setMessage(this.failedRequestDisplay + (options.message? "<br/>"+options.message: ""));
@@ -128,7 +124,7 @@
                             });
                         },
                         error: function(xhr) {
-                            self.onAfterExportData({error: true});
+                            self.onAfterExportData({error: true, message: xhr.responseText});
                         }
                     });
                 });

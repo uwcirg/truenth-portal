@@ -213,14 +213,14 @@
   {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup" data-profile-section-id="demo">
-        <div class="col-md-6 col-sm-6 col-xs-10">
+        <div class="col-md-5 col-sm-5 col-xs-10">
           <div class="form-group float-input-label">
             <label>Name</label>
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" aria-label="{{_('First name')}}" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}" v-model="demo.data.name.given" lazy />
             <div class="help-block with-errors"></div>
           </div>
         </div>
-        <div class="col-md-6 col-sm-6 col-xs-10">
+        <div class="col-md-5 col-sm-5 col-xs-10">
           <div class="form-group float-input-label">
             <label class="dummy">&nbsp;</label>
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" aria-label="{{_('Last name')}}" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" v-model="demo.data.name.family" lazy/>
@@ -233,12 +233,12 @@
       <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist">
           <div class="radio">
             <label>
-              <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> {{ _("I'm a man who is concerned about prostate cancer for myself") }}
+              <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"><span class="text">{{ _("I'm a man who is concerned about prostate cancer for myself") }}</span>
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" class="init-queries-field" name="user_type" id="role_caregiver" value="partner"> {{ _("I'm a caregiver, spouse or partner who wants to learn more about prostate cancer") }}
+              <input type="radio" class="init-queries-field" name="user_type" id="role_caregiver" value="partner"><span class="text">{{ _("I'm a caregiver, spouse or partner who wants to learn more about prostate cancer") }}</span>
             </label>
           </div>
       </div>
@@ -252,7 +252,7 @@
           <div class="form-group">
             <label>{{ _("Birth Date") }} <span class="bd-optional text-muted">{{_("(optional)")}}</span></label>
             <div class="row">
-              <div class="col-md-4 col-sm-6 col-xs-10">
+              <div class="col-md-3 col-sm-6 col-xs-10">
                 <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" aria-label="{{_('Birth date')}}" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The birth day field is required and must be valid format')}}"  data-trigger-event="change" v-model="demo.data.birthDay" lazy required />
               </div>
               <div class="col-md-4 col-sm-6 col-xs-10">
@@ -272,7 +272,7 @@
                   <option value="12">{{ _("December") }}</option>
                 </select>
               </div>
-              <div class="col-md-4 col-sm-6 col-xs-10">
+              <div class="col-md-3 col-sm-6 col-xs-10">
                 <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" aria-label="Birth year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-trigger-event="change" data-error="{{_('The birth year is required and must be in valid format')}}" v-model="demo.data.birthYear" lazy required />
               </div>
             </div>
@@ -295,10 +295,10 @@
             	<label>{{_("Biopsy Date")}}:</label>
             	<input id="biopsyDate" type="hidden" data-name="biopsy" class="form-control" value="">
               <div class="row">
-                <div class="col-md-3 col-sm-6 col-xs-10">
+                <div class="col-md-3 col-sm-3 col-xs-10">
                   <input class="form-control biopsy-date-element init-queries-field" id="biopsy_day" name="biopsy_day" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The biopsy day field is required and must be valid format')}}" data-save-container-id="patBiopsy" required />
                 </div>
-                <div class="col-md-4 col-sm-6 col-xs-10">
+                <div class="col-md-4 col-sm-4 col-xs-10">
                   <select data-type="select" class="form-control biopsy-date-element init-queries-field" id="biopsy_month" name="biopsy_month" data-save-container-id="patBiopsy" data-error="{{_('A biopsy month must be selected')}}" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -315,7 +315,7 @@
                     <option value="12">{{ _("December") }}</option>
                   </select>
                 </div>
-                <div class="col-md-3 col-sm-6 col-xs-10">
+                <div class="col-md-3 col-sm-3 col-xs-10">
                   <input class="form-control biopsy-date-element init-queries-field" id="biopsy_year" name="biopsy_year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="{{_('The biopsy year is required and must be in valid format')}}" data-save-container-id="patBiopsy" required />
                 </div>
               </div>
@@ -335,7 +335,6 @@
           </div>
         </div>
         <div id="patDiag" data-topic="pca_diag" class="tnth-hide pat-q" data-profile-section-id="clinicalquestions">
-          <br />
           <p class="pat-label">{{ _("Have you been diagnosed with prostate cancer?") }}</p>
           <div class="form-group">
             <div class="radio">
@@ -356,8 +355,7 @@
           </div>
         </div>
         {% if not config.LOCALIZED_AFFILIATE_ORG %}
-          <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
-             <br />
+          <div id="patMeta" data-topic="pca_localized" data-next="tx" class="tnth-hide pat-q">
              <p class="pat-label">{{ _("Is the prostate cancer only within the prostate?") }}</p>
              <div class="form-group">
                <div class="radio">
@@ -379,7 +377,6 @@
           </div>
         {% endif %}
         <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
-          <br />
           <p class="pat-label">{{ _("Have you begun prostate cancer treatment?") }}</p>
           <div class="form-group">
             <div class="radio">

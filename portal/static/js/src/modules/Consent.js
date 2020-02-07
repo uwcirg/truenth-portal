@@ -13,8 +13,11 @@ export default { /*global i18next datepicker $*/
         }
         return this.orgTool;
     },
+    getModalElementSelectors: function() {
+        return "#consentContainer .modal, #defaultConsentModal, #defaultConsentContainer .modal";
+    },
     initFieldEvents: function(userId) {
-        var __self = this, orgTool = this.getOrgTool(), modalElements = $("#consentContainer .modal, #defaultConsentContainer .modal");
+        var __self = this, orgTool = this.getOrgTool(), modalElements = $(this.getModalElementSelectors());
         var closeButtons = modalElements.find("button.btn-consent-close, button[data-dismiss]");
         $("#consentHistoryModal").modal({"show": false});
         modalElements.each(function() {
@@ -56,7 +59,6 @@ export default { /*global i18next datepicker $*/
             e.stopPropagation();
             setTimeout(function() { location.reload(); }, 10);
         });
-
         modalElements.each(function() {
             $(this).on("hidden.bs.modal", function() {
                 if ($(this).find("input[name='toConsent']:checked").length > 0) {
@@ -244,13 +246,15 @@ export default { /*global i18next datepicker $*/
         var consentText = i18next.t("I consent to sharing information with <span class='consent-clinic-name'>{orgName}</span>.".replace("{orgName}", orgName));
         var orgModalElement = $("#defaultConsentModal").clone(true);
         var tempHTML = orgModalElement.html();
-        tempHTML = tempHTML.replace(/\{orgId\}/g, orgId)
-            .replace(/\{close\}/g, i18next.t("Close"))
-            .replace(/\{yes\}/g, i18next.t("Yes"))
-            .replace(/\{no\}/g, i18next.t("No"))
-            .replace(/\{title\}/g, title)
-            .replace(/\{consentText\}/g, consentText);
-        orgModalElement.html(tempHTML);
+        if (tempHTML) {
+            tempHTML = tempHTML.replace(/\{orgId\}/g, orgId)
+                .replace(/\{close\}/g, i18next.t("Close"))
+                .replace(/\{yes\}/g, i18next.t("Yes"))
+                .replace(/\{no\}/g, i18next.t("No"))
+                .replace(/\{title\}/g, title)
+                .replace(/\{consentText\}/g, consentText);
+            orgModalElement.html(tempHTML);
+        }
         orgModalElement.attr("id", orgModalId);
         $("#defaultConsentContainer").append(orgModalElement);
         return $("#"+orgModalId);

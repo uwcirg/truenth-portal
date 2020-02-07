@@ -53,8 +53,29 @@ class TimeoutLock(object):
             timeout -= 1
             time.sleep(1)
 
+        current_app.logger.debug("Timeout on lock '{}'".format(self.key))
         raise LockTimeout("Timeout whilst waiting for lock {}".format(
             self.key))
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.redis.delete(self.key)
+
+
+def guarded_task_launch(task, **kwargs):
+    """Launch task after obtaining named semaphore key
+
+    Used by expensive tasks that should prevent multiple simultaneous runs.
+
+    :param task: celery task instance to be launched
+    :param kwargs: all arguments to include in task launch, plus `lock_key`
+
+    :raises TimeoutLock: if the named lock is unattainable
+    :returns: task id on successful launch
+
+    """
+    if 'lock_key' not in kwargs:
+        raise ValueError("guarded_tasks require a 'lock_key'")
+
+    lock = TimeoutLock(key=kwargs['lock_key'], expires=300)
+    lock.__enter__()  # raises LockTimeout if unavailable
+    return task.apply_async(kwargs=kwargs)

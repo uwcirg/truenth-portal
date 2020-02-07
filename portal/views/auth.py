@@ -64,7 +64,7 @@ google_blueprint = make_google_blueprint(
 )
 
 facebook_blueprint = make_facebook_blueprint(
-    scope=['email', 'user_birthday', 'user_gender'],
+    scope=['email'],
     login_url='/login/facebook/',
 )
 

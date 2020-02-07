@@ -45,7 +45,6 @@ docgen_test:
   variables:
     TOXENV: docs
   <<: *test_definition
-  allow_failure: true
 
 i18n_test_eproms:
   variables:

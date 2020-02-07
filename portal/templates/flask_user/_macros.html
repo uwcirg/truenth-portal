@@ -90,3 +90,21 @@
 {% macro copyrightText() -%}
 <span>&copy;{{_("%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.", year=config.COPYRIGHT_YEAR)}}</span>
 {%- endmacro %}
+{% macro passwordPopover() -%}
+    <div id="passwordPopover">
+        <div class="password-popover popover" role="tooltip">
+            <div class="arrow"></div>
+            <h3 class="popover-title"></h3>
+            <div class="popover-content">
+                <b>{{_("Password must have at least:")}}</b>
+                <ul id='pwdHintList'>
+                    <li class='text-info eight-characters'>{{_("Eight characters")}}</li>
+                    <li class='text-info lowercase-letter'>{{_("One lowercase letter")}}</li>
+                    <li class='text-info uppercase-letter'>{{_("One uppercase letter")}}</li>
+                    <li class='text-info one-number'>{{_("One number")}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/flask_user/PasswordPopover.js') }}"></script>
+{%- endmacro %}

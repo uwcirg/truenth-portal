@@ -27,7 +27,7 @@
                         </div>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
                         <!-- display export status -->
-                        <ExportDataLoader :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
+                        <ExportDataLoader ref="exportDataLoader" :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
@@ -102,12 +102,20 @@
                         self.instruments.selected = "";
                     }
                 });
+                $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
+                    //clear pre-existing error
+                    self.resetExportError();
+                });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
                     self.instruments.dataType = "csv";
+                    self.resetExportError();
                     $("#patientsInstrumentList").addClass("ready");
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
+            },
+            resetExportError: function() {
+                this.$refs.exportDataLoader.clearExportDataUI();
             },
             initExportEvent: function() {
                 /*

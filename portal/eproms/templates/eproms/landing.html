@@ -18,6 +18,7 @@
         <form action="{{url_for('user.login')}}" method="POST" class="form tnth-form to-validate" role="form" data-toggle="validator">
             <div class="headline">{{ app_text('landing title') }}</div>
             <div class="inputs-container">
+                <input type="hidden" name="next" value="/next-after-login" />
                 <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="fields-container">
                     <div class="input-field-container">
