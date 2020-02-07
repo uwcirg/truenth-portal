@@ -5,6 +5,11 @@
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
 **/
+@import "logo.less";
+@TrueNTHLogoThumbnailWidth: 128px;
+@TrueNTHLogoThumbnailHeight: 40px;
+@MovemberLogoThumbnailWidth: 116px;
+@MovemberLogoThumbnailHeight: 41px;
 @font-face {
     font-family: "symbols";
     src: url("../fonts/symbols.eot");
@@ -198,6 +203,7 @@ small,
 .fixed-table-container thead th .both,
 .form-group .help-block {
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .fixed-table-pagination {
@@ -599,6 +605,9 @@ select:not([multiple]) {
       border-top: 1px solid #ccc;
       padding-top: 1em;
     }
+    .logo-container {
+      padding-top: 1.5em;
+    }
   }
   img {
     width: 40%;
@@ -609,6 +618,45 @@ select:not([multiple]) {
     img {
       width: auto;
     }
+  }
+}
+
+#footerLogo {
+  display: inline-block;
+  margin-right: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  top:4px;
+  background-image: @thumbNailTrueNTHLogoPath;
+  background-size: @TrueNTHLogoThumbnailWidth @TrueNTHLogoThumbnailHeight;
+  background-repeat: no-repeat;
+  width: @TrueNTHLogoThumbnailWidth;
+  height: @TrueNTHLogoThumbnailHeight;
+  &.white-theme {
+    background-image: @thumbNailTruenthWhiteLogoPath;
+    height: 46px;
+  } 
+}
+#footerMovember {
+  display: inline-block;
+  vertical-align: bottom;
+  margin-bottom: 8px;
+  background-image: @thumbNailMovemberLogoPath;
+  background-size: @MovemberLogoThumbnailWidth @MovemberLogoThumbnailHeight;
+  background-repeat: no-repeat;
+  width: @MovemberLogoThumbnailWidth;
+  height: @MovemberLogoThumbnailHeight;
+  &.white-theme {
+    background-image: @thumbNailWhiteMovemberLogoPath;
+    background-size: 116px 56px;
+    width: 116px;
+    height: 56px;
+    
+  }
+}
+@media (min-width: 612px) {
+  #footerLogo, #footerMovember {
+    margin-bottom: 0;
   }
 }
 
@@ -2398,7 +2446,8 @@ div.pull-right {
     display: none;
   }
   .logo-container {
-    margin: auto;
+    margin: 4px auto 0;
+    text-align: center;
   }
 
   #profileHeader * {
@@ -2408,7 +2457,6 @@ div.pull-right {
   & .copyright-container *,
   & .logo-container * {
     color: @footerWhiteThemeColor;
-    margin-bottom: 1em;
   }
   & .copyright-container {
     font-size: @footerSize;
@@ -4097,7 +4145,7 @@ div.timezone-warning.text-warning {
       padding: 2em 3em 2.7em 3em;
     }
     .copyright-container {
-      width: 80%;
+      width: 67.5%;
     }
   }
   #createProfileForm {

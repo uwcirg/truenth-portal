@@ -229,6 +229,11 @@ class BaseConfig(object):
         'uwcirg.github.io',
     ]
 
+    BANNER_LOGOS = [
+        '/static/img/logo_wordmark_topnav2.png',
+        '/static/img/logo_wordmark_topnav.png'
+    ]
+
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
         if os.environ.get('MAINTENANCE_WINDOW') else None

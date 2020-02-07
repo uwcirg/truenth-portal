@@ -36,7 +36,7 @@
 }
 .watermark, .watermark-nowrapper {
   position: absolute;
-  top: 6em;
+  top: 7.5em;
   right: 0;
   z-index: 1000;
   font-weight: normal;
@@ -127,7 +127,7 @@
   z-index: 1000;
   border: none;
   position: relative;
-  min-height: 72px;
+  min-height: 80px;
   overflow: hidden;
   &:after {
     clear: both;
@@ -166,28 +166,23 @@
 /** Logo **/
 #tnthLogo {
   width: 500px;
-  margin: 0 auto;
+  margin: 4px auto;
   transition: margin 10ms ease-in;
   text-align: center;
-  img {
-    height: 75px;
-  }
 }
 #tnthLogoXs {
   padding: 0;
   display: block;
-  width: 100px;
   max-width: 100%;
   margin: auto;
-  text-align: center;
-  img {
-    height: 40px;
-  }
+  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-@media (min-width: 417px) {
+@media (min-width: 699px) {
   #tnthLogoXs {
-    margin: auto;
-    display: block;
+    top: 57.5%;
   }
 }
 #tnthTopLinks {
@@ -357,6 +352,7 @@ padding: 0 6px;
   .tnth-navbar-header {
     margin-right: -15px;
     margin-left: -15px;
+    position: relative;
     &:after, &:before {
       display: table;
       content: " ";

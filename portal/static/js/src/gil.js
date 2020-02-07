@@ -412,7 +412,7 @@ module.exports = VisObj = (function() {
     };
     this.showMain = function() {
       if (!this.HAS_REDIRECT) {
-        if ($(".watermark").length > 0) {
+        if ($(".watermark:visible").length > 0) {
           $("header.no-banner ").css("padding-top", "35px");
         }
         $("#mainHolder").css({
