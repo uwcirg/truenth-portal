@@ -646,11 +646,14 @@ select:not([multiple]) {
   background-repeat: no-repeat;
   width: @MovemberLogoThumbnailWidth;
   height: @MovemberLogoThumbnailHeight;
+  position: relative;
+  top: 4px;
   &.white-theme {
     background-image: @thumbNailWhiteMovemberLogoPath;
     background-size: 116px 56px;
     width: 116px;
     height: 56px;
+    top: 0;
     
   }
 }
@@ -4145,7 +4148,11 @@ div.timezone-warning.text-warning {
       padding: 2em 3em 2.7em 3em;
     }
     .copyright-container {
-      width: 80%;
+      width: 70%;
+      .copyright {
+        display: inline-block;
+        width: 80%;
+      }
     }
   }
   #createProfileForm {
