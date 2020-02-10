@@ -5002,7 +5002,7 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
 .header .logo {
     position: absolute;
     left: 50%;
-    margin-left: (@TrueNTHLogoWidth - 20) / 2 * -1;
+    margin-left: @TrueNTHLogoWidth / 2 * -1;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio:2),
@@ -5071,12 +5071,14 @@ only screen and (-moz-min-device-pixel-ratio:2),
 only screen and (min-device-pixel-ratio:2),
 only screen and (min-resolution:192dpi),
 only screen and (min-resolution:2dppx) {
-    .theme--intro-light .logo {
-        background-image:  @TrueNTHWhiteLogoSVGPath;
-    }
-    .is-scrolled .logo,
-    .is-scrolled .theme--intro-light .logo {
-        background-image:  @TrueNTHLogoSVGPath;
+    @media (min-width: 992px) {
+        .theme--intro-light .logo {
+            background-image:  @TrueNTHWhiteLogoSVGPath;
+        }
+        .is-scrolled .logo,
+        .is-scrolled .theme--intro-light .logo {
+            background-image:  @TrueNTHLogoSVGPath;
+        }
     }
 }
 
@@ -6693,7 +6695,7 @@ a:hover {
 
 @media (max-width:899px) {
     .header {
-        padding: 22px 80px;
+        padding: 28px 80px;
         position: fixed;
         top: 0;
         height: 116px;
