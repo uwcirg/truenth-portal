@@ -4972,11 +4972,22 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
     width: @TrueNTHLogoWidth - 20;
     height:  @TrueNTHLogoHeight - 10;
 }
+.allow-svg {
+    .logo {
+        background-image:  @TrueNTHLogoSVGPath;
+    }
+}
 
 @media (min-width:900px) {
     .theme--white .logo,
     .header--white .logo {
-        background-image: @TrueNTHWhiteLogoPath;
+        background-image: @TrueNTHWhiteLogoSVGPath;
+    }
+    .allow-svg {
+        .theme--white .logo,
+        .header--white .logo {
+            background-image: @TrueNTHWhiteLogoSVGPath;
+        }
     }
 }
 
@@ -4991,37 +5002,34 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
 .header .logo {
     position: absolute;
     left: 50%;
-    //margin-left: @TrueNTHLogoMobileWidth / 2 * -1;
     margin-left: (@TrueNTHLogoWidth - 20) / 2 * -1;
 }
 
-.is-scrolled .header .logo {
-    margin-left: @TrueNTHLogoScrollWidth / 2 * -1;
-    margin-top: -16px
-}
-
-@media (min-width:992px) {
-    .header .logo {
-        margin-left: @TrueNTHLogoWidth / 2 * -1;
-        margin-top: -8px
+@media only screen and (-webkit-min-device-pixel-ratio:2),
+only screen and (-moz-min-device-pixel-ratio:2),
+only screen and (min-device-pixel-ratio:2),
+only screen and (min-resolution:192dpi),
+only screen and (min-resolution:2dppx) {
+    .logo {
+        background-image:  @TrueNTHLogoSVGPath;
     }
 }
 
-// @media only screen and (-webkit-min-device-pixel-ratio:2),
-// only screen and (-moz-min-device-pixel-ratio:2),
-// only screen and (min-device-pixel-ratio:2),
-// only screen and (min-resolution:192dpi),
-// only screen and (min-resolution:2dppx) {
-//     .logo {
-//         background-size: @TrueNTHLogoWidth @TrueNTHLogoHeight;
-//     }
-// }
+.is-scrolled .header .logo {
+    margin-left: (@TrueNTHLogoScrollWidth / 2) * -1;
+    margin-top: -8px;
+}
 
-.is-scrolled .logo {
+.is-scrolled .logo,
+.is-scrolled .theme--intro-light .logo {
     background-image: @TrueNTHLogoPath;
     background-size: @TrueNTHLogoScrollWidth @TrueNTHLogoScrollHeight;
     width: @TrueNTHLogoScrollWidth;
     height: @TrueNTHLogoScrollHeight;
+}
+.is-scrolled .allow-svg  .logo,
+.is-scrolled .allow-svg .theme--intro-light .logo {
+    background-image: @TrueNTHLogoSVGPath !important;
 }
 
 @media (max-width:899px) {
@@ -5036,16 +5044,39 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
         width: @TrueNTHLogoMobileWidth;
         height: @TrueNTHLogoMobileHeight;
     }
+    .allow-svg {
+        .logo {
+            background-image: @TrueNTHLogoSVGPath;
+        }
+    }
 }
 
 @media (min-width:901px) {
-    :not(.is-scrolled) .theme--intro-light .logo {
+    .theme--intro-light .logo {
         background-image: @TrueNTHWhiteLogoPath;
         background-size: @TrueNTHLogoWidth @TrueNTHLogoHeight;
         background-repeat: no-repeat;
         width: @TrueNTHLogoWidth;
         height: @TrueNTHLogoHeight;
         color: #FFF
+    }
+    .allow-svg {
+        .theme--intro-light .logo {
+            background-image: @TrueNTHWhiteLogoSVGPath;
+        }
+    }
+}
+@media only screen and (-webkit-min-device-pixel-ratio:2),
+only screen and (-moz-min-device-pixel-ratio:2),
+only screen and (min-device-pixel-ratio:2),
+only screen and (min-resolution:192dpi),
+only screen and (min-resolution:2dppx) {
+    .theme--intro-light .logo {
+        background-image:  @TrueNTHWhiteLogoSVGPath;
+    }
+    .is-scrolled .logo,
+    .is-scrolled .theme--intro-light .logo {
+        background-image:  @TrueNTHLogoSVGPath;
     }
 }
 
