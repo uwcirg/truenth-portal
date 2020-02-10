@@ -5025,8 +5025,14 @@ only screen and (min-resolution:2dppx) {
 }
 
 .is-scrolled .header .logo {
-    margin-left: ((@TrueNTHLogoScrollWidth + 27) / 2) * -1;
+    margin-left: ((@TrueNTHLogoScrollWidth + 7.5) / 2) * -1;
     margin-top: -12px;
+}
+@media (min-width: 900px) {
+    .is-scrolled .header .logo {
+        margin-left: ((@TrueNTHLogoScrollWidth + 27) / 2) * -1;
+        margin-top: -12px;
+    }
 }
 
 .is-scrolled .logo,
@@ -6808,11 +6814,12 @@ a:hover {
         margin-top: 20px;
         display: block;
     }
-    .is-scrolled {
-        .header__menu,
-        .header__meta {
-            margin-top: 0;
-        }
+}
+
+.is-scrolled {
+    .header__menu,
+    .header__meta {
+        margin-top: 0;
     }
 }
 
@@ -7360,7 +7367,7 @@ figure.nav-overlay {
 }
 
 .home-intro .intro__sub {
-    margin: 0;
+    margin: 0 16px;
     font-size: 28px;
     line-height: 1.4;
 }
@@ -7390,7 +7397,7 @@ figure.nav-overlay {
 
 .home-intro .intro__down figure:before {
     position: relative;
-    top: 13px
+    top: 16px
 }
 
 .simple-page-content {
