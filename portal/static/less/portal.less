@@ -632,7 +632,7 @@ select:not([multiple]) {
   width: @TrueNTHLogoThumbnailWidth;
   height: @TrueNTHLogoThumbnailHeight;
   &.white-theme {
-    top:4px;
+    top:2px;
     background-image: @thumbNailTruenthWhiteLogoPath;
     height: 46px;
   } 
@@ -656,6 +656,24 @@ select:not([multiple]) {
     top: 0;
     
   }
+}
+@media only screen and (-webkit-min-device-pixel-ratio:2),
+only screen and (-moz-min-device-pixel-ratio:2),
+only screen and (min-device-pixel-ratio:2),
+only screen and (min-resolution:192dpi),
+only screen and (min-resolution:2dppx) {
+    #footerLogo {
+      background-image: @thumbNailx2TrueNTHLogoPath;
+      &.white-theme {
+        background-image: @thumbNailx2TruenthWhiteLogoPath;
+      }
+    }
+    #footerMovember {
+      background-image: @thumbNailx2MovemberLogoPath;
+      &.white-theme {
+        background-image: @thumbNailx2WhiteMovemberLogoPath;
+      }
+    }
 }
 @media (min-width: 612px) {
   #footerLogo, #footerMovember {
