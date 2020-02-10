@@ -5011,7 +5011,7 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
 .header .logo {
     position: absolute;
     left: 50%;
-    margin-left: @TrueNTHLogoWidth / 2 * -1;
+    margin-left: (@TrueNTHLogoWidth + 35) / 2 * -1;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio:2),
@@ -5025,8 +5025,14 @@ only screen and (min-resolution:2dppx) {
 }
 
 .is-scrolled .header .logo {
-    margin-left: (@TrueNTHLogoScrollWidth / 2) * -1;
+    margin-left: ((@TrueNTHLogoScrollWidth + 7.5) / 2) * -1;
     margin-top: -12px;
+}
+@media (min-width: 900px) {
+    .is-scrolled .header .logo {
+        margin-left: ((@TrueNTHLogoScrollWidth + 40) / 2) * -1;
+        margin-top: -12px;
+    }
 }
 
 .is-scrolled .logo,
@@ -5045,7 +5051,7 @@ only screen and (min-resolution:2dppx) {
     .header .logo {
         position: absolute;
         left: 50%;
-        margin-left: @TrueNTHLogoMobileWidth / 2 * -1;
+        margin-left: (@TrueNTHLogoMobileWidth + 40) / 2 * -1;
     }
     .logo {
         background-image: @TrueNTHLogoPath;
