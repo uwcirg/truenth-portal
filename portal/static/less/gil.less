@@ -2209,7 +2209,7 @@ pre code {
     .photo-grid-container,
     .icon-box-group__wrapper,
     .module {
-        width: 1155px
+        width: 1088px
     }
 }
 
@@ -5496,7 +5496,7 @@ only screen and (min-resolution:2dppx) {
     font-size: 25px;
     line-height: 1.5;
     letter-spacing: .3px;
-    padding: 50px 0 30px;
+    padding: 50px 1em 30px;
     margin: 0
 }
 
@@ -7409,7 +7409,8 @@ figure.nav-overlay {
     p {
         font-size: 20px;
         line-height: 1.6;
-        margin: 0 0 20px
+        margin: 0 0 20px;
+        letter-spacing: 0.02rem;
     }
 }
 
@@ -7466,7 +7467,7 @@ figure.nav-overlay {
 }
 
 .page-intro--theme-brown-light {
-    background: #626460;
+    background: #5e5a4f;
     color: #fff
 }
 
@@ -8471,11 +8472,19 @@ aside {
     background-position: 75% top;
     transition: background-position 150ms ease-out;
     .page-intro__content {
-        padding-top: 18%;
+        padding-top: 25%;
         min-height: 380px
     }
     .page-intro__sub {
         margin-top: .5em
+    }
+}
+
+@media (min-width: 699px) {
+    .page-intro--lived-experience {
+        .page-intro__content {
+            padding-top: 18%;
+        }
     }
 }
 
@@ -9570,6 +9579,11 @@ aside .module--flex {
         padding-left: 36px;
         padding-right: 36px;
         top: 232px;
+    }
+}
+@media (min-width: 1200px) {
+    .home--items-wrapper {
+        width: 1116px;
     }
 }
 
