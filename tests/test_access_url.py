@@ -6,7 +6,6 @@ from flask_webtest import SessionScope
 from portal.extensions import db, user_manager
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from tests import TestCase
 
 
 def test_create_access_url(app, client, add_user, promote_user, login, teardown_db):
