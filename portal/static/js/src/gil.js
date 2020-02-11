@@ -1289,8 +1289,8 @@ module.exports = utilObj = (function() {
     };
 
     this.setSVGSupportAttr = function() {
-      if (Utility.supportSVG()) {
-        $("body").addClass("allow-svg");
+      if (!Utility.supportSVG()) {
+        $("body").addClass("no-svg-support");
       }
     };
 

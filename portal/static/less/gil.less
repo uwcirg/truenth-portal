@@ -4966,16 +4966,25 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
 
 .logo {
     display: block;
-    background-image: @TrueNTHLogoPath;
+    background-image: @TrueNTHLogoSVGPath;
     background-size: (@TrueNTHLogoWidth - 20) (@TrueNTHLogoHeight - 10);
     background-repeat: no-repeat;
     width: @TrueNTHLogoWidth - 20;
     height:  @TrueNTHLogoHeight - 10;
+    opacity: 0.8;
 }
-.allow-svg {
+.theme--white .logo,
+.header--white .logo,
+.theme--intro-light .logo,
+&.theme--white .logo,
+&.header--white .logo,
+&.theme--intro-light .logo {
+    opacity: 1;
+}
+.no-svg-support {
     .logo {
-        background-image:  @TrueNTHLogoSVGPath;
-        opacity: 0.8;
+        background-image:  @TrueNTHLogoPath;
+        opacity: 1;
     }
     .theme--white .logo,
     .header--white .logo,
@@ -4992,10 +5001,10 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
     .header--white .logo {
         background-image: @TrueNTHWhiteLogoSVGPath;
     }
-    .allow-svg {
+    .no-svg-support {
         .theme--white .logo,
         .header--white .logo {
-            background-image: @TrueNTHWhiteLogoSVGPath;
+            background-image: @TrueNTHWhiteLogoPath;
         }
     }
 }
@@ -5037,14 +5046,14 @@ only screen and (min-resolution:2dppx) {
 
 .is-scrolled .logo,
 .is-scrolled .theme--intro-light .logo {
-    background-image: @TrueNTHLogoPath;
+    background-image: @TrueNTHLogoSVGPath;
     background-size: @TrueNTHLogoScrollWidth @TrueNTHLogoScrollHeight;
     width: @TrueNTHLogoScrollWidth;
     height: @TrueNTHLogoScrollHeight;
 }
-.is-scrolled .allow-svg  .logo,
-.is-scrolled .allow-svg .theme--intro-light .logo {
-    background-image: @TrueNTHLogoSVGPath !important;
+.is-scrolled .no-svg-support  .logo,
+.is-scrolled .no-svg-support .theme--intro-light .logo {
+    background-image: @TrueNTHLogoPath !important;
 }
 
 @media (max-width:899px) {
@@ -5054,30 +5063,30 @@ only screen and (min-resolution:2dppx) {
         margin-left: (@TrueNTHLogoMobileWidth + 27) / 2 * -1;
     }
     .logo {
-        background-image: @TrueNTHLogoPath;
+        background-image: @TrueNTHLogoSVGPath;
         background-size: @TrueNTHLogoMobileWidth @TrueNTHLogoMobileHeight;
         width: @TrueNTHLogoMobileWidth;
         height: @TrueNTHLogoMobileHeight;
     }
-    .allow-svg {
+    .no-svg-support {
         .logo {
-            background-image: @TrueNTHLogoSVGPath;
+            background-image: @TrueNTHLogoPath;
         }
     }
 }
 
 @media (min-width:901px) {
     .theme--intro-light .logo {
-        background-image: @TrueNTHWhiteLogoPath;
+        background-image: @TrueNTHWhiteLogoSVGPath;
         background-size: @TrueNTHLogoWidth @TrueNTHLogoHeight;
         background-repeat: no-repeat;
         width: @TrueNTHLogoWidth;
         height: @TrueNTHLogoHeight;
         color: #FFF
     }
-    .allow-svg {
+    .no-svg-support {
         .theme--intro-light .logo {
-            background-image: @TrueNTHWhiteLogoSVGPath;
+            background-image: @TrueNTHWhiteLogoPath;
         }
     }
 }

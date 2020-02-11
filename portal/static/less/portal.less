@@ -626,14 +626,14 @@ select:not([multiple]) {
   margin-right: 12px;
   margin-bottom: 12px;
   position: relative;
-  background-image: @thumbNailTrueNTHLogoPath;
+  background-image: @thumbNail2xTrueNTHLogoPath;
   background-size: @TrueNTHLogoThumbnailWidth @TrueNTHLogoThumbnailHeight;
   background-repeat: no-repeat;
   width: @TrueNTHLogoThumbnailWidth;
   height: @TrueNTHLogoThumbnailHeight;
   &.white-theme {
     top:2px;
-    background-image: @thumbNailTruenthWhiteLogoPath;
+    background-image: @thumbNail2xTruenthWhiteLogoPath;
     height: 46px;
   } 
 }
@@ -641,7 +641,7 @@ select:not([multiple]) {
   display: inline-block;
   vertical-align: bottom;
   margin-bottom: 8px;
-  background-image: @thumbNailMovemberLogoPath;
+  background-image: @thumbNail2xMovemberLogoPath;
   background-size: @MovemberLogoThumbnailWidth @MovemberLogoThumbnailHeight;
   background-repeat: no-repeat;
   width: @MovemberLogoThumbnailWidth;
@@ -649,12 +649,25 @@ select:not([multiple]) {
   position: relative;
   top: 4px;
   &.white-theme {
-    background-image: @thumbNailWhiteMovemberLogoPath;
+    background-image: @thumbNail2xWhiteMovemberLogoPath;
     background-size: 116px 56px;
     width: 116px;
     height: 56px;
     top: 0;
-    
+  }
+}
+.no-svg-support {
+  #footerLogo {
+    background-image: @thumbNailTrueNTHLogoPath;
+    &.white-theme {
+      background-image: @thumbNailTruenthWhiteLogoPath;
+    } 
+  }
+  #footerMovember {
+    background-image: @thumbNailMovemberLogoPath;
+    &.white-theme {
+      background-image: @thumbNailWhiteMovemberLogoPath;
+    }
   }
 }
 @media only screen and (-webkit-min-device-pixel-ratio:2),
@@ -663,15 +676,15 @@ only screen and (min-device-pixel-ratio:2),
 only screen and (min-resolution:192dpi),
 only screen and (min-resolution:2dppx) {
     #footerLogo {
-      background-image: @thumbNailx2TrueNTHLogoPath;
+      background-image: @thumbNail2xTrueNTHLogoPath;
       &.white-theme {
-        background-image: @thumbNailx2TruenthWhiteLogoPath;
+        background-image: @thumbNail2xTruenthWhiteLogoPath;
       }
     }
     #footerMovember {
-      background-image: @thumbNailx2MovemberLogoPath;
+      background-image: @thumbNail2xMovemberLogoPath;
       &.white-theme {
-        background-image: @thumbNailx2WhiteMovemberLogoPath;
+        background-image: @thumbNail2xWhiteMovemberLogoPath;
       }
     }
 }
