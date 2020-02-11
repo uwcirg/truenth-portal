@@ -298,6 +298,9 @@ export default (function() {
                 });
             },
             isUserEmailReady: function() {
+                if (!this.demo.data.email) { //user has no email address, should just return false by default
+                    return false;
+                }
                 return this.userEmailReady;
             },
             setUserEmailReady: function(params) {

@@ -475,9 +475,8 @@
 
 {% macro resetPassword(person) %}
     <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
-        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn" v-bind:class="{disabled: !isUserEmailReady()}" v-bind:disabled="!isUserEmailReady()">{{_("Send email")}}</button>
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{_("Send email")}}</button>
         <div id="passwordResetMessage" class="text-info"></div>
-        {{emailReadyMessage()}}
     </div>
 {%-endmacro %}
 
