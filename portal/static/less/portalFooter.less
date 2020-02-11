@@ -6,21 +6,21 @@
 @MovemberFooterLogoWidth: 125px;
 @MovemberFooterLogoHeight: 60px;
 @mobile_footer_logo: {
-    background-image: @TrueNTHWhiteLogoPath;
+    background-image: @TrueNTHWhiteLogoSVGPath;
     background-size: @TrueNTHFooterLogoMobileWidth @TrueNTHFooterLogoMobileHeight;
     background-repeat: no-repeat;
     width: @TrueNTHFooterLogoMobileWidth;
     height: @TrueNTHFooterLogoMobileHeight;
 }
 @desktop_footer_logo: {
-    background-image: @TrueNTHWhiteLogoPath;
+    background-image: @TrueNTHWhiteLogoSVGPath;
     background-size: @TrueNTHFooterLogoWidth @TrueNTHFooterLogoHeight;
     background-repeat: no-repeat;
     width: @TrueNTHFooterLogoWidth;
     height: @TrueNTHFooterLogoHeight;
 }
 @movember_footer_logo: {
-    background-image: @WhiteMovemberLogoPath;
+    background-image: @thumbNail2xWhiteMovemberLogoPath;
     background-size: @MovemberFooterLogoWidth @MovemberFooterLogoHeight;
     background-repeat: no-repeat;
     width: @MovemberFooterLogoWidth;
@@ -196,21 +196,17 @@
     //         top: 1px;
     //     }
     // }
-
-    @media only screen and (-webkit-min-device-pixel-ratio:2),
-    only screen and (-moz-min-device-pixel-ratio:2),
-    only screen and (min-device-pixel-ratio:2),
-    only screen and (min-resolution:192dpi),
-    only screen and (min-resolution:2dppx) {
-        .logo-footer-movember,
-        .footer__logo--movember {
-            background-image: @WhiteMovemberLogoPath;
-            background-size: @MovemberFooterLogoWidth @MovemberFooterLogoHeight;
-            background-repeat: no-repeat;
-        }
+}
+.no-svg-support {
+    .logo-footer-truenth,
+    .footer__logo--truenth {
+        background-image: @TrueNTHWhiteLogoPath;
+    }
+    .logo-footer-movember,
+    .footer__logo--movember {
+        background-image: @WhiteMovemberLogoPath;
     }
 }
-
 @media (min-width: 992px) {
     #tnthBottomNavWrapper.footer {
         .main-nav-list {
