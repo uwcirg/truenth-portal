@@ -5027,7 +5027,7 @@ only screen and (min-resolution:2dppx) {
 }
 
 .is-scrolled .header .logo {
-    margin-left: ((@TrueNTHLogoScrollWidth + 7.5) / 2) * -1;
+    margin-left: ((@TrueNTHLogoMobileWidth + 7.5) / 2) * -1;
     margin-top: -12px;
 }
 @media (min-width: 900px) {
@@ -5040,9 +5040,17 @@ only screen and (min-resolution:2dppx) {
 .is-scrolled .logo,
 .is-scrolled .theme--white .logo {
     background-image: @TrueNTHLogoSVGPath;
-    background-size: @TrueNTHLogoScrollWidth @TrueNTHLogoScrollHeight;
-    width: @TrueNTHLogoScrollWidth;
-    height: @TrueNTHLogoScrollHeight;
+    background-size: @TrueNTHLogoMobileWidth @TrueNTHLogoMobileHeight;
+    width: @TrueNTHLogoMobileWidth;
+    height: @TrueNTHLogoMobileHeight;
+}
+@media (min-width: 900px) {
+    .is-scrolled .logo,
+    .is-scrolled .theme--white .logo {
+        background-size: @TrueNTHLogoScrollWidth @TrueNTHLogoScrollHeight;
+        width: @TrueNTHLogoScrollWidth;
+        height: @TrueNTHLogoScrollHeight;
+    }
 }
 .is-scrolled .no-svg-support  .logo,
 .is-scrolled .no-svg-support .theme--white .logo {
