@@ -16,7 +16,4 @@ $(document).ready(function() {
     if (hc.length === 1) {
         hc.removeClass("home--item-container").addClass("home--item-container-full");
     }
-    setTimeout(function() {
-        $("#portalMain").addClass("active");
-    }, 150);
 });
