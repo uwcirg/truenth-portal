@@ -112,27 +112,17 @@ def celery_app(app):
     return celery
 
 
-@pytest.fixture(scope="session")
-def test_user(app, initialized_db):
+@pytest.fixture
+def test_user(app, add_user, initialized_db):
     DEFAULT_PASSWORD = 'fakePa$$'
-
     TEST_USERNAME = 'test@example.com'
     FIRST_NAME = '✓'
     LAST_NAME = 'Last'
     IMAGE_URL = 'http://examle.com/photo.jpg'
 
-    password = app.user_manager.hash_password(DEFAULT_PASSWORD)
-    test_user = User(
-        username=TEST_USERNAME, first_name=FIRST_NAME,
-        last_name=LAST_NAME, image_url=IMAGE_URL,
-        password=DEFAULT_PASSWORD)
-    with SessionScope(db):
-        db.session.add(test_user)
-        db.session.commit()
-    test_user = db.session.merge(test_user)
-    # Avoid testing cached/stale data
-    invalidate_users_QBT(test_user.id)
-
+    test_user = add_user(
+            username=TEST_USERNAME, first_name=FIRST_NAME,
+            last_name=LAST_NAME, image_url=IMAGE_URL)
     yield test_user
 
 

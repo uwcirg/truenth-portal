@@ -198,7 +198,7 @@ def test_client_add(promote_user, login, client):
     client = Client.query.filter_by(user_id=TEST_USER_ID).first()
     assert client.application_origins == origins
 
-def test_client_bad_add(promote_user, login, client):
+def test_client_bad_add(promote_user, login, client, initialized_db, teardown_db):
     """Test adding a bad client application"""
     promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
     login()
@@ -301,9 +301,6 @@ def test_service_account_promotion(add_client):
 
 def test_token_status(client, test_user):
     with SessionScope(db):
-        # added to prevent foreign key error
-        db.session.add(test_user)
-
         test_client = Client(
             client_id='test-id', client_secret='test-secret',
             user_id=TEST_USER_ID)
