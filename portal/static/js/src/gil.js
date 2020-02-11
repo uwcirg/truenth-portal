@@ -1288,10 +1288,8 @@ module.exports = utilObj = (function() {
       }
     };
 
-    this.setSVGSupportAttr = function() {
-      if (!Utility.supportSVG()) {
-        $("body").addClass("no-svg-support");
-      }
+    this.handleSVGSupport = function() {
+      Utility.setNoSVGSupportCssClass();
     };
 
     this.setVis = function(show) {
@@ -1477,7 +1475,7 @@ $(document).ready(function(){
   window.app.accessCodeObj.handleEvents();
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
   window.app.menuObj.init(currentUserId, function() { //enable/disabled menu items depending on user roles
-    window.app.utilObj.setSVGSupportAttr();
+    window.app.utilObj.handleSVGSupport();
     window.app.utilObj.setVis(false);
   });
 });
