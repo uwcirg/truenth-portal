@@ -301,9 +301,6 @@ export default (function() {
                 return !this.demo.data.email;
             },
             isUserEmailReady: function() {
-                if (!this.userHasNoEmail()) { //user has no email address, should just return false by default
-                    return false;
-                }
                 return this.userEmailReady;
             },
             setUserEmailReady: function(params, callback) {
@@ -319,10 +316,12 @@ export default (function() {
                         callback();
                         return false;
                     }
-                    if (!params.ignore_preference) {
-                        self.userEmailReady = data.ready;
-                        self.messages.userEmailReadyMessage = data.reason || "";
+                    if (params.ignore_preference) {
+                        callback(data);
+                        return;
                     }
+                    self.userEmailReady = data.ready;
+                    self.messages.userEmailReadyMessage = data.reason || "";
                     callback(data);
                 });
             },
