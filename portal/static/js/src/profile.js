@@ -316,7 +316,13 @@ export default (function() {
                         callback();
                         return false;
                     }
+                    /*
+                     * check for the presence of ignore_preference in parameters
+                     */
                     if (params.ignore_preference) {
+                        /*
+                         * this will allow manual enabling of capacity to send email to user
+                         */
                         callback(data);
                         return;
                     }
