@@ -230,8 +230,8 @@ class BaseConfig(object):
     ]
 
     BANNER_LOGOS = {
-        'desktop': 'static/img/TrueNTH_Banner_Logo.svg',
-        'mobile': 'static/img/TrueNTH_Banner_Logo_Mobile.svg'
+        'desktop': os.environ.get('PERSISTENCE_DIR', 'gil') + '/static/img/TrueNTH_Banner_Logo.svg',
+        'mobile': os.environ.get('PERSISTENCE_DIR', 'gil') + '/static/img/TrueNTH_Banner_Logo_Mobile.svg'
     }
 
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
