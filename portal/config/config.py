@@ -229,10 +229,10 @@ class BaseConfig(object):
         'uwcirg.github.io',
     ]
 
-    BANNER_LOGOS = [
-        '/static/img/logo_wordmark_topnav2.png',
-        '/static/img/logo_wordmark_topnav.png'
-    ]
+    BANNER_LOGOS = {
+        'desktop': 'TrueNTH_Banner_Logo.svg',
+        'mobile': 'TrueNTH_Banner_Logo_Mobile.svg'
+    }
 
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
