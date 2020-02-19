@@ -5,9 +5,10 @@
 # NB: setting PGHOST will cause the postgres service to fail
 variables:
   SECRET_KEY: static secret key
-  SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:@postgres/${POSTGRES_DB}
+  SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
   REDIS_URL: redis://redis:6379/0
   POSTGRES_DB: portaldb
+  POSTGRES_PASSWORD: wplatrop
 stages:
   - test
   - deploy
