@@ -1,5 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
+from datetime import datetime
+
 from flask import url_for
 from flask_webtest import SessionScope
 import pytest
@@ -9,17 +11,25 @@ from portal.cache import cache
 from portal.config.config import TestConfig
 from portal.database import db
 from portal.factories.app import create_app
-from portal.models.client import Client
 from portal.factories.celery import create_celery
+from portal.models.audit import Audit
+from portal.models.client import Client
 from portal.models.clinical_constants import add_static_concepts
 from portal.models.intervention import add_static_interventions
-from portal.models.organization import Organization, add_static_organization
+from portal.models.organization import Organization, OrgTree, add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
+from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
+from portal.models.user_consent import (
+    INCLUDE_IN_REPORTS_MASK,
+    SEND_REMINDERS_MASK,
+    STAFF_EDITABLE_MASK,
+    UserConsent,
+)
+from tests import TEST_USER_ID 
 
-TEST_USER_ID = 1
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -28,6 +38,53 @@ def pytest_addoption(parser):
         default=False,
         help="run selenium ui tests",
     )
+
+
+def shallow_org_tree():
+    """Create shallow org tree for common test needs"""
+    org_101 = Organization(id=101, name='101')
+    org_102 = Organization(id=102, name='102')
+    org_1001 = Organization(id=1001, name='1001', partOf_id=101)
+
+    already_done = Organization.query.get(101)
+    if already_done:
+        return
+
+    with SessionScope(db):
+        [db.session.add(org) for org in (org_101, org_102, org_1001)]
+        db.session.commit()
+    OrgTree.invalidate_cache()
+
+
+def calc_date_params(backdate, setdate):
+    """
+    Returns the calculated date given user's request
+
+    Tests frequently need to mock times, this returns the calculated time,
+    either by adjusting from utcnow (via backdate), using the given value
+    (in setdate) or using the value of now if neither of those are available.
+
+    :param backdate: a relative timedelta to move from now
+    :param setdate: a specific datetime value
+    :return: best date given parameters
+
+    """
+    if setdate and backdate:
+        raise ValueError("set ONE, `backdate` OR `setdate`")
+
+    if setdate:
+        acceptance_date = setdate
+    elif backdate:
+        # Guard against associative problems with backdating by
+        # months.
+        if backdate.months:
+            raise ValueError(
+                "moving dates by month values is non-associative; use"
+                "`associative_backdate` and pass in `setdate` param")
+        acceptance_date = datetime.utcnow() - backdate
+    else:
+        acceptance_date = datetime.utcnow()
+    return acceptance_date
 
 
 @pytest.fixture(scope="session")
@@ -166,6 +223,76 @@ def add_service_user(initialize_static, test_user):
 
         return db.session.merge(service_user)
     return add_service_user
+
+
+@pytest.fixture
+def bless_with_basics(test_user, promote_user):
+    def bless_with_basics(
+            user=None, backdate=None, setdate=None,
+            local_metastatic=None, make_patient=True):
+        """Bless user with basic requirements for coredata
+
+        :param user: user to bless, test_user by default
+        :param backdate: timedelta value.  Define to mock consents
+          happening said period in the past.  See
+          ``associative_backdate`` for issues with 'months'.
+        :param setdate: datetime value.  Define to mock consents
+          happening at exact time in the past
+        :param local_metastatic: set to 'localized' or 'metastatic' for
+          tests needing those respective orgs assigned to the user
+        :param make_patient: add patient role unless set False
+
+        """
+        if not user:
+            user = db.session.merge(test_user)
+        else:
+            user = db.session.merge(user)
+        user_id = user.id
+        user.birthdate = datetime.utcnow()
+
+        if make_patient:
+            promote_user(user=user, role_name=ROLE.PATIENT.value)
+
+        # Register with a clinic
+        shallow_org_tree()
+
+        if local_metastatic:
+            org = Organization.query.filter(
+                Organization.name == local_metastatic).one()
+        else:
+            org = Organization.query.filter(
+                Organization.partOf_id.isnot(None)).first()
+        assert org
+        user = db.session.merge(user)
+        user.organizations.append(org)
+
+        # Agree to Terms of Use and sign consent
+        audit = Audit(user_id=user_id, subject_id=user_id)
+        tou = ToU(
+            audit=audit, agreement_url='http://not.really.org',
+            type='website terms of use')
+        privacy = ToU(
+            audit=audit, agreement_url='http://not.really.org',
+            type='privacy policy')
+        parent_org = OrgTree().find(org.id).top_level()
+        options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
+                   SEND_REMINDERS_MASK)
+        consent = UserConsent(
+            user_id=user_id, organization_id=parent_org,
+            options=options, audit=audit, agreement_url='http://fake.org',
+            acceptance_date=calc_date_params(
+                backdate=backdate, setdate=setdate))
+        with SessionScope(db):
+            db.session.add(tou)
+            db.session.add(privacy)
+            db.session.add(consent)
+            db.session.commit()
+
+        # Invalidate org tree cache, in case orgs are added by other
+        # tests.  W/o doing so, the new orgs aren't in the orgtree
+        OrgTree.invalidate_cache()
+    yield bless_with_basics
+
 
 
 @pytest.fixture
