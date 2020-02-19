@@ -5,6 +5,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         this.registerModules();
         this.setCustomJQueryEvents(this.checkJQuery()?(jQuery): null); /*global jQuery*/
         this.consolePolyFill();
+        Utility.setNoSVGSupportCssClass();
     },
     "registerModules": function() {
         if (typeof i18next === "undefined") { i18next = {t: function(key) { return key; }}; } //fallback for i18next in older browser?

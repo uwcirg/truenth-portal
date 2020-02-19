@@ -2,7 +2,7 @@
 {% block title %}{{super()}} {{_("Symptom Tracker")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
-    <main class="main symptom-tracker-main" data-section="symptomtracker" data-theme="white" data-link-identifier="symptom-tracker">
+    <main class="main symptom-tracker-main theme--white" data-section="symptomtracker" data-theme="white" data-link-identifier="symptom-tracker">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--symptom-tracker" style="background-image: url({{url_for('static', filename='img/ST-Top-Background.jpg') }})">
         <div class="page-intro__content">
