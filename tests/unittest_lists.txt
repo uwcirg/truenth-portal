@@ -1,5 +1,3 @@
-test_clinical.py
-test_model_persistence.py
 test_coredata.py
 test_timeout.py
 test_exclusion_persistence.py
@@ -29,6 +27,7 @@ test_research_protocol.py
 test_research_protocol.py
 test_patch_flask_user.py
 test_tou.py
+test_model_persistence.py
 -----hard tests-----
 test_assessment_status.py
 test_assessment_engine.py
