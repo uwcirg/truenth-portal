@@ -1,13 +1,41 @@
+@import "logo.less";
+@TrueNTHFooterLogoWidth: 175px;
+@TrueNTHFooterLogoHeight: 55px;
+@TrueNTHFooterLogoMobileWidth: 175px;
+@TrueNTHFooterLogoMobileHeight: 55px;
+@MovemberFooterLogoWidth: 125px;
+@MovemberFooterLogoHeight: 60px;
+@mobile_footer_logo: {
+    background-image: @TrueNTHWhiteLogoSVGPath;
+    background-size: @TrueNTHFooterLogoMobileWidth @TrueNTHFooterLogoMobileHeight;
+    background-repeat: no-repeat;
+    width: @TrueNTHFooterLogoMobileWidth;
+    height: @TrueNTHFooterLogoMobileHeight;
+}
+@desktop_footer_logo: {
+    background-image: @TrueNTHWhiteLogoSVGPath;
+    background-size: @TrueNTHFooterLogoWidth @TrueNTHFooterLogoHeight;
+    background-repeat: no-repeat;
+    width: @TrueNTHFooterLogoWidth;
+    height: @TrueNTHFooterLogoHeight;
+}
+@movember_footer_logo: {
+    background-image: @thumbNail2xWhiteMovemberLogoPath;
+    background-size: @MovemberFooterLogoWidth @MovemberFooterLogoHeight;
+    background-repeat: no-repeat;
+    width: @MovemberFooterLogoWidth;
+    height: @MovemberFooterLogoHeight;
+}
 @footerBackgroundColor: #000;
 @linkColor: #FFF;
 @linkHoverColor: #FFF;
-@copyRightColor: #7A7B7A;
+@copyRightColor: #a3a9a3;
 
 #tnthBottomNavWrapper.no-fouc {
     display: none;
 }
 #tnthBottomNavWrapper { 
-    padding: 46px 28px 12px;
+    padding: 32px 28px 12px;
     background: @footerBackgroundColor; 
     display: block;
     font-size: 14px;
@@ -22,7 +50,7 @@
 }
 
 #tnthBottomNavWrapper.footer {
-    padding: 46px 28px 12px;
+    padding: 42px 28px 20px;
     background: @footerBackgroundColor;
     a {
         color: @linkColor;
@@ -44,11 +72,17 @@
         display: inline-block
     }
     .nav-image {
-        min-width: 25%;
+        width: 100%;
         max-width: 100%;
         text-align: center;
-        padding-top: 3.75%;
-        padding-bottom: 3.75%;
+        padding-top: 0.25em;
+        padding-left: 2.25em;
+        padding-bottom: 0.25em;
+    }
+    @media(min-width: 992px) {
+        .nav-image {
+            text-align: left;
+        }
     }
     .nav-list {
         padding-right: 0;
@@ -63,7 +97,7 @@
         font-size:16px;
         text-transform: capitalize;
         line-height: 2;
-        padding-left: 12px;
+        padding-left: 20px;
         padding-right: 12px;
         margin: 8px 20px;
         display: block;
@@ -96,10 +130,10 @@
     }
 
     .hr {
-        border-top: 1px solid #252525;
-        margin-top: 12px;
-        margin-bottom: 12px;
-        width: 96.5%;
+        border-top: 2px solid #252525;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        width: 95.5%;
         margin-right: auto;
         margin-left: auto;
     }
@@ -108,10 +142,11 @@
         color: @copyRightColor;
         opacity: .9;
         font-size: 14px;
+        line-height: 1.5;
     }
     .footer__logo-area {
-        padding-left: 24px;
-        padding-right: 24px;
+        padding-left: 32px;
+        padding-right: 32px;
         margin-bottom: 20px;
         width: 100%;
         display: flex;
@@ -139,59 +174,36 @@
     }
     .logo-footer-truenth,
     .footer__logo--truenth {
-        background-image: url(/static/img/TrueNTH-Footer-Logo.png);
-        background-size: 99px 111px;
-        background-repeat: no-repeat;
-        width: 99px;
-        height: 111px;
+        @mobile_footer_logo();
     }
 
-    @media only screen and (-webkit-min-device-pixel-ratio:2),
-    only screen and (-moz-min-device-pixel-ratio:2),
-    only screen and (min-device-pixel-ratio:2),
-    only screen and (min-resolution:192dpi),
-    only screen and (min-resolution:2dppx) {
+    @media (min-width: 992px) {
         .logo-footer-truenth,
         .footer__logo--truenth {
-            background-image: url(/static/img/TrueNTH-Footer-Logo.png);
-            background-size: 89px 101px;
-            background-repeat: no-repeat;
-        }
+            @desktop_footer_logo();
+        }    
     }
 
     .logo-footer-movember,
     .footer__logo--movember {
-        background-image: url(/static/img/Movember-Footer-Logo.png);
-        background-size: 72px 72px;
-        background-repeat: no-repeat;
-        width: 72px;
-        height: 72px;
+        @movember_footer_logo();
         position: relative;
         top: 8px;
     }
-    @media (min-width: 900px) {
-        .logo-footer-movember,
-        .footer__logo--movember {
-            top: 1px;
-        }
+}
+.no-svg-support {
+    .logo-footer-truenth,
+    .footer__logo--truenth {
+        background-image: @TrueNTHWhiteLogoPath;
     }
-
-    @media only screen and (-webkit-min-device-pixel-ratio:2),
-    only screen and (-moz-min-device-pixel-ratio:2),
-    only screen and (min-device-pixel-ratio:2),
-    only screen and (min-resolution:192dpi),
-    only screen and (min-resolution:2dppx) {
-        .logo-footer-movember,
-        .footer__logo--movember {
-            background-image: url(/static/img/Movember-Footer-Logo@2x.png);
-            background-size: 72px 72px;
-            background-repeat: no-repeat;
-        }
+    .logo-footer-movember,
+    .footer__logo--movember {
+        background-image: @WhiteMovemberLogoPath;
     }
 }
-
 @media (min-width: 992px) {
     #tnthBottomNavWrapper.footer {
+        padding: 36px 28px 28px;
         .main-nav-list {
             justify-content: space-between;
             align-items: flex-start;
@@ -216,12 +228,13 @@
 @media(min-width: 619px) {
     #tnthBottomNavWrapper.footer {
         .main-nav-list {
-            margin-bottom: 40px;
+            margin-top: 28px;
+            margin-bottom: 24px;
         }
         .footer__logo-area {
             align-items: flex-start;
             .item.links {
-                width: 80%;
+                width: 65%;
                 padding-left: 8px;
                 padding-right: 8px;
                 .copyright {

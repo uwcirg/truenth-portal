@@ -5,6 +5,11 @@
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
 **/
+@import "logo.less";
+@TrueNTHLogoThumbnailWidth: 120px;
+@TrueNTHLogoThumbnailHeight: 38px;
+@MovemberLogoThumbnailWidth: 120px;
+@MovemberLogoThumbnailHeight: 42px;
 @font-face {
     font-family: "symbols";
     src: url("/static/fonts/symbols.eot");
@@ -84,6 +89,7 @@
 @labelColor: #777;
 @mutedColor: #777;
 @inputHeight: 2.5em;
+@inputFocusBgColor: #f3f4f5;
 @wellColor: #F7F7F7;
 @notificationBgColor: #EB1939;
 @notificationLinkHoverBgColor: #CC112D;
@@ -713,6 +719,23 @@ body.landing {
     width: 325px;
   }
 }
+#resetPasswordForm {
+  min-height: 40vh;
+  label {
+    color: darken(@labelColor, 10%);
+    font-weight: 400;
+  }
+  .item {
+    margin-bottom: 1.5em;
+  }
+  input {
+    outline: none;
+  }
+  input:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
+}
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #socialMediaLoginContainer .btn-social,
@@ -744,6 +767,12 @@ body.landing {
   margin: auto;
   display: block;
   box-shadow: none;
+  border: 1px solid lighten(@mutedColor, 15%);
+  outline: none;
+  &:focus {
+    outline: none;
+    background: @inputFocusBgColor;
+  }
 }
 
 #regForm input[type="submit"],
@@ -865,7 +894,7 @@ body.landing {
 @media (min-width: 992px) {
   .login-form {
     #loginForm {
-      padding: 7vh 0;
+      padding: 4vh 0;
     }
   }
 }
@@ -1114,6 +1143,33 @@ select:not([multiple]) {
   }
   .logo-container {
     text-align: right;
+  }
+}
+#footerLogo {
+  display: inline-block;
+  background-image: @defaultFooterLogoPath;
+  background-size: 88px 100px;
+  background-repeat: no-repeat;
+  width: 88px;
+  height: 100px;
+  &.white-theme {
+    background-image: @defaultFooterWhiteLogoPath;
+    position: relative;
+    top: 6px;
+  } 
+}
+#footerMovember {
+  display: inline-block;
+  background-image: @defaultFooterMovemberPath;
+  background-size: 80px 100px;
+  background-repeat: no-repeat;
+  width: 80px;
+  height: 100px;
+  &.white-theme {
+    background-image: @defaultFooterWhiteMovemberPath;
+    background-size: 86px 86px;
+    width: 86px;
+    height: 86px;
   }
 }
 @media (min-width: 699px) {
@@ -1802,6 +1858,10 @@ div.footer-wrapper.right-panel {
     position: relative;
     padding-top: 4px;
     padding-bottom: 4px;
+    &.active {
+      min-width: 50px;
+      min-height: 50px;
+    }
   }
   .exportReport__status.active:before, 
   .export__status.active:before {
@@ -1811,7 +1871,7 @@ div.footer-wrapper.right-panel {
     content: " ";
     bottom: 0;
     left: 0;
-    top: 20px;
+    top: 24px;
     width: 10px;
     height: 10px;
     background: darken(@btnDefaultBorderColor, 5%);
@@ -4479,7 +4539,7 @@ div.timezone-warning.text-warning {
     font-size:@baseFontSize;
   }
   .tnth-headline {
-    margin: 30px 0 20px;
+    margin: 32px 0 24px;
     font-size: @headlineSize;
     letter-spacing: 1px;
   }

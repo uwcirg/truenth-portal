@@ -47,6 +47,7 @@ from portal.models.user import (
     User,
     flag_test,
     permanently_delete_user,
+    suppress_email,
     validate_email,
 )
 from portal.tasks import celery_beat_health_check
@@ -408,6 +409,17 @@ def healthcheck():
 
     # Healthcheck failed. Return a failing status code
     return sys.exit(result.status_code)
+
+
+@click.option('--email', '-e', help='Email address wanting no communication')
+@click.option(
+    '--actor', '-a',
+    help='email address of user taking this action, for audit trail'
+)
+@app.cli.command()
+def no_email(email, actor):
+    """Suppress all future emails for user (beyond p/w reset)"""
+    suppress_email(email, actor)
 
 
 @click.option('--qnr_id', help="Questionnaire Response ID")

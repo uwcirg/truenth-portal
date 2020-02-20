@@ -305,6 +305,14 @@ var Utility = (function() {
             sessionStorage.removeItem("logout");
         }
     };
+    UtilityObj.prototype.isSVGSupported = function() {
+        return document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
+    };
+    UtilityObj.prototype.setNoSVGSupportCssClass = function() {
+        if (!this.isSVGSupported()) {
+            $("body").addClass("no-svg-support");
+        }
+    };
     UtilityObj.prototype.displaySystemOutageMessage = function(locale) {
         locale = locale || "en-us";
         locale = locale.replace("_", "-");

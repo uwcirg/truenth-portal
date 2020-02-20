@@ -2,7 +2,7 @@
 {% block title %}{{super()}} {{_("Decision Support")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
-    <main class="main decision-support-main" data-section="decisionsupport" data-theme="white" data-link-identifier="decision-support">
+    <main class="main decision-support-main theme--white" data-section="decisionsupport" data-theme="white" data-link-identifier="decision-support">
      {{ super() }}
       <div class="page-intro page-intro--dark page-intro--decision-support" style="background-image: url({{url_for('.static', filename='img/DS-Top-Background.jpg') }})">
         <div class="page-intro__content">

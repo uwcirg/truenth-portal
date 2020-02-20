@@ -5,6 +5,11 @@
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
 **/
+@import "logo.less";
+@TrueNTHLogoThumbnailWidth: 132px;
+@TrueNTHLogoThumbnailHeight: 41px;
+@MovemberLogoThumbnailWidth: 108px;
+@MovemberLogoThumbnailHeight: 52px;
 @font-face {
     font-family: "symbols";
     src: url("../fonts/symbols.eot");
@@ -89,6 +94,7 @@
 @disabledOpacity: 0.6;
 @profileItemBgColor: #e8e8e8;
 @inputHeight: 2.5em;
+@inputFocusBgColor: #f3f4f5;
 
 
 /**
@@ -197,6 +203,7 @@ small,
 .fixed-table-container thead th .both,
 .form-group .help-block {
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .fixed-table-pagination {
@@ -526,6 +533,10 @@ a.btn {
   border-radius: 0;
   width: 400px;
   max-width: 100%;
+  &:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
 }
 
 #regForm input[type="submit"],
@@ -561,7 +572,7 @@ a.btn {
   border-radius: 0;
 }
 select:not([multiple]) {
-  border: 1px solid #bdb9b9;
+  border: 1px solid #ccc;
   overflow: hidden;
   background-image: none;
   max-width: 100%;
@@ -594,6 +605,9 @@ select:not([multiple]) {
       border-top: 1px solid #ccc;
       padding-top: 1em;
     }
+    .logo-container {
+      padding-top: 1em;
+    }
   }
   img {
     width: 40%;
@@ -604,6 +618,79 @@ select:not([multiple]) {
     img {
       width: auto;
     }
+  }
+}
+
+#footerLogo {
+  display: inline-block;
+  margin-right: 12px;
+  margin-bottom: 12px;
+  position: relative;
+  background-image: @thumbNail2xTrueNTHLogoPath;
+  background-size: @TrueNTHLogoThumbnailWidth @TrueNTHLogoThumbnailHeight;
+  background-repeat: no-repeat;
+  width: @TrueNTHLogoThumbnailWidth;
+  height: @TrueNTHLogoThumbnailHeight;
+  &.white-theme {
+    top:2px;
+    background-image: @thumbNail2xTruenthWhiteLogoPath;
+    height: 46px;
+  } 
+}
+#footerMovember {
+  display: inline-block;
+  vertical-align: bottom;
+  margin-bottom: 8px;
+  background-image: @thumbNail2xMovemberLogoPath;
+  background-size: @MovemberLogoThumbnailWidth @MovemberLogoThumbnailHeight;
+  background-repeat: no-repeat;
+  width: @MovemberLogoThumbnailWidth;
+  height: @MovemberLogoThumbnailHeight;
+  position: relative;
+  top: 4px;
+  &.white-theme {
+    background-image: @thumbNail2xWhiteMovemberLogoPath;
+    background-size: 116px 56px;
+    width: 116px;
+    height: 56px;
+    top: 0;
+  }
+}
+.no-svg-support {
+  #footerLogo {
+    background-image: @thumbNailTrueNTHLogoPath;
+    &.white-theme {
+      background-image: @thumbNailTruenthWhiteLogoPath;
+    } 
+  }
+  #footerMovember {
+    background-image: @thumbNailMovemberLogoPath;
+    &.white-theme {
+      background-image: @thumbNailWhiteMovemberLogoPath;
+    }
+  }
+}
+@media only screen and (-webkit-min-device-pixel-ratio:2),
+only screen and (-moz-min-device-pixel-ratio:2),
+only screen and (min-device-pixel-ratio:2),
+only screen and (min-resolution:192dpi),
+only screen and (min-resolution:2dppx) {
+    #footerLogo {
+      background-image: @thumbNail2xTrueNTHLogoPath;
+      &.white-theme {
+        background-image: @thumbNail2xTruenthWhiteLogoPath;
+      }
+    }
+    #footerMovember {
+      background-image: @thumbNail2xMovemberLogoPath;
+      &.white-theme {
+        background-image: @thumbNail2xWhiteMovemberLogoPath;
+      }
+    }
+}
+@media (min-width: 612px) {
+  #footerLogo, #footerMovember {
+    margin-bottom: 0;
   }
 }
 
@@ -872,16 +959,30 @@ div.right-panel {
       margin-top: 8px;
       margin-bottom: 8px;
       input[type=radio] {
-        top: -2px;
+       // top: -2px;
         left: 2px;
       }
+    }
+    .text {
+      display: inline-block;
+      float: left;
+      width: 90%;
+      max-width: 100%;
+    }
+  }
+  @media (min-width: 992px) {
+    .iq-container .content-body {
+      padding: 7.5em 3.5em 3em 3.5em;
     }
   }
   .iq-container .subtitle {
     color: @sectionTitleColor;
-    margin: 1em auto;
+    margin: 1.75em auto 1.5em;
     font-size: @subSmallHeadSize;
     position: relative;
+  }
+  .iq-container .pat-q {
+    margin-top: 1.25em;
   }
   .iq-container #clinics {
     margin-top: 2em;
@@ -904,6 +1005,9 @@ div.right-panel {
   #userOrgs {
     label {
       font-size: @mobileOrgSize;
+      &.radio-inline {
+        margin-top: 8px;
+      }
     }
   }
   .prompt {
@@ -932,7 +1036,6 @@ div.right-panel {
       float: left;
       display: inline-block;
       margin-right: 12px;
-      height: 1.5em;
       vertical-align: top;
     }
     label {
@@ -946,6 +1049,7 @@ div.right-panel {
   #patientQ .save-info {
     display: none;
   }
+  
   #next,  #updateProfile {
     opacity: 0;
     position: absolute;
@@ -997,7 +1101,7 @@ div.right-panel {
     }
   }
   .iq-container .noOrg-container {
-    margin-left: 0.8em;
+    margin-top: 1.25em;
   }
 }
 .iq-container {
@@ -2376,7 +2480,8 @@ div.pull-right {
     display: none;
   }
   .logo-container {
-    margin: auto;
+    margin: 4px auto 0;
+    text-align: center;
   }
 
   #profileHeader * {
@@ -2386,7 +2491,6 @@ div.pull-right {
   & .copyright-container *,
   & .logo-container * {
     color: @footerWhiteThemeColor;
-    margin-bottom: 1em;
   }
   & .copyright-container {
     font-size: @footerSize;
@@ -2397,7 +2501,7 @@ div.pull-right {
     clear: both;
     display:flex;
     justify-content: space-between;
-    padding: 1em 0.5em;
+    padding: 1em 0.5em 0.25em;
     border-top: 1px solid #ddd;
     flex-wrap: nowrap;
     margin: 0 0.5em;
@@ -2414,6 +2518,7 @@ div.pull-right {
   }
   #biopsyDateContainer {
     label {
+      font-size: 1.05em;
       margin-bottom: 0.2em;
     }
   }
@@ -2442,6 +2547,20 @@ div.pull-right {
   width: 300px;
   max-width: 100%;
   padding: 1em 0;
+}
+#resetPasswordForm {
+  min-height: 40vh;
+  label {
+    color: darken(@labelColor, 10%);
+    font-weight: 400;
+  }
+  .item {
+    margin-bottom: 1.5em;
+  }
+  input:focus {
+    background: @inputFocusBgColor;
+    outline: none;
+  }
 }
 .deceased-date-container {
   margin-top:-18px
@@ -2521,7 +2640,7 @@ div.main-state-container .noOrg-container {
   margin-left: 1.03em;
 }
 .state-container, .state-selector-container {
-  padding: 0 1em;
+  padding: 0;
 }
 
 .state-container {
@@ -2537,7 +2656,8 @@ div.main-state-container .noOrg-container {
 
 #userOrgs {
   .prompt {
-    line-height: 2em;
+    color: @sectionTitleColor;
+    line-height: 1.75em;
   }
   #stateSelector {
     width: 50%;
@@ -2546,8 +2666,7 @@ div.main-state-container .noOrg-container {
   }
   &.customized input.clinic {
     position: relative;
-    left: 2px;
-    top: -1px;
+    left: 1px;
   }
 }
 #userOrgsInfo {
@@ -2583,7 +2702,7 @@ div.main-state-container .noOrg-container {
     color: @legendColor;
     margin: 0.85em 0 0.1em 0;
     &:first-of-type {
-      margin: 0.5em 0 0.1em 0;
+      margin: 1em 0 0.1em 0;
     }
   }
   .parent-org-container {
@@ -2611,10 +2730,10 @@ div.main-state-container .noOrg-container {
     label {
       position: relative;
       top: 4px;
-      left: 6px;
       input {
         display: inline-block;
         margin-right: 6px;
+        left: 2px;
       }
       span {
         display: inline-block;
@@ -2630,7 +2749,6 @@ div.main-state-container .noOrg-container {
       position: relative;
       padding-bottom: 6px;
       label {
-        left: -1px;
         margin-left: 0;
       }
     }
@@ -3115,7 +3233,6 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   }
   label input[type="radio"] {
     position: relative;
-    top: 0;
     margin-right: 0.5em;
   }
   .close {
@@ -3468,6 +3585,11 @@ div.org-container {
 }
 #aboutForm {
   #biopsyDateContainer {
+    margin-left: 1.25em;
+    margin-top: 0.75em;
+    label {
+      color: @sectionTitleColor;
+    }
     select {
       font-size: @subSmallHeadSize;
     }
@@ -4057,7 +4179,11 @@ div.timezone-warning.text-warning {
       padding: 2em 3em 2.7em 3em;
     }
     .copyright-container {
-      width: 80%;
+      width: 70%;
+      .copyright {
+        display: inline-block;
+        width: 80%;
+      }
     }
   }
   #createProfileForm {

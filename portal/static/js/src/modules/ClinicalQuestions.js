@@ -69,8 +69,12 @@ export default { /*global $ i18next */
                             $("#biopsyDateContainer").hide();
                         }
                     }
+                    let parentContainer = $radios.parents(".pat-q");
                     if (String(clinicalValue) === "true" || truesyValue) {
-                        $radios.parents(".pat-q").next().fadeIn(150);
+                        parentContainer.next().fadeIn(150);
+                    }
+                    if (parentContainer.attr("data-next")) {
+                        $("#patientQ [data-topic='"+parentContainer.attr("data-next")+"']").fadeIn(150);
                     }
                 }
             }
@@ -82,6 +86,10 @@ export default { /*global $ i18next */
             var hasCancerTreatment = String(treatmentCode) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE);
             $("#tx_yes").prop("checked", hasCancerTreatment);
             $("#tx_no").prop("checked", !hasCancerTreatment);
+            let ci = $("div[data-topic='tx']");
+            if (ci.length > 0) {
+                ci.fadeIn();
+            }
         }
     },
     initFieldEvents: function(subjectId) {

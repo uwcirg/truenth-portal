@@ -1472,6 +1472,12 @@ def email_ready(user_id):
         required: true
         type: integer
         format: int64
+      - name: ignore_preference
+        in: query
+        description: Set for checks that should ignore a users preference
+          to not receive email, such as a password reset action
+        required: false
+        type: string
     responses:
       200:
         description:
@@ -1498,7 +1504,8 @@ def email_ready(user_id):
     """
     user = get_user_or_abort(user_id)
     current_user().check_role('view', other_id=user_id)
-    ready, reason = user.email_ready()
+    ignore_preference = request.args.get('ignore_preference', False)
+    ready, reason = user.email_ready(ignore_preference)
     if ready:
         return jsonify(ready=ready)
     else:

@@ -17,6 +17,7 @@ from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from ..database import db
@@ -50,6 +51,7 @@ from .practitioner import Practitioner
 from .reference import Reference
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
+from .user_preference import UserPreference
 from .telecom import ContactPoint, Telecom
 from .value_quantity import ValueQuantity
 
@@ -132,7 +134,7 @@ def permanently_delete_user(
         user = User.query.filter_by(username=username).first()
         if user_id and user.id != user_id:
             raise ValueError(
-                "Contridicting username and user_id values given")
+                "Contradicting username and user_id values given")
 
     def purge_user(user, acting_user):
         if not user:
@@ -166,6 +168,33 @@ def permanently_delete_user(
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           TimezoneExtension, UserIndigenousStatusExtension)
+
+
+def suppress_email(user_email, actor_email):
+    """"""
+    try:
+        acting_user = User.query.filter_by(username=actor_email).one()
+    except NoResultFound:
+        raise ValueError("Actor email {} not found; can't continue".format(
+            actor_email))
+    try:
+        user = User.query.filter_by(username=user_email).one()
+    except NoResultFound:
+        raise ValueError("User email {} not found; can't continue".format(
+            user_email))
+
+    exists = UserPreference.query.filter(
+        UserPreference.user_id == user.id).filter(
+        UserPreference.preference_name == 'suppress_email').first()
+    if exists:
+        return
+    db.session.add(UserPreference(
+        user_id=user.id, preference_name='suppress_email'))
+    db.session.add(Audit(
+        user_id=acting_user.id, subject_id=user.id,
+        context='user', comment="suppress future communication")
+    )
+    db.session.commit()
 
 
 def user_extension_map(user, extension):
@@ -487,18 +516,26 @@ class User(db.Model, UserMixin):
             self._email = email
         assert (self._email and len(self._email))
 
-    def email_ready(self):
+    def email_ready(self, ignore_preference=False):
         """Returns (True, None) IFF user has valid email & necessary criteria
 
-        As user's frequently forget their passwords or start in a state
+        As users frequently forget their passwords or start in a state
         without a valid email address, the system should NOT email invites
         or reminders unless adequate data is on file for the user to perform
         a reset password loop.
+
+        Also considers the `user_preferences` table.  If the user has a
+        `suppress_email` preference recorded, this will return False and
+        the detail, unless `ignore_preference` is set.
 
         NB exceptions exist for systems with the NO_CHALLENGE_WO_DATA
         configuration set, as those systems allow for change of password
         without the verification step, if the user doesn't have a required
         field set.
+
+        :param ignore_preference: set if the check is specific to password
+          reset/check emails.  Even users with the preference to not receive
+          communication should get password related email
 
         :returns: (Success, Failure message), such as (True, None) if the
             user account is "email_ready" or (False, _"invalid email") if
@@ -514,6 +551,11 @@ class User(db.Model, UserMixin):
 
         if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
             return False, _("invalid email address")
+
+        if not ignore_preference and UserPreference.query.filter(
+                UserPreference.user_id == self.id).filter(
+                UserPreference.preference_name == 'suppress_email').first():
+            return False, _("user requests no email")
 
         if current_app.config.get('NO_CHALLENGE_WO_DATA', False):
             # Grandfather in systems that didn't capture all challenge fields
@@ -1805,8 +1847,6 @@ def add_user(user_info):
     user = User(
         first_name=user_info.first_name,
         last_name=user_info.last_name,
-        birthdate=user_info.birthdate,
-        gender=user_info.gender,
         email=user_info.email,
         image_url=user_info.image_url
     )

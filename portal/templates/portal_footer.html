@@ -13,16 +13,17 @@
     Enclose external stylesheet to style content
     -->
     <link rel="stylesheet" href="{{PORTAL}}{{url_for('static', filename='css/portalFooter.css')}}">
+    <div id="tnthBottomNavWrapper" class="footer no-fouc">
     <script>document.querySelector("#tnthBottomNavWrapper").classList.add("js");</script>
     <!-- 
       footer HTML content specific for TrueNTH USA, containing GIL specific endpoints that are not accessible when in EPROMS, i.e. different registered
       For information: details regarding blueprint registration here: factories/app.py
     -->
-    <div id="tnthBottomNavWrapper" class="footer no-fouc">
+        <div class="nav-image">
+          <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
+        </div>
+        <hr class="hr" />
         <div class="main-nav-list">
-          <div class="nav-image">
-              <a href="https://www.movember.com" target="_blank"><figure class="footer__logo--truenth"></figure></a>
-          </div>
           <ul class="nav-list">
             <li class="nav-list__item heading">{{_("TrueNTH")}}</li>
             <li class="nav-list__item"><a href="{{PORTAL}}">{{_("Home")}}</a></li>
@@ -45,7 +46,7 @@
             <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank">{{_("Twitter")}}</a></li>
           </ul>
         </div>
-        <hr class="hr">
+        <hr class="hr" />
         <div class="footer__logo-area">
           <div class="item links">
               <span class="nav-list-secondary__item"><a href="{{PORTAL}}{{url_for('gil.terms_and_conditions')}}">{{_("Terms & Conditions")}}</a></span>
