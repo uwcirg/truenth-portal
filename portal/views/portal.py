@@ -28,7 +28,6 @@ from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_user import roles_required
 from flask_wtf import FlaskForm
-import requests
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import (
@@ -1280,51 +1279,3 @@ def stock_consent(org_name):
             </body>
         </html>""",
         body=body)
-
-
-def get_asset(uuid):
-    url = "{}/c/portal/truenth/asset/detailed".format(
-        current_app.config["LR_ORIGIN"])
-    return requests.get(url, params={'uuid': uuid}).json()['asset']
-
-
-def get_any_tag_data(*anyTags):
-    """ query LR based on any tags
-
-    this is an OR condition; will match any tag specified
-
-    :param anyTag: a variable number of tags to be queried,
-         e.g., 'tag1', 'tag2'
-
-    """
-    # NOTE: need to convert tags to format: anyTags=tag1&anyTags=tag2...
-    liferay_qs_params = {
-        'anyTags': anyTags,
-        'sort': 'true',
-        'sortType': 'DESC'
-    }
-
-    url = "{}/c/portal/truenth/asset/query".format(
-        current_app.config["LR_ORIGIN"])
-    return requests.get(url, params=liferay_qs_params).json()
-
-
-def get_all_tag_data(*allTags):
-    """ query LR based on all required tags
-
-    this is an AND condition; all required tags must be present
-
-    :param allTags: variable number of tags to be queried,
-        e.g., 'tag1', 'tag2'
-
-    """
-    # NOTE: need to convert tags to format: allTags=tag1&allTags=tag2...
-    liferay_qs_params = {
-        'allTags': allTags,
-        'sort': 'true',
-        'sortType': 'DESC'
-    }
-
-    url = "{}/c/portal/truenth/asset/query".format(
-        current_app.config["LR_ORIGIN"])
-    return requests.get(url, params=liferay_qs_params).json()
