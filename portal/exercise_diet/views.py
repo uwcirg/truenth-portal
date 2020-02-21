@@ -3,7 +3,7 @@ from collections import OrderedDict
 from flask import Blueprint, redirect, render_template, url_for
 
 from ..models.user import current_user
-from ..views.portal import get_any_tag_data, get_asset
+from ..views.external_assets import asset_by_uuid, get_any_tag_data
 
 exercise_diet = Blueprint(
     'exercise_diet', __name__, template_folder='templates',
@@ -76,7 +76,7 @@ def introduction():
     assets = []
     data = get_any_tag_data("introduction")
     for asset in data['results']:
-        assets.append(get_asset(asset['uuid']))
+        assets.append(asset_by_uuid(asset['uuid']))
 
     return render_template('exercise_diet/index.html', assets=assets,
                            user=current_user())
@@ -87,7 +87,7 @@ def diet():
     data = get_any_tag_data("diet")
     assets = []
     for asset in data['results']:
-        assets.append(get_asset(asset['uuid']))
+        assets.append(asset_by_uuid(asset['uuid']))
 
     modal_data = get_any_tag_data("diet-modal")
     modals = OrderedDict()
@@ -95,7 +95,7 @@ def diet():
         tag = modal['tags']
         tag.remove('diet-modal')
         modals[tag[0]] = (modal['title'], modal['priority'],
-                          get_asset(modal['uuid']))
+                          asset_by_uuid(modal['uuid']))
 
     return render_template('exercise_diet/diet.html', assets=assets,
                            modals=modals, user=current_user())
@@ -112,7 +112,7 @@ def exercise():
     data = get_any_tag_data("exercise")
     assets = []
     for asset in data['results']:
-        assets.append(get_asset(asset['uuid']))
+        assets.append(asset_by_uuid(asset['uuid']))
 
     modal_data = get_any_tag_data("exercise-modal")
     modals = OrderedDict()
@@ -120,7 +120,7 @@ def exercise():
         tag = modal['tags']
         tag.remove('exercise-modal')
         modals[tag[0]] = (modal['title'], modal['priority'],
-                          get_asset(modal['uuid']))
+                          asset_by_uuid(modal['uuid']))
 
     return render_template('exercise_diet/exercise.html', assets=assets,
                            modals=modals, user=current_user())
@@ -129,7 +129,7 @@ def exercise():
 @exercise_diet.route('/recipes')
 def recipes():
     data = get_any_tag_data("recipe-intro")
-    recipe_intro = get_asset(data['results'][0]['uuid'])
+    recipe_intro = asset_by_uuid(data['results'][0]['uuid'])
     recipe_assets = get_all_recipes()
     return render_template('exercise_diet/recipes.html',
                            recipe_intro=recipe_intro,
@@ -140,7 +140,7 @@ def recipes():
 @exercise_diet.route('/recipe/<heading>/<int:item>')
 def recipe(heading, item):
     assets = get_all_recipes()
-    asset = get_asset(assets[heading][item][1])
+    asset = asset_by_uuid(assets[heading][item][1])
 
     ordered_headings = ['healthy_vegetable_fat', 'vegetables', 'tomatoes',
                         'fish', 'alternatives_to_processed_meats']
