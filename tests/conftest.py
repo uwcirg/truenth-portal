@@ -14,20 +14,25 @@ from portal.factories.app import create_app
 from portal.factories.celery import create_celery
 from portal.models.audit import Audit
 from portal.models.client import Client
-from portal.models.clinical_constants import add_static_concepts
+from portal.models.clinical_constants import CC, add_static_concepts
+from portal.models.codeable_concept import CodeableConcept
+from portal.models.coding import Coding
+from portal.models.encounter import Encounter
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import Organization, OrgTree, add_static_organization
+from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
-from portal.models.user import User, UserRoles
+from portal.models.user import User, UserRoles, get_user
 from portal.models.user_consent import (
     INCLUDE_IN_REPORTS_MASK,
     SEND_REMINDERS_MASK,
     STAFF_EDITABLE_MASK,
     UserConsent,
 )
+from portal.system_uri import SNOMED
 from tests import TEST_USER_ID 
 
 
@@ -294,9 +299,58 @@ def bless_with_basics(test_user, promote_user):
     yield bless_with_basics
 
 
+@pytest.fixture
+def add_required_clinical_data():
+    def add_required_clinical_data(backdate=None, setdate=None):
+        """Add clinical data to get beyond the landing page
+
+        :param backdate: timedelta value.  Define to mock Dx
+          happening said period in the past
+        :param setdate: datetime value.  Define to mock Dx
+          happening at given time
+
+        """
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
+            get_user(TEST_USER_ID).save_observation(
+                codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
+                audit=audit, status='preliminary', issued=calc_date_params(
+                    backdate=backdate, setdate=setdate))
+    yield add_required_clinical_data
+
 
 @pytest.fixture
-def add_music_org():
+def add_procedure(test_user):
+    def add_procedure(code='367336001', display='Chemotherapy',
+                      system=SNOMED, setdate=None):
+        "Add procedure data into the db for the test user"
+        with SessionScope(db):
+            audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+            procedure = Procedure(audit=audit)
+            coding = Coding(
+                system=system,
+                code=code,
+                display=display).add_if_not_found(True)
+            code = CodeableConcept(codings=[coding]).add_if_not_found(True)
+            enc = Encounter(
+                status='planned',
+                auth_method='url_authenticated',
+                user_id=TEST_USER_ID, start_time=datetime.utcnow())
+            db.session.add(enc)
+            db.session.commit()
+            enc = db.session.merge(enc)
+            procedure.code = code
+            procedure.user = db.session.merge(test_user)
+            procedure.start_time = setdate or datetime.utcnow()
+            procedure.end_time = datetime.utcnow()
+            procedure.encounter = enc
+            db.session.add(procedure)
+            db.session.commit()
+    yield add_procedure
+
+
+@pytest.fixture
+def music_org():
     music_org = Organization(
         name="Michigan Urological Surgery Improvement Collaborative"
              " (MUSIC)")
@@ -304,10 +358,11 @@ def add_music_org():
         db.session.add(music_org)
         db.session.commit()
     music_org = db.session.merge(music_org)
+    yield music_org
 
 
 @pytest.fixture
-def login(initialize_static, app, client, add_music_org):
+def login(initialize_static, app, client, music_org):
     def login(
             user_id=TEST_USER_ID,
             oauth_info=None,
@@ -332,7 +387,7 @@ def login(initialize_static, app, client, add_music_org):
 
 
 @pytest.fixture
-def local_login(client, initialize_static, add_music_org):
+def local_login(client, initialize_static, music_org):
     def local_login(email, password, follow_redirects=True):
         initialize_static()
         url = url_for('user.login')
