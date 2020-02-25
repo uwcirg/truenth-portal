@@ -45,6 +45,7 @@ def pytest_addoption(parser):
     )
 
 
+@pytest.fixture(scope="function")
 def shallow_org_tree():
     """Create shallow org tree for common test needs"""
     org_101 = Organization(id=101, name='101')
@@ -58,6 +59,15 @@ def shallow_org_tree():
     with SessionScope(db):
         [db.session.add(org) for org in (org_101, org_102, org_1001)]
         db.session.commit()
+
+    # As orgs were just added, make sure they're loaded on next OrgTree call
+    OrgTree.invalidate_cache()
+
+    yield  # setup complete, teardown follows
+
+    # After using this fixture, invalidate OrgTree so subsequent tests
+    # don't find stale entries, namely dead references to the orgs created
+    # above.
     OrgTree.invalidate_cache()
 
 
@@ -231,7 +241,7 @@ def add_service_user(initialize_static, test_user):
 
 
 @pytest.fixture
-def bless_with_basics(test_user, promote_user):
+def bless_with_basics(test_user, promote_user, shallow_org_tree):
     def bless_with_basics(
             user=None, backdate=None, setdate=None,
             local_metastatic=None, make_patient=True):
@@ -259,7 +269,6 @@ def bless_with_basics(test_user, promote_user):
             promote_user(user=user, role_name=ROLE.PATIENT.value)
 
         # Register with a clinic
-        shallow_org_tree()
 
         if local_metastatic:
             org = Organization.query.filter(
