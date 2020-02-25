@@ -1,4 +1,3 @@
-test_coredata.py
 test_timeout.py
 test_exclusion_persistence.py
 test_identifier.py
