@@ -5,6 +5,11 @@
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
 **/
+@import "logo.less";
+@TrueNTHLogoThumbnailWidth: 120px;
+@TrueNTHLogoThumbnailHeight: 38px;
+@MovemberLogoThumbnailWidth: 120px;
+@MovemberLogoThumbnailHeight: 42px;
 @font-face {
     font-family: "symbols";
     src: url("/static/fonts/symbols.eot");
@@ -889,7 +894,7 @@ body.landing {
 @media (min-width: 992px) {
   .login-form {
     #loginForm {
-      padding: 7vh 0;
+      padding: 4vh 0;
     }
   }
 }
@@ -1138,6 +1143,33 @@ select:not([multiple]) {
   }
   .logo-container {
     text-align: right;
+  }
+}
+#footerLogo {
+  display: inline-block;
+  background-image: @defaultFooterLogoPath;
+  background-size: 88px 100px;
+  background-repeat: no-repeat;
+  width: 88px;
+  height: 100px;
+  &.white-theme {
+    background-image: @defaultFooterWhiteLogoPath;
+    position: relative;
+    top: 6px;
+  } 
+}
+#footerMovember {
+  display: inline-block;
+  background-image: @defaultFooterMovemberPath;
+  background-size: 80px 100px;
+  background-repeat: no-repeat;
+  width: 80px;
+  height: 100px;
+  &.white-theme {
+    background-image: @defaultFooterWhiteMovemberPath;
+    background-size: 86px 86px;
+    width: 86px;
+    height: 86px;
   }
 }
 @media (min-width: 699px) {

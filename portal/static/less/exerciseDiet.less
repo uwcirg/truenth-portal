@@ -90,9 +90,6 @@ body {
     background-color: #FFF;
     font-family: @bodyFontFamily;
 }
-.main {
-    top: 55px;
-}
 .is-upper-banner-closed {
     .main {
         top: 32px;
@@ -1083,7 +1080,7 @@ body.page-exercise-diet-portal {
         display: inline-block;
         text-transform: uppercase;
         text-align: center;
-        padding: 26px 25px 20px;
+        padding: 24px 25px 20px;
         width: 250px;
         margin-top: 40px;
     }
@@ -1157,7 +1154,7 @@ body.page-exercise-diet-portal {
 
 @media (min-width: 900px) {
     #Exercise-Diet-Portal .intro-content {
-        padding-top: 7.5em;
+        padding-top: 8.5em;
         margin-top: 5em;
     }
 }
@@ -1859,16 +1856,15 @@ img.recipe-table-image {
     padding: 40px 0 0;
     height: 100%;
 }
+.is-upper-banner-closed {
+    #ED-Intro #Intro-Hero {
+        padding: 24px 0 0;
+    }
+}
 @media (min-width: 481px) {
     #ED-Intro #Intro-Hero {
         padding: 40px 0 0;
     }
-    .is-upper-banner-closed {
-        #ED-Intro #Intro-Hero {
-            padding: 0 0 0;
-        }
-    }
-   
 }
 
 #ED-Exercise #Intro-Hero {
@@ -1879,6 +1875,11 @@ img.recipe-table-image {
     #ED-Intro #Intro-Hero,
     #ED-Exercise #Intro-Hero {
        padding: 0;
+    }
+    .is-upper-banner-closed {
+        #ED-Intro #Intro-Hero {
+            padding: 0 0 0;
+        }
     }
 }
 

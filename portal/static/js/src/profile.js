@@ -297,20 +297,38 @@ export default (function() {
                     callback(self.getCurrentUserOrgs());
                 });
             },
+            userHasNoEmail: function() {
+                return !this.demo.data.email;
+            },
             isUserEmailReady: function() {
                 return this.userEmailReady;
             },
-            setUserEmailReady: function(params) {
+            setUserEmailReady: function(params, callback) {
+                callback = callback || function() {};
+                params = params || {};
                 if (this.mode !== "profile") { //setting email ready status only applies to profile page
+                    callback();
                     return false;
                 }
                 var self = this;
-                this.modules.tnthAjax.getEmailReady(this.subjectId, params, function(data) {
+                this.modules.tnthAjax.getEmailReady(this.subjectId, {data: params}, function(data) {
                     if (data.error) {
+                        callback();
                         return false;
+                    }
+                    /*
+                     * check for the presence of ignore_preference in parameters
+                     */
+                    if (params.ignore_preference) {
+                        /*
+                         * this will allow manual enabling of capacity to send email to user
+                         */
+                        callback(data);
+                        return;
                     }
                     self.userEmailReady = data.ready;
                     self.messages.userEmailReadyMessage = data.reason || "";
+                    callback(data);
                 });
             },
             isDisableField: function(fieldId="") {
@@ -1387,6 +1405,24 @@ export default (function() {
             },
             initResetPasswordSection: function() {
                 var self = this;
+                /*
+                 *  ignore use preference so reset password email can still be sent as long as the API returns true for email readiness
+                 */
+                this.setUserEmailReady({"ignore_preference": true}, function(data) {
+                    if (!data || data.error) {
+                        return;
+                    }
+                    /*
+                     * set approproiate UI display after call to API with param to ignore preference
+                     */
+                    if (data.ready) {
+                        $("#btnPasswordResetEmail").attr("disabled", false);
+                        $("#passwordResetMessage").html("").removeClass("text-warning");
+                        return;
+                    }
+                    $("#btnPasswordResetEmail").attr("disabled", true);
+                    $("#passwordResetMessage").html(data.reason).addClass("text-warning");
+                });
                 $("#btnPasswordResetEmail").on("click", function(event) {
                     event.preventDefault();
                     event.stopImmediatePropagation(); //stop bubbling of events

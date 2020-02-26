@@ -412,7 +412,7 @@ module.exports = VisObj = (function() {
     };
     this.showMain = function() {
       if (!this.HAS_REDIRECT) {
-        if ($(".watermark").length > 0) {
+        if ($(".watermark:visible").length > 0) {
           $("header.no-banner ").css("padding-top", "35px");
         }
         $("#mainHolder").css({
@@ -1288,6 +1288,10 @@ module.exports = utilObj = (function() {
       }
     };
 
+    this.handleSVGSupport = function() {
+      Utility.setNoSVGSupportCssClass();
+    };
+
     this.setVis = function(show) {
       if (show) {
         window.app.visObj.showLoader();
@@ -1471,6 +1475,7 @@ $(document).ready(function(){
   window.app.accessCodeObj.handleEvents();
   window.app.utilObj.appendLREditContainer($("main .LR-content-container"), $("#LREditorURL").val(), window.app.global.checkRole("content_manager"));
   window.app.menuObj.init(currentUserId, function() { //enable/disabled menu items depending on user roles
+    window.app.utilObj.handleSVGSupport();
     window.app.utilObj.setVis(false);
   });
 });
