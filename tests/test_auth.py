@@ -27,6 +27,7 @@ def test_nouser_logout(client):
     response = client.get('/logout')
     assert 302 == response.status_code
 
+
 def test_local_user_add(client):
     """Add a local user via flask_user forms"""
     data = {
@@ -37,6 +38,7 @@ def test_local_user_add(client):
     assert response.status_code == 302
     new_user = User.query.filter_by(username=data['email']).first()
     assert new_user.active is True
+
 
 def test_local_login_valid_username_and_password(add_user, local_login):
     """login through the login form"""
@@ -56,6 +58,7 @@ def test_local_login_valid_username_and_password(add_user, local_login):
     assert response.status_code is 200
     assert user.password_verification_failures == 0
 
+
 def test_local_login_failure_increments_lockout(add_user, local_login):
     """login through the login form"""
     # Create a user
@@ -74,7 +77,9 @@ def test_local_login_failure_increments_lockout(add_user, local_login):
     db.session.refresh(user)
     assert user.password_verification_failures == 1
 
-def test_local_login_valid_username_and_password_resets_lockout(add_user, local_login):
+
+def test_local_login_valid_username_and_password_resets_lockout(
+        add_user, local_login):
     """login through the login form"""
     # Create a user
     email = 'localuser@test.com'
@@ -96,7 +101,9 @@ def test_local_login_valid_username_and_password_resets_lockout(add_user, local_
     db.session.refresh(user)
     assert user.password_verification_failures == 0
 
-def test_local_login_lockout_after_unsuccessful_attempts(add_user, local_login):
+
+def test_local_login_lockout_after_unsuccessful_attempts(
+        add_user, local_login):
     """login through the login form"""
     email = 'localuser@test.com'
     password = 'Password1'
@@ -121,6 +128,7 @@ def test_local_login_lockout_after_unsuccessful_attempts(add_user, local_login):
     response = local_login(user.email, 'invalidpassword')
     db.session.refresh(user)
     assert user.is_locked_out
+
 
 def test_local_login_verify_lockout_resets_after_lockout_period(add_user):
     """login through the login form"""
@@ -147,6 +155,7 @@ def test_local_login_verify_lockout_resets_after_lockout_period(add_user):
     # Verify we are no longer locked out
     assert not user.is_locked_out
 
+
 def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
     """login through the login form"""
     email = 'localuser@test.com'
@@ -170,10 +179,12 @@ def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
     # Verify the user is still locked out
     assert user.is_locked_out
 
-def test_register_now(app, promote_user, login, assert_redirects, client, test_user):
+
+def test_register_now(
+        app, promote_user, login, assert_redirects, client, test_user):
     """Initiate process to register exiting account"""
     app.config['NO_CHALLENGE_WO_DATA'] = False
-    #added to avoid detached instance error
+    # added to avoid detached instance error
     db.session.add(test_user)
 
     test_user.password = None
@@ -185,6 +196,7 @@ def test_register_now(app, promote_user, login, assert_redirects, client, test_u
 
     response = client.get('/api/user/register-now')
     assert_redirects(response, url_for('user.register', email=email))
+
 
 def test_client_add(promote_user, login, client):
     """Test adding a client application"""
@@ -198,7 +210,9 @@ def test_client_add(promote_user, login, client):
     client = Client.query.filter_by(user_id=TEST_USER_ID).first()
     assert client.application_origins == origins
 
-def test_client_bad_add(promote_user, login, client, initialized_db, teardown_db):
+
+def test_client_bad_add(
+        promote_user, login, client, initialized_db, teardown_db):
     """Test adding a bad client application"""
     promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
     login()
@@ -207,6 +221,7 @@ def test_client_bad_add(promote_user, login, client, initialized_db, teardown_db
         data=dict(application_origins="bad data in")).get_data(
         as_text=True)
     assert "Invalid URL" in response
+
 
 def test_client_edit(client, login, add_client):
     """Test editing a client application"""
@@ -237,6 +252,7 @@ def test_client_edit(client, login, add_client):
 
     test_client = Client.query.get('test_client')
     assert test_client.callback_url != invalid_url
+
 
 def test_callback_validation(client, login, add_client):
     """Confirm only valid urls can be set"""
@@ -282,6 +298,7 @@ def test_service_account_creation(add_client):
     assert (token.expires > datetime.datetime.utcnow()
             + datetime.timedelta(days=364))
 
+
 def test_service_account_promotion(add_client):
     """Confirm we can not promote a service account """
     add_client()
@@ -299,13 +316,16 @@ def test_service_account_promotion(add_client):
 
     assert len(service_user.roles) == 1
 
+
 def test_token_status(client, test_user):
     with SessionScope(db):
         test_client = Client(
             client_id='test-id', client_secret='test-secret',
             user_id=TEST_USER_ID)
         token = Token(
-            access_token='test-token', client=test_client, user_id=TEST_USER_ID,
+            access_token='test-token',
+            client=test_client,
+            user_id=TEST_USER_ID,
             token_type='bearer',
             expires=(datetime.datetime.utcnow() +
                      datetime.timedelta(seconds=30)))
@@ -321,10 +341,12 @@ def test_token_status(client, test_user):
     data = response.json
     assert pytest.approx(30, 5) == data['expires_in']
 
+
 def test_token_status_wo_header(client):
     """Call for token_status w/o token should return 401"""
     response = client.get("/oauth/token-status")
     assert 401 == response.status_code
+
 
 def test_origin_validation(app, add_client):
     test_client = add_client()
@@ -337,6 +359,7 @@ def test_origin_validation(app, add_client):
     assert validate_origin(local_url)
     assert pytest.raises(Unauthorized, validate_origin, invalid_url)
 
+
 def test_origin_validation_origin_not_in_whitelist(app):
     valid_origin = 'www.domain.com'
     app.config['CORS_WHITELIST'] = [valid_origin]
@@ -345,12 +368,14 @@ def test_origin_validation_origin_not_in_whitelist(app):
 
     assert pytest.raises(Unauthorized, validate_origin, url)
 
+
 def test_origin_validation_origin_in_whitelist(app):
     valid_origin = 'www.domain.com'
     app.config['CORS_WHITELIST'] = [valid_origin]
     url = 'http://{}/'.format(valid_origin)
 
     assert validate_origin(url)
+
 
 def test_oauth_with_new_auth_provider_and_new_user(login):
     # Login using the test backdoor
@@ -368,6 +393,7 @@ def test_oauth_with_new_auth_provider_and_new_user(login):
         provider_id=OAUTH_INFO_PROVIDER_LOGIN['provider_id'],
         user_id=user.id,
     ).first()
+
 
 def test_oauth_with_new_auth_provider_and_new_user_unicode_name(login):
     # Set a unicode name
@@ -392,6 +418,7 @@ def test_oauth_with_new_auth_provider_and_new_user_unicode_name(login):
 
     pass
 
+
 def test_oauth_with_new_auth_provider_and_existing_user(login):
     # Create the user
     user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
@@ -409,6 +436,7 @@ def test_oauth_with_new_auth_provider_and_existing_user(login):
         user_id=user.id,
     ).first()
 
+
 def test_oauth_with_existing_auth_provider_and_existing_user(login):
     # Create the user
     user = add_user_from_oauth_info(OAUTH_INFO_PROVIDER_LOGIN)
@@ -422,6 +450,7 @@ def test_oauth_with_existing_auth_provider_and_existing_user(login):
     # Verify the response returned successfully
     assert response.status_code == 200
 
+
 def test_oauth_when_mock_provider_fails_to_get_user_json(login):
     # Make the mock provider fail to get user json
     oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
@@ -432,6 +461,7 @@ def test_oauth_when_mock_provider_fails_to_get_user_json(login):
 
     # Verify 500
     assert response.status_code == 500
+
 
 def test_oauth_when_non_required_value_undefined(login):
     # Make the mock provider fail to get user json
@@ -444,6 +474,7 @@ def test_oauth_when_non_required_value_undefined(login):
     # Verify the response returned successfully
     assert response.status_code == 200
 
+
 def test_oauth_when_required_value_undefined(login):
     # Make the mock provider fail to get user json
     oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
@@ -454,6 +485,7 @@ def test_oauth_when_required_value_undefined(login):
 
     # Verify 500
     assert response.status_code == 500
+
 
 def test_oauth_with_invalid_token(login, assert_redirects):
     # Set an invalid token
@@ -483,4 +515,3 @@ def add_auth_provider(oauth_info, user):
     db.session.add(auth_provider)
     db.session.commit()
     return auth_provider
-

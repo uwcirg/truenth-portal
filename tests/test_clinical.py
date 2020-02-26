@@ -19,7 +19,7 @@ from portal.models.performer import Performer
 from portal.models.reference import Reference
 from portal.models.user import User
 from portal.models.value_quantity import ValueQuantity
-from tests import TEST_USER_ID 
+from tests import TEST_USER_ID
 
 
 def prep_db_for_clinical():
@@ -46,6 +46,7 @@ def prep_db_for_clinical():
         db.session.commit()
     return gleason_concept
 
+
 def test_datetime_for_concept(test_user):
     gleason_concept = prep_db_for_clinical()
     gleason_concept = db.session.merge(gleason_concept)
@@ -53,6 +54,7 @@ def test_datetime_for_concept(test_user):
     assert (pytest.approx(datetime.utcnow().toordinal()) ==
             test_user.fetch_datetime_for_concept(
                 gleason_concept).toordinal())
+
 
 def test_clinicalGET(login, client, test_user):
     prep_db_for_clinical()
@@ -71,6 +73,7 @@ def test_clinicalGET(login, client, test_user):
     found = found.replace(tzinfo=None)
     assert (abs(datetime.utcnow() - found) <= timedelta(seconds=5))
 
+
 def test_dstu2GET(login, client, test_user):
     prep_db_for_clinical()
     login()
@@ -88,6 +91,7 @@ def test_dstu2GET(login, client, test_user):
         'resource']['valueQuantity']['value'])
     assert (json.dumps(Reference.patient(TEST_USER_ID).as_fhir())
             == clinical_data['entry'][0]['resource']['performer'][0])
+
 
 def test_clinicalPOST(login, client, test_user):
     data = {
@@ -121,6 +125,7 @@ def test_clinicalPOST(login, client, test_user):
     uo = UserObservation.query.filter_by(user_id=TEST_USER_ID).one()
     assert uo.encounter.auth_method == 'password_authenticated'
 
+
 def test_int_code_POST(login, client, test_user):
     data = {
         "resourceType": "Observation",
@@ -143,6 +148,7 @@ def test_int_code_POST(login, client, test_user):
     assert '111' in response.json['message']
     assert test_user.observations.count() == 1
 
+
 def test_clinicalPUT(login, client, test_user):
     prep_db_for_clinical()
     login()
@@ -158,6 +164,7 @@ def test_clinicalPUT(login, client, test_user):
     assert clinical_data['status'] == 'unknown'
     assert clinical_data['issued'] == new_issued + "+00:00"  # tz
     assert clinical_data['valueQuantity']['value'] == 'false'
+
 
 def test_clinical0forFalse(login, client, test_user):
     prep_db_for_clinical()
@@ -175,11 +182,13 @@ def test_clinical0forFalse(login, client, test_user):
     assert clinical_data['issued'] == new_issued + "+00:00"  # tz
     assert clinical_data['valueQuantity']['value'] == 'false'
 
+
 def test_empty_clinical_get(login, client, test_user):
     """Access clinical on user w/o any clinical info"""
     login()
     response = client.get('/api/patient/%s/clinical' % TEST_USER_ID)
     assert response.status_code == 200
+
 
 def test_unknown_clinical_post(login, client, test_user):
     login()
@@ -200,14 +209,16 @@ def test_unknown_clinical_post(login, client, test_user):
     response = client.get('/api/patient/%s/clinical' % TEST_USER_ID)
     assert 'unknown' == response.json['entry'][0]['content']['status']
 
+
 def test_empty_biopsy_get(login, client, test_user):
     """Access biopsy on user w/o any clinical info"""
     login()
     response = client.get('/api/patient/%s/clinical/biopsy'
-                               % TEST_USER_ID)
+            % TEST_USER_ID)
     assert response.status_code == 200
     data = response.json
     assert data['value'] == 'unknown'
+
 
 def test_clinical_biopsy_put(login, client, test_user):
     """Shortcut API - just biopsy data w/o FHIR overhead"""
@@ -232,7 +243,7 @@ def test_clinical_biopsy_put(login, client, test_user):
 
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
-                               % TEST_USER_ID)
+            % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'true'
 
@@ -246,13 +257,14 @@ def test_clinical_biopsy_put(login, client, test_user):
 
     # Confirm it's altered
     response = client.get('/api/patient/%s/clinical/biopsy'
-                               % TEST_USER_ID)
+            % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'false'
 
     # Confirm history is retained
     user = User.query.get(TEST_USER_ID)
     assert user.observations.count() == 2
+
 
 def test_clinical_biopsy_unknown(login, client, test_user):
     """Shortcut API - biopsy data w status unknown"""
@@ -280,7 +292,7 @@ def test_clinical_biopsy_unknown(login, client, test_user):
 
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
-                               % TEST_USER_ID)
+            % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'unknown'
 
@@ -294,13 +306,14 @@ def test_clinical_biopsy_unknown(login, client, test_user):
 
     # Confirm it's altered
     response = client.get('/api/patient/%s/clinical/biopsy'
-                               % TEST_USER_ID)
+            % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'false'
 
     # Confirm history is retained
     user = User.query.get(TEST_USER_ID)
     assert user.observations.count() == 2
+
 
 def test_clinical_pca_diag(login, client, test_user):
     """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
@@ -329,6 +342,7 @@ def test_clinical_pca_diag(login, client, test_user):
         '/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'true'
+
 
 def test_clinical_pca_diag_unknown(login, client, test_user):
     """Shortcut API - PCa diagnosis w/ status unknown"""
@@ -360,6 +374,7 @@ def test_clinical_pca_diag_unknown(login, client, test_user):
     data = response.json
     assert data['value'] == 'unknown'
 
+
 def test_clinical_pca_localized(login, client, test_user):
     """Shortcut API - just PCa localized diagnosis w/o FHIR overhead"""
     login()
@@ -386,6 +401,7 @@ def test_clinical_pca_localized(login, client, test_user):
         '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'true'
+
 
 def test_clinical_pca_localized_unknown(login, client, test_user):
     """Shortcut API - PCa localized diagnosis w status unknown"""
@@ -416,6 +432,7 @@ def test_clinical_pca_localized_unknown(login, client, test_user):
         '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'unknown'
+
 
 def test_weight(login, client, test_user):
     with open(os.path.join(os.path.dirname(__file__),

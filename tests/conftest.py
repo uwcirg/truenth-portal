@@ -19,7 +19,11 @@ from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
 from portal.models.encounter import Encounter
 from portal.models.intervention import add_static_interventions
-from portal.models.organization import Organization, OrgTree, add_static_organization
+from portal.models.organization import (
+        Organization, 
+        OrgTree, 
+        add_static_organization
+)
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
@@ -33,7 +37,7 @@ from portal.models.user_consent import (
     UserConsent,
 )
 from portal.system_uri import SNOMED
-from tests import TEST_USER_ID 
+from tests import TEST_USER_ID
 
 
 def pytest_addoption(parser):
@@ -382,7 +386,7 @@ def login(initialize_static, app, client, music_org):
         app.config.from_object(TestConfig)
 
         if not oauth_info:
-            oauth_info= {'user_id': user_id} 
+            oauth_info = {'user_id': user_id}
 
         return client.get(
                 'test/oauth',
