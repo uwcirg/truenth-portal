@@ -20,8 +20,8 @@ from portal.models.coding import Coding
 from portal.models.encounter import Encounter
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import (
-        Organization, 
-        OrgTree, 
+        Organization,
+        OrgTree,
         add_static_organization
 )
 from portal.models.procedure import Procedure

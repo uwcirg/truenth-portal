@@ -214,7 +214,7 @@ def test_empty_biopsy_get(login, client, test_user):
     """Access biopsy on user w/o any clinical info"""
     login()
     response = client.get('/api/patient/%s/clinical/biopsy'
-            % TEST_USER_ID)
+                          % TEST_USER_ID)
     assert response.status_code == 200
     data = response.json
     assert data['value'] == 'unknown'
@@ -243,7 +243,7 @@ def test_clinical_biopsy_put(login, client, test_user):
 
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
-            % TEST_USER_ID)
+                          % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'true'
 
@@ -257,7 +257,7 @@ def test_clinical_biopsy_put(login, client, test_user):
 
     # Confirm it's altered
     response = client.get('/api/patient/%s/clinical/biopsy'
-            % TEST_USER_ID)
+                          % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'false'
 
@@ -292,7 +292,7 @@ def test_clinical_biopsy_unknown(login, client, test_user):
 
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
-            % TEST_USER_ID)
+                          % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'unknown'
 
@@ -306,7 +306,7 @@ def test_clinical_biopsy_unknown(login, client, test_user):
 
     # Confirm it's altered
     response = client.get('/api/patient/%s/clinical/biopsy'
-            % TEST_USER_ID)
+                          % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'false'
 

@@ -268,6 +268,7 @@ def test_callback_validation(client, login, add_client):
     test_client = Client.query.get('test_client')
     assert test_client.callback_url is None
 
+
 def test_service_account_creation(add_client):
     """Confirm we can create a service account and token"""
     test_client = add_client()

@@ -48,7 +48,7 @@ def test_registry():
 
 
 def test_partner(
-        app, bless_with_basics, promote_user, 
+        app, bless_with_basics, promote_user,
         test_user, initialized_db, teardown_db):
     """Partner doesn't need dx etc., set min and check pass"""
     config_as(app, TRUENTH)
@@ -59,8 +59,8 @@ def test_partner(
 
 
 def test_patient(
-        app, bless_with_basics, test_user, 
-        login, add_required_clinical_data, 
+        app, bless_with_basics, test_user,
+        login, add_required_clinical_data,
         add_procedure, initialized_db, teardown_db):
     """Patient has additional requirements"""
     config_as(app, TRUENTH)
