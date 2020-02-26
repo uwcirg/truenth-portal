@@ -60,6 +60,7 @@ def test_missing_arg(initialized_db, teardown_db):
                                '{{ app_text("landing title") }}'
                                '<body/><html/>')
 
+
 def test_permanent_url(app):
     args = {
         'uuid': 'cbe17d0d-f25d-27fb-0d92-c22bc687bb0f',
@@ -76,6 +77,7 @@ def test_permanent_url(app):
         generic_url=sample, version=args['version'])
     assert Url(result) == Url(expected)
 
+
 def test_config_value_in_custom_text(app, initialized_db, teardown_db):
     app.config['CT_TEST'] = 'found!'
     with SessionScope(db):
@@ -88,6 +90,7 @@ def test_config_value_in_custom_text(app, initialized_db, teardown_db):
     result = app_text('embed config value')
     assert 'found!' in result
 
+
 def test_fetch_elements_invalid_url():
     sample_url = "https://notarealwebsitebeepboop.com"
     sample_error = (
@@ -96,6 +99,7 @@ def test_fetch_elements_invalid_url():
     assert result.error_msg == sample_error
     assert result.url == sample_url
     assert result.asset == sample_error
+
 
 def test_asset_variable_replacement(test_user, initialized_db, teardown_db):
     test_user = User.query.get(TEST_USER_ID)
@@ -120,6 +124,7 @@ def test_asset_variable_replacement(test_user, initialized_db, teardown_db):
         assert error_key == "u'variable'"
     else:
         assert error_key == "'variable'"
+
 
 def test_mail_resource():
     testvars = {"subjkey": "test",

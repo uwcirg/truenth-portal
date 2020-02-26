@@ -8,7 +8,8 @@ from portal.models.organization import Organization
 from portal.models.role import ROLE
 
 
-def test_create_access_url(app, client, add_user, promote_user, login, teardown_db):
+def test_create_access_url(
+        app, client, add_user, promote_user, login, teardown_db):
     onetime = add_user('one@time.com')
     promote_user(user=onetime, role_name=ROLE.WRITE_ONLY.value)
 
@@ -28,7 +29,9 @@ def test_create_access_url(app, client, add_user, promote_user, login, teardown_
     assert not has_expired
     assert id == onetime.id
 
-def test_use_access_url(client, add_user, promote_user, assert_redirects, teardown_db):
+
+def test_use_access_url(
+        client, add_user, promote_user, assert_redirects, teardown_db):
     """The current flow forces access to the challenge page"""
     onetime = add_user(
         'one@time.com', first_name='first', last_name='last')
@@ -44,6 +47,7 @@ def test_use_access_url(client, add_user, promote_user, assert_redirects, teardo
     assert_redirects(
         response,
         url_for('portal.challenge_identity', request_path=access_url))
+
 
 def test_bad_token(client):
     token = 'TBKSYw7iHndUT3DfaED9tw.DHZMrQ.Wwr8SPM7ylABWf0mQHhGHHwttYk'

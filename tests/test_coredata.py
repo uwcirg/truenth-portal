@@ -6,7 +6,7 @@ from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from tests import TEST_USER_ID 
+from tests import TEST_USER_ID
 
 TRUENTH = 'TrueNTH'
 EPROMS = 'ePROMs'
@@ -42,10 +42,14 @@ def config_as(app, system, **kwargs):
     Coredata.reset()
     configure_coredata(app)
 
+
 def test_registry():
     assert len(Coredata()._registered) > 1
 
-def test_partner(app, bless_with_basics, promote_user, test_user, initialized_db, teardown_db):
+
+def test_partner(
+        app, bless_with_basics, promote_user, 
+        test_user, initialized_db, teardown_db):
     """Partner doesn't need dx etc., set min and check pass"""
     config_as(app, TRUENTH)
     bless_with_basics(make_patient=False)
@@ -53,7 +57,11 @@ def test_partner(app, bless_with_basics, promote_user, test_user, initialized_db
     test_user = db.session.merge(test_user)
     assert Coredata().initial_obtained(test_user)
 
-def test_patient(app, bless_with_basics, test_user, login, add_required_clinical_data, add_procedure, initialized_db, teardown_db):
+
+def test_patient(
+        app, bless_with_basics, test_user, 
+        login, add_required_clinical_data, 
+        add_procedure, initialized_db, teardown_db):
     """Patient has additional requirements"""
     config_as(app, TRUENTH)
     bless_with_basics()
@@ -76,7 +84,10 @@ def test_patient(app, bless_with_basics, test_user, login, add_required_clinical
     found = set(Coredata().optional(test_user))
     assert found == expect
 
-def test_still_needed(app, promote_user, test_user, music_org, initialized_db, teardown_db):
+
+def test_still_needed(
+        app, promote_user, test_user,
+        music_org, initialized_db, teardown_db):
     """Query for list of missing datapoints in legible format"""
     config_as(app, TRUENTH)
     promote_user(role_name=ROLE.PATIENT.value)
@@ -94,7 +105,10 @@ def test_still_needed(app, promote_user, test_user, music_org, initialized_db, t
     required = Coredata().required(test_user)
     assert set(required) - set(needed) == {'name', 'role'}
 
-def test_eproms_staff(app, promote_user, test_user, music_org, initialized_db, teardown_db):
+
+def test_eproms_staff(
+        app, promote_user, test_user,
+        music_org, initialized_db, teardown_db):
     """Eproms staff: privacy policy and website terms of use"""
     config_as(app, EPROMS)
     promote_user(role_name=ROLE.STAFF.value)
@@ -106,7 +120,10 @@ def test_eproms_staff(app, promote_user, test_user, music_org, initialized_db, t
     assert SUBJ_CONSENT not in needed
     assert STORED_FORM not in needed
 
-def test_eproms_patient(app, promote_user, test_user, music_org, initialized_db, teardown_db):
+
+def test_eproms_patient(
+        app, promote_user, test_user,
+        music_org, initialized_db, teardown_db):
     """Eproms patient: all ToU but stored form"""
     config_as(app, EPROMS)
     promote_user(role_name=ROLE.PATIENT.value)
@@ -118,7 +135,10 @@ def test_eproms_patient(app, promote_user, test_user, music_org, initialized_db,
     assert SUBJ_CONSENT in needed
     assert STORED_FORM not in needed
 
-def test_enter_manually_interview_assisted(app, promote_user, add_user, test_user, music_org, initialized_db, teardown_db):
+
+def test_enter_manually_interview_assisted(
+        app, promote_user, add_user, test_user,
+        music_org, initialized_db, teardown_db):
     "interview: subject_website_consent and stored_web_consent_form"
     config_as(app, EPROMS)
     promote_user(role_name=ROLE.STAFF.value)
@@ -134,7 +154,10 @@ def test_enter_manually_interview_assisted(app, promote_user, add_user, test_use
     assert SUBJ_CONSENT in needed
     assert STORED_FORM in needed
 
-def test_enter_manually_paper(app, promote_user, add_user, test_user, music_org, initialized_db, teardown_db):
+
+def test_enter_manually_paper(
+        app, promote_user, add_user, test_user,
+        music_org, initialized_db, teardown_db):
     "paper: subject_website_consent"
     config_as(app, EPROMS)
     promote_user(role_name=ROLE.STAFF.value)
@@ -150,7 +173,10 @@ def test_enter_manually_paper(app, promote_user, add_user, test_user, music_org,
     assert SUBJ_CONSENT in needed
     assert STORED_FORM not in needed
 
-def test_music_exception(app, test_user, promote_user, client, login, music_org, initialized_db, teardown_db):
+
+def test_music_exception(
+        app, test_user, promote_user, client,
+        login, music_org, initialized_db, teardown_db):
     config_as(
         app, system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
     test_user = db.session.merge(test_user)
