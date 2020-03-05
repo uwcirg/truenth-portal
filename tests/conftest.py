@@ -106,16 +106,16 @@ def calc_date_params(backdate, setdate):
     return acceptance_date
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def initialize_static(initialized_db):
-    def initialize_static():
-        add_static_concepts(only_quick=True)
-        add_static_interventions()
-        add_static_organization()
-        add_static_relationships()
-        add_static_roles()
-        db.session.commit()
-    return initialize_static
+    add_static_concepts(only_quick=True)
+    add_static_interventions()
+    add_static_organization()
+    add_static_relationships()
+    add_static_roles()
+    db.session.commit()
+
+    yield
 
 
 @pytest.fixture(scope="session")
@@ -229,7 +229,6 @@ def add_user(app, initialized_db):
 @pytest.fixture
 def add_service_user(initialize_static, test_user):
     def add_service_user(sponsor=None):
-        initialize_static()
 
         if not sponsor:
             sponsor = test_user
@@ -381,7 +380,6 @@ def login(initialize_static, app, client, music_org):
             oauth_info=None,
             follow_redirects=True
     ):
-        initialize_static()
 
         app.config.from_object(TestConfig)
 
@@ -402,7 +400,6 @@ def login(initialize_static, app, client, music_org):
 @pytest.fixture
 def local_login(client, initialize_static, music_org):
     def local_login(email, password, follow_redirects=True):
-        initialize_static()
         url = url_for('user.login')
         return client.post(
             url,
@@ -433,7 +430,6 @@ def add_client(promote_user):
 @pytest.fixture
 def promote_user(initialize_static, test_user):
     def promote_user(user=None, role_name=None):
-        initialize_static()
 
         """Bless a user with role needed for a test"""
         if not user:
