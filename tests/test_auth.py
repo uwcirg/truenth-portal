@@ -223,9 +223,8 @@ def test_client_bad_add(
     assert "Invalid URL" in response
 
 
-def test_client_edit(client, login, add_client):
+def test_client_edit(client, login, test_client):
     """Test editing a client application"""
-    test_client = add_client()
     test_url = 'http://tryme.com'
     origins = "{} {}".format(test_client.application_origins, test_url)
     login()
@@ -254,9 +253,8 @@ def test_client_edit(client, login, add_client):
     assert test_client.callback_url != invalid_url
 
 
-def test_callback_validation(client, login, add_client):
+def test_callback_validation(client, login, test_client):
     """Confirm only valid urls can be set"""
-    test_client = add_client()
     login()
     response = client.post(
         '/client/{0}'.format(test_client.client_id),
@@ -269,9 +267,8 @@ def test_callback_validation(client, login, add_client):
     assert test_client.callback_url is None
 
 
-def test_service_account_creation(add_client):
+def test_service_account_creation(test_client):
     """Confirm we can create a service account and token"""
-    test_client = add_client()
     test_user = User.query.get(TEST_USER_ID)
     service_user = test_user.add_service_account()
 
@@ -300,9 +297,8 @@ def test_service_account_creation(add_client):
             + datetime.timedelta(days=364))
 
 
-def test_service_account_promotion(add_client):
+def test_service_account_promotion(test_client):
     """Confirm we can not promote a service account """
-    add_client()
     test_user = User.query.get(TEST_USER_ID)
     service_user = test_user.add_service_account()
 
@@ -349,8 +345,7 @@ def test_token_status_wo_header(client):
     assert 401 == response.status_code
 
 
-def test_origin_validation(app, add_client):
-    test_client = add_client()
+def test_origin_validation(app, test_client):
     client_url = test_client._redirect_uris
     local_url = "http://{}/home?test".format(
         app.config.get('SERVER_NAME'))
