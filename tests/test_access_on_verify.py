@@ -2,14 +2,20 @@ import json
 
 from flask import url_for
 from flask_webtest import SessionScope
+import pytest
 
 from portal.database import db
 from portal.extensions import user_manager
 
+@pytest.fixture
+def access_on_verify_user(add_user, promote_user):
+    weak_access_user = add_user(username='fake@org.com')
+    promote_user(weak_access_user, role_name = 'access_on_verify')
+    return db.session.merge(weak_access_user)
 
-def test_create_account_via_api(app, client, add_service_user, login):
+def test_create_account_via_api(app, client, service_user, login):
     # use APIs to create account w/ special role
-    service_user = add_service_user()
+    db.session.add(service_user)
     login(user_id=service_user.id)
     response = client.post(
         '/api/account',
@@ -27,14 +33,11 @@ def test_create_account_via_api(app, client, add_service_user, login):
     assert response.status_code == 200
 
 
-def test_access(client, add_user, promote_user, assert_redirects):
+def test_access(client, access_on_verify_user, assert_redirects):
     # confirm exception on access w/o DOB
-    weak_access_user = add_user(username='fake@org.com')
-    promote_user(weak_access_user, role_name='access_on_verify')
-    weak_access_user = db.session.merge(weak_access_user)
-    assert not weak_access_user.birthdate
+    assert not access_on_verify_user.birthdate
 
-    token = user_manager.token_manager.generate_token(weak_access_user.id)
+    token = user_manager.token_manager.generate_token(access_on_verify_user.id)
     access_url = url_for(
         'portal.access_via_token', token=token, _external=True)
 
@@ -42,9 +45,9 @@ def test_access(client, add_user, promote_user, assert_redirects):
     assert response.status_code == 400
 
     # add DOB & names and expect redirect to challenge
-    weak_access_user.birthdate = '01-31-1999'
-    weak_access_user.first_name = 'Testy'
-    weak_access_user.last_name = 'User'
+    access_on_verify_user.birthdate = '01-31-1999'
+    access_on_verify_user.first_name = 'Testy'
+    access_on_verify_user.last_name = 'User'
     with SessionScope(db):
         db.session.commit()
 
