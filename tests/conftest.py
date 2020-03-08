@@ -227,20 +227,14 @@ def add_user(app, initialized_db):
 
 
 @pytest.fixture
-def add_service_user(initialize_static, test_user):
-    def add_service_user(sponsor=None):
+def service_user(initialize_static, test_user):
+    sponsor = test_user
+    service_user = sponsor.add_service_account()
+    with SessionScope(db):
+        db.session.add(service_user)
+        db.session.commit()
 
-        if not sponsor:
-            sponsor = test_user
-        if sponsor not in db.session:
-            sponsor = db.session.merge(sponsor)
-        service_user = sponsor.add_service_account()
-        with SessionScope(db):
-            db.session.add(service_user)
-            db.session.commit()
-
-        return db.session.merge(service_user)
-    return add_service_user
+    yield db.session.merge(service_user)
 
 
 @pytest.fixture
@@ -413,18 +407,16 @@ def local_login(client, initialize_static, music_org):
 
 
 @pytest.fixture
-def add_client(promote_user):
-    def add_client():
-        promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
-        client_id = 'test_client'
-        client = Client(
-                client_id=client_id, _redirect_uris='http://localhost',
-                client_secret='tc_secret', user_id=TEST_USER_ID)
-        with SessionScope(db):
-            db.session.add(client)
-            db.session.commit()
-        return db.session.merge(client)
-    return add_client
+def test_client(promote_user):
+    promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
+    client_id = 'test_client'
+    client = Client(
+            client_id=client_id, _redirect_uris='http://localhost',
+            client_secret='tc_secret', user_id=TEST_USER_ID)
+    with SessionScope(db):
+        db.session.add(client)
+        db.session.commit()
+    return db.session.merge(client)
 
 
 @pytest.fixture
