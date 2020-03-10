@@ -203,6 +203,89 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
+def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
+    """returns test patient with data necessary to avoid initial_queries"""
+    TEST_USERNAME = 'test@example.com'
+    FIRST_NAME = '✓'
+    LAST_NAME = 'Last'
+    IMAGE_URL = 'http://examle.com/photo.jpg'
+    now = datetime.utcnow()
+    test_user = add_user(
+        username=TEST_USERNAME, first_name=FIRST_NAME,
+        last_name=LAST_NAME, image_url=IMAGE_URL)
+    test_user.birthdate = now
+    test_user_id = test_user.id
+    role_id = db.session.query(Role.id).filter(
+        Role.name == 'patient').first()[0]
+    with SessionScope(db):
+        db.session.add(UserRoles(user_id=test_user_id, role_id=role_id))
+        db.session.commit()
+
+    org = Organization.query.filter(
+        Organization.partOf_id.isnot(None)).first()
+    test_user = db.session.merge(test_user)
+    test_user.organizations.append(org)
+
+    # Agree to Terms of Use and sign consent
+    audit = Audit(user_id=test_user_id, subject_id=test_user_id)
+    tou = ToU(
+        audit=audit, agreement_url='http://not.really.org',
+        type='website terms of use')
+    subj_web = ToU(
+        audit=audit, agreement_url='http://not.really.org',
+        type='subject website consent')
+    privacy = ToU(
+        audit=audit, agreement_url='http://not.really.org',
+        type='privacy policy')
+    parent_org = OrgTree().find(org.id).top_level()
+    options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
+               SEND_REMINDERS_MASK)
+    consent = UserConsent(
+        user_id=test_user_id, organization_id=parent_org,
+        options=options, audit=audit, agreement_url='http://fake.org',
+        acceptance_date=now)
+
+    for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
+        test_user.save_observation(
+            codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
+            audit=audit, status='preliminary', issued=now)
+
+    with SessionScope(db):
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        procedure = Procedure(audit=audit)
+        coding = Coding(
+            system=SNOMED,
+            code='999999999',
+            display='Other primary treatment').add_if_not_found(True)
+        code = CodeableConcept(codings=[coding]).add_if_not_found(True)
+        enc = Encounter(
+            status='planned',
+            auth_method='url_authenticated',
+            user_id=TEST_USER_ID, start_time=datetime.utcnow())
+        db.session.add(enc)
+        db.session.commit()
+        enc = db.session.merge(enc)
+        procedure.code = code
+        procedure.user = db.session.merge(test_user)
+        procedure.start_time = now
+        procedure.encounter = enc
+        db.session.add(procedure)
+        db.session.commit()
+
+    with SessionScope(db):
+        db.session.add(tou)
+        db.session.add(subj_web)
+        db.session.add(privacy)
+        db.session.add(consent)
+        db.session.commit()
+
+    # Invalidate org tree cache, in case more orgs are added by test
+    OrgTree.invalidate_cache()
+
+    yield test_user
+
+
+@pytest.fixture
 def add_user(app, initialized_db):
     def add_user(
             username, first_name="", last_name="",
