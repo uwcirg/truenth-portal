@@ -1,6 +1,7 @@
 """Coredata tests"""
 
 from flask_webtest import SessionScope
+import pytest
 
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
@@ -14,6 +15,18 @@ PRIVACY = 'privacy_policy'
 WEB_TOU = 'website_terms_of_use'
 SUBJ_CONSENT = 'subject_website_consent'
 STORED_FORM = 'stored_website_consent_form'
+
+
+@pytest.fixture
+def staff_user(test_user, promote_user):
+    promote_user(role_name=ROLE.STAFF.value)
+    return test_user 
+
+
+@pytest.fixture
+def patient_user(test_user, promote_user):
+    promote_user(role_name=ROLE.PATIENT.value)
+    return test_user
 
 
 def config_as(app, system, **kwargs):
@@ -86,14 +99,13 @@ def test_patient(
 
 
 def test_still_needed(
-        app, promote_user, test_user,
+        app, patient_user,
         music_org, initialized_db, teardown_db):
     """Query for list of missing datapoints in legible format"""
     config_as(app, TRUENTH)
-    promote_user(role_name=ROLE.PATIENT.value)
-    test_user = db.session.merge(test_user)
+    patient_user = db.session.merge(patient_user)
 
-    needed = [i['field'] for i in Coredata().still_needed(test_user)]
+    needed = [i['field'] for i in Coredata().still_needed(patient_user)]
     assert len(needed) > 1
     assert 'dob' in needed
     assert 'website_terms_of_use' in needed
@@ -102,17 +114,16 @@ def test_still_needed(
     assert 'org' in needed
 
     # needed should match required (minus 'name', 'role')
-    required = Coredata().required(test_user)
+    required = Coredata().required(patient_user)
     assert set(required) - set(needed) == {'name', 'role'}
 
 
 def test_eproms_staff(
-        app, promote_user, test_user,
+        app, staff_user,
         music_org, initialized_db, teardown_db):
     """Eproms staff: privacy policy and website terms of use"""
     config_as(app, EPROMS)
-    promote_user(role_name=ROLE.STAFF.value)
-    test_user = db.session.merge(test_user)
+    test_user = db.session.merge(staff_user)
 
     needed = [i['field'] for i in Coredata().still_needed(test_user)]
     assert PRIVACY in needed
@@ -122,12 +133,11 @@ def test_eproms_staff(
 
 
 def test_eproms_patient(
-        app, promote_user, test_user,
+        app, patient_user,
         music_org, initialized_db, teardown_db):
     """Eproms patient: all ToU but stored form"""
     config_as(app, EPROMS)
-    promote_user(role_name=ROLE.PATIENT.value)
-    test_user = db.session.merge(test_user)
+    test_user = db.session.merge(patient_user)
 
     needed = [i['field'] for i in Coredata().still_needed(test_user)]
     assert PRIVACY in needed
@@ -137,15 +147,12 @@ def test_eproms_patient(
 
 
 def test_enter_manually_interview_assisted(
-        app, promote_user, add_user, test_user,
+        app, staff_user, patient_user,
         music_org, initialized_db, teardown_db):
     "interview: subject_website_consent and stored_web_consent_form"
     config_as(app, EPROMS)
-    promote_user(role_name=ROLE.STAFF.value)
-    patient = add_user('patient')
-    promote_user(patient, role_name=ROLE.PATIENT.value)
     test_user, patient = map(
-        db.session.merge, (test_user, patient))
+        db.session.merge, (staff_user, patient_user))
 
     needed = [i['field'] for i in Coredata().still_needed(
         patient, entry_method='interview assisted')]
@@ -156,15 +163,12 @@ def test_enter_manually_interview_assisted(
 
 
 def test_enter_manually_paper(
-        app, promote_user, add_user, test_user,
+        app, staff_user, patient_user,
         music_org, initialized_db, teardown_db):
     "paper: subject_website_consent"
     config_as(app, EPROMS)
-    promote_user(role_name=ROLE.STAFF.value)
-    patient = add_user('patient')
-    promote_user(patient, role_name=ROLE.PATIENT.value)
     test_user, patient = map(
-        db.session.merge, (test_user, patient))
+        db.session.merge, (staff_user, patient_user))
 
     needed = [i['field'] for i in Coredata().still_needed(
         patient, entry_method='paper')]
@@ -175,13 +179,12 @@ def test_enter_manually_paper(
 
 
 def test_music_exception(
-        app, test_user, promote_user, client,
+        app, patient_user, client,
         login, music_org, initialized_db, teardown_db):
     config_as(
         app, system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
-    test_user = db.session.merge(test_user)
+    test_user = db.session.merge(patient_user)
     test_user.organizations.append(music_org)
-    promote_user(role_name=ROLE.PATIENT.value)
 
     user = db.session.merge(test_user)
     needed = Coredata().still_needed(user)
