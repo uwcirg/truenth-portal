@@ -87,14 +87,17 @@ def fixup_qnr(questionnaire_response_json, questionnaire_option_map):
                     fixed_answers.append(answer)
                     continue
 
-            # encode strings as codes
+            # encode strings as codes, if matching code found
             if 'valueString' in answer:
-                coded_answer = {'valueCoding': {
-                    # lookup code from valueString
-                    'code': questionnaire_option_map[answer['valueString']],
-                    'system': 'https://eproms.truenth.org/api/codings/assessment',
-                }}
-                fixed_answers.append(coded_answer)
+                fixed_answer = answer
+                if answer['valueString'] in questionnaire_option_map:
+                    fixed_answer = {'valueCoding': {
+                        # lookup code from valueString
+                        'code': questionnaire_option_map[answer['valueString']],
+                        'system': 'https://eproms.truenth.org/api/codings/assessment',
+                    }}
+
+                fixed_answers.append(fixed_answer)
                 continue
 
             # catch any other answer types
