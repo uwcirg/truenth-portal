@@ -127,7 +127,10 @@ def upgrade():
             ].astext.endswith(instrument_id)
         ).order_by(QuestionnaireResponse.id)
         for qnr in questionnaire_responses:
-            qnr_json = fixup_qnr(qnr.document, questionnaire_option_map=q_codes)
+            qnr_json = fixup_qnr(
+                questionnaire_response_json=qnr.document,
+                questionnaire_option_map=q_codes,
+            )
             if qnr_json == qnr.document:
                 continue
 
