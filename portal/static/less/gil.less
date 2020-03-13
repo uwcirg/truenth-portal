@@ -7110,12 +7110,14 @@ figure.nav-overlay {
 @media (max-width:767px) {
     .side-nav {
         top: 92px;
+        height: calc(100vh - 86px);
+        overflow: scroll;
     }
     .side-nav__inner {
         padding: 20px
     }
     .is-nav-expanded .side-nav {
-        width: 100%
+        width: 100%;
     }
     .side-nav .side-nav-items__button {
         font-size: 1em;
@@ -7126,7 +7128,23 @@ figure.nav-overlay {
         font-size: 1.05em;
     }
 }
-
+@media (min-width: 320px) and (max-width: 480px) {
+    .side-nav {
+        height: 77.5vh;
+        overflow-y:scroll;
+        &.is-scroll::before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            content: '';
+            display: block;
+            background: transparent;
+            z-index: 1002;
+        }
+    }
+}
 .is-nav-expanded .side-nav {
     left: 0
 }
@@ -7135,7 +7153,10 @@ figure.nav-overlay {
     h3 {
         color: #BFC0BD;
         text-align: left;
-        padding: 0 0 10px
+        padding: 0 0 10px;
+        &.side-nav__heading {
+            padding: 0;
+        }
     }
 }
 
@@ -7161,7 +7182,7 @@ figure.nav-overlay {
 
 .side-nav-items__button {
     float: left;
-    margin: 15px 15px 0 0
+    margin: 15px 15px 35px 0;
 }
 
 .side-nav-items__button a {

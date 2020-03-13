@@ -1,5 +1,3 @@
-import json
-
 from flask import (
     Blueprint,
     abort,
@@ -32,7 +30,11 @@ from ..models.organization import Organization
 from ..models.role import ROLE
 from ..models.user import current_user, get_user_or_abort
 from ..views.auth import next_after_login
-from ..views.portal import get_all_tag_data, get_any_tag_data, get_asset
+from ..views.external_assets import (
+    asset_by_uuid,
+    get_all_tag_data,
+    get_any_tag_data,
+)
 
 eproms = Blueprint(
     'eproms', __name__, template_folder='templates', static_folder='static',
@@ -277,7 +279,7 @@ def resources():
         video_content = []
         for asset in results:
             if 'video' in asset['tags']:
-                video_content.append(get_asset(asset['uuid']))
+                video_content.append(asset_by_uuid(asset['uuid']))
         return render_template('eproms/resources.html',
                                results=results, video_content=video_content)
     else:
@@ -298,7 +300,7 @@ def work_instruction(tag):
                                              format(org.name.lower()))
     results = work_instruction_data['results']
     if len(results) > 0:
-        content = get_asset(results[0]['uuid'])
+        content = asset_by_uuid(results[0]['uuid'])
         return render_template('eproms/work_instruction.html',
                                content=content, title=tag)
     else:
