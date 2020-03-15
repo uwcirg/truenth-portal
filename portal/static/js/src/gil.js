@@ -224,6 +224,25 @@ module.exports = NavToggle = (function() {
   }
 
   NavToggle.prototype.build = function() {
+
+    var ENABLE_DELAY = 550;
+    var scrollTimerId = 0;
+    /*
+     * address issue on touchscreen devices :
+     * scroll or momentum scroll will trigger onclick event of a menu item
+     * create a overlay over sidebar menu when scrolling will prevent onclick event from triggering
+     */
+    $(".side-nav").on("scroll", function() {
+        clearTimeout(scrollTimerId);
+        if (!$(this).hasClass("is-scroll")) {
+          $(this).addClass("is-scroll");
+        }
+        scrollTimerId = setTimeout(function() {
+          // remove the class after a timeout of 500 milliseconds
+          $(this).removeClass("is-scroll");
+        }.bind(this), ENABLE_DELAY);
+    });
+   
     $(".js-nav-menu-toggle").on("click", function(e) {
       e.preventDefault();
       return $("html").toggleClass(navExpandedClass, !$("html").hasClass(navExpandedClass));
@@ -233,7 +252,7 @@ module.exports = NavToggle = (function() {
         return $("html").removeClass(navExpandedClass);
       }
     });
-    $(".side-nav a").not("[data-toggle=modal]").on("click touchend", function(e) {
+    $(".side-nav a").not("[data-toggle=modal]").on("click", function(e) {
       var href;
       e.preventDefault();
       href = $(this).attr("href");
@@ -248,7 +267,7 @@ module.exports = NavToggle = (function() {
         window.app.utilObj.setVis();
       }, 500);
     });
-    return $(".side-nav a[data-toggle=modal]").on("click touchend", function(e) {
+    return $(".side-nav a[data-toggle=modal]").on("click", function(e) {
       var target;
       e.preventDefault();
       target = $(this).attr("data-target");
