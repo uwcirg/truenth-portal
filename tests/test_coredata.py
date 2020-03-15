@@ -20,7 +20,7 @@ STORED_FORM = 'stored_website_consent_form'
 @pytest.fixture
 def staff_user(test_user, promote_user):
     promote_user(role_name=ROLE.STAFF.value)
-    return test_user 
+    return test_user
 
 
 @pytest.fixture
