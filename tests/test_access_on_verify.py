@@ -7,11 +7,13 @@ import pytest
 from portal.database import db
 from portal.extensions import user_manager
 
+
 @pytest.fixture
 def access_on_verify_user(add_user, promote_user):
     weak_access_user = add_user(username='fake@org.com')
-    promote_user(weak_access_user, role_name = 'access_on_verify')
+    promote_user(weak_access_user, role_name='access_on_verify')
     return db.session.merge(weak_access_user)
+
 
 def test_create_account_via_api(app, client, service_user, login):
     # use APIs to create account w/ special role

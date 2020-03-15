@@ -35,7 +35,6 @@ def test_auth_user(add_user):
     return user
 
 
-
 def test_nouser_logout(client, initialized_db, teardown_db):
     """Confirm logout works without a valid user"""
     response = client.get('/logout')
@@ -103,7 +102,8 @@ def test_local_login_lockout_after_unsuccessful_attempts(
         assert response.status_code is 200
 
         db.session.refresh(test_auth_user)
-        assert test_auth_user.password_verification_failures == (failureIndex + 1)
+        assert test_auth_user.password_verification_failures == (
+                failureIndex + 1)
         assert not test_auth_user.is_locked_out
 
     # Validate that after using up all permitted attempts
@@ -113,7 +113,8 @@ def test_local_login_lockout_after_unsuccessful_attempts(
     assert test_auth_user.is_locked_out
 
 
-def test_local_login_verify_lockout_resets_after_lockout_period(test_auth_user):
+def test_local_login_verify_lockout_resets_after_lockout_period(
+        test_auth_user):
     test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
     # Lock the user out
@@ -132,7 +133,8 @@ def test_local_login_verify_lockout_resets_after_lockout_period(test_auth_user):
     assert not test_auth_user.is_locked_out
 
 
-def test_local_login_verify_cant_login_when_locked_out(test_auth_user, local_login):
+def test_local_login_verify_cant_login_when_locked_out(
+        test_auth_user, local_login):
     test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
     # Lock the user out
