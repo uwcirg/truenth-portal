@@ -36,7 +36,7 @@ def test_auth_user(add_user):
 
 
 
-def test_nouser_logout(client):
+def test_nouser_logout(client, initialized_db, teardown_db):
     """Confirm logout works without a valid user"""
     response = client.get('/logout')
     assert 302 == response.status_code
