@@ -22,6 +22,20 @@ from portal.models.user import (
 from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID
 
 
+@pytest.fixture
+def test_auth_user(add_user):
+    # Create a user
+    email = 'localuser@test.com'
+    password = 'Password1'
+    user = add_user(
+        username='username',
+        email=email,
+        password=password
+    )
+    return user
+
+
+
 def test_nouser_logout(client):
     """Confirm logout works without a valid user"""
     response = client.get('/logout')
@@ -40,144 +54,99 @@ def test_local_user_add(client):
     assert new_user.active is True
 
 
-def test_local_login_valid_username_and_password(add_user, local_login):
+def test_local_login_valid_username_and_password(test_auth_user, local_login):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    # Create a user
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Attempt to login with valid creds
-    response = local_login(user.email, password)
+    response = local_login(test_auth_user.email, 'Password1')
 
     # Validate login was successful
     assert response.status_code is 200
-    assert user.password_verification_failures == 0
+    assert test_auth_user.password_verification_failures == 0
 
 
-def test_local_login_failure_increments_lockout(add_user, local_login):
+def test_local_login_failure_increments_lockout(test_auth_user, local_login):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    # Create a user
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Attempt to login with an invalid password
-    response = local_login(user.email, 'invalidpassword')
+    response = local_login(test_auth_user.email, 'invalidpassword')
 
     # Verify there was a password failure
-    db.session.refresh(user)
-    assert user.password_verification_failures == 1
+    db.session.refresh(test_auth_user)
+    assert test_auth_user.password_verification_failures == 1
 
 
 def test_local_login_valid_username_and_password_resets_lockout(
-        add_user, local_login):
+        test_auth_user, local_login):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    # Create a user
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Mock a failed password attempt
-    user.add_password_verification_failure()
-    assert user.password_verification_failures == 1
+    test_auth_user.add_password_verification_failure()
+    assert test_auth_user.password_verification_failures == 1
 
     # Atempt to login with valid creds
-    response = local_login(user.email, password)
+    response = local_login(test_auth_user.email, 'Password1')
 
     # Verify lockout was reset
-    db.session.refresh(user)
-    assert user.password_verification_failures == 0
+    db.session.refresh(test_auth_user)
+    assert test_auth_user.password_verification_failures == 0
 
 
 def test_local_login_lockout_after_unsuccessful_attempts(
-        add_user, local_login):
+        test_auth_user, local_login):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Use up all of the permitted login attempts
-    attempts = user.failed_login_attempts_before_lockout - 1
+    attempts = test_auth_user.failed_login_attempts_before_lockout - 1
     for failureIndex in range(0, attempts):
-        response = local_login(user.email, 'invalidpassword')
+        response = local_login(test_auth_user.email, 'invalidpassword')
         assert response.status_code is 200
 
-        db.session.refresh(user)
-        assert user.password_verification_failures == (failureIndex + 1)
-        assert not user.is_locked_out
+        db.session.refresh(test_auth_user)
+        assert test_auth_user.password_verification_failures == (failureIndex + 1)
+        assert not test_auth_user.is_locked_out
 
     # Validate that after using up all permitted attempts
     # the next is locked out
-    response = local_login(user.email, 'invalidpassword')
-    db.session.refresh(user)
-    assert user.is_locked_out
+    response = local_login(test_auth_user.email, 'invalidpassword')
+    db.session.refresh(test_auth_user)
+    assert test_auth_user.is_locked_out
 
 
-def test_local_login_verify_lockout_resets_after_lockout_period(add_user):
+def test_local_login_verify_lockout_resets_after_lockout_period(test_auth_user):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Lock the user out
-    attempts = user.failed_login_attempts_before_lockout
+    attempts = test_auth_user.failed_login_attempts_before_lockout
     for failureIndex in range(0, attempts):
-        user.add_password_verification_failure()
+        test_auth_user.add_password_verification_failure()
 
     # Verify the user is locked out
-    assert user.is_locked_out
+    assert test_auth_user.is_locked_out
 
     # Move time to the end of the lockout period
-    user.last_password_verification_failure = \
-        datetime.datetime.utcnow() - user.lockout_period_timedelta
+    test_auth_user.last_password_verification_failure = \
+        datetime.datetime.utcnow() - test_auth_user.lockout_period_timedelta
 
     # Verify we are no longer locked out
-    assert not user.is_locked_out
+    assert not test_auth_user.is_locked_out
 
 
-def test_local_login_verify_cant_login_when_locked_out(add_user, local_login):
+def test_local_login_verify_cant_login_when_locked_out(test_auth_user, local_login):
+    test_auth_user = db.session.merge(test_auth_user)
     """login through the login form"""
-    email = 'localuser@test.com'
-    password = 'Password1'
-    user = add_user(
-        username='username',
-        email=email,
-        password=password
-    )
-
     # Lock the user out
-    attempts = user.failed_login_attempts_before_lockout
+    attempts = test_auth_user.failed_login_attempts_before_lockout
     for failureIndex in range(0, attempts):
-        user.add_password_verification_failure()
+        test_auth_user.add_password_verification_failure()
 
-    assert user.is_locked_out
+    assert test_auth_user.is_locked_out
 
     # Atempt to login with valid creds
-    response = local_login(user.email, password)
+    response = local_login(test_auth_user.email, 'Password1')
 
     # Verify the user is still locked out
-    assert user.is_locked_out
+    assert test_auth_user.is_locked_out
 
 
 def test_register_now(
@@ -185,7 +154,7 @@ def test_register_now(
     """Initiate process to register exiting account"""
     app.config['NO_CHALLENGE_WO_DATA'] = False
     # added to avoid detached instance error
-    db.session.add(test_user)
+    test_user = db.session.merge(test_user)
 
     test_user.password = None
     test_user.birthdate = '1998-01-31'
