@@ -658,26 +658,29 @@ def consolidate_answer_pairs(answers):
         (at the time of administration) may be submitted alongside coded
         answers for ease of display
     """
+    last_answer = None
+    for answer in answers:
+        # answer pair detected, only yield coded value
+        if 'valueCoding' in answer and last_answer and 'valueString' in last_answer:
+            last_answer = None
+            yield answer
+            continue
 
-    answer_types = [list(a.keys())[0] for a in answers]
+        # no pair, yield last answer before storing another
+        if last_answer:
+            yield last_answer
 
-    # Exit early if assumptions not met, i.e. ordered pairs of
-    # 'valueString' followed by 'valueCoding' keys
-    if answer_types != ['valueString', 'valueCoding'] * int(len(answers)/2):
-        return answers
+        # store answer and check for pair on next iteration
+        if 'valueString' in answer:
+            last_answer = answer
+            continue
 
-    filtered_answers = []
-    for pair in zip(*[iter(answers)] * 2):
-        # Sort so first pair is always valueCoding
-        pair = sorted(pair, key=lambda k: list(k.keys())[0])
-        coded_answer, string_answer = pair
+        # not valueString, yield immediatly
+        yield answer
 
-        coded_answer['valueCoding']['text'] = string_answer['valueString']
-
-        filtered_answers.append(coded_answer)
-
-    return filtered_answers
-
+    # yield leftover unpaired valueString
+    if last_answer:
+        yield last_answer
 
 qnr_csv_column_headers = (
     'identifier',
