@@ -662,6 +662,7 @@ def consolidate_answer_pairs(answers):
     for answer in answers:
         # answer pair detected, only yield coded value
         if 'valueCoding' in answer and last_answer and 'valueString' in last_answer:
+            answer['valueCoding']['text'] = last_answer['valueString']
             last_answer = None
             yield answer
             continue
