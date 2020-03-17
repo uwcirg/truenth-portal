@@ -17,15 +17,15 @@ def write_only_user(add_user, promote_user):
 
 
 @pytest.fixture
-def admin_user(write_only_user, promote_user):
-    promote_user(user=write_only_user, role_name=ROLE.ADMIN.value)
+def admin_user(promote_user):
+    admin_user = promote_user(role_name=ROLE.ADMIN.value)
     return write_only_user
 
 
 def test_create_access_url(
-        app, client, admin_user, login, teardown_db):
+        app, client, admin_user, write_only_user, login, teardown_db):
     login()
-    onetime = db.session.merge(admin_user)
+    onetime = db.session.merge(write_only_user)
     response = client.get('/api/user/{}/access_url'.format(
         onetime.id))
     assert response.status_code == 200
