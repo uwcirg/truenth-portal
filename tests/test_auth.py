@@ -35,7 +35,7 @@ def test_auth_user(add_user):
     return user
 
 
-def test_nouser_logout(client, initialized_db, teardown_db):
+def test_nouser_logout(client, initialized_db):
     """Confirm logout works without a valid user"""
     response = client.get('/logout')
     assert 302 == response.status_code
@@ -183,7 +183,7 @@ def test_client_add(promote_user, login, client):
 
 
 def test_client_bad_add(
-        promote_user, login, client, initialized_db, teardown_db):
+        promote_user, login, client, initialized_db):
     """Test adding a bad client application"""
     promote_user(role_name=ROLE.APPLICATION_DEVELOPER.value)
     login()
