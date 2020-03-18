@@ -17,7 +17,7 @@ def test_default_timeout(login, client, test_user):
     assert int(cookies['SS_INACTIVITY_TIMEOUT'].value) == 30 * 60
 
 
-def test_SR_timeout(login, client, test_user, initialize_static):
+def test_SR_timeout(login, client, test_user):
     # SR users get 1 hour
     ui = UserIntervention(
         user_id=TEST_USER_ID,
@@ -34,16 +34,14 @@ def test_SR_timeout(login, client, test_user, initialize_static):
     assert int(cookies['SS_INACTIVITY_TIMEOUT'].value) == 60 * 60
 
 
-def test_kiosk_mode(app, login, test_user):
+def test_kiosk_mode(app, login, client, test_user):
     # Mock scenario where system is configured with unique timeout
     system_timeout = '299'
-    with app.test_client() as client:
-        client.set_cookie(
-            app.config['SERVER_NAME'], 'SS_TIMEOUT', system_timeout)
-        login()
-        response = client.get(
+    client.set_cookie(
+        app.config['SERVER_NAME'], 'SS_TIMEOUT', system_timeout)
+    login()
+    response = client.get(
             '/next-after-login', follow_redirects=False)
-
     cookies = SimpleCookie()
     [cookies.load(item[1]) for item in response.headers
      if item[0] == 'Set-Cookie']
