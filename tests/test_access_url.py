@@ -23,7 +23,7 @@ def admin_user(promote_user):
 
 
 def test_create_access_url(
-        app, client, admin_user, write_only_user, login, teardown_db):
+        app, client, admin_user, write_only_user, login):
     login()
     onetime = db.session.merge(write_only_user)
     response = client.get('/api/user/{}/access_url'.format(
@@ -41,7 +41,7 @@ def test_create_access_url(
 
 
 def test_use_access_url(
-        client, write_only_user, assert_redirects, teardown_db):
+        client, write_only_user, assert_redirects):
     """The current flow forces access to the challenge page"""
     onetime = db.session.merge(write_only_user)
     onetime.birthdate = '01-31-1969'  # verify requires DOB

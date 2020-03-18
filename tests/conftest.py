@@ -142,23 +142,19 @@ def app_logger(app):
     return app.logger
 
 
-@pytest.fixture(scope='session')
-def initialized_db(app, request):
+@pytest.fixture(autouse=True)
+def initialized_db(app):
     """Create database schema"""
     db.drop_all()
     db.create_all()
 
+    yield
 
-@pytest.fixture(autouse=True)
-def teardown_db(app, request):
-    def teardown():
-        cache.clear()
-        db.session.remove()
-        db.engine.dispose()
-        db.drop_all()
-        db.create_all()
-
-    request.addfinalizer(teardown)
+    cache.clear()
+    db.session.remove()
+    db.engine.dispose()
+    db.drop_all()
+    db.create_all()
 
 
 @pytest.fixture(scope='session')

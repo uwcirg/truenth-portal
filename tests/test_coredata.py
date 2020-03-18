@@ -62,7 +62,7 @@ def test_registry():
 
 def test_partner(
         app, bless_with_basics, promote_user,
-        test_user, initialized_db, teardown_db):
+        test_user, initialized_db):
     """Partner doesn't need dx etc., set min and check pass"""
     config_as(app, TRUENTH)
     bless_with_basics(make_patient=False)
@@ -74,7 +74,7 @@ def test_partner(
 def test_patient(
         app, bless_with_basics, test_user,
         login, add_required_clinical_data,
-        add_procedure, initialized_db, teardown_db):
+        add_procedure, initialized_db):
     """Patient has additional requirements"""
     config_as(app, TRUENTH)
     bless_with_basics()
@@ -100,7 +100,7 @@ def test_patient(
 
 def test_still_needed(
         app, patient_user,
-        music_org, initialized_db, teardown_db):
+        music_org, initialized_db):
     """Query for list of missing datapoints in legible format"""
     config_as(app, TRUENTH)
     patient_user = db.session.merge(patient_user)
@@ -120,7 +120,7 @@ def test_still_needed(
 
 def test_eproms_staff(
         app, staff_user,
-        music_org, initialized_db, teardown_db):
+        music_org, initialized_db):
     """Eproms staff: privacy policy and website terms of use"""
     config_as(app, EPROMS)
     test_user = db.session.merge(staff_user)
@@ -134,7 +134,7 @@ def test_eproms_staff(
 
 def test_eproms_patient(
         app, patient_user,
-        music_org, initialized_db, teardown_db):
+        music_org, initialized_db):
     """Eproms patient: all ToU but stored form"""
     config_as(app, EPROMS)
     test_user = db.session.merge(patient_user)
@@ -148,7 +148,7 @@ def test_eproms_patient(
 
 def test_enter_manually_interview_assisted(
         app, staff_user, patient_user,
-        music_org, initialized_db, teardown_db):
+        music_org, initialized_db):
     "interview: subject_website_consent and stored_web_consent_form"
     config_as(app, EPROMS)
     test_user, patient = map(
@@ -164,7 +164,7 @@ def test_enter_manually_interview_assisted(
 
 def test_enter_manually_paper(
         app, staff_user, patient_user,
-        music_org, initialized_db, teardown_db):
+        music_org, initialized_db):
     "paper: subject_website_consent"
     config_as(app, EPROMS)
     test_user, patient = map(
@@ -180,7 +180,7 @@ def test_enter_manually_paper(
 
 def test_music_exception(
         app, patient_user, client,
-        login, music_org, initialized_db, teardown_db):
+        login, music_org, initialized_db):
     config_as(
         app, system=TRUENTH, ACCEPT_TERMS_ON_NEXT_ORG=music_org.name)
     test_user = db.session.merge(patient_user)
