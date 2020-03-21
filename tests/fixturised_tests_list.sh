@@ -6,4 +6,5 @@ test_access_url.py \
 test_app_text.py \
 test_auth.py \
 test_clinical.py \
-test_coredata.py
+test_coredata.py \
+test_timeout.py
