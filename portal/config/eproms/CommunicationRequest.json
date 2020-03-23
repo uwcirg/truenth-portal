@@ -491,7 +491,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -746,7 +746,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_start6mo_yearly_end30mo"
@@ -1001,7 +1001,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -1256,7 +1256,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_annual_pattern"
@@ -1511,7 +1511,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 2,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -1766,7 +1766,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_start6mo_yearly_end30mo"
@@ -2021,7 +2021,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -2276,7 +2276,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 1,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_annual_pattern"
@@ -2497,7 +2497,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -2616,7 +2616,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_start6mo_yearly_end30mo"
@@ -2837,7 +2837,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -2956,7 +2956,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 2,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_annual_pattern"
@@ -3177,7 +3177,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -3262,7 +3262,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_start3.5years_yearly"
@@ -3347,7 +3347,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -3432,7 +3432,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 2,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_annual_pattern"
@@ -3517,7 +3517,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -3602,7 +3602,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_start3.5years_yearly"
@@ -3687,7 +3687,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 3,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
@@ -3772,7 +3772,7 @@
         }
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
-      "notify_post_qb_start": "{\"days\": 14}",
+      "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 2,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_annual_pattern"
