@@ -159,16 +159,19 @@ class CommunicationRequest(db.Model):
         @return: the new or matched CommunicationRequest
 
         """
-        existing = CommunicationRequest.query.filter(
-            CommunicationRequest.questionnaire_bank_id ==
-            self.questionnaire_bank_id
-        ).filter(
-            CommunicationRequest.notify_post_qb_start ==
-            self.notify_post_qb_start
-        ).filter(
-            CommunicationRequest.qb_iteration ==
-            self.qb_iteration
-        ).first()
+        if self.identifiers.count() == 1:
+            existing = CommunicationRequest.find_by_identifier(self.identifiers.first())
+        else:
+            existing = CommunicationRequest.query.filter(
+                CommunicationRequest.questionnaire_bank_id ==
+                self.questionnaire_bank_id
+            ).filter(
+                CommunicationRequest.notify_post_qb_start ==
+                self.notify_post_qb_start
+            ).filter(
+                CommunicationRequest.qb_iteration ==
+                self.qb_iteration
+            ).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:
