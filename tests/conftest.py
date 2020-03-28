@@ -499,6 +499,33 @@ def test_client(promote_user):
 
 
 @pytest.fixture
+def system_user(add_user, promote_user):
+    """create and return system user expected for some tasks """
+    sysusername = '__system__'
+    if not User.query.filter_by(username=sysusername).first():
+        sys_user = add_user(sysusername, 'System', 'Admin')
+    promote_user(sys_user, ROLE.ADMIN.value)
+    yield sys_user
+
+
+def add_required_clinical_data(self, backdate=None, setdate=None):
+    """Add clinical data to get beyond the landing page
+
+    :param backdate: timedelta value.  Define to mock Dx
+      happening said period in the past
+    :param setdate: datetime value.  Define to mock Dx
+      happening at given time
+
+    """
+    audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+    for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
+        get_user(TEST_USER_ID).save_observation(
+            codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
+            audit=audit, status='preliminary', issued=calc_date_params(
+                backdate=backdate, setdate=setdate))
+
+
+@pytest.fixture
 def promote_user(initialize_static, test_user):
     def promote_user(user=None, role_name=None):
 
