@@ -508,21 +508,24 @@ def system_user(add_user, promote_user):
     yield sys_user
 
 
-def add_required_clinical_data(self, backdate=None, setdate=None):
-    """Add clinical data to get beyond the landing page
-
-    :param backdate: timedelta value.  Define to mock Dx
-      happening said period in the past
-    :param setdate: datetime value.  Define to mock Dx
-      happening at given time
-
-    """
-    audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-    for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-        get_user(TEST_USER_ID).save_observation(
-            codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-            audit=audit, status='preliminary', issued=calc_date_params(
-                backdate=backdate, setdate=setdate))
+@pytest.fixture
+def add_required_clinical_data():
+    def add_required_clinical_data(backdate=None, setdate=None):
+        """Add clinical data to get beyond the landing page
+    
+        :param backdate: timedelta value.  Define to mock Dx
+          happening said period in the past
+        :param setdate: datetime value.  Define to mock Dx
+          happening at given time
+    
+        """
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
+            get_user(TEST_USER_ID).save_observation(
+                codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
+                audit=audit, status='preliminary', issued=calc_date_params(
+                    backdate=backdate, setdate=setdate))
+    yield add_required_clinical_data
 
 
 @pytest.fixture
