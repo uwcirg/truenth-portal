@@ -2838,7 +2838,7 @@
       ],
       "lr_uuid": "b71dfdf6-bb19-3fff-84bd-4cdb30050499",
       "notify_post_qb_start": "{\"weeks\": 2}",
-      "qb_iteration": 3,
+      "qb_iteration": 5,
       "questionnaire_bank": {
         "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
       },
