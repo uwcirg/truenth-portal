@@ -115,7 +115,7 @@ def initialize_static(initialized_db):
     add_static_roles()
     db.session.commit()
 
-    yield
+    return 
 
 
 @pytest.fixture(scope="session")
@@ -195,7 +195,7 @@ def test_user(app, add_user, initialized_db):
     test_user = add_user(
             username=TEST_USERNAME, first_name=FIRST_NAME,
             last_name=LAST_NAME, image_url=IMAGE_URL)
-    yield test_user
+    return test_user
 
 
 @pytest.fixture
@@ -278,7 +278,7 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
     # Invalidate org tree cache, in case more orgs are added by test
     OrgTree.invalidate_cache()
 
-    yield test_user
+    return test_user
 
 
 @pytest.fixture
@@ -302,7 +302,7 @@ def add_user(app, initialized_db):
         # Avoid testing cached/stale data
         invalidate_users_QBT(test_user.id)
         return test_user
-    yield add_user
+    return add_user
 
 
 @pytest.fixture
@@ -313,7 +313,7 @@ def service_user(initialize_static, test_user):
         db.session.add(service_user)
         db.session.commit()
 
-    yield db.session.merge(service_user)
+    return db.session.merge(service_user)
 
 
 @pytest.fixture
@@ -381,7 +381,7 @@ def bless_with_basics(test_user, promote_user, shallow_org_tree):
         # Invalidate org tree cache, in case orgs are added by other
         # tests.  W/o doing so, the new orgs aren't in the orgtree
         OrgTree.invalidate_cache()
-    yield bless_with_basics
+    return bless_with_basics
 
 
 @pytest.fixture
@@ -401,7 +401,7 @@ def add_required_clinical_data():
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=calc_date_params(
                     backdate=backdate, setdate=setdate))
-    yield add_required_clinical_data
+    return add_required_clinical_data
 
 
 @pytest.fixture
@@ -431,7 +431,7 @@ def add_procedure(test_user):
             procedure.encounter = enc
             db.session.add(procedure)
             db.session.commit()
-    yield add_procedure
+    return add_procedure
 
 
 @pytest.fixture
@@ -443,7 +443,7 @@ def music_org():
         db.session.add(music_org)
         db.session.commit()
     music_org = db.session.merge(music_org)
-    yield music_org
+    return music_org
 
 
 @pytest.fixture
@@ -505,19 +505,19 @@ def system_user(add_user, promote_user):
     if not User.query.filter_by(username=sysusername).first():
         sys_user = add_user(sysusername, 'System', 'Admin')
     promote_user(sys_user, ROLE.ADMIN.value)
-    yield sys_user
+    return sys_user
 
 
 @pytest.fixture
 def add_required_clinical_data():
     def add_required_clinical_data(backdate=None, setdate=None):
         """Add clinical data to get beyond the landing page
-    
+
         :param backdate: timedelta value.  Define to mock Dx
           happening said period in the past
         :param setdate: datetime value.  Define to mock Dx
           happening at given time
-    
+
         """
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
@@ -525,7 +525,7 @@ def add_required_clinical_data():
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=calc_date_params(
                     backdate=backdate, setdate=setdate))
-    yield add_required_clinical_data
+    return add_required_clinical_data
 
 
 @pytest.fixture

@@ -145,7 +145,7 @@ def test_deactivate_tous(test_user):
 
 
 def test_deactivate_tous_by_org(
-        system_user, shallow_org_tree, 
+        system_user, shallow_org_tree,
         add_user, promote_user, test_user):
     timestamp = datetime.utcnow()
 
