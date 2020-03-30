@@ -115,7 +115,7 @@ def initialize_static(initialized_db):
     add_static_roles()
     db.session.commit()
 
-    return 
+    return
 
 
 @pytest.fixture(scope="session")
