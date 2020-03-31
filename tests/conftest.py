@@ -115,8 +115,6 @@ def initialize_static(initialized_db):
     add_static_roles()
     db.session.commit()
 
-    return
-
 
 @pytest.fixture(scope="session")
 def app(request):
@@ -465,7 +463,7 @@ def login(initialize_static, app, client, music_org):
                 follow_redirects=follow_redirects
         )
 
-    return login
+    yield login
     db.session.remove()
     db.engine.dispose()
 

@@ -60,7 +60,7 @@ def test_local_login_valid_username_and_password(test_auth_user, local_login):
     response = local_login(test_auth_user.email, 'Password1')
 
     # Validate login was successful
-    assert response.status_code is 200
+    assert response.status_code == 200
     assert test_auth_user.password_verification_failures == 0
 
 
