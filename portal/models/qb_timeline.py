@@ -384,7 +384,9 @@ class RP_flyweight(object):
                 trace("Finished cur RP with remaining QBs in next")
                 self.cur_start = self.nxt_start
                 self.transition()
-            elif self.cur_start != self.nxt_start:
+            elif self.cur_start > self.nxt_start + relativedelta(months=1):
+                # The plus one month covers RP v5 date adjustments.
+
                 # Valid only when the RP being replaced doesn't have all the
                 # visits defined in the next one (i.e. v3 doesn't have months
                 # 27 or 33 and v5 does). Look ahead for a match
@@ -395,7 +397,7 @@ class RP_flyweight(object):
                     self.nxt_start = calc_and_adjust_start(
                         user=self.user, qbd=self.nxt_qbd,
                         initial_trigger=self.td)
-                if self.cur_start != self.nxt_start:
+                if self.cur_start > self.nxt_start:
                     # Still no match means poorly defined RP QBs
                     raise ValueError(
                         "Invalid state {}:{} not in lock-step even on "
@@ -414,7 +416,8 @@ class RP_flyweight(object):
         """Transition internal state to 'next' Research Protocol"""
         trace("transitioning to the next RP w/ cur_start {}".format(
             self.cur_start))
-        if self.cur_start != self.nxt_start:
+        if self.cur_start > self.nxt_start + relativedelta(months=1):
+            # The plus one month covers RP v5 shift
             raise ValueError(
                 "Invalid state {}:{} not in lock-step; RPs need "
                 "to maintain same schedule".format(
