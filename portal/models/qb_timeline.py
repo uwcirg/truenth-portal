@@ -431,13 +431,16 @@ class RP_flyweight(object):
         if self.skipped_nxt_start:
             assert self.skipped_nxt_start < start
             start = self.skipped_nxt_start
+        entropy_check = 99
         while True:
-            # Fear not, won't loop forever as `next_qbd` will
-            # quickly exhaust, thus raising an exception, in
-            # the event of a config error where RPs somehow
-            # change the start, expiration synchronization.
+            entropy_check -= 1
+            if entropy_check < 0:
+                raise RuntimeError("entropy wins again; QB configs out of sync")
+
             self.next_qbd()
-            if start == self.cur_start:
+            if start < self.cur_start + relativedelta(months=1):
+                # due to early start for RP v5, add a month before comparison
+                current_app.logger.debug("breaking with self.cur_start{} and previous start{}".format(self.cur_start, start))
                 break
 
         # reset in case of another advancement

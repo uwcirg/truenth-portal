@@ -536,7 +536,8 @@ def visit_name(qbd):
     if not qbd.questionnaire_bank:
         return None
     if qbd.recur:
-        srd = RelativeDelta(qbd.recur.start)
+        # Round up 15 days to accommodate RP v5's backdating
+        srd = RelativeDelta(qbd.recur.start) + RelativeDelta(days=15)
         sm = srd.months or 0
         sm += (srd.years * 12) if srd.years else 0
         clrd = RelativeDelta(qbd.recur.cycle_length)
