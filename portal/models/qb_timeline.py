@@ -440,7 +440,6 @@ class RP_flyweight(object):
             self.next_qbd()
             if start < self.cur_start + relativedelta(months=1):
                 # due to early start for RP v5, add a month before comparison
-                current_app.logger.debug("breaking with self.cur_start{} and previous start{}".format(self.cur_start, start))
                 break
 
         # reset in case of another advancement
