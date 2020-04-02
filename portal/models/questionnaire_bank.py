@@ -537,7 +537,9 @@ def visit_name(qbd):
         return None
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
-        if qbd.questionnaire_bank.research_protocol.name.endswith('v5'):
+        if (
+                qbd.questionnaire_bank.research_protocol and
+                qbd.questionnaire_bank.research_protocol.name.endswith('v5')):
             # TODO: remove this ugly hack.  V5 starts early, must add 1 month
             # but that can't be done across the board as others don't need
             srd += RelativeDelta(months=1)
