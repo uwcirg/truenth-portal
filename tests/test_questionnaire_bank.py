@@ -117,6 +117,8 @@ class TestQuestionnaireBank(TestCase):
         recur3 = Recur(
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
+        if rp_name == 'v5':
+            recur3.start = '{"months": 2}'
         exists = Recur.query.filter_by(
             start=recur3.start, cycle_length=recur3.cycle_length,
             termination=recur3.termination).first()
@@ -126,6 +128,8 @@ class TestQuestionnaireBank(TestCase):
         recur6 = Recur(
             start='{"months": 6}', cycle_length='{"years": 1}',
             termination='{"years": 3, "months": 3}')
+        if rp_name == 'v5':
+            recur6.start = '{"months": 5}'
         exists = Recur.query.filter_by(
             start=recur6.start, cycle_length=recur6.cycle_length,
             termination=recur6.termination).first()
