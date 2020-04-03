@@ -1,4 +1,3 @@
-test_timeout.py
 test_exclusion_persistence.py
 test_identifier.py
 test_scheduled_job.py
@@ -25,7 +24,6 @@ test_proceduer.py
 test_research_protocol.py
 test_research_protocol.py
 test_patch_flask_user.py
-test_tou.py
 test_model_persistence.py
 -----hard tests-----
 test_assessment_status.py
