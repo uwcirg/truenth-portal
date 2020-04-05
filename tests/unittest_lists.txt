@@ -1,6 +1,7 @@
+test_organization.py
+test_portal.py
 test_identifier.py
 test_scheduled_job.py
-test_portal.py
 test_encounter.py
 test_practitioner.py
 test_user.py
@@ -13,7 +14,6 @@ test_recur.py
 test_next_step.py
 test_audit.py
 test_patient.py
-test_organization.py
 test_group.py
 test_user_document.py
 test_i18n.py

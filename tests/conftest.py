@@ -75,6 +75,38 @@ def shallow_org_tree():
     OrgTree.invalidate_cache()
 
 
+@pytest.fixture(scope="function")
+def deepen_org_tree(shallow_org_tree):
+    """Create deeper tree when test needs it"""
+    org_l2 = Organization(id=1002, name='l2', partOf_id=102)
+    org_l3_1 = Organization(id=10031, name='l3_1', partOf_id=1002)
+    org_l3_2 = Organization(id=10032, name='l3_2', partOf_id=1002)
+    with SessionScope(db):
+        [db.session.add(org) for org in (org_l2, org_l3_1, org_l3_2)]
+        db.session.commit()
+    # As orgs were just added, make sure they're loaded on next OrgTree call
+    OrgTree.invalidate_cache()
+
+    yield
+
+    # After using this fixture, invalidate OrgTree so subsequent tests
+    # don't find stale entries, namely dead references to the orgs created
+    # above.
+    OrgTree.invalidate_cache()
+
+
+@pytest.fixture
+def prep_org_w_identifier():
+    o = Organization(name='test org')
+    i = Identifier(system=US_NPI, value='123-45')
+    o.identifiers.append(i)
+    with SessionScope(db):
+        db.session.add(o)
+        db.session.commit()
+    o = db.session.merge(o)
+    return o
+
+
 def calc_date_params(backdate, setdate):
     """
     Returns the calculated date given user's request
