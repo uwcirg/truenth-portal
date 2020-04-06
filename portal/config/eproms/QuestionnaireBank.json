@@ -335,9 +335,9 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 0}",
-      "expired": "{\"months\": 3, \"days\": -2}",
+      "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_recurring_3mo_pattern",
-      "overdue": "{\"days\": 16}",
+      "overdue": "{\"months\": 1, \"days\": 1}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -457,9 +457,9 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 0}",
-      "expired": "{\"months\": 3, \"days\": -2}",
+      "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_start6mo_yearly_end30mo",
-      "overdue": "{\"days\": 16}",
+      "overdue": "{\"months\": 1, \"days\": 1}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -507,9 +507,9 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 0}",
-      "expired": "{\"months\": 3, \"days\": -2}",
+      "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_start3.5years_yearly",
-      "overdue": "{\"days\": 16}",
+      "overdue": "{\"months\": 1, \"days\": 1}",
       "questionnaires": [
         {
           "questionnaire": {
@@ -664,9 +664,9 @@
     {
       "classification": "recurring",
       "due": "{\"days\": 0}",
-      "expired": "{\"months\": 3, \"days\": -2}",
+      "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_recurring_annual_pattern",
-      "overdue": "{\"days\": 16}",
+      "overdue": "{\"months\": 1, \"days\": 1}",
       "questionnaires": [
         {
           "questionnaire": {
