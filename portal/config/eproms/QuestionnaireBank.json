@@ -666,7 +666,7 @@
       "due": "{\"days\": 0}",
       "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_recurring_annual_pattern",
-      "overdue": "{\"month\": 1, \"days\": 1}",
+      "overdue": "{\"months\": 1, \"days\": 1}",
       "questionnaires": [
         {
           "questionnaire": {
