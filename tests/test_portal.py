@@ -20,8 +20,8 @@ from portal.models.user import User, get_user
 from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID
 
 
-def test_card_html(test_client, login, add_required_clinical_data,
-        bless_with_basics, client, test_user):
+def test_card_html(test_client, test_user_login, required_clinical_data,
+        bless_with_basics_no_patient_role, client):
     """Interventions can customize the button text """
     intervention = INTERVENTION.DECISION_SUPPORT_P3P
     intervention.public_access = True  # make the card avail for the test
@@ -29,9 +29,6 @@ def test_card_html(test_client, login, add_required_clinical_data,
     test_client.intervention = intervention
     intervention.card_html = "Custom Label"
 
-    login()
-    add_required_clinical_data()
-    bless_with_basics(make_patient=False)
     response = client.get('/home')
     assert response.status_code == 200
 
@@ -39,8 +36,9 @@ def test_card_html(test_client, login, add_required_clinical_data,
     intervention = db.session.merge(intervention)
     assert intervention.card_html in response.get_data(as_text=True)
 
-def test_user_card_html(test_client, login, add_required_clinical_data,
-        test_user, bless_with_basics, client):
+def test_user_card_html(test_client, test_user_login,
+        required_clinical_data,
+        bless_with_basics_no_patient_role, client):
     """Interventions can further customize per user"""
     intervention = INTERVENTION.DECISION_SUPPORT_P3P
     intervention.public_access = True  # make the card avail for the test
@@ -55,10 +53,7 @@ def test_user_card_html(test_client, login, add_required_clinical_data,
         db.session.add(ui)
         db.session.commit()
 
-    login()
-    add_required_clinical_data()
-    bless_with_basics(make_patient=False)
-    user = db.session.merge(test_user)
+    user = User.query.get(TEST_USER_ID)
 
     response = client.get('/home')
     assert response.status_code == 200
@@ -72,8 +67,8 @@ def test_user_card_html(test_client, login, add_required_clinical_data,
         intervention.display_for_user(user).link_label
         in response.get_data(as_text=True))
 
-def test_staff_html(test_client, bless_with_basics, login, 
-        promote_user, app, client, test_user):
+def test_staff_html(test_client, bless_with_basics, 
+        test_user_login, promote_user, app, client):
     """Interventions can customize the staff text """
     intervention = INTERVENTION.sexual_recovery
     test_client = db.session.merge(test_client)
@@ -86,8 +81,6 @@ def test_staff_html(test_client, bless_with_basics, login,
         db.session.add(ui)
         db.session.commit()
 
-    bless_with_basics()
-    login()
     promote_user(role_name=ROLE.INTERVENTION_STAFF.value)
 
     # This test requires PATIENT_LIST_ADDL_FIELDS includes the
@@ -99,17 +92,14 @@ def test_staff_html(test_client, bless_with_basics, login,
     results = response.get_data(as_text=True)
     assert ui.staff_html in results
 
-def test_public_access(test_client, login, add_required_clinical_data,
-        bless_with_basics, client, test_user):
+def test_public_access(test_client, test_user_login, 
+        required_clinical_data, bless_with_basics, client):
     """Interventions w/o public access should be hidden"""
     intervention = INTERVENTION.sexual_recovery
     test_client = db.session.merge(test_client)
     test_client.intervention = intervention
     intervention.public_access = False
 
-    login()
-    add_required_clinical_data()
-    bless_with_basics()
     response = client.get('/home')
 
     assert 'Sexual Recovery' not in response.get_data(as_text=True)
@@ -127,7 +117,7 @@ def test_public_access(test_client, login, add_required_clinical_data,
 
     assert 'Sexual Recovery' in response.get_data(as_text=True)
 
-def test_admin_list(add_user, promote_user, login, client, test_user):
+def test_admin_list(add_user, promote_user, test_user_login, client):
     """Test admin view lists all users"""
     # Generate a few users with a smattering of roles
     u1 = add_user(username='u1@foo.bar')
@@ -137,21 +127,19 @@ def test_admin_list(add_user, promote_user, login, client, test_user):
 
     # Test user needs admin role to view list
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
     response = client.get('/admin')
 
     # Should at least see an entry per user in system
     assert (response.get_data(as_text=True).count('/profile')
             >= User.query.count())
 
-def test_invite(test_user, login, client):
+def test_invite(test_user_login, client):
     """Test email invite form"""
     test_user = User.query.get(TEST_USER_ID)
     test_user.email = 'test_user@uw.edu'
     db.session.add(test_user)
     db.session.commit()
 
-    login()
     postdata = {
         'subject': 'unittest subject',
         'recipients': 'test_user@yahoo.com test_user@uw.edu',
@@ -160,7 +148,7 @@ def test_invite(test_user, login, client):
                                 follow_redirects=True)
     assert "Email Invite Sent" in response.get_data(as_text=True)
 
-def test_message_sent(login, client, test_user):
+def test_message_sent(test_user_login, client):
     """Email invites - test view for sent messages"""
     sent_at = datetime.strptime(
         "2000/01/01 12:31:00", "%Y/%m/%d %H:%M:%S")
@@ -179,16 +167,14 @@ def test_message_sent(login, client, test_user):
     assert 'style' in body
     assert isinstance(body, str)
 
-    login()
     response = client.get('/invite/{0}'.format(message.id))
     assert (response.get_data(as_text=True).find(
         sent_at.strftime('%m/%d/%Y %H:%M:%S')) > 0)
     assert (response.get_data(as_text=True).find('one@ex1.com two@two.org')
             > 0)
 
-def test_missing_message(login, client, test_user):
+def test_missing_message(test_user_login, client):
     """Request to view non existant message should 404"""
-    login()
     response = client.get('/invite/404')
     assert response.status_code == 404
 
@@ -219,8 +205,7 @@ def test_swagger_validation(client):
 
         validate_spec_url("file:%s" % temp_spec.name)
 
-def test_report_error(login, client, test_user):
-    login()
+def test_report_error(test_user_login, client):
     params = {
         'subject_id': 112,
         'page_url': '/not/real',
@@ -230,8 +215,7 @@ def test_report_error(login, client, test_user):
         urllib.parse.urlencode(params)))
     assert response.status_code == 200
 
-def test_configuration_settings(login, app, client, test_user):
-    login()
+def test_configuration_settings(test_user_login, app, client):
     lr_group = app.config['LR_GROUP']
     response = client.get('/api/settings/lr_group')
     assert response.status_code == 200
@@ -256,23 +240,18 @@ def test_configuration_secrets(client):
 
 
 @pytest.fixture
-def eproms_app(request):
+def eproms_app():
     """
     Overload base version to hide the GIL (allows registration of ePROMs)
     """
     tc = TestConfig()
     setattr(tc, 'HIDE_GIL', True)
     app = create_app(tc)
-    ctx = app.app_context()
-
-    def teardown():
-        ctx.pop()
-
-    request.addfinalizer(teardown)
     return app
 
-def test_redirect_validation(promote_user, login, test_client,
-        eproms_app, client, test_user):
+def test_redirect_validation_website_consent(
+        promote_user, login, test_client,
+        eproms_app, client):
     promote_user(role_name=ROLE.ADMIN.value)
     promote_user(role_name=ROLE.STAFF.value)
 
@@ -303,6 +282,26 @@ def test_redirect_validation(promote_user, login, test_client,
         query_string={'redirect_url': invalid_url}
     )
     assert response2.status_code == 401
+    
+
+def test_redirect_validation_session_login_valid_url(
+        promote_user, login, test_client,
+        eproms_app, client):
+    promote_user(role_name=ROLE.ADMIN.value)
+    promote_user(role_name=ROLE.STAFF.value)
+
+    org = Organization(name='test org')
+    user = get_user(TEST_USER_ID)
+    with SessionScope(db):
+        db.session.add(org)
+        user.organizations.append(org)
+        db.session.commit()
+
+    test_client = db.session.merge(test_client)
+    client_url = test_client._redirect_uris
+    local_url = "http://{}/home?test".format(
+        eproms_app.config.get('SERVER_NAME'))
+    invalid_url = 'http://invalid.org'
 
     # validate session login redirect with valid url
     oauth_info = {
@@ -312,16 +311,79 @@ def test_redirect_validation(promote_user, login, test_client,
     response3 = login(oauth_info=oauth_info)
     assert response3.status_code == 200
 
+def test_redirect_validation_session_login_invalid_url(
+        promote_user, login, test_client,
+        eproms_app, client):
+    promote_user(role_name=ROLE.ADMIN.value)
+    promote_user(role_name=ROLE.STAFF.value)
+
+    org = Organization(name='test org')
+    user = get_user(TEST_USER_ID)
+    with SessionScope(db):
+        db.session.add(org)
+        user.organizations.append(org)
+        db.session.commit()
+
+    test_client = db.session.merge(test_client)
+    client_url = test_client._redirect_uris
+    local_url = "http://{}/home?test".format(
+        eproms_app.config.get('SERVER_NAME'))
+    invalid_url = 'http://invalid.org'
+
+    oauth_info = {
+       'user_id': TEST_USER_ID,
+       'next': client_url,
+    }
     # validate session login redirect with invalid url
     oauth_info['next'] = invalid_url
     response4 = login(oauth_info=oauth_info)
     assert response4.status_code == 401
+
+def test_redirect_validation_provider_login_valid_url(
+        promote_user, login, test_client,
+        eproms_app, client):
+    promote_user(role_name=ROLE.ADMIN.value)
+    promote_user(role_name=ROLE.STAFF.value)
+
+    org = Organization(name='test org')
+    user = get_user(TEST_USER_ID)
+    with SessionScope(db):
+        db.session.add(org)
+        user.organizations.append(org)
+        db.session.commit()
+
+    test_client = db.session.merge(test_client)
+    client_url = test_client._redirect_uris
+    local_url = "http://{}/home?test".format(
+        eproms_app.config.get('SERVER_NAME'))
+    invalid_url = 'http://invalid.org'
 
     # validate provider login redirect with invalid url
     oauth_info = dict(OAUTH_INFO_PROVIDER_LOGIN)
     oauth_info['next'] = invalid_url
     response5 = login(oauth_info=oauth_info)
     assert response5.status_code == 401
+
+def test_redirect_validation_challenge_post(
+        promote_user, login, test_client,
+        eproms_app, client):
+    promote_user(role_name=ROLE.ADMIN.value)
+    promote_user(role_name=ROLE.STAFF.value)
+
+    org = Organization(name='test org')
+    user = get_user(TEST_USER_ID)
+    with SessionScope(db):
+        db.session.add(org)
+        user.organizations.append(org)
+        db.session.commit()
+
+    login()
+
+    test_client = db.session.merge(test_client)
+    client_url = test_client._redirect_uris
+    local_url = "http://{}/home?test".format(
+        eproms_app.config.get('SERVER_NAME'))
+    invalid_url = 'http://invalid.org'
 
     # validate redirect of /challenge POST
     formdata = {'user_id': TEST_USER_ID, 'next_url': local_url}
