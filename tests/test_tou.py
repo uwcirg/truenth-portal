@@ -32,8 +32,7 @@ def test_get_tou(client):
     assert 'url' in response.json
 
 
-def test_accept(login, client, test_user):
-    login()
+def test_accept(test_user_login, client):
     data = {'agreement_url': tou_url}
     response = client.post(
         '/api/tou/accepted',
@@ -45,9 +44,8 @@ def test_accept(login, client, test_user):
     assert tou.audit.user_id == TEST_USER_ID
 
 
-def test_accept_w_org(login, test_user, bless_with_basics, client):
-    login()
-    bless_with_basics()
+def test_accept_w_org(test_user_login, test_user,
+        bless_with_basics, client):
     test_user = db.session.merge(test_user)
     org_id = test_user.organizations[0].id
     data = {'agreement_url': tou_url, 'organization_id': org_id}
@@ -64,7 +62,7 @@ def test_accept_w_org(login, test_user, bless_with_basics, client):
 
 def test_service_accept(service_user, login, client):
     service_user = db.session.merge(service_user)
-    login(user_id=service_user.id)
+    login(service_user.id)
     data = {'agreement_url': tou_url}
     response = client.post(
         '/api/user/{}/tou/accepted'.format(TEST_USER_ID),
@@ -76,7 +74,7 @@ def test_service_accept(service_user, login, client):
     assert tou.audit.user_id == TEST_USER_ID
 
 
-def test_get(login, client, test_user):
+def test_get(test_user_login, client):
     audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
     tou = ToU(audit=audit, agreement_url=tou_url,
               type='website terms of use')
@@ -84,14 +82,13 @@ def test_get(login, client, test_user):
         db.session.add(tou)
         db.session.commit()
 
-    login()
     response = client.get('/api/user/{}/tou'.format(TEST_USER_ID))
     doc = response.json
     assert response.status_code == 200
     assert len(doc['tous']) == 1
 
 
-def test_get_by_type(login, client, test_user):
+def test_get_by_type(test_user_login, client):
     timestamp = datetime.utcnow()
     audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
                   timestamp=timestamp)
@@ -101,7 +98,6 @@ def test_get_by_type(login, client, test_user):
         db.session.add(tou)
         db.session.commit()
 
-    login()
     response = client.get('/api/user/{}/tou/privacy-policy'.format(
         TEST_USER_ID))
     assert response.status_code == 200
