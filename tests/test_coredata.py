@@ -61,30 +61,31 @@ def test_registry():
 
 
 def test_partner(
-        app, bless_with_basics, promote_user,
+        app, bless_with_basics_no_patient_role, promote_user,
         test_user, initialized_db):
     """Partner doesn't need dx etc., set min and check pass"""
     config_as(app, TRUENTH)
-    bless_with_basics(make_patient=False)
     promote_user(role_name=ROLE.PARTNER.value)
     test_user = db.session.merge(test_user)
     assert Coredata().initial_obtained(test_user)
 
 
-def test_patient(
+def test_patient_without_clinical_data(
         app, bless_with_basics, test_user,
-        login, add_required_clinical_data,
+        required_clinical_data,
         add_procedure, initialized_db):
-    """Patient has additional requirements"""
     config_as(app, TRUENTH)
-    bless_with_basics()
     test_user = db.session.merge(test_user)
     # Prior to adding clinical data, should return false
     Coredata()
     assert not Coredata().initial_obtained(test_user)
 
-    login()
-    add_required_clinical_data()
+
+def test_patient_with_clinical_data(
+        app, bless_with_basics, test_user,
+        test_user_login, required_clinical_data,
+        add_procedure, initialized_db):
+    """Patient has additional requirements"""
     # related to whether patient has received treatment question
     add_procedure(code='118877007', display='Procedure on prostate')
     with SessionScope(db):
