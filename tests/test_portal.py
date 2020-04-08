@@ -6,6 +6,7 @@ import urllib
 
 from flask_swagger import swagger
 from flask_webtest import SessionScope
+import pytest
 from swagger_spec_validator import validate_spec_url
 
 from portal.config.config import TestConfig
@@ -254,17 +255,24 @@ def test_configuration_secrets(client):
     )
 
 
-def create_app():
+@pytest.fixture
+def eproms_app(request):
     """
     Overload base version to hide the GIL (allows registration of ePROMs)
     """
     tc = TestConfig()
     setattr(tc, 'HIDE_GIL', True)
     app = create_app(tc)
+    ctx = app.app_context()
+
+    def teardown():
+        ctx.pop()
+
+    request.addfinalizer(teardown)
     return app
 
 def test_redirect_validation(promote_user, login, test_client,
-        app, client, test_user):
+        eproms_app, client, test_user):
     promote_user(role_name=ROLE.ADMIN.value)
     promote_user(role_name=ROLE.STAFF.value)
 
@@ -280,7 +288,7 @@ def test_redirect_validation(promote_user, login, test_client,
     test_client = db.session.merge(test_client)
     client_url = test_client._redirect_uris
     local_url = "http://{}/home?test".format(
-        app.config.get('SERVER_NAME'))
+        eproms_app.config.get('SERVER_NAME'))
     invalid_url = 'http://invalid.org'
 
     # validate redirect of /website-consent-script GET
