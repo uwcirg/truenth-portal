@@ -20,7 +20,8 @@ from portal.models.user import User, get_user
 from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID
 
 
-def test_card_html(test_client, test_user_login, required_clinical_data,
+def test_card_html(
+        test_client, test_user_login, required_clinical_data,
         bless_with_basics_no_patient_role, client):
     """Interventions can customize the button text """
     intervention = INTERVENTION.DECISION_SUPPORT_P3P
@@ -36,7 +37,9 @@ def test_card_html(test_client, test_user_login, required_clinical_data,
     intervention = db.session.merge(intervention)
     assert intervention.card_html in response.get_data(as_text=True)
 
-def test_user_card_html(test_client, test_user_login,
+
+def test_user_card_html(
+        test_client, test_user_login,
         required_clinical_data,
         bless_with_basics_no_patient_role, client):
     """Interventions can further customize per user"""
@@ -67,7 +70,9 @@ def test_user_card_html(test_client, test_user_login,
         intervention.display_for_user(user).link_label
         in response.get_data(as_text=True))
 
-def test_staff_html(test_client, bless_with_basics, 
+
+def test_staff_html(
+        test_client, bless_with_basics,
         test_user_login, promote_user, app, client):
     """Interventions can customize the staff text """
     intervention = INTERVENTION.sexual_recovery
@@ -92,7 +97,9 @@ def test_staff_html(test_client, bless_with_basics,
     results = response.get_data(as_text=True)
     assert ui.staff_html in results
 
-def test_public_access(test_client, test_user_login, 
+
+def test_public_access(
+        test_client, test_user_login,
         required_clinical_data, bless_with_basics, client):
     """Interventions w/o public access should be hidden"""
     intervention = INTERVENTION.sexual_recovery
@@ -117,6 +124,7 @@ def test_public_access(test_client, test_user_login,
 
     assert 'Sexual Recovery' in response.get_data(as_text=True)
 
+
 def test_admin_list(add_user, promote_user, test_user_login, client):
     """Test admin view lists all users"""
     # Generate a few users with a smattering of roles
@@ -133,6 +141,7 @@ def test_admin_list(add_user, promote_user, test_user_login, client):
     assert (response.get_data(as_text=True).count('/profile')
             >= User.query.count())
 
+
 def test_invite(test_user_login, client):
     """Test email invite form"""
     test_user = User.query.get(TEST_USER_ID)
@@ -145,8 +154,9 @@ def test_invite(test_user_login, client):
         'recipients': 'test_user@yahoo.com test_user@uw.edu',
         'body': "Ode to joy"}
     response = client.post('/invite', data=postdata,
-                                follow_redirects=True)
+                           follow_redirects=True)
     assert "Email Invite Sent" in response.get_data(as_text=True)
+
 
 def test_message_sent(test_user_login, client):
     """Email invites - test view for sent messages"""
@@ -173,10 +183,12 @@ def test_message_sent(test_user_login, client):
     assert (response.get_data(as_text=True).find('one@ex1.com two@two.org')
             > 0)
 
+
 def test_missing_message(test_user_login, client):
     """Request to view non existant message should 404"""
     response = client.get('/invite/404')
     assert response.status_code == 404
+
 
 def test_swagger_docgen(client):
     """Build swagger docs for entire project"""
@@ -192,6 +204,7 @@ def test_swagger_docgen(client):
     for key in expected_keys:
         assert key in swag
 
+
 def test_swagger_validation(client):
     """Ensure our swagger spec matches swagger schema"""
 
@@ -205,6 +218,7 @@ def test_swagger_validation(client):
 
         validate_spec_url("file:%s" % temp_spec.name)
 
+
 def test_report_error(test_user_login, client):
     params = {
         'subject_id': 112,
@@ -215,6 +229,7 @@ def test_report_error(test_user_login, client):
         urllib.parse.urlencode(params)))
     assert response.status_code == 200
 
+
 def test_configuration_settings(test_user_login, app, client):
     lr_group = app.config['LR_GROUP']
     response = client.get('/api/settings/lr_group')
@@ -222,6 +237,7 @@ def test_configuration_settings(test_user_login, app, client):
     assert response.json.get('LR_GROUP') == lr_group
     response2 = client.get('/api/settings/bad_value')
     assert response2.status_code == 400
+
 
 def test_configuration_secrets(client):
     """Ensure config keys containing secrets are not exposed"""
@@ -248,6 +264,7 @@ def eproms_app():
     setattr(tc, 'HIDE_GIL', True)
     app = create_app(tc)
     return app
+
 
 def test_redirect_validation_website_consent(
         promote_user, login, test_client,
@@ -282,7 +299,7 @@ def test_redirect_validation_website_consent(
         query_string={'redirect_url': invalid_url}
     )
     assert response2.status_code == 401
-    
+
 
 def test_redirect_validation_session_login_valid_url(
         promote_user, login, test_client,
@@ -310,6 +327,7 @@ def test_redirect_validation_session_login_valid_url(
     }
     response3 = login(oauth_info=oauth_info)
     assert response3.status_code == 200
+
 
 def test_redirect_validation_session_login_invalid_url(
         promote_user, login, test_client,
@@ -339,6 +357,7 @@ def test_redirect_validation_session_login_invalid_url(
     response4 = login(oauth_info=oauth_info)
     assert response4.status_code == 401
 
+
 def test_redirect_validation_provider_login_valid_url(
         promote_user, login, test_client,
         eproms_app, client):
@@ -363,6 +382,7 @@ def test_redirect_validation_provider_login_valid_url(
     oauth_info['next'] = invalid_url
     response5 = login(oauth_info=oauth_info)
     assert response5.status_code == 401
+
 
 def test_redirect_validation_challenge_post(
         promote_user, login, test_client,
