@@ -502,7 +502,6 @@ def required_clinical_data():
             codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
             audit=audit, status='preliminary', issued=calc_date_params(
                 backdate=backdate, setdate=setdate))
-    return add_required_clinical_data
 
 
 @pytest.fixture
@@ -627,26 +626,6 @@ def system_user(add_user, promote_user):
         sys_user = add_user(sysusername, 'System', 'Admin')
     promote_user(sys_user, ROLE.ADMIN.value)
     return sys_user
-
-
-@pytest.fixture
-def add_required_clinical_data():
-    backdate=None
-    setdate=None
-    """Add clinical data to get beyond the landing page
-
-    :param backdate: timedelta value.  Define to mock Dx
-      happening said period in the past
-    :param setdate: datetime value.  Define to mock Dx
-      happening at given time
-
-    """
-    audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-    for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-        get_user(TEST_USER_ID).save_observation(
-            codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-            audit=audit, status='preliminary', issued=calc_date_params(
-                backdate=backdate, setdate=setdate))
 
 
 @pytest.fixture

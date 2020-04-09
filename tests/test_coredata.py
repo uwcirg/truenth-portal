@@ -72,12 +72,11 @@ def test_partner(
 
 def test_patient_without_clinical_data(
         app, bless_with_basics, test_user,
-        required_clinical_data,
         add_procedure, initialized_db):
     config_as(app, TRUENTH)
-    test_user = db.session.merge(test_user)
     # Prior to adding clinical data, should return false
     Coredata()
+    test_user = db.session.merge(test_user)
     assert not Coredata().initial_obtained(test_user)
 
 
