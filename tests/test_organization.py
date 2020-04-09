@@ -60,6 +60,7 @@ def test_from_fhir():
     assert org.default_locale == "en_AU"
     assert org._timezone == "US/Pacific"
 
+
 def test_from_fhir_partOf():
     # prepopulate database with parent organization
     parent = Organization(id=101, name='fake parent reference')
@@ -94,6 +95,7 @@ def test_from_fhir_partOf():
     assert org.id
     assert org.partOf_id == parent_id
 
+
 def test_timezone_inheritance():
     parent = Organization(id=101, name='parentOrg')
     org = Organization(id=102, name='org', partOf_id=101)
@@ -122,6 +124,7 @@ def test_timezone_inheritance():
     org = db.session.merge(org)
     assert org.timezone == 'Europe/Rome'
 
+
 def test_as_fhir():
     org = Organization(name='Homer\'s Hospital')
     org.use_specific_codings = True
@@ -130,6 +133,7 @@ def test_as_fhir():
     assert org.name == data['name']
     assert data['use_specific_codings']
     assert not data['race_codings']
+
 
 def test_multiple_rps_in_fhir():
     yesterday = datetime.utcnow() - timedelta(days=1)
@@ -165,6 +169,7 @@ def test_multiple_rps_in_fhir():
     results = [(rp, retired) for rp, retired in org.rps_w_retired()]
     assert [(rp1, None), (rp2, yesterday), (rp3, lastyear)] == results
 
+
 def test_organization_get(test_user_login, client):
     org = Organization(name='test')
     with SessionScope(db):
@@ -175,6 +180,7 @@ def test_organization_get(test_user_login, client):
     # use api to obtain FHIR
     response = client.get('/api/organization/{}'.format(org.id))
     assert response.status_code == 200
+
 
 def test_organization_get_by_identifier(login, client, test_user):
     org_id_system = "http://test/system"
@@ -209,12 +215,14 @@ def test_organization_get_by_identifier(login, client, test_user):
     assert org.id == fetched.id
     assert org.name == fetched.name
 
+
 def test_org_missing_identifier(test_user_login, client):
     # should get 404 w/o finding a match
     response = client.get(
         '/api/organization/{value}?system={system}'.format(
             system=quote_plus('http://nonsense.org'), value='123-45'))
     assert response.status_code == 404
+
 
 def test_organization_list(test_user_login, client):
     count = Organization.query.count()
@@ -226,8 +234,9 @@ def test_organization_list(test_user_login, client):
     assert bundle['resourceType'] == 'Bundle'
     assert len(bundle['entry']) == count
 
-def test_organization_search(shallow_org_tree, login, 
-        client, test_user):
+
+def test_organization_search(
+        shallow_org_tree, login, client, test_user):
     count = Organization.query.count()
     assert count > 1
 
@@ -251,8 +260,9 @@ def test_organization_search(shallow_org_tree, login,
     assert bundle['resourceType'] == 'Bundle'
     assert len(bundle['entry']) == 1
 
-def test_organization_inheritence_search(deepen_org_tree, 
-        login, client, test_user):
+
+def test_organization_inheritence_search(
+        deepen_org_tree, login, client, test_user):
     # Region at top should apply to leaves
     count = Organization.query.count()
     assert count > 3
@@ -285,12 +295,13 @@ def test_organization_inheritence_search(deepen_org_tree,
     assert bundle['resourceType'] == 'Bundle'
     assert len(bundle['entry']) == 2
 
-def test_organization_filter(deepen_org_tree, 
-        login, client, test_user):
+
+def test_organization_filter(
+        deepen_org_tree, login, client, test_user):
     # Filter w/o a search term
     count = Organization.query.count()
     assert count > 6
-    
+
     login()
 
     # Filter w/o search should give a short list of orgs
@@ -300,8 +311,9 @@ def test_organization_filter(deepen_org_tree,
     assert bundle['resourceType'] == 'Bundle'
     assert len(bundle['entry']) == 3
 
-def test_organization_put(promote_user, login, 
-        client, test_user):
+
+def test_organization_put(
+        promote_user, login, client, test_user):
     promote_user(role_name=ROLE.ADMIN.value)
     login()
     with (open(
@@ -341,8 +353,9 @@ def test_organization_put(promote_user, login,
     assert org.name == data['name']
     assert org.phone == "022-655 2300"
 
-def test_organization_put_update(promote_user, 
-        login, client, test_user):
+
+def test_organization_put_update(
+        promote_user, login, client, test_user):
     # confirm unmentioned fields persist
     promote_user(role_name=ROLE.ADMIN.value)
     login()
@@ -386,8 +399,9 @@ def test_organization_put_update(promote_user,
     assert org.locales[0] == en_AU
     assert org.timezone == 'US/Pacific'
 
-def test_organization_extension_update(promote_user, 
-        login, client, test_user):
+
+def test_organization_extension_update(
+        promote_user, login, client, test_user):
     # confirm clearing one of several extensions works
     promote_user(role_name=ROLE.ADMIN.value)
     login()
@@ -444,8 +458,9 @@ def test_organization_extension_update(promote_user,
         assert 'url' in e
         assert len(e.keys()) > 1
 
-def test_organization_post(promote_user, login, 
-        client, test_user):
+
+def test_organization_post(
+        promote_user, login, client, test_user):
     with (open(
         os.path.join(
             os.path.dirname(__file__),
@@ -463,7 +478,9 @@ def test_organization_post(promote_user, login,
         data=json.dumps(data))
     assert response.status_code == 400
 
-def test_organization_delete(shallow_org_tree, promote_user, 
+
+def test_organization_delete(
+        shallow_org_tree, promote_user,
         login, client, test_user):
     (org1_id, org1_name), (org2_id, org2_name) = [
         (org.id, org.name) for org in Organization.query.filter(
@@ -480,8 +497,9 @@ def test_organization_delete(shallow_org_tree, promote_user,
     assert 'none of the above' in names
     assert org1_name in names
 
-def test_organization_identifiers(shallow_org_tree, 
-        initialized_db):
+
+def test_organization_identifiers(
+        shallow_org_tree, initialized_db):
     alias = Identifier(
         use='official', system='http://www.zorgkaartnederland.nl/',
         value='my official alias', assigner='Organization/1')
@@ -497,8 +515,10 @@ def test_organization_identifiers(shallow_org_tree,
     org = db.session.merge(org)
     assert org.identifiers.count() == before + 2
 
-def test_organization_identifiers_update(promote_user, 
-        test_user_login, client, initialized_db):
+
+def test_organization_identifiers_update(
+        promote_user, test_user_login,
+        client, initialized_db):
     with open(os.path.join(
         os.path.dirname(__file__),
         'organization-example-gastro.json'), 'r'
@@ -528,6 +548,7 @@ def test_organization_identifiers_update(promote_user,
     org = Organization.query.filter_by(name='Gastroenterology').one()
     assert 2 == org.identifiers.count()
 
+
 def test_shortname(shallow_org_tree):
     shorty = Identifier(system=SHORTNAME_ID, value='shorty')
     org = Organization.query.filter(Organization.id > 0).first()
@@ -541,6 +562,7 @@ def test_shortname(shallow_org_tree):
     # after, should get the shortname
     assert org.shortname == 'shorty'
 
+
 def test_org_tree_nodes(shallow_org_tree):
     with pytest.raises(ValueError) as context:
         OrgTree().all_leaves_below_id(0)  # none of the above
@@ -549,18 +571,22 @@ def test_org_tree_nodes(shallow_org_tree):
     nodes = OrgTree().all_leaves_below_id(101)
     assert 1 == len(nodes)
 
+
 def test_deeper_org_tree(deepen_org_tree):
     leaves = OrgTree().all_leaves_below_id(102)
     assert len(leaves) == 2
     assert 10032 in leaves
     assert 10031 in leaves
 
+
 def test_at_and_above(deepen_org_tree):
     results = OrgTree().at_and_above_ids(10032)
     assert len(results) == 3
 
+
 def test_top_names(deepen_org_tree):
     assert {'101', '102'} == set(OrgTree().top_level_names())
+
 
 def test_roots(deepen_org_tree):
     # Given two orgs on the same branch of tree and one from another
@@ -570,6 +596,7 @@ def test_roots(deepen_org_tree):
         Organization.query.get(1001))
     assert ({Organization.query.get(101), Organization.query.get(102)}
             == OrgTree().find_top_level_orgs(orgs_on_branch))
+
 
 def test_staff_leaves(deepen_org_tree, promote_user, test_user):
     # test staff with several org associations produces correct list
@@ -592,6 +619,7 @@ def test_staff_leaves(deepen_org_tree, promote_user, test_user):
     assert 10031 in leaves
     assert 10032 in leaves
 
+
 def test_all_leaves(deepen_org_tree):
     # can we get a list of just the leaf orgs
     leaves = OrgTree().all_leaf_ids()
@@ -599,11 +627,13 @@ def test_all_leaves(deepen_org_tree):
     for i in (1001, 10031, 10032):
         assert i in leaves
 
+
 def test_here_and_below_id(deepen_org_tree):
     nodes = OrgTree().here_and_below_id(102)
     assert len(nodes) == 4
     for i in (102, 1002, 10031, 10032):
         assert i in nodes
+
 
 def test_visible_orgs_on_none(test_user, promote_user):
     # Add none of the above to users orgs
@@ -614,8 +644,9 @@ def test_visible_orgs_on_none(test_user, promote_user):
     org_list = org_restriction_by_role(test_user, None)
     assert len(org_list) == 0
 
-def test_user_org_get(bless_with_basics, test_user, 
-        login, client):
+
+def test_user_org_get(
+        bless_with_basics, test_user, login, client):
     test_user = db.session.merge(test_user)
     expected = [
         Reference.organization(o.id).as_fhir()
@@ -626,8 +657,9 @@ def test_user_org_get(bless_with_basics, test_user,
     assert response.status_code == 200
     assert response.json['organizations'] == expected
 
-def test_user_org_post(shallow_org_tree,
-        login, client, test_user):
+
+def test_user_org_post(
+        shallow_org_tree, login, client, test_user):
     data = {'organizations': [
         {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
         {'reference': 'api/organization/1001'}
@@ -641,11 +673,12 @@ def test_user_org_post(shallow_org_tree,
     assert response.status_code == 200
     assert len(response.json['organizations']) == 2
 
-def test_user_org_bogus_identifier(shallow_org_tree, login, 
-        client, test_user):
+
+def test_user_org_bogus_identifier(
+        shallow_org_tree, login, client, test_user):
     data = {'organizations': [
         {'reference':
-             'api/organization/123-45?system={}'.format(US_NPI[:-1])}
+         'api/organization/123-45?system={}'.format(US_NPI[:-1])}
     ]}
     login()
     response = client.post(
@@ -655,8 +688,9 @@ def test_user_org_bogus_identifier(shallow_org_tree, login,
 
     assert response.status_code == 400
 
-def test_user_org_invalid_timezone_post(shallow_org_tree, 
-        login, client, test_user):
+
+def test_user_org_invalid_timezone_post(
+        shallow_org_tree, login, client, test_user):
     # only one org in list can be marked with `apply_to_user`
     data = {'organizations': [
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
@@ -670,8 +704,9 @@ def test_user_org_invalid_timezone_post(shallow_org_tree,
 
     assert response.status_code == 400
 
-def test_user_org_apply_defaults(shallow_org_tree, 
-        login, client, test_user):
+
+def test_user_org_apply_defaults(
+        shallow_org_tree, login, client, test_user):
     # apply org timezone and language defaults to user
     sib = Organization.query.get(102)
     sib.timezone = 'Europe/Rome'
