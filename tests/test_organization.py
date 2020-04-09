@@ -165,8 +165,7 @@ def test_multiple_rps_in_fhir():
     results = [(rp, retired) for rp, retired in org.rps_w_retired()]
     assert [(rp1, None), (rp2, yesterday), (rp3, lastyear)] == results
 
-def test_organization_get(login, client, test_user):
-    login()
+def test_organization_get(test_user_login, client):
     org = Organization(name='test')
     with SessionScope(db):
         db.session.add(org)
@@ -210,19 +209,17 @@ def test_organization_get_by_identifier(login, client, test_user):
     assert org.id == fetched.id
     assert org.name == fetched.name
 
-def test_org_missing_identifier(login, client, test_user):
-    login()
+def test_org_missing_identifier(test_user_login, client):
     # should get 404 w/o finding a match
     response = client.get(
         '/api/organization/{value}?system={system}'.format(
             system=quote_plus('http://nonsense.org'), value='123-45'))
     assert response.status_code == 404
 
-def test_organization_list(login, client, test_user):
+def test_organization_list(test_user_login, client):
     count = Organization.query.count()
 
     # use api to obtain FHIR bundle
-    login()
     response = client.get('/api/organization')
     assert response.status_code == 200
     bundle = response.json
@@ -501,14 +498,13 @@ def test_organization_identifiers(shallow_org_tree,
     assert org.identifiers.count() == before + 2
 
 def test_organization_identifiers_update(promote_user, 
-        login, client, test_user, initialized_db):
+        test_user_login, client, initialized_db):
     with open(os.path.join(
         os.path.dirname(__file__),
         'organization-example-gastro.json'), 'r'
     ) as fhir_data:
         data = json.load(fhir_data)
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
     before = Organization.query.count()
     response = client.post(
         '/api/organization', content_type='application/json',
@@ -620,7 +616,6 @@ def test_visible_orgs_on_none(test_user, promote_user):
 
 def test_user_org_get(bless_with_basics, test_user, 
         login, client):
-    bless_with_basics()
     test_user = db.session.merge(test_user)
     expected = [
         Reference.organization(o.id).as_fhir()
