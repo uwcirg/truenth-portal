@@ -416,8 +416,8 @@ def bless_with_basics(test_user, promote_user, shallow_org_tree):
 
 
 @pytest.fixture
-def bless_with_basics_no_patient_role(test_user, promote_user,
-        shallow_org_tree):
+def bless_with_basics_no_patient_role(
+        test_user, promote_user, shallow_org_tree):
     user = None
     backdate = None
     setdate = None
@@ -572,7 +572,8 @@ def login(initialize_static, app, client, music_org):
 
 
 @pytest.fixture
-def test_user_login(initialize_static, app, client,
+def test_user_login(
+        initialize_static, app, client,
         music_org, test_user):
     user_id = TEST_USER_ID,
     follow_redirects = True

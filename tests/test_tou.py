@@ -44,7 +44,8 @@ def test_accept(test_user_login, client):
     assert tou.audit.user_id == TEST_USER_ID
 
 
-def test_accept_w_org(test_user_login, test_user,
+def test_accept_w_org(
+        test_user_login, test_user,
         bless_with_basics, client):
     test_user = db.session.merge(test_user)
     org_id = test_user.organizations[0].id
