@@ -506,6 +506,37 @@ def required_clinical_data():
 
 
 @pytest.fixture
+def prostate_procedure(test_user):
+    code = '118877007'
+    display = 'Procedure on prostate'
+    system = SNOMED
+    setdate = None
+    with SessionScope(db):
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        procedure = Procedure(audit=audit)
+        coding = Coding(
+            system=system,
+            code=code,
+            display=display).add_if_not_found(True)
+        code = CodeableConcept(codings=[coding]).add_if_not_found(True)
+        enc = Encounter(
+            status='planned',
+            auth_method='url_authenticated',
+            user_id=TEST_USER_ID, start_time=datetime.utcnow())
+        db.session.add(enc)
+        db.session.commit()
+        enc = db.session.merge(enc)
+        procedure.code = code
+        procedure.user = db.session.merge(test_user)
+        procedure.start_time = setdate or datetime.utcnow()
+        procedure.end_time = datetime.utcnow()
+        procedure.encounter = enc
+        db.session.add(procedure)
+        db.session.commit()
+    return db.session.merge(procedure)
+
+
+@pytest.fixture
 def add_procedure(test_user):
     def add_procedure(code='367336001', display='Chemotherapy',
                       system=SNOMED, setdate=None):

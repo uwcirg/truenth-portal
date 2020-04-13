@@ -29,6 +29,11 @@ def patient_user(test_user, promote_user):
     return test_user
 
 
+@pytest.fixture
+def prostate_procedure(add_procedure):
+    add_procedure('118877007', 'Procedure on prostate')
+
+
 def config_as(app, system, **kwargs):
     """Set REQUIRED_CORE_DATA to match system under test"""
     # Ideally this would be read directly from the respective
@@ -71,8 +76,7 @@ def test_partner(
 
 
 def test_patient_without_clinical_data(
-        app, bless_with_basics, test_user,
-        add_procedure, initialized_db):
+        app, bless_with_basics, test_user, initialized_db):
     config_as(app, TRUENTH)
     # Prior to adding clinical data, should return false
     Coredata()
@@ -83,10 +87,9 @@ def test_patient_without_clinical_data(
 def test_patient_with_clinical_data(
         app, bless_with_basics, test_user,
         test_user_login, required_clinical_data,
-        add_procedure, initialized_db):
+        prostate_procedure, initialized_db):
     """Patient has additional requirements"""
     # related to whether patient has received treatment question
-    add_procedure(code='118877007', display='Procedure on prostate')
     with SessionScope(db):
         db.session.commit()
     test_user = db.session.merge(test_user)
