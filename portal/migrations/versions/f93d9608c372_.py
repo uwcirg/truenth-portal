@@ -23,7 +23,6 @@ down_revision = '894bbf6a8aa5'
 
 def visit_name(qb_id, iteration):
     """special purpose for this migration"""
-    assert qb_id == 20
     if iteration == 0:
         return "6 month"
     elif iteration == 1:
