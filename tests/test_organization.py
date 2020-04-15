@@ -216,7 +216,8 @@ def test_organization_get_by_identifier(login, client, test_user):
     assert org.name == fetched.name
 
 
-def test_org_missing_identifier(test_user_login, client):
+def test_org_missing_identifier(login, client, initialized_patient):
+    login()
     # should get 404 w/o finding a match
     response = client.get(
         '/api/organization/{value}?system={system}'.format(
@@ -224,7 +225,7 @@ def test_org_missing_identifier(test_user_login, client):
     assert response.status_code == 404
 
 
-def test_organization_list(test_user_login, client):
+def test_organization_list(test_user_login, client, shallow_org_tree):
     count = Organization.query.count()
 
     # use api to obtain FHIR bundle
@@ -262,7 +263,7 @@ def test_organization_search(
 
 
 def test_organization_inheritence_search(
-        deepen_org_tree, login, client, test_user):
+        test_user_login, deepen_org_tree, client):
     # Region at top should apply to leaves
     count = Organization.query.count()
     assert count > 3
@@ -281,7 +282,6 @@ def test_organization_inheritence_search(
         db.session.commit()
 
     # use api to obtain FHIR bundle
-    login()
     response = client.get('/api/organization?state=NY')
     assert response.status_code == 200
     bundle = response.json
@@ -297,19 +297,20 @@ def test_organization_inheritence_search(
 
 
 def test_organization_filter(
-        deepen_org_tree, login, client, test_user):
+        test_user_login, deepen_org_tree, client):
     # Filter w/o a search term
     count = Organization.query.count()
     assert count > 6
-
-    login()
 
     # Filter w/o search should give a short list of orgs
     response = client.get('/api/organization?filter=leaves')
     assert response.status_code == 200
     bundle = response.json
     assert bundle['resourceType'] == 'Bundle'
-    assert len(bundle['entry']) == 3
+
+    # one organization is music_org 
+    # other three came from deepen_org_tree
+    assert len(bundle['entry']) == 4
 
 
 def test_organization_put(
@@ -517,7 +518,7 @@ def test_organization_identifiers(
 
 
 def test_organization_identifiers_update(
-        promote_user, test_user_login,
+        shallow_org_tree, promote_user, login,
         client, initialized_db):
     with open(os.path.join(
         os.path.dirname(__file__),
@@ -526,6 +527,7 @@ def test_organization_identifiers_update(
         data = json.load(fhir_data)
     promote_user(role_name=ROLE.ADMIN.value)
     before = Organization.query.count()
+    login()
     response = client.post(
         '/api/organization', content_type='application/json',
         data=json.dumps(data))
@@ -659,7 +661,7 @@ def test_user_org_get(
 
 
 def test_user_org_post(
-        shallow_org_tree, login, client, test_user):
+        shallow_org_tree, prep_org_w_identifier, login, client, test_user):
     data = {'organizations': [
         {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
         {'reference': 'api/organization/1001'}

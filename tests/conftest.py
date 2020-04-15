@@ -17,6 +17,7 @@ from portal.models.client import Client
 from portal.models.clinical_constants import CC, add_static_concepts
 from portal.models.codeable_concept import CodeableConcept
 from portal.models.coding import Coding
+from portal.models.identifier import Identifier
 from portal.models.encounter import Encounter
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import (
@@ -36,7 +37,14 @@ from portal.models.user_consent import (
     STAFF_EDITABLE_MASK,
     UserConsent,
 )
-from portal.system_uri import SNOMED
+from portal.system_uri import (
+    IETF_LANGUAGE_TAG,
+    PRACTICE_REGION,
+    SHORTCUT_ALIAS,
+    SHORTNAME_ID,
+    SNOMED,
+    US_NPI,
+)
 from tests import TEST_USER_ID
 
 
