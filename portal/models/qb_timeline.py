@@ -397,7 +397,7 @@ class RP_flyweight(object):
                     self.nxt_start = calc_and_adjust_start(
                         user=self.user, qbd=self.nxt_qbd,
                         initial_trigger=self.td)
-                if self.cur_start > self.nxt_start:
+                if self.cur_start > self.nxt_start + relativedelta(months=1):
                     # Still no match means poorly defined RP QBs
                     raise ValueError(
                         "Invalid state {}:{} not in lock-step even on "
