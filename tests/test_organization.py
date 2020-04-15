@@ -182,10 +182,9 @@ def test_organization_get(test_user_login, client):
     assert response.status_code == 200
 
 
-def test_organization_get_by_identifier(login, client, test_user):
+def test_organization_get_by_identifier(test_user_login, client):
     org_id_system = "http://test/system"
     org_id_value = "testval"
-    login()
     org = Organization(name='test', id=999)
     ident = Identifier(id=99, system=org_id_system, value=org_id_value)
     org_ident = OrganizationIdentifier(
@@ -216,7 +215,8 @@ def test_organization_get_by_identifier(login, client, test_user):
     assert org.name == fetched.name
 
 
-def test_org_missing_identifier(login, client, initialized_patient):
+def test_org_missing_identifier(
+        login, client, initialized_patient):
     login()
     # should get 404 w/o finding a match
     response = client.get(
@@ -225,9 +225,11 @@ def test_org_missing_identifier(login, client, initialized_patient):
     assert response.status_code == 404
 
 
-def test_organization_list(test_user_login, client, shallow_org_tree):
+def test_organization_list(
+        login, client, shallow_org_tree, initialized_patient):
     count = Organization.query.count()
 
+    login()
     # use api to obtain FHIR bundle
     response = client.get('/api/organization')
     assert response.status_code == 200
@@ -237,7 +239,7 @@ def test_organization_list(test_user_login, client, shallow_org_tree):
 
 
 def test_organization_search(
-        shallow_org_tree, login, client, test_user):
+        shallow_org_tree, client, test_user_login):
     count = Organization.query.count()
     assert count > 1
 
@@ -254,7 +256,6 @@ def test_organization_search(
         db.session.commit()
 
     # use api to obtain FHIR bundle
-    login()
     response = client.get('/api/organization?state=NY')
     assert response.status_code == 200
     bundle = response.json
@@ -314,9 +315,8 @@ def test_organization_filter(
 
 
 def test_organization_put(
-        promote_user, login, client, test_user):
+        promote_user, test_user_login, client):
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
     with (open(
         os.path.join(
             os.path.dirname(__file__),
@@ -356,10 +356,9 @@ def test_organization_put(
 
 
 def test_organization_put_update(
-        promote_user, login, client, test_user):
+        promote_user, test_user_login, client):
     # confirm unmentioned fields persist
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
 
     en_AU = LocaleConstants().AustralianEnglish
 
@@ -402,10 +401,9 @@ def test_organization_put_update(
 
 
 def test_organization_extension_update(
-        promote_user, login, client, test_user):
+        promote_user, test_user_login, client):
     # confirm clearing one of several extensions works
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
 
     en_AU = LocaleConstants().AustralianEnglish
 
@@ -461,7 +459,7 @@ def test_organization_extension_update(
 
 
 def test_organization_post(
-        promote_user, login, client, test_user):
+        promote_user, test_user_login, client):
     with (open(
         os.path.join(
             os.path.dirname(__file__),
@@ -473,7 +471,6 @@ def test_organization_post(
     # the 002-burgers-card org refers to another - should fail
     # prior to adding the parent (partOf) org
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
     response = client.post(
         '/api/organization', content_type='application/json',
         data=json.dumps(data))
@@ -482,14 +479,13 @@ def test_organization_post(
 
 def test_organization_delete(
         shallow_org_tree, promote_user,
-        login, client, test_user):
+        test_user_login, client):
     (org1_id, org1_name), (org2_id, org2_name) = [
         (org.id, org.name) for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
 
     # use api to delete one and confirm the other remains
     promote_user(role_name=ROLE.ADMIN.value)
-    login()
     response = client.delete('/api/organization/{}'.format(org2_id))
     assert response.status_code == 200
     assert Organization.query.get(org2_id) is None
@@ -518,7 +514,7 @@ def test_organization_identifiers(
 
 
 def test_organization_identifiers_update(
-        shallow_org_tree, promote_user, login,
+        shallow_org_tree, promote_user, test_user_login,
         client, initialized_db):
     with open(os.path.join(
         os.path.dirname(__file__),
@@ -527,7 +523,6 @@ def test_organization_identifiers_update(
         data = json.load(fhir_data)
     promote_user(role_name=ROLE.ADMIN.value)
     before = Organization.query.count()
-    login()
     response = client.post(
         '/api/organization', content_type='application/json',
         data=json.dumps(data))
@@ -648,12 +643,11 @@ def test_visible_orgs_on_none(test_user, promote_user):
 
 
 def test_user_org_get(
-        bless_with_basics, test_user, login, client):
+        bless_with_basics, test_user, test_user_login, client):
     test_user = db.session.merge(test_user)
     expected = [
         Reference.organization(o.id).as_fhir()
         for o in test_user.organizations]
-    login()
     response = client.get('/api/user/{}/organization'.format(
         TEST_USER_ID))
     assert response.status_code == 200
@@ -661,12 +655,11 @@ def test_user_org_get(
 
 
 def test_user_org_post(
-        shallow_org_tree, prep_org_w_identifier, login, client, test_user):
+        shallow_org_tree, prep_org_w_identifier, test_user_login, client):
     data = {'organizations': [
         {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
         {'reference': 'api/organization/1001'}
     ]}
-    login()
     response = client.post(
         '/api/user/{}/organization'.format(TEST_USER_ID),
         content_type='application/json',
@@ -677,12 +670,11 @@ def test_user_org_post(
 
 
 def test_user_org_bogus_identifier(
-        shallow_org_tree, login, client, test_user):
+        shallow_org_tree, test_user_login, client):
     data = {'organizations': [
         {'reference':
          'api/organization/123-45?system={}'.format(US_NPI[:-1])}
     ]}
-    login()
     response = client.post(
         '/api/user/{}/organization'.format(TEST_USER_ID),
         content_type='application/json',
@@ -692,13 +684,12 @@ def test_user_org_bogus_identifier(
 
 
 def test_user_org_invalid_timezone_post(
-        shallow_org_tree, login, client, test_user):
+        shallow_org_tree, test_user_login, client):
     # only one org in list can be marked with `apply_to_user`
     data = {'organizations': [
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
         {'reference': 'api/organization/1001', 'timezone': "apply_to_user"}
     ]}
-    login()
     response = client.post(
         '/api/user/{}/organization'.format(TEST_USER_ID),
         content_type='application/json',
@@ -708,7 +699,7 @@ def test_user_org_invalid_timezone_post(
 
 
 def test_user_org_apply_defaults(
-        shallow_org_tree, login, client, test_user):
+        shallow_org_tree, test_user, test_user_login, client):
     # apply org timezone and language defaults to user
     sib = Organization.query.get(102)
     sib.timezone = 'Europe/Rome'
@@ -721,7 +712,6 @@ def test_user_org_apply_defaults(
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
         {'reference': 'api/organization/1001', 'language': "apply_to_user"}
     ]}
-    login()
     response = client.post(
         '/api/user/{}/organization'.format(TEST_USER_ID),
         content_type='application/json',
