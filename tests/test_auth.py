@@ -194,11 +194,10 @@ def test_client_bad_add(
     assert "Invalid URL" in response
 
 
-def test_client_edit(client, login, test_client):
+def test_client_edit(client, test_user_login, test_client):
     """Test editing a client application"""
     test_url = 'http://tryme.com'
     origins = "{} {}".format(test_client.application_origins, test_url)
-    login()
     response = client.post(
         '/client/{0}'.format(test_client.client_id),
         data=dict(
@@ -224,9 +223,8 @@ def test_client_edit(client, login, test_client):
     assert test_client.callback_url != invalid_url
 
 
-def test_callback_validation(client, login, test_client):
+def test_callback_validation(client, test_user_login, test_client):
     """Confirm only valid urls can be set"""
-    login()
     response = client.post(
         '/client/{0}'.format(test_client.client_id),
         data=dict(
