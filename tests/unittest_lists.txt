@@ -1,5 +1,3 @@
-test_organization.py
-test_portal.py
 test_identifier.py
 test_scheduled_job.py
 test_encounter.py
