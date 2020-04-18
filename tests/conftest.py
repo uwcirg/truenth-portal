@@ -25,6 +25,7 @@ from portal.models.organization import (
         OrgTree,
         add_static_organization
 )
+from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
@@ -511,6 +512,21 @@ def required_clinical_data():
             codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
             audit=audit, status='preliminary', issued=calc_date_params(
                 backdate=backdate, setdate=setdate))
+
+
+@pytest.fixture
+def add_practitioner():
+    def add_practitioner(
+            first_name='first', last_name='last', id_value='12345'):
+        p = Practitioner(first_name=first_name, last_name=last_name)
+        i = Identifier(system=US_NPI, value=id_value)
+        p.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(p)
+            db.session.commit()
+        p = db.session.merge(p)
+        return p
+    return add_practitioner
 
 
 @pytest.fixture
