@@ -1,7 +1,6 @@
 test_identifier.py
 test_scheduled_job.py
 test_encounter.py
-test_practitioner.py
 test_user.py
 test_healthcheck.py
 test_consent.py

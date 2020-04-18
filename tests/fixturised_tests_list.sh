@@ -9,4 +9,5 @@ test_clinical.py \
 test_coredata.py \
 test_timeout.py \
 test_tou.py \
-test_organization.py
+test_organization.py \
+test_practitioner.py
