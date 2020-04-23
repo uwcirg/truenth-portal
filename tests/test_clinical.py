@@ -211,7 +211,9 @@ def test_empty_biopsy_get(test_user_login, client):
     assert data['value'] == 'unknown'
 
 
-def test_clinical_biopsy_put(test_user_login, client):
+def test_clinical_biopsy_put_FHIR(test_user_login, client):
+    user = User.query.get(TEST_USER_ID)
+    assert user.observations.count() == 0
     """Shortcut API - just biopsy data w/o FHIR overhead"""
     response = client.post(
         '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
@@ -231,12 +233,29 @@ def test_clinical_biopsy_put(test_user_login, client):
     assert coding['system'] == 'http://us.truenth.org/clinical-codes'
     assert vq['value'] == 'true'
 
+    assert user.observations.count() == 1
+
+
+def test_clinical_biopsy_direct(test_user_login, client):
+    user = User.query.get(TEST_USER_ID)
+    assert user.observations.count() == 0
+    """Shortcut API - just biopsy data w/o FHIR overhead"""
+    response = client.post(
+        '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        content_type='application/json', data=json.dumps({'value': True}))
+
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
                           % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'true'
 
+    assert user.observations.count() == 1
+
+
+def test_clinical_biopsy_alter(test_user_login, client):
+    user = User.query.get(TEST_USER_ID)
+    assert user.observations.count() == 0
     # Can we alter the value?
     response = client.post(
         '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
@@ -252,11 +271,12 @@ def test_clinical_biopsy_put(test_user_login, client):
     assert data['value'] == 'false'
 
     # Confirm history is retained
+    assert user.observations.count() == 1
+
+
+def test_clinical_biopsy_unknown_put_FHIR(test_user_login, client):
     user = User.query.get(TEST_USER_ID)
-    assert user.observations.count() == 2
-
-
-def test_clinical_biopsy_unknown(test_user_login, client):
+    assert user.observations.count() == 0
     """Shortcut API - biopsy data w status unknown"""
     response = client.post(
         '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
@@ -265,6 +285,8 @@ def test_clinical_biopsy_unknown(test_user_login, client):
     assert response.status_code == 200
     result = response.json
     assert result['message'] == 'ok'
+
+    assert user.observations.count() == 1
 
     # Can we get it back in FHIR?
     response = client.get('/api/patient/%s/clinical' % TEST_USER_ID)
@@ -279,12 +301,30 @@ def test_clinical_biopsy_unknown(test_user_login, client):
     assert vq['value'] == 'true'
     assert status == 'unknown'
 
+    assert user.observations.count() == 1
+
+
+def test_clinical_biopsy_unknown_direct(test_user_login, client):
+    user = User.query.get(TEST_USER_ID)
+    assert user.observations.count() == 0
+    """Shortcut API - biopsy data w status unknown"""
+    response = client.post(
+        '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        content_type='application/json',
+        data=json.dumps({'value': True, 'status': 'unknown'}))
+ 
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
                           % TEST_USER_ID)
     data = response.json
     assert data['value'] == 'unknown'
 
+    assert user.observations.count() == 1
+
+
+def test_clinical_biopsy_unknown_alter(test_user_login, client):
+    user = User.query.get(TEST_USER_ID)
+    assert user.observations.count() == 0
     # Can we alter the value?
     response = client.post(
         '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
@@ -293,6 +333,8 @@ def test_clinical_biopsy_unknown(test_user_login, client):
     result = response.json
     assert result['message'] == 'ok'
 
+    assert user.observations.count() == 1
+
     # Confirm it's altered
     response = client.get('/api/patient/%s/clinical/biopsy'
                           % TEST_USER_ID)
@@ -300,8 +342,7 @@ def test_clinical_biopsy_unknown(test_user_login, client):
     assert data['value'] == 'false'
 
     # Confirm history is retained
-    user = User.query.get(TEST_USER_ID)
-    assert user.observations.count() == 2
+    assert user.observations.count() == 1
 
 
 def test_clinical_pca_diag(test_user_login, client):
