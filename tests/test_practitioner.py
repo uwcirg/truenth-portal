@@ -59,7 +59,7 @@ def test_practitioner_search(add_practitioner, test_user_login, client):
         '/api/practitioner?system=testsys&value=notvalid')
     assert resp.status_code == 404
 
-def test_practitioner_get(add_practitioner, test_user_login, client):
+def test_practitioner_get_id(add_practitioner, test_user_login, client):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -78,6 +78,16 @@ def test_practitioner_get(add_practitioner, test_user_login, client):
     email_json = {'system': 'email', 'value': 'test@notarealsite.com'}
     assert email_json in resp.json['telecom']
 
+
+def test_practitioner_get_external_id(
+        add_practitioner, test_user_login, client):
+    pract = add_practitioner(first_name="Indiana", last_name="Jones")
+    pract.phone = '555-1234'
+    pract.email = 'test@notarealsite.com'
+    add_practitioner(
+        first_name="John", last_name="Watson", id_value='jwatson')
+    pract = db.session.merge(pract)
+
     # test get by external identifier
     resp = client.get(
         '/api/practitioner/{}?system={}'.format('jwatson', US_NPI))
@@ -86,10 +96,21 @@ def test_practitioner_get(add_practitioner, test_user_login, client):
     assert resp.json['resourceType'] == 'Practitioner'
     assert resp.json['name'][0]['family'] == 'Watson'
 
+
+def test_practitioner_get_invalid_external_id(
+        add_practitioner, test_user_login, client):
+    pract = add_practitioner(first_name="Indiana", last_name="Jones")
+    pract.phone = '555-1234'
+    pract.email = 'test@notarealsite.com'
+    add_practitioner(
+        first_name="John", last_name="Watson", id_value='jwatson')
+    pract = db.session.merge(pract)
+
     # test with invalid external identifier
     resp = client.get(
         '/api/practitioner/{}?system={}'.format('invalid', 'testsys'))
     assert resp.status_code == 404
+
 
 def test_practitioner_post(test_user, promote_user, login, client):
     data = {
