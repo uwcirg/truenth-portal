@@ -276,12 +276,13 @@ def resources():
         '{} work instruction'.format(org.name.lower()))
     results = resources_data['results']
     if (len(results) > 0):
-        video_content = []
+        demo_content = []
         for asset in results:
-            if 'video' in asset['tags']:
-                video_content.append(asset_by_uuid(asset['uuid']))
+            if 'demo' in asset['tags']:
+                demo_content.append(asset_by_uuid(asset['uuid']))
+
         return render_template('eproms/resources.html',
-                               results=results, video_content=video_content)
+                               results=results, demo_content=demo_content)
     else:
         abort(400, 'no resources found')
 
