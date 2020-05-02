@@ -9,7 +9,9 @@ from portal.models.role import ROLE
 from portal.system_uri import US_NPI
 
 
-def test_practitioner_search(add_practitioner, test_user_login, client):
+def test_practitioner_search(
+        add_practitioner, test_user_login, client,
+        bless_with_basics):
     pract1 = add_practitioner(
         first_name="Indiana", last_name="Jones", id_value='ijones')
     pract2 = add_practitioner(
