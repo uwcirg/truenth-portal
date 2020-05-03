@@ -38,7 +38,6 @@ def questionnaire_bank_list():
 
 @questionnaire_api.route('/api/questionnaire')
 @crossdomain()
-@oauth.require_oauth()
 def questionnaire_list():
     """Obtain a bundle (list) of all Questionnaires
 
@@ -65,7 +64,6 @@ def questionnaire_list():
 
 @questionnaire_api.route('/api/questionnaire/<string:value>')
 @crossdomain()
-@oauth.require_oauth()
 def get_questionnaire(value):
     """Return the specified Questionnaire
 

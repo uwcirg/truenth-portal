@@ -11,7 +11,7 @@ certifi==2019.9.11        # via requests
 cffi==1.13.2              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
-coverage==5.0.4
+coverage==5.1
 decorator==4.4.0          # via validators
 dogpile.cache==0.9.0      # via flask-sqlalchemy-caching
 enum34==1.1.6
@@ -42,14 +42,14 @@ markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
 passlib==1.7.1            # via flask-user
 polib==1.1.0
-pycparser==2.19           # via cffi
+pycparser==2.20           # via cffi
 pycryptodome==3.9.0       # via flask-user
 python-dateutil==2.8.0
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 pytz==2019.3              # via babel, celery
-pyyaml==5.2              # via flask-swagger, swagger-spec-validator
+pyyaml==5.3.1              # via flask-swagger, swagger-spec-validator
 redis==3.3.11
 requests-cache==0.5.2
 requests-oauthlib==1.1.0  # pyup: <1.2.0 # pin until OAuthlib>=3.0.0 # via flask-oauthlib
