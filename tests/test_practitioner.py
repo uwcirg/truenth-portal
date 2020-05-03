@@ -11,7 +11,7 @@ from portal.system_uri import US_NPI
 
 def test_practitioner_search(
         add_practitioner, test_user_login, client,
-        bless_with_basics):
+        shallow_org_tree):
     pract1 = add_practitioner(
         first_name="Indiana", last_name="Jones", id_value='ijones')
     pract2 = add_practitioner(
@@ -61,7 +61,8 @@ def test_practitioner_search(
         '/api/practitioner?system=testsys&value=notvalid')
     assert resp.status_code == 404
 
-def test_practitioner_get_id(add_practitioner, test_user_login, client):
+def test_practitioner_get_id(
+        add_practitioner, test_user_login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -82,7 +83,7 @@ def test_practitioner_get_id(add_practitioner, test_user_login, client):
 
 
 def test_practitioner_get_external_id(
-        add_practitioner, test_user_login, client):
+        add_practitioner, test_user_login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -100,7 +101,7 @@ def test_practitioner_get_external_id(
 
 
 def test_practitioner_get_invalid_external_id(
-        add_practitioner, test_user_login, client):
+        add_practitioner, test_user_login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -114,7 +115,8 @@ def test_practitioner_get_invalid_external_id(
     assert resp.status_code == 404
 
 
-def test_practitioner_post(test_user, promote_user, login, client):
+def test_practitioner_post(
+        test_user, promote_user, login, client, shallow_org_tree):
     data = {
         'resourceType': 'Practitioner',
         'name': [
@@ -183,7 +185,8 @@ def test_practitioner_post(test_user, promote_user, login, client):
                             content_type='application/json')
     assert resp.status_code == 409
 
-def test_practitioner_put(add_practitioner, promote_user, login, client):
+def test_practitioner_put(
+        add_practitioner, promote_user, login, client, shallow_org_tree):
     pract = add_practitioner(first_name="John", last_name="Watson")
     pract.phone = '555-1234'
     pract.email = 'test1@notarealsite.com'
