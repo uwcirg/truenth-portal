@@ -10,7 +10,7 @@ from portal.system_uri import US_NPI
 
 
 def test_practitioner_search(
-        add_practitioner, login, client,
+        add_practitioner, login, test_user, client,
         shallow_org_tree):
     pract1 = add_practitioner(
         first_name="Indiana", last_name="Jones", id_value='ijones')
@@ -64,7 +64,7 @@ def test_practitioner_search(
     assert resp.status_code == 404
 
 def test_practitioner_get_id(
-        add_practitioner, login, client, shallow_org_tree):
+        add_practitioner, login, test_user, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -87,7 +87,7 @@ def test_practitioner_get_id(
 
 
 def test_practitioner_get_external_id(
-        add_practitioner, login, client, shallow_org_tree):
+        add_practitioner, login, test_user, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -106,7 +106,7 @@ def test_practitioner_get_external_id(
 
 
 def test_practitioner_get_invalid_external_id(
-        add_practitioner, login, client, shallow_org_tree):
+        add_practitioner, login, test_user, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
