@@ -10,7 +10,7 @@ from portal.system_uri import US_NPI
 
 
 def test_practitioner_search(
-        add_practitioner, test_user_login, client,
+        add_practitioner, login, client,
         shallow_org_tree):
     pract1 = add_practitioner(
         first_name="Indiana", last_name="Jones", id_value='ijones')
@@ -18,6 +18,8 @@ def test_practitioner_search(
         first_name="John", last_name="Watson", id_value='jwatson')
     pract3 = add_practitioner(
         first_name="John", last_name="Zoidberg", id_value='jzoidberg')
+
+    login()
 
     # test base query
     resp = client.get('/api/practitioner')
@@ -62,7 +64,7 @@ def test_practitioner_search(
     assert resp.status_code == 404
 
 def test_practitioner_get_id(
-        add_practitioner, test_user_login, client, shallow_org_tree):
+        add_practitioner, login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -71,6 +73,8 @@ def test_practitioner_get_id(
     pract = db.session.merge(pract)
 
     # test get by ID
+    login()
+
     resp = client.get('/api/practitioner/{}'.format(pract.id))
     assert resp.status_code == 200
 
@@ -83,7 +87,7 @@ def test_practitioner_get_id(
 
 
 def test_practitioner_get_external_id(
-        add_practitioner, test_user_login, client, shallow_org_tree):
+        add_practitioner, login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -92,6 +96,7 @@ def test_practitioner_get_external_id(
     pract = db.session.merge(pract)
 
     # test get by external identifier
+    login()
     resp = client.get(
         '/api/practitioner/{}?system={}'.format('jwatson', US_NPI))
     assert resp.status_code == 200
@@ -101,7 +106,7 @@ def test_practitioner_get_external_id(
 
 
 def test_practitioner_get_invalid_external_id(
-        add_practitioner, test_user_login, client, shallow_org_tree):
+        add_practitioner, login, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
     pract.phone = '555-1234'
     pract.email = 'test@notarealsite.com'
@@ -110,6 +115,7 @@ def test_practitioner_get_invalid_external_id(
     pract = db.session.merge(pract)
 
     # test with invalid external identifier
+    login()
     resp = client.get(
         '/api/practitioner/{}?system={}'.format('invalid', 'testsys'))
     assert resp.status_code == 404
