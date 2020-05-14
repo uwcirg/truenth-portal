@@ -3,14 +3,15 @@
 <h3 class="tnth-headline">{{_("Resources")}}</h3>
 <article id="resourcesContentContainer">
     <section class="tabs-container">
-        {% if video_content|length > 0 %}
+        {% if demo_content|length > 0 %}
+            <!-- training material in video or slides-->
             <div class="tab">
               <input id="tab-one" type="checkbox" name="tabs" class="tab-input">
-              <label for="tab-one" class="tab-label">{{_("Videos")}}</label>
+              <label for="tab-one" class="tab-label">{{_("Training Slides and Video")}}</label>
               <div class="tab-content">
                 <ul class="work-instruction-list">
-                    {% for video in video_content %}
-                        <li class="work-instruction-item">{{video | safe}}</li>
+                    {% for item in demo_content %}
+                        <li class="work-instruction-item">{{item | safe}}</li>
                     {% endfor %}
                 </ul>
               </div>
@@ -22,7 +23,7 @@
             <div class="tab-content">
                 <ul class="work-instruction-list">
                     {% for asset in results %}
-                        {% if 'video' not in asset['tags'] %}
+                        {% if 'individual work instruction' in asset['tags'] %}
                             <li class="work-instruction-item">
                                 <a href="{{url_for('.work_instruction', tag=asset['tags'][1])}}" class="first-letter">{{asset['title']}}</a>
                             </li>

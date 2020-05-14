@@ -15,7 +15,7 @@ pluggy==0.13.1             # via tox
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 psycopg2-binary==2.8.4
 py==1.8.0                 # via tox
-pygments==2.4.2           # via sphinx
+pygments==2.6.1           # via sphinx
 pyparsing==2.4.1.1          # via packaging
 pytest==5.2.2
 pytest-flask==0.15.0
@@ -24,7 +24,7 @@ snowballstemmer==2.0.0    # via sphinx
 sphinx-rtd-theme==0.4.3
 sphinx==2.3.1
 sphinxcontrib-websupport==1.1.2  # via sphinx
-tox==3.14.0
+tox==3.14.6
 typing==3.7.4.1             # via sphinx
 virtualenv==16.7.8        # via tox
 waitress==1.4.3           # via webtest
