@@ -48,13 +48,14 @@ def existing_qnr_deets(patient_id, missing_qb_id):
 
 
 def upgrade():
-    three_mo_qb = QuestionnaireBank.query.filter(
-        QuestionnaireBank.name == 'IRONMAN_v3_recurring_3mo_pattern').first().id
     six_mo_qb = QuestionnaireBank.query.filter(
-        QuestionnaireBank.name == 'IRONMAN_v3_recurring_6mo_pattern').first().id
+        QuestionnaireBank.name == 'IRONMAN_v3_recurring_6mo_pattern').first()
     if not six_mo_qb:
         # System w/o problem QB - nothing needed
         return
+    six_mo_qb = six_mo_qb.id
+    three_mo_qb = QuestionnaireBank.query.filter(
+        QuestionnaireBank.name == 'IRONMAN_v3_recurring_3mo_pattern').first().id
 
     candidate_patients = [p[0] for p in session.query(QBT).filter(
         QBT.qb_id == three_mo_qb).distinct(
