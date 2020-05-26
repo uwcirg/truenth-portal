@@ -599,6 +599,10 @@ def login(initialize_static, app, client, music_org):
 def test_user_login(
         initialize_static, app, client,
         music_org, test_user):
+    """Only use if the function requires user login before other tasks.
+    login can be a location specific,
+    calling login() manually if that is the case.
+    """
     user_id = TEST_USER_ID,
     follow_redirects = True
 

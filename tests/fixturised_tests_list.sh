@@ -10,4 +10,5 @@ test_coredata.py \
 test_timeout.py \
 test_tou.py \
 test_organization.py \
-test_practitioner.py
+test_practitioner.py \
+test_identifier.py
