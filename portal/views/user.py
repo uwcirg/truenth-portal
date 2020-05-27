@@ -957,6 +957,89 @@ def delete_user_consents(user_id):
     return jsonify(message="ok")
 
 
+@user_api.route('/user/<int:user_id>/encounter', methods=('GET',))
+@crossdomain()
+@oauth.require_oauth()
+def current_encounter(user_id):
+    """Return current/latest encounter for logged in user
+
+    NB: only expected use at this time is current user. raises
+    RuntimeError if called on another, to avoid creating false,
+    failsafe encounters.
+
+    ---
+    tags:
+      - User
+      - Encounter
+    operationId: current_encounter
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the current encounter for the requested user.  NB only
+          the ``current_user`` is supported at this time.
+        schema:
+          id: encounter
+          required:
+            - id
+            - status
+            - patient
+            - auth_method
+          properties:
+            id:
+              type: integer
+              format: int64
+              description:
+                Current encounter identifier
+            status:
+              description:
+                Plain text describing the encounter status,
+                expect ``in-progress`` for "current" encounter.
+              type: string
+              enum:
+                - planned
+                - arrived
+                - in-progress
+                - onleave
+                - finished
+                - cancelled
+            patient:
+              description: Reference to patient owning the encounter
+              $ref: "#/definitions/Reference"
+            auth_method:
+              description: Form of encounter authentication
+              type: string
+              enum:
+                - password_authenticated
+                - url_authenticated
+                - staff_authenticated
+                - staff_handed_to_patient
+                - service_token_authenticated
+                - url_authenticated_and_verified
+                - failsafe
+      400:
+        description:
+          Only supported for current user - any other will result in 400
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user_id != user.id:
+        abort(400, "Only current_user's encounter accessible")
+    return jsonify(user.current_encounter.as_fhir())
+
+
 @user_api.route('/user/<int:user_id>/groups')
 @crossdomain()
 @oauth.require_oauth()

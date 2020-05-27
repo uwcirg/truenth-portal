@@ -391,6 +391,13 @@ class TestUser(TestCase):
         response = self.client.post('/api/user/{}/reactivate'.format(user_id))
         assert response.status_code == 400
 
+    def test_user_encounter(self):
+        self.login()
+        response = self.client.get(
+            '/api/user/{}/encounter'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert response.json['auth_method'] == 'password_authenticated'
+
     def test_user_timezone(self):
         assert self.test_user.timezone == 'UTC'
         self.login()
