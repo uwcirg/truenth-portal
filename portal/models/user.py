@@ -434,7 +434,8 @@ class User(db.Model, UserMixin):
         the subject, if a different user is performing the action.
         """
         query = Encounter.query.filter(Encounter.user_id == self.id).filter(
-            Encounter.status == 'in-progress')
+            Encounter.status == 'in-progress').order_by(
+            Encounter.start_time.desc())
         if query.count() == 0:
             current_app.logger.error(
                 "Failed to locate in-progress encounter for {}"
@@ -443,7 +444,7 @@ class User(db.Model, UserMixin):
         if query.count() != 1:
             # Not good - we should only have one `active` encounter for
             # the current user.  Log details for debugging and return the
-            # first
+            # most recently started
             msg = "Multiple active encounters found for {}: {}".format(
                 self,
                 [(e.status, str(e.start_time), str(e.end_time))
