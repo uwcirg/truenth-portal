@@ -84,7 +84,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 if (!userId) {
                     return;
                 }
-                const url_auth_method = "password_authenticated";
+                const url_auth_method = "url_authenticated";
                 //call to check if the current user is authenticated via url authenticated method
                 $.ajax({
                     type: "GET",
@@ -102,7 +102,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                                     //this will redirect user to login page
                                     const loginPath = "/user/sign-in";
                                     if ($(item)[0].nodeName.toLowerCase() === "a") {
-                                        $(item).attr("href", lognPath);
+                                        $(item).attr("href", loginPath);
                                     } else {
                                         $(item).off("click").on("click", function() {
                                             window.location = loginPath;
