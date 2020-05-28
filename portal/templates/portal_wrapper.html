@@ -64,7 +64,7 @@
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
-                            <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
+                            <li><a class="profile-menu-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                             {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
@@ -120,7 +120,7 @@
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
-                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
+                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a class="profile-menu-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
