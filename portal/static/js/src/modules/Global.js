@@ -96,12 +96,12 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (String(data.auth_method).toLowerCase() === url_auth_method) {
                         const loginPath = "/user/sign-in";
                         //links needing to redirect to login page 
-                        $(".url-authenticated-disabled-link").each(function() {
+                        $(".portal-weak-auth-disabled").each(function() {
                             let originalHref = $(this).attr("href");
                             $(this).attr("href", `${loginPath}?next=${originalHref}`);
                         });
                         //elements needing to be hidden
-                        $(".url-authenticated-hide").each(function() {
+                        $(".portal-weak-auth-hide").each(function() {
                             $(this).hide();
                         });
                     }
