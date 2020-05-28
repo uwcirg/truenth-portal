@@ -94,24 +94,16 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                         return;
                     }
                     if (String(data.auth_method).toLowerCase() === url_auth_method) {
-                        //link to profile in menu and in home page where indicated via css class
-                        ["#tnthNavWrapper .profile-menu-link",
-                        "#mainDiv .portal-weak-auth-disabled"].forEach(
-                            item => {
-                                if ($(item).length) {
-                                    //this will redirect user to login page
-                                    const loginPath = "/user/sign-in";
-                                    if ($(item)[0].nodeName.toLowerCase() === "a") {
-                                        $(item).attr("href", loginPath);
-                                    } else {
-                                        $(item).off("click").on("click", function() {
-                                            window.location = loginPath;
-                                            return false;
-                                        });
-                                    }
-                                }
-                            }
-                        );
+                        const loginPath = "/user/sign-in";
+                        //links needing to redirect to login page 
+                        $(".url-authenticated-disabled-link").each(function() {
+                            let originalHref = $(this).attr("href");
+                            $(this).attr("href", `${loginPath}?next=${originalHref}`);
+                        });
+                        //elements needing to be hidden
+                        $(".url-authenticated-hide").each(function() {
+                            $(this).hide();
+                        });
                     }
                 });
             }

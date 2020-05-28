@@ -64,7 +64,7 @@
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
-                            <li><a class="profile-menu-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
+                            <li><a class="url-authenticated-disabled-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                             {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
@@ -94,7 +94,7 @@
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                             {% if enable_links %}&nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>{% endif %}
                             <img class="profile-img" src="{{movember_profile}}" width="50" height="50" alt="{{_('Profile image')}}"/>
-                            <span class="welcome-text"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
+                            <span class="welcome-text url-authenticated-hide"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
                             {% if config.DEBUG_TIMEOUTS %}({{ expires_in }} seconds remaining){% endif %}
                          </button>
                             {% elif login_url %}<ul class="tnth-dropdown-menu" role="menu"><li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li></ul>
@@ -120,7 +120,7 @@
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
-                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a class="profile-menu-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
+                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a class="url-authenticated-disabled-link" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
