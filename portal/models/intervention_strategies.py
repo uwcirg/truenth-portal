@@ -327,15 +327,13 @@ def update_card_html_on_completion():
                 "When you are done, completed questionnaires will be "
                 "shown here.")
             completed_placeholder = """
-                <div>
-                  <div class="portal-description disabled">
+                <div class="portal-description disabled">
                     <h4 class="portal-description-title">
                       {header}
                     </h4>
                     <div class="portal-description-body">
                       <p>{message}</p>
                     </div>
-                  </div>
                 </div>""".format(header=header, message=message)
 
             completed_html = """
