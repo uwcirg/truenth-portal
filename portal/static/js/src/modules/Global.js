@@ -84,7 +84,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 if (!userId) {
                     return;
                 }
-
                 const url_auth_method = "url_authenticated";
                 //call to check if the current user is authenticated via url authenticated method
                 $.ajax({
