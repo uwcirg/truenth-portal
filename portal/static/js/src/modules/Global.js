@@ -52,6 +52,64 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         this.initValidator();
         this.handleClientInterventionForm();
     },
+    "getCurrentUser": function(callback) {
+        callback = callback || function() {};
+        let cachedCurrentUserId = sessionStorage.getItem("current_user_id");
+        if (cachedCurrentUserId) {
+            callback(cachedCurrentUserId);
+            return cachedCurrentUserId;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/me",
+            async: false
+        }).done(function(data) {
+            var userId = "";
+            if (data) { userId = data.id; }
+            if (!userId) {
+                callback();
+                return;
+            }
+            sessionStorage.setItem("current_user_id", userId);
+            callback(userId);
+        }).fail(function() {
+            callback();
+        });
+
+        return cachedCurrentUserId;
+    },
+    "checkURLAuthenticated": function() {
+        this.getCurrentUser(
+            function(userId) {
+                if (!userId) {
+                    return;
+                }
+
+                const url_auth_method = "url_authenticated";
+                //call to check if the current user is authenticated via url authenticated method
+                $.ajax({
+                    type: "GET",
+                    url: `/api/user/${userId}/encounter`
+                }).done(function(data) {
+                    if (!data || !data.auth_method) {
+                        return;
+                    }
+                    if (String(data.auth_method).toLowerCase() === url_auth_method) {
+                        //link to profile in menu and in home page where indicated via css class
+                        ["#tnthNavWrapper .profile-menu-link",
+                        "#mainDiv .portal-weak-auth-disabled"].forEach(
+                            item => {
+                                if ($(item).length) {
+                                    //this will redirect user to login page
+                                    $(item).attr("href", "/user/sign-in");
+                                }
+                            }
+                        );
+                    }
+                });
+            }
+        );
+    },
     "prePopulateEmail": function() {
         var requestEmail =  Utility.getUrlParameter("email"), emailField = document.querySelector("#email");
         if (requestEmail && emailField) { /*global Utility getUrlParameter */
@@ -107,6 +165,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
+                self.checkURLAuthenticated();
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
@@ -163,13 +222,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             return false;
         }
         var locale = "en_us";
-        $.ajax({
-            type: "GET",
-            url: "/api/me",
-            async: false
-        }).done(function(data) {
-            var userId = "";
-            if (data) { userId = data.id; }
+        this.getCurrentUser(function(userId) {
             if (!userId) {
                 locale = "en_us";
                 return false;
@@ -190,7 +243,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     }
                 });
             });
-        }).fail(function() {});
+        });
         return locale;
     },
     "getCopyrightYear": function(callback) {
