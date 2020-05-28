@@ -414,6 +414,13 @@ def access_via_token(token, next_step=None):
     # If not WRITE_ONLY user, redirect to login page
     # Email field is auto-populated unless using alt auth (fb/google/etc)
     if user.email and user.password:
+        if (
+                not current_app.config.get('GIL') and
+                Coredata().initial_obtained(user)):
+            # TN-2627, allow completion of PROMs w/o authentication
+            login_user(user=user, auth_method='url_authenticated')
+            return next_after_login()
+
         return redirect(url_for('user.login', email=user.email))
     return redirect(url_for('user.login'))
 
