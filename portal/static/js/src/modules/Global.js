@@ -84,7 +84,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 if (!userId) {
                     return;
                 }
-                const url_auth_method = "url_authenticated";
+                const url_auth_method = "password_authenticated";
                 //call to check if the current user is authenticated via url authenticated method
                 $.ajax({
                     type: "GET",
@@ -100,7 +100,15 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                             item => {
                                 if ($(item).length) {
                                     //this will redirect user to login page
-                                    $(item).attr("href", "/user/sign-in");
+                                    const loginPath = "/user/sign-in";
+                                    if ($(item)[0].nodeName.toLowerCase() === "a") {
+                                        $(item).attr("href", lognPath);
+                                    } else {
+                                        $(item).off("click").on("click", function() {
+                                            window.location = loginPath;
+                                            return false;
+                                        });
+                                    }
                                 }
                             }
                         );
