@@ -10,7 +10,7 @@ from ..models.identifier import (
     UserIdentifier,
     parse_identifier_params,
 )
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 identifier_api = Blueprint('identifier_api', __name__)
@@ -70,8 +70,7 @@ def identifiers(user_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
 
     # Return current identifiers
     return jsonify(identifier=[i.as_fhir() for i in user.identifiers])
@@ -153,8 +152,7 @@ def add_identifier(user_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'identifier' not in request.json:
         abort(400, "Requires identifier list")
 
@@ -229,7 +227,7 @@ def unique_user_identifier(user_id):
       - ServiceToken: []
 
     """
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     system, value = parse_identifier_params(request.args.get('identifier'))
     identifier = Identifier(system=system, value=value).add_if_not_found()
     try:

@@ -4,7 +4,7 @@ from flask import Blueprint, abort, current_app, jsonify
 from ..database import db
 from ..extensions import oauth
 from ..models.notification import UserNotification
-from ..models.user import current_user, get_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from ..type_tools import check_int
 from .crossdomain import crossdomain
 
@@ -76,12 +76,7 @@ def get_user_notification(user_id):
       - ServiceToken: []
 
     """
-    check_int(user_id)
-
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     notifs = [notif.as_json() for notif in user.notifications]
 
     return jsonify(notifications=notifs)
@@ -140,17 +135,7 @@ def delete_user_notification(user_id, notification_id):
     current_app.logger.debug(
         'delete user notification called for user {} and '
         'notification {}'.format(user_id, notification_id))
-
-    check_int(user_id)
-    check_int(notification_id)
-
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
-
+    get_user(user_id, 'edit')
     un = UserNotification.query.filter_by(
         user_id=user_id, notification_id=notification_id).first()
     if not un:

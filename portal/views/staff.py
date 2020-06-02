@@ -14,7 +14,7 @@ from ..models.app_text import (
 from ..models.communication import load_template_args
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import ROLE, Role
-from ..models.user import User, UserRoles, current_user, get_user_or_abort
+from ..models.user import User, UserRoles, current_user, get_user
 
 staff = Blueprint('staff', __name__)
 
@@ -24,11 +24,7 @@ staff = Blueprint('staff', __name__)
 @oauth.require_oauth()
 def staff_registration_email(user_id):
     """Staff Registration Email Content"""
-    if user_id:
-        user = get_user_or_abort(user_id)
-    else:
-        user = current_user()
-
+    user = get_user(user_id, 'view')
     org = user.first_top_organization()
     args = load_template_args(user=user)
 
@@ -47,7 +43,7 @@ def staff_registration_email(user_id):
 @roles_required(ROLE.STAFF_ADMIN.value)
 @oauth.require_oauth()
 def staff_profile_create():
-    user = current_user()
+    user = get_user(current_user().id, 'edit')
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
 
@@ -61,7 +57,7 @@ def staff_profile_create():
 @oauth.require_oauth()
 def staff_profile(user_id):
     """staff profile view function"""
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
     terms = VersionedResource(
@@ -84,7 +80,7 @@ def staff_index():
     the staff admin's organizations (and any descendant organizations)
 
     """
-    user = current_user()
+    user = get_user(current_user().id, 'edit')
 
     ot = OrgTree()
     staff_role_id = Role.query.filter(
@@ -96,7 +92,7 @@ def staff_index():
 
     user_orgs = set()
 
-    # Build list of all organization ids, and their decendents, the
+    # Build list of all organization ids, and their descendents, the
     # user belongs to
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count

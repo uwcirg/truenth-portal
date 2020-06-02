@@ -34,7 +34,7 @@ from ..models.questionnaire_response import (
     QuestionnaireResponse,
 )
 from ..models.role import ROLE
-from ..models.user import User, current_user, get_user_or_abort
+from ..models.user import User, current_user, get_user
 from ..timeout_lock import LockTimeout, guarded_task_launch
 from ..trace import dump_trace, establish_trace
 from ..type_tools import check_int
@@ -594,9 +594,7 @@ def assessment(patient_id, instrument_id):
       - ServiceToken: []
 
     """
-
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'view')
     questionnaire_responses = QuestionnaireResponse.query.filter_by(
         subject_id=patient.id).order_by(QuestionnaireResponse.authored.desc())
 
@@ -822,8 +820,7 @@ def assessment_update(patient_id):
             message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
 
     response = {
         'ok': False,
@@ -1491,8 +1488,8 @@ def assessment_add(patient_id):
             message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
+
     response = {
         'ok': False,
         'message': 'error saving questionnaire response',
@@ -1572,7 +1569,7 @@ def assessment_add(patient_id):
 def invalidate(user_id):
     from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
 
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     invalidate_users_QBT(user_id)
     return jsonify(invalidated=user.as_fhir())
 
@@ -1592,10 +1589,8 @@ def present_needed():
     from ..models.qb_status import QB_Status  # avoid cycle
 
     subject_id = request.args.get('subject_id') or current_user().id
-    subject = get_user_or_abort(subject_id)
-    if subject != current_user():
-        current_user().check_role(permission='edit', other_id=subject_id)
-
+    subject = get_user(
+        subject_id, 'edit', allow_on_url_authenticated_encounters=True)
     as_of_date = FHIR_datetime.parse(
         request.args.get('authored'), none_safe=True)
     if not as_of_date:
@@ -1957,9 +1952,7 @@ def patient_assessment_status(patient_id):
     """
     from ..models.qb_status import QB_Status
 
-    patient = get_user_or_abort(patient_id)
-    current_user().check_role(permission='view', other_id=patient_id)
-
+    patient = get_user(patient_id, 'view')
     date = request.args.get('as_of_date')
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 

@@ -74,7 +74,7 @@ from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
-from ..models.user import User, current_user, get_user_or_abort
+from ..models.user import User, current_user, get_user, unchecked_get_user
 from ..system_uri import SHORTCUT_ALIAS
 from ..timeout_lock import TimeoutLock
 from ..trace import dump_trace, establish_trace, trace
@@ -334,7 +334,7 @@ def access_via_token(token, next_step=None):
         abort(404, "URL token is invalid")
 
     # Valid token - confirm user id looks legit
-    user = get_user_or_abort(user_id)
+    user = unchecked_get_user(user_id)
     not_allowed = {
         ROLE.ADMIN.value,
         ROLE.APPLICATION_DEVELOPER.value,
@@ -487,9 +487,9 @@ def challenge_identity(
             validate_origin(form.next_url.data)
         if not form.user_id.data:
             abort(400, "missing user in identity challenge")
-        user = get_user_or_abort(form.user_id.data)
+        user = unchecked_get_user(form.user_id.data)
     else:
-        user = get_user_or_abort(user_id)
+        user = unchecked_get_user(user_id)
         form = ChallengeIdForm(
             next_url=next_url, user_id=user.id,
             merging_accounts=merging_accounts,
@@ -545,7 +545,7 @@ def challenge_identity(
 @portal.route('/initial-queries', methods=['GET', 'POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
-    user = current_user()
+    user = get_user(current_user().id, 'edit')
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
@@ -593,7 +593,7 @@ def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
 
-    user = current_user()
+    user = get_user(current_user().id, 'edit')
 
     pref_org_list = None
     # check user table preference for organization filters
@@ -641,7 +641,7 @@ def invite():
     subject = request.form.get('subject')
     body = request.form.get('body')
     recipients = request.form.get('recipients')
-    user = current_user()
+    user = get_user(current_user().id, 'view')
     if not user.email:
         abort(400, "Users without an email address can't send email")
     email = EmailMessage(
@@ -660,7 +660,7 @@ def invite_sent(message_id):
     message = EmailMessage.query.get(message_id)
     if not message:
         abort(404, "Message not found")
-    current_user().check_role('view', other_id=message.user_id)
+    get_user(message.user_id, 'view')
     return render_template('invite_sent.html', message=message)
 
 
@@ -670,14 +670,15 @@ def invite_sent(message_id):
 @oauth.require_oauth()
 def profile(user_id):
     """profile view function"""
-    user = current_user()
-    # template file for user self's profile
-    template_file = 'profile/my_profile.html'
-    if user_id and user_id != user.id:
-        user.check_role("edit", other_id=user_id)
-        user = get_user_or_abort(user_id)
-        # template file for view of other user's profile
-        template_file = 'profile/user_profile.html'
+    # template file for view of other user's profile
+    template_file = 'profile/user_profile.html'
+
+    if user_id is None:
+        user_id = current_user().id
+        # template file for user self's profile
+        template_file = 'profile/my_profile.html'
+
+    user = get_user(user_id, "edit")
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
     terms = VersionedResource(
@@ -694,10 +695,7 @@ def profile(user_id):
 @oauth.require_oauth()
 def patient_invite_email(user_id):
     """Patient Invite Email Content"""
-    if user_id:
-        user = get_user_or_abort(user_id)
-    else:
-        user = current_user()
+    user = get_user(user_id, 'edit')
 
     try:
         top_org = user.first_top_organization()
@@ -721,10 +719,7 @@ def patient_invite_email(user_id):
 def patient_reminder_email(user_id):
     """Patient Reminder Email Content"""
     from ..models.qb_status import QB_Status
-    if user_id:
-        user = get_user_or_abort(user_id)
-    else:
-        user = current_user()
+    user = get_user(user_id, 'edit')
 
     try:
         top_org = user.first_top_organization()
@@ -754,7 +749,7 @@ def patient_reminder_email(user_id):
 
 @portal.route('/explore')
 def explore():
-    user = current_user()
+    user = get_user(current_user().id, 'view')
     """Explore TrueNTH page"""
     return render_template('explore.html', user=user)
 
@@ -787,8 +782,8 @@ def contact_sent(message_id):
 def psa_tracker():
     user = current_user()
     if user:
-        user.check_role("edit", other_id=user.id)
-    return render_template('psa_tracker.html', user=current_user())
+        get_user(user.id, "edit")
+    return render_template('psa_tracker.html', user=user)
 
 
 class SettingsForm(FlaskForm):
@@ -809,7 +804,7 @@ class SettingsForm(FlaskForm):
 def settings():
     """settings panel for admins"""
     # load all top level orgs and consent agreements
-    user = current_user()
+    user = get_user(current_user().id, 'view')
     organization_consents = Organization.consent_agreements(
         locale_code=user.locale_code)
 
@@ -851,7 +846,7 @@ def settings():
             locale_code=user.locale_code)
 
     if form.patient_id.data and form.timestamp.data:
-        patient = get_user_or_abort(form.patient_id.data)
+        patient = get_user(form.patient_id.data, 'edit')
         try:
             dt = FHIR_datetime.parse(form.timestamp.data)
             for qnr in QuestionnaireResponse.query.filter_by(
@@ -935,7 +930,8 @@ def research_dashboard():
     Only accessible to those with the Researcher role.
 
     """
-    return render_template('research.html', user=current_user())
+    user = get_user(current_user().id, 'view')
+    return render_template('research.html', user=user)
 
 
 @portal.route('/spec')

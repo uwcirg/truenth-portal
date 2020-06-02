@@ -4,7 +4,7 @@ from flask import Blueprint, abort, jsonify, request
 from ..database import db
 from ..extensions import oauth
 from ..models.role import Role
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 role_api = Blueprint('role_api', __name__)
@@ -97,11 +97,7 @@ def roles(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     return jsonify(roles=[r.as_json() for r in user.roles])
 
 
@@ -161,10 +157,7 @@ def add_roles(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
 
@@ -232,10 +225,7 @@ def delete_roles(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
 
@@ -299,10 +289,7 @@ def set_roles(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
 
