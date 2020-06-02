@@ -534,6 +534,7 @@ def challenge_identity(
         login_user(user=user, auth_method='url_authenticated_and_verified')
     return redirect(form.next_url.data)
 
+
 @portal.route('/confirm-identity', methods=['GET', 'POST'])
 def confirm_identity():
     return render_template(
