@@ -1618,6 +1618,11 @@ def present_needed():
         return redirect('/')
 
     url = url_for('.present_assessment', **args)
+
+    encounter = current_user().current_encounter
+    if encounter.auth_method == "url_authenticated":
+        return redirect('/confirm-identity?redirect_url={}'.format(url))
+
     current_app.logger.debug('present assessment url, redirecting to: %s', url)
     return redirect(url, code=302)
 

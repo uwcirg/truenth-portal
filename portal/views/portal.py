@@ -542,6 +542,12 @@ def challenge_identity(
     return redirect(form.next_url.data)
 
 
+@portal.route('/confirm-identity', methods=['GET', 'POST'])
+def confirm_identity():
+    return render_template(
+        'confirm_identity.html', user=current_user(),
+        redirect_url=request.args.get("redirect_url", "/"))
+
 @portal.route('/initial-queries', methods=['GET', 'POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
