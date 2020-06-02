@@ -1015,7 +1015,8 @@ class User(db.Model, UserMixin):
             value_quantity_id=value_quantity.id).add_if_not_found(True)
         # The audit defines the acting user, to which the current
         # encounter is attached.
-        encounter = get_user(audit.user_id).current_encounter
+        acting_user = User.query.get(audit.user_id)
+        encounter = acting_user.current_encounter
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
@@ -1654,6 +1655,7 @@ class User(db.Model, UserMixin):
         assert (permission in ('view', 'edit'))  # limit vocab for now
         if (
                 not allow_on_url_authenticated_encounters and
+                current_app.config.get('ENABLE_URL_AUTHENTICATED') and
                 self.current_encounter.auth_method == 'url_authenticated'):
             abort(401, "inadequate auth_method: {}".format(
                 self.current_encounter.auth_method))

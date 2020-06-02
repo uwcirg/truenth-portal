@@ -415,7 +415,7 @@ def access_via_token(token, next_step=None):
     # Email field is auto-populated unless using alt auth (fb/google/etc)
     if user.email and user.password:
         if (
-                not current_app.config.get('GIL') and
+                current_app.config.get('ENABLE_URL_AUTHENTICATED') and
                 Coredata().initial_obtained(user)):
             # TN-2627, allow completion of PROMs w/o authentication
             login_user(user=user, auth_method='url_authenticated')
