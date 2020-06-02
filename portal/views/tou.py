@@ -232,8 +232,8 @@ def post_user_accepted_tou(user_id):
       - ServiceToken: []
 
     """
-    authd_user = current_user()
-    authd_user.check_role(permission='edit', other_id=user_id)
+    authd_user = get_user(current_user().id, 'view')
+    get_user(user_id, 'edit')  # confirm auth
     audit = Audit(
         user_id=authd_user.id, subject_id=user_id,
         comment="user {} posting accepted ToU for user {}".format(

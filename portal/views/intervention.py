@@ -16,7 +16,7 @@ from ..models.intervention_strategies import AccessStrategy
 from ..models.message import EmailMessage
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..models.user import User, current_user
+from ..models.user import User, current_user, get_user
 from .crossdomain import crossdomain
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
@@ -107,7 +107,7 @@ def user_intervention_get(intervention_name, user_id):
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
         abort(404, 'no such intervention {}'.format(intervention_name))
-    current_user().check_role(permission='edit', other_id=user_id)
+    get_user(user_id, 'edit')
 
     ui = UserIntervention.query.filter_by(
         user_id=user_id, intervention_id=intervention.id).first()
@@ -251,11 +251,7 @@ def user_intervention_set(intervention_name):
     if not request.json or 'user_id' not in request.json:
         abort(400, "Requires JSON defining at least user_id")
     user_id = request.json.get('user_id')
-    current_user().check_role(permission='edit', other_id=user_id)
-
-    user = User.query.get(user_id)
-    if user.deleted:
-        abort(400, "deleted user - operation not permitted")
+    get_user(user_id, 'edit')
     ui = UserIntervention.query.filter_by(
         user_id=user_id, intervention_id=intervention.id).first()
     if not ui:

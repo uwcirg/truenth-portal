@@ -531,7 +531,7 @@ def next_after_login():
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
 
-    # Present intial questions (TOU et al) if not already obtained
+    # Present initial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
     # client during patient registration
     if (not session.get('suspend_initial_queries', None) and
