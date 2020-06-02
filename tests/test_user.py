@@ -39,7 +39,7 @@ from portal.models.user import (
     UserIndigenousStatusExtension,
     UserObservation,
     UserRelationship,
-    get_user_or_abort,
+    get_user,
     permanently_delete_user,
     user_extension_map,
 )
@@ -55,12 +55,12 @@ from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 
 def test_null_id():
     with pytest.raises(BadRequest):
-        get_user_or_abort(None)
+        get_user(None, 'view')
 
 
 def test_empty_id():
     with pytest.raises(NotFound):
-        get_user_or_abort('')
+        get_user('', 'view')
 
 
 class TestUser(TestCase):

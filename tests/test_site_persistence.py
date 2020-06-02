@@ -28,7 +28,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.user import get_user
+from portal.models.user import User
 from tests import TEST_USER_ID, TestCase
 
 
@@ -83,7 +83,7 @@ class TestSitePersistence(TestCase):
             db.session.commit()
         self.add_procedure(
             code='424313000', display='Started active surveillance')
-        get_user(TEST_USER_ID).save_observation(
+        User.query.get(TEST_USER_ID).save_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
             status=None, issued=None)
