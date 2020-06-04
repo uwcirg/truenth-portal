@@ -36,6 +36,18 @@ from tests.test_assessment_status import (
 )
 
 
+@pytest.fixture
+def admin_user(test_user, promote_user):
+    promote_user(role_name=ROLE.ADMIN.value)
+    return test_user
+
+
+@pytest.fixture
+def patient_user(test_user, promote_user):
+    promote_user(role_name=ROLE.PATIENT.value)
+    return test_user
+
+
 def test_intervention_wrong_service_user(service_user, login, client, deepen_org_tree):
     service_user = db.session.merge(service_user)
     login(user_id=service_user.id)
@@ -47,7 +59,10 @@ def test_intervention_wrong_service_user(service_user, login, client, deepen_org
         data=json.dumps(data))
     assert response.status_code == 401
 
-def test_intervention(test_client, service_user, login, client, deepen_org_tree):
+
+def test_intervention(
+        test_client, service_user,
+        login, client, deepen_org_tree):
     test_client = db.session.merge(test_client)
     test_client.intervention = INTERVENTION.SEXUAL_RECOVERY
     test_client.application_origins = 'http://safe.com'
@@ -79,7 +94,10 @@ def test_intervention(test_client, service_user, login, client, deepen_org_tree)
     assert ui.status_text == data['status_text']
     assert ui.staff_html == data['staff_html']
 
-def test_music_hack(test_client, service_user, login, client, deepen_org_tree):
+
+def test_music_hack(
+        test_client, service_user,
+        login, client, deepen_org_tree):
     test_client = db.session.merge(test_client)
     test_client.intervention = INTERVENTION.MUSIC
     test_client.application_origins = 'http://safe.com'
@@ -98,7 +116,10 @@ def test_music_hack(test_client, service_user, login, client, deepen_org_tree):
     assert ui.user_id == data['user_id']
     assert ui.access == 'subscribed'
 
-def test_intervention_partial_put(test_client, service_user, login, client, deepen_org_tree):
+
+def test_intervention_partial_put(
+        test_client, service_user,
+        login, client, deepen_org_tree):
     test_client = db.session.merge(test_client)
     test_client.intervention = INTERVENTION.SEXUAL_RECOVERY
     test_client.application_origins = 'http://safe.com'
@@ -150,7 +171,10 @@ def test_intervention_partial_put(test_client, service_user, login, client, deep
     assert ui.status_text == data['status_text']
     assert ui.staff_html == data['staff_html']
 
-def test_intervention_bad_access(test_client, service_user, login, client, deepen_org_tree):
+
+def test_intervention_bad_access(
+        test_client, service_user,
+        login, client, deepen_org_tree):
     test_client = db.session.merge(test_client)
     test_client.intervention = INTERVENTION.SEXUAL_RECOVERY
     service_user = db.session.merge(service_user)
@@ -167,7 +191,10 @@ def test_intervention_bad_access(test_client, service_user, login, client, deepe
         data=json.dumps(data))
     assert response.status_code == 400
 
-def test_intervention_validation(test_client, service_user, login, client, deepen_org_tree):
+
+def test_intervention_validation(
+        test_client, service_user,
+        login, client, deepen_org_tree):
     test_client = db.session.merge(test_client)
     test_client.intervention = INTERVENTION.SEXUAL_RECOVERY
     test_client.application_origins = 'http://safe.com'
@@ -184,6 +211,7 @@ def test_intervention_validation(test_client, service_user, login, client, deepe
         content_type='application/json',
         data=json.dumps(data))
     assert response.status_code == 400
+
 
 def test_clinc_id(initialize_static, test_user):
     # Create several orgs with identifier
@@ -237,7 +265,10 @@ def test_clinc_id(initialize_static, test_user):
     assert cp.display_for_user(user).access
     assert cp.quick_access_check(user)
 
-def test_diag_stategy(initialize_static, test_user, login, deepen_org_tree):
+
+def test_diag_stategy(
+        initialize_static, test_user,
+        login, deepen_org_tree):
     """Test strategy for diagnosis"""
     # Add access strategies to the care plan intervention
     cp = INTERVENTION.CARE_PLAN
@@ -277,6 +308,7 @@ def test_diag_stategy(initialize_static, test_user, login, deepen_org_tree):
 
     assert cp.display_for_user(user).access
     assert cp.quick_access_check(user)
+
 
 def test_diag_changed_stategy(test_user, login, deepen_org_tree):
     """Test strategy for altered diagnosis"""
@@ -377,6 +409,7 @@ def test_no_tx(initialize_static, test_user, add_procedure):
     assert not cp.display_for_user(user).access
     assert not cp.quick_access_check(user)
 
+
 def test_exclusive_stategy(initialize_static, test_user):
     """Test exclusive intervention strategy"""
     user = db.session.merge(test_user)
@@ -418,6 +451,7 @@ def test_exclusive_stategy(initialize_static, test_user):
     assert not ds_p3p.quick_access_check(user)
     assert ds_wc.display_for_user(user).access
     assert ds_wc.quick_access_check(user)
+
 
 def test_not_in_role_or_sr(initialize_static, test_user):
     user = db.session.merge(test_user)
@@ -519,7 +553,9 @@ def test_in_role(initialize_static, test_user):
     assert sm.display_for_user(user).access
     assert sm.quick_access_check(user)
 
-def test_card_html_update(initialize_static, bless_with_basics, test_user):
+
+def test_card_html_update(
+        initialize_static, bless_with_basics, test_user):
     """Test strategy with side effects - card_html update"""
     ae = INTERVENTION.ASSESSMENT_ENGINE
     ae_id = ae.id
@@ -583,6 +619,7 @@ def test_card_html_update(initialize_static, bless_with_basics, test_user):
         dt + timedelta(days=1), '%e %b %Y')
     assert tomorrow in card_html
 
+
 def test_expired(bless_with_basics, test_user):
     """If baseline expired check message"""
     ae = INTERVENTION.ASSESSMENT_ENGINE
@@ -619,6 +656,7 @@ def test_expired(bless_with_basics, test_user):
         "The assessment is no longer available" in
         ae.display_for_user(user).card_html)
 
+
 def test_strat_from_json(initialize_static):
     """Create access strategy from json"""
     d = {
@@ -634,9 +672,8 @@ def test_strat_from_json(initialize_static):
     assert d['name'] == acc_strat.name
     assert d['function_details'] == json.loads(acc_strat.function_details)
 
-def test_strat_view(promote_user, login, client, deepen_org_tree):
+def test_strat_view(admin_user, login, client, deepen_org_tree):
     """Test strategy view functions"""
-    promote_user(role_name=ROLE.ADMIN.value)
     login()
     d = {
         'name': 'unit test example',
@@ -661,9 +698,9 @@ def test_strat_view(promote_user, login, client, deepen_org_tree):
     assert d['name'] == data['rules'][0]['name']
     assert d['function_details'] == data['rules'][0]['function_details']
 
-def test_strat_dup_rank(promote_user, login, client, deepen_org_tree):
+
+def test_strat_dup_rank(admin_user, login, client, deepen_org_tree):
     """Rank must be unique"""
-    promote_user(role_name=ROLE.ADMIN.value)
     login()
     d = {
         'name': 'unit test example',
@@ -694,6 +731,7 @@ def test_strat_dup_rank(promote_user, login, client, deepen_org_tree):
         content_type='application/json',
         data=json.dumps(d))
     assert response.status_code == 400
+
 
 def test_and_strats(initialize_static, test_user):
     # Create a logical 'and' with multiple strategies
@@ -765,7 +803,9 @@ def test_and_strats(initialize_static, test_user):
     # first strat true, second false.  AND should be false
     assert not ds_p3p.display_for_user(user).access
 
-def test_p3p_conditions(test_user, add_procedure, login, deepen_org_tree):
+
+def test_p3p_conditions(
+        test_user, add_procedure, login, deepen_org_tree):
     # Test the list of conditions expected for p3p
     ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
     ds_p3p.public_access = False
@@ -877,7 +917,9 @@ def test_p3p_conditions(test_user, add_procedure, login, deepen_org_tree):
     assert len(user.organizations) == 0
     assert ds_p3p.display_for_user(user).access
 
-def test_eproms_p3p_conditions(test_user, add_procedure, login, deepen_org_tree):
+
+def test_eproms_p3p_conditions(
+        test_user, add_procedure, login, deepen_org_tree):
     # Test the list of conditions expected for p3p on eproms
     # very similar to truenth p3p, plus ! role write_only
     ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
@@ -1014,7 +1056,10 @@ def test_eproms_p3p_conditions(test_user, add_procedure, login, deepen_org_tree)
     user, ds_p3p = map(db.session.merge, (user, ds_p3p))
     assert not ds_p3p.display_for_user(user).access
 
-def test_truenth_st_conditions(initialize_static, test_user, add_procedure, login, deepen_org_tree):
+
+def test_truenth_st_conditions(
+        initialize_static, test_user,
+        add_procedure, login, deepen_org_tree):
     # Test the list of conditions expected for SymptomTracker in truenth
     sm = INTERVENTION.SELF_MANAGEMENT
     sm.public_access = False
@@ -1110,7 +1155,9 @@ def test_truenth_st_conditions(initialize_static, test_user, add_procedure, logi
     user, sm = map(db.session.merge, (user, sm))
     assert not sm.display_for_user(user).access
 
-def test_get_empty_user_intervention(test_user_login, client, deepen_org_tree):
+
+def test_get_empty_user_intervention(
+        test_user_login, client, deepen_org_tree):
     # Get on user w/o user_intervention
     response = client.get('/api/intervention/{i}/user/{u}'.format(
         i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
@@ -1118,7 +1165,10 @@ def test_get_empty_user_intervention(test_user_login, client, deepen_org_tree):
     assert len(response.json.keys()) == 1
     assert response.json['user_id'] == TEST_USER_ID
 
-def test_get_user_intervention(initialize_static, test_user, login, client, deepen_org_tree):
+
+def test_get_user_intervention(
+        initialize_static, test_user,
+        login, client, deepen_org_tree):
     intervention_id = INTERVENTION.SEXUAL_RECOVERY.id
     ui = UserIntervention(intervention_id=intervention_id,
                           user_id=TEST_USER_ID,
@@ -1144,6 +1194,7 @@ def test_get_user_intervention(initialize_static, test_user, login, client, deep
     assert response.json['link_url'] == "http://example.com"
     assert response.json['status_text'] == "status example"
     assert response.json['staff_html'] == "custom ph"
+
 
 def test_communicate(add_user, login, client, deepen_org_tree):
     email_group = Group(name='test_email')
@@ -1172,6 +1223,7 @@ def test_communicate(add_user, login, client, deepen_org_tree):
     set2 = set(message.recipients.split())
     assert set1 == set2
 
+
 def test_dynamic_intervention_access():
     # Confirm interventions dynamically added still accessible
     newbee = Intervention(
@@ -1182,7 +1234,9 @@ def test_dynamic_intervention_access():
 
     assert INTERVENTION.newbee == db.session.merge(newbee)
 
-def test_bogus_intervention_access(test_user, login, promote_user, client, deepen_org_tree):
+
+def test_bogus_intervention_access(
+        test_user, login, promote_user, client, deepen_org_tree):
     with pytest.raises(AttributeError):
         INTERVENTION.phoney
 
@@ -1193,19 +1247,6 @@ def test_bogus_intervention_access(test_user, login, promote_user, client, deepe
     assert response.status_code == 404
 
 
-#"""Tests relying on eproms config"""
-#@pytest.fixture(scope="session")
-#def eproms_app(request):
-#    app_ = create_app(TestEpromsStrategies)
-#    ctx = app_.app_context()
-#    ctx.push()
-#
-#    def teardown():
-#        ctx.pop()
-#
-#    request.addfinalizer(teardown)
-#    return app_
-#
 @pytest.fixture
 def setUp(initialize_static):
 
@@ -1234,14 +1275,15 @@ def setUp(initialize_static):
             lookup_field=model.lookup_field, target_dir=eproms_config_dir)
         mp.import_(keep_unmentioned=False)
 
-def test_self_mgmt(setUp, promote_user, test_user):
+
+def test_self_mgmt(setUp, patient_user, test_user):
     """Patient w/ Southampton org should get access to self_mgmt"""
-    promote_user(role_name=ROLE.PATIENT.value)
     southampton = Organization.query.filter_by(name='Southampton').one()
     test_user = db.session.merge(test_user)
     test_user.organizations.append(southampton)
     self_mgmt = Intervention.query.filter_by(name='self_management').one()
     assert self_mgmt.quick_access_check(test_user)
+
 
 def test_self_mgmt_user_denied(setUp, test_user):
     """Non-patient w/ Southampton org should NOT get self_mgmt access"""
@@ -1250,9 +1292,9 @@ def test_self_mgmt_user_denied(setUp, test_user):
     self_mgmt = Intervention.query.filter_by(name='self_management').one()
     assert not self_mgmt.quick_access_check(test_user)
 
-def test_self_mgmt_org_denied(setUp, promote_user, test_user):
+
+def test_self_mgmt_org_denied(setUp, patient_user, test_user):
     """Patient w/o Southampton org should NOT get self_mgmt access"""
-    promote_user(role_name=ROLE.PATIENT.value)
     self_mgmt = Intervention.query.filter_by(name='self_management').one()
     user = db.session.merge(test_user)
     assert not self_mgmt.quick_access_check(user)
