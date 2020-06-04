@@ -346,7 +346,7 @@ def add_user(app, initialized_db):
 
 @pytest.fixture
 def service_user(initialize_static, test_user):
-    sponsor = test_user
+    sponsor = db.session.merge(test_user)
     service_user = sponsor.add_service_account()
     with SessionScope(db):
         db.session.add(service_user)
