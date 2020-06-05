@@ -94,7 +94,9 @@
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                             {% if enable_links %}&nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>{% endif %}
                             <img class="profile-img" src="{{movember_profile}}" width="50" height="50" alt="{{_('Profile image')}}"/>
-                            <span class="welcome-text portal-weak-auth-hide"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
+                            {% if user.current_encounter.auth_method != 'url_authenticated' %}
+                                <span class="welcome-text portal-weak-auth-hide"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
+                            {% endif %}
                             {% if config.DEBUG_TIMEOUTS %}({{ expires_in }} seconds remaining){% endif %}
                          </button>
                             {% elif login_url %}<ul class="tnth-dropdown-menu" role="menu"><li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li></ul>
