@@ -4,7 +4,7 @@ from ..date_tools import FHIR_datetime, as_fhir
 from .codeable_concept import CodeableConcept
 from .encounter import Encounter
 from .reference import Reference
-from .user import get_user
+from .user import User
 
 
 class Procedure(db.Model):
@@ -76,7 +76,7 @@ class Procedure(db.Model):
         if 'encounter' in data:
             p.encounter = Encounter.from_fhir(data['encounter'])
         else:
-            p.encounter = get_user(audit.user_id).current_encounter
+            p.encounter = User.query.get(audit.user_id).current_encounter
         p.user_id = Reference.parse(data['subject']).id
         if 'performedDateTime' in data:
             p.start_time = FHIR_datetime.parse(

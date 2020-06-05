@@ -43,7 +43,7 @@ from ..models.user import (
     User,
     UserRelationship,
     current_user,
-    get_user_or_abort,
+    get_user,
     permanently_delete_user,
     validate_email,
 )
@@ -96,6 +96,8 @@ def me():
 
     """
     user = current_user()
+    if user.current_encounter.auth_method == 'url_authenticated':
+        return jsonify(id=user.id)
     return jsonify(
         id=user.id, username=user.username, email=user.email)
 
@@ -343,8 +345,7 @@ def delete_user(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = get_user_or_abort(user_id)
-    current_user().check_role('edit', other_id=user_id)
+    user = get_user(user_id, 'edit')
     try:
         user.delete_user(acting_user=current_user())
     except ValueError as v:
@@ -401,8 +402,7 @@ def reactivate_user(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = get_user_or_abort(user_id, allow_deleted=True)
-    current_user().check_role('edit', other_id=user_id)
+    user = get_user(user_id, permission='edit', include_deleted=True)
     try:
         user.reactivate_user(acting_user=current_user())
     except ValueError as v:
@@ -465,8 +465,7 @@ def access_url(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    current_user().check_role(permission='edit', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, permission='edit')
     not_allowed = {
         ROLE.ADMIN.value,
         ROLE.APPLICATION_DEVELOPER.value,
@@ -592,11 +591,7 @@ def user_consents(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     return jsonify(consent_agreements=[c.as_json() for c in
                                        user.all_consents])
 
@@ -697,10 +692,7 @@ def set_user_consents(user_id):
     """
     current_app.logger.debug('post user consent called w/: {}'.format(
         request.json))
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
@@ -806,10 +798,7 @@ def withdraw_user_consent(user_id):
     """
     current_app.logger.debug('withdraw user consent called w/: '
                              '{}'.format(request.json))
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, permission='edit')
     if not request.json:
         abort(400, "Requires JSON with submission including "
                    "HEADER 'Content-Type: application/json'")
@@ -926,10 +915,7 @@ def delete_user_consents(user_id):
     """
     current_app.logger.debug('delete user consent called w/: {}'.format(
         request.json))
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     remove_uc = None
     try:
         id_to_delete = int(request.json['organization_id'])
@@ -955,6 +941,89 @@ def delete_user_consents(user_id):
     db.session.commit()
 
     return jsonify(message="ok")
+
+
+@user_api.route('/user/<int:user_id>/encounter', methods=('GET',))
+@crossdomain()
+@oauth.require_oauth()
+def current_encounter(user_id):
+    """Return current/latest encounter for logged in user
+
+    NB: only expected use at this time is current user. raises
+    RuntimeError if called on another, to avoid creating false,
+    failsafe encounters.
+
+    ---
+    tags:
+      - User
+      - Encounter
+    operationId: current_encounter
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the current encounter for the requested user.  NB only
+          the ``current_user`` is supported at this time.
+        schema:
+          id: encounter
+          required:
+            - id
+            - status
+            - patient
+            - auth_method
+          properties:
+            id:
+              type: integer
+              format: int64
+              description:
+                Current encounter identifier
+            status:
+              description:
+                Plain text describing the encounter status,
+                expect ``in-progress`` for "current" encounter.
+              type: string
+              enum:
+                - planned
+                - arrived
+                - in-progress
+                - onleave
+                - finished
+                - cancelled
+            patient:
+              description: Reference to patient owning the encounter
+              $ref: "#/definitions/Reference"
+            auth_method:
+              description: Form of encounter authentication
+              type: string
+              enum:
+                - password_authenticated
+                - url_authenticated
+                - staff_authenticated
+                - staff_handed_to_patient
+                - service_token_authenticated
+                - url_authenticated_and_verified
+                - failsafe
+      400:
+        description:
+          Only supported for current user - any other will result in 400
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user_id != user.id:
+        abort(400, "Only current_user's encounter accessible")
+    return jsonify(user.current_encounter.as_fhir())
 
 
 @user_api.route('/user/<int:user_id>/groups')
@@ -1003,11 +1072,7 @@ def user_groups(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     return jsonify(groups=[g.as_json() for g in user.groups])
 
 
@@ -1086,10 +1151,7 @@ def set_user_groups(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'groups' not in request.json:
         abort(400, "Requires 'groups' list")
 
@@ -1226,10 +1288,7 @@ def relationships(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     results = []
     for r in user.relationships:
         results.append({'user': r.user_id,
@@ -1391,10 +1450,7 @@ def set_relationships(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'relationships' not in request.json:
         abort(400, "Requires relationship list in JSON")
     # First confirm all the data is valid and the user has permission
@@ -1502,8 +1558,7 @@ def email_ready(user_id):
       - ServiceToken: []
 
     """
-    user = get_user_or_abort(user_id)
-    current_user().check_role('view', other_id=user_id)
+    user = get_user(user_id, 'view')
     ignore_preference = request.args.get('ignore_preference', False)
     ready, reason = user.email_ready(ignore_preference)
     if ready:
@@ -1681,11 +1736,7 @@ def user_documents(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     doctype = request.args.get('document_type')
     if doctype:
         results = user.documents.filter_by(document_type=doctype)
@@ -1740,11 +1791,7 @@ def download_user_document(user_id, doc_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'edit')
     download_ud = None
     for ud in user.documents:
         if ud.id == doc_id:
@@ -1820,10 +1867,7 @@ def upload_user_document(user_id):
       - ServiceToken: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
 
     def posted_filename(req):
         """Return file regardless of POST convention
@@ -1930,10 +1974,7 @@ def trigger_password_reset_email(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, permission='edit')
     if '@' not in getattr(user, 'email', ''):
         abort(400, "invalid email address")
 
@@ -2017,16 +2058,10 @@ def get_table_preferences(user_id, table_name):
       - ServiceToken: []
 
     """
-    if not user_id or not table_name:
-        abort(400, "missing user or table parameters")
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     pref = TablePreference.query.filter_by(
         table_name=table_name, user_id=user.id).first()
-    # 404 case handled by current_user() or check_role above.  Return
+    # 404 case handled by get_user() above.  Return
     # empty list if no preferences yet exist.
     if not pref:
         return jsonify({})
@@ -2121,12 +2156,7 @@ def set_table_preferences(user_id, table_name):
       - OAuth2AuthzFlow: []
 
     """
-    if not user_id or not table_name:
-        abort(400, "missing user or table parameters")
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     if not request.json:
         abort(400, "no table preference data provided")
 
@@ -2206,7 +2236,7 @@ def invite(user_id):
       - ServiceToken: []
       - OAuth2AuthzFlow: []
     """
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     validate_email(user.email)
     sender = current_app.config.get("MAIL_DEFAULT_SENDER")
     org = user.first_top_organization()
@@ -2287,7 +2317,7 @@ def get_user_messages(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
+    get_user(user_id, 'view')
     messages = []
     for em in EmailMessage.query.filter(
             EmailMessage.recipient_id == user_id):
@@ -2338,11 +2368,7 @@ def get_current_user_qb(user_id):
 
     """
     from ..models.qb_status import QB_Status
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='view', other_id=user_id)
-        user = get_user_or_abort(user_id)
-
+    user = get_user(user_id, 'view')
     date = request.args.get('as_of_date')
     # allow date and time info to be available
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()

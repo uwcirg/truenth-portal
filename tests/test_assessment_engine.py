@@ -24,7 +24,7 @@ from portal.models.questionnaire_response import (
 )
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.user import get_user
+from portal.models.user import User
 from portal.models.user_consent import UserConsent
 from portal.system_uri import (
     TRUENTH_STATUS_EXTENSION,
@@ -218,7 +218,7 @@ class TestAssessmentEngine(TestCase):
         qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
         qb.questionnaires.append(qbq)
 
-        test_user = get_user(TEST_USER_ID)
+        test_user = User.query.get(TEST_USER_ID)
         test_user.organizations.append(org)
         authored = FHIR_datetime.parse(data['authored'])
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
@@ -289,7 +289,7 @@ class TestAssessmentEngine(TestCase):
         qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
         qb.questionnaires.append(qbq)
 
-        test_user = get_user(TEST_USER_ID)
+        test_user = User.query.get(TEST_USER_ID)
         test_user.organizations.append(org)
         authored = FHIR_datetime.parse(data['authored'])
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
@@ -310,7 +310,7 @@ class TestAssessmentEngine(TestCase):
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
-        test_user = get_user(TEST_USER_ID)
+        test_user = User.query.get(TEST_USER_ID)
         qb = db.session.merge(qb)
         assert test_user.questionnaire_responses.count() == 1
         assert (
@@ -349,7 +349,7 @@ class TestAssessmentEngine(TestCase):
         qbq = QuestionnaireBankQuestionnaire(questionnaire=qn, rank=0)
         qb.questionnaires.append(qbq)
 
-        test_user = get_user(TEST_USER_ID)
+        test_user = User.query.get(TEST_USER_ID)
         test_user.organizations.append(org)
         authored = FHIR_datetime.parse(data['authored'])
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
@@ -370,7 +370,7 @@ class TestAssessmentEngine(TestCase):
         response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
         assert response.status_code == 200
-        test_user = get_user(TEST_USER_ID)
+        test_user = User.query.get(TEST_USER_ID)
         assert test_user.questionnaire_responses.count() == 1
         assert (
             test_user.questionnaire_responses[0].questionnaire_bank_id

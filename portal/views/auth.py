@@ -50,7 +50,7 @@ from ..models.flaskdanceprovider import (
 from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import User, add_user, current_user, get_user_or_abort
+from ..models.user import User, add_user, current_user, get_user
 from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
@@ -531,7 +531,7 @@ def next_after_login():
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
 
-    # Present intial questions (TOU et al) if not already obtained
+    # Present initial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
     # client during patient registration
     if (not session.get('suspend_initial_queries', None) and
@@ -621,9 +621,8 @@ def login_as(user_id, auth_method='staff_authenticated'):
       'staff_handed_to_patient', depending on context.
 
     """
-    # said business rules enforced by check_role()
-    current_user().check_role('edit', user_id)
-    target_user = get_user_or_abort(user_id)
+    # said business rules enforced by get_user()
+    target_user = get_user(user_id, 'edit')
 
     # Guard against abuse
     if not target_user.has_role(ROLE.PATIENT.value, ROLE.PARTNER.value):

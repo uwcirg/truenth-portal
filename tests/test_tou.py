@@ -72,7 +72,8 @@ class TestTou(TestCase):
         assert response.status_code == 200
         tou = ToU.query.one()
         assert tou.agreement_url == tou_url
-        assert tou.audit.user_id == TEST_USER_ID
+        assert tou.audit.user_id == service_user.id
+        assert tou.audit.subject_id == TEST_USER_ID
 
     def test_get(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)

@@ -19,7 +19,7 @@ from ..models.organization import Organization
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user_or_abort, patients_query
+from ..models.user import current_user, get_user, patients_query
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -109,8 +109,7 @@ def patient_profile_create():
     '/session-report/<int:subject_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
 def session_report(subject_id, instrument_id, authored_date):
-    current_user().check_role("view", other_id=subject_id)
-    user = get_user_or_abort(subject_id)
+    user = get_user(subject_id, 'view')
     return render_template(
         "sessionReport.html", user=user,
         current_user=current_user(), instrument_id=instrument_id,
@@ -123,8 +122,7 @@ def session_report(subject_id, instrument_id, authored_date):
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
     user = current_user()
-    user.check_role("edit", other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
 

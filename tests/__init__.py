@@ -43,7 +43,7 @@ from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
-from portal.models.user import User, UserRoles, get_user
+from portal.models.user import User, UserRoles
 from portal.models.user_consent import (
     INCLUDE_IN_REPORTS_MASK,
     SEND_REMINDERS_MASK,
@@ -303,7 +303,7 @@ class TestCase(Base):
         """
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-            get_user(TEST_USER_ID).save_observation(
+            User.query.get(TEST_USER_ID).save_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=calc_date_params(
                     backdate=backdate, setdate=setdate))

@@ -52,6 +52,63 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         this.initValidator();
         this.handleClientInterventionForm();
     },
+    "getCurrentUser": function(callback) {
+        callback = callback || function() {};
+        let cachedCurrentUserId = sessionStorage.getItem("current_user_id");
+        if (cachedCurrentUserId) {
+            callback(cachedCurrentUserId);
+            return cachedCurrentUserId;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/me",
+            async: false
+        }).done(function(data) {
+            var userId = "";
+            if (data) { userId = data.id; }
+            if (!userId) {
+                callback();
+                return;
+            }
+            sessionStorage.setItem("current_user_id", userId);
+            callback(userId);
+        }).fail(function() {
+            callback();
+        });
+
+        return cachedCurrentUserId;
+    },
+    "checkURLAuthenticated": function() {
+        this.getCurrentUser(
+            function(userId) {
+                if (!userId) {
+                    return;
+                }
+                const url_auth_method = "url_authenticated";
+                //call to check if the current user is authenticated via url authenticated method
+                $.ajax({
+                    type: "GET",
+                    url: `/api/user/${userId}/encounter`
+                }).done(function(data) {
+                    if (!data || !data.auth_method) {
+                        return;
+                    }
+                    if (String(data.auth_method).toLowerCase() === url_auth_method) {
+                        const loginPath = "/user/sign-in";
+                        //links needing to redirect to login page 
+                        $(".portal-weak-auth-disabled").each(function() {
+                            let originalHref = $(this).attr("href");
+                            $(this).attr("href", `${loginPath}?next=${originalHref}`);
+                        });
+                        //elements needing to be hidden
+                        $(".portal-weak-auth-hide").each(function() {
+                            $(this).hide();
+                        });
+                    }
+                });
+            }
+        );
+    },
     "prePopulateEmail": function() {
         var requestEmail =  Utility.getUrlParameter("email"), emailField = document.querySelector("#email");
         if (requestEmail && emailField) { /*global Utility getUrlParameter */
@@ -107,6 +164,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
+                self.checkURLAuthenticated();
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
@@ -163,13 +221,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             return false;
         }
         var locale = "en_us";
-        $.ajax({
-            type: "GET",
-            url: "/api/me",
-            async: false
-        }).done(function(data) {
-            var userId = "";
-            if (data) { userId = data.id; }
+        this.getCurrentUser(function(userId) {
             if (!userId) {
                 locale = "en_us";
                 return false;
@@ -190,7 +242,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     }
                 });
             });
-        }).fail(function() {});
+        });
         return locale;
     },
     "getCopyrightYear": function(callback) {

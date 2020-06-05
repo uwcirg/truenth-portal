@@ -7,7 +7,7 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.reference import MissingReference
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
@@ -68,11 +68,9 @@ def demographics(patient_id):
       - ServiceToken: []
 
     """
-    if patient_id:
-        current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user_or_abort(patient_id)
-    else:
-        patient = current_user()
+    if patient_id is None:
+        patient_id = current_user().id
+    patient = get_user(patient_id, 'view')
     return jsonify(patient.as_fhir(include_empties=False))
 
 
@@ -147,8 +145,7 @@ def demographics_set(patient_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if not request.json:
         abort(
             400,

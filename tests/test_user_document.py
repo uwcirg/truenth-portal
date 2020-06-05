@@ -11,7 +11,7 @@ from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.auth import create_service_token
 from portal.models.intervention import INTERVENTION
-from portal.models.user import get_user
+from portal.models.user import User
 from portal.models.user_document import UserDocument
 from tests import TEST_USER_ID, TestCase
 
@@ -52,7 +52,7 @@ class TestUserDocument(TestCase):
         # user doc file
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY
-        create_service_token(client=client, user=get_user(TEST_USER_ID))
+        create_service_token(client=client, user=User.query.get(TEST_USER_ID))
         self.login()
 
         test_contents = b"This is a test."

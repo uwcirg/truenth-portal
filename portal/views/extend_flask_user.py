@@ -6,7 +6,7 @@ from flask_user.views import reset_password
 
 from ..audit import auditable_event
 from ..models.role import ROLE
-from ..models.user import get_user_or_abort
+from ..models.user import unchecked_get_user
 from .portal import challenge_identity
 
 
@@ -15,7 +15,7 @@ def reset_password_view_function(token):
     is_valid, has_expired, user_id = current_app.user_manager.verify_token(
         token,
         current_app.user_manager.reset_password_expiration)
-    user = get_user_or_abort(user_id)
+    user = unchecked_get_user(user_id)
 
     # as this is an entry point for not-yet-logged-in users, capture their
     # locale_code in the session for template rendering prior to logging in.

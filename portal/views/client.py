@@ -34,7 +34,7 @@ from ..models.auth import Token, create_service_token
 from ..models.client import Client, validate_origin
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
-from ..models.user import current_user
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 client_api = Blueprint('client', __name__)
@@ -186,7 +186,7 @@ def client_reg():
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
+    user = get_user(current_user().id, 'view')
     form = ClientEditForm(application_role=INTERVENTION.DEFAULT.name)
     if not form.validate_on_submit():
         return render_template('client_add.html', form=form)
@@ -287,8 +287,8 @@ def client_edit(client_id):
     client = Client.query.get(client_id)
     if not client:
         abort(404)
-    user = current_user()
-    user.check_role(permission='edit', other_id=client.user_id)
+    user = get_user(current_user().id, 'view')
+    get_user(client.user_id, 'edit')  # confirm auth
 
     if request.method == 'POST':
         form = ClientEditForm(request.form)
@@ -420,7 +420,7 @@ def clients_list():
       - OAuth2AuthzFlow: []
 
     """
-    user = current_user()
+    user = get_user(current_user().id, 'view')
     if user.has_role(ROLE.ADMIN.value):
         clients = Client.query.all()
     else:

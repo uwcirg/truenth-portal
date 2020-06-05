@@ -15,7 +15,7 @@ from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from portal.models.user import User, get_user
+from portal.models.user import User
 from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 
 
@@ -270,7 +270,7 @@ class TestPortalEproms(TestCase):
         self.promote_user(role_name=ROLE.STAFF.value)
 
         org = Organization(name='test org')
-        user = get_user(TEST_USER_ID)
+        user = User.query.get(TEST_USER_ID)
         with SessionScope(db):
             db.session.add(org)
             user.organizations.append(org)
