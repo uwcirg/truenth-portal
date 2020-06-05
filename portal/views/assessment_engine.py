@@ -1621,6 +1621,7 @@ def present_needed():
 
     encounter = current_user().current_encounter
     if encounter.auth_method == "url_authenticated":
+        current_app.logger.debug('redirect to confirm identity')
         return redirect('/confirm-identity?redirect_url={}'.format(url))
 
     current_app.logger.debug('present assessment url, redirecting to: %s', url)
