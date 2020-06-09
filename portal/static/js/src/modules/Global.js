@@ -106,7 +106,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                             $(this).on("click", function(e) {
                                 e.preventDefault();
                                 let originalHref = $(this).attr("href");
-                                let redirectHref = `[view path]?next=${originalHref}`;
+                                let redirectHref = `/promote-encounter?next=${originalHref}`;
                                 $(this).attr("href", redirectHref);
                                 $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
                                 $("#urlAuthenticatedModal").modal("show");
