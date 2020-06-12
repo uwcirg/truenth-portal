@@ -323,7 +323,7 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
 @pytest.fixture
 def add_user(app, initialized_db):
     def add_user(
-            username, first_name="", last_name="",
+            username, first_name="James", last_name="Nguyen",
             image_url=None, password="fakePa$$", email=None):
         """Create a user and add to test db, and return it"""
         # Hash the password
@@ -578,9 +578,6 @@ def login(initialize_static, app, client, music_org):
             oauth_info=None,
             follow_redirects=True
     ):
-
-        app.config.from_object(TestConfig)
-
         if not oauth_info:
             oauth_info = {'user_id': user_id}
 
