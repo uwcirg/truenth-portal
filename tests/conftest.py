@@ -663,7 +663,7 @@ def promote_user(initialize_static, test_user):
         if not user:
             user = test_user
         user = db.session.merge(user)
-        assert (role_name)
+        assert role_name
         role_id = db.session.query(Role.id).filter(
             Role.name == role_name).first()[0]
         with SessionScope(db):
