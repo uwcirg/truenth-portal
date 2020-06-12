@@ -1961,7 +1961,12 @@ def get_user(
     :raises: 401 Unauthorized if the current user does not have authorization
 
     """
-    uid = int(uid)  # request parameters may be in string form
+    if uid is None:
+        raise BadRequest('invalid uid')
+    try:
+        uid = int(uid)  # request parameters may be in string form
+    except ValueError:
+        raise NotFound("User not found - expected integer ID")
     requested = unchecked_get_user(uid, allow_deleted=include_deleted)
     cur = current_user()
     allow_weak = allow_on_url_authenticated_encounters
