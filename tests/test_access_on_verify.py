@@ -21,7 +21,7 @@ def test_create_account_via_api(app, client, service_user, login):
     login(user_id=service_user.id)
     response = client.post(
         '/api/account',
-        data=json.dumps({}),
+        json={},
         content_type='application/json')
     assert response.status_code == 200
 
