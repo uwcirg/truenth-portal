@@ -1653,6 +1653,7 @@ class User(db.Model, UserMixin):
 
         """
         assert (permission in ('view', 'edit'))  # limit vocab for now
+        assert other_id == int(other_id)  # look out for str/int comparisons
         if (
                 not allow_on_url_authenticated_encounters and
                 current_app.config.get('ENABLE_URL_AUTHENTICATED') and
@@ -1960,6 +1961,12 @@ def get_user(
     :raises: 401 Unauthorized if the current user does not have authorization
 
     """
+    if uid is None:
+        raise BadRequest('invalid uid')
+    try:
+        uid = int(uid)  # request parameters may be in string form
+    except ValueError:
+        raise NotFound("User not found - expected integer ID")
     requested = unchecked_get_user(uid, allow_deleted=include_deleted)
     cur = current_user()
     allow_weak = allow_on_url_authenticated_encounters
