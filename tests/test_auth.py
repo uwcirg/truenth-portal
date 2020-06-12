@@ -50,7 +50,7 @@ def test_local_user_add(client):
     response = client.post('/user/register', data=data)
     assert response.status_code == 302
     new_user = User.query.filter_by(username=data['email']).first()
-    assert new_user.active is True
+    assert new_user.active
 
 
 def test_local_login_valid_username_and_password(test_auth_user, local_login):
