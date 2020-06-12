@@ -21,7 +21,7 @@ def test_create_account_via_api(app, client, service_user, login):
     login(user_id=service_user.id)
     response = client.post(
         '/api/account',
-        json={},
+        json={})
     assert response.status_code == 200
 
     # add role to account
@@ -29,8 +29,7 @@ def test_create_account_via_api(app, client, service_user, login):
     data = {'roles': [{'name': 'access_on_verify'}]}
     response = client.put(
         '/api/user/{user_id}/roles'.format(user_id=user_id),
-        data=json.dumps(data),
-        content_type='application/json')
+        json={})
     assert response.status_code == 200
 
 
