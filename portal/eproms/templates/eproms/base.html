@@ -59,7 +59,27 @@
             {%- endblock -%}
           </div> {# <!-- <div id="mainDiv"> --> #}
         </div> {# <!-- <div id="mainHolder"> --> #}
-
+        <div class="modal fade" tabindex="-1" role="dialog" id="urlAuthenticatedModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}"><span aria-hidden="true">&times;</span></button>
+                    <h2 class="modal-title">{{ _("Limited Access") }}</h2>
+                </div>
+                <div class="modal-body">
+                    <p>{{_("If you want to access that, you'll need to log in with your username and password.")}}</p>
+                    <br/>
+                    <div class="buttons-container text-center">
+                        <a type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Continue with limited access") }}</a>
+                        <a id="btnUrlAuthenticatedContinue" type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Log in to see more") }}</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+                </div>
+                </div>
+            </div>
+        </div>
         {# One-time system messages called Flash messages #}
         {% block flash_messages %}
             {%- with messages = get_flashed_messages(with_categories=true) -%}

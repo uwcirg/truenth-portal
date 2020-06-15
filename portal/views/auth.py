@@ -641,6 +641,24 @@ def login_as(user_id, auth_method='staff_authenticated'):
     return next_after_login()
 
 
+@auth.route('/promote-encounter')
+@oauth.require_oauth()
+def promote_encounter():
+    """View to assist in promotion of weak-auth encounter to stronger one.
+
+    For a user to be able to ``log in`` and thus gain a stronger
+    authenticated encounter, they must first be logged out of the weak one.
+
+    This view manages the logout and redirects to login, preserving ``next``
+    for the login page.
+
+    """
+    logout(
+        prevent_redirect=True,
+        reason="logout to promote encounter authentication")
+    return redirect(url_for('user.login', next=request.args.get('next')))
+
+
 @auth.route('/logout')
 def logout(prevent_redirect=False, reason=None):
     """logout view function

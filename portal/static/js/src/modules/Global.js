@@ -79,6 +79,12 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         return cachedCurrentUserId;
     },
     "checkURLAuthenticated": function() {
+        $("#urlAuthenticatedModal").modal({
+            "show":false,
+            "backdrop": "static",
+            "focus": true,
+            "keyboard": false
+        });
         this.getCurrentUser(
             function(userId) {
                 if (!userId) {
@@ -97,8 +103,14 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                         const loginPath = "/user/sign-in";
                         //links needing to redirect to login page 
                         $(".portal-weak-auth-disabled").each(function() {
-                            let originalHref = $(this).attr("href");
-                            $(this).attr("href", `${loginPath}?next=${originalHref}`);
+                            $(this).on("click", function(e) {
+                                e.preventDefault();
+                                let originalHref = $(this).attr("href");
+                                let redirectHref = `/promote-encounter?next=${originalHref}`;
+                                $(this).attr("href", redirectHref);
+                                $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
+                                $("#urlAuthenticatedModal").modal("show");
+                            });
                         });
                         //elements needing to be hidden
                         $(".portal-weak-auth-hide").each(function() {
