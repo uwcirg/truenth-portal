@@ -15,6 +15,7 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
+from urllib.parse import quote
 import jsonschema
 import requests
 
@@ -1622,7 +1623,7 @@ def present_needed():
     encounter = current_user().current_encounter
     if encounter.auth_method == "url_authenticated":
         current_app.logger.debug('redirect to confirm identity')
-        return redirect('/confirm-identity?redirect_url={}'.format(url))
+        return redirect('/confirm-identity?redirect_url={}'.format(quote(url)))
 
     current_app.logger.debug('present assessment url, redirecting to: %s', url)
     return redirect(url, code=302)
