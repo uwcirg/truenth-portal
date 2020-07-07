@@ -24,6 +24,9 @@ export default {
             self.initApp();
         });
     },
+    /*
+     * methods available to the application
+     */
     methods: {
         isLoading: function() {
             return this.loading;
