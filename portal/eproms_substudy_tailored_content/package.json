@@ -1,7 +1,7 @@
 {
-  "name": "substudy_domains_application",
+  "name": "substudy_tailored_content_application",
   "version": "0.0.1",
-  "description": "Substudy Domains Application",
+  "description": "Substudy Tailored Content Application",
   "author": "CIRG",
   "license": "BSD-Source-Code",
   "scripts": {

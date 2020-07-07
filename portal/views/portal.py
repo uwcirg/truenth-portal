@@ -212,12 +212,12 @@ class ShortcutAliasForm(FlaskForm):
                 raise validators.ValidationError("Code not found")
 
 
-@portal.route('/substudy-domains')
+@portal.route('/substudy-tailored-content')
 @oauth.require_oauth()
-def substudy_domains():
+def substudy_tailored_content():
     return send_from_directory(
         safe_join(current_app.static_folder, 'templates'),
-        'substudy_domains.html',
+        'substudy_tailored_content.html',
         cache_timeout=-1
     )
 

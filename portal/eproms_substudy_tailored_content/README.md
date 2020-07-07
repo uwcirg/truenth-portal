@@ -1,4 +1,4 @@
-# Eproms Substudy Domains Interface
+# Eproms Substudy Tailored Content Interface
 
 ## To build and run in development:
 1. Install [Node.js](https://nodejs.org/en/download/)

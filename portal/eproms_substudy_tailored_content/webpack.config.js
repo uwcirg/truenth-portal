@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const FileManagerPlugin = require('filemanager-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const vendorPath = './src/vendors';
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
@@ -95,9 +96,9 @@ module.exports = function(_env, argv) {
       new VueLoaderPlugin(),
       //new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
-        title: "Substudy Domains",
+        title: "Substudy Tailored Content",
         template: path.join(__dirname, '/src/app.html'),
-        filename: path.join(__dirname, `${templateDirectory}/substudy_domains.html`),
+        filename: path.join(__dirname, `${templateDirectory}/substudy_tailored_content.html`),
         favicon: path.join(__dirname, '/src/assets/favicon.ico'),
       }),
       new webpack.ProvidePlugin(
@@ -114,6 +115,13 @@ module.exports = function(_env, argv) {
         "process.env.NODE_ENV": JSON.stringify(
           isProduction ? "production" : "development"
         )
+      }),
+      new FileManagerPlugin({
+        onStart: {
+          delete: [
+            path.join(__dirname, '/dist')
+          ]
+        }
       })
     ],
     optimization: {
