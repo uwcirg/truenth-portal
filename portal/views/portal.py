@@ -211,6 +211,7 @@ class ShortcutAliasForm(FlaskForm):
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
+
 @portal.route('/substudy-domains')
 @oauth.require_oauth()
 def substudy_domains():
