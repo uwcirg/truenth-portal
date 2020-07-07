@@ -11,7 +11,6 @@
 3. Run `npm run watch`
 
 ## To build and deploy using a standard web server
-
 1. Install [Node.js](https://nodejs.org/en/download/)
 2. Install dependencies by executing `npm install`
 3. Run `npm run build` to compile the code to the `dist` folder

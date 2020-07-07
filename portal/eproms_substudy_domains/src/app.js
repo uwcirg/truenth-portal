@@ -7,5 +7,3 @@ var SubStudyAppObj = window.SubStudyAppObj = new Vue({ /*global Vue $ */
     render: h => h(App)
 }).$mount("#app");
 
-
-
