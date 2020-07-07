@@ -1,3 +1,5 @@
+<!-- portal wrapper banner -->
+<!-- we need this right? -->
 <template>
     <header :id="sectionId" ref="header" v-bind:class="{active : loaded}">
         <div class="content" v-html="content"></div>
