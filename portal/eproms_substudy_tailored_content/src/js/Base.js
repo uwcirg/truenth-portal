@@ -1,4 +1,4 @@
-import {sendRequest, initI18next} from "./Utility";
+import {sendRequest} from "./Utility";
 export default {
     mounted: function() {
         var self = this;
