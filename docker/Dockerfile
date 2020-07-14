@@ -34,7 +34,7 @@ WORKDIR "$HOME/portal"
 COPY . .
 
 # Copy substudy app files built in substudy_app stage
-COPY --from=substudy_app /tmp/substudy_app/dist /portal/portal/static
+COPY --from=substudy_app /tmp/substudy_app/dist/* /portal/portal/static/
 
 # Install build dependencies
 RUN \
