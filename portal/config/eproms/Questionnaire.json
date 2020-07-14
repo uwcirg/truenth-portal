@@ -6951,6 +6951,826 @@
         }
       ],
       "resourceType": "Questionnaire"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "ironman_ss"
+        }
+      ],
+      "status": "draft",
+      "resourceType": "Questionnaire",
+      "item": [
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.1",
+          "text": "In the last 7 days, how OFTEN did you have pain?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.1.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.1.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.1.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.1.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.1.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.2",
+          "text": "In the last 7 days, what was the SEVERITY of your PAIN at its WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.2.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.2.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.2.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.2.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.2.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.3",
+          "text": "In the last 7 days, how much did PAIN INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.3.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.3.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.3.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.3.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.3.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.4",
+          "text": "In the last 7 days, how OFTEN did you have ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS)?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.4.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.4.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.4.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.4.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.4.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.5",
+          "text": "In the last 7 days, what was the SEVERITY of your ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) at their WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.5.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.5.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.5.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.5.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.5.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.6",
+          "text": "In the last 7 days, how much did ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.6.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.6.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.6.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.6.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.6.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.7",
+          "text": "In the last 7 days, what was the SEVERITY of your INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) at its worst?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.7.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.7.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.7.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.7.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.7.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.8",
+          "text": "In the last 7 days, how much did INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.8.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.8.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.8.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.8.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.8.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.9",
+          "text": "In the last 7 days, what was the SEVERITY of your FATIGUE, TIREDNESS, OR LACK OF ENERGY at its WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.9.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.9.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.9.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.9.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.9.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.10",
+          "text": "In the last 7 days, how much did FATIGUE, TIREDNESS, OR LACK OF ENERGY INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.10.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.10.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.10.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.10.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.10.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.11",
+          "text": "In the last 7 days, how OFTEN did you feel ANXIETY?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.11.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.11.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.11.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.11.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.11.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.12",
+          "text": "In the last 7 days, what was the SEVERITY of your ANXIETY at its WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.12.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.12.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.12.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.12.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.12.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.13",
+          "text": "In the last 7 days, how much did ANXIETY INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.13.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.13.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.13.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.13.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.13.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.14",
+          "text": "In the last 7 days, how OFTEN did you FEEL THAT NOTHING COULD CHEER YOU UP?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.14.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.14.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.14.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.14.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.14.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.15",
+          "text": "In the last 7 days, what was the SEVERITY of your FEELINGS THAT NOTHING COULD CHEER YOU UP at THEIR WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.15.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.15.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.15.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.15.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.15.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.16",
+          "text": "In the last 7 days, how much did THE FEELING THAT NOTHING COULD CHEER YOU UP INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.16.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.16.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.16.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.16.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.16.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.17",
+          "text": "In the last 7 days, how OFTEN did you have SAD OR UNHAPPY FEELINGS?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.17.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.17.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.17.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.17.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.17.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.18",
+          "text": "In the last 7 days, what was the SEVERITY of your SAD OR UNHAPPY FEELINGS at their WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.18.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.18.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.18.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.18.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.18.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.19",
+          "text": "In the last 7 days, how much did SAD OR UNHAPPY FEELINGS INTERFERE with your usual or daily activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.19.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little bit",
+                "code": "ironman_ss.19.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Somewhat",
+                "code": "ironman_ss.19.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.19.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.19.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.20",
+          "text": "In the last 7 days, how OFTEN did you have HOT FLASHES/FLUSHES?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Never",
+                "code": "ironman_ss.20.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Rarely",
+                "code": "ironman_ss.20.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Occasionally",
+                "code": "ironman_ss.20.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Frequently",
+                "code": "ironman_ss.20.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Almost constantly",
+                "code": "ironman_ss.20.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.21",
+          "text": "In the last 7 days, what was the SEVERITY of your HOT FLASHES/FLUSHES at their WORST?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "None",
+                "code": "ironman_ss.21.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Mild",
+                "code": "ironman_ss.21.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Moderate",
+                "code": "ironman_ss.21.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Severe",
+                "code": "ironman_ss.21.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very severe",
+                "code": "ironman_ss.21.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss.22",
+          "text": "During the past week: Has your physical condition or medical treatment interfered with your social activities?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Not at all",
+                "code": "ironman_ss.22.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "A little",
+                "code": "ironman_ss.22.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Quite a bit",
+                "code": "ironman_ss.22.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very much",
+                "code": "ironman_ss.22.4"
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "id": "SitePersistence v0.2",
