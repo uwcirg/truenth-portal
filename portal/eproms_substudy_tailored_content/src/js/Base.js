@@ -134,7 +134,8 @@ export default {
             this.currentView = viewId;
         },
         isCurrentView: function(viewId) {
-            return !this.hasError() && !this.isLoading() && this.isMatchView(viewId);
+            //return !this.hasError() && !this.isLoading() && this.isMatchView(viewId);
+            return !this.isLoading() && this.isMatchView(viewId);
         },
         isMatchView: function(viewId) {
             return this.currentView === viewId;
@@ -148,24 +149,42 @@ export default {
             );
         },
         getSelectedDomain: function() {
-           return this.activeDomain;
+           //return this.activeDomain;
+           return "diet";
         },
         getSearchURL: function() {
             //TODO use current domain name as tag
             //pass in locale info
-            return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
+            //return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
             //CORS issue with querying LR directly, TODO: uncomment this when resolves
-            //return  `${this.getLRBaseURL()}//c/portal/truenth/asset/query?content=true&anyTags=exercise?languageId=${this.getLocale}`;
+            return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
         },
         getIntroContent: function() {
             if (this.introContent) {
                 //already populated
                 return this.introContent;
             }
+            // $.ajax({
+            //     url : this.getSearchURL(),
+            //     crossDomain : true,
+            //     cache : false,   //if needed..
+            //     type : 'GET',    //Default..
+            //     retryCount : 0,
+            //     retryLimit : 3,
+            //     xhrFields : {
+            //         withCredentials : true //if needed..
+            //     }}).done(function(data) {
+            //         console.log("data? ", data)
+            //     }).fail(function(e) {
+            //         console.log("failed ")
+            //     });
             sendRequest(this.getSearchURL()).then(response => {
-                this.setIntroContent(response);
+                console.log("response? ", JSON.parse(response));
+                let content = JSON.parse(response);
+                this.setIntroContent(content["results"][0]["content"]);
                 this.setCurrentView("intro");
             }).catch(e => {
+                console.log("failed? ", e)
                 this.setErrorMessage(`Error occurred retrieving content: ${e.responseText}`);
             });
         },

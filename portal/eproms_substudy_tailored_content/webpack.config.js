@@ -6,8 +6,9 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const vendorPath = './src/vendors';
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+
 module.exports = function(_env, argv) {
-  const isProduction = argv.mode === "production";
+  const isProduction = argv && argv.mode === "production";
   const isDevelopment = !isProduction;
   /*
    * output to static file for ease of development
@@ -27,7 +28,9 @@ module.exports = function(_env, argv) {
        * create a new hash for each new build
        */
       filename: `app.bundle.[name]${isProduction?'-[hash:6]':''}.js`,
-      publicPath: "/static/bundle/"
+      publicPath: "/static/bundle/",
+      devtoolModuleFilenameTemplate: '[absolute-resource-path]',
+      devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
     },
     resolve: {
         extensions: ['.js', '.vue'],
@@ -35,6 +38,7 @@ module.exports = function(_env, argv) {
           'jquery': path.join(__dirname, '/node_modules/jquery/dist/jquery.min.js')
         }
     },
+    devtool: 'inline-cheap-module-source-map',
     module: {
       rules: [
         {
