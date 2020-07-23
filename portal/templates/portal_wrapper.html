@@ -46,7 +46,7 @@
         <span class="close" title="{{_('dismiss')}}">X</span>
     </div>
 {% endif %}
-{# for url-authenticated user, access profile link requiring that user signs in first #}
+{# for an user that is url-authenticated, accessing the profile link requires that the user signs in first #}
 {% 
     set profile_link = '/profile' if user and user.current_encounter.auth_method != 'url_authenticated' else '/user/sign-in?next=/profile'
 %}
