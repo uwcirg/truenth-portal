@@ -66,15 +66,13 @@ def shallow_org_tree():
     org_1001 = Organization(id=1001, name='1001', partOf_id=101)
 
     already_done = Organization.query.get(101)
-    if already_done:
-        return
+    if not already_done:
+        with SessionScope(db):
+            [db.session.add(org) for org in (org_101, org_102, org_1001)]
+            db.session.commit()
 
-    with SessionScope(db):
-        [db.session.add(org) for org in (org_101, org_102, org_1001)]
-        db.session.commit()
-
-    # As orgs were just added, make sure they're loaded on next OrgTree call
-    OrgTree.invalidate_cache()
+        # As orgs were just added, make sure they're loaded on next OrgTree call
+        OrgTree.invalidate_cache()
 
     yield  # setup complete, teardown follows
 
@@ -113,7 +111,11 @@ def prep_org_w_identifier():
         db.session.add(o)
         db.session.commit()
     o = db.session.merge(o)
-    return o
+    OrgTree().invalidate_cache()
+    yield o
+
+    OrgTree().invalidate_cache()
+
 
 
 def calc_date_params(backdate, setdate):
@@ -314,10 +316,9 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
         db.session.add(consent)
         db.session.commit()
 
-    # Invalidate org tree cache, in case more orgs are added by test
-    OrgTree.invalidate_cache()
+    yield test_user
 
-    return test_user
+    OrgTree.invalidate_cache()
 
 
 @pytest.fixture
@@ -568,7 +569,9 @@ def music_org():
         db.session.add(music_org)
         db.session.commit()
     music_org = db.session.merge(music_org)
-    return music_org
+    yield music_org
+
+    OrgTree.invalidate_cache()
 
 
 @pytest.fixture
