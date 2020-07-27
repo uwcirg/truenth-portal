@@ -451,6 +451,10 @@ class Organization(db.Model):
         agreements = {}
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
+            if not org:
+                raise RuntimeError(
+                    "org_id in OrgTree but not database?! Missing: OrgTree().invalidate_cache()")
+
             # Not all organizations maintain consent agreements
             # include only those with such defined
             try:
