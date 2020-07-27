@@ -227,6 +227,7 @@ class TestTou(TestCase):
         assert UserNotification.query.filter(
             UserNotification.user_id == second_user_id).count() == 0
 
+
 def test_tou_str():
     audit = Audit(
         user_id=TEST_USER_ID, subject_id=TEST_USER_ID,

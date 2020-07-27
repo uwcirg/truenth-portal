@@ -309,7 +309,7 @@ def test_organization_filter(
     bundle = response.json
     assert bundle['resourceType'] == 'Bundle'
 
-    # one organization is music_org 
+    # one organization is music_org
     # other three came from deepen_org_tree
     assert len(bundle['entry']) == 4
 

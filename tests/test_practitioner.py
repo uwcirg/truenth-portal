@@ -63,6 +63,7 @@ def test_practitioner_search(
         '/api/practitioner?system=testsys&value=notvalid')
     assert resp.status_code == 404
 
+
 def test_practitioner_get_id(
         add_practitioner, login, test_user, client, shallow_org_tree):
     pract = add_practitioner(first_name="Indiana", last_name="Jones")
@@ -153,8 +154,7 @@ def test_practitioner_post(
     promote_user(role_name=ROLE.ADMIN.value)
     login()
 
-    resp = client.post('/api/practitioner', data=json.dumps(data),
-                            content_type='application/json')
+    resp = client.post('/api/practitioner', json=data)
     assert resp.status_code == 200
 
     assert Practitioner.query.count() == 1
@@ -187,9 +187,12 @@ def test_practitioner_post(
         ]
     }
 
-    resp = client.post('/api/practitioner', data=json.dumps(data),
-                            content_type='application/json')
+    resp = client.post(
+        '/api/practitioner',
+        data=json.dumps(data),
+        content_type='application/json')
     assert resp.status_code == 409
+
 
 def test_practitioner_put(
         add_practitioner, promote_user, login, client, shallow_org_tree):
@@ -227,9 +230,7 @@ def test_practitioner_put(
     login()
 
     # test update by ID
-    resp = client.put('/api/practitioner/{}'.format(pract_id),
-                           data=json.dumps(data),
-                           content_type='application/json')
+    resp = client.put('/api/practitioner/{}'.format(pract_id), json=data)
     assert resp.status_code == 200
 
     updated = Practitioner.query.get(pract_id)
@@ -282,9 +283,7 @@ def test_practitioner_put(
         ]
     }
 
-    resp = client.put('/api/practitioner/{}'.format(pract_id),
-                           data=json.dumps(data),
-                           content_type='application/json')
+    resp = client.put('/api/practitioner/{}'.format(pract_id), json=data)
     assert resp.status_code == 409
 
     # test updating with same external identifier

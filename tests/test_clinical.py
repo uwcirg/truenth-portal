@@ -312,7 +312,7 @@ def test_clinical_biopsy_unknown_direct(test_user_login, client):
         '/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
         content_type='application/json',
         data=json.dumps({'value': True, 'status': 'unknown'}))
- 
+
     # Access the direct biopsy value
     response = client.get('/api/patient/%s/clinical/biopsy'
                           % TEST_USER_ID)

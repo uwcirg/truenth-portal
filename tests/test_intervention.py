@@ -48,7 +48,8 @@ def patient_user(test_user, promote_user):
     return test_user
 
 
-def test_intervention_wrong_service_user(service_user, login, client, deepen_org_tree):
+def test_intervention_wrong_service_user(
+        service_user, login, client, deepen_org_tree):
     service_user = db.session.merge(service_user)
     login(user_id=service_user.id)
 
@@ -364,6 +365,7 @@ def test_diag_changed_stategy(test_user, login, deepen_org_tree):
     assert not cp.display_for_user(user).access
     assert not cp.quick_access_check(user)
 
+
 def test_no_tx(initialize_static, test_user, add_procedure):
     """Test strategy for not starting treatment"""
     # Add access strategies to the care plan intervention
@@ -520,6 +522,7 @@ def test_not_in_role_or_sr(initialize_static, test_user):
     assert not sm.display_for_user(user).access
     assert not sm.quick_access_check(user)
 
+
 def test_in_role(initialize_static, test_user):
     user = db.session.merge(test_user)
     sm = INTERVENTION.SELF_MANAGEMENT
@@ -671,6 +674,7 @@ def test_strat_from_json(initialize_static):
     acc_strat = AccessStrategy.from_json(d)
     assert d['name'] == acc_strat.name
     assert d['function_details'] == json.loads(acc_strat.function_details)
+
 
 def test_strat_view(admin_user, login, client, deepen_org_tree):
     """Test strategy view functions"""

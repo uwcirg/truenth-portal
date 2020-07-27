@@ -16,8 +16,7 @@ def testGET(test_user, login, client):
     test_user = db.session.merge(test_user)
     expected = len(test_user.identifiers)
     login()
-    response = client.get('/api/user/{}/identifier'
-                               .format(TEST_USER_ID))
+    response = client.get('/api/user/{}/identifier'.format(TEST_USER_ID))
     assert response.status_code == 200
     assert len(response.json['identifier']) == expected
 
