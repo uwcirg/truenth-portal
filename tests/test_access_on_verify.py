@@ -29,7 +29,7 @@ def test_create_account_via_api(app, client, service_user, login):
     data = {'roles': [{'name': 'access_on_verify'}]}
     response = client.put(
         '/api/user/{user_id}/roles'.format(user_id=user_id),
-        json={})
+        json=data)
     assert response.status_code == 200
 
 
