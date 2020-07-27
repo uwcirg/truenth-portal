@@ -46,6 +46,10 @@
         <span class="close" title="{{_('dismiss')}}">X</span>
     </div>
 {% endif %}
+{# for an user that is url-authenticated, accessing the profile link requires that the user signs in first #}
+{% 
+    set profile_link = '/profile' if user and user.current_encounter.auth_method != 'url_authenticated' else '/user/sign-in?next=/profile'
+%}
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
@@ -64,7 +68,7 @@
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
-                            <li><a class="portal-weak-auth-disabled" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
+                            <li><a href="{{PORTAL}}{{profile_link}}">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                             {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
@@ -122,7 +126,7 @@
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
-                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a class="portal-weak-auth-disabled" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
+                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}{{profile_link}}">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
