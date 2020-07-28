@@ -16,7 +16,7 @@ from functools import wraps
 # ReCaptcha is used for form verification
 # Flask-Session provides server side sessions
 # Flask-User
-from flask import abort, current_app, request
+from flask import abort, request
 from flask_babel import Babel
 from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
