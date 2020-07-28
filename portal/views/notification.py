@@ -76,7 +76,7 @@ def get_user_notification(user_id):
       - ServiceToken: []
 
     """
-    user = get_user(user_id, 'edit')
+    user = get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
     notifs = [notif.as_json() for notif in user.notifications]
 
     return jsonify(notifications=notifs)
