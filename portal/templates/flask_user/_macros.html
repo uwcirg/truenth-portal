@@ -110,3 +110,45 @@
     </div>
     <script src="{{ url_for('static', filename='js/flask_user/PasswordPopover.js') }}"></script>
 {%- endmacro %}
+{% macro urlAuthenticatedLoginModal() -%}
+    <div class="modal fade" tabindex="-1" role="dialog" id="urlAuthenticatedModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ _('Close') }}"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title">{{ _("Limited Access") }}</h2>
+            </div>
+            <div class="modal-body">
+                <p>{{_("To access this information, you will need to log in with your username and password.")}}</p>
+                <br/>
+                <div class="buttons-container text-center">
+                    <a type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Continue with limited access") }}</a>
+                    <a id="btnUrlAuthenticatedContinue" type="button" class="btn btn-default btn-tnth-primary btn-lg" >{{ _("Log in to see more") }}</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function() {
+            var d=document, g=d.createElement("script"), s=d.getElementsByTagName("head")[0];
+            g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/flask_user/urlAuthenticatedModal.js") }}';
+            //inserting script in HEAD element
+            s.appendChild(g);
+            function initURLAuthenticatedModal() {
+                setTimeout(function() {
+                    (new URLAuthenticatedModalObj()).init();
+                }, 150);
+            }
+            g.onreadystatechange= function () { //IE
+                if (this.readyState === "complete") {
+                    initURLAuthenticatedModal();
+                }
+            }
+            g.onload = initURLAuthenticatedModal; //other browsers
+        })();
+    </script>
+{%- endmacro %}
