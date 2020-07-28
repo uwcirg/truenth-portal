@@ -30,7 +30,7 @@ def login_user(user, auth_method=None):
             "No current encounter found for user {}, initiate as {}".format(
                 user.id, auth_method))
         initiate_encounter(user, auth_method)
-    if auth_method and active_encounter.auth_method != auth_method:
+    elif auth_method and active_encounter.auth_method != auth_method:
         current_app.logger.debug(
             "Active encounter has different auth_method: {}; "
             "Starting new with {}".format(
