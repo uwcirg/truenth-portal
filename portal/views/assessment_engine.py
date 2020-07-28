@@ -1491,7 +1491,8 @@ def assessment_add(patient_id):
             message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
-    patient = get_user(patient_id, 'edit')
+    patient = get_user(
+        patient_id, 'edit', allow_on_url_authenticated_encounters=True)
 
     response = {
         'ok': False,
