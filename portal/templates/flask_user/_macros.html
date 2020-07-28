@@ -110,7 +110,7 @@
     </div>
     <script src="{{ url_for('static', filename='js/flask_user/PasswordPopover.js') }}"></script>
 {%- endmacro %}
-{% macro urlAuthenticatedLoginModal() -%}
+{% macro urlAuthenticatedLoginModal(PORTAL_BASE_URL="") -%}
     <!-- reusable component login modal that prompts user to login when accessing protected link-->
     <div class="modal fade" tabindex="-1" role="dialog" id="urlAuthenticatedModal">
         <div class="modal-dialog">
@@ -136,7 +136,7 @@
     <script type="text/javascript">
         (function() {
             var d=document, g=d.createElement("script"), s=d.getElementsByTagName("head")[0];
-            g.type="text/javascript"; g.async=true; g.defer=true; g.src='{{PORTAL}}{{ url_for("static", filename="js/flask_user/urlAuthenticatedModal.js") }}';
+            g.type="text/javascript"; g.src='{{PORTAL_BASE_URL}}{{ url_for("static", filename="js/flask_user/urlAuthenticatedModal.js") }}';
             //inserting script in HEAD element, NOTE, this will prevent browser from wiping out SCRIPT tag that includes a static file
             s.appendChild(g);
             function initURLAuthenticatedModal() {

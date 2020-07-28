@@ -1,6 +1,4 @@
 var URLAuthenticatedModalObj = function() {
-    this.URL_AUTH_METHOD_IDENTIFIER = "url_authenticated";
-    this.PROMOTE_ENCOUNTER_URL = "/promote-encounter";
     /*
      * initialized modal
      */
@@ -19,7 +17,8 @@ var URLAuthenticatedModalObj = function() {
         if (!data || !data.id) {
             return;
         }
-        var self = this;
+        var URL_AUTH_METHOD_IDENTIFIER = "url_authenticated";
+        var PROMOTE_ENCOUNTER_URL = "/promote-encounter";
         //call to check if the current user is authenticated via url authenticated method
         $.ajax({
             type: "GET",
@@ -28,13 +27,13 @@ var URLAuthenticatedModalObj = function() {
             if (!data || !data.auth_method) {
                 return;
             }
-            if (String(data.auth_method).toLowerCase() === self.URL_AUTH_METHOD_IDENTIFIER) {
+            if (String(data.auth_method).toLowerCase() === URL_AUTH_METHOD_IDENTIFIER) {
                 //links needing to redirect to login page 
                 $(".portal-weak-auth-disabled").each(function() {
                     $(this).on("click", function(e) {
                         e.preventDefault();
                         var originalHref = $(this).attr("href");
-                        var redirectHref = self.PROMOTE_ENCOUNTER_URL+"?next="+originalHref;
+                        var redirectHref = PROMOTE_ENCOUNTER_URL+"?next="+originalHref;
                         $(this).attr("href", redirectHref);
                         $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
                         $("#urlAuthenticatedModal").modal("show");
