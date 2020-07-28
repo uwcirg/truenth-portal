@@ -96,7 +96,7 @@ def me():
 
     """
     user = current_user()
-    if user.current_encounter.auth_method == 'url_authenticated':
+    if user.current_encounter().auth_method == 'url_authenticated':
         return jsonify(id=user.id)
     return jsonify(
         id=user.id, username=user.username, email=user.email)
@@ -1023,7 +1023,7 @@ def current_encounter(user_id):
     user = current_user()
     if user_id != user.id:
         abort(400, "Only current_user's encounter accessible")
-    return jsonify(user.current_encounter.as_fhir())
+    return jsonify(user.current_encounter().as_fhir())
 
 
 @user_api.route('/user/<int:user_id>/groups')

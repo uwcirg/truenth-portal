@@ -426,8 +426,7 @@ class User(db.Model, UserMixin):
             name = self.username
         return escape(name) if name else None
 
-    @property
-    def current_encounter(self):
+    def current_encounter(self, generate_failsafe_if_missing=True):
         """Shortcut to current encounter, generate failsafe if not found
 
         An encounter is typically bound to the logged in user, not
@@ -437,6 +436,8 @@ class User(db.Model, UserMixin):
             Encounter.status == 'in-progress').order_by(
             Encounter.start_time.desc())
         if query.count() == 0:
+            if not generate_failsafe_if_missing:
+                return None
             current_app.logger.error(
                 "Failed to locate in-progress encounter for {}"
                 "; generate failsafe".format(self))
@@ -1016,7 +1017,7 @@ class User(db.Model, UserMixin):
         # The audit defines the acting user, to which the current
         # encounter is attached.
         acting_user = User.query.get(audit.user_id)
-        encounter = acting_user.current_encounter
+        encounter = acting_user.current_encounter()
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
@@ -1657,9 +1658,9 @@ class User(db.Model, UserMixin):
         if (
                 not allow_on_url_authenticated_encounters and
                 current_app.config.get('ENABLE_URL_AUTHENTICATED') and
-                self.current_encounter.auth_method == 'url_authenticated'):
+                self.current_encounter().auth_method == 'url_authenticated'):
             abort(401, "inadequate auth_method: {}".format(
-                self.current_encounter.auth_method))
+                self.current_encounter().auth_method))
 
         if self.id == other_id:
             return True

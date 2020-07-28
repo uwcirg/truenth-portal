@@ -1540,7 +1540,7 @@ def assessment_add(patient_id):
         'valid': True,
     })
 
-    encounter = current_user().current_encounter
+    encounter = current_user().current_encounter()
     if 'entry_method' in request.args:
         encounter_type = getattr(
             EC, request.args['entry_method'].upper()).codings[0]
@@ -1621,8 +1621,7 @@ def present_needed():
 
     url = url_for('.present_assessment', **args)
 
-    encounter = current_user().current_encounter
-    if encounter.auth_method == "url_authenticated":
+    if current_user().current_encounter().auth_method == "url_authenticated":
         current_app.logger.debug('redirect to confirm identity')
         return redirect('/confirm-identity?redirect_url={}'.format(quote(url)))
 
