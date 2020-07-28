@@ -97,7 +97,8 @@ def roles(user_id):
       - ServiceToken: []
 
     """
-    user = get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
+    user = get_user(
+        user_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(roles=[r.as_json() for r in user.roles])
 
 

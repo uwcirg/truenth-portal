@@ -70,7 +70,8 @@ def demographics(patient_id):
     """
     if patient_id is None:
         patient_id = current_user().id
-    patient = get_user(patient_id, 'view')
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(patient.as_fhir(include_empties=False))
 
 

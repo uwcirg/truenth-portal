@@ -23,8 +23,9 @@ def login_user(user, auth_method=None):
     if not _call_or_get(flask_login_current_user.is_authenticated):
         flask_user_login(user)
 
-    # Reuse active encounter if available, and a new auth_method wasn't provided
-    active_encounter = user.current_encounter(generate_failsafe_if_missing=False)
+    # Reuse active encounter if available
+    active_encounter = user.current_encounter(
+        generate_failsafe_if_missing=False)
     if not active_encounter:
         current_app.logger.debug(
             "No current encounter found for user {}, initiate as {}".format(

@@ -482,7 +482,8 @@ def user_organizations(user_id):
 
     """
     # Return user's current organizations
-    user = get_user(user_id, 'view')
+    user = get_user(
+        user_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(organizations=[
         Reference.organization(org.id).as_fhir()
         for org in user.organizations])

@@ -56,7 +56,8 @@ def procedure(patient_id):
       - ServiceToken: []
 
     """
-    patient = get_user(patient_id, 'view')
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 

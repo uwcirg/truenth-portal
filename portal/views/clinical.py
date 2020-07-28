@@ -360,7 +360,8 @@ def clinical(patient_id):
       - ServiceToken: []
 
     """
-    patient = get_user(patient_id, 'view')
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     patch_dstu2 = request.args.get('patch_dstu2', False)
     return jsonify(patient.clinical_history(
         requestURL=request.url, patch_dstu2=patch_dstu2))

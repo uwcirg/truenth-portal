@@ -107,7 +107,7 @@ def user_intervention_get(intervention_name, user_id):
     intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
         abort(404, 'no such intervention {}'.format(intervention_name))
-    get_user(user_id, 'edit')
+    get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
 
     ui = UserIntervention.query.filter_by(
         user_id=user_id, intervention_id=intervention.id).first()
