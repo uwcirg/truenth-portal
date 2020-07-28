@@ -49,9 +49,9 @@ class TestEncounter(TestCase):
     def test_encounter_after_logout(self):
         self.login()
         time.sleep(0.1)
-        self.login()  # generate a second encounter - should logout the first
+        self.login()  # generate a second encounter - should reuse the first
         self.client.get('/logout', follow_redirects=True)
-        assert len(self.test_user.encounters) > 1
+        assert len(self.test_user.encounters) == 1
         assert all(e.status == 'finished' for e in self.test_user.encounters)
         # as we generate failsafe on missing, confirm that's the type returned
         assert self.test_user.current_encounter().auth_method == 'failsafe'
