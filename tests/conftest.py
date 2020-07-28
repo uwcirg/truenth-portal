@@ -195,7 +195,6 @@ def initialized_db(app):
     db.session.remove()
     db.engine.dispose()
     db.drop_all()
-    db.create_all()
 
 
 @pytest.fixture(scope='session')
