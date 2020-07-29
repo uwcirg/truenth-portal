@@ -943,7 +943,7 @@ def delete_user_consents(user_id):
     return jsonify(message="ok")
 
 
-@user_api.route('/user/<int:user_id>/encounter', methods=('GET', 'OPTIONS'))
+@user_api.route('/user/<int:user_id>/encounter', methods=('GET',))
 @crossdomain()
 @oauth.require_oauth()
 def current_encounter(user_id):
