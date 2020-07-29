@@ -28,14 +28,13 @@ def login_user(user, auth_method=None):
         generate_failsafe_if_missing=False)
     if not active_encounter:
         current_app.logger.debug(
-            "No current encounter found for user {}, initiate as {}".format(
-                user.id, auth_method))
+            "No current encounter found for user %d, initiate as %s", user.id,
+            auth_method)
         initiate_encounter(user, auth_method)
     elif auth_method and active_encounter.auth_method != auth_method:
         current_app.logger.debug(
-            "Active encounter has different auth_method: {}; "
-            "Starting new with {}".format(
-                active_encounter.auth_method, auth_method))
+            "Active encounter has different auth_method: %s; "
+            "Starting new with %s", active_encounter.auth_method, auth_method)
         initiate_encounter(user, auth_method)
 
     # remove session var used to capture locale_code prior to login, now
