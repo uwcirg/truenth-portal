@@ -77,6 +77,11 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
  */
 URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback = callback || function() {};
+    var presetUserId = $("#"+this.MODAL_ELEMENT_IDENTIFIER).attr("data-user-id");
+    if (presetUserId) {
+        callback({"id": presetUserId});
+        return;
+    }
     $.ajax({
         type: "GET",
         url: this.getPortalBaseURL() + "/api/me"

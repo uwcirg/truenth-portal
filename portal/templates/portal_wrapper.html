@@ -154,7 +154,7 @@
     The modal will be triggered when user who is URL-authenticated attempts to access a protected link, e.g. profile
     The modal includes content that prompts the user to either login to access the protected link or continue with limited access
 -->
-{% if user and user.current_encounter().auth_method == 'url_authenticated'%}{{urlAuthenticatedLoginModal(PORTAL)}}{% endif %}
+{% if user and user.current_encounter().auth_method == 'url_authenticated'%}{{urlAuthenticatedLoginModal(PORTAL_BASE_URL=PORTAL, user_id=user.id)}}{% endif %}
 <input type="hidden" id="sessionMonitorProps" data-baseurl="{{PORTAL}}" data-crsftoken="{{csrf_token()}}" data-expires-in="{{expires_in}}"/>
 <div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
