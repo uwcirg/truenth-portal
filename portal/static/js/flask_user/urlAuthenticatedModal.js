@@ -77,7 +77,6 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
  */
 URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback = callback || function() {};
-    console.log("PORTAL BASE ? ", this.getPortalBaseURL())
     $.ajax({
         type: "GET",
         url: this.getPortalBaseURL() + "/api/me"
