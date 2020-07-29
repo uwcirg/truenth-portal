@@ -39,6 +39,9 @@ URLAuthenticatedModalObj.prototype.getProvidedAuthMethod = function() {
     return $("#"+this.MODAL_ELEMENT_IDENTIFIER).attr("data-auth-method");
 };
 
+/*
+ * update UI state and attribute, e.g. href, when encounter auth method is url-authenticated
+ */
 URLAuthenticatedModalObj.prototype.setUI = function() {
     var self = this;
     //links needing to redirect to login page
