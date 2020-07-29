@@ -122,7 +122,7 @@ class TestFHIR(TestCase):
             subject_id=TEST_USER_ID,
             status='in-progress',
             authored=datetime.utcnow(),
-            encounter=self.test_user.current_encounter
+            encounter=self.test_user.current_encounter()
         )
         db.session.add(qr)
         db.session.commit()
