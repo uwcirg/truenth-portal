@@ -33,9 +33,44 @@ URLAuthenticatedModalObj.prototype.initURLAuthenticatedModal = function() {
 };
 
 /*
- * set UI element with matching CSS class identifier to trigger the login modal
+ *  get the provided user encounter auth method, usually passed in as a parameter by the caller of module
  */
-URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
+URLAuthenticatedModalObj.prototype.getProvidedAuthMethod = function() {
+    return $("#"+this.MODAL_ELEMENT_IDENTIFIER).attr("data-auth-method");
+};
+
+URLAuthenticatedModalObj.prototype.setUI = function() {
+    var self = this;
+    //links needing to redirect to login page
+    $("body").delegate(".portal-weak-auth-disabled", "click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var originalHref = $(this).attr("href");
+        var redirectHref = self.getPromoteEncounterURL()+"?next="+originalHref;
+        $(this).attr("href", redirectHref);
+        $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
+        $("#"+self.MODAL_ELEMENT_IDENTIFIER).modal("show");
+    })
+    //elements needing to be hidden
+    $(".portal-weak-auth-hide").each(
+        function() {
+            $(this).hide();
+        }
+    );
+}
+
+/*
+ * check user current encounter and set UI element with matching CSS class identifier to trigger the login modal when * needed
+ */
+URLAuthenticatedModalObj.prototype.handleURLAuthenticatedUI = function() {
+    var providedAuthMethod = this.getProvidedAuthMethod();
+    /*
+     * if user encounter auth method is known then just set state of relevant UI elements
+     */
+    if (String(providedAuthMethod).toLowerCase() === this.URL_AUTH_METHOD_IDENTIFIER) {
+        this.setUI();
+        return;
+    }
     var self = this;
     this.getCurrentUser(function(data) {
         if (!data || !data.id) {
@@ -44,29 +79,13 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
         //call to check if the current user is authenticated via url authenticated method
         $.ajax({
             type: "GET",
-            url: self.getPortalBaseURL() + "/api/user/" + data.id + "/encounter",
-            crossDomain: true
+            url: self.getPortalBaseURL() + "/api/user/" + data.id + "/encounter"
         }).done(function(data) {
             if (!data || !data.auth_method) {
                 return;
             }
             if (String(data.auth_method).toLowerCase() === self.URL_AUTH_METHOD_IDENTIFIER) {
-                //links needing to redirect to login page
-                $("body").delegate(".portal-weak-auth-disabled", "click", function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var originalHref = $(this).attr("href");
-                    var redirectHref = self.getPromoteEncounterURL()+"?next="+originalHref;
-                    $(this).attr("href", redirectHref);
-                    $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
-                    $("#"+self.MODAL_ELEMENT_IDENTIFIER).modal("show");
-                })
-                //elements needing to be hidden
-                $(".portal-weak-auth-hide").each(
-                    function() {
-                        $(this).hide();
-                    }
-                );
+                self.setUI();
             }
         });
     });
@@ -78,15 +97,9 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
  */
 URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback = callback || function() {};
-    var presetUserId = $("#"+this.MODAL_ELEMENT_IDENTIFIER).attr("data-user-id");
-    if (presetUserId) {
-        callback({"id": presetUserId});
-        return;
-    }
     $.ajax({
         type: "GET",
-        url: this.getPortalBaseURL() + "/api/me",
-        crossDomain: true
+        url: this.getPortalBaseURL() + "/api/me"
     }).done(function(data) {
         if (!data || !data.id) {
             callback({error: true});
@@ -104,5 +117,5 @@ URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
  */
 URLAuthenticatedModalObj.prototype.init = function() {
     this.initURLAuthenticatedModal();
-    this.setURLAuthenticatedUI();
+    this.handleURLAuthenticatedUI();
 };
