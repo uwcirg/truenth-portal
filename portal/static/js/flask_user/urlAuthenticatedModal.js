@@ -5,6 +5,7 @@ function URLAuthenticatedModalObj() {
     this.URL_AUTH_METHOD_IDENTIFIER = "url_authenticated";
     this.PROMOTE_ENCOUNTER_URL = "/promote-encounter";
     this.MODAL_ELEMENT_IDENTIFIER = "urlAuthenticatedModal";
+    this.PORTAL_BASE_URL = window.location.protocol + "//" + window.location.host;
 };
 
 /*
@@ -31,7 +32,7 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
         //call to check if the current user is authenticated via url authenticated method
         $.ajax({
             type: "GET",
-            url: "/api/user/" + data.id + "/encounter"
+            url: this.PORTAL_BASE_URL + "/api/user/" + data.id + "/encounter"
         }).done(function(data) {
             if (!data || !data.auth_method) {
                 return;
@@ -67,7 +68,7 @@ URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback.bind(this);
     $.ajax({
         type: "GET",
-        url: "/api/me"
+        url: this.PORTAL_BASE_URL + "/api/me"
     }).done(function(data) {
         if (!data || !data.id) {
             callback({error: true});
