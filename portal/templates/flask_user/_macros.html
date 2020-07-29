@@ -112,7 +112,7 @@
 {%- endmacro %}
 {% macro urlAuthenticatedLoginModal(PORTAL_BASE_URL="") -%}
     <!-- reusable login modal component that prompts user to login when accessing protected link-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="urlAuthenticatedModal">
+    <div class="modal fade" tabindex="-1" role="dialog" id="urlAuthenticatedModal" data-ref-url="{{PORTAL_BASE_URL}}">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">

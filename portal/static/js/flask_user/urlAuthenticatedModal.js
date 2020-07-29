@@ -3,10 +3,22 @@
  */
 function URLAuthenticatedModalObj() {
     this.URL_AUTH_METHOD_IDENTIFIER = "url_authenticated";
-    this.PROMOTE_ENCOUNTER_URL = "/promote-encounter";
     this.MODAL_ELEMENT_IDENTIFIER = "urlAuthenticatedModal";
-    this.PORTAL_BASE_URL = window.location.protocol + "//" + window.location.host;
 };
+
+/*
+ * return Portal base URL, important to affix when calling api from intervention
+ */
+URLAuthenticatedModalObj.prototype.getPortalBaseURL = function() {
+    return $("#"+this.MODAL_ELEMENT_IDENTIFIER).attr("data-ref-url") || (window.location.protocol + "//" + window.location.host);
+}
+
+/*
+ * return URL for promoting encounter
+ */
+URLAuthenticatedModalObj.prototype.getPromoteEncounterURL = function() {
+    return this.getPortalBaseURL() + "/promote-encounter";
+}
 
 /*
  * initialized login prompt modal
@@ -32,7 +44,7 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
         //call to check if the current user is authenticated via url authenticated method
         $.ajax({
             type: "GET",
-            url: self.PORTAL_BASE_URL + "/api/user/" + data.id + "/encounter"
+            url: self.getPortalBaseURL() + "/api/user/" + data.id + "/encounter"
         }).done(function(data) {
             if (!data || !data.auth_method) {
                 return;
@@ -43,7 +55,7 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
                     e.preventDefault();
                     e.stopPropagation();
                     var originalHref = $(this).attr("href");
-                    var redirectHref = self.PROMOTE_ENCOUNTER_URL+"?next="+originalHref;
+                    var redirectHref = self.getPromoteEncounterURL()+"?next="+originalHref;
                     $(this).attr("href", redirectHref);
                     $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
                     $("#"+self.MODAL_ELEMENT_IDENTIFIER).modal("show");
@@ -65,10 +77,10 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
  */
 URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback = callback || function() {};
-    console.log("PORTAL BASE ? ", this.PORTAL_BASE_URL)
+    console.log("PORTAL BASE ? ", this.getPortalBaseURL())
     $.ajax({
         type: "GET",
-        url: this.PORTAL_BASE_URL + "/api/me"
+        url: this.getPortalBaseURL() + "/api/me"
     }).done(function(data) {
         if (!data || !data.id) {
             callback({error: true});
