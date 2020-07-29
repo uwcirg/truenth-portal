@@ -439,7 +439,7 @@ class User(db.Model, UserMixin):
             if not generate_failsafe_if_missing:
                 return None
             current_app.logger.error(
-                "Failed to locate in-progress encounter for %s"
+                "Failed to locate in-progress encounter for %d"
                 "; generate failsafe", self.id)
             return initiate_encounter(self, auth_method='failsafe')
         if query.count() != 1:
