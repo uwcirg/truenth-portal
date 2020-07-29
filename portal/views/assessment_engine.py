@@ -595,7 +595,8 @@ def assessment(patient_id, instrument_id):
       - ServiceToken: []
 
     """
-    patient = get_user(patient_id, 'view')
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     questionnaire_responses = QuestionnaireResponse.query.filter_by(
         subject_id=patient.id).order_by(QuestionnaireResponse.authored.desc())
 
@@ -1490,7 +1491,8 @@ def assessment_add(patient_id):
             message='Requires resourceType of "QuestionnaireResponse"'), 400
 
     # Verify the current user has permission to edit given patient
-    patient = get_user(patient_id, 'edit')
+    patient = get_user(
+        patient_id, 'edit', allow_on_url_authenticated_encounters=True)
 
     response = {
         'ok': False,
@@ -1540,7 +1542,7 @@ def assessment_add(patient_id):
         'valid': True,
     })
 
-    encounter = current_user().current_encounter
+    encounter = current_user().current_encounter()
     if 'entry_method' in request.args:
         encounter_type = getattr(
             EC, request.args['entry_method'].upper()).codings[0]
@@ -1621,8 +1623,7 @@ def present_needed():
 
     url = url_for('.present_assessment', **args)
 
-    encounter = current_user().current_encounter
-    if encounter.auth_method == "url_authenticated":
+    if current_user().current_encounter().auth_method == "url_authenticated":
         current_app.logger.debug('redirect to confirm identity')
         return redirect('/confirm-identity?redirect_url={}'.format(quote(url)))
 

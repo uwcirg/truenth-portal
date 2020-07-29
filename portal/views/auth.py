@@ -388,9 +388,11 @@ def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
 
-    # After a successfull login make sure lockout is reset
+    # After a successful login make sure lockout is reset
     user.reset_lockout()
 
+    current_app.logger.debug(
+        "captured flask_user_login_event, login w/ 'password_authenticated'")
     login_user(user, 'password_authenticated')
 
 

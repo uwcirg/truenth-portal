@@ -172,6 +172,10 @@ def initiate_encounter(user, auth_method):
     if user.has_role(ROLE.SERVICE.value):
         auth_method = 'service_token_authenticated'
 
+    # If the auth_method is unknown, fall back to failsafe
+    if auth_method is None:
+        auth_method = 'failsafe'
+
     # Initiate new as directed
     encounter = Encounter(
         status='in-progress', auth_method=auth_method,

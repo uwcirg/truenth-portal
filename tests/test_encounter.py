@@ -43,23 +43,23 @@ class TestEncounter(TestCase):
     def test_encounter_on_login(self):
         self.login()
         assert len(self.test_user.encounters) == 1
-        assert (self.test_user.current_encounter.auth_method
+        assert (self.test_user.current_encounter().auth_method
                 == 'password_authenticated')
 
     def test_encounter_after_logout(self):
         self.login()
         time.sleep(0.1)
-        self.login()  # generate a second encounter - should logout the first
+        self.login()  # generate a second encounter - should reuse the first
         self.client.get('/logout', follow_redirects=True)
-        assert len(self.test_user.encounters) > 1
+        assert len(self.test_user.encounters) == 1
         assert all(e.status == 'finished' for e in self.test_user.encounters)
         # as we generate failsafe on missing, confirm that's the type returned
-        assert self.test_user.current_encounter.auth_method == 'failsafe'
+        assert self.test_user.current_encounter().auth_method == 'failsafe'
 
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        assert (service_user.current_encounter.auth_method
+        assert (service_user.current_encounter().auth_method
                 == 'service_token_authenticated')
 
     def test_login_as(self):
@@ -72,13 +72,13 @@ class TestEncounter(TestCase):
         self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
-        assert staff_user.current_encounter
+        assert staff_user.current_encounter(generate_failsafe_if_missing=False)
 
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
         response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         assert response.status_code == 302  # sent to next_after_login
-        assert (self.test_user.current_encounter.auth_method
+        assert (self.test_user.current_encounter().auth_method
                 == 'staff_authenticated')
         assert self.test_user._email.startswith(INVITE_PREFIX)
 
@@ -93,15 +93,15 @@ class TestEncounter(TestCase):
         self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
-        assert staff_user.current_encounter
+        assert staff_user.current_encounter(generate_failsafe_if_missing=False)
 
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
         response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         # should return 401 as test user isn't a patient or partner
         assert response.status_code == 401
-        assert self.test_user.current_encounter.auth_method == 'failsafe'
-        assert staff_user.current_encounter
+        assert self.test_user.current_encounter().auth_method == 'failsafe'
+        assert staff_user.current_encounter(generate_failsafe_if_missing=False)
 
     def test_failsafe(self):
         self.bless_with_basics()
@@ -113,13 +113,13 @@ class TestEncounter(TestCase):
         self.promote_user(user=staff_user, role_name=ROLE.STAFF.value)
         staff_user = db.session.merge(staff_user)
         self.login(user_id=staff_user.id)
-        assert staff_user.current_encounter
+        assert staff_user.current_encounter(generate_failsafe_if_missing=False)
 
         # Switch to test_user using login_as, test the encounter
         self.test_user = db.session.merge(self.test_user)
         response = self.client.get('/login-as/{}'.format(TEST_USER_ID))
         assert response.status_code == 302  # sent to next_after_login
-        assert (self.test_user.current_encounter.auth_method
+        assert (self.test_user.current_encounter().auth_method
                 == 'staff_authenticated')
         assert self.test_user._email.startswith(INVITE_PREFIX)
 
@@ -129,6 +129,6 @@ class TestEncounter(TestCase):
         db.session.delete(e)
 
         self.test_user = db.session.merge(self.test_user)
-        encounter = self.test_user.current_encounter
+        encounter = self.test_user.current_encounter()
         assert encounter.auth_method == 'failsafe'
         assert encounter.status == 'in-progress'
