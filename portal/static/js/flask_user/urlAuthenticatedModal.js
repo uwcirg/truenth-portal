@@ -32,7 +32,7 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
         //call to check if the current user is authenticated via url authenticated method
         $.ajax({
             type: "GET",
-            url: this.PORTAL_BASE_URL + "/api/user/" + data.id + "/encounter"
+            url: self.PORTAL_BASE_URL + "/api/user/" + data.id + "/encounter"
         }).done(function(data) {
             if (!data || !data.auth_method) {
                 return;
@@ -65,7 +65,7 @@ URLAuthenticatedModalObj.prototype.setURLAuthenticatedUI = function() {
  */
 URLAuthenticatedModalObj.prototype.getCurrentUser = function(callback) {
     callback = callback || function() {};
-    callback.bind(this);
+    console.log("PORTAL BASE ? ", this.PORTAL_BASE_URL)
     $.ajax({
         type: "GET",
         url: this.PORTAL_BASE_URL + "/api/me"
