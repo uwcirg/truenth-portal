@@ -575,7 +575,8 @@ def test_card_html_update(
     metastatic_org = Organization.query.filter_by(name='metastatic').one()
     test_user = db.session.merge(test_user)
     test_user.organizations.append(metastatic_org)
-    consent = UserConsent.query.filter(UserConsent.user_id == test_user.id).one()
+    consent = UserConsent.query.filter(
+        UserConsent.user_id == test_user.id).one()
     consent.organization_id = metastatic_org.id
     consent.acceptance_date = dt
 
@@ -639,7 +640,8 @@ def test_expired(bless_with_basics, test_user):
     localized_org = Organization.query.filter_by(name='localized').one()
     test_user = db.session.merge(test_user)
     test_user.organizations.append(localized_org)
-    consent = UserConsent.query.filter(UserConsent.user_id == test_user.id).one()
+    consent = UserConsent.query.filter(
+        UserConsent.user_id == test_user.id).one()
     consent.organization_id = localized_org.id
     consent.acceptance_date = backdate
 

@@ -117,7 +117,6 @@ def prep_org_w_identifier():
     OrgTree().invalidate_cache()
 
 
-
 def calc_date_params(backdate, setdate):
     """
     Returns the calculated date given user's request
