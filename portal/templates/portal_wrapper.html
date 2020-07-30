@@ -46,10 +46,7 @@
         <span class="close" title="{{_('dismiss')}}">X</span>
     </div>
 {% endif %}
-{# for an user that is url-authenticated, accessing the profile link requires that the user signs in first #}
-{% 
-    set profile_link = '/profile' if user and user.current_encounter.auth_method != 'url_authenticated' else '/user/sign-in?next=/profile'
-%}
+{% from "flask_user/_macros.html" import urlAuthenticatedLoginModal %}
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
@@ -68,7 +65,7 @@
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
-                            <li><a href="{{PORTAL}}{{profile_link}}">{{ _("My TrueNTH Profile") }}</a></li>
+                            <li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                             {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
@@ -98,7 +95,7 @@
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                             {% if enable_links %}&nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>{% endif %}
                             <img class="profile-img" src="{{movember_profile}}" width="50" height="50" alt="{{_('Profile image')}}"/>
-                            {% if user.current_encounter.auth_method != 'url_authenticated' %}
+                            {% if user.current_encounter().auth_method != 'url_authenticated' %}
                                 <span class="welcome-text portal-weak-auth-hide"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
                             {% endif %}
                             {% if config.DEBUG_TIMEOUTS %}({{ expires_in }} seconds remaining){% endif %}
@@ -126,7 +123,7 @@
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
-                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}{{profile_link}}">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
+                    {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
@@ -152,6 +149,13 @@
         </div>
     </div>
 </div>
+<!-- URL authenticated login modal-->
+<!-- 
+    The modal will be triggered when user who is URL-authenticated attempts to access a protected link, e.g. profile
+    The modal includes content that prompts the user to either login to access the protected link or continue with limited access
+-->
+{% set user_auth_method = user.current_encounter().auth_method if user else '' %}
+{% if user_auth_method == 'url_authenticated'%}{{urlAuthenticatedLoginModal(PORTAL_BASE_URL=PORTAL, auth_method=user_auth_method)}}{% endif %}
 <input type="hidden" id="sessionMonitorProps" data-baseurl="{{PORTAL}}" data-crsftoken="{{csrf_token()}}" data-expires-in="{{expires_in}}"/>
 <div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
