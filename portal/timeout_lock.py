@@ -76,6 +76,8 @@ def guarded_task_launch(task, **kwargs):
     if 'lock_key' not in kwargs:
         raise ValueError("guarded_tasks require a 'lock_key'")
 
-    lock = TimeoutLock(key=kwargs['lock_key'], expires=300)
-    lock.__enter__()  # raises LockTimeout if unavailable
-    return task.apply_async(kwargs=kwargs)
+    # raises LockTimeout if unavailable
+    with TimeoutLock(key=kwargs['lock_key'], expires=300, timeout=0):
+        result = task.apply_async(kwargs=kwargs)
+
+    return result
