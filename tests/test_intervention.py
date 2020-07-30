@@ -9,7 +9,6 @@ from flask_webtest import SessionScope
 import pytest
 
 from portal.extensions import db
-from portal.factories.app import create_app
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.group import Group
@@ -576,6 +575,9 @@ def test_card_html_update(
     metastatic_org = Organization.query.filter_by(name='metastatic').one()
     test_user = db.session.merge(test_user)
     test_user.organizations.append(metastatic_org)
+    consent = UserConsent.query.filter(UserConsent.user_id == test_user.id).one()
+    consent.organization_id = metastatic_org.id
+    consent.acceptance_date = dt
 
     with SessionScope(db):
         d = {'function': 'update_card_html_on_completion',
@@ -637,14 +639,11 @@ def test_expired(bless_with_basics, test_user):
     localized_org = Organization.query.filter_by(name='localized').one()
     test_user = db.session.merge(test_user)
     test_user.organizations.append(localized_org)
-    audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-    uc = UserConsent(
-        user_id=TEST_USER_ID, organization=localized_org,
-        audit=audit, agreement_url='http://no.com',
-        acceptance_date=backdate)
+    consent = UserConsent.query.filter(UserConsent.user_id == test_user.id).one()
+    consent.organization_id = localized_org.id
+    consent.acceptance_date = backdate
 
     with SessionScope(db):
-        db.session.add(uc)
         d = {'function': 'update_card_html_on_completion',
              'kwargs': []}
         strat = AccessStrategy(
