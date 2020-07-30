@@ -453,7 +453,8 @@ class Organization(db.Model):
             org = Organization.query.get(org_id)
             if not org:
                 raise RuntimeError(
-                    "org_id in OrgTree but not database?! Missing: OrgTree().invalidate_cache()")
+                    "org_id in OrgTree but not database?!"
+                    " Missing: OrgTree().invalidate_cache()")
 
             # Not all organizations maintain consent agreements
             # include only those with such defined
