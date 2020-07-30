@@ -71,7 +71,7 @@ def shallow_org_tree():
             [db.session.add(org) for org in (org_101, org_102, org_1001)]
             db.session.commit()
 
-        # As orgs were just added, make sure they're loaded on next OrgTree call
+        # Invalidate as organizations were just added
         OrgTree.invalidate_cache()
 
     yield  # setup complete, teardown follows
