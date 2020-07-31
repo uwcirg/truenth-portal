@@ -3256,6 +3256,34 @@
     {
       "extension": [
         {
+          "timezone": "Europe/Madrid",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146146,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-146"
+        }
+      ],
+      "language": "es_ES",
+      "name": "Instituto Valenciano de Oncologia",
+      "partOf": {
+        "reference": "api/organization/29000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
@@ -3359,6 +3387,34 @@
       ],
       "language": "en_GB",
       "name": "St. Vincent's University Hospital",
+      "partOf": {
+        "reference": "api/organization/20100"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Dublin",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146145,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-145"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Sligo University Hospital",
       "partOf": {
         "reference": "api/organization/20100"
       },
