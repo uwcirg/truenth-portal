@@ -242,6 +242,8 @@ class ModelPersistence(object):
         # ignoring empty fields), a valid representation is available.
         empty_instance = self.model()
         complete_form = getattr(empty_instance, serialize)()
+        assert complete_form, "{}.{} failed to return value".format(
+            str(self.model), str(serialize))
         # Now overwrite any values present in persistence version
         complete_form.update(new_data)
         new_obj = from_method(complete_form)
