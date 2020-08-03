@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: portal 19.12.20.4.dev12+g1151586c\n"
+"Project-Id-Version: portal 20.5.14.7.dev20+g13b7d73c\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-01-22 00:56+0000\n"
+"POT-Creation-Date: 2020-08-03 18:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,13 +63,13 @@ msgstr ""
 #: /mnt/code/portal/eproms/templates/eproms/privacy.html:4
 #: /mnt/code/portal/eproms/templates/eproms/terms.html:4
 #: /mnt/code/portal/templates/explore.html:48
-#: /mnt/code/portal/templates/portal_footer.html:28
+#: /mnt/code/portal/templates/portal_footer.html:29
 msgid "Home"
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/about.html:5
-#: /mnt/code/portal/templates/portal_wrapper.html:69
-#: /mnt/code/portal/templates/portal_wrapper.html:124
+#: /mnt/code/portal/templates/portal_wrapper.html:70
+#: /mnt/code/portal/templates/portal_wrapper.html:127
 msgid "About TrueNTH"
 msgstr ""
 
@@ -83,27 +83,29 @@ msgstr ""
 msgid "You are using an outdated browser. Please upgrade your browser to improve your experience."
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/base.html:78
-#: /mnt/code/portal/eproms/templates/eproms/base.html:90
+#: /mnt/code/portal/eproms/templates/eproms/base.html:77
+#: /mnt/code/portal/eproms/templates/eproms/base.html:89
 #: /mnt/code/portal/templates/admin/admin_base.html:24
-#: /mnt/code/portal/templates/admin/patients_by_org.html:127
-#: /mnt/code/portal/templates/admin/patients_by_org.html:153
-#: /mnt/code/portal/templates/flask_user/register.html:105
+#: /mnt/code/portal/templates/admin/patients_by_org.html:125
+#: /mnt/code/portal/templates/admin/patients_by_org.html:151
+#: /mnt/code/portal/templates/flask_user/_macros.html:119
+#: /mnt/code/portal/templates/flask_user/_macros.html:131
+#: /mnt/code/portal/templates/flask_user/register.html:89
 #: /mnt/code/portal/templates/layout.html:77
 #: /mnt/code/portal/templates/layout.html:89
 #: /mnt/code/portal/templates/profile/profile_macros.html:449
-#: /mnt/code/portal/templates/profile/profile_macros.html:619
-#: /mnt/code/portal/templates/profile/profile_macros.html:696
-#: /mnt/code/portal/templates/profile/profile_macros.html:706
-#: /mnt/code/portal/templates/profile/profile_macros.html:735
-#: /mnt/code/portal/templates/profile/profile_macros.html:744
-#: /mnt/code/portal/templates/profile/profile_macros.html:772
+#: /mnt/code/portal/templates/profile/profile_macros.html:618
+#: /mnt/code/portal/templates/profile/profile_macros.html:695
+#: /mnt/code/portal/templates/profile/profile_macros.html:705
+#: /mnt/code/portal/templates/profile/profile_macros.html:734
+#: /mnt/code/portal/templates/profile/profile_macros.html:743
+#: /mnt/code/portal/templates/profile/profile_macros.html:771
 msgid "Close"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/base.html:79
+#: /mnt/code/portal/eproms/templates/eproms/base.html:78
 #: /mnt/code/portal/templates/layout.html:78
-#: /mnt/code/portal/templates/portal_footer.html:27
+#: /mnt/code/portal/templates/portal_footer.html:28
 msgid "TrueNTH"
 msgstr ""
 
@@ -133,9 +135,9 @@ msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/contact.html:22
 #: /mnt/code/portal/templates/admin/admin.html:44
-#: /mnt/code/portal/templates/admin/patients_by_org.html:60
+#: /mnt/code/portal/templates/admin/patients_by_org.html:61
 #: /mnt/code/portal/templates/admin/staff_by_org.html:43
-#: /mnt/code/portal/templates/flask_user/register.html:18
+#: /mnt/code/portal/templates/flask_user/register.html:17
 #: /mnt/code/portal/templates/profile/profile_macros.html:50
 msgid "Email"
 msgstr ""
@@ -179,7 +181,7 @@ msgid "What is on your mind?"
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/contact.html:57
-#: /mnt/code/portal/templates/profile/profile_macros.html:771
+#: /mnt/code/portal/templates/profile/profile_macros.html:770
 msgid "Submit"
 msgstr ""
 
@@ -196,11 +198,11 @@ msgstr ""
 msgid "TrueNTH Logo"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:25
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:26
 msgid "log in"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:26
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:27
 #: /mnt/code/portal/templates/profile/patient_profile_create.html:12
 #: /mnt/code/portal/templates/profile/patient_profile_create.html:13
 #: /mnt/code/portal/templates/profile/profile_macros.html:278
@@ -210,12 +212,12 @@ msgstr ""
 msgid "Email Address"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:30
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:31
 #: /mnt/code/portal/templates/flask_user/register.html:22
 msgid "Password"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:34
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:35
 #: /mnt/code/portal/templates/flask_user/forgot_password.html:9
 #: /mnt/code/portal/templates/flask_user/login.html:22
 #: /mnt/code/portal/templates/flask_user/login_or_register.html:104
@@ -223,12 +225,12 @@ msgstr ""
 msgid "Having trouble logging in?"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:38
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:39
 msgid "You have been logged out due to inactivity. Please log in again to continue."
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/landing.html:49
 #: /mnt/code/portal/eproms/templates/eproms/landing.html:50
+#: /mnt/code/portal/eproms/templates/eproms/landing.html:51
 msgid "TrueNTH Footer Logo"
 msgstr ""
 
@@ -259,16 +261,16 @@ msgid "Privacy"
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/resources.html:3
-#: /mnt/code/portal/templates/portal_wrapper.html:89
-#: /mnt/code/portal/templates/portal_wrapper.html:140
+#: /mnt/code/portal/templates/portal_wrapper.html:90
+#: /mnt/code/portal/templates/portal_wrapper.html:143
 msgid "Resources"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/resources.html:9
-msgid "Videos"
+#: /mnt/code/portal/eproms/templates/eproms/resources.html:10
+msgid "Training Slides and Video"
 msgstr ""
 
-#: /mnt/code/portal/eproms/templates/eproms/resources.html:21
+#: /mnt/code/portal/eproms/templates/eproms/resources.html:22
 #: /mnt/code/portal/eproms/templates/eproms/work_instruction.html:4
 msgid "Work Instructions"
 msgstr ""
@@ -303,9 +305,8 @@ msgstr ""
 msgid "Password Reset"
 msgstr ""
 
-#: Intervention:self_management
-#: /mnt/code/portal/templates/portal_footer.html:40
-#: /mnt/code/portal/models/communication.py:210
+#: /mnt/code/portal/models/communication.py:210 Intervention:self_management
+#: /mnt/code/portal/templates/portal_footer.html:41
 msgid "Symptom Tracker"
 msgstr ""
 
@@ -407,16 +408,20 @@ msgid ""
 "A research staff member will contact you for assistance."
 msgstr ""
 
-#: /mnt/code/portal/models/questionnaire_bank.py:546
+#: /mnt/code/portal/models/questionnaire_bank.py:552
 #, python-format
 msgid "Month %(month_total)d"
 msgstr ""
 
-#: /mnt/code/portal/models/user.py:516 /mnt/code/portal/models/user.py:522
+#: /mnt/code/portal/models/user.py:555 /mnt/code/portal/models/user.py:566
 msgid "invalid email address"
 msgstr ""
 
-#: /mnt/code/portal/models/user.py:531
+#: /mnt/code/portal/models/user.py:560
+msgid "user requests no email"
+msgstr ""
+
+#: /mnt/code/portal/models/user.py:575
 msgid "missing required data: "
 msgstr ""
 
@@ -476,11 +481,11 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:260
 #: /mnt/code/portal/templates/initial_queries_macros.html:303
 #: /mnt/code/portal/templates/profile/profile_macros.html:132
-#: /mnt/code/portal/templates/profile/profile_macros.html:793
-#: /mnt/code/portal/templates/profile/profile_macros.html:994
+#: /mnt/code/portal/templates/profile/profile_macros.html:792
+#: /mnt/code/portal/templates/profile/profile_macros.html:993
+#: /mnt/code/portal/templates/profile/profile_macros.html:1102
 #: /mnt/code/portal/templates/profile/profile_macros.html:1103
-#: /mnt/code/portal/templates/profile/profile_macros.html:1104
-#: /mnt/code/portal/templates/profile/profile_macros.html:1207
+#: /mnt/code/portal/templates/profile/profile_macros.html:1206
 msgid "Month"
 msgstr ""
 
@@ -492,10 +497,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:261
 #: /mnt/code/portal/templates/initial_queries_macros.html:304
 #: /mnt/code/portal/templates/profile/profile_macros.html:133
-#: /mnt/code/portal/templates/profile/profile_macros.html:794
-#: /mnt/code/portal/templates/profile/profile_macros.html:995
-#: /mnt/code/portal/templates/profile/profile_macros.html:1105
-#: /mnt/code/portal/templates/profile/profile_macros.html:1208
+#: /mnt/code/portal/templates/profile/profile_macros.html:793
+#: /mnt/code/portal/templates/profile/profile_macros.html:994
+#: /mnt/code/portal/templates/profile/profile_macros.html:1104
+#: /mnt/code/portal/templates/profile/profile_macros.html:1207
 msgid "January"
 msgstr ""
 
@@ -503,10 +508,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:262
 #: /mnt/code/portal/templates/initial_queries_macros.html:305
 #: /mnt/code/portal/templates/profile/profile_macros.html:134
-#: /mnt/code/portal/templates/profile/profile_macros.html:795
-#: /mnt/code/portal/templates/profile/profile_macros.html:996
-#: /mnt/code/portal/templates/profile/profile_macros.html:1106
-#: /mnt/code/portal/templates/profile/profile_macros.html:1209
+#: /mnt/code/portal/templates/profile/profile_macros.html:794
+#: /mnt/code/portal/templates/profile/profile_macros.html:995
+#: /mnt/code/portal/templates/profile/profile_macros.html:1105
+#: /mnt/code/portal/templates/profile/profile_macros.html:1208
 msgid "February"
 msgstr ""
 
@@ -514,10 +519,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:263
 #: /mnt/code/portal/templates/initial_queries_macros.html:306
 #: /mnt/code/portal/templates/profile/profile_macros.html:135
-#: /mnt/code/portal/templates/profile/profile_macros.html:796
-#: /mnt/code/portal/templates/profile/profile_macros.html:997
-#: /mnt/code/portal/templates/profile/profile_macros.html:1107
-#: /mnt/code/portal/templates/profile/profile_macros.html:1210
+#: /mnt/code/portal/templates/profile/profile_macros.html:795
+#: /mnt/code/portal/templates/profile/profile_macros.html:996
+#: /mnt/code/portal/templates/profile/profile_macros.html:1106
+#: /mnt/code/portal/templates/profile/profile_macros.html:1209
 msgid "March"
 msgstr ""
 
@@ -525,10 +530,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:264
 #: /mnt/code/portal/templates/initial_queries_macros.html:307
 #: /mnt/code/portal/templates/profile/profile_macros.html:136
-#: /mnt/code/portal/templates/profile/profile_macros.html:797
-#: /mnt/code/portal/templates/profile/profile_macros.html:998
-#: /mnt/code/portal/templates/profile/profile_macros.html:1108
-#: /mnt/code/portal/templates/profile/profile_macros.html:1211
+#: /mnt/code/portal/templates/profile/profile_macros.html:796
+#: /mnt/code/portal/templates/profile/profile_macros.html:997
+#: /mnt/code/portal/templates/profile/profile_macros.html:1107
+#: /mnt/code/portal/templates/profile/profile_macros.html:1210
 msgid "April"
 msgstr ""
 
@@ -536,10 +541,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:265
 #: /mnt/code/portal/templates/initial_queries_macros.html:308
 #: /mnt/code/portal/templates/profile/profile_macros.html:137
-#: /mnt/code/portal/templates/profile/profile_macros.html:798
-#: /mnt/code/portal/templates/profile/profile_macros.html:999
-#: /mnt/code/portal/templates/profile/profile_macros.html:1109
-#: /mnt/code/portal/templates/profile/profile_macros.html:1212
+#: /mnt/code/portal/templates/profile/profile_macros.html:797
+#: /mnt/code/portal/templates/profile/profile_macros.html:998
+#: /mnt/code/portal/templates/profile/profile_macros.html:1108
+#: /mnt/code/portal/templates/profile/profile_macros.html:1211
 msgid "May"
 msgstr ""
 
@@ -547,10 +552,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:266
 #: /mnt/code/portal/templates/initial_queries_macros.html:309
 #: /mnt/code/portal/templates/profile/profile_macros.html:138
-#: /mnt/code/portal/templates/profile/profile_macros.html:799
-#: /mnt/code/portal/templates/profile/profile_macros.html:1000
-#: /mnt/code/portal/templates/profile/profile_macros.html:1110
-#: /mnt/code/portal/templates/profile/profile_macros.html:1213
+#: /mnt/code/portal/templates/profile/profile_macros.html:798
+#: /mnt/code/portal/templates/profile/profile_macros.html:999
+#: /mnt/code/portal/templates/profile/profile_macros.html:1109
+#: /mnt/code/portal/templates/profile/profile_macros.html:1212
 msgid "June"
 msgstr ""
 
@@ -558,10 +563,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:267
 #: /mnt/code/portal/templates/initial_queries_macros.html:310
 #: /mnt/code/portal/templates/profile/profile_macros.html:139
-#: /mnt/code/portal/templates/profile/profile_macros.html:800
-#: /mnt/code/portal/templates/profile/profile_macros.html:1001
-#: /mnt/code/portal/templates/profile/profile_macros.html:1111
-#: /mnt/code/portal/templates/profile/profile_macros.html:1214
+#: /mnt/code/portal/templates/profile/profile_macros.html:799
+#: /mnt/code/portal/templates/profile/profile_macros.html:1000
+#: /mnt/code/portal/templates/profile/profile_macros.html:1110
+#: /mnt/code/portal/templates/profile/profile_macros.html:1213
 msgid "July"
 msgstr ""
 
@@ -569,10 +574,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:268
 #: /mnt/code/portal/templates/initial_queries_macros.html:311
 #: /mnt/code/portal/templates/profile/profile_macros.html:140
-#: /mnt/code/portal/templates/profile/profile_macros.html:801
-#: /mnt/code/portal/templates/profile/profile_macros.html:1002
-#: /mnt/code/portal/templates/profile/profile_macros.html:1112
-#: /mnt/code/portal/templates/profile/profile_macros.html:1215
+#: /mnt/code/portal/templates/profile/profile_macros.html:800
+#: /mnt/code/portal/templates/profile/profile_macros.html:1001
+#: /mnt/code/portal/templates/profile/profile_macros.html:1111
+#: /mnt/code/portal/templates/profile/profile_macros.html:1214
 msgid "August"
 msgstr ""
 
@@ -580,10 +585,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:269
 #: /mnt/code/portal/templates/initial_queries_macros.html:312
 #: /mnt/code/portal/templates/profile/profile_macros.html:141
-#: /mnt/code/portal/templates/profile/profile_macros.html:802
-#: /mnt/code/portal/templates/profile/profile_macros.html:1003
-#: /mnt/code/portal/templates/profile/profile_macros.html:1113
-#: /mnt/code/portal/templates/profile/profile_macros.html:1216
+#: /mnt/code/portal/templates/profile/profile_macros.html:801
+#: /mnt/code/portal/templates/profile/profile_macros.html:1002
+#: /mnt/code/portal/templates/profile/profile_macros.html:1112
+#: /mnt/code/portal/templates/profile/profile_macros.html:1215
 msgid "September"
 msgstr ""
 
@@ -591,10 +596,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:270
 #: /mnt/code/portal/templates/initial_queries_macros.html:313
 #: /mnt/code/portal/templates/profile/profile_macros.html:142
-#: /mnt/code/portal/templates/profile/profile_macros.html:803
-#: /mnt/code/portal/templates/profile/profile_macros.html:1004
-#: /mnt/code/portal/templates/profile/profile_macros.html:1114
-#: /mnt/code/portal/templates/profile/profile_macros.html:1217
+#: /mnt/code/portal/templates/profile/profile_macros.html:802
+#: /mnt/code/portal/templates/profile/profile_macros.html:1003
+#: /mnt/code/portal/templates/profile/profile_macros.html:1113
+#: /mnt/code/portal/templates/profile/profile_macros.html:1216
 msgid "October"
 msgstr ""
 
@@ -602,10 +607,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:271
 #: /mnt/code/portal/templates/initial_queries_macros.html:314
 #: /mnt/code/portal/templates/profile/profile_macros.html:143
-#: /mnt/code/portal/templates/profile/profile_macros.html:804
-#: /mnt/code/portal/templates/profile/profile_macros.html:1005
-#: /mnt/code/portal/templates/profile/profile_macros.html:1115
-#: /mnt/code/portal/templates/profile/profile_macros.html:1218
+#: /mnt/code/portal/templates/profile/profile_macros.html:803
+#: /mnt/code/portal/templates/profile/profile_macros.html:1004
+#: /mnt/code/portal/templates/profile/profile_macros.html:1114
+#: /mnt/code/portal/templates/profile/profile_macros.html:1217
 msgid "November"
 msgstr ""
 
@@ -613,10 +618,10 @@ msgstr ""
 #: /mnt/code/portal/templates/initial_queries_macros.html:272
 #: /mnt/code/portal/templates/initial_queries_macros.html:315
 #: /mnt/code/portal/templates/profile/profile_macros.html:144
-#: /mnt/code/portal/templates/profile/profile_macros.html:805
-#: /mnt/code/portal/templates/profile/profile_macros.html:1006
-#: /mnt/code/portal/templates/profile/profile_macros.html:1116
-#: /mnt/code/portal/templates/profile/profile_macros.html:1219
+#: /mnt/code/portal/templates/profile/profile_macros.html:804
+#: /mnt/code/portal/templates/profile/profile_macros.html:1005
+#: /mnt/code/portal/templates/profile/profile_macros.html:1115
+#: /mnt/code/portal/templates/profile/profile_macros.html:1218
 msgid "December"
 msgstr ""
 
@@ -632,6 +637,33 @@ msgstr ""
 msgid "Confirm Identity"
 msgstr ""
 
+#: /mnt/code/portal/templates/confirm_identity.html:8
+msgid "Identity verification"
+msgstr ""
+
+#: /mnt/code/portal/templates/confirm_identity.html:12
+msgid "I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself."
+msgstr ""
+
+#: /mnt/code/portal/templates/confirm_identity.html:17
+#: /mnt/code/portal/templates/initial_queries_macros.html:291
+#: /mnt/code/portal/templates/initial_queries_macros.html:363
+#: /mnt/code/portal/templates/initial_queries_macros.html:384
+#: /mnt/code/portal/templates/profile/profile_macros.html:609
+#: /mnt/code/portal/templates/profile/profile_macros.html:976
+#: /mnt/code/portal/templates/profile/profile_macros.html:1255
+msgid "Yes"
+msgstr ""
+
+#: /mnt/code/portal/templates/confirm_identity.html:18
+#: /mnt/code/portal/templates/initial_queries_macros.html:327
+#: /mnt/code/portal/templates/initial_queries_macros.html:389
+#: /mnt/code/portal/templates/profile/profile_macros.html:611
+#: /mnt/code/portal/templates/profile/profile_macros.html:976
+#: /mnt/code/portal/templates/profile/profile_macros.html:1255
+msgid "No"
+msgstr ""
+
 #: /mnt/code/portal/templates/contact_sent.html:7
 msgid "Thank you for contacting us."
 msgstr ""
@@ -641,8 +673,8 @@ msgid "We have sent an email to the team supporting TrueNTH."
 msgstr ""
 
 #: /mnt/code/portal/templates/contact_sent.html:11
-#: /mnt/code/portal/templates/portal_wrapper.html:65
-#: /mnt/code/portal/templates/portal_wrapper.html:122
+#: /mnt/code/portal/templates/portal_wrapper.html:66
+#: /mnt/code/portal/templates/portal_wrapper.html:125
 msgid "TrueNTH Home"
 msgstr ""
 
@@ -708,8 +740,8 @@ msgid "White"
 msgstr ""
 
 #: classification_enum:Other
-#: /mnt/code/portal/templates/profile/profile_macros.html:248
 #: /mnt/code/portal/templates/profile/profile_macros.html:210
+#: /mnt/code/portal/templates/profile/profile_macros.html:248
 #: /mnt/code/portal/templates/coredata.html:60
 msgid "Other"
 msgstr ""
@@ -740,7 +772,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/explore.html:30
 #: /mnt/code/portal/templates/flask_user/login.html:28
-#: /mnt/code/portal/templates/flask_user/register.html:39
+#: /mnt/code/portal/templates/flask_user/register.html:38
 msgid "or"
 msgstr ""
 
@@ -850,7 +882,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:111
 #: /mnt/code/portal/templates/profile/patient_profile.html:43
-#: /mnt/code/portal/templates/profile/profile_macros.html:1134
+#: /mnt/code/portal/templates/profile/profile_macros.html:1133
 msgid "OK"
 msgstr ""
 
@@ -971,17 +1003,8 @@ msgid "The birth year is required and must be in valid format"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:287
-#: /mnt/code/portal/templates/profile/profile_macros.html:878
+#: /mnt/code/portal/templates/profile/profile_macros.html:877
 msgid "Have you had a prostate cancer biopsy?"
-msgstr ""
-
-#: /mnt/code/portal/templates/initial_queries_macros.html:291
-#: /mnt/code/portal/templates/initial_queries_macros.html:365
-#: /mnt/code/portal/templates/initial_queries_macros.html:387
-#: /mnt/code/portal/templates/profile/profile_macros.html:610
-#: /mnt/code/portal/templates/profile/profile_macros.html:977
-#: /mnt/code/portal/templates/profile/profile_macros.html:1256
-msgid "Yes"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:295
@@ -1000,52 +1023,44 @@ msgstr ""
 msgid "The biopsy year is required and must be in valid format"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:327
-#: /mnt/code/portal/templates/initial_queries_macros.html:392
-#: /mnt/code/portal/templates/profile/profile_macros.html:612
-#: /mnt/code/portal/templates/profile/profile_macros.html:977
-#: /mnt/code/portal/templates/profile/profile_macros.html:1256
-msgid "No"
-msgstr ""
-
 #: /mnt/code/portal/templates/initial_queries_macros.html:332
-#: /mnt/code/portal/templates/initial_queries_macros.html:353
-#: /mnt/code/portal/templates/initial_queries_macros.html:375
+#: /mnt/code/portal/templates/initial_queries_macros.html:352
+#: /mnt/code/portal/templates/initial_queries_macros.html:373
 msgid "I don't know"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:339
-#: /mnt/code/portal/templates/profile/profile_macros.html:879
+#: /mnt/code/portal/templates/initial_queries_macros.html:338
+#: /mnt/code/portal/templates/profile/profile_macros.html:878
 msgid "Have you been diagnosed with prostate cancer?"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:343
+#: /mnt/code/portal/templates/initial_queries_macros.html:342
 msgid "Yes (my biopsy was positive)"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:348
+#: /mnt/code/portal/templates/initial_queries_macros.html:347
 msgid "No (my biopsy was negative)"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:361
-#: /mnt/code/portal/templates/profile/profile_macros.html:880
+#: /mnt/code/portal/templates/initial_queries_macros.html:359
+#: /mnt/code/portal/templates/profile/profile_macros.html:879
 msgid "Is the prostate cancer only within the prostate?"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:370
+#: /mnt/code/portal/templates/initial_queries_macros.html:368
 msgid "No (the cancer is in other parts of my body, too)"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:383
+#: /mnt/code/portal/templates/initial_queries_macros.html:380
 msgid "Have you begun prostate cancer treatment?"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:406
-#: /mnt/code/portal/templates/profile/profile_macros.html:503
+#: /mnt/code/portal/templates/initial_queries_macros.html:403
+#: /mnt/code/portal/templates/profile/profile_macros.html:502
 msgid "What is your main clinic for prostate cancer care?"
 msgstr ""
 
-#: /mnt/code/portal/templates/initial_queries_macros.html:410
+#: /mnt/code/portal/templates/initial_queries_macros.html:407
 msgid "I'm not receiving care at any of the above clinics"
 msgstr ""
 
@@ -1094,52 +1109,52 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:29
+#: /mnt/code/portal/templates/portal_footer.html:30
 msgid "Sexual Wellbeing"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:30
+#: /mnt/code/portal/templates/portal_footer.html:31
 msgid "Prostate Cancer Facts"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:80
-#: /mnt/code/portal/templates/portal_footer.html:31
+#: /mnt/code/portal/templates/portal_footer.html:32
 msgid "About"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:32
+#: /mnt/code/portal/templates/portal_footer.html:33
 msgid "Contact Us"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:35
+#: /mnt/code/portal/templates/portal_footer.html:36
 msgid "Tools"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:37
+#: /mnt/code/portal/templates/portal_footer.html:38
 msgid "Decision Support"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:38 Intervention:psa_tracker
+#: /mnt/code/portal/templates/portal_footer.html:39 Intervention:psa_tracker
 msgid "PSA Tracker"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:43
+#: /mnt/code/portal/templates/portal_footer.html:44
 msgid "Socials"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:44
+#: /mnt/code/portal/templates/portal_footer.html:45
 msgid "Facebook"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:45
+#: /mnt/code/portal/templates/portal_footer.html:46
 msgid "Twitter"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:51
+#: /mnt/code/portal/templates/portal_footer.html:52
 msgid "Terms & Conditions"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_footer.html:52
+#: /mnt/code/portal/templates/portal_footer.html:53
 msgid "Privacy Policy"
 msgstr ""
 
@@ -1147,107 +1162,107 @@ msgstr ""
 msgid "dismiss"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:54
-#: /mnt/code/portal/templates/portal_wrapper.html:112
+#: /mnt/code/portal/templates/portal_wrapper.html:55
+#: /mnt/code/portal/templates/portal_wrapper.html:115
 msgid "TrueNTH logo"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:57
-#: /mnt/code/portal/templates/portal_wrapper.html:115
+#: /mnt/code/portal/templates/portal_wrapper.html:58
+#: /mnt/code/portal/templates/portal_wrapper.html:118
 msgid "brand logo"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:67
-#: /mnt/code/portal/templates/portal_wrapper.html:123
+#: /mnt/code/portal/templates/portal_wrapper.html:68
+#: /mnt/code/portal/templates/portal_wrapper.html:126
 #: /mnt/code/portal/templates/profile/my_profile.html:4
 msgid "My TrueNTH Profile"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:71
-#: /mnt/code/portal/templates/portal_wrapper.html:125
+#: /mnt/code/portal/templates/portal_wrapper.html:72
+#: /mnt/code/portal/templates/portal_wrapper.html:128
 msgid "Client Applications"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:74
-#: /mnt/code/portal/templates/portal_wrapper.html:126
+#: /mnt/code/portal/templates/portal_wrapper.html:75
+#: /mnt/code/portal/templates/portal_wrapper.html:129
 msgid "Patients"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:76
-#: /mnt/code/portal/templates/portal_wrapper.html:127
+#: /mnt/code/portal/templates/portal_wrapper.html:77
+#: /mnt/code/portal/templates/portal_wrapper.html:130
 msgid "Staff List"
 msgstr ""
 
 #: /mnt/code/portal/templates/admin/admin.html:12
-#: /mnt/code/portal/templates/portal_wrapper.html:78
-#: /mnt/code/portal/templates/portal_wrapper.html:129
+#: /mnt/code/portal/templates/portal_wrapper.html:79
+#: /mnt/code/portal/templates/portal_wrapper.html:132
 msgid "User Administration"
 msgstr ""
 
 #: /mnt/code/portal/templates/admin/admin.html:8
-#: /mnt/code/portal/templates/portal_wrapper.html:79
-#: /mnt/code/portal/templates/portal_wrapper.html:130
+#: /mnt/code/portal/templates/portal_wrapper.html:80
+#: /mnt/code/portal/templates/portal_wrapper.html:133
 msgid "Scheduled Jobs"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:80
-#: /mnt/code/portal/templates/portal_wrapper.html:131
+#: /mnt/code/portal/templates/portal_wrapper.html:81
+#: /mnt/code/portal/templates/portal_wrapper.html:134
 msgid "Settings"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:134 Intervention:analytics
-#: /mnt/code/portal/templates/portal_wrapper.html:83
+#: /mnt/code/portal/templates/portal_wrapper.html:137
+#: /mnt/code/portal/templates/portal_wrapper.html:84 Intervention:analytics
 msgid "Analytics"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:86
-#: /mnt/code/portal/templates/portal_wrapper.html:137
+#: /mnt/code/portal/templates/portal_wrapper.html:87
+#: /mnt/code/portal/templates/portal_wrapper.html:140
 #: /mnt/code/portal/templates/research.html:3
 msgid "Research Data"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:91
-#: /mnt/code/portal/templates/portal_wrapper.html:142
+#: /mnt/code/portal/templates/portal_wrapper.html:92
+#: /mnt/code/portal/templates/portal_wrapper.html:145
 msgid "Log Out of TrueNTH"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:95
-#: /mnt/code/portal/templates/portal_wrapper.html:110
+#: /mnt/code/portal/templates/portal_wrapper.html:96
+#: /mnt/code/portal/templates/portal_wrapper.html:113
 msgid "MENU"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:96
-#: /mnt/code/portal/templates/portal_wrapper.html:110
+#: /mnt/code/portal/templates/portal_wrapper.html:97
+#: /mnt/code/portal/templates/portal_wrapper.html:113
 msgid "Profile image"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:97
-#: /mnt/code/portal/templates/portal_wrapper.html:101
+#: /mnt/code/portal/templates/portal_wrapper.html:99
+#: /mnt/code/portal/templates/portal_wrapper.html:104
 msgid "Welcome"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:100
-#: /mnt/code/portal/templates/portal_wrapper.html:121
+#: /mnt/code/portal/templates/portal_wrapper.html:103
+#: /mnt/code/portal/templates/portal_wrapper.html:124
 msgid "Log In to TrueNTH"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:111
+#: /mnt/code/portal/templates/portal_wrapper.html:114
 msgid "Return to TrueNTH home"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:153
+#: /mnt/code/portal/templates/portal_wrapper.html:163
 msgid "Your session is about to expire"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:155
+#: /mnt/code/portal/templates/portal_wrapper.html:165
 msgid "Your session will expire in approximately {time} seconds due to inactivity."
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:156
+#: /mnt/code/portal/templates/portal_wrapper.html:166
 msgid "Log Out"
 msgstr ""
 
-#: /mnt/code/portal/templates/portal_wrapper.html:156
+#: /mnt/code/portal/templates/portal_wrapper.html:166
 msgid "Stay Logged In"
 msgstr ""
 
@@ -1280,7 +1295,7 @@ msgstr ""
 msgid "Assessment Report Detail"
 msgstr ""
 
-#: Role:patient /mnt/code/portal/templates/sessionReport.html:9
+#: /mnt/code/portal/templates/sessionReport.html:9 Role:patient
 msgid "Patient"
 msgstr ""
 
@@ -1314,7 +1329,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/login_or_register.html:52
 #: /mnt/code/portal/templates/flask_user/login_or_register.html:159
-#: /mnt/code/portal/templates/flask_user/register.html:35
+#: /mnt/code/portal/templates/flask_user/register.html:34
 #: /mnt/code/portal/templates/shortcut_alias.html:20
 msgid "Register"
 msgstr ""
@@ -1332,8 +1347,8 @@ msgstr ""
 msgid "TrueNTH ID"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:68
-#: /mnt/code/portal/templates/profile/profile_macros.html:1028
+#: /mnt/code/portal/templates/admin/patients_by_org.html:67
+#: /mnt/code/portal/templates/profile/profile_macros.html:1027
 #: /mnt/code/portal/templates/site_overdue_table.html:7
 msgid "Study ID"
 msgstr ""
@@ -1385,7 +1400,7 @@ msgid "Deactivate Account"
 msgstr ""
 
 #: /mnt/code/portal/templates/admin/admin.html:48
-#: /mnt/code/portal/templates/admin/patients_by_org.html:77
+#: /mnt/code/portal/templates/admin/patients_by_org.html:76
 #: /mnt/code/portal/templates/admin/staff_by_org.html:47
 msgid "activation status"
 msgstr ""
@@ -1411,7 +1426,7 @@ msgid "View deactivated accounts"
 msgstr ""
 
 #: /mnt/code/portal/templates/admin/admin_base.html:41
-#: /mnt/code/portal/templates/admin/patients_by_org.html:75
+#: /mnt/code/portal/templates/admin/patients_by_org.html:74
 msgid "Deactivate"
 msgstr ""
 
@@ -1456,98 +1471,91 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:61
-#: /mnt/code/portal/templates/profile/profile_macros.html:53
-#: /mnt/code/portal/templates/profile/profile_macros.html:458
-msgid "Cell"
+#: /mnt/code/portal/templates/admin/patients_by_org.html:60
+#: /mnt/code/portal/templates/profile/profile_macros.html:49
+msgid "Date of Birth"
 msgstr ""
 
 #: /mnt/code/portal/templates/admin/patients_by_org.html:62
-#: /mnt/code/portal/templates/profile/profile_macros.html:54
-#: /mnt/code/portal/templates/profile/profile_macros.html:468
-msgid "Phone (Other)"
-msgstr ""
-
-#: /mnt/code/portal/templates/admin/patients_by_org.html:63
 msgid "Reports"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:65
+#: /mnt/code/portal/templates/admin/patients_by_org.html:64
 msgid "Questionnaire Status"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:66
-#: /mnt/code/portal/templates/profile/profile_macros.html:851
+#: /mnt/code/portal/templates/admin/patients_by_org.html:65
+#: /mnt/code/portal/templates/profile/profile_macros.html:850
 msgid "Visit"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:69
+#: /mnt/code/portal/templates/admin/patients_by_org.html:68
 msgid "(GMT)"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:70
+#: /mnt/code/portal/templates/admin/patients_by_org.html:69
 #: /mnt/code/portal/templates/admin/staff_by_org.html:44
 msgid "Site(s)"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:72
-#: /mnt/code/portal/templates/profile/profile_macros.html:1150
+#: /mnt/code/portal/templates/admin/patients_by_org.html:71
+#: /mnt/code/portal/templates/profile/profile_macros.html:1149
 msgid "Interventions"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:95
+#: /mnt/code/portal/templates/admin/patients_by_org.html:93
 msgid "ST"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:95
+#: /mnt/code/portal/templates/admin/patients_by_org.html:93
 msgid "DS"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:128
+#: /mnt/code/portal/templates/admin/patients_by_org.html:126
 msgid "Patient Report"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:137
+#: /mnt/code/portal/templates/admin/patients_by_org.html:135
 msgid "Type"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:137
+#: /mnt/code/portal/templates/admin/patients_by_org.html:135
 msgid "Report Name"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:137
+#: /mnt/code/portal/templates/admin/patients_by_org.html:135
 msgid "Generated (GMT)"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:137
+#: /mnt/code/portal/templates/admin/patients_by_org.html:135
 msgid "Downloaded"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:146
+#: /mnt/code/portal/templates/admin/patients_by_org.html:144
 msgid "View All"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:163
+#: /mnt/code/portal/templates/admin/patients_by_org.html:161
 msgid "Export report data"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:164
+#: /mnt/code/portal/templates/admin/patients_by_org.html:162
 msgid "CSV"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:164
+#: /mnt/code/portal/templates/admin/patients_by_org.html:162
 msgid "JSON"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:168
+#: /mnt/code/portal/templates/admin/patients_by_org.html:166
 msgid "Export request submitted"
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:169
+#: /mnt/code/portal/templates/admin/patients_by_org.html:167
 msgid "Note: due to the size of result data, this may take a while."
 msgstr ""
 
-#: /mnt/code/portal/templates/admin/patients_by_org.html:178
+#: /mnt/code/portal/templates/admin/patients_by_org.html:176
 msgid "Retry"
 msgstr ""
 
@@ -1584,22 +1592,53 @@ msgid "Terms"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:84
-#: /mnt/code/portal/templates/flask_user/_macros.html:87
+#: /mnt/code/portal/templates/flask_user/_macros.html:88
 msgid "Movember"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/_macros.html:84
-#: /mnt/code/portal/templates/flask_user/_macros.html:88
+#: /mnt/code/portal/templates/flask_user/_macros.html:85
 msgid "Movember Logo"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/_macros.html:84
-msgid "Movember logo"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/_macros.html:91
+#: /mnt/code/portal/templates/flask_user/_macros.html:93
 #, python-format
 msgid "%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:101
+msgid "Password must have at least:"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:103
+msgid "Eight characters"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:104
+msgid "One lowercase letter"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:105
+msgid "One uppercase letter"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:106
+msgid "One number"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:120
+msgid "Limited Access"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:123
+msgid "To access this information, you will need to log in with your username and password."
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:126
+msgid "Continue with limited access"
+msgstr ""
+
+#: /mnt/code/portal/templates/flask_user/_macros.html:127
+msgid "Log in to see more"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/change_password.html:6
@@ -1632,11 +1671,11 @@ msgstr ""
 msgid "Manage Emails"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:14
+#: /mnt/code/portal/templates/flask_user/register.html:13
 msgid "Email address"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:15
+#: /mnt/code/portal/templates/flask_user/register.html:14
 msgid "Email address is required."
 msgstr ""
 
@@ -1645,72 +1684,52 @@ msgstr ""
 msgid "Oops, the password does not meet the minimum requirements."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:28
+#: /mnt/code/portal/templates/flask_user/register.html:27
 msgid "Retype Password"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:29
+#: /mnt/code/portal/templates/flask_user/register.html:28
 #: /mnt/code/portal/templates/flask_user/reset_password.html:13
 msgid "Oops, the two password fields do not match."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:30
+#: /mnt/code/portal/templates/flask_user/register.html:29
 msgid "Please re-type your password."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:45
+#: /mnt/code/portal/templates/flask_user/register.html:44
 msgid "Register using:"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:49
+#: /mnt/code/portal/templates/flask_user/register.html:48
 msgid "Log In With Facebook"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:56
+#: /mnt/code/portal/templates/flask_user/register.html:55
 msgid "Log In With Google"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:61
+#: /mnt/code/portal/templates/flask_user/register.html:60
 msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:76
-msgid "Password must have at least:"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/register.html:78
-msgid "Eight characters"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/register.html:79
-msgid "One lowercase letter"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/register.html:80
-msgid "One uppercase letter"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/register.html:81
-msgid "One number"
-msgstr ""
-
-#: /mnt/code/portal/templates/flask_user/register.html:91
+#: /mnt/code/portal/templates/flask_user/register.html:75
 msgid "About Using Google or Facebook for TrueNTH"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:97
+#: /mnt/code/portal/templates/flask_user/register.html:81
 msgid "We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Facebook or Google provides a few additional benefits to you:"
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:99
+#: /mnt/code/portal/templates/flask_user/register.html:83
 msgid "A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:100
+#: /mnt/code/portal/templates/flask_user/register.html:84
 msgid "TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image."
 msgstr ""
 
-#: /mnt/code/portal/templates/flask_user/register.html:101
+#: /mnt/code/portal/templates/flask_user/register.html:85
 msgid "Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts."
 msgstr ""
 
@@ -1885,7 +1904,7 @@ msgid "This is intended for \"kiosk\" style administration of an assessment, whe
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/patient_profile.html:44
-#: /mnt/code/portal/templates/profile/profile_macros.html:1135
+#: /mnt/code/portal/templates/profile/profile_macros.html:1134
 msgid "Cancel"
 msgstr ""
 
@@ -1901,7 +1920,7 @@ msgid "Agreement to Share Clinical Information"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/patient_profile.html:66
-#: /mnt/code/portal/templates/profile/profile_macros.html:692
+#: /mnt/code/portal/templates/profile/profile_macros.html:691
 #: /mnt/code/portal/templates/profile/user_profile.html:33
 msgid "Consent History"
 msgstr ""
@@ -1941,7 +1960,7 @@ msgid "TrueNTH Profile"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_create_base.html:7
-#: /mnt/code/portal/templates/profile/profile_macros.html:533
+#: /mnt/code/portal/templates/profile/profile_macros.html:532
 msgid "Clinics"
 msgstr ""
 
@@ -1989,16 +2008,22 @@ msgstr ""
 msgid "User Information"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:49
-msgid "Date of Birth"
-msgstr ""
-
 #: /mnt/code/portal/templates/profile/profile_macros.html:51
 msgid "Study Id"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:52
 msgid "Site Id"
+msgstr ""
+
+#: /mnt/code/portal/templates/profile/profile_macros.html:53
+#: /mnt/code/portal/templates/profile/profile_macros.html:458
+msgid "Cell"
+msgstr ""
+
+#: /mnt/code/portal/templates/profile/profile_macros.html:54
+#: /mnt/code/portal/templates/profile/profile_macros.html:468
+msgid "Phone (Other)"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:78
@@ -2102,12 +2127,12 @@ msgstr ""
 #: /mnt/code/portal/templates/profile/profile_macros.html:308
 #: /mnt/code/portal/templates/profile/profile_macros.html:351
 #: /mnt/code/portal/templates/profile/profile_macros.html:478
-#: /mnt/code/portal/templates/profile/profile_macros.html:1051
+#: /mnt/code/portal/templates/profile/profile_macros.html:1050
 msgid "Send email"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:322
 #: AppText:profileSendEmail option invite
+#: /mnt/code/portal/templates/profile/profile_macros.html:322
 msgid "TrueNTH Invite"
 msgstr ""
 
@@ -2176,8 +2201,8 @@ msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:458
 #: /mnt/code/portal/templates/profile/profile_macros.html:468
-#: /mnt/code/portal/templates/profile/profile_macros.html:533
-#: /mnt/code/portal/templates/profile/profile_macros.html:1028
+#: /mnt/code/portal/templates/profile/profile_macros.html:532
+#: /mnt/code/portal/templates/profile/profile_macros.html:1027
 msgid "Optional"
 msgstr ""
 
@@ -2186,32 +2211,32 @@ msgstr ""
 msgid "Phone number must be in numbers."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:494
+#: /mnt/code/portal/templates/profile/profile_macros.html:493
 msgid "In what state is the patient currently receiving prostate cancer care?"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:496
+#: /mnt/code/portal/templates/profile/profile_macros.html:495
 msgid "In what state are you currently receiving prostate cancer care?"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:509
-#: /mnt/code/portal/templates/profile/profile_macros.html:540
+#: /mnt/code/portal/templates/profile/profile_macros.html:508
+#: /mnt/code/portal/templates/profile/profile_macros.html:539
 msgid "None of the Above"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:512
+#: /mnt/code/portal/templates/profile/profile_macros.html:511
 msgid "No clinic found in selected state."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:532
+#: /mnt/code/portal/templates/profile/profile_macros.html:531
 msgid "Main clinic for prostate cancer care"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:593
+#: /mnt/code/portal/templates/profile/profile_macros.html:592
 msgid "Consent to share information"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:605
+#: /mnt/code/portal/templates/profile/profile_macros.html:604
 #, python-format
 msgid ""
 "\n"
@@ -2219,436 +2244,436 @@ msgid ""
 "                                "
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:653
+#: /mnt/code/portal/templates/profile/profile_macros.html:652
 msgid "No consent record found"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:686
+#: /mnt/code/portal/templates/profile/profile_macros.html:685
 msgid "History"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:707
+#: /mnt/code/portal/templates/profile/profile_macros.html:706
 msgid "Consent Status Editor"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:710
+#: /mnt/code/portal/templates/profile/profile_macros.html:709
 msgid "Modify the consent status for this user to"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:713
+#: /mnt/code/portal/templates/profile/profile_macros.html:712
 msgid "Consented / Enrolled"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:720
+#: /mnt/code/portal/templates/profile/profile_macros.html:719
 msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:721
+#: /mnt/code/portal/templates/profile/profile_macros.html:720
 msgid "Suspend Data Collection and Report Historic Data"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:728
+#: /mnt/code/portal/templates/profile/profile_macros.html:727
 msgid "Purged / Removed"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:745
+#: /mnt/code/portal/templates/profile/profile_macros.html:744
 msgid "Consent Date Editor"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:748
+#: /mnt/code/portal/templates/profile/profile_macros.html:747
 msgid "Current consent date: "
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:750
+#: /mnt/code/portal/templates/profile/profile_macros.html:749
 msgid "Modify the consent date"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:750
+#: /mnt/code/portal/templates/profile/profile_macros.html:749
 msgid "GMT 24-hour format"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:750
+#: /mnt/code/portal/templates/profile/profile_macros.html:749
 msgid "for this agreement to:"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:789
-#: /mnt/code/portal/templates/profile/profile_macros.html:792
-#: /mnt/code/portal/templates/profile/profile_macros.html:809
-#: /mnt/code/portal/templates/profile/profile_macros.html:1100
-#: /mnt/code/portal/templates/profile/profile_macros.html:1103
-#: /mnt/code/portal/templates/profile/profile_macros.html:1120
-#: /mnt/code/portal/templates/profile/profile_macros.html:1203
-#: /mnt/code/portal/templates/profile/profile_macros.html:1206
-#: /mnt/code/portal/templates/profile/profile_macros.html:1223
+#: /mnt/code/portal/templates/profile/profile_macros.html:788
+#: /mnt/code/portal/templates/profile/profile_macros.html:791
+#: /mnt/code/portal/templates/profile/profile_macros.html:808
+#: /mnt/code/portal/templates/profile/profile_macros.html:1099
+#: /mnt/code/portal/templates/profile/profile_macros.html:1102
+#: /mnt/code/portal/templates/profile/profile_macros.html:1119
+#: /mnt/code/portal/templates/profile/profile_macros.html:1202
+#: /mnt/code/portal/templates/profile/profile_macros.html:1205
+#: /mnt/code/portal/templates/profile/profile_macros.html:1222
 msgid "Date must be valid and in the required format."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:828
+#: /mnt/code/portal/templates/profile/profile_macros.html:827
 msgid "for"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:829
+#: /mnt/code/portal/templates/profile/profile_macros.html:828
 msgid "Editable by admins only."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:850
+#: /mnt/code/portal/templates/profile/profile_macros.html:849
 msgid "Session History"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:850
+#: /mnt/code/portal/templates/profile/profile_macros.html:849
 msgid "click each row to review report"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:851
+#: /mnt/code/portal/templates/profile/profile_macros.html:850
 msgid "Questionnaire Name"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:851
+#: /mnt/code/portal/templates/profile/profile_macros.html:850
 msgid "Status"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:851
+#: /mnt/code/portal/templates/profile/profile_macros.html:850
 msgid "Last Updated"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:851
+#: /mnt/code/portal/templates/profile/profile_macros.html:850
 msgid "GMT, Y-M-D"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:873
+#: /mnt/code/portal/templates/profile/profile_macros.html:872
 msgid "My Prostate Cancer Profile"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:873
+#: /mnt/code/portal/templates/profile/profile_macros.html:872
 msgid "Clinical Questions"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:875
+#: /mnt/code/portal/templates/profile/profile_macros.html:874
 msgid "Questions asked of the patient at registration"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:901
+#: /mnt/code/portal/templates/profile/profile_macros.html:900
 msgid "Intervention Reports"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:906
+#: /mnt/code/portal/templates/profile/profile_macros.html:905
 msgid "No reports available."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:919
+#: /mnt/code/portal/templates/profile/profile_macros.html:918
 msgid "Select"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:920
+#: /mnt/code/portal/templates/profile/profile_macros.html:919
 msgid "Africa/Johannesburg"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:921
+#: /mnt/code/portal/templates/profile/profile_macros.html:920
 msgid "America/Chicago"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:922
+#: /mnt/code/portal/templates/profile/profile_macros.html:921
 msgid "America/Denver"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:923
+#: /mnt/code/portal/templates/profile/profile_macros.html:922
 msgid "America/Los Angeles"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:924
+#: /mnt/code/portal/templates/profile/profile_macros.html:923
 msgid "America/Indianapolis"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:925
+#: /mnt/code/portal/templates/profile/profile_macros.html:924
 msgid "America/New York"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:926
+#: /mnt/code/portal/templates/profile/profile_macros.html:925
 msgid "America/Sao Paulo"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:927
+#: /mnt/code/portal/templates/profile/profile_macros.html:926
 msgid "Australia/Adelaide"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:928
+#: /mnt/code/portal/templates/profile/profile_macros.html:927
 msgid "Australia/Brisbane"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:929
+#: /mnt/code/portal/templates/profile/profile_macros.html:928
 msgid "Australia/Broken_Hill"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:930
+#: /mnt/code/portal/templates/profile/profile_macros.html:929
 msgid "Australia/Canberra"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:931
+#: /mnt/code/portal/templates/profile/profile_macros.html:930
 msgid "Australia/Currie"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:932
+#: /mnt/code/portal/templates/profile/profile_macros.html:931
 msgid "Australia/Darwin"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:933
+#: /mnt/code/portal/templates/profile/profile_macros.html:932
 msgid "Australia/Eucla"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:934
+#: /mnt/code/portal/templates/profile/profile_macros.html:933
 msgid "Australia/Hobart"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:935
+#: /mnt/code/portal/templates/profile/profile_macros.html:934
 msgid "Australia/Lindeman"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:936
+#: /mnt/code/portal/templates/profile/profile_macros.html:935
 msgid "Australia/Lord_Howe"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:937
+#: /mnt/code/portal/templates/profile/profile_macros.html:936
 msgid "Australia/Melbourne"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:938
+#: /mnt/code/portal/templates/profile/profile_macros.html:937
 msgid "Australia/North"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:939
+#: /mnt/code/portal/templates/profile/profile_macros.html:938
 msgid "Australia/Perth"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:940
+#: /mnt/code/portal/templates/profile/profile_macros.html:939
 msgid "Australia/Queensland"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:941
+#: /mnt/code/portal/templates/profile/profile_macros.html:940
 msgid "Australia/South"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:942
+#: /mnt/code/portal/templates/profile/profile_macros.html:941
 msgid "Australia/Sydney"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:943
+#: /mnt/code/portal/templates/profile/profile_macros.html:942
 msgid "Australia/Tasmania"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:944
+#: /mnt/code/portal/templates/profile/profile_macros.html:943
 msgid "Australia/Victoria"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:945
+#: /mnt/code/portal/templates/profile/profile_macros.html:944
 msgid "Australia/West"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:946
+#: /mnt/code/portal/templates/profile/profile_macros.html:945
 msgid "Australia/Yancowinna"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:947
-#: /mnt/code/portal/templates/profile/profile_macros.html:950
+#: /mnt/code/portal/templates/profile/profile_macros.html:946
+#: /mnt/code/portal/templates/profile/profile_macros.html:949
 msgid "Europe/Andorra"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:948
+#: /mnt/code/portal/templates/profile/profile_macros.html:947
 msgid "Europe/Vienna"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:949
+#: /mnt/code/portal/templates/profile/profile_macros.html:948
 msgid "Europe/Brussels"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:951
+#: /mnt/code/portal/templates/profile/profile_macros.html:950
 msgid "Europe/Stockholm"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:952
+#: /mnt/code/portal/templates/profile/profile_macros.html:951
 msgid "Europe/Sofia"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:953
+#: /mnt/code/portal/templates/profile/profile_macros.html:952
 msgid "Europe/Zurich"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:963
+#: /mnt/code/portal/templates/profile/profile_macros.html:962
 msgid "Deceased Status"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:966
+#: /mnt/code/portal/templates/profile/profile_macros.html:965
 msgid "Patient is deceased"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:972
+#: /mnt/code/portal/templates/profile/profile_macros.html:971
 msgid "no data provided"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:976
+#: /mnt/code/portal/templates/profile/profile_macros.html:975
 msgid "Has the patient passed away?"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:977
+#: /mnt/code/portal/templates/profile/profile_macros.html:976
 #, python-format
 msgid "By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:977
+#: /mnt/code/portal/templates/profile/profile_macros.html:976
 msgid "Withdrawn - Suspend Data Collection"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:982
+#: /mnt/code/portal/templates/profile/profile_macros.html:981
 msgid "Deceased Date"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1037
+#: /mnt/code/portal/templates/profile/profile_macros.html:1036
 msgid "Site ID"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1047
+#: /mnt/code/portal/templates/profile/profile_macros.html:1046
 msgid "Three ways to complete questionnaire"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1053
+#: /mnt/code/portal/templates/profile/profile_macros.html:1052
 msgid "Invite or remind patient over email to complete their questionnaire"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1057
-#: /mnt/code/portal/templates/profile/profile_macros.html:1059
+#: /mnt/code/portal/templates/profile/profile_macros.html:1056
+#: /mnt/code/portal/templates/profile/profile_macros.html:1058
 msgid "Log in as patient"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1058
+#: /mnt/code/portal/templates/profile/profile_macros.html:1057
 msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1062
-#: /mnt/code/portal/templates/profile/profile_macros.html:1066
+#: /mnt/code/portal/templates/profile/profile_macros.html:1061
+#: /mnt/code/portal/templates/profile/profile_macros.html:1065
 msgid "Enter manually"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1064
+#: /mnt/code/portal/templates/profile/profile_macros.html:1063
 msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1072
+#: /mnt/code/portal/templates/profile/profile_macros.html:1071
 msgid "Enter questionnaire manually on patient's behalf"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1079
+#: /mnt/code/portal/templates/profile/profile_macros.html:1078
 msgid "Select the method in which the questionnaire will be completed:"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1087
+#: /mnt/code/portal/templates/profile/profile_macros.html:1086
 msgid "Interview assisted"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1092
+#: /mnt/code/portal/templates/profile/profile_macros.html:1091
 msgid "Paper"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1097
+#: /mnt/code/portal/templates/profile/profile_macros.html:1096
 msgid "Questionnaire completion date"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1100
+#: /mnt/code/portal/templates/profile/profile_macros.html:1099
 msgid "Completion Day"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1120
+#: /mnt/code/portal/templates/profile/profile_macros.html:1119
 msgid "Completion Year"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1152
+#: /mnt/code/portal/templates/profile/profile_macros.html:1151
 msgid "Patient is participating in the following intervention(s): "
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1156
-#: /mnt/code/portal/templates/profile/profile_macros.html:1158
+#: /mnt/code/portal/templates/profile/profile_macros.html:1155
+#: /mnt/code/portal/templates/profile/profile_macros.html:1157
 msgid "None"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1173
+#: /mnt/code/portal/templates/profile/profile_macros.html:1172
 msgid "My Treatments"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1173
+#: /mnt/code/portal/templates/profile/profile_macros.html:1172
 msgid "Clinical Data"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1173
+#: /mnt/code/portal/templates/profile/profile_macros.html:1172
 msgid "(Optional)"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1179
-#: /mnt/code/portal/templates/profile/profile_macros.html:1184
+#: /mnt/code/portal/templates/profile/profile_macros.html:1178
+#: /mnt/code/portal/templates/profile/profile_macros.html:1183
 msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1181
+#: /mnt/code/portal/templates/profile/profile_macros.html:1180
 msgid ""
 "Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
 "                            date, please make your best guess."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1189
+#: /mnt/code/portal/templates/profile/profile_macros.html:1188
 msgid "Select an option"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1200
+#: /mnt/code/portal/templates/profile/profile_macros.html:1199
 msgid "Date"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1228
-#: /mnt/code/portal/templates/profile/profile_macros.html:1270
+#: /mnt/code/portal/templates/profile/profile_macros.html:1227
+#: /mnt/code/portal/templates/profile/profile_macros.html:1269
 msgid "Save"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1228
+#: /mnt/code/portal/templates/profile/profile_macros.html:1227
 msgid "Add"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1238
+#: /mnt/code/portal/templates/profile/profile_macros.html:1237
 msgid "My History"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1240
+#: /mnt/code/portal/templates/profile/profile_macros.html:1239
 msgid "Past"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1240
+#: /mnt/code/portal/templates/profile/profile_macros.html:1239
 msgid "Management(s)"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1251
+#: /mnt/code/portal/templates/profile/profile_macros.html:1250
 msgid "Delete"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1254
+#: /mnt/code/portal/templates/profile/profile_macros.html:1253
 msgid "Are you sure you want to delete this treatment?"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1267
+#: /mnt/code/portal/templates/profile/profile_macros.html:1266
 msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1267
+#: /mnt/code/portal/templates/profile/profile_macros.html:1266
 msgid "Or"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1267
+#: /mnt/code/portal/templates/profile/profile_macros.html:1266
 msgid "cancel"
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1268
+#: /mnt/code/portal/templates/profile/profile_macros.html:1267
 msgid "There is a problem with your profile. Please correct it before saving."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1268
+#: /mnt/code/portal/templates/profile/profile_macros.html:1267
 msgid "Make sure all required fields are filled out and all entries are valid."
 msgstr ""
 
-#: /mnt/code/portal/templates/profile/profile_macros.html:1271
+#: /mnt/code/portal/templates/profile/profile_macros.html:1270
 msgid "Profile changes have been saved"
 msgstr ""
 
@@ -2668,7 +2693,7 @@ msgstr ""
 msgid "New Staff"
 msgstr ""
 
-#: /mnt/code/portal/views/assessment_engine.py:1610
+#: /mnt/code/portal/views/assessment_engine.py:1620
 msgid "All available questionnaires have been completed"
 msgstr ""
 
@@ -2686,15 +2711,15 @@ msgstr ""
 msgid "This application requires Javascript enabled. Please check your browser settings."
 msgstr ""
 
-#: /mnt/code/portal/views/portal.py:516
+#: /mnt/code/portal/views/portal.py:526
 msgid "Unable to match identity"
 msgstr ""
 
-#: /mnt/code/portal/views/portal.py:518
+#: /mnt/code/portal/views/portal.py:528
 msgid "User Not Found"
 msgstr ""
 
-#: /mnt/code/portal/views/portal.py:1262
+#: /mnt/code/portal/views/portal.py:1282
 #, python-format
 msgid "I consent to sharing information with %(org_name)s"
 msgstr ""
@@ -2739,16 +2764,12 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
 msgstr ""
 
-#: AppText:TrueNTH Global Registry patient terms and conditions URL
-#: AppText:Initial Consent Terms
+#: AppText:Initial Consent Terms URL AppText:TrueNTH Global Registry patient
+#: terms and conditions
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
 msgstr ""
 
-#: AppText:TrueNTH Global Registry organization consent URL
-msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d3a28016-656a-36c1-0201-fa1571c42b32&editorUrl=true"
-msgstr ""
-
-#: AppText:TrueNTH Global Registry organization website consent URL patient
+#: AppText:TrueNTH Global Registry patient website consent URL organization
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
 msgstr ""
 
@@ -3162,6 +3183,10 @@ msgstr ""
 msgid "Juravinski Cancer Centre"
 msgstr ""
 
+#: Organization:Cross Cancer Institute (Alberta Health Services)
+msgid "Cross Cancer Institute (Alberta Health Services)"
+msgstr ""
+
 #: Organization:Winship Cancer Institute Emory University
 msgid "Winship Cancer Institute Emory University"
 msgstr ""
@@ -3186,24 +3211,28 @@ msgstr ""
 msgid "Kantonsspitals Chur"
 msgstr ""
 
-#: Organization:Kantonsspitals St. Gallen
-msgid "Kantonsspitals St. Gallen"
+#: Organization:Universitätsspital Zürich
+msgid "Universitätsspital Zürich"
 msgstr ""
 
-#: Organization:United Kingdom (Region/Country Site)
-msgid "United Kingdom (Region/Country Site)"
+#: Organization:The Royal Marsden NHS Foundation Trust
+msgid "The Royal Marsden NHS Foundation Trust"
 msgstr ""
 
-#: Organization:Guys St. Thomas NHS Foundation Trust
-msgid "Guys St. Thomas NHS Foundation Trust"
+#: Organization:The Christie NHS Foundation Trust
+msgid "The Christie NHS Foundation Trust"
 msgstr ""
 
-#: Organization:University Hospital Southampton NHS Foundation Trust
-msgid "University Hospital Southampton NHS Foundation Trust"
+#: Organization:Velindre Cancer Centre
+msgid "Velindre Cancer Centre"
 msgstr ""
 
-#: Organization:University Hospitals of Morecambe Bay NHS Trust
-msgid "University Hospitals of Morecambe Bay NHS Trust"
+#: Organization:South Tyneside and Sunderland NHS Foundation Trust
+msgid "South Tyneside and Sunderland NHS Foundation Trust"
+msgstr ""
+
+#: Organization:Lister Hospital
+msgid "Lister Hospital"
 msgstr ""
 
 #: Organization:South Tyneside District Hospital
@@ -3258,6 +3287,14 @@ msgstr ""
 msgid "Hospital Universitario La Princesa"
 msgstr ""
 
+#: Organization:Institut Catalá d'Oncologia Badalona
+msgid "Institut Catalá d'Oncologia Badalona"
+msgstr ""
+
+#: Organization:Instituto Valenciano de Oncologia
+msgid "Instituto Valenciano de Oncologia"
+msgstr ""
+
 #: Organization:Beacon Hospital
 msgid "Beacon Hospital"
 msgstr ""
@@ -3266,32 +3303,44 @@ msgstr ""
 msgid "St. Vincent's University Hospital"
 msgstr ""
 
-#: Organization:Universitätsspital Zürich
-msgid "Universitätsspital Zürich"
+#: Organization:Test Site
+msgid "Test Site"
 msgstr ""
 
-#: Organization:The Royal Marsden NHS Foundation Trust
-msgid "The Royal Marsden NHS Foundation Trust"
+#: Organization:Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
 msgstr ""
 
-#: Organization:The Christie NHS Foundation Trust
-msgid "The Christie NHS Foundation Trust"
+#: Organization:United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
 msgstr ""
 
-#: Organization:Velindre Cancer Centre
-msgid "Velindre Cancer Centre"
+#: Organization:Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
 msgstr ""
 
-#: Organization:South Tyneside and Sunderland NHS Foundation Trust
-msgid "South Tyneside and Sunderland NHS Foundation Trust"
+#: Organization:University Hospital Southampton NHS Foundation Trust
+msgid "University Hospital Southampton NHS Foundation Trust"
+msgstr ""
+
+#: Organization:University Hospitals of Morecambe Bay NHS Trust
+msgid "University Hospitals of Morecambe Bay NHS Trust"
+msgstr ""
+
+#: Organization:Mount Vernon Cancer Centre
+msgid "Mount Vernon Cancer Centre"
+msgstr ""
+
+#: Organization:Clatterbridge Cancer Centre NHS Foundation Trust
+msgid "Clatterbridge Cancer Centre NHS Foundation Trust"
 msgstr ""
 
 #: Organization:Sunderland Royal Hospital
 msgid "Sunderland Royal Hospital"
 msgstr ""
 
-#: Organization:Queensland University of Technology
-msgid "Queensland University of Technology"
+#: Organization:Sheffield Teaching Hospitals NHS Foundation Trust
+msgid "Sheffield Teaching Hospitals NHS Foundation Trust"
 msgstr ""
 
 #: Organization:TrueNTH Global
@@ -3330,6 +3379,14 @@ msgstr ""
 msgid "Hospital Universitario Central de Asturias"
 msgstr ""
 
+#: Organization:Institut Catalá d'Oncologia Hospitalet
+msgid "Institut Catalá d'Oncologia Hospitalet"
+msgstr ""
+
+#: Organization:Hospital del Mar
+msgid "Hospital del Mar"
+msgstr ""
+
 #: Organization:Ireland (Region/Country Site)
 msgid "Ireland (Region/Country Site)"
 msgstr ""
@@ -3338,8 +3395,12 @@ msgstr ""
 msgid "Tallaght University Hospital"
 msgstr ""
 
-#: Organization:Test Site
-msgid "Test Site"
+#: Organization:Sligo University Hospital
+msgid "Sligo University Hospital"
+msgstr ""
+
+#: Organization:Test Site II
+msgid "Test Site II"
 msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_3mo_pattern
@@ -3350,12 +3411,24 @@ msgstr ""
 msgid "Ironman V3 Recurring 3Mo Pattern"
 msgstr ""
 
+#: QuestionnaireBank:IRONMAN_v5_recurring_3mo_pattern
+msgid "Ironman V5 Recurring 3Mo Pattern"
+msgstr ""
+
 #: QuestionnaireBank:IRONMAN_recurring_6mo_pattern
 msgid "Ironman Recurring 6Mo Pattern"
 msgstr ""
 
 #: QuestionnaireBank:IRONMAN_v3_recurring_6mo_pattern
 msgid "Ironman V3 Recurring 6Mo Pattern"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_v5_start6mo_yearly_end30mo
+msgid "Ironman V5 Start6Mo Yearly End30Mo"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_v5_start3.5years_yearly
+msgid "Ironman V5 Start3.5Years Yearly"
 msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_annual_pattern
@@ -3366,6 +3439,10 @@ msgstr ""
 msgid "Ironman V3 Recurring Annual Pattern"
 msgstr ""
 
+#: QuestionnaireBank:IRONMAN_v5_recurring_annual_pattern
+msgid "Ironman V5 Recurring Annual Pattern"
+msgstr ""
+
 #: QuestionnaireBank:none of the above
 msgid "None Of The Above"
 msgstr ""
@@ -3374,12 +3451,16 @@ msgstr ""
 msgid "Ironman Baseline"
 msgstr ""
 
+#: QuestionnaireBank:IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr ""
+
 #: QuestionnaireBank:IRONMAN_v3_indefinite
 msgid "Ironman V3 Indefinite"
 msgstr ""
 
-#: QuestionnaireBank:IRONMAN_indefinite
-msgid "Ironman Indefinite"
+#: QuestionnaireBank:IRONMAN_v5_baseline
+msgid "Ironman V5 Baseline"
 msgstr ""
 
 #: QuestionnaireBank:CRV_baseline
@@ -3388,6 +3469,14 @@ msgstr ""
 
 #: QuestionnaireBank:IRONMAN_v3_baseline
 msgid "Ironman V3 Baseline"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_v5_indefinite
+msgid "Ironman V5 Indefinite"
+msgstr ""
+
+#: ResearchProtocol:IRONMAN v5
+msgid "Ironman V5"
 msgstr ""
 
 #: ResearchProtocol:IRONMAN v3
