@@ -55,9 +55,7 @@ msgid "Internal Server Error"
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/500.html:34
-msgid ""
-"Your request is not processed due to server error(s). If you are still "
-"experiencing problem.  Please use the link below."
+msgid "Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/about.html:4
@@ -82,9 +80,7 @@ msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/base.html:45
 #: /mnt/code/portal/templates/layout.html:44
-msgid ""
-"You are using an outdated browser. Please upgrade your browser to improve "
-"your experience."
+msgid "You are using an outdated browser. Please upgrade your browser to improve your experience."
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/base.html:77
@@ -230,8 +226,7 @@ msgid "Having trouble logging in?"
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/landing.html:39
-msgid ""
-"You have been logged out due to inactivity. Please log in again to continue."
+msgid "You have been logged out due to inactivity. Please log in again to continue."
 msgstr ""
 
 #: /mnt/code/portal/eproms/templates/eproms/landing.html:50
@@ -346,22 +341,17 @@ msgstr ""
 
 #: /mnt/code/portal/models/intervention_strategies.py:276
 #, python-format
-msgid ""
-"Please complete your %(assigning_authority)s questionnaire as soon as "
-"possible. It will expire on %(expired_date)s."
+msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
 msgstr ""
 
 #: /mnt/code/portal/models/intervention_strategies.py:286
 #, python-format
-msgid ""
-"Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
+msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
 msgstr ""
 
 #: /mnt/code/portal/models/intervention_strategies.py:303
 #, python-format
-msgid ""
-"Please complete your %(assigning_authority)s questionnaire at your "
-"convenience."
+msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
 msgstr ""
 
 #: /mnt/code/portal/models/intervention_strategies.py:325
@@ -440,9 +430,7 @@ msgid "Identity Verification"
 msgstr ""
 
 #: /mnt/code/portal/templates/challenge_identity.html:7
-msgid ""
-"To ensure your personal details are not shared with others, please enter the"
-" following data for account confirmation."
+msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
 msgstr ""
 
 #: /mnt/code/portal/templates/challenge_identity.html:21
@@ -654,9 +642,7 @@ msgid "Identity verification"
 msgstr ""
 
 #: /mnt/code/portal/templates/confirm_identity.html:12
-msgid ""
-"I confirm that I am a participant in the IRONMAN Registry Study and am "
-"completing this questionnaire myself."
+msgid "I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself."
 msgstr ""
 
 #: /mnt/code/portal/templates/confirm_identity.html:17
@@ -697,9 +683,7 @@ msgid "More About You"
 msgstr ""
 
 #: /mnt/code/portal/templates/coredata.html:6
-msgid ""
-"The TrueNTH system asks these questions in order to give you information "
-"that best fits"
+msgid "The TrueNTH system asks these questions in order to give you information that best fits"
 msgstr ""
 
 #: /mnt/code/portal/templates/coredata.html:6
@@ -775,15 +759,11 @@ msgid "Explore How TrueNTH Works"
 msgstr ""
 
 #: /mnt/code/portal/templates/explore.html:20
-msgid ""
-"A program aimed at improving the lives of men diagnosed and living with "
-"prostate cancer, and their partners, loved ones, and caregivers."
+msgid "A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers."
 msgstr ""
 
 #: /mnt/code/portal/templates/explore.html:21
-msgid ""
-"Coming soon … discover tools designed to help those affected by prostate "
-"cancer."
+msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
 msgstr ""
 
 #: /mnt/code/portal/templates/explore.html:29
@@ -817,10 +797,7 @@ msgid "your clinical profile"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries.html:27
-msgid ""
-"The questions we're asking will help us customize what you see and provide "
-"the best information to help you track and manage your prostate cancer "
-"journey."
+msgid "The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries.html:30
@@ -865,9 +842,7 @@ msgid "Terms of Use"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:30
-msgid ""
-"Thanks for signing up for TrueNTH. First, please review the terms of use to "
-"access the TrueNTH tools"
+msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:37
@@ -885,26 +860,16 @@ msgid ""
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:52
-msgid ""
-"By checking this box, I confirm that I have read the information notice "
-"above and consent and agree to the processing of my personal information "
-"(including my health information) on the terms described in this Consent."
+msgid "By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:55
-msgid ""
-"You have previously provided your consent to the website during a visit at "
-"your treating site. If you would like a copy of this please contact your "
-"study contact."
+msgid "You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:73
 #, python-format
-msgid ""
-"<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm "
-"that I have read and accept the website <a href=\"%(privacy_url)s\" "
-"class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" "
-"class=\"required-link\">terms</a>.</span>"
+msgid "<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class=\"required-link\">terms</a>.</span>"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:103
@@ -912,9 +877,7 @@ msgid "To Continue"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:107
-msgid ""
-"You must agree to the terms and conditions by checking the provided "
-"checkbox."
+msgid "You must agree to the terms and conditions by checking the provided checkbox."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:111
@@ -933,13 +896,7 @@ msgid "For Staff Use Only"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:133
-msgid ""
-"By checking this box, I confirm that the patient has read the Website "
-"Consent and consents and agrees to the processing of their personal "
-"information (including their health information) on the terms described in "
-"this Consent and Terms and Conditions and a copy of this consent and "
-"information provided by the patient has been securely stored in accordance "
-"with my local site procedures."
+msgid "By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:143
@@ -947,16 +904,11 @@ msgid "Website Consent Script - Enter Manually - Interview Assisted"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:148
-msgid ""
-"We are inviting you to use the TrueNTH website tool because you have agreed "
-"to participate in the [organization] Registry study."
+msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:149
-msgid ""
-"The information you provide will be used in a global study and will benefit "
-"patients in the future with better treatment and care options.  Does this "
-"sound like something you’d be willing to participate in?"
+msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:151
@@ -977,18 +929,11 @@ msgid "Do you have any questions?"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:162
-msgid ""
-"Do you agree to participate in the TrueNTH website tool and consent to the "
-"processing of your personal information (including your health information) "
-"on the terms I have just read to you?"
+msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:164
-msgid ""
-"If yes, document oral consent below. [NOTE: This consent must absolutely be "
-"read out to them in advance of gathering any personal information. The "
-"patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally "
-"as casual will not be satisfactory.]"
+msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:172
@@ -1004,27 +949,15 @@ msgid "View/print website declaration form"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:204
-msgid ""
-"By checking this box, I confirm that I have read the required information to"
-" the patient and provided the opportunity for the patient to ask questions. "
-"I have addressed the questions to the patient’s satisfaction and have "
-"created an electronic copy of this declaration and have stored this copy. "
-"The patient has provided oral consent to participate in the TrueNTH Global "
-"Registry on the terms set out above."
+msgid "By checking this box, I confirm that I have read the required information to the patient and provided the opportunity for the patient to ask questions. I have addressed the questions to the patient’s satisfaction and have created an electronic copy of this declaration and have stored this copy. The patient has provided oral consent to participate in the TrueNTH Global Registry on the terms set out above."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:205
-msgid ""
-"By checking this box, I confirm that I have read and/or gone through "
-"required information to the subject and have completed the required consent "
-"to the use of the TrueNTH website tool and have created an electronic copy "
-"of this declaration and have stored said copy."
+msgid "By checking this box, I confirm that I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:207
-msgid ""
-"Subject has given consent previously and you had previously signed and "
-"stored an electronic copy of consent declaration.."
+msgid "Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration.."
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:219
@@ -1042,9 +975,7 @@ msgid "I'm a man who is concerned about prostate cancer for myself"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:241
-msgid ""
-"I'm a caregiver, spouse or partner who wants to learn more about prostate "
-"cancer"
+msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
 msgstr ""
 
 #: /mnt/code/portal/templates/initial_queries_macros.html:253
@@ -1324,8 +1255,7 @@ msgid "Your session is about to expire"
 msgstr ""
 
 #: /mnt/code/portal/templates/portal_wrapper.html:165
-msgid ""
-"Your session will expire in approximately {time} seconds due to inactivity."
+msgid "Your session will expire in approximately {time} seconds due to inactivity."
 msgstr ""
 
 #: /mnt/code/portal/templates/portal_wrapper.html:166
@@ -1341,24 +1271,16 @@ msgid "Browser Cookies Disabled"
 msgstr ""
 
 #: /mnt/code/portal/templates/require_cookies.html:9
-msgid ""
-"Our website needs to use cookies to bring you the best, personalized, "
-"browsing experience. Your web browser is currently <b>not</b> allowing "
-"cookies. Help us fix this."
+msgid "Our website needs to use cookies to bring you the best, personalized, browsing experience. Your web browser is currently <b>not</b> allowing cookies. Help us fix this."
 msgstr ""
 
 #: /mnt/code/portal/templates/require_cookies.html:13
-msgid ""
-"Please enable cookies within your browser settings to continue. To learn how"
-" to allow cookies, check online for your web browser's specific "
-"instructions."
+msgid "Please enable cookies within your browser settings to continue. To learn how to allow cookies, check online for your web browser's specific instructions."
 msgstr ""
 
 #: /mnt/code/portal/templates/require_cookies.html:15
 #, python-format
-msgid ""
-"For more information on how we use cookies, see our <u><a "
-"href=\"%(privacy_url)s\">Privacy Policy</a></u>."
+msgid "For more information on how we use cookies, see our <u><a href=\"%(privacy_url)s\">Privacy Policy</a></u>."
 msgstr ""
 
 #: /mnt/code/portal/templates/require_cookies.html:20
@@ -1680,9 +1602,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:93
 #, python-format
-msgid ""
-"%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-"
-"profit organization."
+msgid "%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:101
@@ -1710,9 +1630,7 @@ msgid "Limited Access"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:123
-msgid ""
-"To access this information, you will need to log in with your username and "
-"password."
+msgid "To access this information, you will need to log in with your username and password."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/_macros.html:126
@@ -1800,31 +1718,19 @@ msgid "About Using Google or Facebook for TrueNTH"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/register.html:81
-msgid ""
-"We offer users the ability to create a unique account for TrueNTH or the "
-"option to use their Facebook or Google logins. Choosing to use Facebook or "
-"Google provides a few additional benefits to you:"
+msgid "We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Facebook or Google provides a few additional benefits to you:"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/register.html:83
-msgid ""
-"A single login - you don't need to remember multiple user names or "
-"passwords. Assuming you have an active login with Facebook or Google, "
-"logging into TrueNTH is as simple as clicking a single button."
+msgid "A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/register.html:84
-msgid ""
-"TrueNTH can automatically import basic profile information from those "
-"services, simplifying the amount of information you need to enter. This "
-"includes name, email address, birthdate and profile image."
+msgid "TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/register.html:85
-msgid ""
-"Information is a one-way street - TrueNTH can pull basic profile information"
-" from Facebook and Google, but never share anything with them. And we NEVER "
-"post or share anything to your accounts."
+msgid "Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/resend_confirm_email.html:5
@@ -1837,9 +1743,7 @@ msgid "Reset Password"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/reset_password.html:11
-msgid ""
-"Password must have at least eight characters with one lowercase letter, one "
-"uppercase letter and one number"
+msgid "Password must have at least eight characters with one lowercase letter, one uppercase letter and one number"
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/user_profile.html:5
@@ -1911,34 +1815,24 @@ msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.html:8
 #, python-format
-msgid ""
-"If you did not initiate this password change, <a "
-"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
-"contact your representative at %(organization_name)s."
+msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(organization_name)s."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.html:10
 #, python-format
-msgid ""
-"If you did not initiate this password change, <a "
-"href=\"%(forgot_password_url)s\">please click here to reset it</a>, or "
-"contact your representative at %(app_name)s."
+msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(app_name)s."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.html:16
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.txt:20
 #, python-format
-msgid ""
-"If you did not initiate this password change, please contact your "
-"representative at %(organization_name)s."
+msgid "If you did not initiate this password change, please contact your representative at %(organization_name)s."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.html:18
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.txt:22
 #, python-format
-msgid ""
-"If you did not initiate this password change, please contact your "
-"representative at %(app_name)s."
+msgid "If you did not initiate this password change, please contact your representative at %(app_name)s."
 msgstr ""
 
 #: /mnt/code/portal/templates/flask_user/emails/eproms_password_changed_message.txt:4
@@ -2006,11 +1900,7 @@ msgid "Log in as this patient"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/patient_profile.html:39
-msgid ""
-"This is intended for \"kiosk\" style administration of an assessment, "
-"wherein the staff person \"logs in as the patient\", which logs the staff "
-"person out of their session, and automatically logs in this patient without "
-"their needing to enter login credentials. Proceed?"
+msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/patient_profile.html:44
@@ -2625,9 +2515,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:976
 #, python-format
-msgid ""
-"By checking this box, the patient's consent status will be updated to "
-"'%(new_consent_status)s'. Do you want to continue?"
+msgid "By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:976
@@ -2656,10 +2544,7 @@ msgid "Log in as patient"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1057
-msgid ""
-"This logs you out, and logs in the patient without their needing to enter "
-"credentials. This is so the patient can complete their questionnaire on this"
-" device. Ideal for tablet and kiosk computers."
+msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1061
@@ -2668,9 +2553,7 @@ msgid "Enter manually"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1063
-msgid ""
-"Enter questionnaire responses on patient's behalf. Helpful if responses have"
-" been completed on paper."
+msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1071
@@ -2724,10 +2607,7 @@ msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1178
 #: /mnt/code/portal/templates/profile/profile_macros.html:1183
-msgid ""
-"Which of the following prostate cancer management options has the patient "
-"had, if any? If you don&#39;t remember the exact date, please make your best"
-" guess."
+msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1180
@@ -2774,8 +2654,7 @@ msgid "Are you sure you want to delete this treatment?"
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1266
-msgid ""
-"You have updated your profile. Click the Save button to submit your changes."
+msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1266
@@ -2791,8 +2670,7 @@ msgid "There is a problem with your profile. Please correct it before saving."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1267
-msgid ""
-"Make sure all required fields are filled out and all entries are valid."
+msgid "Make sure all required fields are filled out and all entries are valid."
 msgstr ""
 
 #: /mnt/code/portal/templates/profile/profile_macros.html:1270
@@ -2821,25 +2699,16 @@ msgstr ""
 
 #: /mnt/code/portal/views/extend_flask_user.py:79
 #, python-format
-msgid ""
-"We see you're having trouble - let us help.                 Your account "
-"will now be locked while we give it a refresh.                 Please try "
-"again in %(time)d minutes.                 If you're still having issues, "
-"please click                 \"Having trouble logging in?\" below."
+msgid "We see you're having trouble - let us help.                 Your account will now be locked while we give it a refresh.                 Please try again in %(time)d minutes.                 If you're still having issues, please click                 \"Having trouble logging in?\" below."
 msgstr ""
 
 #: /mnt/code/portal/views/patch_flask_user.py:56
 #, python-format
-msgid ""
-"If the email address '%(email)s' is in the system, a reset password email "
-"will now have been sent to it. Please open that email and follow the "
-"instructions to reset your password."
+msgid "If the email address '%(email)s' is in the system, a reset password email will now have been sent to it. Please open that email and follow the instructions to reset your password."
 msgstr ""
 
 #: /mnt/code/portal/views/portal.py:95
-msgid ""
-"This application requires Javascript enabled. Please check your browser "
-"settings."
+msgid "This application requires Javascript enabled. Please check your browser settings."
 msgstr ""
 
 #: /mnt/code/portal/views/portal.py:526
@@ -2856,92 +2725,72 @@ msgid "I consent to sharing information with %(org_name)s"
 msgstr ""
 
 #: AppText:About TrueNTH URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
 msgstr ""
 
 #: AppText:Cellphone
 msgid "Mobile"
 msgstr ""
 
-#: AppText:IRONMAN patient website consent URL AppText:IRONMAN organization
-#: website consent URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+#: AppText:IRONMAN patient website consent URL organization
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN patient privacy URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN patient terms and conditions URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-"
-"ddc9fe98a921&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN staff privacy URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN staff registraion email URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN staff terms and conditions URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry staff website consent URL AppText:IRONMAN
-#: staff website consent URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
 msgstr ""
 
 #: AppText:IRONMAN website declaration form URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
 msgstr ""
 
 #: AppText:Initial Consent Terms URL AppText:TrueNTH Global Registry patient
-#: terms and conditions URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+#: terms and conditions
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
 msgstr ""
 
-#: AppText:TrueNTH Global Registry patient website consent URL AppText:TrueNTH
-#: Global Registry organization website consent URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+#: AppText:TrueNTH Global Registry patient website consent URL organization
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry patient privacy URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry staff privacy URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry staff registraion email URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry staff terms and conditions URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
 msgstr ""
 
 #: AppText:TrueNTH Global Registry website declaration form URL
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
 msgstr ""
 
 #: AppText:consent date label
@@ -2964,54 +2813,28 @@ msgstr ""
 msgid "TrueNTH Registration"
 msgstr ""
 
-#: AppText:patient invite email TrueNTH Global Registry AppText:patient invite
-#: email
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
+#: AppText:patient invite email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
 msgstr ""
 
 #: AppText:patient invite email IRONMAN
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
 msgstr ""
 
 #: AppText:patient reminder email IRONMAN
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
 msgstr ""
 
 #: AppText:patient reminder email TrueNTH Global Registry
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
 msgstr ""
 
 #: AppText:profileSendEmail invite email_body
-msgid ""
-"<p>(greeting),</p><p>This email was sent to you because you are a patient at"
-" (clinic name) and consented to participate in the Prostate Cancer Outcomes "
-"- (parent org) Registry Study.</p><p>This is an invitation to use the "
-"TrueNTH website, where you will report on your health. Your participation "
-"will help us collectively improve the care that men receive during their "
-"prostate cancer journey.</p><p>To complete your first questionnaire, please "
-"first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your"
-" account</a></div><p>You can also access the TrueNTH website with this "
-"link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can "
-"return to TrueNTH any time.</p><p>If you have any queries, please contact "
-"your representative at (clinic name).</p>"
+msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
 msgstr ""
 
 #: AppText:profileSendEmail reminder email_body
-msgid ""
-"<p>Hello,</p><p>This email was sent to you by (clinic name). This is where "
-"you report on your health along your prostate cancer journey. The "
-"information collected will be used to determine where improvements in "
-"Prostate Cancer Care can be made.</p><p>Login now to complete your "
-"questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and"
-" answer questionnaire now</a></div><p>Click the button above or use the link"
-" below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any"
-" questions or concerns, please contact (clinic name).</p><p><em>&mdash; This"
-" email was sent because you consented to participate in the TrueNTH registry"
-" project</em></p>"
+msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
 msgstr ""
 
 #: AppText:profileSendEmail reminder email_subject
@@ -3026,14 +2849,12 @@ msgstr ""
 msgid "Register for TrueNTH"
 msgstr ""
 
-#: AppText:site summary email IRONMAN AppText:site summary email
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+#: AppText:site summary email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
 msgstr ""
 
 #: AppText:site summary email TrueNTH Global Registry
-msgid ""
-"{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
 msgstr ""
 
 #: Intervention:assessment_engine
@@ -3045,9 +2866,7 @@ msgid "Care Plan"
 msgstr ""
 
 #: Intervention:care_plan
-msgid ""
-"<p>Organization and support for the many details of life as a prostate "
-"cancer survivor</p>"
+msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
 msgstr ""
 
 #: Intervention:community_of_wellness
@@ -3059,9 +2878,7 @@ msgid "Decision Support tool"
 msgstr ""
 
 #: Intervention:decision_support_p3p
-msgid ""
-" <p>Explore your values, your preferences, and the current medical knowledge"
-" to help you discuss your treatment options with your doctors.</p>"
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
 msgstr ""
 
 #: Intervention:decision_support_wisercare
@@ -3073,9 +2890,7 @@ msgid "OTHER: not yet officially supported"
 msgstr ""
 
 #: Intervention:self_management
-msgid ""
-"<p>Learn about symptoms that are common in men with prostate cancer, and "
-"about ways to manage and improve these symptoms.</p>"
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
 msgstr ""
 
 #: Intervention:sexual_recovery
@@ -3083,9 +2898,7 @@ msgid "Sexual Recovery"
 msgstr ""
 
 #: Intervention:sexual_recovery
-msgid ""
-"<p>Learn strategies for developing a new normal in your sex life after "
-"treatment for prostate cancer.</p>"
+msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
 msgstr ""
 
 #: Intervention:social_support
@@ -3142,8 +2955,7 @@ msgstr ""
 
 #: Organization:Medical Oncology, Division Of Cancer Services, Princess
 #: Alexandra Hospital
-msgid ""
-"Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
 msgstr ""
 
 #: Organization:Urology South Brisbane
@@ -3363,7 +3175,7 @@ msgstr ""
 msgid "CHU de Quebec - Universite Laval"
 msgstr ""
 
-#: Organization:Centre Hospitalier de l'Université de Montréal
+#: Organization:Centre Hospitalier de l'Université Montréal
 msgid "Centre Hospitalier de l'Université de Montréal"
 msgstr ""
 
@@ -3543,7 +3355,7 @@ msgstr ""
 msgid "Brazil (Region/Country Site)"
 msgstr ""
 
-#: Organization:Centro de Paulista de Oncologia
+#: Organization:Centro de Paulista Oncologia
 msgid "Centro de Paulista de Oncologia"
 msgstr ""
 
