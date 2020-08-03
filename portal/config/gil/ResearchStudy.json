@@ -1,5 +1,12 @@
 {
-  "entry": [],
+  "entry": [
+    {
+      "id": 0,
+      "title": "Base Study",
+      "status": "active",
+      "resourceType": "ResearchStudy"
+    }
+  ],
   "id": "SitePersistence v0.2",
   "meta": {
     "fhir_comments": [
