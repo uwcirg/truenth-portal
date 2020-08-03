@@ -1,0 +1,26 @@
+{
+  "entry": [
+    {
+      "id": 0,
+      "title": "Base Study",
+      "status": "active",
+      "resourceType": "ResearchStudy"
+    },
+    {
+      "id": 1,
+      "title": "IRONMAN Sub Study - Improving Outcomes",
+      "status": "active",
+      "resourceType": "ResearchStudy"
+    }
+  ],
+  "id": "SitePersistence v0.2",
+  "meta": {
+    "fhir_comments": [
+      "export of dynamic site data from host",
+      "stg.us.truenth.org"
+    ],
+    "lastUpdated": "2017-11-22T00:23:11.971774Z"
+  },
+  "resourceType": "Bundle",
+  "type": "document"
+}
