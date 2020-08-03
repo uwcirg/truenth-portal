@@ -14,304 +14,304 @@ msgstr ""
 
 #: flask_user/forms.py:41
 msgid "Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number"
-msgstr "Iphaswedi imele ibe neekharektha eziyi-6 ubuncinane, ibe nonobumba omnye omncinci, unobumba omnye omkhulu nenombolo enye"
+msgstr "Passordet må ha minst 6 tegn med 1 liten bokstav, 1 stor bokstav og 1 tall"
 
 #: flask_user/forms.py:47
 msgid "Username must be at least 3 characters long"
-msgstr "I-Username imele ibe ziikharektha ezi-3 ubude"
+msgstr "Brukernavnet må ha minst 3 tegn"
 
 #: flask_user/forms.py:52
 msgid "Username may only contain letters, numbers, '-', '.' and '_'"
-msgstr "I-Username inokuquka kuphela oonobumba, amanani, '-', '.' kunye '_'"
+msgstr "Brukernavn kan bare inneholde bokstaver, tall, '-', '.' og '_'"
 
 #: flask_user/forms.py:58
 msgid "This Username is already in use. Please try another one."
-msgstr "Le Username sele isetyenziswa. Nceda uzame enye."
+msgstr "Dette brukernavnet er allerede i bruk. Vennligst prøv et annet."
 
 #: flask_user/forms.py:65
 msgid "This Email is already in use. Please try another one."
-msgstr "Le Imeyile sele isetyenziswa. Nceda uzame enye."
+msgstr "Denne eposten er allerede i bruk. Vennligst prøv en annen."
 
 #: flask_user/forms.py:72 flask_user/forms.py:173 flask_user/forms.py:232
 #: flask_user/forms.py:260 flask_user/forms.py:336
 msgid "Email"
-msgstr "I-imeyile"
+msgstr "Epost"
 
 #: flask_user/forms.py:73 flask_user/forms.py:174 flask_user/forms.py:261
 #: flask_user/forms.py:337
 msgid "Email is required"
-msgstr "I-Imeyile iyafuneka"
+msgstr "Epost er påkrevd"
 
 #: flask_user/forms.py:74 flask_user/forms.py:175 flask_user/forms.py:262
 #: flask_user/forms.py:338
 msgid "Invalid Email"
-msgstr "Idilesi ye-imeyile asiyiyo"
+msgstr "Ugyldig epost"
 
 #: flask_user/forms.py:76
 msgid "Add Email"
-msgstr "Faka i-Imeyile"
+msgstr "Legg til epost"
 
 #: flask_user/forms.py:79 flask_user/forms.py:122
 msgid "Old Password"
-msgstr "Iphaswedi Indala"
+msgstr "Gammelt passord"
 
 #: flask_user/forms.py:80 flask_user/forms.py:123
 msgid "Old Password is required"
-msgstr "Iphaswedi Endala iyafuneka"
+msgstr "Du må oppgi gammelt passord"
 
 #: flask_user/forms.py:82 flask_user/forms.py:310
 msgid "New Password"
-msgstr "Iphaswedi Entsha"
+msgstr "Nytt passord"
 
 #: flask_user/forms.py:83 flask_user/forms.py:311
 msgid "New Password is required"
-msgstr "Iphaswedi Entsha iyafuneka"
+msgstr "Du må oppgi nytt passord"
 
 #: flask_user/forms.py:85 flask_user/forms.py:312
 msgid "Retype New Password"
-msgstr "Phinda utayiphe kwakhona Iphaswedi Entsha"
+msgstr "Gjenta nytt passord"
 
 #: flask_user/forms.py:86 flask_user/forms.py:313
 msgid "New Password and Retype Password did not match"
-msgstr "Iphaswedi Entsha, nePhaswedi ophinde wayitayipa azingqamani"
+msgstr "Nytt passord og gjentatt passord stemte ikke overens"
 
 #: flask_user/forms.py:89 flask_user/forms.py:315
 #: flask_user/templates/flask_user/change_password.html:5
 #: flask_user/templates/flask_user/user_profile.html:11
 msgid "Change password"
-msgstr "Tshintsha iphaswedi"
+msgstr "Endre passord"
 
 #: flask_user/forms.py:111 flask_user/forms.py:145
 msgid "Old Password is incorrect"
-msgstr "Iphaswedi Endala ayichananga"
+msgstr "Det gamle passordet er feil"
 
 #: flask_user/forms.py:118
 msgid "New Username"
-msgstr "I-Username Entsha"
+msgstr "Nytt brukernavn"
 
 #: flask_user/forms.py:119 flask_user/forms.py:171 flask_user/forms.py:258
 msgid "Username is required"
-msgstr "I-Username iyafuneka"
+msgstr "Brukernavn er påkrevd"
 
 #: flask_user/forms.py:126
 #: flask_user/templates/flask_user/change_username.html:5
 #: flask_user/templates/flask_user/user_profile.html:8
 msgid "Change username"
-msgstr "Tshintsha igama lomsebenzisi"
+msgstr "Endre brukernavn"
 
 #: flask_user/forms.py:152 flask_user/forms.py:303
 msgid "Your email address"
-msgstr "Idilesi ye-imeyile yakho"
+msgstr "Din epostadresse"
 
 #: flask_user/forms.py:153 flask_user/forms.py:304
 msgid "Email address is required"
-msgstr "Idilesi ye-imeyile iyafuneka"
+msgstr "Epostadresse er påkrevd"
 
 #: flask_user/forms.py:154 flask_user/forms.py:305
 msgid "Invalid Email address"
-msgstr "Idilesi ye-imeyile esetyenzisiweyo asiyiyo"
+msgstr "Ugyldig epostadresse"
 
 #: flask_user/forms.py:156
 msgid "Send reset password email"
-msgstr "Thumela i-imeyile yokuseta kwakhona iphaswedi"
+msgstr "Send passordtilbakestillingsepost"
 
 #: flask_user/forms.py:163 flask_user/forms.py:237
 #, python-format
 msgid "%(username_or_email)s does not exist"
-msgstr "%(username_or_email)s ayikho"
+msgstr "%(username_or_email)s eksisterer ikke"
 
 #: flask_user/forms.py:170 flask_user/forms.py:229 flask_user/forms.py:257
 msgid "Username"
-msgstr "Igama Lomsebenzisi"
+msgstr "Brukernavn"
 
 #: flask_user/forms.py:177 flask_user/forms.py:264
 msgid "Password"
-msgstr "Iphaswedi"
+msgstr "Passord"
 
 #: flask_user/forms.py:178 flask_user/forms.py:265
 msgid "Password is required"
-msgstr "Iphaswedi iyafuneka"
+msgstr "Passord er påkrevd"
 
 #: flask_user/forms.py:180
 msgid "Remember me"
-msgstr "Ndikhumbule"
+msgstr "Husk meg"
 
 #: flask_user/forms.py:182 flask_user/templates/flask_user/login.html:5
 #: flask_user/templates/flask_user/login_or_register.html:9
 msgid "Sign in"
-msgstr "Sayina ungene"
+msgstr "Logg inn"
 
 #: flask_user/forms.py:189
 msgid "Username or Email"
-msgstr "I-Username okanye i-Imeyile"
+msgstr "Brukernavn eller epost"
 
 #: flask_user/forms.py:226
 msgid "Username/Email"
-msgstr "Username/Imeyile"
+msgstr "Brukernavn/epost"
 
 #: flask_user/forms.py:240
 msgid "Incorrect Password"
-msgstr "IPhaswedi Ayichananga"
+msgstr "Feil passord"
 
 #: flask_user/forms.py:244
 #, python-format
 msgid "Incorrect %(username_or_email)s and/or Password"
-msgstr "Ayichananga %(username_or_email)s kunye/okanye iPhaswedi"
+msgstr "Feil %(username_or_email)s og/eller passord"
 
 #: flask_user/forms.py:266
 msgid "Retype Password"
-msgstr "Tayipha Kwakhona Iphaswedi"
+msgstr "Skriv inn passordet på nytt"
 
 #: flask_user/forms.py:267
 msgid "Password and Retype Password did not match"
-msgstr "Iphaswedi, nePhaswedi oyitayiphe Kwakhona azingqamani"
+msgstr "Passord og gjentatt passord stemte ikke overens"
 
 #: flask_user/forms.py:268
 msgid "Token"
-msgstr "ITokeni"
+msgstr "Token"
 
 #: flask_user/forms.py:270
 #: flask_user/templates/flask_user/login_or_register.html:41
 #: flask_user/templates/flask_user/register.html:5
 msgid "Register"
-msgstr "Bhalisa"
+msgstr "Registrer"
 
 #: flask_user/forms.py:307
 msgid "Resend email confirmation email"
-msgstr "Thumela Kwakhona i-imeyile yokuqinisekisa"
+msgstr "Send bekreftelseseposten på nytt"
 
 #: flask_user/forms.py:340
 msgid "Invite!"
-msgstr "Mema!"
+msgstr "Invitasjon!"
 
 #: flask_user/translations.py:74
 msgid "Home Page"
-msgstr "Iphepha Lokuqala"
+msgstr "Hjemmeside"
 
 #: flask_user/translations.py:75
 msgid "Profile Page"
-msgstr "Iphepha leProfayile"
+msgstr "Profilside"
 
 #: flask_user/translations.py:76
 msgid "Special Page"
-msgstr "Iphepha Elikhethekileyo"
+msgstr "Spesiell side"
 
 #: flask_user/views.py:46
 msgid "Your confirmation token has expired."
-msgstr "Itokeni yakho yokuqinisekisa iphelelwe."
+msgstr "Din bekreftelsestoken har utløpt."
 
 #: flask_user/views.py:50 flask_user/views.py:70
 msgid "Invalid confirmation token."
-msgstr "Itokeni yokuqinisekisa asiyiyo."
+msgstr "Ugyldig bekreftelsestoken."
 
 #: flask_user/views.py:77
 msgid "Your email has been confirmed."
-msgstr "I-Imeyile yakho iqinisekisiwe."
+msgstr "Din epostadresse har blitt bekreftet."
 
 #: flask_user/views.py:115
 msgid "Your password has been changed successfully."
-msgstr "Iphaswedi yakho itshintshwe ngempumelelo."
+msgstr "Ditt passord har blitt endret."
 
 #: flask_user/views.py:153
 #, python-format
 msgid "Your username has been changed to '%(username)s'."
-msgstr "I-username yakho itshintshelwe ku '%(username)s'."
+msgstr "Ditt brukernavn har blitt endret til '%(username)s'."
 
 #: flask_user/views.py:221
 #, python-format
 msgid "A reset password email has been sent to '%(email)s'. Open that email and follow the instructions to reset your password."
-msgstr "I-imeyile yokuseta kwakhona iphaswedi ithunyelwe ku '%(email)s'. Vula laa imeyile uze ulandele imiyalelo ukutshintsha kwakhona iphaswedi yakho."
+msgstr "En passordtilbakestillingsepost har blitt sendt til '%(email)s'. Åpne eposten og følg instruksjonene for å tilbakestille ditt passord."
 
 #: flask_user/views.py:293
 msgid "You have signed out successfully."
-msgstr "Usayine waphuma ngempumelelo"
+msgstr "Du har logget deg ut."
 
 #: flask_user/views.py:534
 msgid "Invitation has been sent."
-msgstr "Isimemo sithunyelwe"
+msgstr "Invitasjon har blitt sendt."
 
 #: flask_user/views.py:578
 msgid "Your reset password token has expired."
-msgstr "Itokeni yakho yephaswedi iphelelwe."
+msgstr "Din passordtilbakestillingstoken er utløpt."
 
 #: flask_user/views.py:582
 msgid "Your reset password token is invalid."
-msgstr "Itokeni yakho yephaswedi ayiyo"
+msgstr "Din passordtilbakestillingstoken er ugyldig."
 
 #: flask_user/views.py:609
 msgid "Your password has been reset successfully."
-msgstr "Iphaswedi yakho itshintshwe ngempumelelo."
+msgstr "Ditt passord har blitt endret."
 
 #: flask_user/views.py:626
 #, python-format
 msgid "You must confirm your email to access '%(url)s'."
-msgstr "Kufuneka uqinisekisa i-imeyile yakho ukuze ufikelele '%(url)s'."
+msgstr "Du må bekrefte din epost for å få tilgang til '%(url)s'."
 
 #: flask_user/views.py:638
 #, python-format
 msgid "You must be signed in to access '%(url)s'."
-msgstr "Kufuneka usayine ungene ukufikelela '%(url)s'."
+msgstr "Du må være logget inn for å få tilgang til '%(url)s'."
 
 #: flask_user/views.py:649
 #, python-format
 msgid "You do not have permission to access '%(url)s'."
-msgstr "Awunayo imvume yokufikelela '%(url)s'."
+msgstr "Du har ikke tillatelse til å få tilgang til '%(url)s'."
 
 #: flask_user/views.py:680 flask_user/views.py:701
 #, python-format
 msgid "A confirmation email has been sent to %(email)s with instructions to complete your registration."
-msgstr "I-imeyile yokuqinisekisa ithunyelwe ku %(email)s kunye nemiyalelo yokugqibezela ubhaliso."
+msgstr "En bekreftelsesepost har blitt sendt til %(email)s med instruksjoner for å fullføre din registrering."
 
 #: flask_user/views.py:682
 msgid "You have registered successfully."
-msgstr "Ubhaliswe ngempumelelo"
+msgstr "Registreringen var vellykket."
 
 #: flask_user/views.py:710
 msgid "Your account has not been enabled."
-msgstr "Iakhawunti yakho ayikenziwa isebenze."
+msgstr "Din konto er ikke aktivert."
 
 #: flask_user/views.py:719
 #, python-format
 msgid "Your email address has not yet been confirmed. Check your email Inbox and Spam folders for the confirmation email or <a href=\"%(url)s\">Re-send confirmation email</a>."
-msgstr "I-Imeyile yakho ayikaqinisekiswa. Jonga i-imeyile zakho okanye indawo yeZingafunwayo okanye <a href=\"%(url)s\">thumela kwakhona i-imeyile yokuqinisekisal</a>."
+msgstr "Din epostadresse er ikke bekreftet ennå. Sjekk innboks- og søppelmapper i din epostkonto for bekreftelseseposten eller <a href=\"%(url)s\">Send bekreftelseseposten på nytt</a>."
 
 #: flask_user/views.py:730
 msgid "You have signed in successfully."
-msgstr "Usayine wangena ngempumelelo."
+msgstr "Du er logget på."
 
 #: flask_user/templates/flask_user/forgot_password.html:5
 msgid "Forgot Password"
-msgstr "Ulibele iPhaswedi"
+msgstr "Glemt passord"
 
 #: flask_user/templates/flask_user/invite.html:5
 msgid "Invite User"
-msgstr "Mema Umsebenzisi"
+msgstr "Inviter bruker"
 
 #: flask_user/templates/flask_user/login.html:21
 msgid "New here? Register."
-msgstr "Umtsha apha? Bhalisa."
+msgstr "Ny her? Registrer deg."
 
 #: flask_user/templates/flask_user/login.html:44
 #: flask_user/templates/flask_user/login_or_register.html:34
 msgid "Forgot your Password?"
-msgstr "Ulibele iPhaswedi yakho?"
+msgstr "Glemt passord?"
 
 #: flask_user/templates/flask_user/manage_emails.html:5
 msgid "Manage Emails"
-msgstr "Lawula I-imeyile"
+msgstr "Behandle eposter"
 
 #: flask_user/templates/flask_user/register.html:21
 msgid "Already registered? Sign in."
-msgstr "Sowubhalisile? Sayina ungene."
+msgstr "Allerede registrert? Logg inn."
 
 #: flask_user/templates/flask_user/resend_confirm_email.html:5
 msgid "Resend Confirmation Email"
-msgstr "Thumela Kwakhona Uqinisekiso lwe-Imeyile"
+msgstr "Send bekreftelseseposten på nytt"
 
 #: flask_user/templates/flask_user/reset_password.html:5
 msgid "Reset Password"
-msgstr "Seta Kwakhona Iphaswedi"
+msgstr "Tilbakestill passord"
 
 #: flask_user/templates/flask_user/user_profile.html:5
 msgid "User profile"
-msgstr "Iprofayile yomsebenzisi"
+msgstr "Brukerprofil"
