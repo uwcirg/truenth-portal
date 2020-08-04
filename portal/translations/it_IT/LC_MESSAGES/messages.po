@@ -14,15 +14,15 @@ msgstr ""
 
 #: eproms/templates/eproms/404.html:32
 msgid "Page Not Found."
-msgstr "Sidan hittades inte."
+msgstr "Pagina non trovata."
 
 #: eproms/templates/eproms/404.html:34
 msgid "Sorry, the page you requested is not found. It may have been moved."
-msgstr "Tyvärr, det gick inte att hitta den sida du söker. Den kan ha flyttats."
+msgstr "Siamo spiacenti, la pagina richiesta non è stata trovata. Potrebbe essere stata spostata."
 
 #: eproms/templates/eproms/404.html:37 eproms/templates/eproms/500.html:39
 msgid "Back To Home"
-msgstr "Tillbaka till startsidan"
+msgstr "Torna alla Home Page"
 
 #: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
 msgid "Explore How This Works"
@@ -46,7 +46,7 @@ msgstr ""
 
 #: eproms/templates/eproms/500.html:34
 msgid "Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
-msgstr "Din begäran kunde inte behandlas på grund av serverfel. Använd länken nedan om  problemet kvarstår."
+msgstr "La tua richiesta non è stata elaborata a causa di uno o più errori del server. Se il problema persiste,  usa il link sottostante."
 
 #: eproms/templates/eproms/about.html:4 eproms/templates/eproms/contact.html:4
 #: eproms/templates/eproms/privacy.html:4 eproms/templates/eproms/terms.html:4
@@ -55,22 +55,22 @@ msgstr "Din begäran kunde inte behandlas på grund av serverfel. Använd länke
 #: gil/templates/gil/base.html:67 templates/explore.html:48
 #: templates/portal_footer.html:29
 msgid "Home"
-msgstr "Hem"
+msgstr "Home"
 
 #: eproms/templates/eproms/about.html:5 gil/templates/gil/base.html:74
 #: gil/templates/gil/portal.html:28 templates/portal_wrapper.html:70
 #: templates/portal_wrapper.html:127
 msgid "About TrueNTH"
-msgstr "Om TrueNTH"
+msgstr "Informazioni su TrueNTH"
 
 #: eproms/templates/eproms/base.html:34 eproms/templates/eproms/landing.html:8
 #: exercise_diet/templates/exercise_diet/recipes.html:132
 msgid "Loading..."
-msgstr "Laddar ..."
+msgstr "In caricamento..."
 
 #: eproms/templates/eproms/base.html:45 templates/layout.html:44
 msgid "You are using an outdated browser. Please upgrade your browser to improve your experience."
-msgstr "Du använder en föråldrad webbläsare. Uppgradera webbläsaren för att förbättra din upplevelse."
+msgstr "Stai usando un browser obsoleto. Aggiorna il browser per migliorare la tua esperienza."
 
 #: eproms/templates/eproms/base.html:77 eproms/templates/eproms/base.html:89
 #: gil/templates/gil/base.html:261 gil/templates/gil/base.html:289
@@ -86,7 +86,7 @@ msgstr "Du använder en föråldrad webbläsare. Uppgradera webbläsaren för at
 #: templates/profile/profile_macros.html:743
 #: templates/profile/profile_macros.html:771
 msgid "Close"
-msgstr "Stäng"
+msgstr "Chiudi"
 
 #: eproms/templates/eproms/base.html:78 gil/templates/gil/base.html:7
 #: templates/layout.html:78 templates/portal_footer.html:28
@@ -95,44 +95,44 @@ msgstr "TrueNTH"
 
 #: eproms/templates/eproms/contact.html:6 templates/contact_sent.html:5
 msgid "Contact TrueNTH"
-msgstr "Kontakta TrueNTH"
+msgstr "Contatta TrueNTH"
 
 #: eproms/templates/eproms/contact.html:7
 msgid "Use this form to get in touch with TrueNTH"
-msgstr "Använd detta formulär för att kontakta TrueNTH"
+msgstr "Compila questo modulo per contattare TrueNTH"
 
 #: eproms/templates/eproms/contact.html:15 templates/challenge_identity.html:16
 #: templates/profile/profile_macros.html:48
 #: templates/profile/profile_macros.html:175
 msgid "Name"
-msgstr "Namn"
+msgstr "Nome"
 
 #: eproms/templates/eproms/contact.html:17
 msgid "Please enter your name"
-msgstr "Ange ditt namn"
+msgstr "Inserire il proprio nome"
 
 #: eproms/templates/eproms/contact.html:18
 msgid "Your Name"
-msgstr "Ditt namn"
+msgstr "Il tuo nome"
 
 #: eproms/templates/eproms/contact.html:22 templates/admin/admin.html:44
 #: templates/admin/patients_by_org.html:61 templates/admin/staff_by_org.html:43
 #: templates/flask_user/register.html:17
 #: templates/profile/profile_macros.html:50
 msgid "Email"
-msgstr "E-post"
+msgstr "E-mail"
 
 #: eproms/templates/eproms/contact.html:24 gil/templates/gil/contact.html:50
 msgid "Your Email"
-msgstr "Din e-postadress"
+msgstr "Il tuo indirizzo e-mail"
 
 #: eproms/templates/eproms/contact.html:25
 msgid "This is not a valid e-mail address, please double-check."
-msgstr "Det här är inte en giltig e-postadress. Kontrollera adressen igen."
+msgstr "L'indirizzo e-mail non è valido, controllare di nuovo."
 
 #: eproms/templates/eproms/contact.html:31 gil/templates/gil/contact.html:57
 msgid "Enquiry Type"
-msgstr "Typ av förfrågan"
+msgstr "Tipo di richiesta"
 
 #: eproms/templates/eproms/contact.html:36 gil/templates/gil/contact.html:62
 msgid "Not sure"
@@ -142,45 +142,45 @@ msgstr ""
 #: gil/templates/gil/contact.html:70 templates/invite.html:12
 #: templates/invite_sent.html:18
 msgid "Subject"
-msgstr "Ämne"
+msgstr "Oggetto"
 
 #: eproms/templates/eproms/contact.html:42
 msgid "What is this about?"
-msgstr "Vad handlar detta om?"
+msgstr "Di che cosa si tratta?"
 
 #: eproms/templates/eproms/contact.html:45
 msgid "Text"
-msgstr "Text"
+msgstr "Testo"
 
 #: eproms/templates/eproms/contact.html:46
 msgid "Please add a message for TrueNTH"
-msgstr "Lägg till ett meddelande till TrueNTH"
+msgstr "Aggiungi un messaggio per TrueNTH"
 
 #: eproms/templates/eproms/contact.html:46
 msgid "What is on your mind?"
-msgstr "Vad vill du berätta?"
+msgstr "Che cosa pensi?"
 
 #: eproms/templates/eproms/contact.html:57 gil/templates/gil/base.html:250
 #: gil/templates/gil/contact.html:96 templates/profile/profile_macros.html:770
 msgid "Submit"
-msgstr "Skicka"
+msgstr "Invia"
 
 #: eproms/templates/eproms/contact.html:62
 msgid "Please confirm all fields are filled."
-msgstr "Kontrollera att alla fält är ifyllda."
+msgstr "Verifica che tutti i campi siano stati compilati."
 
 #: eproms/templates/eproms/landing.html:6
 #, python-format
 msgid "%(env)s version - Not for study or clinical use"
-msgstr "%(env)s-version – Inte för studie eller klinisk användning"
+msgstr "Versione %(env)s - Non per studio o uso clinico"
 
 #: eproms/templates/eproms/landing.html:13
 msgid "TrueNTH Logo"
-msgstr "TrueNTH:s logotyp"
+msgstr "Logo TrueNTH"
 
 #: eproms/templates/eproms/landing.html:26
 msgid "log in"
-msgstr "Logga in"
+msgstr "accedi"
 
 #: eproms/templates/eproms/landing.html:27 gil/templates/gil/base.html:195
 #: gil/templates/gil/contact.html:51
@@ -191,12 +191,12 @@ msgstr "Logga in"
 #: templates/profile/staff_profile_create.html:12
 #: templates/profile/staff_profile_create.html:13
 msgid "Email Address"
-msgstr "E-postadress"
+msgstr "Indirizzo e-mail"
 
 #: eproms/templates/eproms/landing.html:31 gil/templates/gil/base.html:196
 #: templates/flask_user/register.html:22
 msgid "Password"
-msgstr "Lösenord"
+msgstr "Password"
 
 #: eproms/templates/eproms/landing.html:35 gil/templates/gil/base.html:199
 #: templates/flask_user/forgot_password.html:9
@@ -204,20 +204,20 @@ msgstr "Lösenord"
 #: templates/flask_user/login_or_register.html:104
 #: templates/flask_user/login_or_register.html:152
 msgid "Having trouble logging in?"
-msgstr "Har du problem med att logga in?"
+msgstr "Hai problemi di accesso?"
 
 #: eproms/templates/eproms/landing.html:39
 msgid "You have been logged out due to inactivity. Please log in again to continue."
-msgstr "Du har loggats ut på grund av inaktivitet. Logga in igen för att fortsätta."
+msgstr "La sessione è stata chiusa per inattività. Esegui di nuovo l'accesso per continuare."
 
 #: eproms/templates/eproms/landing.html:50
 #: eproms/templates/eproms/landing.html:51
 msgid "TrueNTH Footer Logo"
-msgstr "TrueNTH-logotyp för sidfot"
+msgstr "Logo piè di pagina TrueNTH"
 
 #: eproms/templates/eproms/portal.html:15 templates/explore.html:12
 msgid "Welcome to TrueNTH"
-msgstr "Välkommen till TrueNTH"
+msgstr "Benvenuto in TrueNTH"
 
 #: eproms/templates/eproms/portal.html:16
 msgid "Tools for navigating the prostate cancer journey"
@@ -225,7 +225,7 @@ msgstr ""
 
 #: eproms/templates/eproms/portal.html:39
 msgid "Not available"
-msgstr "Inte tillgänglig"
+msgstr "Non disponibile"
 
 #: eproms/templates/eproms/portal.html:57
 msgid "Not Available"
@@ -237,7 +237,7 @@ msgstr ""
 
 #: eproms/templates/eproms/privacy.html:5 templates/flask_user/_macros.html:80
 msgid "Privacy"
-msgstr "Sekretess"
+msgstr "Privacy"
 
 #: eproms/templates/eproms/resources.html:3 templates/portal_wrapper.html:90
 #: templates/portal_wrapper.html:143
@@ -255,17 +255,17 @@ msgstr ""
 
 #: eproms/templates/eproms/terms.html:5
 msgid "General Terms"
-msgstr "Allmänna villkor"
+msgstr "Termini generali"
 
 #: eproms/templates/eproms/website_consent_script.html:13
 #: templates/initial_queries.html:45
 msgid "Continue to TrueNTH"
-msgstr "Fortsätt till TrueNTH"
+msgstr "Prosegui su TrueNTH"
 
 #: eproms/templates/eproms/work_instruction.html:6
 #: templates/initial_queries_macros.html:180
 msgid "Print"
-msgstr "Skriv ut"
+msgstr "Stampa"
 
 #: eproms/templates/eproms/work_instruction.html:7
 msgid "Back to Resources"
@@ -319,6 +319,9 @@ msgid ""
 "                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>\n"
 "                        "
 msgstr ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>chiusi</b><span>X</span></button>\n"
+"                        "
 
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:3
 #: gil/templates/gil/about.html:44
@@ -345,11 +348,11 @@ msgstr ""
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:23
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:44
 msgid "start <span class=\"figure\">&rarr;</span>"
-msgstr ""
+msgstr "inizia <span class=\"figure\">→</span>"
 
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:29
 msgid "watch"
-msgstr ""
+msgstr "osserva"
 
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:33
 msgid "Objective N<em>o</em>&nbsp;6: CUSTOM TOOLS &mdash; EXERCISE AND DIET"
@@ -389,7 +392,7 @@ msgstr ""
 
 #: exercise_diet/templates/exercise_diet/recipe.html:16
 msgid "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>"
-msgstr ""
+msgstr "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>chiusi</b><span>X</span></button>"
 
 #: exercise_diet/templates/exercise_diet/recipes.html:10
 msgid "Healthy Fats from Oils and Nuts"
@@ -413,32 +416,32 @@ msgstr ""
 
 #: gil/templates/gil/404.html:2
 msgid "TrueNTH Page Not Found"
-msgstr ""
+msgstr "Pagina TrueNTH non trovata"
 
 #: gil/templates/gil/404.html:9
 msgid "Page Not found"
-msgstr ""
+msgstr "Pagina non trovata"
 
 #: gil/templates/gil/404.html:10
 msgid "Sorry, the page you requested was not found. It may have been moved."
-msgstr ""
+msgstr "Siamo spiacenti, la pagina richiesta non è stata trovata. Potrebbe essere stata spostata."
 
 #: gil/templates/gil/500.html:2
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #: gil/templates/gil/500.html:10
 msgid "Your request was not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
-msgstr ""
+msgstr "La tua richiesta non è stata elaborata a causa di un errore del server. Se il problema persiste,  usa il link sottostante."
 
 #: gil/templates/gil/500.html:12
 msgid "Send Message"
-msgstr ""
+msgstr "Invia messaggio"
 
 #: gil/templates/gil/about.html:2 templates/flask_user/_macros.html:80
 #: templates/portal_footer.html:32
 msgid "About"
-msgstr "Om"
+msgstr "Informazioni"
 
 #: gil/templates/gil/about.html:9
 msgid ""
@@ -446,10 +449,13 @@ msgid ""
 "          <h1 class=\"page-intro__main\">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>\n"
 "          "
 msgstr ""
+"\n"
+"          <h1 class=\"page-intro__main\">Il nostro è un programma collaborativo<br/> finanziato e creato dalla <a href='http://www.movember.com' target='_blank'>Fondazione Movember </a>.</h1>\n"
+"          "
 
 #: gil/templates/gil/about.html:12
 msgid "Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers."
-msgstr ""
+msgstr "Il nostro obiettivo è di migliorare il percorso per combattere il tumore della prostata che devono affrontare i pazienti, i loro cari e le persone che li assistono unendo le loro voci a quelle di medici, ricercatori e volontari."
 
 #: gil/templates/gil/about.html:14 gil/templates/gil/about.html:19
 #: gil/templates/gil/decision-support.html:11
@@ -457,12 +463,12 @@ msgstr ""
 #: gil/templates/gil/symptom-tracker.html:16
 #: gil/templates/gil/what-is-prostate-cancer.html:11
 msgid "Learn More"
-msgstr ""
+msgstr "Scopri di più"
 
 #: gil/templates/gil/about.html:21 gil/templates/gil/decision-support.html:18
 #: gil/templates/gil/index.html:38 gil/templates/gil/symptom-tracker.html:18
 msgid "Watch"
-msgstr ""
+msgstr "Osserva"
 
 #: gil/templates/gil/about.html:26
 msgid "Objective N<em>o</em>6: Custom Tools\""
@@ -548,7 +554,7 @@ msgstr ""
 
 #: Intervention:care_plan gil/templates/gil/about.html:70
 msgid "Care Plan"
-msgstr "Vårdplan"
+msgstr ""
 
 #: gil/templates/gil/about.html:70
 msgid "Navigation Resources"
@@ -569,68 +575,68 @@ msgstr ""
 
 #: gil/templates/gil/about.html:86
 msgid "University of Colorado Cancer Center"
-msgstr ""
+msgstr "University of Colorado Cancer Center"
 
 #: gil/templates/gil/about.html:87
 msgid "Dana Farber Cancer Institute"
-msgstr ""
+msgstr "Dana Farber Cancer Institute"
 
 #: gil/templates/gil/about.html:88
 msgid "Duke University"
-msgstr ""
+msgstr "Duke University"
 
 #: gil/templates/gil/about.html:89
 msgid "Emory University"
-msgstr ""
+msgstr "Emory University"
 
 #: gil/templates/gil/about.html:90
 msgid "Johns Hopkins University"
-msgstr ""
+msgstr "Johns Hopkins University"
 
 #: gil/templates/gil/about.html:91
 msgid "Karmanos Cancer Institute"
-msgstr ""
+msgstr "Karmanos Cancer Institute"
 
 #: gil/templates/gil/about.html:92 Organization:Memorial Sloan Kettering Cancer
 #: Center
 msgid "Memorial Sloan Kettering Cancer Center"
-msgstr ""
+msgstr "Memorial Sloan Kettering Cancer Center"
 
 #: gil/templates/gil/about.html:93 Organization:University of Michigan
 msgid "University of Michigan"
-msgstr ""
+msgstr "University of Michigan"
 
 #: gil/templates/gil/about.html:94
 msgid "Moffitt Cancer Center"
-msgstr ""
+msgstr "Moffitt Cancer Center"
 
 #: gil/templates/gil/about.html:96
 msgid "OHSU"
-msgstr ""
+msgstr "OHSU"
 
 #: gil/templates/gil/about.html:97
 msgid "UC Davis"
-msgstr ""
+msgstr "UC Davis"
 
 #: gil/templates/gil/about.html:98
 msgid "UCLA"
-msgstr ""
+msgstr "UCLA"
 
 #: gil/templates/gil/about.html:99
 msgid "UCSF"
-msgstr ""
+msgstr "UCSF"
 
 #: gil/templates/gil/about.html:100
 msgid "UNC"
-msgstr ""
+msgstr "UNC"
 
 #: gil/templates/gil/about.html:101 Organization:University of Washington
 msgid "University of Washington"
-msgstr ""
+msgstr "University of Washington"
 
 #: gil/templates/gil/about.html:108
 msgid "Global Strategy"
-msgstr ""
+msgstr "Strategia globale"
 
 #: gil/templates/gil/about.html:109
 msgid "TrueNTH is currently active in 7 countries around the world:"
@@ -638,19 +644,19 @@ msgstr ""
 
 #: gil/templates/gil/about.html:110
 msgid "World Map"
-msgstr ""
+msgstr "Mappa del mondo"
 
 #: gil/templates/gil/about.html:112
 msgid "USA"
-msgstr ""
+msgstr "Stati Uniti d'America"
 
 #: gil/templates/gil/about.html:112
 msgid "US"
-msgstr ""
+msgstr "Stati Uniti"
 
 #: gil/templates/gil/about.html:115
 msgid "Canada"
-msgstr ""
+msgstr "Canada"
 
 #: gil/templates/gil/about.html:115
 msgid "CA"
@@ -658,7 +664,7 @@ msgstr ""
 
 #: gil/templates/gil/about.html:118
 msgid "Ireland"
-msgstr ""
+msgstr "Irlanda"
 
 #: gil/templates/gil/about.html:118
 msgid "IE"
@@ -670,7 +676,7 @@ msgstr ""
 
 #: gil/templates/gil/about.html:124
 msgid "Singapore"
-msgstr ""
+msgstr "Singapore"
 
 #: gil/templates/gil/about.html:124
 msgid "SG"
@@ -678,7 +684,7 @@ msgstr ""
 
 #: gil/templates/gil/about.html:127
 msgid "Australia"
-msgstr ""
+msgstr "Australia"
 
 #: gil/templates/gil/about.html:127
 msgid "AU"
@@ -686,7 +692,7 @@ msgstr ""
 
 #: gil/templates/gil/about.html:130
 msgid "New Zealand"
-msgstr ""
+msgstr "Nuova Zelanda"
 
 #: gil/templates/gil/about.html:130
 msgid "NZ"
@@ -720,21 +726,21 @@ msgstr ""
 
 #: gil/templates/gil/base.html:39
 msgid "Loading"
-msgstr ""
+msgstr "In caricamento"
 
 #: gil/templates/gil/base.html:65
 msgid "Navigation"
-msgstr ""
+msgstr "Navigazione"
 
 #: gil/templates/gil/base.html:69 templates/portal_wrapper.html:75
 #: templates/portal_wrapper.html:129
 msgid "Patients"
-msgstr "Patienter"
+msgstr "Pazienti"
 
 #: gil/templates/gil/base.html:72 templates/portal_wrapper.html:68
 #: templates/portal_wrapper.html:126 templates/profile/my_profile.html:4
 msgid "My TrueNTH Profile"
-msgstr "Min TrueNTH-profil"
+msgstr "Il mio profilo TrueNTH"
 
 #: gil/templates/gil/base.html:76 templates/portal_wrapper.html:72
 #: templates/portal_wrapper.html:128
@@ -744,27 +750,27 @@ msgstr ""
 #: gil/templates/gil/base.html:79 templates/portal_wrapper.html:87
 #: templates/portal_wrapper.html:140 templates/research.html:3
 msgid "Research Data"
-msgstr "Forskningsdata"
+msgstr ""
 
 #: gil/templates/gil/base.html:82 templates/portal_wrapper.html:77
 #: templates/portal_wrapper.html:130
 msgid "Staff List"
-msgstr "Personallista"
+msgstr "Elenco del personale"
 
 #: gil/templates/gil/base.html:85 templates/admin/admin.html:12
 #: templates/portal_wrapper.html:79 templates/portal_wrapper.html:132
 msgid "User Administration"
-msgstr "Användaradministration"
+msgstr "Amministrazione utente"
 
 #: gil/templates/gil/base.html:86 templates/admin/admin.html:8
 #: templates/portal_wrapper.html:80 templates/portal_wrapper.html:133
 msgid "Scheduled Jobs"
-msgstr "Schemalagda jobb"
+msgstr "Lavori programmati"
 
 #: gil/templates/gil/base.html:87 templates/portal_wrapper.html:81
 #: templates/portal_wrapper.html:134
 msgid "Settings"
-msgstr "Inställningar"
+msgstr "Impostazioni"
 
 #: gil/templates/gil/base.html:93 gil/templates/gil/sexual_wellbeing.html:2
 #: templates/portal_footer.html:30
@@ -784,7 +790,7 @@ msgstr ""
 #: gil/templates/gil/base.html:98 gil/templates/gil/contact.html:2
 #: templates/flask_user/_macros.html:80
 msgid "Contact"
-msgstr "Kontakt"
+msgstr "Contatti"
 
 #: gil/templates/gil/base.html:100 gil/templates/gil/base.html:126
 #: gil/templates/gil/base.html:139 gil/templates/gil/base.html:165
@@ -792,17 +798,17 @@ msgstr "Kontakt"
 #: gil/templates/gil/index.html:33 gil/templates/gil/lived-experience.html:16
 #: gil/templates/gil/lived_experience_base.html:11
 msgid "Join Us"
-msgstr ""
+msgstr "Unisciti a noi"
 
 #: gil/templates/gil/base.html:101 gil/templates/gil/base.html:126
 #: gil/templates/gil/contact.html:16 gil/templates/gil/lived-experience.html:16
 #: templates/explore.html:31
 msgid "Log In"
-msgstr "logga in"
+msgstr "Accedi"
 
 #: gil/templates/gil/base.html:103 templates/portal_wrapper.html:166
 msgid "Log Out"
-msgstr "Logga ut"
+msgstr "Esci"
 
 #: gil/templates/gil/base.html:111
 msgid "Click here to join us"
@@ -811,7 +817,7 @@ msgstr ""
 #: gil/templates/gil/base.html:121 gil/templates/gil/contact.html:11
 #: gil/templates/gil/lived-experience.html:11
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: gil/templates/gil/base.html:136
 #: gil/templates/gil/lived_experience_base.html:7
@@ -825,7 +831,7 @@ msgstr ""
 
 #: gil/templates/gil/base.html:149 gil/templates/gil/base.html:151
 msgid "TrueNTH Version"
-msgstr ""
+msgstr "Versione TrueNTH"
 
 #: gil/templates/gil/base.html:166 gil/templates/gil/base.html:228
 msgid "It’s going to take a group effort to improve the prostate cancer experience for future generations."
@@ -842,26 +848,26 @@ msgstr ""
 #: gil/templates/gil/base.html:175 templates/initial_queries.html:44
 #: templates/shortcut_alias.html:13
 msgid "Next"
-msgstr "Nästa"
+msgstr "Avanti"
 
 #: gil/templates/gil/base.html:179
 msgid "otherwise"
-msgstr ""
+msgstr "altrimenti"
 
 #: gil/templates/gil/base.html:182 gil/templates/gil/base.html:228
 msgid "Create Account"
-msgstr ""
+msgstr "Crea account"
 
 #: gil/templates/gil/base.html:191 gil/templates/gil/base.html:221
 #: gil/templates/gil/base.html:222
 msgid "Login"
-msgstr ""
+msgstr "Accesso"
 
 #: gil/templates/gil/base.html:201 gil/templates/gil/base.html:224
 #: templates/explore.html:30 templates/flask_user/login.html:28
 #: templates/flask_user/register.html:38
 msgid "or"
-msgstr "eller"
+msgstr "o"
 
 #: gil/templates/gil/base.html:208
 msgid "Log in with Facebook"
@@ -869,25 +875,25 @@ msgstr ""
 
 #: gil/templates/gil/base.html:211
 msgid "Log in with Google"
-msgstr ""
+msgstr "Accedi con Google"
 
 #: gil/templates/gil/base.html:238 templates/initial_queries_macros.html:403
 #: templates/profile/profile_macros.html:502
 msgid "What is your main clinic for prostate cancer care?"
-msgstr "Vilken är din huvudsakliga klinik för prostatacancervård?"
+msgstr "Qual è la clinica principale a cui fai affidamento per il trattamento del tumore della prostata?"
 
 #: gil/templates/gil/base.html:248 templates/profile/profile_macros.html:508
 #: templates/profile/profile_macros.html:539
 msgid "None of the Above"
-msgstr "Inget av ovanstående"
+msgstr "Nessuna delle precedenti"
 
 #: gil/templates/gil/base.html:262
 msgid "Session Timed Out"
-msgstr ""
+msgstr "Sessione scaduta"
 
 #: gil/templates/gil/base.html:262
 msgid "You have been logged out due to inactivity.  Please log in again to continue."
-msgstr ""
+msgstr "La sessione è stata chiusa per inattività.  Accedi nuovamente per continuare."
 
 #: gil/templates/gil/base.html:265 gil/templates/gil/base.html:300
 #: templates/initial_queries_macros.html:111
@@ -898,27 +904,27 @@ msgstr "OK"
 
 #: gil/templates/gil/base.html:290
 msgid "System Message"
-msgstr ""
+msgstr "Messaggio di sistema"
 
 #: gil/templates/gil/base.html:315
 msgid "Consent checkbox"
-msgstr ""
+msgstr "Casella di controllo per il consenso"
 
 #: gil/templates/gil/contact.html:22 templates/portal_footer.html:33
 msgid "Contact Us"
-msgstr "Kontakta oss"
+msgstr "Contatti"
 
 #: gil/templates/gil/contact.html:23
 msgid "Please connect with us, ask questions, share your story, and make suggestions for how we can do better."
-msgstr ""
+msgstr "Entra in contatto con noi, rivolgi domande, condividi la tua storia e offri i tuoi suggerimenti su come poter migliorare."
 
 #: gil/templates/gil/contact.html:33
 msgid "Contact Form"
-msgstr ""
+msgstr "Modulo di contatto"
 
 #: gil/templates/gil/contact.html:34
 msgid "Use this form to get in touch with TrueNTH USA."
-msgstr ""
+msgstr "Usa questo modulo per metterti in contatto con TrueNTH USA."
 
 #: gil/templates/gil/contact.html:40 gil/templates/gil/contact.html:41
 #: templates/admin/admin.html:42 templates/admin/patients_by_org.html:58
@@ -926,7 +932,7 @@ msgstr ""
 #: templates/initial_queries_macros.html:219
 #: templates/profile/profile_macros.html:179
 msgid "First Name"
-msgstr "Förnamn"
+msgstr "Nome di battesimo"
 
 #: gil/templates/gil/contact.html:44 gil/templates/gil/contact.html:45
 #: templates/admin/admin.html:43 templates/admin/patients_by_org.html:59
@@ -934,27 +940,27 @@ msgstr "Förnamn"
 #: templates/initial_queries_macros.html:226
 #: templates/profile/profile_macros.html:187
 msgid "Last Name"
-msgstr "Efternamn"
+msgstr "Cognome"
 
 #: gil/templates/gil/contact.html:75 templates/invite_sent.html:22
 msgid "Message"
-msgstr "Meddelande"
+msgstr "Messaggio"
 
 #: gil/templates/gil/contact.html:81
 msgid "About You"
-msgstr ""
+msgstr "Informazioni su di te"
 
 #: gil/templates/gil/contact.html:83 templates/profile/profile_macros.html:918
 msgid "Select"
-msgstr "Välj"
+msgstr "Seleziona"
 
 #: gil/templates/gil/contact.html:84
 msgid "I've been diagnosed with prostate cancer"
-msgstr ""
+msgstr "Mi è stato diagnosticato il tumore della prostata"
 
 #: gil/templates/gil/contact.html:85
 msgid "I want to learn more about prostate cancer"
-msgstr ""
+msgstr "Vorrei saperne di più sul tumore della prostata"
 
 #: gil/templates/gil/david_andrew_story.html:2
 msgid "Lived Experience - David and Andrew Perez Story"
@@ -1164,7 +1170,7 @@ msgstr ""
 
 #: gil/templates/gil/index.html:11
 msgid "Truenth Home"
-msgstr ""
+msgstr "Home TrueNTH"
 
 #: gil/templates/gil/index.html:13
 msgid "TrueNTH is a collective approach to improving your quality of life throughout your prostate cancer journey."
@@ -1181,7 +1187,7 @@ msgstr ""
 
 #: gil/templates/gil/index.html:20
 msgid "More About TrueNTH"
-msgstr ""
+msgstr "Scopri di più su TrueNTH"
 
 #: gil/templates/gil/index.html:23
 msgid "Jim Williams"
@@ -1254,7 +1260,7 @@ msgstr ""
 #: gil/templates/gil/index.html:47
 #, python-format
 msgid "In %(year)d, over %(population)s men will be diagnosed with prostate cancer in the USA."
-msgstr "År %(year)d kommer mer än %(population)s män att diagnostiseras med prostatacancer i USA."
+msgstr "Nel %(year)d, a oltre il %(population)s degli uomini negli Stati Uniti sarà diagnosticato il tumore della prostata."
 
 #: gil/templates/gil/index.html:54
 msgid "Men have different stages of prostate cancer and have different treatment options available to them."
@@ -1262,7 +1268,7 @@ msgstr ""
 
 #: gil/templates/gil/index.html:58
 msgid "Preferences"
-msgstr ""
+msgstr "Preferenze"
 
 #: gil/templates/gil/index.html:59
 msgid "Understanding what is important to you"
@@ -1271,7 +1277,7 @@ msgstr ""
 #: gil/templates/gil/index.html:64
 #: gil/templates/gil/what-is-prostate-cancer.html:45
 msgid "Education"
-msgstr ""
+msgstr "Formazione scolastica"
 
 #: gil/templates/gil/index.html:65
 msgid "Learning about the factors that impact your decision"
@@ -1279,7 +1285,7 @@ msgstr ""
 
 #: gil/templates/gil/index.html:70 templates/admin/patients_by_org.html:62
 msgid "Reports"
-msgstr "Rapporter"
+msgstr "Resoconti"
 
 #: gil/templates/gil/index.html:71
 msgid "Results to use during the visit with your doctor"
@@ -1291,7 +1297,7 @@ msgstr ""
 
 #: gil/templates/gil/index.html:86 gil/templates/gil/index.html:126
 msgid "More Info"
-msgstr ""
+msgstr "Maggiori informazioni"
 
 #: gil/templates/gil/index.html:93
 msgid "Objective N<em>o</em>6: Custom Tools – Symptom Tracker"
@@ -1303,23 +1309,23 @@ msgstr ""
 
 #: gil/templates/gil/index.html:98
 msgid "Urinary Incontinence"
-msgstr ""
+msgstr "Incontinenza urinaria"
 
 #: gil/templates/gil/index.html:99
 msgid "Not being able to control your urine"
-msgstr ""
+msgstr "Non in grado di controllare lo stimolo a urinare"
 
 #: gil/templates/gil/index.html:105
 msgid "Physical and emotional changes to your sex life and erectile function"
-msgstr ""
+msgstr "Cambiamenti fisici ed emotivi nella vita sessuale e nella funzione erettile"
 
 #: gil/templates/gil/index.html:110
 msgid "Fatigue"
-msgstr ""
+msgstr "Stanchezza"
 
 #: gil/templates/gil/index.html:111
 msgid "Feeling tired due to treatment for prostate cancer"
-msgstr ""
+msgstr "Sensazione di affaticamento causato dal trattamento per il tumore alla prostata"
 
 #: gil/templates/gil/index.html:116
 msgid "We’ve created a tool to track your experience and symptoms over time and provide personal guidance."
@@ -1331,7 +1337,7 @@ msgstr ""
 
 #: gil/templates/gil/lived-experience.html:23
 msgid "TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey."
-msgstr ""
+msgstr "TrueNTH offre esperienze vissute dagli uomini, dalle persone che li assistono e dai medici, per aiutarti lungo il percorso da affrontare per combattere il tumore della prostata."
 
 #: gil/templates/gil/lived-experience.html:29
 msgid "Alonzo McCann Mobile Image"
@@ -1379,19 +1385,19 @@ msgstr ""
 
 #: gil/templates/gil/portal.html:2
 msgid "Dashboard"
-msgstr ""
+msgstr "Bacheca"
 
 #: gil/templates/gil/portal.html:9
 msgid "Welcome to your TrueNTH Dashboard"
-msgstr ""
+msgstr "Benvenuto alla Bacheca TrueNTH"
 
 #: gil/templates/gil/portal.html:12
 msgid "More tools for you will be available as TrueNTH develops."
-msgstr ""
+msgstr "Gli strumenti a tua disposizione aumenteranno di pari passo con i futuri sviluppi di TrueNTH."
 
 #: gil/templates/gil/portal.html:13
 msgid "For now, learn more about TrueNTH:"
-msgstr ""
+msgstr "Per ora, scopri di più su TrueNTH:"
 
 #: gil/templates/gil/portal.html:15
 msgid "Below are the TrueNTH tools available to you."
@@ -1403,23 +1409,23 @@ msgstr ""
 
 #: gil/templates/gil/portal.html:31
 msgid "About Prostate Cancer"
-msgstr ""
+msgstr "Informazioni sul tumore della prostata"
 
 #: gil/templates/gil/portal.html:57
 msgid "Complete Registration"
-msgstr "Slutför registrering"
+msgstr "Completa la registrazione"
 
 #: gil/templates/gil/portal.html:58
 msgid "Completing your registration will allow you to return here in the future to see the information you've previously entered."
-msgstr "Genom att slutföra din registrering kan du återvända hit i framtiden för att se den information som du tidigare har angivit."
+msgstr ""
 
 #: gil/templates/gil/portal.html:60
 msgid "Registration"
-msgstr "Registrering"
+msgstr "Registrazione"
 
 #: gil/templates/gil/privacy.html:2
 msgid "Privacy Statement"
-msgstr ""
+msgstr "Informativa sulla privacy"
 
 #: gil/templates/gil/symptom-tracker.html:10
 msgid "Track your symptoms to see how they are changing over time, and how they compare to other men with prostate cancer."
@@ -1431,7 +1437,7 @@ msgstr ""
 
 #: gil/templates/gil/symptom-tracker.html:24
 msgid "Monitoring and Tracking"
-msgstr ""
+msgstr "Monitoraggio e tracciamento"
 
 #: gil/templates/gil/symptom-tracker.html:25
 msgid "We’ve created a tool that asks you questions about your symptoms and side-effects throughout your prostate cancer journey from diagnosis through recovery."
@@ -1459,15 +1465,15 @@ msgstr ""
 
 #: gil/templates/gil/terms.html:2
 msgid "Terms and Conditions"
-msgstr ""
+msgstr "Termini e condizioni"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:2
 msgid "Prostate Cancer Information"
-msgstr ""
+msgstr "Informazioni sul tumore della prostata"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:9
 msgid "What is <span class=\"page-intro__main--accent\">Prostate Cancer</span>?"
-msgstr ""
+msgstr "Che cos'è il <span class=\"page-intro__main--accent\">tumore della prostata</span>?"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:10
 msgid "Cancer is a disease in which cells in the body grow out of control. Prostate Cancer is when cancer starts in the prostate. Many men with prostate cancer die of other causes without ever having any symptoms from the cancer."
@@ -1483,7 +1489,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:27
 msgid "In 2019, over 174,500 men will be diagnosed with prostate cancer in the USA."
-msgstr "År 2019 kommer mer än 174 500 män att diagnostiseras med prostatacancer i USA."
+msgstr "Nel 2019, a oltre 174.500 uomini negli Stati Uniti sarà diagnosticato il tumore della prostata."
 
 #: gil/templates/gil/what-is-prostate-cancer.html:32
 msgid "It is estimated that there are nearly 3 million U.S. men currently living with prostate cancer."
@@ -1515,7 +1521,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:58
 msgid "Age"
-msgstr ""
+msgstr "Età"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:59
 msgid "The older a man is, the greater his risk for getting prostate cancer."
@@ -1525,7 +1531,7 @@ msgstr ""
 #: templates/profile/profile_macros.html:91
 #: templates/profile/profile_macros.html:219
 msgid "Race"
-msgstr "Ras"
+msgstr "Razza"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:63
 msgid "Prostate cancer is more common in African-American men, tends to start at younger ages, and grow faster than in other racial or ethnic groups."
@@ -1533,7 +1539,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:68
 msgid "Family History"
-msgstr ""
+msgstr "Anamnesi familiare"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:69
 msgid "Certain genes, passed from parent to child, that you inherited from your parents may affect your prostate cancer risk. A man that has a father, brother, or son who has had prostate cancer is two to three times more likely to develop the disease himself."
@@ -1614,7 +1620,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:124
 msgid "Diagnosis"
-msgstr ""
+msgstr "Diagnosi"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:125
 msgid "How Is Prostate Cancer <span class=\"module__heading--accent\">Diagnosed</span>?"
@@ -1626,7 +1632,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:130
 msgid "Gleason Score"
-msgstr ""
+msgstr "Punteggio di Gleason"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:131
 msgid "If there is cancer a Gleason score assigned. It indicates how likely it is to spread. The score ranges from 2 to 10. The lower the score, the less likely it is that the cancer will spread."
@@ -1650,7 +1656,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:152
 msgid "Treatment"
-msgstr ""
+msgstr "Trattamento"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:153
 msgid "How Is Prostate Cancer <span class=\"module__heading--accent\">Treated</span>?"
@@ -1670,7 +1676,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:164
 msgid "Surgery"
-msgstr ""
+msgstr "Intervento chirurgico"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:165
 msgid "Procedure to remove the prostate called prostatectomy."
@@ -1710,7 +1716,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:184
 msgid "Hormone Therapy"
-msgstr ""
+msgstr "Terapia ormonale"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:185
 msgid "Lowering levels of hormones to help slow the growth of cancer."
@@ -1718,7 +1724,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:186
 msgid "Chemotherapy"
-msgstr ""
+msgstr "Chemioterapia"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:187
 msgid "Using special drugs to shrink or kill the cancer."
@@ -1726,7 +1732,7 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:188
 msgid "Immunotherapy"
-msgstr ""
+msgstr "Immunoterapia"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:189
 msgid "Medications that use the power of the immune system to target cancer cells."
@@ -1778,11 +1784,11 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:228
 msgid "Information about Prostate Cancer"
-msgstr ""
+msgstr "Informazioni sul tumore della prostata"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:232
 msgid "Prostate Cancer Foundation"
-msgstr ""
+msgstr "Fondazione per il tumore della prostata"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:232
 msgid "Understanding Prostate Cancer"
@@ -1791,7 +1797,7 @@ msgstr ""
 #: gil/templates/gil/what-is-prostate-cancer.html:236
 #: gil/templates/gil/what-is-prostate-cancer.html:240
 msgid "UsTOO"
-msgstr ""
+msgstr "UsTOO"
 
 #: gil/templates/gil/what-is-prostate-cancer.html:236
 msgid "Education & Support for Prostate Cancer Patients & their Caregivers"
@@ -1799,11 +1805,11 @@ msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:240
 msgid "Online Prostate Cancer Discussion Forum and Community"
-msgstr ""
+msgstr "Community e forum di discussione online per il tumore della prostata"
 
 #: models/communication.py:104
 msgid "Complete Questionnaire"
-msgstr "Fyll i frågeformuläret"
+msgstr "Completa il questionario"
 
 #: models/communication.py:128
 msgid "TrueNTH P3P"
@@ -1811,93 +1817,93 @@ msgstr ""
 
 #: models/communication.py:166
 msgid "Password Reset"
-msgstr "Lösenord återställt"
+msgstr "Reimposta la password"
 
 #: models/communication.py:227
 msgid "Verify Account"
-msgstr "Bekräfta konto"
+msgstr "Verifica account"
 
 #: models/intervention_strategies.py:237
 #, python-format
 msgid "Thank you, %(full_name)s."
-msgstr "Tack, %(full_name)s."
+msgstr "Grazie, %(full_name)s."
 
 #: models/intervention_strategies.py:238
 #, python-format
 msgid "You've completed the %(registry)s questionnaire."
-msgstr "Du har fyllt i %(registry)s frågeformuläret."
+msgstr "Hai completato il questionario %(registry)s."
 
 #: models/intervention_strategies.py:241
 msgid "You will be notified when the next questionnaire is ready to complete."
-msgstr "Du får ett meddelande när nästa enkät är klar att fyllas i."
+msgstr "Riceverai una notifica quando il prossimo questionario sarà pronto per essere completato."
 
 #: models/intervention_strategies.py:244
 msgid "Log out"
-msgstr "Logga ut"
+msgstr "Esci"
 
 #: models/intervention_strategies.py:270 models/intervention_strategies.py:302
 #: models/intervention_strategies.py:479
 #, python-format
 msgid "Hi, %(full_name)s"
-msgstr "Hej, %(full_name)s"
+msgstr "Ciao, %(full_name)s"
 
 #: models/intervention_strategies.py:276
 #, python-format
 msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
-msgstr "Slutför ditt %(assigning_authority)s frågeformulär så snart som möjligt. Det löper ut den %(expired_date)s."
+msgstr "Completa il prima possibile il questionario %(assigning_authority)s. Scadrà il %(expired_date)s."
 
 #: models/intervention_strategies.py:286
 #, python-format
 msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
-msgstr "Slutför ditt %(assigning_authority)s frågeformulär senast den %(due_date)s."
+msgstr "Completa il questionario %(assigning_authority)s entro il %(due_date)s."
 
 #: models/intervention_strategies.py:303
 #, python-format
 msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
-msgstr "Slutför ditt %(assigning_authority)s frågeformulär när det passar dig."
+msgstr "Completa il questionario %(assigning_authority)s quando ti sarà più comodo."
 
 #: models/intervention_strategies.py:325 models/intervention_strategies.py:354
 msgid "Completed Questionnaires"
-msgstr "Ifyllda enkäter"
+msgstr "Questionari completati"
 
 #: models/intervention_strategies.py:326
 msgid "When you are done, completed questionnaires will be shown here."
-msgstr "När du är färdig kommer de ifyllda enkäterna att visas här."
+msgstr "Quando avrai terminato, i questionari completati compariranno qui."
 
 #: models/intervention_strategies.py:357
 #, python-format
 msgid "View questionnaire completed on %(comp_date)s"
-msgstr "Se frågeformuläret som slutfördes den %(comp_date)s"
+msgstr "Visualizza il questionario completato il giorno %(comp_date)s"
 
 #: models/intervention_strategies.py:375 models/intervention_strategies.py:409
 msgid "Go to questionnaire"
-msgstr "Gå till enkäten"
+msgstr "Vai al questionario"
 
 #: models/intervention_strategies.py:378 models/intervention_strategies.py:407
 msgid "Continue questionnaire"
-msgstr "Fortsätt fylla i enkäten"
+msgstr "Continua il questionario"
 
 #: models/intervention_strategies.py:381 models/intervention_strategies.py:411
 #: models/intervention_strategies.py:440
 msgid "Open Questionnaire"
-msgstr "Öppna enkäten"
+msgstr "Apri il questionario"
 
 #: models/intervention_strategies.py:382 models/intervention_strategies.py:412
 #, python-format
 msgid "Please complete your %(assigning_authority)s questionnaire here."
-msgstr "Slutför ditt %(assigning_authority)s frågeformulär här."
+msgstr "Completa il questionario %(assigning_authority)s qui."
 
 #: models/intervention_strategies.py:438
 msgid "View previous questionnaire"
-msgstr "Visa föregående enkät"
+msgstr "Visualizza il questionario precedente"
 
 #: models/intervention_strategies.py:441
 msgid "No questionnaire is due."
-msgstr "Ingen enkät att fylla i för närvarande."
+msgstr "Nessun questionario previsto."
 
 #: models/intervention_strategies.py:480
 msgid "Questionnaire Expired"
-msgstr "Frågeformuläret har upphört att gälla"
+msgstr "Questionario scaduto"
 
 #: models/intervention_strategies.py:481
 msgid ""
@@ -1908,23 +1914,23 @@ msgstr ""
 #: models/questionnaire_bank.py:552
 #, python-format
 msgid "Month %(month_total)d"
-msgstr "Månad %(month_total)d"
+msgstr "Mese %(month_total)d"
 
 #: models/user.py:555 models/user.py:566
 msgid "invalid email address"
-msgstr "Ogiltig e-postadress"
+msgstr "indirizzo email non valido"
 
 #: models/user.py:560
 msgid "user requests no email"
-msgstr "användaren begär inga e-postmeddelanden"
+msgstr "l'utente rifiuta contatti via e-mail"
 
 #: models/user.py:575
 msgid "missing required data: "
-msgstr "nödvändiga uppgifter saknas: "
+msgstr "dati richiesti mancanti: "
 
 #: templates/challenge_identity.html:5
 msgid "Identity Verification"
-msgstr "Identitetsverifiering"
+msgstr "Verifica dell'identità"
 
 #: templates/challenge_identity.html:7
 msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
@@ -1933,27 +1939,27 @@ msgstr ""
 #: templates/challenge_identity.html:21
 #: templates/initial_queries_macros.html:219
 msgid "First name is required"
-msgstr "Förnamn måste anges"
+msgstr "È necessario inserire il nome di battesimo"
 
 #: templates/challenge_identity.html:29
 #: templates/initial_queries_macros.html:226
 msgid "Last name is required"
-msgstr "Efternamn måste anges"
+msgstr "È necessario inserire il cognome"
 
 #: templates/challenge_identity.html:35
 #: templates/initial_queries_macros.html:253
 #: templates/profile/profile_macros.html:125
 #: templates/profile/profile_macros.html:127
 msgid "Birth Date"
-msgstr "Födelsedatum"
+msgstr "Data di nascita"
 
 #: templates/challenge_identity.html:41
 msgid "Day"
-msgstr "Dag"
+msgstr "Giorno"
 
 #: templates/challenge_identity.html:42
 msgid "Day is required"
-msgstr "Dag krävs"
+msgstr "È necessario inserire il giorno"
 
 #: templates/challenge_identity.html:50 templates/challenge_identity.html:52
 #: templates/initial_queries_macros.html:260
@@ -1965,11 +1971,11 @@ msgstr "Dag krävs"
 #: templates/profile/profile_macros.html:1103
 #: templates/profile/profile_macros.html:1206
 msgid "Month"
-msgstr "Månad"
+msgstr "Mese"
 
 #: templates/challenge_identity.html:51
 msgid "Month is required"
-msgstr "Månad krävs"
+msgstr "È necessario inserire il mese"
 
 #: templates/challenge_identity.html:53
 #: templates/initial_queries_macros.html:261
@@ -1980,7 +1986,7 @@ msgstr "Månad krävs"
 #: templates/profile/profile_macros.html:1104
 #: templates/profile/profile_macros.html:1207
 msgid "January"
-msgstr "Januari"
+msgstr "Gennaio"
 
 #: templates/challenge_identity.html:54
 #: templates/initial_queries_macros.html:262
@@ -1991,7 +1997,7 @@ msgstr "Januari"
 #: templates/profile/profile_macros.html:1105
 #: templates/profile/profile_macros.html:1208
 msgid "February"
-msgstr "Februari"
+msgstr "Febbraio"
 
 #: templates/challenge_identity.html:55
 #: templates/initial_queries_macros.html:263
@@ -2002,7 +2008,7 @@ msgstr "Februari"
 #: templates/profile/profile_macros.html:1106
 #: templates/profile/profile_macros.html:1209
 msgid "March"
-msgstr "Mars"
+msgstr "Marzo"
 
 #: templates/challenge_identity.html:56
 #: templates/initial_queries_macros.html:264
@@ -2013,7 +2019,7 @@ msgstr "Mars"
 #: templates/profile/profile_macros.html:1107
 #: templates/profile/profile_macros.html:1210
 msgid "April"
-msgstr "April"
+msgstr "Aprile"
 
 #: templates/challenge_identity.html:57
 #: templates/initial_queries_macros.html:265
@@ -2024,7 +2030,7 @@ msgstr "April"
 #: templates/profile/profile_macros.html:1108
 #: templates/profile/profile_macros.html:1211
 msgid "May"
-msgstr "Maj"
+msgstr "Maggio"
 
 #: templates/challenge_identity.html:58
 #: templates/initial_queries_macros.html:266
@@ -2035,7 +2041,7 @@ msgstr "Maj"
 #: templates/profile/profile_macros.html:1109
 #: templates/profile/profile_macros.html:1212
 msgid "June"
-msgstr "Juni"
+msgstr "Giugno"
 
 #: templates/challenge_identity.html:59
 #: templates/initial_queries_macros.html:267
@@ -2046,7 +2052,7 @@ msgstr "Juni"
 #: templates/profile/profile_macros.html:1110
 #: templates/profile/profile_macros.html:1213
 msgid "July"
-msgstr "Juli"
+msgstr "Luglio"
 
 #: templates/challenge_identity.html:60
 #: templates/initial_queries_macros.html:268
@@ -2057,7 +2063,7 @@ msgstr "Juli"
 #: templates/profile/profile_macros.html:1111
 #: templates/profile/profile_macros.html:1214
 msgid "August"
-msgstr "Augusti"
+msgstr "Agosto"
 
 #: templates/challenge_identity.html:61
 #: templates/initial_queries_macros.html:269
@@ -2068,7 +2074,7 @@ msgstr "Augusti"
 #: templates/profile/profile_macros.html:1112
 #: templates/profile/profile_macros.html:1215
 msgid "September"
-msgstr "September"
+msgstr "Settembre"
 
 #: templates/challenge_identity.html:62
 #: templates/initial_queries_macros.html:270
@@ -2079,7 +2085,7 @@ msgstr "September"
 #: templates/profile/profile_macros.html:1113
 #: templates/profile/profile_macros.html:1216
 msgid "October"
-msgstr "Oktober"
+msgstr "Ottobre"
 
 #: templates/challenge_identity.html:63
 #: templates/initial_queries_macros.html:271
@@ -2090,7 +2096,7 @@ msgstr "Oktober"
 #: templates/profile/profile_macros.html:1114
 #: templates/profile/profile_macros.html:1217
 msgid "November"
-msgstr "November"
+msgstr "Novembre"
 
 #: templates/challenge_identity.html:64
 #: templates/initial_queries_macros.html:272
@@ -2101,27 +2107,27 @@ msgstr "November"
 #: templates/profile/profile_macros.html:1115
 #: templates/profile/profile_macros.html:1218
 msgid "December"
-msgstr "December"
+msgstr "Dicembre"
 
 #: templates/challenge_identity.html:73
 msgid "Year"
-msgstr "År"
+msgstr "Anno"
 
 #: templates/challenge_identity.html:74
 msgid "Year is required"
-msgstr "År krävs"
+msgstr "È necessario inserire l'anno"
 
 #: templates/challenge_identity.html:82
 msgid "Confirm Identity"
-msgstr "Bekräfta identitet"
+msgstr "Conferma identità"
 
 #: templates/confirm_identity.html:8
 msgid "Identity verification"
-msgstr "Identitetsverifiering"
+msgstr "Verifica dell'identità"
 
 #: templates/confirm_identity.html:12
 msgid "I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself."
-msgstr "Jag bekräftar att jag deltar i IRONMANs registerstudie och att jag själv fyller i enkäten."
+msgstr "Confermo di essere un partecipante dello Studio di osservazione IRONMAN e di aver completato personalmente il presente questionario."
 
 #: templates/confirm_identity.html:17 templates/initial_queries_macros.html:291
 #: templates/initial_queries_macros.html:363
@@ -2130,7 +2136,7 @@ msgstr "Jag bekräftar att jag deltar i IRONMANs registerstudie och att jag sjä
 #: templates/profile/profile_macros.html:976
 #: templates/profile/profile_macros.html:1255
 msgid "Yes"
-msgstr "Ja"
+msgstr "Sì"
 
 #: templates/confirm_identity.html:18 templates/initial_queries_macros.html:327
 #: templates/initial_queries_macros.html:389
@@ -2138,82 +2144,82 @@ msgstr "Ja"
 #: templates/profile/profile_macros.html:976
 #: templates/profile/profile_macros.html:1255
 msgid "No"
-msgstr "Nej"
+msgstr "No"
 
 #: templates/contact_sent.html:7
 msgid "Thank you for contacting us."
-msgstr "Tack för att du kontaktar oss."
+msgstr "Grazie per averci contattato."
 
 #: templates/contact_sent.html:9
 msgid "We have sent an email to the team supporting TrueNTH."
-msgstr "Vi har skickat ett e-postmeddelande till det team som tillhandahåller support för TrueNTH:s räkning."
+msgstr "Abbiamo inviato un'e-mail al team di supporto TrueNTH."
 
 #: templates/contact_sent.html:11 templates/portal_wrapper.html:66
 #: templates/portal_wrapper.html:125
 msgid "TrueNTH Home"
-msgstr "Startsida TrueNTH"
+msgstr "Home TrueNTH"
 
 #: templates/coredata.html:5
 msgid "More About You"
-msgstr "Mer om dig"
+msgstr "Scopri di più su di te"
 
 #: templates/coredata.html:6
 msgid "The TrueNTH system asks these questions in order to give you information that best fits"
-msgstr "TrueNTH-systemet ställer dessa frågor för att ge dig den information som är bäst lämpad för dig"
+msgstr "Il sistema TrueNTH pone queste domande allo scopo di fornirti le informazioni più appropriate"
 
 #: templates/coredata.html:6
 msgid ""
 "You may\n"
 "    skip any question you prefer not to answer."
 msgstr ""
-"Du kan\n"
-" hoppa över de frågor du inte vill svara på."
+"Puoi\n"
+"    saltare qualsiasi domanda a cui preferisci non rispondere."
 
 #: templates/coredata.html:13 templates/profile/profile_macros.html:90
 #: templates/profile/profile_macros.html:259
 msgid "Ethnicity"
-msgstr "Etnicitet"
+msgstr "Etnia"
 
 #: templates/coredata.html:18 templates/profile/profile_macros.html:263
 msgid "Hispanic or Latino"
-msgstr "Spanskättad eller latinamerikansk"
+msgstr "Ispanica o latina"
 
 #: templates/coredata.html:23 templates/profile/profile_macros.html:268
 msgid "Not Hispanic or Latino"
-msgstr "Inte latinamerikanskt ursprung"
+msgstr "Non ispanico o latino"
 
 #: templates/coredata.html:35 templates/profile/profile_macros.html:223
 msgid "American Indian or Alaska Native"
-msgstr "Amerikansk ursprungsbefolkning, inklusive Alaska"
+msgstr "Indiano d'America o nativo dell'Alaska"
 
 #: templates/coredata.html:40 templates/profile/profile_macros.html:228
 msgid "Asian"
-msgstr "Asiatisk"
+msgstr "Asiatica"
 
 #: templates/coredata.html:45 templates/profile/profile_macros.html:233
 msgid "Black or African American"
-msgstr "Svart eller afroamerikansk"
+msgstr "Nero o afroamericano"
 
 #: templates/coredata.html:50 templates/profile/profile_macros.html:238
 msgid "Native Hawaiian or Other Pacific Islander"
-msgstr "Från Hawaii eller andra öar i Stilla havet"
+msgstr "Nativo delle Hawaii o di altre isole del Pacifico"
 
 #: templates/coredata.html:55 templates/profile/profile_macros.html:243
 msgid "White"
-msgstr "Vit"
+msgstr "Bianco"
 
 #: templates/profile/profile_macros.html:248 classification_enum:Other
 #: templates/coredata.html:60 templates/profile/profile_macros.html:210
 msgid "Other"
-msgstr "Annat"
+msgstr "Altro"
 
 #: templates/coredata.html:69
 msgid "Skip This"
-msgstr "Hoppa över detta"
+msgstr "Salta"
 
 #: templates/coredata.html:77
 msgid "Continue"
-msgstr "Fortsätt"
+msgstr "Continua"
 
 #: templates/explore.html:13
 msgid "Explore How TrueNTH Works"
@@ -2225,7 +2231,7 @@ msgstr ""
 
 #: templates/explore.html:21
 msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
-msgstr "Kommer snart ... verktyg som har utformats för att hjälpa dem som har drabbats av prostatacancer."
+msgstr ""
 
 #: templates/explore.html:29
 msgid "Register Now"
@@ -2233,11 +2239,11 @@ msgstr ""
 
 #: templates/initial_queries.html:17
 msgid "Tell us a little about yourself."
-msgstr "Berätta lite om dig själv."
+msgstr "Raccontaci qualcosa su di te."
 
 #: templates/initial_queries.html:17
 msgid "your information"
-msgstr "dina uppgifter"
+msgstr "le tue informazioni"
 
 #: templates/initial_queries.html:26
 msgid "Now it is time to build your prostate cancer profile."
@@ -2245,7 +2251,7 @@ msgstr ""
 
 #: templates/initial_queries.html:26
 msgid "your clinical profile"
-msgstr "din kliniska profil"
+msgstr "il tuo profilo clinico"
 
 #: templates/initial_queries.html:27
 msgid "The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey."
@@ -2253,39 +2259,39 @@ msgstr ""
 
 #: templates/initial_queries.html:30
 msgid "Your clinic of care."
-msgstr "Din vårdklinik."
+msgstr "La tua clinica di riferimento."
 
 #: templates/initial_queries.html:30
 msgid "your clinic"
-msgstr "din klinik"
+msgstr "la tua clinica"
 
 #: templates/initial_queries.html:39
 msgid "Thank you."
-msgstr "Tack!"
+msgstr "Grazie."
 
 #: templates/initial_queries.html:40
 msgid "Click continue to start using TrueNTH"
-msgstr "Klicka på \"Fortsätt\" för att börja använda TrueNTH"
+msgstr "Clicca continua per iniziare a usare TrueNTH"
 
 #: templates/initial_queries_macros.html:4
 msgid "Data Saved"
-msgstr "Data har sparats"
+msgstr "Dati salvati"
 
 #: templates/initial_queries_macros.html:5
 msgid "Unable to Save Data. System error."
-msgstr "Kunde inte spara data. Systemfel."
+msgstr "Impossibile salvare i dati. Errore di sistema."
 
 #: templates/initial_queries_macros.html:9
 msgid "saving data..."
-msgstr "sparar uppgifter ..."
+msgstr "salvataggio dei dati in corso..."
 
 #: templates/initial_queries_macros.html:24
 msgid "terms"
-msgstr "villkor"
+msgstr "termini"
 
 #: templates/initial_queries_macros.html:27
 msgid "Terms of Use"
-msgstr "Användarvillkor"
+msgstr "Condizioni d'uso"
 
 #: templates/initial_queries_macros.html:30
 msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
@@ -2293,7 +2299,7 @@ msgstr ""
 
 #: templates/initial_queries_macros.html:37
 msgid "View TrueNTH Terms"
-msgstr "Visa villkoren för TrueNTH"
+msgstr "Visualizza le condizioni TrueNTH"
 
 #: templates/initial_queries_macros.html:40
 #, python-format
@@ -2307,108 +2313,108 @@ msgstr ""
 
 #: templates/initial_queries_macros.html:52
 msgid "By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent."
-msgstr "Genom att kryssa för denna ruta, bekräftar jag att jag har läst informationsmeddelandet ovan och godkänner och samtycker till att mina personuppgifter (inklusive min hälsoinformation) behandlas enligt de villkor som beskrivs i detta samtycke."
+msgstr "Selezionando questa casella, confermo di aver letto l'informativa di cui sopra e di accettare e dare il consenso al trattamento delle mie informazioni personali (comprese quelle sanitarie) secondo i termini descritti nel presente Consenso."
 
 #: templates/initial_queries_macros.html:55
 msgid "You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact."
-msgstr "Du har tidigare givit ditt samtycke till webbplatsen under ett besök på din vårdenhet/klinik . Om du vill ha en kopia av detta ber vi dig att vända dig till din kontaktperson i studien (läkare eller sköterska)."
+msgstr "In precedenza, hai dato il tuo consenso al sito Internet in occasione di una visita al centro di trattamento. Per riceverne una copia, puoi rivolgerti al referente dello studio."
 
 #: templates/initial_queries_macros.html:73
 #, python-format
 msgid "<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class=\"required-link\">terms</a>.</span>"
-msgstr "<span class=\"terms-tick-box-text\"> Genom att markera rutan bekräftar jag att jag har läst och accepterar webbplatsens <a href=\"%(privacy_url)s\" class=\"required-link\">integritetspolicy</a> och <a href=\"%(terms_url)s\" class=\"required-link\">villkor</a>.</span>"
+msgstr "<span class=\"terms-tick-box-text\"> Selezionando questa casella, confermo di aver letto e di accettare <a href=\"%(privacy_url)s\" class=\"required-link\">l'informativa sulla privacy</a> del sito Internet e <a href=\"%(terms_url)s\" class=\"required-link\">le relative condizioni</a>.</span>"
 
 #: templates/initial_queries_macros.html:103
 msgid "To Continue"
-msgstr "För att fortsätta"
+msgstr "Per continuare"
 
 #: templates/initial_queries_macros.html:107
 msgid "You must agree to the terms and conditions by checking the provided checkbox."
-msgstr "Du måste godkänna villkoren genom att markera kryssrutan."
+msgstr "È obbligatorio accettare i termini e le condizioni selezionando l'apposita casella."
 
 #: templates/initial_queries_macros.html:120
 msgid "Website Consent Script - Enter Manually - Paper Form"
-msgstr "Text för samtycke för webbplatsen – Fyll i för hand – Pappersformulär"
+msgstr "Testo del consenso per il sito Internet - Inserisci manualmente - Modulo cartaceo"
 
 #: templates/initial_queries_macros.html:121
 #: templates/initial_queries_macros.html:144
 msgid "For Staff Use Only"
-msgstr "Endast för personalbruk"
+msgstr "A uso esclusivo dello staff"
 
 #: templates/initial_queries_macros.html:133
 msgid "By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures."
-msgstr "Genom att kryssa för denna ruta, bekräftar jag att patienten har läst samtycket för webbplatsen och godkänner och samtycker till att personliga uppgifter (inklusive hälsouppgifter) behandlas i enlighet med samtycket och tillhörande villkor. En kopia av patientens samtycke och övriga uppgifter förvaras i enlighet med de lokala reglerna för förvaring."
+msgstr "Selezionando questa casella, confermo che il paziente ha letto l'Informativa sul consenso del sito Internet, accetta e dà il consenso al trattamento delle proprie informazioni personali (comprese quelle sanitarie) ai sensi del Consenso nonché dei Termini e delle Condizioni; una copia del presente e le informazioni fornite dal paziente sono state archiviate in modo sicuro conformemente alle procedure del mio centro."
 
 #: templates/initial_queries_macros.html:143
 msgid "Website Consent Script - Enter Manually - Interview Assisted"
-msgstr "Text för samtycke för webbplatsen – Fyll i för hand – Assistans vid intervjun"
+msgstr "Testo per il consenso al sito Internet - inserire manualmente - intervista assistita"
 
 #: templates/initial_queries_macros.html:148
 msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study."
-msgstr "Vi erbjuder dig att använda TrueNTH:s webbplats frågeformulär eftersom du har samtyckt till att delta i den registerstudie som [organisation] genomför."
+msgstr "Sei invitato a usare lo strumento del sito Internet TrueNTH in quanto hai accettato di partecipare allo studio di Registro [dell'organizzazione]."
 
 #: templates/initial_queries_macros.html:149
 msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
-msgstr "De uppgifter du lämnar kommer att användas i en global studie och kommer att gynna patienter i framtiden genom bättre alternativ för behandling och vård.  Låter detta som något du skulle vara villig att delta i?"
+msgstr "Le informazioni fornite verranno utilizzate in uno studio globale e andranno a beneficio dei pazienti favorendo migliori opzioni per il trattamento e la cura.  Pensi si tratti di qualcosa a cui ti farebbe piacere partecipare?"
 
 #: templates/initial_queries_macros.html:151
 msgid "If yes, continue to read below text and Consent."
-msgstr "Om ja, fortsätt läsa nedanstående text och text för samtycke."
+msgstr "Se sì, continua a leggere il testo e il Consenso."
 
 #: templates/initial_queries_macros.html:152
 #: templates/initial_queries_macros.html:165
 msgid "If no, thank them for their time."
-msgstr "Om nej, tacka honom/henne för att han/hon har tagit sig tid."
+msgstr "Se no, ringrazia il paziente per il tempo dedicato."
 
 #: templates/initial_queries_macros.html:154
 msgid "Read consent [exactly as written]"
-msgstr "Läs text för samtycke [exakt som den är skriven]"
+msgstr "Leggi il consenso [esattamente così com'è scritto]"
 
 #: templates/initial_queries_macros.html:161
 msgid "Do you have any questions?"
-msgstr "Har du några frågor?"
+msgstr "Domande?"
 
 #: templates/initial_queries_macros.html:162
 msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
-msgstr "Samtycker du till att vara delaktig i TrueNTH:s webbplatsverktyg och att dina personuppgifter (inklusive din hälsoinformation) behandlas enligt de villkor som jag har just läst upp för dig?"
+msgstr "Accetti di partecipare all'uso dello strumento del sito Internet TrueNTH e acconsenti al trattamento delle informazioni personali (comprese quelle sanitarie) alle condizioni che ti ho appena letto?"
 
 #: templates/initial_queries_macros.html:164
 msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
-msgstr "Om ja, dokumentera muntligt samtycke nedan. [OBS! Detta samtycke måste läsas upp innan eventuella personuppgifter samlas in. Patienten måste säga \"Ja, jag samtycker\". \"Mmm\", \"japp\", \"ok\" eller liknande är inte tillräckligt.]"
+msgstr "Se sì, documenta il consenso verbale qui di seguito. [NOTA: Il consenso va assolutamente letto ad alta voce e prima di raccogliere qualsiasi informazione personale. Il paziente deve dire \"sì, do il consenso\", risposte del tipo \"uhm\", \"ok\", \"va bene\" o simili non sono sufficienti.]"
 
 #: templates/initial_queries_macros.html:172
 msgid "Please print and fill out the form"
-msgstr "Skriv ut och fyll i formuläret"
+msgstr "Stampa e compila il modulo"
 
 #: templates/initial_queries_macros.html:181
 msgid "CLOSE"
-msgstr "STÄNG"
+msgstr "CHIUDI"
 
 #: templates/initial_queries_macros.html:188
 msgid "View/print website declaration form"
-msgstr "Visa/skriv ut intygsblankett för webbplatsen"
+msgstr "Visualizza/stampa il modulo di dichiarazione del sito Internet"
 
 #: templates/initial_queries_macros.html:204
 msgid "By checking this box, I confirm that I have read the required information to the patient and provided the opportunity for the patient to ask questions. I have addressed the questions to the patient’s satisfaction and have created an electronic copy of this declaration and have stored this copy. The patient has provided oral consent to participate in the TrueNTH Global Registry on the terms set out above."
-msgstr "Genom att markera denna ruta bekräftar jag att jag har läst upp den erforderliga informationen för patienten och givit patienten möjlighet att ställa frågor. Jag har svarat på frågorna till patientens tillfredsställelse, skapat en elektronisk kopia av denna deklaration och har lagrat denna kopia. Patienten har lämnat muntligt samtycke till att delta i TrueNTH:s globala register i enlighet med de villkor som anges ovan."
+msgstr "Selezionando questa casella, confermo di aver letto le informazioni necessarie al paziente e di aver dato al paziente l'opportunità di rivolgere eventuali domande. Ho risposto alle domande del paziente in modo soddisfacente e ho creato e salvato una copia elettronica di questa dichiarazione. Il paziente ha dato verbalmente il proprio consenso a partecipare al Registro Globale TrueNTH secondo i termini sopra descritti."
 
 #: templates/initial_queries_macros.html:205
 msgid "By checking this box, I confirm that I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
-msgstr "Genom att markera denna ruta bekräftar jag att jag har läst och/eller gått igenom nödvändig information om ämnet, fyllt i det erforderliga samtyckesformuläret för användning av TrueNTH:s webbplatsverktyg och skapat en elektronisk kopia av denna deklaration, samt arkiverat nämnda kopia."
+msgstr "Selezionando questa casella, confermo di aver letto e/o esaminato le informazioni richieste con il soggetto e di aver completato il consenso richiesto per l'uso dello strumento del sito Internet TrueNTH nonché di aver creato una copia elettronica di questa dichiarazione e di averla salvata."
 
 #: templates/initial_queries_macros.html:207
 msgid "Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration.."
-msgstr "Personen har gett sitt samtycke tidigare och du har tidigare skrivit under och lagrat en elektronisk kopia av medgivandeförklaringen ..."
+msgstr "In precedenza, il soggetto ha dato il suo consenso e tu hai firmato e archiviato una copia elettronica della dichiarazione di consenso."
 
 #: templates/initial_queries_macros.html:219
 #: templates/profile/profile_macros.html:179
 msgid "First name"
-msgstr "Förnamn"
+msgstr "Nome di battesimo"
 
 #: templates/initial_queries_macros.html:226
 #: templates/profile/profile_macros.html:187
 msgid "Last name"
-msgstr "Efternamn"
+msgstr "Cognome"
 
 #: templates/initial_queries_macros.html:236
 msgid "I'm a man who is concerned about prostate cancer for myself"
@@ -2420,72 +2426,72 @@ msgstr ""
 
 #: templates/initial_queries_macros.html:253
 msgid "(optional)"
-msgstr "(valfritt)"
+msgstr "(facoltativo)"
 
 #: templates/initial_queries_macros.html:256
 msgid "Birth date"
-msgstr "Födelsedatum"
+msgstr "Data di nascita"
 
 #: templates/initial_queries_macros.html:256
 msgid "The birth day field is required and must be valid format"
-msgstr "Fältet för födelsedag är obligatoriskt och måste vara i ett giltigt format"
+msgstr "È obbligatorio compilare il campo relativo al giorno di nascita in formato valido"
 
 #: templates/initial_queries_macros.html:259
 msgid "Birth month"
-msgstr "Födelsemånad"
+msgstr "Mese di nascita"
 
 #: templates/initial_queries_macros.html:259
 msgid "A birth month must be selected"
-msgstr "Födelsemånad måste väljas"
+msgstr "Occorre selezionare un mese di nascita"
 
 #: templates/initial_queries_macros.html:276
 msgid "The birth year is required and must be in valid format"
-msgstr "Fältet för födelseår är obligatoriskt och måste vara i ett giltigt format"
+msgstr "L'anno di nascita è necessario e deve essere inserito in un formato valido"
 
 #: templates/initial_queries_macros.html:287
 #: templates/profile/profile_macros.html:877
 msgid "Have you had a prostate cancer biopsy?"
-msgstr "Har du genomgått en prostatabiopsi?"
+msgstr ""
 
 #: templates/initial_queries_macros.html:295
 msgid "Biopsy Date"
-msgstr "Datum för biopsi"
+msgstr ""
 
 #: templates/initial_queries_macros.html:299
 msgid "The biopsy day field is required and must be valid format"
-msgstr "Fältet för datum för biopsi är obligatoriskt och måste vara i ett giltigt format"
+msgstr ""
 
 #: templates/initial_queries_macros.html:302
 msgid "A biopsy month must be selected"
-msgstr "Månad för biopsi måste väljas"
+msgstr ""
 
 #: templates/initial_queries_macros.html:319
 msgid "The biopsy year is required and must be in valid format"
-msgstr "År för biopsi är obligatoriskt och måste vara i ett giltigt format"
+msgstr ""
 
 #: templates/initial_queries_macros.html:332
 #: templates/initial_queries_macros.html:352
 #: templates/initial_queries_macros.html:373
 msgid "I don't know"
-msgstr "Jag vet inte"
+msgstr "Non saprei"
 
 #: templates/initial_queries_macros.html:338
 #: templates/profile/profile_macros.html:878
 msgid "Have you been diagnosed with prostate cancer?"
-msgstr "Har du diagnostiserats med prostatacancer?"
+msgstr "Hai ricevuto una diagnosi del tumore della prostata?"
 
 #: templates/initial_queries_macros.html:342
 msgid "Yes (my biopsy was positive)"
-msgstr "Ja (min biopsi var positiv)"
+msgstr ""
 
 #: templates/initial_queries_macros.html:347
 msgid "No (my biopsy was negative)"
-msgstr "Nej (min biopsi var negativ)"
+msgstr ""
 
 #: templates/initial_queries_macros.html:359
 #: templates/profile/profile_macros.html:879
 msgid "Is the prostate cancer only within the prostate?"
-msgstr "Är prostatacancern bara i prostatan?"
+msgstr "Il tumore è limitato all'interno della prostata?"
 
 #: templates/initial_queries_macros.html:368
 msgid "No (the cancer is in other parts of my body, too)"
@@ -2497,55 +2503,55 @@ msgstr ""
 
 #: templates/initial_queries_macros.html:407
 msgid "I'm not receiving care at any of the above clinics"
-msgstr "Jag får inte vård på någon av de ovanstående klinikerna"
+msgstr "Non ricevo assistenza presso nessuna delle cliniche indicate qui sopra"
 
 #: templates/invite.html:4 templates/invite_sent.html:6
 msgid "Email Invite"
-msgstr "E-postinbjudan"
+msgstr "Invito tramite e-mail"
 
 #: templates/invite.html:5
 msgid "Send a TrueNTH email invite by filling in the form below."
-msgstr "Skicka en inbjudan till TrueNTH via e-post genom att fylla i nedanstående formulär."
+msgstr "Spedisci un invito a TrueNTH via e-mail compilando il modulo sottostante."
 
 #: templates/invite.html:8
 msgid "To (separate multiple addresses with white space)"
-msgstr "Till (separera flera adresser med blanksteg)"
+msgstr "A (separare gli indirizzi tra loro con uno spazio)"
 
 #: templates/invite.html:13
 msgid "Invitation to try TrueNTH"
-msgstr "Inbjudan att prova TrueNTH"
+msgstr "Invito a provare TrueNTH"
 
 #: templates/invite.html:16
 msgid "Body"
-msgstr "Brödtext"
+msgstr "Corpo"
 
 #: templates/invite.html:17
 msgid "TrueNTH Invitation"
-msgstr "Inbjudan till TrueNTH"
+msgstr "Invito TrueNTH"
 
 #: templates/invite.html:19
 msgid "Send Invite"
-msgstr "Skicka inbjudan"
+msgstr "Spedisci un invito"
 
 #: templates/invite_sent.html:8
 msgid "Email Invite Sent"
-msgstr "E-postinbjudan skickad"
+msgstr "Invito spedito via e-mail"
 
 #: templates/invite_sent.html:10
 msgid "To"
-msgstr "Till"
+msgstr "A"
 
 #: templates/invite_sent.html:14
 msgid "Sent"
-msgstr "Skickat"
+msgstr "Inviato"
 
 #: templates/portal_footer.html:36
 msgid "Tools"
-msgstr "Verktyg"
+msgstr "Strumenti"
 
 #: templates/portal_footer.html:44
 msgid "Socials"
-msgstr "Sociala medier"
+msgstr "Social"
 
 #: templates/portal_footer.html:45
 msgid "Facebook"
@@ -2557,113 +2563,113 @@ msgstr ""
 
 #: templates/portal_footer.html:52
 msgid "Terms & Conditions"
-msgstr "Villkor och bestämmelser"
+msgstr "Termini & Condizioni"
 
 #: templates/portal_footer.html:53
 msgid "Privacy Policy"
-msgstr "Integritetspolicy"
+msgstr "Informativa sulla privacy"
 
 #: templates/portal_wrapper.html:46
 msgid "dismiss"
-msgstr "avvisa"
+msgstr "ignora"
 
 #: templates/portal_wrapper.html:55 templates/portal_wrapper.html:115
 msgid "TrueNTH logo"
-msgstr "TrueNTH:s logotyp"
+msgstr "Logo TrueNTH"
 
 #: templates/portal_wrapper.html:58 templates/portal_wrapper.html:118
 msgid "brand logo"
-msgstr "varumärkeslogotyp"
+msgstr "logo del marchio"
 
 #: templates/portal_wrapper.html:84 Intervention:analytics
 #: templates/portal_wrapper.html:137
 msgid "Analytics"
-msgstr "Analys"
+msgstr "Analitica"
 
 #: templates/portal_wrapper.html:92 templates/portal_wrapper.html:145
 msgid "Log Out of TrueNTH"
-msgstr "Logga ut från TrueNTH"
+msgstr "Esci da TrueNTH"
 
 #: templates/portal_wrapper.html:96 templates/portal_wrapper.html:113
 msgid "MENU"
-msgstr "MENY"
+msgstr "MENU"
 
 #: templates/portal_wrapper.html:97 templates/portal_wrapper.html:113
 msgid "Profile image"
-msgstr "Profilbild"
+msgstr "Immagine del profilo"
 
 #: templates/portal_wrapper.html:99 templates/portal_wrapper.html:104
 msgid "Welcome"
-msgstr "Välkommen"
+msgstr "Benvenuto"
 
 #: templates/portal_wrapper.html:103 templates/portal_wrapper.html:124
 msgid "Log In to TrueNTH"
-msgstr "Logga in på TrueNTH"
+msgstr "Accedi a TrueNTH"
 
 #: templates/portal_wrapper.html:114
 msgid "Return to TrueNTH home"
-msgstr "Återgå till startsida för TrueNTH"
+msgstr "Ritorna alla Home TrueNTH"
 
 #: templates/portal_wrapper.html:163
 msgid "Your session is about to expire"
-msgstr "Din session är på väg att löpa ut"
+msgstr "La tua sessione sta per scadere"
 
 #: templates/portal_wrapper.html:165
 msgid "Your session will expire in approximately {time} seconds due to inactivity."
-msgstr "Din session löper ut om ungefär {time} sekunder på grund av inaktivitet."
+msgstr "La sessione scadrà tra circa {time} secondi a causa dell'inattività."
 
 #: templates/portal_wrapper.html:166
 msgid "Stay Logged In"
-msgstr "Fortsätt vara inloggad"
+msgstr "Rimani connesso"
 
 #: templates/require_cookies.html:6
 msgid "Browser Cookies Disabled"
-msgstr "Webbläsarcookies inaktiverade"
+msgstr "Cookie del browser disabilitati"
 
 #: templates/require_cookies.html:9
 msgid "Our website needs to use cookies to bring you the best, personalized, browsing experience. Your web browser is currently <b>not</b> allowing cookies. Help us fix this."
-msgstr "Vi behöver använda cookies för att kunna ge dig den bästa och lämpligast anpassade navigeringsupplevelsen på vår webbplats. Din webbläsare tillåter för närvarande <b>inte</b> cookies. Hjälp oss ordna det."
+msgstr "Il nostro sito Internet usa i cookie per offrirti la migliore esperienza di navigazione personalizzata possibile. Attualmente il browser Internet in uso <b>non</b> consente i cookie. Aiutaci a risolvere il problema."
 
 #: templates/require_cookies.html:13
 msgid "Please enable cookies within your browser settings to continue. To learn how to allow cookies, check online for your web browser's specific instructions."
-msgstr "Aktivera cookies i inställningarna för din webbläsare för att fortsätta. För att få veta hur du tillåter cookies, kan du läsa de specifika instruktionerna för din webbläsare online."
+msgstr "Per continuare, abilita i cookie nelle impostazioni del browser. Per sapere come fare, cerca in rete le istruzioni specifiche per il tuo browser web."
 
 #: templates/require_cookies.html:15
 #, python-format
 msgid "For more information on how we use cookies, see our <u><a href=\"%(privacy_url)s\">Privacy Policy</a></u>."
-msgstr "För mer information om hur vi använder cookies, läs vår <u><a href=\"%(privacy_url)s\">Integritetspolicy</a></u>."
+msgstr "Per ulteriori informazioni su come vengono usati i cookie, consulta la nostra <u><a href=\"%(privacy_url)s\">Informativa sulla Privacy</a></u>."
 
 #: templates/require_cookies.html:20
 msgid "Try Again"
-msgstr "Försök igen"
+msgstr "Riprova"
 
 #: templates/require_cookies.html:49
 msgid "Browser cookie setting check complete"
-msgstr ""
+msgstr "Controllo delle impostazioni dei cookie del browser completato"
 
 #: templates/sessionReport.html:8
 msgid "Assessment Report Detail"
-msgstr "Utvärderingsdetalj"
+msgstr "Dettagli del resoconto di valutazione"
 
 #: templates/sessionReport.html:9 Role:patient
 msgid "Patient"
-msgstr "Patient"
+msgstr "Paziente"
 
 #: templates/sessionReport.html:13
 msgid "Back to Profile"
-msgstr "Tillbaka till profilen"
+msgstr "Torna al profilo"
 
 #: templates/sessionReport.html:16
 msgid "Back to Patient Profile"
-msgstr "Tillbaka till patientprofil"
+msgstr "Torna al profilo del paziente"
 
 #: templates/sessionReport.html:18
 msgid "Back to User Profile"
-msgstr "Tillbaka till användarprofilen"
+msgstr "Torna al profilo utente"
 
 #: templates/sessionReport.html:21
 msgid "Back to Truenth Home"
-msgstr "Tillbaka till TrueNTH:s startsida"
+msgstr "Torna alla Home TrueNTH"
 
 #: templates/shortcut_alias.html:8
 msgid "Do you have an Access Code?"
@@ -2681,53 +2687,53 @@ msgstr ""
 #: templates/flask_user/login_or_register.html:159
 #: templates/flask_user/register.html:34 templates/shortcut_alias.html:20
 msgid "Register"
-msgstr "Registrera"
+msgstr "Registra"
 
 #: templates/site_overdue_table.html:2
 msgid "Overdue Patients"
-msgstr ""
+msgstr "Pazienti in ritardo"
 
 #: templates/site_overdue_table.html:5
 msgid "Site"
-msgstr "Klinik"
+msgstr "Centro"
 
 #: templates/admin/patients_by_org.html:56 templates/site_overdue_table.html:6
 msgid "TrueNTH ID"
-msgstr "TrueNTH-ID"
+msgstr "ID TrueNTH"
 
 #: templates/admin/patients_by_org.html:67
 #: templates/profile/profile_macros.html:1027
 #: templates/site_overdue_table.html:7
 msgid "Study ID"
-msgstr "Studie-ID"
+msgstr "ID studio"
 
 #: templates/site_overdue_table.html:8
 msgid "Visit Name"
-msgstr ""
+msgstr "Nome della visita"
 
 #: templates/site_overdue_table.html:9
 msgid "Due Date"
-msgstr ""
+msgstr "Data di scadenza"
 
 #: templates/site_overdue_table.html:10
 msgid "Expired Date"
-msgstr ""
+msgstr "Scadenza superata"
 
 #: templates/admin/admin.html:4
 msgid "Admin Tools"
-msgstr "Admin. verktyg"
+msgstr "Strumenti di amministrazione"
 
 #: templates/admin/admin.html:5
 msgid "Click on each for details"
-msgstr "Klicka på vart och ett för detaljer"
+msgstr "Clicca su ogni elemento per ulteriori dettagli"
 
 #: templates/admin/admin.html:14
 msgid "Select any user to view details or make changes."
-msgstr "Markera valfri användare för att visa detaljer eller göra ändringar."
+msgstr "Seleziona un utente per visualizzare i dettagli o apportare modifiche."
 
 #: templates/admin/admin.html:16
 msgid "AdminList_"
-msgstr "Administrationslista_"
+msgstr ""
 
 #: templates/admin/admin.html:41 templates/admin/staff_by_org.html:40
 msgid "ID"
@@ -2735,68 +2741,68 @@ msgstr "ID"
 
 #: templates/admin/admin.html:45
 msgid "Roles"
-msgstr "Roller"
+msgstr "Ruoli"
 
 #: templates/admin/admin.html:46
 msgid "Sites"
-msgstr "Platser"
+msgstr "Siti"
 
 #: templates/admin/admin.html:47 templates/admin/staff_by_org.html:46
 msgid "Deactivate Account"
-msgstr "Inaktivera konto"
+msgstr "Disattiva account"
 
 #: templates/admin/admin.html:48 templates/admin/patients_by_org.html:76
 #: templates/admin/staff_by_org.html:47
 msgid "activation status"
-msgstr "aktiveringsstatus"
+msgstr "stato di attivazione"
 
 #: templates/admin/admin_base.html:14
 msgid "Filter list by site"
-msgstr "Filtrera listan efter kliniker"
+msgstr "Filtra l'elenco per centro"
 
 #: templates/admin/admin_base.html:22
 msgid "Select All"
-msgstr "Markera alla"
+msgstr "Seleziona tutto"
 
 #: templates/admin/admin_base.html:23
 msgid "Clear All"
-msgstr "Rensa alla"
+msgstr "Cancella tutto"
 
 #: templates/admin/admin_base.html:29
 msgid "Site filter applied"
-msgstr "Platsfilter tillämpas"
+msgstr "Filtro del sito applicato"
 
 #: templates/admin/admin_base.html:36
 msgid "View deactivated accounts"
-msgstr "Visa inaktiverade konton"
+msgstr "Visualizza gli account disattivati"
 
 #: templates/admin/admin_base.html:41 templates/admin/patients_by_org.html:74
 msgid "Deactivate"
-msgstr "Inaktivera"
+msgstr "Disattiva"
 
 #: templates/admin/admin_base.html:41
 msgid "Inactive"
-msgstr "Inaktiv"
+msgstr "Inattivo"
 
 #: templates/admin/admin_base.html:41
 msgid "Reactivate account"
-msgstr "Återaktivera konto"
+msgstr "Riattiva account"
 
 #: templates/admin/admin_base.html:48
 msgid "include test accounts"
-msgstr "inkludera testkonton"
+msgstr "includi account di prova"
 
 #: templates/admin/patients_by_org.html:6
 msgid "Patient List"
-msgstr "Patientlista"
+msgstr "Elenco dei pazienti"
 
 #: templates/admin/patients_by_org.html:9
 msgid "Create a patient record"
-msgstr "Skapa en patientjournal"
+msgstr "Crea scheda paziente"
 
 #: templates/admin/patients_by_org.html:12
 msgid "Select a patient below to view or update details."
-msgstr "Välj en patient nedan för att visa eller uppdatera information."
+msgstr "Seleziona uno dei pazienti qui sotto per visualizzare o aggiornare i dettagli."
 
 #: templates/admin/patients_by_org.html:15
 msgid "PatientList_"
@@ -2804,30 +2810,30 @@ msgstr ""
 
 #: templates/admin/patients_by_org.html:23
 msgid "Refresh Patient List"
-msgstr "Uppdatera patientlista"
+msgstr "Aggiorna l'elenco dei pazienti"
 
 #: templates/admin/patients_by_org.html:24
 #, python-format
 msgid "Last updated %(minutes)d minutes ago"
-msgstr "Senast uppdaterad för %(minutes)d minuter sedan"
+msgstr "Ultimo aggiornamento %(minutes)d minuti fa"
 
 #: templates/admin/patients_by_org.html:57
 msgid "Username"
-msgstr "Användarnamn"
+msgstr "Nome utente"
 
 #: templates/admin/patients_by_org.html:60
 #: templates/profile/profile_macros.html:49
 msgid "Date of Birth"
-msgstr "Födelsedatum"
+msgstr "Data di nascita"
 
 #: templates/admin/patients_by_org.html:64
 msgid "Questionnaire Status"
-msgstr "Enkätstatus"
+msgstr "Stato del questionario"
 
 #: templates/admin/patients_by_org.html:65
 #: templates/profile/profile_macros.html:850
 msgid "Visit"
-msgstr "Besök"
+msgstr "Visita"
 
 #: templates/admin/patients_by_org.html:68
 msgid "(GMT)"
@@ -2835,20 +2841,20 @@ msgstr "(GMT)"
 
 #: templates/admin/patients_by_org.html:69 templates/admin/staff_by_org.html:44
 msgid "Site(s)"
-msgstr "Klinik(er)"
+msgstr "Centro/i"
 
 #: templates/admin/patients_by_org.html:71
 #: templates/profile/profile_macros.html:1149
 msgid "Interventions"
-msgstr "Interventioner"
+msgstr "Interventi"
 
 #: templates/admin/patients_by_org.html:93
 msgid "ST"
-msgstr "ST"
+msgstr ""
 
 #: templates/admin/patients_by_org.html:93
 msgid "DS"
-msgstr "DS"
+msgstr ""
 
 #: templates/admin/patients_by_org.html:126
 msgid "Patient Report"
@@ -2856,75 +2862,75 @@ msgstr ""
 
 #: templates/admin/patients_by_org.html:135
 msgid "Type"
-msgstr "Typ"
+msgstr "Inserisci"
 
 #: templates/admin/patients_by_org.html:135
 msgid "Report Name"
-msgstr "Rapportens namn"
+msgstr "Nome del resoconto"
 
 #: templates/admin/patients_by_org.html:135
 msgid "Generated (GMT)"
-msgstr "Skapad (GMT)"
+msgstr "Generato (GMT)"
 
 #: templates/admin/patients_by_org.html:135
 msgid "Downloaded"
-msgstr "Hämtat"
+msgstr "Scaricati"
 
 #: templates/admin/patients_by_org.html:144
 msgid "View All"
-msgstr "Visa alla"
+msgstr "Visualizza tutto"
 
 #: templates/admin/patients_by_org.html:161
 msgid "Export report data"
-msgstr "Exportera rapportdata"
+msgstr "Esporta i dati del resoconto"
 
 #: templates/admin/patients_by_org.html:162
 msgid "CSV"
-msgstr "CSV"
+msgstr ""
 
 #: templates/admin/patients_by_org.html:162
 msgid "JSON"
-msgstr "JSON"
+msgstr ""
 
 #: templates/admin/patients_by_org.html:166
 msgid "Export request submitted"
-msgstr "Exportbegäran skickad"
+msgstr "Richiesta di esportazione inviata"
 
 #: templates/admin/patients_by_org.html:167
 msgid "Note: due to the size of result data, this may take a while."
-msgstr "Obs! Beroende på dataresultatets storlek kan detta ta ett tag."
+msgstr "Nota: a causa delle dimensioni dei dati, l'operazione potrebbe richiedere del tempo."
 
 #: templates/admin/patients_by_org.html:176
 msgid "Retry"
-msgstr "Försök igen"
+msgstr "Riprova"
 
 #: templates/admin/staff_by_org.html:6
 msgid "Staff Administration"
-msgstr "Personaladministration"
+msgstr "Amministrazione del personale"
 
 #: templates/admin/staff_by_org.html:9
 msgid "Create a staff record"
-msgstr "Skapa en personalpost"
+msgstr "Crea scheda staff"
 
 #: templates/admin/staff_by_org.html:11
 msgid "Select a user below to view or update details."
-msgstr "Välj en användare nedan för att visa eller uppdatera information."
+msgstr "Seleziona uno degli utenti qui sotto per visualizzare o aggiornare i dettagli."
 
 #: templates/admin/staff_by_org.html:15
 msgid "StaffList_"
-msgstr "Personallista_"
+msgstr ""
 
 #: templates/admin/staff_by_org.html:45 Role:staff_admin
 msgid "Staff Admin"
-msgstr "Personaladministratör"
+msgstr "Amministrazione del personale"
 
 #: templates/flask_user/_macros.html:55
 msgid "Back to"
-msgstr "Tillbaka till"
+msgstr "Torna a"
 
 #: templates/flask_user/_macros.html:80
 msgid "Terms"
-msgstr "Villkor"
+msgstr "Termini"
 
 #: templates/flask_user/_macros.html:84 templates/flask_user/_macros.html:88
 msgid "Movember"
@@ -2932,62 +2938,62 @@ msgstr "Movember"
 
 #: templates/flask_user/_macros.html:85
 msgid "Movember Logo"
-msgstr "Movembers logotyp"
+msgstr "Logo Movember"
 
 #: templates/flask_user/_macros.html:93
 #, python-format
 msgid "%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
-msgstr "%(year)d Movember Foundation. Alla rättigheter förbehålls. En ideell organisation med 501 (c) 3-status."
+msgstr "Fondazione Movember %(year)d. Tutti i diritti riservati. Un'organizzazione no profit registrata come 501(c)3."
 
 #: templates/flask_user/_macros.html:101
 msgid "Password must have at least:"
-msgstr "Lösenordet måste innehålla minst:"
+msgstr "La password deve contenere almeno:"
 
 #: templates/flask_user/_macros.html:103
 msgid "Eight characters"
-msgstr "Åtta tecken"
+msgstr "Otto caratteri"
 
 #: templates/flask_user/_macros.html:104
 msgid "One lowercase letter"
-msgstr "En liten bokstav"
+msgstr "Una lettera minuscola"
 
 #: templates/flask_user/_macros.html:105
 msgid "One uppercase letter"
-msgstr "En stor bokstav"
+msgstr "Una lettera maiuscola"
 
 #: templates/flask_user/_macros.html:106
 msgid "One number"
-msgstr "En siffra"
+msgstr "Un numero"
 
 #: templates/flask_user/_macros.html:120
 msgid "Limited Access"
-msgstr "Begränsad åtkomst"
+msgstr "Accesso limitato"
 
 #: templates/flask_user/_macros.html:123
 msgid "To access this information, you will need to log in with your username and password."
-msgstr "För att få tillgång till informationen, måste du logga in med ditt användarnamn och ditt lösenord."
+msgstr "Per consultare queste informazioni, accedere con il proprio nome utente e password."
 
 #: templates/flask_user/_macros.html:126
 msgid "Continue with limited access"
-msgstr "Fortsätta med begränsad åtkomst"
+msgstr "Continua con accesso limitato"
 
 #: templates/flask_user/_macros.html:127
 msgid "Log in to see more"
-msgstr "Logga in för att se mer"
+msgstr "Accedi per saperne di più"
 
 #: templates/flask_user/change_password.html:6
 #: templates/flask_user/user_profile.html:11
 msgid "Change password"
-msgstr "Ändra lösenord"
+msgstr "Cambia password"
 
 #: templates/flask_user/change_username.html:6
 #: templates/flask_user/user_profile.html:8
 msgid "Change username"
-msgstr "Ändra användarnamn"
+msgstr "Cambia nome utente"
 
 #: templates/flask_user/invite.html:5
 msgid "Invite User"
-msgstr "Bjud in användare"
+msgstr "Invita utente"
 
 #: templates/flask_user/login.html:39
 msgid "Login With Facebook"
@@ -2999,41 +3005,41 @@ msgstr ""
 
 #: templates/flask_user/login_or_register.html:127
 msgid "Sign in"
-msgstr "Logga in"
+msgstr "Accedi"
 
 #: templates/flask_user/manage_emails.html:5
 msgid "Manage Emails"
-msgstr "Hantera e-post"
+msgstr "Gestisci e-mail"
 
 #: templates/flask_user/register.html:13
 msgid "Email address"
-msgstr "E-postadress"
+msgstr "Indirizzo e-mail"
 
 #: templates/flask_user/register.html:14
 msgid "Email address is required."
-msgstr "E-postadress måste anges."
+msgstr "È necessario l'indirizzo e-mail."
 
 #: templates/flask_user/register.html:23
 #: templates/flask_user/reset_password.html:12
 msgid "Oops, the password does not meet the minimum requirements."
-msgstr "Oj då, lösenordet uppfyller inte minimikraven."
+msgstr "Spiacenti, la password non soddisfa i requisiti minimi."
 
 #: templates/flask_user/register.html:27
 msgid "Retype Password"
-msgstr "Ange lösenordet igen"
+msgstr "Inserisci nuovamente la password"
 
 #: templates/flask_user/register.html:28
 #: templates/flask_user/reset_password.html:13
 msgid "Oops, the two password fields do not match."
-msgstr "Oj då, de två lösenordsfälten stämmer inte överens."
+msgstr "Spiacenti, le due password non coincidono."
 
 #: templates/flask_user/register.html:29
 msgid "Please re-type your password."
-msgstr "Ange lösenordet igen."
+msgstr "Per favore, reinserisci la password."
 
 #: templates/flask_user/register.html:44
 msgid "Register using:"
-msgstr "Registrera dig med:"
+msgstr "Registrati tramite:"
 
 #: templates/flask_user/register.html:48
 msgid "Log In With Facebook"
@@ -3041,7 +3047,7 @@ msgstr ""
 
 #: templates/flask_user/register.html:55
 msgid "Log In With Google"
-msgstr "Logga in med Google"
+msgstr ""
 
 #: templates/flask_user/register.html:60
 msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
@@ -3069,24 +3075,24 @@ msgstr ""
 
 #: templates/flask_user/resend_confirm_email.html:5
 msgid "Resend Confirmation Email"
-msgstr "Skicka e-postbekräftelse igen"
+msgstr "Rinvia e-mail di conferma"
 
 #: templates/flask_user/reset_password.html:5
 msgid "Reset Password"
-msgstr "Återställ lösenord"
+msgstr "Reimposta la password"
 
 #: templates/flask_user/reset_password.html:11
 msgid "Password must have at least eight characters with one lowercase letter, one uppercase letter and one number"
-msgstr "Lösenordet måste ha minst åtta tecken med en liten bokstav, en stor bokstav och en siffra"
+msgstr "La password deve contenere almeno otto caratteri, tra cui una lettera minuscola, una lettera maiuscola e un numero"
 
 #: templates/flask_user/user_profile.html:5
 msgid "User profile"
-msgstr "Användarprofil"
+msgstr "Profilo utente"
 
 #: templates/flask_user/emails/eproms_base_message.html:1
 #, python-format
 msgid "Hello %(first_name)s %(last_name)s,"
-msgstr "Hej %(first_name)s %(last_name)s,"
+msgstr "Ciao %(first_name)s %(last_name)s,"
 
 #: templates/flask_user/emails/eproms_base_message.html:5
 msgid ""
@@ -3095,8 +3101,8 @@ msgid ""
 "<p>The TrueNTH Team</p>\n"
 msgstr ""
 "\n"
-"<p>Tack,</p>\n"
-"<p>TrueNTH-teamet</p>\n"
+"<p>Grazie,</p>\n"
+"<p>il team TrueNTH</p>\n"
 
 #: templates/flask_user/emails/eproms_base_message.html:9
 #, python-format
@@ -3104,8 +3110,6 @@ msgid ""
 "\n"
 "<p>Please do not reply to this email. If you have any questions about this message, reach out to your %(parent_org)s representative and they will gladly assist.</p>\n"
 msgstr ""
-"\n"
-"<p>Svara inte på detta e-postmeddelande. Om du har några frågor om detta meddelande ber vi dig kontakta din %(parent_org)s-representant som gärna hjälper till.</p>\n"
 
 #: templates/flask_user/emails/eproms_forgot_password_message.html:4
 #, python-format
@@ -3118,317 +3122,310 @@ msgid ""
 "\n"
 "<p>If you did not initiate this password reset, you may safely ignore this email.</p>\n"
 msgstr ""
-"\n"
-"<p>Vi har fått din begäran om att återställa lösenordet.</p>\n"
-"\n"
-"<p>Om du initierade denna begäran, återställ lösenordet med länken nedan:<br/>\n"
-"    <a href=\"%(reset_password_link)s\">Återställa lösenord</a>.</p>\n"
-"\n"
-"<p>Om du inte initierade återställning av lösenordet kan du ignorera det här e-postmeddelandet.</p>\n"
 
 #: templates/flask_user/emails/eproms_password_changed_message.html:4
 msgid "<p>Your password has been changed.</p>"
-msgstr "<p>Ditt lösenord har ändrats.</p>"
+msgstr "<p>La password è stata modificata.</p>"
 
 #: templates/flask_user/emails/eproms_password_changed_message.html:8
 #, python-format
 msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(organization_name)s."
-msgstr "Om du inte initierade denna ändring av lösenordet, <a href=\"%(forgot_password_url)s\">klicka här för att återställa det</a> eller kontakta din representant på %(organization_name)s."
+msgstr "Se non hai richiesto di modificare la password, <a href=\"%(forgot_password_url)s\">clicca qui per reimpostarla</a>, o contatta il tuo rappresentante presso %(organization_name)s."
 
 #: templates/flask_user/emails/eproms_password_changed_message.html:10
 #, python-format
 msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(app_name)s."
-msgstr "Om du inte initierade denna ändring av lösenordet, <a href=\"%(forgot_password_url)s\">klicka här för att återställa det</a> eller kontakta din representant på %(app_name)s."
+msgstr "Se non hai richiesto di modificare la password, <a href=\"%(forgot_password_url)s\">clicca qui per reimpostarla</a>, o contatta il tuo rappresentante presso %(app_name)s."
 
 #: templates/flask_user/emails/eproms_password_changed_message.html:16
 #, python-format
 msgid "If you did not initiate this password change, please contact your representative at %(organization_name)s."
-msgstr "Om du inte initierade denna ändring av lösenordet, kontakta din representant på %(organization_name)s."
+msgstr "Se non hai richiesto di modificare la password, contatta il tuo rappresentante presso %(organization_name)s."
 
 #: templates/flask_user/emails/eproms_password_changed_message.html:18
 #, python-format
 msgid "If you did not initiate this password change, please contact your representative at %(app_name)s."
-msgstr "Om du inte initierade denna ändring av lösenordet, kontakta din representant på %(app_name)s."
+msgstr "Se non hai richiesto di modificare la password, contatta il tuo rappresentante presso %(app_name)s."
 
 #: templates/profile/my_profile.html:13 templates/profile/user_profile.html:48
 msgid "My Questionnaires"
-msgstr "Mina enkäter"
+msgstr "I miei questionari"
 
 #: templates/profile/my_profile.html:21
 msgid "My Reports"
-msgstr "Mina rapporter"
+msgstr "I miei resoconti"
 
 #: templates/profile/my_profile.html:32 templates/profile/my_profile.html:42
 #: templates/profile/my_profile.html:61
 msgid "My Clinic"
-msgstr "Min klinik"
+msgstr "La mia clinica"
 
 #: templates/profile/my_profile.html:51
 msgid "My Agreement"
-msgstr "Mitt avtal"
+msgstr "I miei consensi"
 
 #: templates/profile/my_profile.html:76
 msgid "My Roles"
-msgstr "Mina roller"
+msgstr "I miei ruoli"
 
 #: templates/profile/patient_profile.html:4
 msgid "Patient Profile"
-msgstr "Patientprofil"
+msgstr "Profilo del paziente"
 
 #: templates/profile/patient_profile.html:24
 msgid "Patient Details"
-msgstr "Patientuppgifter"
+msgstr "Dettagli del paziente"
 
 #: templates/profile/patient_profile.html:29
 msgid "For kiosk style administration of an assessment"
-msgstr "För administrering i kioskstil av en bedömning"
+msgstr "Per la gestione di una valutazione in modalità \"chiosco\" (kiosk)"
 
 #: templates/profile/patient_profile.html:29
 #: templates/profile/patient_profile.html:35
 msgid "Log in as this patient"
-msgstr "Logga in som denna patient"
+msgstr "Accedi come questo paziente"
 
 #: templates/profile/patient_profile.html:39
 msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
-msgstr "Detta är avsett för en \"kioskliknande\" hantering av en bedömning, där vårdpersonen ”loggar in som patienten” och då själv blir utloggad och patienten automatiskt loggas in utan att behöva ange sina inloggningsuppgifter. Vill du fortsätta?"
+msgstr "Si tratta della gestione di una valutazione in modalità \"chiosco\" (kiosk), con cui un membro del personale \"effettua l'accesso come paziente\", ovvero esce dalla sessione in qualità di membro del personale e accede automaticamente al profilo del paziente senza che quest'ultimo debba inserire le proprie credenziali di accesso. Procedere?"
 
 #: templates/profile/patient_profile.html:44
 #: templates/profile/profile_macros.html:1134
 msgid "Cancel"
-msgstr "Avbryt"
+msgstr "Annulla"
 
 #: templates/profile/patient_profile.html:58
 #: templates/profile/staff_profile.html:16
 #: templates/profile/user_profile.html:24
 msgid "Clinic"
-msgstr "Klinik"
+msgstr "Clinica"
 
 #: templates/profile/patient_profile.html:66
 #: templates/profile/user_profile.html:33
 msgid "Agreement to Share Clinical Information"
-msgstr "Samtycke till att dela kliniska uppgifter"
+msgstr "Consenso alla condivisione delle informazioni cliniche"
 
 #: templates/profile/patient_profile.html:66
 #: templates/profile/profile_macros.html:691
 #: templates/profile/user_profile.html:33
 msgid "Consent History"
-msgstr "Medgivandehistorik"
+msgstr "Cronologia dei consensi"
 
 #: templates/profile/patient_profile.html:77
 #: templates/profile/user_profile.html:48
 msgid "PRO Questionnaires"
-msgstr "Enkäter om patientrapporterade resultat"
+msgstr "Questionari PRO"
 
 #: templates/profile/patient_profile.html:88
 #: templates/profile/user_profile.html:62
 msgid "Patient Reports"
-msgstr "Patientrapporter"
+msgstr "Resoconti del paziente"
 
 #: templates/profile/patient_profile.html:101
 #: templates/profile/staff_profile.html:26
 #: templates/profile/user_profile.html:76
 msgid "User Roles"
-msgstr "Användarroller"
+msgstr "Ruoli utente"
 
 #: templates/profile/patient_profile.html:111
 #: templates/profile/staff_profile.html:36
 #: templates/profile/user_profile.html:87
 msgid "Audit Log"
-msgstr "Granskningslogg"
+msgstr "Registro revisione"
 
 #: templates/profile/patient_profile_create.html:15
 msgid "No email"
-msgstr "Ingen e-postadress"
+msgstr "Nessuna e-mail"
 
 #: templates/profile/patient_profile_create.html:15
 msgid "User does not have email address"
-msgstr "Användaren har ingen e-postadress"
+msgstr "L'utente non ha un indirizzo e-mail"
 
 #: templates/profile/profile_base.html:12
 msgid "TrueNTH Profile"
-msgstr "TrueNTH-profil"
+msgstr "Profilo TrueNTH"
 
 #: templates/profile/profile_create_base.html:7
 #: templates/profile/profile_macros.html:532
 msgid "Clinics"
-msgstr "Kliniker"
+msgstr "Cliniche"
 
 #: templates/profile/profile_create_base.html:15
 msgid "Role"
-msgstr "Roll"
+msgstr "Ruolo"
 
 #: templates/profile/profile_create_base.html:17
 msgid "Admin staff"
-msgstr "Administratörspersonal"
+msgstr "Personale amministrativo"
 
 #: templates/profile/profile_create_base.html:31
 msgid "New Patient"
-msgstr "Ny patient"
+msgstr "Nuovo paziente"
 
 #: templates/profile/profile_macros.html:13
 msgid "loading section data..."
-msgstr "laddar avsnittets data ..."
+msgstr "dati della sezione in caricamento..."
 
 #: templates/profile/profile_macros.html:14
 msgid "Edit"
-msgstr "REDIGERA"
+msgstr "Modifica"
 
 #: templates/profile/profile_macros.html:14
 msgid "Edit Button"
-msgstr "Knappen \"Redigera\""
+msgstr "Pulsante modifica"
 
 #: templates/profile/profile_macros.html:26
 msgid "Updated"
-msgstr "Uppdaterad"
+msgstr "Aggiornato"
 
 #: templates/profile/profile_macros.html:26
 msgid "Unable to Update. System error."
-msgstr "Det gick inte att uppdatera systemfel."
+msgstr "Non è possibile effettuare l'aggiornamento. Errore di sistema."
 
 #: templates/profile/profile_macros.html:37
 msgid "My Information"
-msgstr "Mina uppgifter"
+msgstr "Le mie informazioni"
 
 #: templates/profile/profile_macros.html:40
 msgid "Patient Information"
-msgstr "Patientuppgifter"
+msgstr "Informazioni sul paziente"
 
 #: templates/profile/profile_macros.html:42
 msgid "User Information"
-msgstr "Användarinformation"
+msgstr "Informazioni sull'utente"
 
 #: templates/profile/profile_macros.html:51
 msgid "Study Id"
-msgstr "Studie-ID"
+msgstr "ID dello studio"
 
 #: templates/profile/profile_macros.html:52
 msgid "Site Id"
-msgstr "Klinik-ID"
+msgstr "ID sito"
 
 #: templates/profile/profile_macros.html:53
 #: templates/profile/profile_macros.html:458
 msgid "Cell"
-msgstr "Cell"
+msgstr "Cellulare"
 
 #: templates/profile/profile_macros.html:54
 #: templates/profile/profile_macros.html:468
 msgid "Phone (Other)"
-msgstr "Telefon (annan)"
+msgstr "Telefono (altro)"
 
 #: templates/profile/profile_macros.html:78
 msgid "My Detail"
-msgstr "Min uppgift"
+msgstr "I miei dettagli"
 
 #: templates/profile/profile_macros.html:81
 msgid "Patient Detail"
-msgstr "Patientuppgift"
+msgstr "Dettagli del paziente"
 
 #: templates/profile/profile_macros.html:83
 msgid "User Detail"
-msgstr "Användarinformation"
+msgstr "Dettagli dell'utente"
 
 #: templates/profile/profile_macros.html:89
 #: templates/profile/profile_macros.html:198
 msgid "Gender"
-msgstr "Kön"
+msgstr "Genere"
 
 #: templates/profile/profile_macros.html:108
 msgid "Locale / Time Zone"
-msgstr "Plats/tidszon"
+msgstr "Luogo / fuso orario"
 
 #: templates/profile/profile_macros.html:111
 #: templates/profile/profile_macros.html:161
 msgid "Language"
-msgstr "Språk"
+msgstr "Lingua"
 
 #: templates/profile/profile_macros.html:112
 msgid "Time Zone"
-msgstr "Tidszon"
+msgstr "Fuso orario"
 
 #: templates/profile/profile_macros.html:127
 #: templates/profile/profile_macros.html:131
 #: templates/profile/profile_macros.html:149
 msgid "Birth date must be valid and in the required format."
-msgstr "Födelsedatum måste vara giltigt och i det format som krävs."
+msgstr "La data di nascita deve essere valida e rispettare il formato richiesto."
 
 #: templates/profile/profile_macros.html:131
 msgid "Birth Month"
-msgstr "Födelsemånad"
+msgstr "Mese di nascita"
 
 #: templates/profile/profile_macros.html:149
 msgid "Birth Year"
-msgstr "Födelseår"
+msgstr "Anno di nascita"
 
 #: templates/profile/profile_macros.html:164
 msgid "Default"
-msgstr "Standard"
+msgstr "Predefinito"
 
 #: templates/profile/profile_macros.html:179
 msgid "First name is required and must not contain invalid characters."
-msgstr "Förnamn måste anges och får inte innehålla ogiltiga tecken."
+msgstr "Il nome di battesimo è obbligatorio e non deve contenere caratteri non validi."
 
 #: templates/profile/profile_macros.html:187
 msgid "Last name is required and must not contain invalid characters."
-msgstr "Efternamn måste anges och får inte innehålla ogiltiga tecken."
+msgstr "Il cognome è obbligatorio e non deve contenere caratteri non validi."
 
 #: templates/profile/profile_macros.html:202
 msgid "Male"
-msgstr "Man"
+msgstr "Maschio"
 
 #: templates/profile/profile_macros.html:206
 msgid "Female"
-msgstr "Kvinna"
+msgstr "Femmina"
 
 #: templates/profile/profile_macros.html:284
 msgid "Registration Status:"
-msgstr "Registreringsstatus:"
+msgstr "Stato della registrazione:"
 
 #: templates/profile/profile_macros.html:284
 #: templates/profile/profile_macros.html:293
 msgid "not registered"
-msgstr "inte registrerad"
+msgstr "non registrato"
 
 #: templates/profile/profile_macros.html:291
 #: templates/profile/profile_macros.html:344
 msgid "registered"
-msgstr "registrerad"
+msgstr "registrato"
 
 #: templates/profile/profile_macros.html:296
 msgid "complete"
-msgstr "slutförd"
+msgstr "completo"
 
 #: templates/profile/profile_macros.html:297
 msgid "incomplete"
-msgstr "ofullständig"
+msgstr "incompleto"
 
 #: templates/profile/profile_macros.html:298
 msgid "View reports"
-msgstr "Visa rapporter"
+msgstr "Visualizza resoconti"
 
 #: templates/profile/profile_macros.html:301
 msgid "Send email to patient"
-msgstr "Skicka e-post till patienten"
+msgstr "Invia e-mail al paziente"
 
 #: templates/profile/profile_macros.html:303
 msgid "Select Email..."
-msgstr "Välj e-post ..."
+msgstr "Seleziona e-mail..."
 
 #: templates/profile/profile_macros.html:308
 #: templates/profile/profile_macros.html:351
 #: templates/profile/profile_macros.html:478
 #: templates/profile/profile_macros.html:1050
 msgid "Send email"
-msgstr "Skicka e-post"
+msgstr "Invia una e-mail"
 
 #: AppText:profileSendEmail option invite
 #: templates/profile/profile_macros.html:322
 msgid "TrueNTH Invite"
-msgstr "Inbjudan till TrueNTH"
+msgstr "Invito TrueNTH"
 
 #: templates/profile/profile_macros.html:324 AppText:profileSendEmail option
 #: reminder
 msgid "TrueNTH Reminder"
-msgstr "Påminnelse om TrueNTH"
+msgstr "Promemoria TrueNTH"
 
 #: templates/profile/profile_macros.html:330
 msgid "P3P Assessment Status:"
@@ -3436,7 +3433,7 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:330
 msgid "not available"
-msgstr "Inte tillgänglig"
+msgstr "non disponibile"
 
 #: templates/profile/profile_macros.html:331
 msgid "Initial invite to complete P3P assessment"
@@ -3448,57 +3445,57 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:342
 msgid "Registration status:"
-msgstr "Registreringsstatus:"
+msgstr "Stato della registrazione:"
 
 #: templates/profile/profile_macros.html:346
 msgid "not yet registered"
-msgstr "Inte registrerad än"
+msgstr "non ancora registrato"
 
 #: templates/profile/profile_macros.html:365
 #: templates/profile/profile_macros.html:402
 msgid "Communications"
-msgstr "Kommunikation"
+msgstr "Comunicazioni"
 
 #: templates/profile/profile_macros.html:370
 msgid "Send reset password email to patient"
-msgstr "Skicka e-postmeddelande för återställning av lösenord till patienten"
+msgstr "Invia al paziente un'e-mail per reimpostare la password"
 
 #: templates/profile/profile_macros.html:379
 msgid "Send invitation and reminder emails to patient"
-msgstr "Skicka e-postinbjudan och påminnelsemeddelande till patienten"
+msgstr "Spedisci e-mail di invito e promemoria al paziente"
 
 #: templates/profile/profile_macros.html:388
 #: templates/profile/profile_macros.html:414
 msgid "Email audit log"
-msgstr "Skicka granskningslogg via e-post"
+msgstr "E-mail del registro di controllo"
 
 #: templates/profile/profile_macros.html:407
 msgid "Send registration email to user"
-msgstr "Skicka e-post för registrering till användaren"
+msgstr "Invia all'utente un'e-mail di registrazione"
 
 #: templates/profile/profile_macros.html:423
 msgid "Send reset password email to staff"
-msgstr "Skicka e-postmeddelande för återställning av lösenord till personal"
+msgstr "Invia allo staff un'e-mail per reimpostare la password"
 
 #: templates/profile/profile_macros.html:435
 msgid "None available"
-msgstr "Ingen tillgänglig"
+msgstr "Nessuno disponibile"
 
 #: templates/profile/profile_macros.html:443
 msgid "Email Message Content"
-msgstr "Innehåll e-postmeddelande"
+msgstr "Contenuto del messaggio e-mail"
 
 #: templates/profile/profile_macros.html:458
 #: templates/profile/profile_macros.html:468
 #: templates/profile/profile_macros.html:532
 #: templates/profile/profile_macros.html:1027
 msgid "Optional"
-msgstr "Valfritt"
+msgstr "Facoltativo"
 
 #: templates/profile/profile_macros.html:459
 #: templates/profile/profile_macros.html:469
 msgid "Phone number must be in numbers."
-msgstr "Telefonnummer måste anges i siffror."
+msgstr "Il numero di telefono deve contenere solo cifre."
 
 #: templates/profile/profile_macros.html:493
 msgid "In what state is the patient currently receiving prostate cancer care?"
@@ -3514,11 +3511,11 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:531
 msgid "Main clinic for prostate cancer care"
-msgstr "Huvudklinik för prostatacancervård"
+msgstr "Clinica principale per il trattamento del tumore della prostata"
 
 #: templates/profile/profile_macros.html:592
 msgid "Consent to share information"
-msgstr "Samtyck till att dela information"
+msgstr "Dai il consenso alla condivisione delle informazioni"
 
 #: templates/profile/profile_macros.html:604
 #, python-format
@@ -3528,60 +3525,60 @@ msgid ""
 "                                "
 msgstr ""
 "\n"
-"                                    Jag samtycker till att dela information med <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                    Do il consenso a condividere le informazioni con <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
 "                                "
 
 #: templates/profile/profile_macros.html:652
 msgid "No consent record found"
-msgstr "Inget medgivandedokument hittades"
+msgstr "Nessun documento di consenso trovato"
 
 #: templates/profile/profile_macros.html:685
 msgid "History"
-msgstr "Historik"
+msgstr "Cronologia"
 
 #: templates/profile/profile_macros.html:706
 msgid "Consent Status Editor"
-msgstr "Redigerare för medgivandestatus"
+msgstr "Editor dello stato del consenso"
 
 #: templates/profile/profile_macros.html:709
 msgid "Modify the consent status for this user to"
-msgstr "Ändra medgivandestatus för denna användare till"
+msgstr "Modifica lo stato del consenso di questo utente in"
 
 #: templates/profile/profile_macros.html:712
 msgid "Consented / Enrolled"
-msgstr "Samtyckte/registrerade sig"
+msgstr "Consenso dato / Arruolato"
 
 #: templates/profile/profile_macros.html:719
 msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
-msgstr "Återkallad – avbryt datainsamling och rapportera historiska data"
+msgstr "Ritirato - Sospendi la raccolta dati e segnala i dati precedenti"
 
 #: templates/profile/profile_macros.html:720
 msgid "Suspend Data Collection and Report Historic Data"
-msgstr "Avbryt datainsamling och rapportera historiska data"
+msgstr "Sospendi la raccolta dati e segnala i dati storici"
 
 #: templates/profile/profile_macros.html:727
 msgid "Purged / Removed"
-msgstr "Rensad/borttagen"
+msgstr "Eliminato / Rimosso"
 
 #: templates/profile/profile_macros.html:744
 msgid "Consent Date Editor"
-msgstr "Redigerare för medgivandedatum"
+msgstr "Editor della data del consenso"
 
 #: templates/profile/profile_macros.html:747
 msgid "Current consent date: "
-msgstr "Aktuellt datum för samtycke: "
+msgstr "Data attuale del consenso: "
 
 #: templates/profile/profile_macros.html:749
 msgid "Modify the consent date"
-msgstr "Ändra medgivandedatum"
+msgstr "Modifica della data del consenso"
 
 #: templates/profile/profile_macros.html:749
 msgid "GMT 24-hour format"
-msgstr "GMT 24-timmarsformat"
+msgstr "GMT formato 24 ore"
 
 #: templates/profile/profile_macros.html:749
 msgid "for this agreement to:"
-msgstr "för detta avtal till:"
+msgstr "per questo accordo a:"
 
 #: templates/profile/profile_macros.html:788
 #: templates/profile/profile_macros.html:791
@@ -3593,63 +3590,63 @@ msgstr "för detta avtal till:"
 #: templates/profile/profile_macros.html:1205
 #: templates/profile/profile_macros.html:1222
 msgid "Date must be valid and in the required format."
-msgstr "Datum måste vara giltigt och i det format som krävs."
+msgstr "La data deve essere valida e nel formato richiesto."
 
 #: templates/profile/profile_macros.html:827
 msgid "for"
-msgstr "för"
+msgstr "per"
 
 #: templates/profile/profile_macros.html:828
 msgid "Editable by admins only."
-msgstr "Kan bara redigeras av administratörer."
+msgstr "Modificabile solo dagli amministratori."
 
 #: templates/profile/profile_macros.html:849
 msgid "Session History"
-msgstr "Sessionshistorik"
+msgstr "Cronologia delle sessioni"
 
 #: templates/profile/profile_macros.html:849
 msgid "click each row to review report"
-msgstr "klicka på varje rad för att granska rapporten"
+msgstr "clicca su ciascuna riga per esaminare il resoconto"
 
 #: templates/profile/profile_macros.html:850
 msgid "Questionnaire Name"
-msgstr "Enkätnamn"
+msgstr "Nome del questionario"
 
 #: templates/profile/profile_macros.html:850
 msgid "Status"
-msgstr "Status"
+msgstr "Stato"
 
 #: templates/profile/profile_macros.html:850
 msgid "Last Updated"
-msgstr "Senast uppdaterad"
+msgstr "Ultimo aggiornamento"
 
 #: templates/profile/profile_macros.html:850
 msgid "GMT, Y-M-D"
-msgstr "GMT, Å-M-D"
+msgstr "GMT, A-M-G"
 
 #: templates/profile/profile_macros.html:872
 msgid "My Prostate Cancer Profile"
-msgstr "Min prostatacancerprofil"
+msgstr "Il mio profilo sul tumore della prostata"
 
 #: templates/profile/profile_macros.html:872
 msgid "Clinical Questions"
-msgstr "Kliniska frågor"
+msgstr "Domande cliniche"
 
 #: templates/profile/profile_macros.html:874
 msgid "Questions asked of the patient at registration"
-msgstr "Frågor som ställdes till patienten vid registreringen"
+msgstr "Domande poste al paziente al momento della registrazione"
 
 #: templates/profile/profile_macros.html:900
 msgid "Intervention Reports"
-msgstr "Interventionsrapporter"
+msgstr "Resoconti sugli interventi"
 
 #: templates/profile/profile_macros.html:905
 msgid "No reports available."
-msgstr "Inga rapporter tillgängliga."
+msgstr "Nessun resoconto disponibile."
 
 #: templates/profile/profile_macros.html:919
 msgid "Africa/Johannesburg"
-msgstr "Afrika/Johannesburg"
+msgstr "Africa/Johannesburg"
 
 #: templates/profile/profile_macros.html:920
 msgid "America/Chicago"
@@ -3657,103 +3654,103 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:921
 msgid "America/Denver"
-msgstr "USA/Denver"
+msgstr ""
 
 #: templates/profile/profile_macros.html:922
 msgid "America/Los Angeles"
-msgstr "USA/Los Angeles"
+msgstr ""
 
 #: templates/profile/profile_macros.html:923
 msgid "America/Indianapolis"
-msgstr "USA/Indianapolis"
+msgstr ""
 
 #: templates/profile/profile_macros.html:924
 msgid "America/New York"
-msgstr "USA/New York"
+msgstr ""
 
 #: templates/profile/profile_macros.html:925
 msgid "America/Sao Paulo"
-msgstr "Amerika/Sao Paulo"
+msgstr "America/San Paolo"
 
 #: templates/profile/profile_macros.html:926
 msgid "Australia/Adelaide"
-msgstr "Australien/Adelaide"
+msgstr ""
 
 #: templates/profile/profile_macros.html:927
 msgid "Australia/Brisbane"
-msgstr "Australien/Brisbane"
+msgstr ""
 
 #: templates/profile/profile_macros.html:928
 msgid "Australia/Broken_Hill"
-msgstr "Australien/Broken_Hill"
+msgstr ""
 
 #: templates/profile/profile_macros.html:929
 msgid "Australia/Canberra"
-msgstr "Australien/Canberra"
+msgstr ""
 
 #: templates/profile/profile_macros.html:930
 msgid "Australia/Currie"
-msgstr "Australien/Currie"
+msgstr ""
 
 #: templates/profile/profile_macros.html:931
 msgid "Australia/Darwin"
-msgstr "Australien/Darwin"
+msgstr ""
 
 #: templates/profile/profile_macros.html:932
 msgid "Australia/Eucla"
-msgstr "Australien/Eucla"
+msgstr ""
 
 #: templates/profile/profile_macros.html:933
 msgid "Australia/Hobart"
-msgstr "Australien/Hobart"
+msgstr ""
 
 #: templates/profile/profile_macros.html:934
 msgid "Australia/Lindeman"
-msgstr "Australien/Lindeman"
+msgstr ""
 
 #: templates/profile/profile_macros.html:935
 msgid "Australia/Lord_Howe"
-msgstr "Australien/Lord_Howe"
+msgstr ""
 
 #: templates/profile/profile_macros.html:936
 msgid "Australia/Melbourne"
-msgstr "Australien/Melbourne"
+msgstr "Australia/Melbourne"
 
 #: templates/profile/profile_macros.html:937
 msgid "Australia/North"
-msgstr "Australien/norra delarna"
+msgstr "Australia/Nord"
 
 #: templates/profile/profile_macros.html:938
 msgid "Australia/Perth"
-msgstr "Australien/Perth"
+msgstr "Australia/Perth"
 
 #: templates/profile/profile_macros.html:939
 msgid "Australia/Queensland"
-msgstr "Australien/Queensland"
+msgstr "Australia/Queensland"
 
 #: templates/profile/profile_macros.html:940
 msgid "Australia/South"
-msgstr "Australien/södra delarna"
+msgstr "Australia/Sud"
 
 #: templates/profile/profile_macros.html:941
 msgid "Australia/Sydney"
-msgstr "Australien/Sydney"
+msgstr "Australia/Sydney"
 
 #: templates/profile/profile_macros.html:942
 msgid "Australia/Tasmania"
-msgstr "Australien/Tasmanien"
+msgstr "Australia/Tasmania"
 
 #: templates/profile/profile_macros.html:943
 msgid "Australia/Victoria"
-msgstr "Australien/Victoria"
+msgstr "Australia/Victoria"
 
 #: templates/profile/profile_macros.html:944
 msgid "Australia/West"
-msgstr "Australien/västra delarna"
+msgstr "Australia/Ovest"
 
 #: templates/profile/profile_macros.html:945
 msgid "Australia/Yancowinna"
-msgstr "Australien/Yancowinna"
+msgstr "Australia/Yancowinna"
 
 #: templates/profile/profile_macros.html:946
 #: templates/profile/profile_macros.html:949
@@ -3782,111 +3779,111 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:962
 msgid "Deceased Status"
-msgstr "Status avliden"
+msgstr "Deceduto"
 
 #: templates/profile/profile_macros.html:965
 msgid "Patient is deceased"
-msgstr "Patienten är avliden"
+msgstr "Il paziente è deceduto"
 
 #: templates/profile/profile_macros.html:971
 msgid "no data provided"
-msgstr "inga uppgifter har lämnats"
+msgstr "nessun dato fornito"
 
 #: templates/profile/profile_macros.html:975
 msgid "Has the patient passed away?"
-msgstr "Har patienten avlidit?"
+msgstr "Il paziente è deceduto?"
 
 #: templates/profile/profile_macros.html:976
 #, python-format
 msgid "By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?"
-msgstr "Genom att den här rutan markeras kommer patientens status för samtycke uppdateras till \"%(new_consent_status)s\". Vill du fortsätta?"
+msgstr "Selezionando questa casella, lo stato del consenso del paziente diventerà \"%(new_consent_status)s\". Vuoi continuare?"
 
 #: templates/profile/profile_macros.html:976
 msgid "Withdrawn - Suspend Data Collection"
-msgstr "Avbruten – Pausa datainsamling"
+msgstr "Ritirato - Sospendere la raccolta dei dati"
 
 #: templates/profile/profile_macros.html:981
 msgid "Deceased Date"
-msgstr "Avled datum"
+msgstr "Data del decesso"
 
 #: templates/profile/profile_macros.html:1036
 msgid "Site ID"
-msgstr "Klinik-ID"
+msgstr "ID sito"
 
 #: templates/profile/profile_macros.html:1046
 msgid "Three ways to complete questionnaire"
-msgstr "Tre sätt att fylla i enkäten på"
+msgstr "Tre modi per completare il questionario"
 
 #: templates/profile/profile_macros.html:1052
 msgid "Invite or remind patient over email to complete their questionnaire"
-msgstr "Bjud in eller påminn patienten om att fylla i enkäten via e-post"
+msgstr "Invia una e-mail al paziente per invitarlo a completare il questionario o come promemoria"
 
 #: templates/profile/profile_macros.html:1056
 #: templates/profile/profile_macros.html:1058
 msgid "Log in as patient"
-msgstr "Logga in som patient"
+msgstr "Accedi come paziente"
 
 #: templates/profile/profile_macros.html:1057
 msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
-msgstr "Du loggas ut och patienten loggas in utan att han/hon behöver ange sina inloggningsuppgifter. På så sätt kan patienten fylla i sin enkät på denna enhet. Perfekt för surfplattor och kioskdatorer."
+msgstr "Questa procedura ti consente di uscire dal profilo di operatore sanitario e di accedere al profilo del paziente senza inserire le credenziali. Il paziente potrà così completare il questionario sul dispositivo in uso. Ideale per dispositivi tablet e i computer dei chioschi."
 
 #: templates/profile/profile_macros.html:1061
 #: templates/profile/profile_macros.html:1065
 msgid "Enter manually"
-msgstr "Ange manuellt"
+msgstr "Inserimento manuale"
 
 #: templates/profile/profile_macros.html:1063
 msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
-msgstr "Fyll i svaren på frågorna i enkäten åt kunden. Praktiskt om svaren har lämnats på papper."
+msgstr "Inserisci le risposte al questionario per conto del paziente. Utile in caso le risposte siano state fornite su supporto cartaceo."
 
 #: templates/profile/profile_macros.html:1071
 msgid "Enter questionnaire manually on patient's behalf"
-msgstr "Fyll i enkäten för hand åt patienten"
+msgstr "Inserisci il questionario manualmente per conto del paziente"
 
 #: templates/profile/profile_macros.html:1078
 msgid "Select the method in which the questionnaire will be completed:"
-msgstr "Välj hur enkäten kommer att fyllas i:"
+msgstr "Seleziona il metodo con cui sarà completato il questionario:"
 
 #: templates/profile/profile_macros.html:1086
 msgid "Interview assisted"
-msgstr "Bistådd vid intervjun"
+msgstr "Intervista assistita"
 
 #: templates/profile/profile_macros.html:1091
 msgid "Paper"
-msgstr "Papper"
+msgstr "Formato cartaceo"
 
 #: templates/profile/profile_macros.html:1096
 msgid "Questionnaire completion date"
-msgstr "Enkäten slutförd datum"
+msgstr "Data di completamento del questionario"
 
 #: templates/profile/profile_macros.html:1099
 msgid "Completion Day"
-msgstr "Slutförd datum"
+msgstr "Giorno di completamento"
 
 #: templates/profile/profile_macros.html:1119
 msgid "Completion Year"
-msgstr "Slutförd år"
+msgstr "Anno di completamento"
 
 #: templates/profile/profile_macros.html:1151
 msgid "Patient is participating in the following intervention(s): "
-msgstr "Patienten deltar i följande intervention(er): "
+msgstr "Il paziente partecipa al/i seguente/i intervento/i: "
 
 #: templates/profile/profile_macros.html:1155
 #: templates/profile/profile_macros.html:1157
 msgid "None"
-msgstr "Saknas"
+msgstr "Nessuno"
 
 #: templates/profile/profile_macros.html:1172
 msgid "My Treatments"
-msgstr "Mina behandlingar"
+msgstr "I miei trattamenti"
 
 #: templates/profile/profile_macros.html:1172
 msgid "Clinical Data"
-msgstr "Kliniska data"
+msgstr "Dati clinici"
 
 #: templates/profile/profile_macros.html:1172
 msgid "(Optional)"
-msgstr "(Valfritt)"
+msgstr "(Facoltativo)"
 
 #: templates/profile/profile_macros.html:1178
 #: templates/profile/profile_macros.html:1183
@@ -3901,145 +3898,145 @@ msgstr ""
 
 #: templates/profile/profile_macros.html:1188
 msgid "Select an option"
-msgstr "Välj ett alternativ"
+msgstr "Selezionare un'opzione"
 
 #: templates/profile/profile_macros.html:1199
 msgid "Date"
-msgstr "Datum"
+msgstr "Data"
 
 #: templates/profile/profile_macros.html:1227
 #: templates/profile/profile_macros.html:1269
 msgid "Save"
-msgstr "Spara"
+msgstr "Salva"
 
 #: templates/profile/profile_macros.html:1227
 msgid "Add"
-msgstr "Lägg till"
+msgstr "Aggiungi"
 
 #: templates/profile/profile_macros.html:1237
 msgid "My History"
-msgstr "Min historik"
+msgstr "La mia cronologia"
 
 #: templates/profile/profile_macros.html:1239
 msgid "Past"
-msgstr "Tidigare"
+msgstr "Precedente"
 
 #: templates/profile/profile_macros.html:1239
 msgid "Management(s)"
-msgstr "behandling(ar)"
+msgstr "Gestione/i"
 
 #: templates/profile/profile_macros.html:1250
 msgid "Delete"
-msgstr "Radera"
+msgstr "Cancella"
 
 #: templates/profile/profile_macros.html:1253
 msgid "Are you sure you want to delete this treatment?"
-msgstr "Är du säker du vill ta bort denna behandling?"
+msgstr "Sei sicuro di voler cancellare questo trattamento?"
 
 #: templates/profile/profile_macros.html:1266
 msgid "You have updated your profile. Click the Save button to submit your changes."
-msgstr "Du har uppdaterat din profil. Klicka på knappen \"Spara\" för att skicka in dina ändringar."
+msgstr "Hai aggiornato il tuo profilo. Clicca il pulsante Salva per confermare le modifiche."
 
 #: templates/profile/profile_macros.html:1266
 msgid "Or"
-msgstr "eller"
+msgstr "Oppure"
 
 #: templates/profile/profile_macros.html:1266
 msgid "cancel"
-msgstr "avbryt"
+msgstr "annulla"
 
 #: templates/profile/profile_macros.html:1267
 msgid "There is a problem with your profile. Please correct it before saving."
-msgstr "Det har uppstått ett problem med din profil. Åtgärda det innan du sparar."
+msgstr "Si è verificato un problema con il tuo profilo. Correggilo prima di salvare."
 
 #: templates/profile/profile_macros.html:1267
 msgid "Make sure all required fields are filled out and all entries are valid."
-msgstr "Kontrollera att alla obligatoriska fält är ifyllda och alla inmatningar är giltiga."
+msgstr "Assicurati di aver compilato tutti i campi richiesti e che i dati inseriti siano validi."
 
 #: templates/profile/profile_macros.html:1270
 msgid "Profile changes have been saved"
-msgstr "Profiländringar har sparats"
+msgstr "Le modifiche al profilo sono state salvate"
 
 #: templates/profile/staff_profile.html:5 templates/profile/user_profile.html:5
 #, python-format
 msgid "Profile for %(user_email)s"
-msgstr "Profil för %(user_email)s"
+msgstr "Profilo di %(user_email)s"
 
 #: templates/profile/staff_profile.html:7 templates/profile/user_profile.html:7
 #, python-format
 msgid "Profile for #%(user_id)s"
-msgstr "Profil för #%(user_id)s"
+msgstr "Profilo di #%(user_id)s"
 
 #: templates/profile/staff_profile_create.html:2
 msgid "New Staff"
-msgstr "Ny personal"
+msgstr "Nuovo personale"
 
 #: views/assessment_engine.py:1620
 msgid "All available questionnaires have been completed"
-msgstr "Alla tillgängliga frågeformulär har färdigställts"
+msgstr "Tutti i questionari disponibili sono stati completati"
 
 #: views/extend_flask_user.py:79
 #, python-format
 msgid "We see you're having trouble - let us help.                 Your account will now be locked while we give it a refresh.                 Please try again in %(time)d minutes.                 If you're still having issues, please click                 \"Having trouble logging in?\" below."
-msgstr "Vi ser att du har problem – låt oss hjälpa dig.                 Ditt konto kommer att bli låst medan vi uppdaterar det.                 Försök igen om %(time)d minuter.                 Om du fortfarande har problem, klicka på                 \"Har du problem med att logga in?\" nedan."
+msgstr "Ci sembra che tu sia in difficoltà: lascia fare a noi.                 Il tuo account sarà momentaneamente bloccato durante l'aggiornamento.                 Riprova tra %(time)d minuti.                 Se i problemi persistono, clicca su \"Problemi di accesso?\" qui sotto."
 
 #: views/patch_flask_user.py:56
 #, python-format
 msgid "If the email address '%(email)s' is in the system, a reset password email will now have been sent to it. Please open that email and follow the instructions to reset your password."
-msgstr "Om e-postadressen '%(email)s' finns i systemet har ett e-postmeddelande för återställning av lösenord nu skickats dit. Öppna e-postmeddelandet och följ anvisningarna för att återställa ditt lösenord."
+msgstr "Se l'indirizzo \"%(email)s\" è presente nel sistema, spediremo a questa stessa casella un messaggio per reimpostare la password. Una volta ricevuto, apri il messaggio e segui le istruzioni fornite."
 
 #: views/portal.py:95
 msgid "This application requires Javascript enabled. Please check your browser settings."
-msgstr "Denna app kräver att Javascript är aktiverat. Kontrollera dina webbläsarinställningar."
+msgstr "Questa applicazione richiede l'abilitazione di Javascript. Controlla le impostazioni del browser in uso."
 
 #: views/portal.py:526
 msgid "Unable to match identity"
-msgstr "Det gick inte att matcha identiteten"
+msgstr "Impossibile abbinare l'identità"
 
 #: views/portal.py:528
 msgid "User Not Found"
-msgstr "Användare hittades inte"
+msgstr "Utente non trovato"
 
 #: views/portal.py:1282
 #, python-format
 msgid "I consent to sharing information with %(org_name)s"
-msgstr "Jag samtycker till att dela information med %(org_name)s"
+msgstr "Do il consenso a condividere le informazioni con %(org_name)s"
 
 #: AppText:About TrueNTH URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
 
 #: AppText:Cellphone
 msgid "Mobile"
-msgstr "Mobil"
+msgstr "Telefono cellulare"
 
 #: AppText:IRONMAN organization website consent URL patient
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN patient privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN patient terms and conditions URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN staff privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN staff registraion email URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN staff terms and conditions URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry staff website consent URL AppText:IRONMAN
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr ""
 
 #: AppText:IRONMAN website declaration form URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
@@ -4048,35 +4045,35 @@ msgstr ""
 #: AppText:TrueNTH Global Registry patient terms and conditions URL
 #: AppText:Initial Consent Terms
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry organization website consent URL patient
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry patient privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry staff privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry staff registraion email URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry staff terms and conditions URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr ""
 
 #: AppText:TrueNTH Global Registry website declaration form URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr ""
 
 #: AppText:consent date label
 msgid "Study Consent Date"
-msgstr "Datum för samtycke till att delta i studien"
+msgstr "Data del consenso allo studio"
 
 #: AppText:landing sub-title
 msgid " "
@@ -4084,23 +4081,23 @@ msgstr " "
 
 #: AppText:landing title
 msgid "Report your health in order to improve prostate cancer care."
-msgstr "Rapportera din hälsostatus för att förbättra vården av din prostatacancer."
+msgstr "Invia le informazioni sulla tua salute per migliorare il trattamento del tumore della prostata."
 
 #: AppText:layout title
 msgid "Movember TrueNTH"
-msgstr "Movember TrueNTH"
+msgstr "TrueNTH Movember"
 
 #: AppText:portal registration
 msgid "TrueNTH Registration"
-msgstr "Registrering till TrueNTH"
+msgstr "Registrazione TrueNTH"
 
 #: AppText:patient invite email TrueNTH Global Registry
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
+msgstr ""
 
 #: AppText:patient invite email IRONMAN
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+msgstr ""
 
 #: AppText:patient reminder email IRONMAN
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
@@ -4112,31 +4109,31 @@ msgstr ""
 
 #: AppText:profileSendEmail invite email_body
 msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
-msgstr "<p>(hälsning)</p><p>Du har fått detta e-postmeddelande eftersom du är patient vid (klinikens namn) och har samtyckt till att delta i (huvudorganisations) registerstudie kring prostatacancerresultat.</p><p>Detta är en inbjudan att använda TrueNTH:s webbplats där du rapporterar din hälsa. Ditt deltagande kommer att hjälpa oss att gemensamt förbättra den vård som män får under sin prostatacancerresa.</p><p>För att slutföra din första enkät ber vi dig att först verifiera ditt konto.</p><div><a class=\"btn\" href=\"{0}\">Verifiera ditt konto</a></div><p>Du kan också komma till TrueNTH:s webbplats via denna länk:<p/><p><a href=\"{0}\">{0}</a></p><p>Spara detta e-postmeddelande så att du kan komma åt TrueNTH när som helst.</p><p></p> Om du har några frågor ber vi dig kontakta din representant på (klinikens namn)."
+msgstr "<p>(saluto),</p><p> Hai ricevuto questa e-mail in quanto sei un paziente presso (nome della clinica) e hai acconsentito a partecipare allo Studio di Registro sugli Esiti del Tumore della Prostata - (organizzazione madre).</p><p> Con la presente, ti invitiamo a usare il sito Internet TrueNTH, dove potrai inserire informazioni sul tuo stato di salute. La tua partecipazione contribuirà al miglioramento delle cure rivolte a tutti gli uomini che affrontano il tumore della prostata.</p><p>Per completare il primo questionario, verifica innanzitutto il tuo account.</p><div><a class=\"btn\" href=\"{0}\">Verifica l'account</a></div><p>Puoi accedere al sito Internet TrueNTH anche tramite questo link:<p/><p><a href=\"{0}\">{0}</a></p><p> Salva questa email in modo da tornare a TrueNTH in qualsiasi momento.</p><p>In caso di domande, puoi contattare il tuo rappresentante presso (nome della clinica).</p>"
 
 #: AppText:profileSendEmail reminder email_body
 msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
-msgstr "<p>Hej!</p><p>Detta e-postmeddelande har skickats till dig av (klinikens namn). Det är här du rapporterar din hälsa under din prostatacancerresa. Den insamlade informationen kommer att användas för att avgöra var förbättringar i prostatacancervården kan göras.</p><p>Logga in nu för att slutföra din enkät.</p><div><a class=\"btn\" href=\"{0}\">Verifiera ditt konto och fyll i enkäten nu.</a></div><p>Klicka på knappen ovan eller använd länken nedan för att gå till TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Om du har några frågor eller funderingar ber vi dig att kontakta (klinikens namn). </p><p><em>–Du har fått detta e-postmeddelande eftersom du har samtyckt till att delta i TrueNTH:s registerprojekt</em></p>"
+msgstr "<p>Buongiorno,</p><p>(Nome della clinica) ti ha spedito questo messaggio per permetterti di inviare informazioni sul tuo stato di salute e sul percorso che stai affrontando per combattere il tumore della prostata. Le informazioni raccolte saranno usate per individuare possibili miglioramenti nel trattamento del tumore della prostata.</p><p>Esegui l'accesso per completare il questionario.</p><div><a class=\"btn\" href=\"{0}\">Verifica il tuo account e rispondi subito alle domande</a></div><p>Clicca sul pulsante qui sopra o usa il link fornito di seguito per collegarti alla pagina TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>In caso di domande o preoccupazioni, non esitare a contattare (nome della clinica).</p><p><em>— Hai ricevuto questa e-mail in quanto hai dato il consenso a partecipare al progetto di registro TrueNTH</em></p>"
 
 #: AppText:profileSendEmail reminder email_subject
 msgid "Report your health on TrueNTH. Email from (clinic name)"
-msgstr "Rapportera din hälsa på TrueNTH. E-post från (klinikens namn)"
+msgstr "Segnala il tuo stato di salute su TrueNTH. E-mail da (nome della clinica)"
 
 #: AppText:registration prompt
 msgid "Create a password"
-msgstr "Skapa ett lösenord"
+msgstr "Crea una password"
 
 #: AppText:registration title
 msgid "Register for TrueNTH"
-msgstr "Registrera dig för TrueNTH"
+msgstr "Registrati in TrueNTH"
 
 #: AppText:site summary email IRONMAN
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+msgstr ""
 
 #: AppText:site summary email TrueNTH Global Registry
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
-msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+msgstr ""
 
 #: Intervention:assessment_engine
 msgid "Assessment Engine"
@@ -4144,15 +4141,15 @@ msgstr ""
 
 #: Intervention:care_plan
 msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
-msgstr "<p>Organisation och stöd för många aspekter i livet för personer som har överlevt prostatacancer</p>"
+msgstr "<p>Organizzazione e sostegno relativi a molti aspetti della vita di chi ha sconfitto il tumore della prostata </p>"
 
 #: Intervention:community_of_wellness
 msgid "Community of Wellness"
-msgstr "Hälsogemenskap"
+msgstr ""
 
 #: Intervention:decision_support_p3p
 msgid "Decision Support tool"
-msgstr "Verktyg som hjälper dig att fatta beslut"
+msgstr ""
 
 #: Intervention:decision_support_p3p
 msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
@@ -4160,19 +4157,19 @@ msgstr ""
 
 #: Intervention:decision_support_wisercare
 msgid "Decision Support WiserCare"
-msgstr "Stöd att fatta beslut från WiserCare"
+msgstr ""
 
 #: Intervention:default
 msgid "OTHER: not yet officially supported"
-msgstr "ÖVRIGT: stöds inte officiellt än"
+msgstr ""
 
 #: Intervention:self_management
 msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
-msgstr "<p>Lär dig mer om symtom som är vanliga hos män med prostatacancer och om sätt att hantera och förbättra dessa symtom.</p>"
+msgstr "<p>Informati sui sintomi comuni segnalati da chi soffre di tumore della prostata, e su come imparare a gestirli e migliorarli.</p>"
 
 #: Intervention:sexual_recovery
 msgid "Sexual Recovery"
-msgstr "Sexuellt tillfrisknande"
+msgstr ""
 
 #: Intervention:sexual_recovery
 msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
@@ -4180,7 +4177,7 @@ msgstr ""
 
 #: Intervention:social_support
 msgid "Social Support Network"
-msgstr "Socialt stödnätverk"
+msgstr ""
 
 #: Intervention:music
 msgid "MUSIC Integration"
@@ -4192,60 +4189,60 @@ msgstr ""
 
 #: Organization:Ottawa Hospital Cancer Centre
 msgid "Ottawa Hospital Cancer Centre"
-msgstr ""
+msgstr "Ottawa Hospital Cancer Centre"
 
 #: Organization:none of the above
 msgid "none of the above"
-msgstr "Inget av ovanstående"
+msgstr "nessuna delle precedenti"
 
 #: Organization:TrueNTH Global Registry
 msgid "TrueNTH Global Registry"
-msgstr "TrueNTH:s globala register"
+msgstr ""
 
 #: Organization:AUA Local Data Center
 msgid "AUA Local Data Center"
-msgstr ""
+msgstr "Centro dati locale AUA"
 
 #: Organization:Australian Urology Associates (AUA)
 msgid "Australian Urology Associates (AUA)"
-msgstr ""
+msgstr "Australian Urology Associates (AUA)"
 
 #: Organization:Queensland University of Technology LDC
 msgid "Queensland University of Technology LDC"
-msgstr ""
+msgstr "Queensland University of Technology LDC"
 
 #: Organization:Wesley Urology Clinic
 msgid "Wesley Urology Clinic"
-msgstr ""
+msgstr "Wesley Urology Clinic"
 
 #: Organization:Genesis Cancer Care Queensland
 msgid "Genesis Cancer Care Queensland"
-msgstr ""
+msgstr "Genesis Cancer Care Queensland"
 
 #: Organization:Australian Prostate Cancer Research Centre
 msgid "Australian Prostate Cancer Research Centre"
-msgstr ""
+msgstr "Australian Prostate Cancer Research Centre"
 
 #: Organization:Gc Urology
 msgid "Gc Urology"
-msgstr ""
+msgstr "Gc Urology (urologia)"
 
 #: Organization:Medical Oncology, Division Of Cancer Services, Princess
 #: Alexandra Hospital
 msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
-msgstr ""
+msgstr "Oncologia medica, Divisione servizi per il tumore, Princess Alexandra Hospital"
 
 #: Organization:Urology South Brisbane
 msgid "Urology South Brisbane"
-msgstr ""
+msgstr "Urologia South Brisbane"
 
 #: Organization:Department Of Urology, Princess Alexandra Hospital
 msgid "Department Of Urology, Princess Alexandra Hospital"
-msgstr ""
+msgstr "Dipartimento di urologia, Princess Alexandra Hospital"
 
 #: Organization:The Alfred
 msgid "The Alfred"
-msgstr ""
+msgstr "The Alfred"
 
 #: Organization:IRONMAN
 msgid "IRONMAN"
@@ -4253,160 +4250,160 @@ msgstr "IRONMAN"
 
 #: Organization:Australia (Region/Country Site)
 msgid "Australia (Region/Country Site)"
-msgstr "Australien (Region/Land Plats)"
+msgstr "Australia (centro regionale/nazionale)"
 
 #: Organization:Australia Recruiting Site B
 msgid "Australia Recruiting Site B"
-msgstr ""
+msgstr "Centro di arruolamento Australia B"
 
 #: Organization:AU B Child Site 1
 msgid "AU B Child Site 1"
-msgstr ""
+msgstr "AU B Centro pediatrico 1"
 
 #: Organization:AU B Child Site 2
 msgid "AU B Child Site 2"
-msgstr ""
+msgstr "AU B Centro pediatrico 2"
 
 #: Organization:Australian Prostate Cancer Research Centre-Qld (QUT)
 msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
-msgstr ""
+msgstr "Australian Prostate Cancer Research Centre-Qld (QUT)"
 
 #: Organization:Princess Alexandra Hospital
 msgid "Princess Alexandra Hospital"
-msgstr ""
+msgstr "Princess Alexandra Hospital"
 
 #: Organization:Redland Hospital
 msgid "Redland Hospital"
-msgstr ""
+msgstr "Redland Hospital"
 
 #: Organization:Eastern Health
 msgid "Eastern Health"
-msgstr ""
+msgstr "Eastern Health"
 
 #: Organization:Westmead Hospital
 msgid "Westmead Hospital"
-msgstr ""
+msgstr "Westmead Hospital"
 
 #: Organization:Macquarie University Hospital
 msgid "Macquarie University Hospital"
-msgstr ""
+msgstr "Macquarie University Hospital"
 
 #: Organization:Epworth Healthcare
 msgid "Epworth Healthcare"
-msgstr ""
+msgstr "Epworth Healthcare"
 
 #: Organization:Australian Prostate Centre
 msgid "Australian Prostate Centre"
-msgstr ""
+msgstr "Australian Prostate Centre"
 
 #: Organization:St. Vincent's Hospital Sydney
 msgid "St. Vincent's Hospital Sydney"
-msgstr ""
+msgstr "St. Vincent's Hospital Sydney"
 
 #: Organization:USA (Region/Country Site)
 msgid "USA (Region/Country Site)"
-msgstr ""
+msgstr "Stati Uniti d'America (centro regionale/nazionale)"
 
 #: Organization:Baylor College of Medicine
 msgid "Baylor College of Medicine"
-msgstr ""
+msgstr "Baylor College of Medicine"
 
 #: Organization:Dana-Farber Cancer Institute
 msgid "Dana-Farber Cancer Institute"
-msgstr ""
+msgstr "Dana-Farber Cancer Institute"
 
 #: Organization:Chesapeake Urology Associates
 msgid "Chesapeake Urology Associates"
-msgstr ""
+msgstr "Chesapeake Urology Associates"
 
 #: Organization:Columbia University
 msgid "Columbia University"
-msgstr ""
+msgstr "Columbia University"
 
 #: Organization:University of North Carolina
 msgid "University of North Carolina"
-msgstr ""
+msgstr "University of North Carolina"
 
 #: Organization:University of Wisconsin
 msgid "University of Wisconsin"
-msgstr ""
+msgstr "University of Wisconsin"
 
 #: Organization:Oregon Health and Sciences Cancer Center
 msgid "Oregon Health and Sciences Cancer Center"
-msgstr ""
+msgstr "Oregon Health and Sciences Cancer Center"
 
 #: Organization:Robert H. Lurie Comprehensive Cancer Center Northwestern
 #: University
 msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
-msgstr ""
+msgstr "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
 
 #: Organization:Roswell Park Cancer Institute
 msgid "Roswell Park Cancer Institute"
-msgstr ""
+msgstr "Roswell Park Cancer Institute"
 
 #: Organization:Thomas Jefferson University
 msgid "Thomas Jefferson University"
-msgstr ""
+msgstr "Thomas Jefferson University"
 
 #: Organization:Aria Health
 msgid "Aria Health"
-msgstr ""
+msgstr "Aria Health"
 
 #: Organization:Doylestown Health
 msgid "Doylestown Health"
-msgstr ""
+msgstr "Doylestown Health"
 
 #: Organization:Easton Hospital
 msgid "Easton Hospital"
-msgstr ""
+msgstr "Easton Hospital"
 
 #: Organization:Reading Health System
 msgid "Reading Health System"
-msgstr ""
+msgstr "Reading Health System"
 
 #: Organization:University of Virgina (UVA)
 msgid "University of Virgina (UVA)"
-msgstr ""
+msgstr "University of Virgina (UVA)"
 
 #: Organization:Duke Comprehensive Cancer Center
 msgid "Duke Comprehensive Cancer Center"
-msgstr ""
+msgstr "Duke Comprehensive Cancer Center"
 
 #: Organization:Sidney Kimmel Comprehensive Cancer Center
 msgid "Sidney Kimmel Comprehensive Cancer Center"
-msgstr ""
+msgstr "Sidney Kimmel Comprehensive Cancer Center"
 
 #: Organization:Tulane University
 msgid "Tulane University"
-msgstr ""
+msgstr "Tulane University"
 
 #: Organization:University of Alabama-Birmingham
 msgid "University of Alabama-Birmingham"
-msgstr ""
+msgstr "University of Alabama-Birmingham"
 
 #: Organization:University of California Los Angeles
 msgid "University of California Los Angeles"
-msgstr ""
+msgstr "University of California Los Angeles"
 
 #: Organization:University of California San Diego
 msgid "University of California San Diego"
-msgstr ""
+msgstr "University of California San Diego"
 
 #: Organization:University of Chicago
 msgid "University of Chicago"
-msgstr ""
+msgstr "University of Chicago"
 
 #: Organization:University of Illinois at Chicago
 msgid "University of Illinois at Chicago"
-msgstr ""
+msgstr "University of Illinois at Chicago"
 
 #: Organization:Wayne St. University Karmanos Cancer Institute
 msgid "Wayne St. University Karmanos Cancer Institute"
-msgstr ""
+msgstr "Wayne St. University Karmanos Cancer Institute"
 
 #: Organization:Weill Cornell Medical Center
 msgid "Weill Cornell Medical Center"
-msgstr ""
+msgstr "Weill Cornell Medical Center"
 
 #: Organization:Yale University
 msgid "Yale University"
@@ -4430,23 +4427,23 @@ msgstr ""
 
 #: Organization:Canada (Region/Country Site)
 msgid "Canada (Region/Country Site)"
-msgstr ""
+msgstr "Canada (centro regionale/nazionale)"
 
 #: Organization:BC Cancer Agency
 msgid "BC Cancer Agency"
-msgstr ""
+msgstr "BC Cancer Agency"
 
 #: Organization:CHU de Quebec - Universite Laval
 msgid "CHU de Quebec - Universite Laval"
-msgstr ""
+msgstr "CHU de Quebec - Universite Laval"
 
 #: Organization:Centre Hospitalier de l'Université Montréal
 msgid "Centre Hospitalier de l'Université de Montréal"
-msgstr ""
+msgstr "Centre Hospitalier de l'Université de Montréal"
 
 #: Organization:Juravinski Cancer Centre
 msgid "Juravinski Cancer Centre"
-msgstr ""
+msgstr "Juravinski Cancer Centre"
 
 #: Organization:Cross Cancer Institute (Alberta Health Services)
 msgid "Cross Cancer Institute (Alberta Health Services)"
@@ -4454,39 +4451,39 @@ msgstr ""
 
 #: Organization:Winship Cancer Institute Emory University
 msgid "Winship Cancer Institute Emory University"
-msgstr ""
+msgstr "Winship Cancer Institute Emory University"
 
 #: Organization:Sweden (Region/Country Site)
 msgid "Sweden (Region/Country Site)"
-msgstr "Sverige (Region/Land Plats)"
+msgstr "Svezia (centro regionale/nazionale)"
 
 #: Organization:Skane University Hospital
 msgid "Skane University Hospital"
-msgstr ""
+msgstr "Skane University Hospital"
 
 #: Organization:Örebro University Hospital
 msgid "Örebro University Hospital"
-msgstr ""
+msgstr "Örebro University Hospital"
 
 #: Organization:Switzerland (Region/Country Site)
 msgid "Switzerland (Region/Country Site)"
-msgstr ""
+msgstr "Svizzera (centro regionale/nazionale)"
 
 #: Organization:Kantonsspitals Chur
 msgid "Kantonsspitals Chur"
-msgstr ""
+msgstr "Kantonsspitals Chur"
 
 #: Organization:Universitätsspital Zürich
 msgid "Universitätsspital Zürich"
-msgstr ""
+msgstr "Universitätsspital Zürich"
 
 #: Organization:The Royal Marsden NHS Foundation Trust
 msgid "The Royal Marsden NHS Foundation Trust"
-msgstr ""
+msgstr "The Royal Marsden NHS Foundation Trust"
 
 #: Organization:The Christie NHS Foundation Trust
 msgid "The Christie NHS Foundation Trust"
-msgstr ""
+msgstr "The Christie NHS Foundation Trust"
 
 #: Organization:Velindre Cancer Centre
 msgid "Velindre Cancer Centre"
@@ -4514,31 +4511,31 @@ msgstr ""
 
 #: Organization:Southampton
 msgid "Southampton"
-msgstr ""
+msgstr "Southampton"
 
 #: Organization:Tygerberg Hospital
 msgid "Tygerberg Hospital"
-msgstr ""
+msgstr "Tygerberg Hospital"
 
 #: Organization:Centro de Pesquisa em Oncologia
 msgid "Centro de Pesquisa em Oncologia"
-msgstr ""
+msgstr "Centro de Pesquisa em Oncologia"
 
 #: Organization:Hospital Beneficência Portuguesa
 msgid "Hospital Beneficência Portuguesa"
-msgstr ""
+msgstr "Hospital Beneficência Portuguesa"
 
 #: Organization:Instituto Câncer do Estado de São Paulo
 msgid "Instituto Câncer do Estado de São Paulo"
-msgstr ""
+msgstr "Instituto Câncer do Estado de São Paulo"
 
 #: Organization:Vall d'Hebron Institute of Oncology
 msgid "Vall d'Hebron Institute of Oncology"
-msgstr ""
+msgstr "Vall d'Hebron Institute of Oncology"
 
 #: Organization:Hospital Clínic de Barcelona
 msgid "Hospital Clínic de Barcelona"
-msgstr ""
+msgstr "Hospital Clínic de Barcelona"
 
 #: Organization:Hospital Clinico San Carlos
 msgid "Hospital Clinico San Carlos"
@@ -4562,31 +4559,31 @@ msgstr ""
 
 #: Organization:Beacon Hospital
 msgid "Beacon Hospital"
-msgstr ""
+msgstr "Beacon Hospital"
 
 #: Organization:St. Vincent's University Hospital
 msgid "St. Vincent's University Hospital"
-msgstr ""
+msgstr "St. Vincent's University Hospital"
 
 #: Organization:Test Site
 msgid "Test Site"
-msgstr ""
+msgstr "Sito di prova"
 
 #: Organization:Kantonsspitals St. Gallen
 msgid "Kantonsspitals St. Gallen"
-msgstr ""
+msgstr "Kantonsspitals St. Gallen"
 
 #: Organization:United Kingdom (Region/Country Site)
 msgid "United Kingdom (Region/Country Site)"
-msgstr ""
+msgstr "Regno Unito (centro regionale/nazionale)"
 
 #: Organization:Guys St. Thomas NHS Foundation Trust
 msgid "Guys St. Thomas NHS Foundation Trust"
-msgstr ""
+msgstr "Guys St. Thomas NHS Foundation Trust"
 
 #: Organization:University Hospital Southampton NHS Foundation Trust
 msgid "University Hospital Southampton NHS Foundation Trust"
-msgstr ""
+msgstr "University Hospital Southampton NHS Foundation Trust"
 
 #: Organization:University Hospitals of Morecambe Bay NHS Trust
 msgid "University Hospitals of Morecambe Bay NHS Trust"
@@ -4614,27 +4611,27 @@ msgstr "TrueNTH Global"
 
 #: Organization:South Africa (Region/Country Site)
 msgid "South Africa (Region/Country Site)"
-msgstr "Sydafrika (Region/Land Plats)"
+msgstr "Sudafrica (centro regionale/nazionale)"
 
 #: Organization:Brazil (Region/Country Site)
 msgid "Brazil (Region/Country Site)"
-msgstr "Brasilien (Region/Land Plats)"
+msgstr "Brasile (centro regionale/nazionale)"
 
 #: Organization:Centro de Paulista Oncologia
 msgid "Centro de Paulista de Oncologia"
-msgstr ""
+msgstr "Centro de Paulista de Oncologia"
 
 #: Organization:Instituto do Câncer e Transplante
 msgid "Instituto do Câncer e Transplante"
-msgstr ""
+msgstr "Instituto do Câncer e Transplante"
 
 #: Organization:Spain (Region/Country Site)
 msgid "Spain (Region/Country Site)"
-msgstr ""
+msgstr "Spagna (centro regionale/nazionale)"
 
 #: Organization:Hospital Universitario Virgen de la Victoria
 msgid "Hospital Universitario Virgen de la Victoria"
-msgstr ""
+msgstr "Hospital Universitario Virgen de la Victoria"
 
 #: Organization:Hospital Universitario 12 de Octubre
 msgid "Hospital Universitario 12 de Octubre"
@@ -4654,7 +4651,7 @@ msgstr ""
 
 #: Organization:Ireland (Region/Country Site)
 msgid "Ireland (Region/Country Site)"
-msgstr ""
+msgstr "Irlanda (centro regionale/nazionale)"
 
 #: Organization:Tallaght University Hospital
 msgid "Tallaght University Hospital"
@@ -4670,11 +4667,11 @@ msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_3mo_pattern
 msgid "Ironman Recurring 3Mo Pattern"
-msgstr "Återkommande 3Mo-mönster för Ironman"
+msgstr "Ironman Modello ricorrente 3Me"
 
 #: QuestionnaireBank:IRONMAN_v3_recurring_3mo_pattern
 msgid "Ironman V3 Recurring 3Mo Pattern"
-msgstr "Återkommande 3Mo-mönster för Ironman V3"
+msgstr "Ironman V3 Modello ricorrente 3Me"
 
 #: QuestionnaireBank:IRONMAN_v5_recurring_3mo_pattern
 msgid "Ironman V5 Recurring 3Mo Pattern"
@@ -4682,11 +4679,11 @@ msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_6mo_pattern
 msgid "Ironman Recurring 6Mo Pattern"
-msgstr "Återkommande 6Mo-mönster för Ironman"
+msgstr "Ironman V3 Modello ricorrente 6Me"
 
 #: QuestionnaireBank:IRONMAN_v3_recurring_6mo_pattern
 msgid "Ironman V3 Recurring 6Mo Pattern"
-msgstr "Återkommande 6Mo-mönster för Ironman V3"
+msgstr "Ironman V3 Modello ricorrente 6Me"
 
 #: QuestionnaireBank:IRONMAN_v5_start6mo_yearly_end30mo
 msgid "Ironman V5 Start6Mo Yearly End30Mo"
@@ -4698,11 +4695,11 @@ msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_annual_pattern
 msgid "Ironman Recurring Annual Pattern"
-msgstr "Återkommande årligt mönster för Ironman"
+msgstr "Ironman Modello ricorrente annuale"
 
 #: QuestionnaireBank:IRONMAN_v3_recurring_annual_pattern
 msgid "Ironman V3 Recurring Annual Pattern"
-msgstr "Återkommande årligt mönster för Ironman V3"
+msgstr "Ironman V3 Modello ricorrente annuale"
 
 #: QuestionnaireBank:IRONMAN_v5_recurring_annual_pattern
 msgid "Ironman V5 Recurring Annual Pattern"
@@ -4710,19 +4707,19 @@ msgstr ""
 
 #: QuestionnaireBank:none of the above
 msgid "None Of The Above"
-msgstr "Inget av ovanstående"
+msgstr "Nessuna delle precedenti"
 
 #: QuestionnaireBank:IRONMAN_baseline
 msgid "Ironman Baseline"
-msgstr "Baseline för Ironman"
+msgstr "Basale Ironman"
 
 #: QuestionnaireBank:IRONMAN_indefinite
 msgid "Ironman Indefinite"
-msgstr "Ironman obestämd"
+msgstr "Ironman Indefinite"
 
 #: QuestionnaireBank:IRONMAN_v3_indefinite
 msgid "Ironman V3 Indefinite"
-msgstr "Ironman V3 obestämt"
+msgstr "Ironman V3 Indefinite"
 
 #: QuestionnaireBank:IRONMAN_v5_baseline
 msgid "Ironman V5 Baseline"
@@ -4734,7 +4731,7 @@ msgstr ""
 
 #: QuestionnaireBank:IRONMAN_v3_baseline
 msgid "Ironman V3 Baseline"
-msgstr "Baseline för Ironman V3"
+msgstr "Basale Ironman V3"
 
 #: QuestionnaireBank:IRONMAN_v5_indefinite
 msgid "Ironman V5 Indefinite"
@@ -4758,23 +4755,23 @@ msgstr ""
 
 #: Role:access_on_verify
 msgid "Access On Verify"
-msgstr "Åtkomst vid verifiering"
+msgstr ""
 
 #: Role:admin
 msgid "Admin"
-msgstr "Admin"
+msgstr ""
 
 #: Role:analyst
 msgid "Analyst"
-msgstr "Analytiker"
+msgstr ""
 
 #: Role:anon
 msgid "Anon"
-msgstr "Inom kort"
+msgstr "A breve"
 
 #: Role:application_developer
 msgid "Application Developer"
-msgstr "Programutvecklare"
+msgstr ""
 
 #: Role:content_manager
 msgid "Content Manager"
@@ -4782,11 +4779,11 @@ msgstr ""
 
 #: Role:intervention_staff
 msgid "Intervention Staff"
-msgstr "Interventionspersonal"
+msgstr ""
 
 #: Role:partner
 msgid "Partner"
-msgstr "Partner"
+msgstr ""
 
 #: Role:promote_without_identity_challenge
 msgid "Promote Without Identity Challenge"
@@ -4794,60 +4791,60 @@ msgstr ""
 
 #: Role:researcher
 msgid "Researcher"
-msgstr "Forskare"
+msgstr "Ricercatore"
 
 #: Role:staff
 msgid "Staff"
-msgstr "Personal"
+msgstr "Personale"
 
 #: Role:service
 msgid "Service"
-msgstr "Tjänst"
+msgstr ""
 
 #: Role:test
 msgid "Test"
-msgstr "Test"
+msgstr ""
 
 #: Role:write_only
 msgid "Write Only"
-msgstr "Endast skriva"
+msgstr "Solo scrittura"
 
 #: OverallStatus:Completed
 msgid "Completed"
-msgstr "Slutförd"
+msgstr "Completato"
 
 #: OverallStatus:Due
 msgid "Due"
-msgstr "Förfaller"
+msgstr "Data di scadenza"
 
 #: OverallStatus:Expired
 msgid "Expired"
-msgstr "utgången"
+msgstr "Scaduto"
 
 #: OverallStatus:Overdue
 msgid "Overdue"
-msgstr "Försenad"
+msgstr "In ritardo"
 
 #: OverallStatus:Partially Completed
 msgid "Partially Completed"
-msgstr "Delvis slutförd"
+msgstr "Parzialmente completato"
 
 #: OverallStatus:In Progress
 msgid "In Progress"
-msgstr "Pågående"
+msgstr "In corso"
 
 #: OverallStatus:Withdrawn
 msgid "Withdrawn"
-msgstr "Avbruten"
+msgstr "Ritirato"
 
 #: classification_enum:Baseline
 msgid "Baseline"
-msgstr "Baseline"
+msgstr "Basale"
 
 #: classification_enum:Recurring
 msgid "Recurring"
-msgstr "Återkommande"
+msgstr "Ricorrente"
 
 #: classification_enum:Indefinite
 msgid "Indefinite"
-msgstr "Obestämd"
+msgstr "Indefinite"

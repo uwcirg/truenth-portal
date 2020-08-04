@@ -1811,4 +1811,3 @@ msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=2
 # apptext: About TrueNTH URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
 msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549&languageId=en_AU"
-

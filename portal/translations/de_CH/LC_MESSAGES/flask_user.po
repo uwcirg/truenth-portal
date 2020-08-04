@@ -32,15 +32,18 @@ msgstr "Dieser Nutzername ist bereits vergeben. Bitte versuchen Sie einen andere
 msgid "This Email is already in use. Please try another one."
 msgstr "Diese E-Mail-Adresse wird bereits genutzt. Bitte versuchen Sie eine andere."
 
-#: flask_user/forms.py:72 flask_user/forms.py:173 flask_user/forms.py:232 flask_user/forms.py:260 flask_user/forms.py:336
+#: flask_user/forms.py:72 flask_user/forms.py:173 flask_user/forms.py:232
+#: flask_user/forms.py:260 flask_user/forms.py:336
 msgid "Email"
 msgstr "E-Mail"
 
-#: flask_user/forms.py:73 flask_user/forms.py:174 flask_user/forms.py:261 flask_user/forms.py:337
+#: flask_user/forms.py:73 flask_user/forms.py:174 flask_user/forms.py:261
+#: flask_user/forms.py:337
 msgid "Email is required"
 msgstr "E-Mail-Adresse wird benötigt"
 
-#: flask_user/forms.py:74 flask_user/forms.py:175 flask_user/forms.py:262 flask_user/forms.py:338
+#: flask_user/forms.py:74 flask_user/forms.py:175 flask_user/forms.py:262
+#: flask_user/forms.py:338
 msgid "Invalid Email"
 msgstr "Ungültige E-Mail-Adresse"
 
@@ -72,7 +75,9 @@ msgstr "Neues Passwort erneut eingeben"
 msgid "New Password and Retype Password did not match"
 msgstr "Neues Passwort und Wiederholung stimmen nicht überein"
 
-#: flask_user/forms.py:89 flask_user/forms.py:315 flask_user/templates/flask_user/change_password.html:5 flask_user/templates/flask_user/user_profile.html:11
+#: flask_user/forms.py:89 flask_user/forms.py:315
+#: flask_user/templates/flask_user/change_password.html:5
+#: flask_user/templates/flask_user/user_profile.html:11
 msgid "Change password"
 msgstr "Passwort ändern"
 
@@ -88,7 +93,9 @@ msgstr "Neuer Nutzername"
 msgid "Username is required"
 msgstr "Nutzername wird benötigt"
 
-#: flask_user/forms.py:126 flask_user/templates/flask_user/change_username.html:5 flask_user/templates/flask_user/user_profile.html:8
+#: flask_user/forms.py:126
+#: flask_user/templates/flask_user/change_username.html:5
+#: flask_user/templates/flask_user/user_profile.html:8
 msgid "Change username"
 msgstr "Benutzername ändern"
 
@@ -129,7 +136,8 @@ msgstr "Passwort wird benötigt"
 msgid "Remember me"
 msgstr "Angemeldet bleiben"
 
-#: flask_user/forms.py:182 flask_user/templates/flask_user/login.html:5 flask_user/templates/flask_user/login_or_register.html:9
+#: flask_user/forms.py:182 flask_user/templates/flask_user/login.html:5
+#: flask_user/templates/flask_user/login_or_register.html:9
 msgid "Sign in"
 msgstr "Einloggen"
 
@@ -162,7 +170,9 @@ msgstr "Passwort und Passwort-Wiederholung stimmten nicht überein"
 msgid "Token"
 msgstr "Token"
 
-#: flask_user/forms.py:270 flask_user/templates/flask_user/login_or_register.html:41 flask_user/templates/flask_user/register.html:5
+#: flask_user/forms.py:270
+#: flask_user/templates/flask_user/login_or_register.html:41
+#: flask_user/templates/flask_user/register.html:5
 msgid "Register"
 msgstr "Anmelden"
 
@@ -281,7 +291,8 @@ msgstr "Benutzer einladen"
 msgid "New here? Register."
 msgstr "Neu hier? Jetzt Registrieren."
 
-#: flask_user/templates/flask_user/login.html:44 flask_user/templates/flask_user/login_or_register.html:34
+#: flask_user/templates/flask_user/login.html:44
+#: flask_user/templates/flask_user/login_or_register.html:34
 msgid "Forgot your Password?"
 msgstr "Passwort vergessen?"
 
