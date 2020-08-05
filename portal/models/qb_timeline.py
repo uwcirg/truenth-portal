@@ -471,7 +471,9 @@ def ordered_qbs(user, classification=None):
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
     td = trigger_date(user=user)
-    old_td, withdrawal_date = consent_withdrawal_dates(user)
+    # TODO: address research_study_id
+    old_td, withdrawal_date = consent_withdrawal_dates(
+        user, research_study_id=0)
     if not td:
         if old_td:
             trace("withdrawn user, use previous trigger {}".format(old_td))
@@ -713,7 +715,9 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
             # If user withdrew from study - remove any rows post withdrawal
             num_stored = 0
-            _, withdrawal_date = consent_withdrawal_dates(user)
+            # TODO: address research_study_id
+            _, withdrawal_date = consent_withdrawal_dates(
+                user, research_study_id=0)
             if withdrawal_date:
                 trace("withdrawn as of {}".format(withdrawal_date))
                 store_rows = [

@@ -41,6 +41,7 @@ from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import add_static_questionnaire_bank
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
@@ -509,6 +510,7 @@ class TestCase(Base):
             add_static_organization()
             add_static_questionnaire_bank()
             add_static_relationships()
+            add_static_research_studies()
             add_static_roles()
             db.session.commit()
         self.init_data()

@@ -34,7 +34,7 @@ class UserConsent(db.Model):
     """
     __tablename__ = 'user_consents'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.ForeignKey('users.id'), nullable=False, index=True)
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=False)
     acceptance_date = db.Column(
@@ -46,6 +46,9 @@ class UserConsent(db.Model):
     options = db.Column(db.Integer, nullable=False, default=0)
     status = db.Column('status', status_types_enum,
                        server_default='consented', nullable=False)
+    research_study_id = db.Column(
+        db.ForeignKey('research_studies.id', ondelete='cascade'),
+        nullable=False)
 
     audit = db.relationship(Audit, cascade="save-update, delete",
                             foreign_keys=[audit_id])
@@ -110,6 +113,7 @@ class UserConsent(db.Model):
                 if getattr(self, attr):
                     d[attr] = True
         d['status'] = self.status
+        d['research_study_id'] = self.research_study_id
         return d
 
     @classmethod
@@ -139,18 +143,18 @@ class UserConsent(db.Model):
             obj.acceptance_date = FHIR_datetime.parse(
                 data.get('acceptance_date'), error_subject='acceptance_date')
         for attr in ('staff_editable', 'include_in_reports',
-                     'send_reminders', 'status'):
+                     'send_reminders', 'status', 'research_study_id'):
             if attr in data:
                 setattr(obj, attr, data.get(attr))
 
         return obj
 
 
-def latest_consent(user, org_id=None):
+def latest_consent(user, research_study_id):
     """Lookup latest valid consent for user
 
     :param user: subject of query
-    :param org_id: define to restrict to given org
+    :param research_study_id: limit query to respective value
 
     If latest consent for user is 'suspended' or 'deleted', this function
     will return None.  See ``consent_withdrawal_dates()`` for that need.
@@ -159,18 +163,17 @@ def latest_consent(user, org_id=None):
         if no match is located
 
     """
-    if org_id:
-        raise NotImplementedError
-
     # consents are ordered desc(acceptance_date)
     for consent in user.valid_consents:
+        if consent.research_study_id != research_study_id:
+            continue
         if consent.status == 'consented':
             return consent
 
     return None
 
 
-def consent_withdrawal_dates(user):
+def consent_withdrawal_dates(user, research_study_id):
     """Lookup user's most recent consent and withdrawal dates
 
     In a currently withdrawn case, lookup the date of withdrawal and the
@@ -180,12 +183,13 @@ def consent_withdrawal_dates(user):
     consent and None for withdrawal date.
 
     :param user: subject of query
+    :param research_study_id: limit query to consents with respective value
     :returns: (consent_date, withdrawal_date) for user.  Either value
         may be None if not found.
 
     """
     withdrawal_date = None
-    consent = latest_consent(user)
+    consent = latest_consent(user, research_study_id=research_study_id)
     if consent:
         # Valid consent found, user hasn't withdrawn; leave
         return consent.acceptance_date, withdrawal_date

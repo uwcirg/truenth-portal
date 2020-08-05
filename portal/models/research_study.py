@@ -42,3 +42,21 @@ class ResearchStudy(db.Model):
         if 'status' in data:
             self.status = data.get('status')
         return self
+
+
+def add_static_research_studies():
+    """Seed database with default static research studies
+
+    Idempotent - run anytime to pick up any new relationships in existing dbs
+
+    """
+    base = {
+      "id": 0,
+      "title": "Base Study",
+      "status": "active",
+      "resourceType": "ResearchStudy"
+    }
+
+    rs = ResearchStudy.from_fhir(base)
+    if ResearchStudy.query.get(rs.id) is None:
+        db.session.add(rs)
