@@ -278,7 +278,7 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
     consent = UserConsent(
         user_id=test_user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
-        acceptance_date=now)
+        acceptance_date=now, research_study_id=0)
 
     for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
         test_user.save_observation(
@@ -411,7 +411,8 @@ def bless_with_basics(test_user, promote_user, shallow_org_tree):
         user_id=user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
         acceptance_date=calc_date_params(
-            backdate=backdate, setdate=setdate))
+            backdate=backdate, setdate=setdate),
+        research_study_id=0)
     with SessionScope(db):
         db.session.add(tou)
         db.session.add(privacy)
@@ -481,7 +482,8 @@ def bless_with_basics_no_patient_role(
         user_id=user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
         acceptance_date=calc_date_params(
-            backdate=backdate, setdate=setdate))
+            backdate=backdate, setdate=setdate),
+        research_study_id=0)
     with SessionScope(db):
         db.session.add(tou)
         db.session.add(privacy)

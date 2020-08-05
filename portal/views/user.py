@@ -259,6 +259,8 @@ def account():
                     consent['user_id'] = user.id
                 elif consent['user_id'] != user.id:
                     raise ValueError("consent user_id differs from path")
+                if 'research_study_id' not in consent:
+                    consent['research_study_id'] = 0
                 consent_list.append(UserConsent.from_json(consent))
             user.update_consents(consent_list, acting_user=acting_user)
         except ValueError as e:
@@ -613,8 +615,9 @@ def set_user_consents(user_id):
     necessary, defaults to now and five years from now (both in UTC).
 
     NB only one valid consent should be in place between a user and an
-    organization.  Therefore, if this POST would create a second consent on the
-    given user / organization, the existing consent will be marked deleted.
+    organization per research study.  Therefore, if this POST would create
+    a second consent on the given (user, organization, research study), the
+    existing consent will be marked deleted.
 
     Research Studies were added since the initial implementation of this API.
     Therefore, exclusion of a ``research_study_id`` will implicitly use a value

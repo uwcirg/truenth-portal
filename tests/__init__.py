@@ -378,6 +378,7 @@ class TestCase(Base):
             consent = UserConsent(
                 user_id=user_id, organization_id=org_id,
                 audit=audit, agreement_url='http://fake.org',
+                research_study_id=0,
                 acceptance_date=acceptance_date)
         with SessionScope(db):
             if consent not in db.session:
@@ -437,6 +438,7 @@ class TestCase(Base):
         consent = UserConsent(
             user_id=user_id, organization_id=parent_org,
             options=options, audit=audit, agreement_url='http://fake.org',
+            research_study_id=0,
             acceptance_date=calc_date_params(
                 backdate=backdate, setdate=setdate))
         with SessionScope(db):

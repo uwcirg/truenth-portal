@@ -722,7 +722,7 @@ class TestQuestionnaireBank(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
             audit=audit, agreement_url='http://no.com',
-            acceptance_date=now)
+            research_study_id=0, acceptance_date=now)
 
         with SessionScope(db):
             db.session.add(qb)
@@ -814,7 +814,7 @@ class TestQuestionnaireBank(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
             audit=audit, agreement_url='http://no.com',
-            acceptance_date=weekago)
+            research_study_id=0, acceptance_date=weekago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)
@@ -876,7 +876,7 @@ class TestQuestionnaireBank(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization_id=org_id,
             audit=audit, agreement_url='http://no.com',
-            acceptance_date=fourmonthsago)
+            research_study_id=0, acceptance_date=fourmonthsago)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(uc)

@@ -225,6 +225,7 @@ class TestAssessmentEngine(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
             audit=audit, agreement_url='http://no.com',
+            research_study_id=0,
             acceptance_date=authored - relativedelta(days=30))
 
         with SessionScope(db):
@@ -296,6 +297,7 @@ class TestAssessmentEngine(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
             audit=audit, agreement_url='http://no.com',
+            research_study_id=0,
             acceptance_date=authored)
 
         with SessionScope(db):
@@ -356,6 +358,7 @@ class TestAssessmentEngine(TestCase):
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org,
             audit=audit, agreement_url='http://no.com',
+            research_study_id=0,
             acceptance_date=authored - relativedelta(days=91))
 
         with SessionScope(db):
