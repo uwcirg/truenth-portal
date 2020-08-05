@@ -29,6 +29,7 @@ from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
@@ -275,6 +276,7 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
     parent_org = OrgTree().find(org.id).top_level()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
+    add_static_research_studies()
     consent = UserConsent(
         user_id=test_user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
