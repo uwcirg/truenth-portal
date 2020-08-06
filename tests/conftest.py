@@ -407,6 +407,7 @@ def bless_with_basics(test_user, promote_user, shallow_org_tree):
         audit=audit, agreement_url='http://not.really.org',
         type='privacy policy')
     parent_org = OrgTree().find(org.id).top_level()
+    add_static_research_studies()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
     consent = UserConsent(
@@ -478,6 +479,7 @@ def bless_with_basics_no_patient_role(
         audit=audit, agreement_url='http://not.really.org',
         type='privacy policy')
     parent_org = OrgTree().find(org.id).top_level()
+    add_static_research_studies()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
     consent = UserConsent(
