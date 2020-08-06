@@ -1128,8 +1128,8 @@ class User(db.Model, UserMixin):
         If the user had pre-existing consent agreements between the
         same organization_id, the new will replace the old
 
-        NB this will only modify/update consents between the user
-        and the organizations named in the given consent_list.
+        NB this will only modify/update consents between the (user,
+        organization, research_study_id) named in the given consent_list.
 
         """
         delete_consents = []  # capture consents being replaced
@@ -1141,10 +1141,13 @@ class User(db.Model, UserMixin):
                 subject_id=self.id,
                 comment="Consent agreement signed",
                 context='consent')
-            # Look for existing consent for this user/org
+            # Look for existing consent for this user/org/study
             for existing_consent in self.valid_consents:
-                if existing_consent.organization_id == int(
-                        consent.organization_id):
+                if (
+                        existing_consent.organization_id == int(
+                        consent.organization_id) and
+                        existing_consent.research_study_id == int(
+                        consent.research_study_id)):
                     current_app.logger.debug(
                         "deleting matching consent {} replacing with {} ".
                         format(existing_consent, consent))

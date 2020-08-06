@@ -259,6 +259,8 @@ def account():
                     consent['user_id'] = user.id
                 elif consent['user_id'] != user.id:
                     raise ValueError("consent user_id differs from path")
+                if 'research_study_id' not in consent:
+                    consent['research_study_id'] = 0
                 consent_list.append(UserConsent.from_json(consent))
             user.update_consents(consent_list, acting_user=acting_user)
         except ValueError as e:
@@ -542,6 +544,7 @@ def user_consents(user_id):
                   - recorded
                   - expires
                   - agreement_url
+                  - research_study_id
                 properties:
                   user_id:
                     type: string
@@ -583,6 +586,11 @@ def user_consents(user_id):
                     description:
                       True if consenting to receive reminders when
                       assessments are due
+                  research_study_id:
+                    type: string
+                    description:
+                      Research Study identifier to which the consent
+                      agreement applies
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -607,8 +615,13 @@ def set_user_consents(user_id):
     necessary, defaults to now and five years from now (both in UTC).
 
     NB only one valid consent should be in place between a user and an
-    organization.  Therefore, if this POST would create a second consent on the
-    given user / organization, the existing consent will be marked deleted.
+    organization per research study.  Therefore, if this POST would create
+    a second consent on the given (user, organization, research study), the
+    existing consent will be marked deleted.
+
+    Research Studies were added since the initial implementation of this API.
+    Therefore, exclusion of a ``research_study_id`` will implicitly use a value
+    of 0 (zero) as the research_study_id.
 
     ---
     tags:
@@ -667,6 +680,13 @@ def set_user_consents(user_id):
               description:
                 set True if consenting to receive reminders when
                 assessments are due
+            research_study_id:
+              type: integer
+              format: int64
+              description:
+                Research Study identifier defining which research study the
+                consent agreement applies to.  Include to override the default
+                value of 0 (zero).
     responses:
       200:
         description: successful operation
@@ -704,6 +724,8 @@ def set_user_consents(user_id):
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
+        if 'research_study_id' not in request.json:
+            consent.research_study_id = 0
         consent_list = [consent, ]
         user.update_consents(
             consent_list=consent_list, acting_user=current_user())
@@ -771,6 +793,13 @@ def withdraw_user_consent(user_id):
               description:
                 Organization identifier defining with whom the consent
                 agreement applies
+            research_study_id:
+              type: integer
+              format: int64
+              description:
+                Research Study identifier defining which research study the
+                consent agreement applies to.  Include to override the default
+                value of 0 (zero).
     responses:
       200:
         description: successful operation
@@ -806,6 +835,7 @@ def withdraw_user_consent(user_id):
     org_id = request.json.get('organization_id')
     if not org_id:
         abort(400, "missing required organization ID")
+    research_study_id = request.json.get('research_study_id', 0)
     acceptance_date = None
     if 'acceptance_date' in request.json:
         acceptance_date = FHIR_datetime.parse(request.json['acceptance_date'])
@@ -816,17 +846,21 @@ def withdraw_user_consent(user_id):
                              'and org {}'.format(user.id, org_id))
     return withdraw_consent(
         user=user, org_id=org_id, acceptance_date=acceptance_date,
-        acting_user=current_user())
+        acting_user=current_user(), research_study_id=research_study_id)
 
 
-def withdraw_consent(user, org_id, acceptance_date, acting_user):
+def withdraw_consent(
+        user, org_id, acceptance_date, acting_user, research_study_id):
     """execute consent withdrawal - view and test friendly function"""
     uc = UserConsent.query.filter_by(
-        user_id=user.id, organization_id=org_id, status='consented').first()
+        user_id=user.id, organization_id=org_id, status='consented',
+        research_study_id=research_study_id).first()
 
     if not uc:
-        abort(404, "no UserConsent found for user ID {} and org ID {}".format(
-            user.id, org_id))
+        abort(
+            404,
+            "no UserConsent found for user ID {}, org ID {}, research study "
+            "ID {}".format(user.id, org_id, research_study_id))
     try:
         if not acceptance_date:
             acceptance_date = datetime.utcnow()
@@ -835,7 +869,8 @@ def withdraw_consent(user, org_id, acceptance_date, acting_user):
                 "Can't suspend with acceptance date prior to existing consent")
         suspended = UserConsent(
             user_id=user.id, organization_id=org_id, status='suspended',
-            acceptance_date=acceptance_date, agreement_url=uc.agreement_url)
+            acceptance_date=acceptance_date, agreement_url=uc.agreement_url,
+            research_study_id=research_study_id)
         suspended.send_reminders = False
         suspended.include_in_reports = True
         suspended.staff_editable = (not current_app.config.get('GIL'))

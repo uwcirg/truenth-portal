@@ -377,7 +377,9 @@ class QNR_results(object):
             self.user, classification="indefinite")]
 
         td = trigger_date(user=self.user)
-        old_td, withdrawal_date = consent_withdrawal_dates(self.user)
+        # TODO: address research_study_id
+        old_td, withdrawal_date = consent_withdrawal_dates(
+            self.user, research_study_id=0)
         if not td and old_td:
             td = old_td
 

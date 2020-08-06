@@ -335,7 +335,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         user = db.session.merge(self.test_user)
         withdraw_consent(
             user=user, org_id=crv_id, acting_user=user,
-            acceptance_date=datetime.utcnow())
+            research_study_id= 0, acceptance_date=datetime.utcnow())
         gen = ordered_qbs(user=user)
 
         # expect each in order despite overlapping nature

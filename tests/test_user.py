@@ -348,6 +348,7 @@ class TestUser(TestCase):
                 organization_id=consent_org.id,
                 audit=consent_audit,
                 agreement_url='http://example.org',
+                research_study_id=0,
                 options=STAFF_EDITABLE_MASK))
             db.session.commit()
         consent_org, consent_audit = map(db.session.merge,
@@ -801,7 +802,7 @@ class TestUser(TestCase):
         consent = UserConsent(
             user_id=member_of.id, organization_id=org.id,
             audit=audit, agreement_url='http://example.org',
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
         with SessionScope(db):
             db.session.add(consent)
             db.session.commit()
@@ -858,7 +859,7 @@ class TestUser(TestCase):
         uc_w = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_w_id, organization=org_10032,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_x = self.add_user('patient x')
         patient_x_id = patient_x.id
@@ -868,7 +869,7 @@ class TestUser(TestCase):
         uc_x = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_x_id, organization=org_102,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_y = self.add_user('patient y')
         patient_y_id = patient_y.id
@@ -878,7 +879,7 @@ class TestUser(TestCase):
         uc_y = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_y_id, organization=org_10031,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_z = self.add_user('patient z')
         patient_z_id = patient_z.id
@@ -888,7 +889,7 @@ class TestUser(TestCase):
         uc_z = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_z_id, organization=org_10031,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         with SessionScope(db):
             db.session.add(uc_w)

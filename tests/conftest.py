@@ -29,6 +29,7 @@ from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
@@ -275,10 +276,11 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
     parent_org = OrgTree().find(org.id).top_level()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
+    add_static_research_studies()
     consent = UserConsent(
         user_id=test_user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
-        acceptance_date=now)
+        acceptance_date=now, research_study_id=0)
 
     for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
         test_user.save_observation(
@@ -405,13 +407,15 @@ def bless_with_basics(test_user, promote_user, shallow_org_tree):
         audit=audit, agreement_url='http://not.really.org',
         type='privacy policy')
     parent_org = OrgTree().find(org.id).top_level()
+    add_static_research_studies()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
     consent = UserConsent(
         user_id=user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
         acceptance_date=calc_date_params(
-            backdate=backdate, setdate=setdate))
+            backdate=backdate, setdate=setdate),
+        research_study_id=0)
     with SessionScope(db):
         db.session.add(tou)
         db.session.add(privacy)
@@ -475,13 +479,15 @@ def bless_with_basics_no_patient_role(
         audit=audit, agreement_url='http://not.really.org',
         type='privacy policy')
     parent_org = OrgTree().find(org.id).top_level()
+    add_static_research_studies()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
     consent = UserConsent(
         user_id=user_id, organization_id=parent_org,
         options=options, audit=audit, agreement_url='http://fake.org',
         acceptance_date=calc_date_params(
-            backdate=backdate, setdate=setdate))
+            backdate=backdate, setdate=setdate),
+        research_study_id=0)
     with SessionScope(db):
         db.session.add(tou)
         db.session.add(privacy)

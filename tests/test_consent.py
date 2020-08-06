@@ -12,6 +12,7 @@ from portal.date_tools import FHIR_datetime
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
+from portal.models.research_study import ResearchStudy
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
 
@@ -26,7 +27,8 @@ class TestUserConsent(TestCase):
             Organization.id > 0).limit(2)]
         uc = UserConsent(
             user_id=TEST_USER_ID, organization=org1,
-            audit=audit, agreement_url='http://no.com')
+            audit=audit, agreement_url='http://no.com',
+            research_study_id=0)
         uc.include_in_reports = True
         with SessionScope(db):
             db.session.add(uc)
@@ -45,10 +47,12 @@ class TestUserConsent(TestCase):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc1 = UserConsent(
             organization_id=org1.id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            research_study_id=0)
         uc2 = UserConsent(
             organization_id=org2.id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            research_study_id=0)
         uc1.staff_editable = True
         uc1.send_reminders = False
         uc2.staff_editable = True
@@ -84,13 +88,16 @@ class TestUserConsent(TestCase):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc1 = UserConsent(
             organization_id=org1.id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit, acceptance_date=older)
+            agreement_url=self.url, audit=audit, acceptance_date=older,
+            research_study_id=0)
         uc2 = UserConsent(
             organization_id=org2.id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit, acceptance_date=oldest)
+            agreement_url=self.url, audit=audit, acceptance_date=oldest,
+            research_study_id=0)
         uc3 = UserConsent(
             organization_id=0, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit, acceptance_date=old)
+            agreement_url=self.url, audit=audit, acceptance_date=old,
+            research_study_id=0)
         with SessionScope(db):
             db.session.add(uc1)
             db.session.add(uc2)
@@ -248,6 +255,55 @@ class TestUserConsent(TestCase):
                                          status='deleted').first()
         assert dc.deleted_id
 
+    def test_post_2nd_study_user_consent(self):
+        """second consent for different study shouldn't replace existing"""
+        self.shallow_org_tree()
+        acceptance_date = FHIR_datetime.parse("2018-06-30 12:12:12")
+        acceptance_date1 = FHIR_datetime.parse("2018-07-30 12:12:12")
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        data = {'organization_id': org1.id, 'agreement_url': self.url,
+                'staff_editable': True, 'send_reminders': True,
+                'acceptance_date': acceptance_date}
+
+        self.login()
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 1
+        consent = self.test_user.valid_consents[0]
+        assert consent.organization_id == org1.id
+        assert consent.staff_editable
+        assert consent.send_reminders
+        assert consent.status == 'consented'
+        assert consent.research_study_id == 0
+        assert consent.acceptance_date == acceptance_date
+
+        study2 = ResearchStudy(id=1, title="2nd study")
+        with SessionScope(db):
+            db.session.add(study2)
+            db.session.commit()
+
+        # modify for second study
+        data['research_study_id'] = 1
+        data['acceptance_date'] = acceptance_date1
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert response.status_code == 200
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 2
+        # valid_consents are ordered desc(acceptance_date)
+        assert self.test_user.valid_consents[0].research_study_id == 1
+        assert (self.test_user.valid_consents[0].acceptance_date ==
+                acceptance_date1)
+        assert self.test_user.valid_consents[1].research_study_id == 0
+        assert (self.test_user.valid_consents[1].acceptance_date ==
+                acceptance_date)
+
     def test_delete_user_consent(self):
         self.shallow_org_tree()
         org1, org2 = [org for org in Organization.query.filter(
@@ -258,10 +314,12 @@ class TestUserConsent(TestCase):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc1 = UserConsent(
             organization_id=org1_id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            research_study_id=0)
         uc2 = UserConsent(
             organization_id=org2_id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            research_study_id=0)
         with SessionScope(db):
             db.session.add(uc1)
             db.session.add(uc2)
@@ -301,7 +359,8 @@ class TestUserConsent(TestCase):
         uc = UserConsent(
             organization_id=org_id, user_id=TEST_USER_ID,
             agreement_url=self.url, audit=audit,
-            acceptance_date=acceptance_date)
+            acceptance_date=acceptance_date,
+            research_study_id=0)
         with SessionScope(db):
             db.session.add(uc)
             db.session.commit()
@@ -333,6 +392,76 @@ class TestUserConsent(TestCase):
         assert not new_consent.send_reminders
         assert new_consent.acceptance_date == suspend_date
 
+    def test_withdraw_user_consent_other_study(self):
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id = org.id
+
+        study_0_acceptance_date = FHIR_datetime.parse("2018-06-30 12:12:12")
+        study_1_acceptance_date = FHIR_datetime.parse("2018-07-15 12:12:12")
+        suspend_date = FHIR_datetime.parse("2018-07-30 12:12:15")
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit,
+            acceptance_date=study_0_acceptance_date,
+            research_study_id=0)
+        study1 = ResearchStudy(id=1, title="study 1")
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.add(study1)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 1
+
+        # Add a consent for same org, different research study
+        uc1 = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit,
+            acceptance_date=study_1_acceptance_date,
+            research_study_id=1)
+        with SessionScope(db):
+            db.session.add(uc1)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 2
+
+        data = {'organization_id': org_id, 'acceptance_date': suspend_date}
+        self.login()
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 200
+
+        # check that old consent is marked as deleted
+        old_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='deleted').first()
+        assert old_consent.deleted_id
+
+        # check new withdrawn consent
+        new_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='suspended').first()
+        assert old_consent.agreement_url == new_consent.agreement_url
+        assert (
+            new_consent.staff_editable ==
+            (not current_app.config.get('GIL')))
+        assert not new_consent.send_reminders
+        assert new_consent.acceptance_date == suspend_date
+        assert new_consent.research_study_id == 0
+
+        # check the consent for the other research study is intact
+        valid_consents = self.test_user.valid_consents
+        assert len(valid_consents) == 2
+        assert valid_consents[0].research_study_id == 0
+        assert valid_consents[0].status == 'suspended'
+        assert valid_consents[0].acceptance_date == suspend_date
+
+        assert valid_consents[1].research_study_id == 1
+        assert valid_consents[1].acceptance_date == study_1_acceptance_date
+
     def test_withdraw_too_early(self):
         """Avoid problems with withdrawals predating the existing consent"""
         self.shallow_org_tree()
@@ -342,7 +471,8 @@ class TestUserConsent(TestCase):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc = UserConsent(
             organization_id=org_id, user_id=TEST_USER_ID,
-            agreement_url=self.url, audit=audit)
+            agreement_url=self.url, audit=audit,
+            research_study_id=0)
         with SessionScope(db):
             db.session.add(uc)
             db.session.commit()
