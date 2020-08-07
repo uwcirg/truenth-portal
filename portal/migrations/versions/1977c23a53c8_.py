@@ -19,6 +19,13 @@ def upgrade():
     op.add_column(
         'user_consents',
         sa.Column('research_study_id', sa.Integer()))
+    con = op.get_bind()
+    result = con.execute('SELECT id FROM research_studies WHERE id = 0')
+    if not result.rowcount:
+        op.execute(
+            "INSERT INTO research_studies (id, title) VALUES"
+            " (0, 'placeholder')")
+
     op.execute('UPDATE user_consents SET research_study_id = 0')
     op.alter_column('user_consents', 'research_study_id', nullable=False)
     op.create_index(
