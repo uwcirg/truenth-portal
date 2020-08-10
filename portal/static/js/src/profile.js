@@ -2168,8 +2168,17 @@ export default (function() {
                 content += "</tr>";
                 return content;
             },
+            isSubStudyConsent: function(item) {
+                if (!item) {
+                    return false;
+                }
+                return parseInt(item.research_study_id) === 0;
+            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
+                if (this.isSubStudyConsent(item)) {
+                    return i18next.t("IRONMAN sub study");
+                }
                 var orgId = item.organization_id, OT = this.getOrgTool(), currentOrg = OT.orgsList[orgId], orgName = currentOrg ? currentOrg.name : item.organization_id;
                 if (!this.isConsentWithTopLevelOrg()) {
                     var topOrgID = OT.getTopLevelParentOrg(orgId), topOrg = OT.orgsList[topOrgID];
