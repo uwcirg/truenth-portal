@@ -33,7 +33,7 @@ from portal.models.questionnaire_response import (
 from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
-from portal.models.user import get_user
+from portal.models.user import User
 from portal.system_uri import ICHOM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 
@@ -70,7 +70,7 @@ def mock_qr(
         db.session.commit()
     enc = db.session.merge(enc)
     if not qb:
-        qstats = QB_Status(get_user(user_id), timestamp)
+        qstats = QB_Status(User.query.get(user_id), timestamp)
         qbd = qstats.current_qbd()
         qb, iteration = qbd.questionnaire_bank, qbd.iteration
 

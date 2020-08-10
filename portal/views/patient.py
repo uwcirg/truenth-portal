@@ -26,7 +26,7 @@ from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
 from ..models.role import ROLE
-from ..models.user import User, current_user, get_user_or_abort
+from ..models.user import User, current_user, get_user
 from .crossdomain import crossdomain
 from .demographics import demographics
 
@@ -211,8 +211,7 @@ def post_patient_deceased(patient_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if not request.json or set(request.json.keys()).isdisjoint(
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
@@ -273,8 +272,7 @@ def post_patient_dob(patient_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if not request.json or 'birthDate' not in request.json:
         abort(400, "Requires `birthDate` in JSON")
 
@@ -296,11 +294,10 @@ def patient_timeline(patient_id):
     from ..models.questionnaire_bank import visit_name
     from ..trace import dump_trace, establish_trace
 
+    get_user(patient_id, permission='view')
     trace = request.args.get('trace', False)
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
-
-    current_user().check_role(permission='view', other_id=patient_id)
 
     purge = request.args.get('purge', False)
     try:

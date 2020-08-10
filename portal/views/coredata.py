@@ -14,7 +14,7 @@ from werkzeug.exceptions import Unauthorized
 from ..extensions import oauth
 from ..models.client import validate_origin
 from ..models.coredata import Coredata
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
@@ -65,8 +65,7 @@ def still_needed(user_id):
         'collection_method' defined if needed.
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     needed = Coredata().still_needed(user, **validate_request_args(request))
     return jsonify(still_needed=needed)
 
@@ -87,8 +86,7 @@ def requried(user_id):
         intervention affiliations.
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     required = Coredata().required(user, **validate_request_args(request))
     return jsonify(required=required)
 
@@ -109,8 +107,7 @@ def optional(user_id):
         intervention affiliations.
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'view')
     results = Coredata().optional(user, **validate_request_args(request))
     return jsonify(optional=results)
 

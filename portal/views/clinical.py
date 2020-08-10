@@ -7,7 +7,7 @@ from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.clinical_constants import CC
 from ..models.observation import Observation
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from ..models.value_quantity import ValueQuantity
 from .crossdomain import crossdomain
 
@@ -360,8 +360,8 @@ def clinical(patient_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     patch_dstu2 = request.args.get('patch_dstu2', False)
     return jsonify(patient.clinical_history(
         requestURL=request.url, patch_dstu2=patch_dstu2))
@@ -430,8 +430,7 @@ def clinical_set(patient_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if (not request.json or 'resourceType' not in request.json
             or request.json['resourceType'] != 'Observation'):
         abort(400, "Requires FHIR resourceType of 'Observation'")
@@ -508,8 +507,7 @@ def clinical_update(patient_id, observation_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if not request.json:
         abort(400, "No update data provided")
     observation = Observation.query.filter_by(id=observation_id).first()
@@ -525,8 +523,7 @@ def clinical_update(patient_id, observation_id):
 
 def clinical_api_shortcut_set(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
     value = str(request.json['value']).lower()
@@ -549,6 +546,5 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
 
 def clinical_api_shortcut_get(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'view')
     return jsonify(value=patient.concept_value(codeable_concept))

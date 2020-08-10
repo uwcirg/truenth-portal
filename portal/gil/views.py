@@ -12,7 +12,7 @@ from flask import (
 from jinja2 import TemplateNotFound
 
 from ..database import db
-from ..extensions import recaptcha
+from ..extensions import oauth, recaptcha
 from ..models.app_text import (
     AboutATMA,
     PrivacyATMA,
@@ -26,7 +26,7 @@ from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from ..system_uri import SHORTCUT_ALIAS
 from ..views.auth import next_after_login
 from ..views.crossdomain import crossdomain
@@ -115,19 +115,14 @@ def home():
 
 @gil.route('/gil-interventions-items/<int:user_id>')
 @crossdomain()
+@oauth.require_oauth()
 def gil_interventions_items(user_id):
     """ this is needed to filter the GIL menu based on user's intervention(s)
         trying to do this so code is more easily managed from front end side
         Currently it is also accessed via ajax call from gil footer
         see: api/gil-footer-html/
     """
-    user = None
-
-    if user_id:
-        user = get_user_or_abort(user_id)
-    else:
-        user = current_user()
-
+    user = get_user(user_id, permission='view')
     user_interventions = []
 
     if user:

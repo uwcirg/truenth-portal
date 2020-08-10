@@ -9,7 +9,7 @@ from ..models.audit import Audit
 from ..models.procedure import Procedure
 from ..models.procedure_codes import TxNotStartedConstants, TxStartedConstants
 from ..models.qb_timeline import invalidate_users_QBT
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
@@ -56,8 +56,8 @@ def procedure(patient_id):
       - ServiceToken: []
 
     """
-    patient = get_user_or_abort(patient_id)
-    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
@@ -152,8 +152,7 @@ def post_procedure():
 
     # check the permission now that we know the subject
     patient_id = procedure.user_id
-    current_user().check_role(permission='edit', other_id=patient_id)
-    patient = get_user_or_abort(patient_id)
+    patient = get_user(patient_id, 'edit')
     patient.procedures.append(procedure)
     db.session.commit()
     auditable_event(
@@ -208,7 +207,7 @@ def procedure_delete(procedure_id):
 
     # check the permission now that we know the subject
     patient_id = procedure.user_id
-    current_user().check_role(permission='edit', other_id=patient_id)
+    get_user(patient_id, permission='edit')
     db.session.delete(procedure)
     db.session.commit()
     auditable_event(

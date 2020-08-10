@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import get_user
 from .crossdomain import crossdomain
 
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
@@ -77,8 +77,7 @@ def get_audit(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    user = get_user_or_abort(user_id)
-    current_user().check_role(permission='view', other_id=user.id)
+    user = get_user(user_id, 'view')
     audits = Audit.query.filter(or_(
         Audit.user_id == user.id,
         Audit.subject_id == user.id))

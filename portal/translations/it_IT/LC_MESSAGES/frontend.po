@@ -1,0 +1,883 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"POT-Creation-Date: 2020-08-03T21:28:27.906Z\n"
+"PO-Revision-Date: 2020-08-03T21:28:27.906Z\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Server error occurred updating data."
+msgstr "Si è verificato un errore del server durante l'aggiornamento dei dati."
+
+msgid "Invalid user id: %d"
+msgstr "ID utente non valido: %d"
+
+msgid "Account created. Redirecting to profile..."
+msgstr "Account creato. Reindirizzamento al profilo..."
+
+msgid "[Processing error] "
+msgstr "[Elaborazione dell'errore] "
+
+msgid "Email is already in use."
+msgstr "Questo indirizzo e-mail è già usato."
+
+msgid "An organization must be selected."
+msgstr "Selezionare un'organizzazione."
+
+msgid "no data returned"
+msgstr "nessun dato restituito"
+
+msgid "Error occurred retrieving clinics data."
+msgstr "Errore durante il recupero dei dati delle cliniche."
+
+msgid "No clinics data available."
+msgstr "Nessun dato disponibile sulle cliniche."
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} users"
+msgstr "Mostra utenti da {pageFrom} a {pageTo} di {totalRows}"
+
+msgid "{pageNumber} records per page"
+msgstr "{pageNumber} schede per pagina"
+
+msgid "Toggle"
+msgstr "Toggle"
+
+msgid "Columns"
+msgstr "Colonne"
+
+msgid "All rows"
+msgstr "Tutte le righe"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "No matching records found"
+msgstr "Nessuna corrispondenza trovata"
+
+msgid "Export data"
+msgstr "Esporta dati"
+
+msgid "Export patient list"
+msgstr "Esporta l'elenco dei pazienti"
+
+msgid "User Id is required"
+msgstr "È necessario l'ID utente"
+
+msgid "Error occurred retrieving roles for user"
+msgstr "Errore durante il recupero dei ruoli dell'utente"
+
+msgid "Error occurred updating user roles"
+msgstr "Errore durante l'aggiornamento dei ruoli dell'utente"
+
+msgid "Are you sure you want to deactivate this account?"
+msgstr "Sei sicuro di voler disattivare questo account?"
+
+msgid "Yes"
+msgstr "Sì"
+
+msgid "No"
+msgstr "No"
+
+msgid "Enter Text"
+msgstr "Inserisci testo"
+
+msgid "Select"
+msgstr "Seleziona"
+
+msgid "Error occurred retrieving patient report"
+msgstr "Errore durante il recupero del resoconto del paziente"
+
+msgid "Download"
+msgstr "Scarica"
+
+msgid "Patient Reports"
+msgstr "Resoconti del paziente"
+
+msgid "Patient Report"
+msgstr ""
+
+msgid "No report data found."
+msgstr "Non sono stati trovati dati sui resoconti."
+
+msgid "User id is required."
+msgstr "È richiesto l'ID utente."
+
+msgid "Inactive"
+msgstr "Inattivo"
+
+msgid "Deactivate"
+msgstr "Disattiva"
+
+msgid "Error occurred retrieving subject ID"
+msgstr "Errore durante il recupero dell'ID del soggetto"
+
+msgid "Error occurred - unable to reach destination"
+msgstr "Si è verificato un errore: non è possibile raggiungere la destinazione"
+
+msgid "Unable to set session variable for organization modal viewed."
+msgstr "Non è possibile impostare la variabile di sessione per il modello organizzativo visualizzato."
+
+msgid "Error retrieving demographics information for user."
+msgstr "Errore durante il recupero delle informazioni demografiche dell'utente."
+
+msgid "Error occurred updating user organization."
+msgstr "Errore durante l'aggiornamento dell'organizzazione dell'utente."
+
+msgid "Error updating organization"
+msgstr "Errore durante l'aggiornamento dell'organizzazione"
+
+msgid "My Dashboard"
+msgstr "Il mio pannello di controllo"
+
+msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ..."
+msgstr ""
+
+msgid "You have entered an invalid access code.  Please try again"
+msgstr "Hai inserito un codice di accesso non valido.  Riprova"
+
+msgid "System was unable to process your request."
+msgstr "Non è stato possibile elaborare la tua richiesta."
+
+msgid "Edit in Liferay"
+msgstr "Modifica in Liferay"
+
+msgid "You must agree to the terms and conditions by checking the provided checkboxes."
+msgstr "Devi accettare i termini e le condizioni selezionando le apposite caselle."
+
+msgid "Try Again"
+msgstr "Riprova"
+
+msgid "Missing information for consent agreement.  Unable to complete request."
+msgstr "Mancano alcune informazioni per il modulo consenso.  Non è possibile completare la richiesta."
+
+msgid "Error occurred deleting notification"
+msgstr "Errore durante la cancellazione della notifica"
+
+msgid "Alabama"
+msgstr ""
+
+msgid "Alaska"
+msgstr ""
+
+msgid "American Samoa"
+msgstr "Samoa Americane"
+
+msgid "Arizona"
+msgstr ""
+
+msgid "Arkansas"
+msgstr ""
+
+msgid "California"
+msgstr ""
+
+msgid "Colorado"
+msgstr ""
+
+msgid "Connecticut"
+msgstr ""
+
+msgid "Delaware"
+msgstr ""
+
+msgid "District Of Columbia"
+msgstr ""
+
+msgid "Federated States Of Micronesia"
+msgstr ""
+
+msgid "Florida"
+msgstr ""
+
+msgid "Georgia"
+msgstr ""
+
+msgid "Guam"
+msgstr ""
+
+msgid "Hawaii"
+msgstr ""
+
+msgid "Idaho"
+msgstr ""
+
+msgid "Illinois"
+msgstr ""
+
+msgid "Indiana"
+msgstr ""
+
+msgid "Iowa"
+msgstr ""
+
+msgid "Kansas"
+msgstr ""
+
+msgid "Kentucky"
+msgstr ""
+
+msgid "Louisiana"
+msgstr ""
+
+msgid "Maine"
+msgstr ""
+
+msgid "Marshall Islands"
+msgstr ""
+
+msgid "Maryland"
+msgstr ""
+
+msgid "Massachusetts"
+msgstr ""
+
+msgid "Michigan"
+msgstr ""
+
+msgid "Minnesota"
+msgstr ""
+
+msgid "Mississippi"
+msgstr ""
+
+msgid "Missouri"
+msgstr ""
+
+msgid "Montana"
+msgstr ""
+
+msgid "Nebraska"
+msgstr ""
+
+msgid "Nevada"
+msgstr ""
+
+msgid "New Hampshire"
+msgstr ""
+
+msgid "New Jersey"
+msgstr ""
+
+msgid "New Mexico"
+msgstr ""
+
+msgid "New York"
+msgstr ""
+
+msgid "North Carolina"
+msgstr "Carolina del Nord"
+
+msgid "North Dakota"
+msgstr ""
+
+msgid "Northern Mariana Islands"
+msgstr ""
+
+msgid "Ohio"
+msgstr ""
+
+msgid "Oklahoma"
+msgstr ""
+
+msgid "Oregon"
+msgstr "Oregon"
+
+msgid "Palau"
+msgstr ""
+
+msgid "Pennsylvania"
+msgstr ""
+
+msgid "Puerto Rico"
+msgstr ""
+
+msgid "Rhode Island"
+msgstr ""
+
+msgid "South Carolina"
+msgstr ""
+
+msgid "South Dakota"
+msgstr ""
+
+msgid "Tennessee"
+msgstr ""
+
+msgid "Texas"
+msgstr ""
+
+msgid "Utah"
+msgstr ""
+
+msgid "Vermont"
+msgstr ""
+
+msgid "Virgin Islands"
+msgstr ""
+
+msgid "Virginia"
+msgstr ""
+
+msgid "Washington"
+msgstr ""
+
+msgid "West Virginia"
+msgstr ""
+
+msgid "Wisconsin"
+msgstr ""
+
+msgid "Wyoming"
+msgstr ""
+
+msgid "Organization"
+msgstr "Organizzazione"
+
+msgid "Consent Status"
+msgstr "Stato del consenso"
+
+msgid "Agreement"
+msgstr "Accordo"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Registration Date"
+msgstr "Data di registrazione"
+
+msgid "GMT"
+msgstr "GMT"
+
+msgid "Consent Date"
+msgstr "Data del consenso"
+
+msgid "Last Updated"
+msgstr "Ultimo aggiornamento"
+
+msgid "( GMT, Y-M-D )"
+msgstr "(GMT, A-M-G )"
+
+msgid "User"
+msgstr "Utente"
+
+msgid "Consented"
+msgstr "Consenso dato"
+
+msgid "Consented / Enrolled"
+msgstr "Consenso dato / Arruolato"
+
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Ritirato - Sospendi la raccolta dati e segnala i dati precedenti"
+
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Sospendi la raccolta dati e segnala i dati storici"
+
+msgid "Purged / Removed"
+msgstr "Eliminato / Rimosso"
+
+msgid "Replaced"
+msgstr "Sostituito"
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} records"
+msgstr "Mostra dati da {pageFrom} a {pageTo} di {totalRows}"
+
+msgid "not provided"
+msgstr "nessuna informazione inserita"
+
+msgid "Unable to set user settings."
+msgstr "Non è possibile configurare le impostazioni dell'utente."
+
+msgid "Unable to set current user orgs"
+msgstr "Non è possibile configurare le organizzazioni attuali dell'utente"
+
+msgid "DONE"
+msgstr "FATTO"
+
+msgid "EDIT"
+msgstr "MODIFICA"
+
+msgid "No information available"
+msgstr "Nessuna informazione disponibile"
+
+msgid "Unable to properly set session storage variable for login-as. "
+msgstr "Non è possibile impostare correttamente la variabile di archiviazione della sessione per l'accesso \"in qualità di\". "
+
+msgid "Subject id is required"
+msgstr "È richiesto l'ID del soggetto"
+
+msgid "Invalid field value."
+msgstr "Valore del campo non valido."
+
+msgid "Validation error."
+msgstr "Errore di convalida."
+
+msgid "Date (GMT), Y-M-D"
+msgstr "Data (GMT), A-M-G"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "No email log entry found."
+msgstr "Non sono state trovate voci di registro e-mail."
+
+msgid "{emailType} email will be sent to {email}"
+msgstr "L'e-mail {emailType} sarà spedita a {email}"
+
+msgid "Url for email content is unavailable."
+msgstr "L'URL per il contenuto dell'e-mail non è disponibile."
+
+msgid "Unable to send email. Missing content."
+msgstr "Non è possibile inviare l'e-mail. Contenuto mancante."
+
+msgid "failed request to get email invite url"
+msgstr "richiesta dell'URL relativo all'invito via e-mail non riuscita"
+
+msgid "Error occurred while sending invite email."
+msgstr "Errore durante l'invio dell'e-mail di invito."
+
+msgid "{emailType} email sent to {emailAddress}"
+msgstr "E-mail {emailType} spedita a {emailAddress}"
+
+msgid "Error occurred retreving email content via API."
+msgstr "Errore durante il recupero del contenuto e-mail via API."
+
+msgid "your clinic"
+msgstr "la tua clinica"
+
+msgid "Hello, this is an invitation to complete your registration."
+msgstr "Buongiorno, questo è un invito a completare la registrazione."
+
+msgid "Verify your account to complete registration"
+msgstr "Verifica il tuo account per completare la registrazione"
+
+msgid "Registration invite from {clinicName}"
+msgstr "Invito alla registrazione da parte di {clinicName}"
+
+msgid "invite email sent to {email}"
+msgstr "E-mail di invito spedita a {email}"
+
+msgid "Password reset email sent to {email}"
+msgstr "E-mail di reimpostazione della password spedita a {email}"
+
+msgid "Unable to send email."
+msgstr "Impossibile inviare l'e-mail."
+
+msgid "Error occurred suspending consent for subject."
+msgstr "Errore durante la sospensione del consenso per il soggetto."
+
+msgid "Type"
+msgstr "Inserisci"
+
+msgid "Report Name"
+msgstr "Nome del resoconto"
+
+msgid "Generated (GMT)"
+msgstr "Generato (GMT)"
+
+msgid "Document Type"
+msgstr "Tipo di documento"
+
+msgid "No reports available."
+msgstr "Nessun resoconto disponibile."
+
+msgid "Problem retrieving reports from server."
+msgstr "Abbiamo riscontrato un problema nel recupero dei resoconti dal server."
+
+msgid "No questionnaire data found."
+msgstr "Non è stato trovato alcun dato di questionario."
+
+msgid "Problem retrieving session data from server."
+msgstr "Problema durante il recupero dal server dei dati di sessione."
+
+msgid "Click to view report"
+msgstr "Clicca per visualizzare il resoconto"
+
+msgid "No affiliated clinic"
+msgstr "Nessuna clinica affiliata"
+
+msgid "The user does not have a valid assessment link."
+msgstr "L'utente non è in possesso di un link di valutazione valido."
+
+msgid "Server error occurred checking questionnaire window"
+msgstr "Errore del server durante il controllo della finestra del questionario"
+
+msgid "Invalid completion date. Date of completion is outside the days allowed."
+msgstr "Data di completamento non valida. La data di completamento è al di fuori dell'intervallo di giorni consentito."
+
+msgid "All available questionnaires have been completed."
+msgstr "Tutti i questionari disponibili sono stati completati."
+
+msgid "Error retrieving data from server"
+msgstr "Errore durante il recupero dei dati dal server"
+
+msgid "More..."
+msgstr "Altro..."
+
+msgid "Less..."
+msgstr "Meno..."
+
+msgid "Comment"
+msgstr "Commento"
+
+msgid "Date/Time <span class='gmt'>{gmt}</span>"
+msgstr "Data/Ora <span class='gmt'>{gmt}</span>"
+
+msgid "Version"
+msgstr "Versione"
+
+msgid "View"
+msgstr "Visualizza"
+
+msgid "Sharing information with clinics"
+msgstr "Condivisione delle informazioni con le cliniche"
+
+msgid "expired"
+msgstr "scaduto"
+
+msgid "TrueNTH USA"
+msgstr "TrueNTH USA"
+
+msgid "Agreed to {documentType}"
+msgstr "Consenso in merito a {documentType}"
+
+msgid "Agreed to terms"
+msgstr "Termini accettati"
+
+msgid "{projectName} Terms of Use"
+msgstr "Termini di utilizzo {projectName}"
+
+msgid "Error occurred retrieving consent list content."
+msgstr "Errore durante il recupero del contenuto dell'elenco dei consensi."
+
+msgid "Error occurred setting user roles"
+msgstr "Errore durante l'impostazione dei ruoli dell'utente"
+
+msgid "Error occurred setting user organizations"
+msgstr "Errore durante l'impostazione delle organizzazioni dell'utente"
+
+msgid "Date must in the valid format."
+msgstr "La data deve rispettare un formato valido."
+
+msgid "Hour must be in valid format, range 0 to 23."
+msgstr "L'ora deve essere indicata in un formato valido, da 0 a 23."
+
+msgid "Minute must be in valid format, range 0 to 59."
+msgstr "I minuti devono essere indicati in un formato valido, da 0 a 59."
+
+msgid "Second must be in valid format, range 0 to 59."
+msgstr "I secondi devono essere indicati in formato valido, da 0 a 59."
+
+msgid "You must enter a date/time"
+msgstr "Devi inserire una data/ora"
+
+msgid "Error processing data.  Make sure the date is in the correct format."
+msgstr "Errore durante l'elaborazione dei dati.  Assicurarsi che il formato della data sia corretto."
+
+msgid "Consent to share information"
+msgstr "Dai il consenso alla condivisione delle informazioni"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Unable to set default consent agreement"
+msgstr "Non è possibile impostare il modulo di consenso predefinito"
+
+msgid "Error loading portal wrapper"
+msgstr "Errore durante il caricamento del wrapper del portale"
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
+msgstr "© Fondazione Movember {year}. Tutti i diritti riservati. Un'organizzazione no profit registrata come 501(c)3 (Fondazione Movember)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr "© Fondazione Movember {year}. Tutti i diritti riservati. La Fondazione Movember è un'organizzazione di beneficenza registrata in Australia al numero ABN 48894537905 (Fondazione Movember)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr "© Fondazione Movember {year}. Tutti i diritti riservati. La Fondazione Movember è un'organizzazione di beneficenza registrata in Nuova Zelanda al numero CC51320 (Fondazione Movember)."
+
+msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
+msgstr "© Fondazione Movember {year} (Fondazione Movember). Tutti i diritti riservati."
+
+msgid "User id is required"
+msgstr "È richiesto l'ID utente"
+
+msgid "Error occurred retrieving notification."
+msgstr "Errore durante il recupero della notifica."
+
+msgid "No organizations available"
+msgstr "Non sono disponibili organizzazioni"
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr "Qual è la clinica principale a cui fai affidamento per il trattamento del tumore della prostata"
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "error occurred setting current user id"
+msgstr "errore durante l'impostazione dell'ID dell'utente attuale"
+
+msgid "no data found"
+msgstr "nessun dato trovato"
+
+msgid "you"
+msgstr "tu"
+
+msgid "this patient"
+msgstr "questo paziente"
+
+msgid "staff member"
+msgstr "membro dello staff"
+
+msgid "Added!"
+msgstr "Aggiunto!"
+
+msgid "You haven't entered any management option yet."
+msgstr "Non hai ancora inserito opzioni di gestione."
+
+msgid "error occurred retrieving user procedures"
+msgstr "errore durante il recupero delle procedure utente"
+
+msgid "(data entered by {actor} on {date})"
+msgstr "(dati inseriti da {actor} il {date})"
+
+msgid "REMOVE"
+msgstr "RIMUOVI"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "La data della procedura deve essere valida e nel formato richiesto."
+
+msgid "success"
+msgstr "successo"
+
+msgid "Unable to update. System/Server Error."
+msgstr "Impossibile aggiornare. Errore di sistema/server."
+
+msgid "unable to get needed core data"
+msgstr "non è possibile ottenere i dati di base necessari"
+
+msgid "unable to get required core data"
+msgstr "non è possibile ottenere i dati di base richiesti"
+
+msgid "Unable to retrieve portal footer html"
+msgstr "Non è possibile recuperare l'html del piè di pagina del portale"
+
+msgid "No data found"
+msgstr "Nessun dato trovato"
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr "Errore del server durante il recupero delle informazioni sull'organizzazione/clinica."
+
+msgid "Server error occurred retrieving consent information."
+msgstr "Errore del server durante il recupero delle informazioni sul consenso."
+
+msgid "User id and parameters are required"
+msgstr "Sono richiesti ID utente e parametri"
+
+msgid "Server error occurred setting consent status."
+msgstr "Errore del server durante l'impostazione dello stato del consenso."
+
+msgid "Server error occurred removing consent."
+msgstr "Errore del server durante la revoca del consenso."
+
+msgid "User id and organization id are required."
+msgstr "Sono richiesti ID utente e ID organizzazione."
+
+msgid "Error occurred setting suspended consent status."
+msgstr "Errore durante l'impostazione dello stato di consenso sospeso."
+
+msgid "Server error occurred retrieving demographics information."
+msgstr "Errore del server durante il recupero delle informazioni demografiche."
+
+msgid "Server error occurred setting demographics information."
+msgstr "Errore del server durante l'impostazione delle informazioni demografiche."
+
+msgid "Server error occurred retrieving locale information."
+msgstr "Errore del server durante il recupero delle informazioni sulla locale."
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr "Errore del server durante il salvataggio delle informazioni sulla procedura/sul trattamento."
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr "Errore del server durante la rimozione delle informazioni sulla procedura/sul trattamento."
+
+msgid "Server error occurred retrieving roles information."
+msgstr "Errore del server durante il recupero delle informazioni sui ruoli."
+
+msgid "Server error occurred retrieving user role information."
+msgstr "Errore del server durante il recupero delle informazioni sul ruolo dell'utente."
+
+msgid "User Id is required."
+msgstr "È necessario l'ID utente."
+
+msgid "Server error occurred setting user role information."
+msgstr "Errore del server durante l'impostazione delle informazioni sul ruolo dell'utente."
+
+msgid "Server error occurred deleting user role."
+msgstr "Errore del server durante la cancellazione del ruolo dell'utente."
+
+msgid "Server error occurred retrieving clinical data."
+msgstr "Errore del server durante il recupero dei dati clinici."
+
+msgid "Server error occurred updating clinical data."
+msgstr "Errore del server durante l'aggiornamento dei dati clinici."
+
+msgid "no url returned"
+msgstr "nessun url restituito"
+
+msgid "Server error occurred retrieving tou url."
+msgstr "Errore del server durante il recupero dell'URL tou."
+
+msgid "Server error"
+msgstr "Errore del server"
+
+msgid "error retrieving instruments list"
+msgstr "errore durante il recupero dell'elenco degli strumenti"
+
+msgid "Server error occurred retrieving tou data."
+msgstr "Errore del server durante il recupero dei dati tou."
+
+msgid "Server error occurred saving terms of use information."
+msgstr "Errore del server durante il salvataggio delle informazioni sui termini d'uso."
+
+msgid "Error occurred retrieving access url."
+msgstr "Errore durante il recupero dell'URL di accesso."
+
+msgid "Invite data are required."
+msgstr "Sono richiesti i dati di invito."
+
+msgid "Error occurred sending password reset request."
+msgstr "Errore durante l'invio della richiesta di reimpostazione della password."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Errore durante il recupero dello stato di valutazione."
+
+msgid "Questionnaire response data is required."
+msgstr "Sono necessari i dati di risposta al questionario."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Errore durante il recupero dell'elenco di valutazione."
+
+msgid "User id and instrument Id are required."
+msgstr "Sono richiesti l'ID utente e l'ID dello strumento."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Errore durante il recupero del resoconto di valutazione."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Errore durante il recupero della banca del questionario attuale dell'utente."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Errore durante il recupero del resoconto del paziente."
+
+msgid "Error occurred setting table preference."
+msgstr "Errore durante l'impostazione delle preferenze della tabella."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "Errore durante il recupero delle voci di revisione dell'e-mail."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Errore durante il recupero del registro di controllo."
+
+msgid "configuration key is required."
+msgstr "è richiesta la chiave di configurazione."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Errore durante il recupero del contenuto per la chiave di configurazione."
+
+msgid "Error occurred deactivating user."
+msgstr "Errore durante la disattivazione dell'utente."
+
+msgid "Error occurred reactivating user."
+msgstr "Errore durante la riattivazione dell'utente."
+
+msgid "configuration variable name is required."
+msgstr "è richiesto il nome della variabile di configurazione."
+
+msgid "Invalid date. Please try again."
+msgstr "Data non valida. Riprova."
+
+msgid "Date must not be in the future. Please try again."
+msgstr "La data non può essere futura. Riprova."
+
+msgid "Date must not be before 1900. Please try again."
+msgstr "La data non deve precedere il 1900. Riprova."
+
+msgid "Year must be after 1900"
+msgstr "L'anno deve essere successivo al 1900"
+
+msgid "The date must not be in the future."
+msgstr "La data non può essere futura."
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Data non valida. Inserisci una data valida."
+
+msgid "Missing value."
+msgstr "Valore mancante."
+
+msgid "Url is required."
+msgstr "URL richiesto."
+
+msgid "Error occurred processing request"
+msgstr "Errore durante l'elaborazione della richiesta"
+
+msgid "Hi there."
+msgstr "Salve."
+
+msgid "Thanks for your patience while we upgrade our site."
+msgstr "Ti ringraziamo per la paziente attesa durante l'aggiornamento del sito."
+
+msgid "Error occurred when verifying the uniqueness of email"
+msgstr "Errore durante la verifica dell'unicità dell'e-mail"
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr "Questo indirizzo e-mail è già in uso. Inserisci un indirizzo diverso."
+
+msgid "Invalid characters in text."
+msgstr "Caratteri invalidi nel testo."
+
+msgid "Identifier value must be unique"
+msgstr "Il valore dell'identificatore deve essere unico"
+
+msgid "Question"
+msgstr "Domanda"
+
+msgid "Response"
+msgstr "Risposta"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Errore del server durante il recupero dei dati del resoconto"
+
+msgid "No data returned from server"
+msgstr "Il server non ha restituito dati"
+
+msgid "Unable to load report data"
+msgstr "Non è possibile caricare i dati del resoconto"
+
+msgid "Export questionnaire data"
+msgstr "Esporta i dati del questionario"
+
+msgid "Export"
+msgstr "Esporta"
+
+msgid "Data type:"
+msgstr "Tipo di dati:"
+
+msgid "Instrument(s) to export data from:"
+msgstr "Strumento/i da cui esportare i dati:"
+
+msgid "CSV"
+msgstr ""
+
+msgid "JSON"
+msgstr ""
+
+msgid "Export request submitted"
+msgstr "Richiesta di esportazione inviata"
+
+msgid "Request to export data failed."
+msgstr "Richiesta di esportazione dei dati non riuscita."

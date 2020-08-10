@@ -100,8 +100,10 @@ class TestAudit(TestCase):
         audit = Audit(
             user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
             comment='just test data')
-        consent = UserConsent(user_id=TEST_USER_ID, organization_id=org.id,
-                              audit=audit, agreement_url='http://fake.org')
+        consent = UserConsent(
+            user_id=TEST_USER_ID, organization_id=org.id,
+            audit=audit, agreement_url='http://fake.org',
+            research_study_id=0)
         with SessionScope(db):
             db.session.add(audit)
             db.session.add(consent)

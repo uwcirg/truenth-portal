@@ -39,7 +39,7 @@ from portal.models.user import (
     UserIndigenousStatusExtension,
     UserObservation,
     UserRelationship,
-    get_user_or_abort,
+    get_user,
     permanently_delete_user,
     user_extension_map,
 )
@@ -55,12 +55,12 @@ from tests import TEST_USER_ID, TEST_USERNAME, TestCase
 
 def test_null_id():
     with pytest.raises(BadRequest):
-        get_user_or_abort(None)
+        get_user(None, 'view')
 
 
 def test_empty_id():
     with pytest.raises(NotFound):
-        get_user_or_abort('')
+        get_user('', 'view')
 
 
 class TestUser(TestCase):
@@ -348,6 +348,7 @@ class TestUser(TestCase):
                 organization_id=consent_org.id,
                 audit=consent_audit,
                 agreement_url='http://example.org',
+                research_study_id=0,
                 options=STAFF_EDITABLE_MASK))
             db.session.commit()
         consent_org, consent_audit = map(db.session.merge,
@@ -390,6 +391,13 @@ class TestUser(TestCase):
         # Second POST should fail
         response = self.client.post('/api/user/{}/reactivate'.format(user_id))
         assert response.status_code == 400
+
+    def test_user_encounter(self):
+        self.login()
+        response = self.client.get(
+            '/api/user/{}/encounter'.format(TEST_USER_ID))
+        assert response.status_code == 200
+        assert response.json['auth_method'] == 'password_authenticated'
 
     def test_user_timezone(self):
         assert self.test_user.timezone == 'UTC'
@@ -794,7 +802,7 @@ class TestUser(TestCase):
         consent = UserConsent(
             user_id=member_of.id, organization_id=org.id,
             audit=audit, agreement_url='http://example.org',
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
         with SessionScope(db):
             db.session.add(consent)
             db.session.commit()
@@ -851,7 +859,7 @@ class TestUser(TestCase):
         uc_w = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_w_id, organization=org_10032,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_x = self.add_user('patient x')
         patient_x_id = patient_x.id
@@ -861,7 +869,7 @@ class TestUser(TestCase):
         uc_x = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_x_id, organization=org_102,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_y = self.add_user('patient y')
         patient_y_id = patient_y.id
@@ -871,7 +879,7 @@ class TestUser(TestCase):
         uc_y = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_y_id, organization=org_10031,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         patient_z = self.add_user('patient z')
         patient_z_id = patient_z.id
@@ -881,7 +889,7 @@ class TestUser(TestCase):
         uc_z = UserConsent(
             audit=audit, agreement_url='http://fake.org',
             user_id=patient_z_id, organization=org_10031,
-            options=STAFF_EDITABLE_MASK)
+            research_study_id=0, options=STAFF_EDITABLE_MASK)
 
         with SessionScope(db):
             db.session.add(uc_w)

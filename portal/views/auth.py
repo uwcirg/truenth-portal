@@ -50,7 +50,7 @@ from ..models.flaskdanceprovider import (
 from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import User, add_user, current_user, get_user_or_abort
+from ..models.user import User, add_user, current_user, get_user
 from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
@@ -388,9 +388,11 @@ def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
 
-    # After a successfull login make sure lockout is reset
+    # After a successful login make sure lockout is reset
     user.reset_lockout()
 
+    current_app.logger.debug(
+        "captured flask_user_login_event, login w/ 'password_authenticated'")
     login_user(user, 'password_authenticated')
 
 
@@ -531,7 +533,7 @@ def next_after_login():
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
 
-    # Present intial questions (TOU et al) if not already obtained
+    # Present initial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
     # client during patient registration
     if (not session.get('suspend_initial_queries', None) and
@@ -621,9 +623,8 @@ def login_as(user_id, auth_method='staff_authenticated'):
       'staff_handed_to_patient', depending on context.
 
     """
-    # said business rules enforced by check_role()
-    current_user().check_role('edit', user_id)
-    target_user = get_user_or_abort(user_id)
+    # said business rules enforced by get_user()
+    target_user = get_user(user_id, 'edit')
 
     # Guard against abuse
     if not target_user.has_role(ROLE.PATIENT.value, ROLE.PARTNER.value):
@@ -640,6 +641,24 @@ def login_as(user_id, auth_method='staff_authenticated'):
         target_user.mask_email()  # necessary in case registration is attempted
     login_user(target_user, auth_method)
     return next_after_login()
+
+
+@auth.route('/promote-encounter')
+@oauth.require_oauth()
+def promote_encounter():
+    """View to assist in promotion of weak-auth encounter to stronger one.
+
+    For a user to be able to ``log in`` and thus gain a stronger
+    authenticated encounter, they must first be logged out of the weak one.
+
+    This view manages the logout and redirects to login, preserving ``next``
+    for the login page.
+
+    """
+    logout(
+        prevent_redirect=True,
+        reason="logout to promote encounter authentication")
+    return redirect(url_for('user.login', next=request.args.get('next')))
 
 
 @auth.route('/logout')

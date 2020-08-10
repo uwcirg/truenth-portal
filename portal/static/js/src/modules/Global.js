@@ -52,6 +52,32 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         this.initValidator();
         this.handleClientInterventionForm();
     },
+    "getCurrentUser": function(callback) {
+        callback = callback || function() {};
+        let cachedCurrentUserId = sessionStorage.getItem("current_user_id");
+        if (cachedCurrentUserId) {
+            callback(cachedCurrentUserId);
+            return cachedCurrentUserId;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/api/me",
+            async: false
+        }).done(function(data) {
+            var userId = "";
+            if (data) { userId = data.id; }
+            if (!userId) {
+                callback();
+                return;
+            }
+            sessionStorage.setItem("current_user_id", userId);
+            callback(userId);
+        }).fail(function() {
+            callback();
+        });
+
+        return cachedCurrentUserId;
+    },
     "prePopulateEmail": function() {
         var requestEmail =  Utility.getUrlParameter("email"), emailField = document.querySelector("#email");
         if (requestEmail && emailField) { /*global Utility getUrlParameter */
@@ -163,13 +189,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             return false;
         }
         var locale = "en_us";
-        $.ajax({
-            type: "GET",
-            url: "/api/me",
-            async: false
-        }).done(function(data) {
-            var userId = "";
-            if (data) { userId = data.id; }
+        this.getCurrentUser(function(userId) {
             if (!userId) {
                 locale = "en_us";
                 return false;
@@ -190,7 +210,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     }
                 });
             });
-        }).fail(function() {});
+        });
         return locale;
     },
     "getCopyrightYear": function(callback) {

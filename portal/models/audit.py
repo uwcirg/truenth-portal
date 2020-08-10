@@ -51,14 +51,14 @@ class Audit(db.Model):
 
     def as_fhir(self):
         """Typically included as *meta* data in containing FHIR resource"""
-        from .user import get_user
+        from .user import User
         from .fhir import FHIR_datetime
 
         d = {}
         d['version'] = self.version
         d['lastUpdated'] = FHIR_datetime.as_fhir(self.timestamp)
         d['by'] = Reference.patient(self.user_id).as_fhir()
-        d['by']['display'] = get_user(self.user_id).display_name
+        d['by']['display'] = User.query.get(self.user_id).display_name
         d['on'] = Reference.patient(self.subject_id).as_fhir()
         d['context'] = self.context
         if self.comment:

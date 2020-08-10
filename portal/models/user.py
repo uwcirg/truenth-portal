@@ -426,24 +426,26 @@ class User(db.Model, UserMixin):
             name = self.username
         return escape(name) if name else None
 
-    @property
-    def current_encounter(self):
+    def current_encounter(self, generate_failsafe_if_missing=True):
         """Shortcut to current encounter, generate failsafe if not found
 
         An encounter is typically bound to the logged in user, not
         the subject, if a different user is performing the action.
         """
         query = Encounter.query.filter(Encounter.user_id == self.id).filter(
-            Encounter.status == 'in-progress')
+            Encounter.status == 'in-progress').order_by(
+            Encounter.start_time.desc())
         if query.count() == 0:
+            if not generate_failsafe_if_missing:
+                return None
             current_app.logger.error(
-                "Failed to locate in-progress encounter for {}"
-                "; generate failsafe".format(self))
+                "Failed to locate in-progress encounter for %d"
+                "; generate failsafe", self.id)
             return initiate_encounter(self, auth_method='failsafe')
         if query.count() != 1:
             # Not good - we should only have one `active` encounter for
             # the current user.  Log details for debugging and return the
-            # first
+            # most recently started
             msg = "Multiple active encounters found for {}: {}".format(
                 self,
                 [(e.status, str(e.start_time), str(e.end_time))
@@ -1014,7 +1016,8 @@ class User(db.Model, UserMixin):
             value_quantity_id=value_quantity.id).add_if_not_found(True)
         # The audit defines the acting user, to which the current
         # encounter is attached.
-        encounter = get_user(audit.user_id).current_encounter
+        acting_user = User.query.get(audit.user_id)
+        encounter = acting_user.current_encounter()
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
@@ -1125,8 +1128,8 @@ class User(db.Model, UserMixin):
         If the user had pre-existing consent agreements between the
         same organization_id, the new will replace the old
 
-        NB this will only modify/update consents between the user
-        and the organizations named in the given consent_list.
+        NB this will only modify/update consents between the (user,
+        organization, research_study_id) named in the given consent_list.
 
         """
         delete_consents = []  # capture consents being replaced
@@ -1138,10 +1141,13 @@ class User(db.Model, UserMixin):
                 subject_id=self.id,
                 comment="Consent agreement signed",
                 context='consent')
-            # Look for existing consent for this user/org
+            # Look for existing consent for this user/org/study
             for existing_consent in self.valid_consents:
-                if existing_consent.organization_id == int(
-                        consent.organization_id):
+                if (
+                        existing_consent.organization_id == int(
+                        consent.organization_id) and
+                        existing_consent.research_study_id == int(
+                        consent.research_study_id)):
                     current_app.logger.debug(
                         "deleting matching consent {} replacing with {} ".
                         format(existing_consent, consent))
@@ -1633,7 +1639,9 @@ class User(db.Model, UserMixin):
             if ot.at_or_below_ids(org.id, [org_id]):
                 return True
 
-    def check_role(self, permission, other_id):
+    def check_role(
+            self, permission, other_id,
+            allow_on_url_authenticated_encounters=False):
         """check user for adequate role
 
         if user is an admin or a service account, grant carte blanche
@@ -1643,8 +1651,20 @@ class User(db.Model, UserMixin):
         returns true if permission should be granted, raises 404 if the
         other_id can't be found, otherwise raise a 401
 
+        NB - a user with "url_authenticated" as their current encounter's
+        auth_type will NOT have any access, unless specifically requested
+        via the "allow_on_url_authenticated_encounters" parameter
+
         """
         assert (permission in ('view', 'edit'))  # limit vocab for now
+        assert other_id == int(other_id)  # look out for str/int comparisons
+        if (
+                not allow_on_url_authenticated_encounters and
+                current_app.config.get('ENABLE_URL_AUTHENTICATED') and
+                self.current_encounter().auth_method == 'url_authenticated'):
+            abort(401, "inadequate auth_method: {}".format(
+                self.current_encounter().auth_method))
+
         if self.id == other_id:
             return True
         try:
@@ -1894,16 +1914,11 @@ def current_user():
     return None
 
 
-def get_user(uid):
-    if uid:
-        return User.query.get(uid)
+def unchecked_get_user(uid, allow_deleted=False):
+    """direct access to user by id - does NOT include authorization check
 
-
-def get_user_or_abort(uid, allow_deleted=False):
-    """Wraps `get_user` and raises error if not found
-
-    Safe to call with path or parameter info.  Confirms integer value before
-    attempting lookup.
+    Clients should typically use `get_user()` unless there's need to
+    access without authorization check, say prior to login.
 
     :param uid: integer value for user id to look up
     :param allow_deleted: set true to allow access to deleted users
@@ -1926,12 +1941,43 @@ def get_user_or_abort(uid, allow_deleted=False):
         user_id = int(uid)
     except ValueError:
         raise NotFound("User not found - expected integer ID")
-    user = get_user(user_id)
+    user = User.query.get(user_id)
     if not user:
         raise NotFound("User not found")
     if not allow_deleted and user.deleted:
         raise Forbidden("deleted user - operation not permitted")
     return user
+
+
+def get_user(
+        uid, permission, allow_on_url_authenticated_encounters=False,
+        include_deleted=False):
+    """Obtain requested user, raising error if not authorized or found
+
+    :param uid: user_id to obtain
+    :param permission: 'view' or 'edit' as per need
+    :param allow_on_url_authenticated_encounters: rarely used override
+    :param include_deleted: deleted users inaccessible unless this is set
+    :returns: the requested user if the `current_user()` has authorization
+      for the requested permission on said user.  May be same user, which
+      will always be granted.
+
+    :raises: 401 Unauthorized if the current user does not have authorization
+
+    """
+    if uid is None:
+        raise BadRequest('invalid uid')
+    try:
+        uid = int(uid)  # request parameters may be in string form
+    except ValueError:
+        raise NotFound("User not found - expected integer ID")
+    requested = unchecked_get_user(uid, allow_deleted=include_deleted)
+    cur = current_user()
+    allow_weak = allow_on_url_authenticated_encounters
+    cur.check_role(
+        permission=permission, other_id=uid,
+        allow_on_url_authenticated_encounters=allow_weak)
+    return requested
 
 
 def patients_query(

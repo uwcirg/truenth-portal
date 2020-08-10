@@ -90,7 +90,8 @@ def adherence_report(
             'site': patient.organizations[0].name,
             'status': str(qb_stats.overall_status)}
 
-        consent = latest_consent(user=patient)
+        # TODO: address research_study_id
+        consent = latest_consent(user=patient, research_study_id=0)
         if consent:
             row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
 

@@ -328,12 +328,12 @@ def update_card_html_on_completion():
                 "shown here.")
             completed_placeholder = """
                 <div class="portal-description disabled">
-                  <h4 class="portal-description-title">
-                    {header}
-                  </h4>
-                  <div class="portal-description-body">
-                    <p>{message}</p>
-                  </div>
+                    <h4 class="portal-description-title">
+                      {header}
+                    </h4>
+                    <div class="portal-description-body">
+                      <p>{message}</p>
+                    </div>
                 </div>""".format(header=header, message=message)
 
             completed_html = """
@@ -343,7 +343,7 @@ def update_card_html_on_completion():
                   </h4>
                   <div class="portal-description-body">
                     <p>
-                      <a href="{recent_survey_link}">
+                      <a class="portal-weak-auth-disabled" href="{recent_survey_link}">
                         {message}
                       </a>
                     </p>

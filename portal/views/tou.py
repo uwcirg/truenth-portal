@@ -10,7 +10,7 @@ from ..extensions import oauth
 from ..models.app_text import InitialConsent_ATMA, VersionedResource, app_text
 from ..models.audit import Audit
 from ..models.tou import ToU, tou_types
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
@@ -97,8 +97,7 @@ def get_tou(user_id):
       - ServiceToken: []
 
     """
-    user = get_user_or_abort(user_id)
-    current_user().check_role(permission='view', other_id=user.id)
+    user = get_user(user_id, 'view')
     tous = ToU.query.join(Audit).filter(Audit.user_id == user.id)
     if not request.args.get('all'):
         tous = tous.filter(ToU.active.is_(True))
@@ -166,11 +165,7 @@ def get_tou_by_type(user_id, tou_type):
       - ServiceToken: []
 
     """
-    user = get_user_or_abort(user_id)
-    if not user:
-        abort(404)
-    current_user().check_role(permission='view', other_id=user_id)
-
+    get_user(user_id, 'view')
     tou_type = sub('-', ' ', tou_type)
 
     try:
@@ -237,8 +232,8 @@ def post_user_accepted_tou(user_id):
       - ServiceToken: []
 
     """
-    authd_user = current_user()
-    authd_user.check_role(permission='edit', other_id=user_id)
+    authd_user = get_user(current_user().id, 'view')
+    get_user(user_id, 'edit')  # confirm auth
     audit = Audit(
         user_id=authd_user.id, subject_id=user_id,
         comment="user {} posting accepted ToU for user {}".format(
@@ -290,14 +285,13 @@ def accept_tou(user_id=None):
       - ServiceToken: []
 
     """
-    if user_id:
-        user = get_user_or_abort(user_id)
-    else:
-        user = current_user()
+    if user_id is None:
+        user_id = current_user().id
+    user = get_user(user_id, 'edit')
     if not request.json or 'agreement_url' not in request.json:
         abort(400, "Requires JSON with the ToU 'agreement_url'")
     audit = Audit(
-        user_id=user.id, subject_id=user.id,
+        user_id=current_user().id, subject_id=user.id,
         comment="ToU accepted", context='tou')
     tou_type = request.json.get('type') or 'website terms of use'
     if tou_type not in tou_types.enums:

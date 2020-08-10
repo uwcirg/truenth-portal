@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block main %}
+    <input type="hidden" id="surveyRedirectURL" value="{{redirect_url}}" />
+    <div class="modal fade" id="confirmIdentityModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-title">{{_("Identity verification")}}</div>
+            </div>
+            <div class="modal-body">
+                <div class="body-content">
+                    <div>{{_("I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself.")}}</div>
+                </div>
+                <div id="confirmationErrorMessage" class="error-message"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnConfirmIdentity" class="btn btn-default">{{_("Yes")}}</button>
+                <a href="{{url_for('eproms.home')}}" class="btn btn-default">{{_("No")}}</a>
+            </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+{%- block additional_scripts %}<script src="{{ url_for('static', filename='js/flask_user/ConfirmIdentity.js') }}"></script>{% endblock -%}
+{%- from "flask_user/_macros.html" import footer -%}
+{%- block footer %}{% endblock -%}

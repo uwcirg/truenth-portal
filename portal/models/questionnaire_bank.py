@@ -319,8 +319,8 @@ def trigger_date(user, qb=None):
             trace("found biopsy {} for trigger_date".format(b_date))
             return b_date
 
-    def consent_date(user):
-        consent = latest_consent(user)
+    def consent_date(user, research_study_id):
+        consent = latest_consent(user, research_study_id=research_study_id)
         if consent:
             trace('found valid_consent with trigger_date {}'.format(
                 consent.acceptance_date))
@@ -353,7 +353,8 @@ def trigger_date(user, qb=None):
             trigger = tx_date(user)
 
         if not trigger:
-            trigger = consent_date(user)
+            # TODO: address research_study_id
+            trigger = consent_date(user, research_study_id=0)
 
         if not trigger:
             trace(
@@ -370,7 +371,8 @@ def trigger_date(user, qb=None):
     # intervention nor RP, but the intervention method is too expensive
     # for a simple trigger date lookup - will be caught in qb_timeline)
     if ResearchProtocol.assigned_to(user):
-        return consent_date(user)
+        # TODO: address research_study_id
+        return consent_date(user, research_study_id=0)
     else:
         return intervention_trigger(user)
 

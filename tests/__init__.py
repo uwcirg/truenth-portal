@@ -41,9 +41,10 @@ from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import add_static_questionnaire_bank
 from portal.models.questionnaire import Questionnaire
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
-from portal.models.user import User, UserRoles, get_user
+from portal.models.user import User, UserRoles
 from portal.models.user_consent import (
     INCLUDE_IN_REPORTS_MASK,
     SEND_REMINDERS_MASK,
@@ -303,7 +304,7 @@ class TestCase(Base):
         """
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-            get_user(TEST_USER_ID).save_observation(
+            User.query.get(TEST_USER_ID).save_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=audit, status='preliminary', issued=calc_date_params(
                     backdate=backdate, setdate=setdate))
@@ -377,6 +378,7 @@ class TestCase(Base):
             consent = UserConsent(
                 user_id=user_id, organization_id=org_id,
                 audit=audit, agreement_url='http://fake.org',
+                research_study_id=0,
                 acceptance_date=acceptance_date)
         with SessionScope(db):
             if consent not in db.session:
@@ -436,6 +438,7 @@ class TestCase(Base):
         consent = UserConsent(
             user_id=user_id, organization_id=parent_org,
             options=options, audit=audit, agreement_url='http://fake.org',
+            research_study_id=0,
             acceptance_date=calc_date_params(
                 backdate=backdate, setdate=setdate))
         with SessionScope(db):
@@ -509,6 +512,7 @@ class TestCase(Base):
             add_static_organization()
             add_static_questionnaire_bank()
             add_static_relationships()
+            add_static_research_studies()
             add_static_roles()
             db.session.commit()
         self.init_data()

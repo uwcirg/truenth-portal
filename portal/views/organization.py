@@ -21,7 +21,7 @@ from ..models.identifier import Identifier
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.reference import MissingReference, Reference
 from ..models.role import ROLE
-from ..models.user import current_user, get_user_or_abort
+from ..models.user import current_user, get_user
 from ..system_uri import IETF_LANGUAGE_TAG, PRACTICE_REGION
 from .crossdomain import crossdomain
 
@@ -481,11 +481,9 @@ def user_organizations(user_id):
       - ServiceToken: []
 
     """
-    current_user().check_role(permission='view', other_id=user_id)
-    user = get_user_or_abort(user_id)
-
-    # Return current organizations
-
+    # Return user's current organizations
+    user = get_user(
+        user_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(organizations=[
         Reference.organization(org.id).as_fhir()
         for org in user.organizations])
@@ -557,8 +555,7 @@ def add_user_organizations(user_id):
       - OAuth2AuthzFlow: []
 
     """
-    current_user().check_role(permission='edit', other_id=user_id)
-    user = get_user_or_abort(user_id)
+    user = get_user(user_id, 'edit')
     if not request.json or 'organizations' not in request.json:
         abort(400, "Requires `organizations` list")
 

@@ -14,6 +14,7 @@ from ..models.organization import Organization
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.research_protocol import ResearchProtocol
+from ..models.research_study import ResearchStudy
 from ..models.scheduled_job import ScheduledJob
 from .config_persistence import export_config, import_config
 from .exclusion_persistence import (
@@ -34,6 +35,7 @@ ModelDetails = namedtuple(
     'ModelDetails', ['cls', 'sequence_name', 'lookup_field'])
 models = (
     ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
+    ModelDetails(ResearchStudy, 'research_studies_id_seq', 'id'),
     ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(Organization, 'organizations_id_seq', 'id'),
     ModelDetails(Questionnaire, 'questionnaires_id_seq', 'identifier'),
