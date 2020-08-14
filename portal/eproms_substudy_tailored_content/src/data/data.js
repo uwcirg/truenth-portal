@@ -7,6 +7,7 @@ export default {
     errorMessage: "",
     currentView: "intro",
     portalWrapperURL: "/api/portal-wrapper-html/",
+    portalFooterURL: "/api/portal-footer-html/",
     settingsURL: "/api/settings",
     meURL: "/api/me",
     settings: {},
@@ -15,7 +16,6 @@ export default {
     domains: [],
     //chosen domain
     activeDomain: "",
-    introContent: "",
     domainContent: ""
 };
 

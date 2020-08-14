@@ -2,7 +2,8 @@
 @mobileFontSize: 14px;;
 @bodyBackgroundColor: #FFF;
 @bodyColor: #444;
-@headingColor: #3f4b55;
+@headingBackgroundColor: #4C5249;
+@heroHeaderBackgroundColor: #4b5148b3;
 @linkColor: #57675b;
 @linkHoverColor: darken(@linkColor, 10%);
 @placeholderColor: #777;
@@ -12,10 +13,20 @@
 @infoColor: #f3ead1;
 @inputBorderColor: #777;
 @successColor: #82dc29;
+@mutedColor: #777;
+@muterColor:  #e0e0e0;
+@navLinkColor: #787878;
+@heroSectionBackgroundColor: #3F4A55;
 @successBackgroundColor: #9eb781;
-@defaultFontFamily: Helvetica, Arial, sans-serif;
+@mainSectionBackgroundColor: #FFF;
+@navBackgroundColor: #f7f7f7;
+@resourceSectionBackgroundColor: #F5F6F6;
+@featureItemBackgroundColor: #f7f7f7;
+@darkFeatureItemBackgroundColor: #626A5D;
+@defaultFontFamily: Arial, sans-serif;
 @bodyFontFamily: @defaultFontFamily;
 @defaultAnimationSpeed: cubic-bezier(.28, .07, .75, .95);
+@featureItemBoxShadow: 1px 2px 2px #cac8c8;
 
 html, body {
     height: 100%;
@@ -38,6 +49,9 @@ body {
         font-size: @baseFontSize;
         //overflow-y: hidden;
     }
+}
+h1, h2, h3, h4, h5 {
+  font-weight: bold;
 }
 
  ::placeholder,
@@ -143,6 +157,11 @@ select::-ms-expand {
     display: none;
 }
 
+ul {
+  margin: 0;
+  padding: 0 16px;
+}
+
 .disabled,
 .inactive {
     opacity: 0.5;
@@ -186,12 +205,13 @@ main {
     justify-content: flex-start;
     align-items: center;
     margin: 0;
-    padding: 16px;
+    padding: 0;
     position: relative;
     opacity: 1;
     transition: opacity 1s ease;
     position: relative;
     z-index: 2;
+    background-color: @mainSectionBackgroundColor;
 }
 main.active,
 section.active {
@@ -203,7 +223,7 @@ main {
 section.main {
     flex-grow: 1;
     max-width: 100%;
-    margin: 2em 1em 1em;
+    margin: 0;
     min-height: 90%;
     display: none;
     transition: opacity 750ms ease, transform 350ms @defaultAnimationSpeed, height 350ms @defaultAnimationSpeed;
@@ -317,5 +337,324 @@ a {
   }
   to {
       opacity: 1;
+  }
+}
+
+.content-wrapper {
+  display: flex;
+}
+.navigation {
+  display: none;
+  border: 1px solid @muterColor;
+  box-shadow: @featureItemBoxShadow;
+  border-radius: 8px;
+  a {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 16px;
+    color: @navLinkColor;
+  }
+  .title {
+    color: @navLinkColor;
+    font-weight: bold;
+    border-bottom: 1px solid @muterColor;
+    padding-bottom: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+}
+@media (min-width: 699px) {
+  .navigation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: fixed;
+    right: 20px;
+    top: 208px;
+    background: @navBackgroundColor;
+    padding: 16px;
+    width: 200px;
+    font-size: 14px;
+  }
+}
+.module-section {
+  padding: 32px 24px 24px;
+}
+@media (min-width: 699px) {
+  .module-section {
+    padding-right: 248px;
+    padding-left: 48px;
+  }
+}
+.hero-section {
+  background-color: @heroSectionBackgroundColor;
+  background-image: url("../assets/background.jpg");
+  background-size: cover;
+  background-attachment: scroll;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  font-weight: 600;
+  min-height: 500px;
+  padding: 24px 32px;
+  color: #FFF;
+  h1, h2 {
+    font-weight: 600;
+  }
+  .hero-title {
+    margin-top: calc(500px / 4);
+    background-color: @heroHeaderBackgroundColor;
+    padding: 24px 24px 0;
+    width: 100%;
+    max-width: 100%;
+    &:after {
+      display: inline-block;
+      content: "\2304";
+      font-size: 42px;
+      font-family: symbols;
+      font-style: normal;
+      font-weight: 400;
+      margin-bottom: 8px;
+      -webkit-font-smoothing: antialiased;
+      -moz-animation: bounce 2s 10;
+      -webkit-animation: bounce 2s 10;
+      animation: bounce 2s 10;
+      animation-delay: 1.75s;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(12px) scale(1.1);
+  }
+  60% {
+    transform: translateY(12px) scale(1.1);
+  }
+}
+
+@media (min-width: 699px) {
+  .hero-section {
+    padding: 32px 248px 24px 48px;
+    .hero-title {
+      width: 60%;
+    }
+  }
+}
+
+.two-column-feature {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  .item {
+    width: 100%;
+    max-width: 100%;
+    background-color: @featureItemBackgroundColor;
+    padding: 32px;
+    box-shadow: @featureItemBoxShadow;
+    align-self: stretch;
+    margin-bottom: 16px;
+    .title {
+      text-align: left;
+      margin-bottom: 24px;
+    }
+  }
+}
+@media (min-width: 992px) {
+  .two-column-feature {
+    .item {
+      width: 48%;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.topic-feature {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  .title {
+    font-weight: bold;
+    margin-right: 16px;
+    min-width: 160px;
+  }
+}
+@media (min-width: 768px) {
+  .topic-feature {
+    flex-wrap: nowrap;
+  }
+}
+
+.feature-block {
+  box-shadow: @featureItemBoxShadow;
+  background-color: @featureItemBackgroundColor;
+  margin-top: 32px;
+  &.dark {
+    color: #FFF;
+    background: @darkFeatureItemBackgroundColor;
+  }
+  padding: 24px 24px 16px;
+  .title {
+    font-weight: bold;
+    text-align: left;
+    line-height: 1.45;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.collapsible {
+  display: block;
+  width: 100%;
+  padding-top: 12px;
+  border-top: 1px solid @muterColor;
+  position: relative;
+  cursor: pointer;
+  &:after {
+      content: "\f107";
+      font-family: FontAwesome;
+      font-style: normal;
+      font-weight: 600;
+      display: block;
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      font-size: 20px;
+      transition: transform 0.35s ease;
+  }
+  & + .collapsible-content {
+    display: none;
+
+  }
+  &.open {
+    font-weight: bold;
+    text-decoration: underline;
+    &:after {
+      transform: rotate(180deg);
+    }
+    & + .collapsible-content {
+      display: block;
+    }
+  }
+}
+.collapsible-content {
+  background-color: @featureItemBackgroundColor;
+  padding: 16px;
+  .subtitle {
+    margin-bottom: 0;
+  }
+}
+.tiles-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  .tile {
+    padding: 16px;
+  }
+  .title {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .tile-title {
+    margin-bottom: 16px;
+  }
+  .content {
+    font-size: 14px;
+  }
+}
+@media (min-width: 699px) {
+  .tiles-container {
+    flex-wrap: nowrap;
+  }
+}
+.anchor-link + span {
+  font-weight: bold;
+}
+.resource-section {
+  background-color: @resourceSectionBackgroundColor;
+  .tiles-container {
+    margin-top: 16px;
+    justify-content: flex-start;
+  }
+  .tile {
+    color: #FFF;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 16px;
+    margin-right: 8px;
+    a {
+      color: #FFF;
+      display: inline-block;
+      &:after {
+        display: inline-block;
+        content: "\2192";
+        margin-left: 8px;
+      }
+    }
+    background-color: @darkFeatureItemBackgroundColor;
+    align-self: stretch;
+  }
+}
+@media (min-width: 699px) {
+  .resource-section {
+    .tiles-container {
+      flex-wrap: wrap;
+    }
+    .tile {
+      width: 32%;
+      margin-bottom: 8px;
+    }
+  }
+}
+footer {
+  padding-top: 16px;
+}
+#stay-logged-in {
+  background: @buttonBackgroundColor;
+  color: #FFF;
+  border: 0;
+  &:hover {
+    background: @buttonHoverBackgroundColor;
+  }
+}
+
+.call-icon,
+.cell-icon,
+.person-icon {
+  text-align: center !important;
+  &:before {
+    width: 36px;
+    height: 36px;
+    font-family: FontAwesome;
+    font-style: normal;
+    display: block;
+    border-radius: 100%;
+    border: 1px solid #FFF;
+    font-size: 24px;
+    margin: auto;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}
+.call-icon {
+  &:before {
+    content: "\f095";
+  }
+}
+.cell-icon {
+  &:before {
+    content: "\f10b";
+  }
+}
+.person-icon {
+  &:before {
+    content: "\f007";
   }
 }

@@ -1,4 +1,4 @@
-import {sendRequest} from "./Utility";
+import {sendRequest, isInViewport} from "./Utility";
 export default {
     mounted: function() {
         var self = this;
@@ -54,7 +54,7 @@ export default {
                 //TODO filter content based on user's domains?
                 //each domain link on the intro/welcome page should have a representative attribute or css class
                 //that denote which domain it represents
-                self.getIntroContent();
+                self.getDomainContent();
                 self.setInitView();
             }).catch(error => {
                 self.setErrorMessage(`Error in promises ${error}`);
@@ -66,7 +66,7 @@ export default {
             Vue.nextTick(
                 function() {
                     setTimeout(function() {
-                        this.setCurrentView("intro");
+                        this.setCurrentView("domain");
                         this.loading = false;
                     }.bind(self), 350);
                 }
@@ -130,7 +130,7 @@ export default {
             return this.currentView;
         },
         setCurrentView: function(viewId) {
-            viewId = viewId || "intro";
+            viewId = viewId || "domain";
             this.currentView = viewId;
         },
         isCurrentView: function(viewId) {
@@ -150,7 +150,7 @@ export default {
         },
         getSelectedDomain: function() {
            //return this.activeDomain;
-           return "diet";
+           return "substudy";
         },
         getSearchURL: function() {
             //TODO use current domain name as tag
@@ -159,10 +159,54 @@ export default {
             //CORS issue with querying LR directly, TODO: uncomment this when resolves
             return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
         },
-        getIntroContent: function() {
-            if (this.introContent) {
+        setNav: function() {
+            let navElement = document.querySelector(".navigation");
+            if (!navElement) {
+                return;
+            }
+            let anchorElements = document.querySelectorAll(".anchor-link");
+            if (!anchorElements.length) {
+                return;
+            }
+            let contentHTML = "";
+            anchorElements.forEach(el => {
+                if (!el.getAttribute("id")) {
+                    return true;
+                }
+                contentHTML += `<a href="#${el.getAttribute("id")}">${
+                    el.nextSibling && el.nextSibling.innerHTML? 
+                    el.nextSibling.innerHTML : el.getAttribute("id")}</a>`;
+            });
+            let contentElement = document.createElement("div");
+            contentElement.innerHTML = contentHTML;
+            navElement.appendChild(contentElement);
+            window.addEventListener("scroll", function(e) {
+                window.requestAnimationFrame(function() {
+                    let topPosition = 40;
+                    if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
+                        topPosition = document.querySelector(".navigation").offsetWidth + 8;
+                    }
+                    document.querySelector(".navigation").style.top = topPosition+"px";
+                });
+            });
+            // document.querySelector(".navigation").innerHTML= `<div class="title">Article quick links</div>${contentHTML}`;
+        },
+        setCollapsible: function() {
+            let collapsibleElements = document.querySelectorAll(".collapsible");
+            collapsibleElements.forEach(el => {
+                el.addEventListener('click', event => {
+                    if (event.target.classList.contains("open")) {
+                        event.target.classList.remove("open");
+                        return;
+                    }
+                    event.target.classList.add("open");
+                });
+            })
+        },
+        getDomainContent: function() {
+            if (this.domainContent) {
                 //already populated
-                return this.introContent;
+                return this.domainContent;
             }
             // $.ajax({
             //     url : this.getSearchURL(),
@@ -181,18 +225,22 @@ export default {
             sendRequest(this.getSearchURL()).then(response => {
                 console.log("response? ", JSON.parse(response));
                 let content = JSON.parse(response);
-                this.setIntroContent(content["results"][0]["content"]);
-                this.setCurrentView("intro");
+                this.setDomainContent(content["results"][0]["content"]);
+                setTimeout(function() {
+                    this.setNav();
+                    this.setCollapsible();
+                }.bind(this), 50);
+                this.setCurrentView("domain");
             }).catch(e => {
                 console.log("failed? ", e)
                 this.setErrorMessage(`Error occurred retrieving content: ${e.responseText}`);
             });
         },
-        setIntroContent: function(data) {
-            this.introContent = data;
+        setDomainContent: function(data) {
+            this.domainContent = data;
         },
         goHome: function() {
-            this.goToView("intro");
+            this.goToView("domain");
         }
     }
 };

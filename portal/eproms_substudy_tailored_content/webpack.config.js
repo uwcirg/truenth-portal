@@ -53,7 +53,7 @@ module.exports = function(_env, argv) {
           use: 'url-loader?limit=10000',
         },
         {
-          test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
+          test: /\.(ttf|eot|svg|png|jpe?g|gif)(\?[\s\S]+)?$/,
           use: 'file-loader',
         },
         {

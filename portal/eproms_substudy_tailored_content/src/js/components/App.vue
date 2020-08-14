@@ -3,12 +3,13 @@
         <div id="loadingIndicator" class="loader" v-show="isLoading()"></div>
         <header-section></header-section>
         <main>
-            <intro-section v-bind:content="introContent"></intro-section>
+            <!--<intro-section v-bind:content="introContent"></intro-section>-->
             <!--empty and content populated dynamically-->
             <domain-section v-bind:content="domainContent"></domain-section>
             <!-- TODO will there be a resource section? if so have a separate template section -->
             <error></error>
         </main>
+        <footer-section></footer-section>
     </div>
 </template>
 <script>
@@ -20,7 +21,8 @@
     import Error from "./Error.vue";
     import DomainSection from "./DomainSection.vue";
     import HeaderSection from "./Header.vue";
-    import IntroSection from "./IntroSection.vue";
+    import FooterSection from "./Footer.vue";
+    //import IntroSection from "./IntroSection.vue";
     import AppData from "../../data/data.js";
     import BaseMethods from "../Base.js";
 
@@ -29,7 +31,8 @@
             Error,
             DomainSection,
             HeaderSection,
-            IntroSection
+            FooterSection,
+            //IntroSection
         },
         mixins: [BaseMethods],
         errorCaptured: function(Error, Component, info) {

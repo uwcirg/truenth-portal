@@ -3,9 +3,9 @@
 -->
 <template>
     <section id="introSection" ref="intro" v-bind:class="{active : getAppObj().isCurrentView('intro'), main: true}">
-        <!--TODO remove this hard-coded text -->
-        <div>THIS IS WELCOME PAGE</div>
-        <div v-html="content" v-bind:class="{active : content, 'body-content': true}"></div>
+        <div class="content-wrapper">
+            <div v-html="content" v-bind:class="{active : content, 'body-content': true}"></div>
+        </div>
     </section>
 </template>
 <script>
