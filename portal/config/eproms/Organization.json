@@ -1505,7 +1505,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-05T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
