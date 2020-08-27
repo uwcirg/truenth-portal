@@ -161,6 +161,7 @@ def initialize_static(initialized_db):
     add_static_interventions()
     add_static_organization()
     add_static_relationships()
+    add_static_research_studies()
     add_static_roles()
     db.session.commit()
 
