@@ -1721,7 +1721,8 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF.value)):
+                other.has_role(ROLE.STAFF.value) or
+                other.has_role(ROLE.CLINICAL.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
