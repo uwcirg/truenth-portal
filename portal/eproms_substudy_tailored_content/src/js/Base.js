@@ -160,7 +160,8 @@ export default {
             return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
         },
         setNav: function() {
-            let navElement = document.querySelector(".navigation");
+            let navElement = document.querySelector(".navigation .content");
+            let mobileNavElement = document.querySelector(".mobile-navigation .content");
             if (!navElement) {
                 return;
             }
@@ -179,7 +180,11 @@ export default {
             });
             let contentElement = document.createElement("div");
             contentElement.innerHTML = contentHTML;
+            let mobileContentElement = contentElement.cloneNode(true);
             navElement.appendChild(contentElement);
+            if (mobileNavElement) {
+                mobileNavElement.appendChild(mobileContentElement);
+            }
             window.addEventListener("scroll", function(e) {
                 window.requestAnimationFrame(function() {
                     let topPosition = 40;
@@ -189,12 +194,40 @@ export default {
                     document.querySelector(".navigation").style.top = topPosition+"px";
                 });
             });
+            let mobileLinkButton = document.querySelector(".mobile-quick-links button");
+            if (mobileLinkButton) {
+                mobileLinkButton.addEventListener("click",function(e) {
+                    document.querySelector(".mobile-navigation").classList.add("open");
+                    document.querySelector("body").classList.add("fixed");
+                });
+            }
+            let mobileCloseButton = document.querySelector(".mobile-navigation");
+            if (mobileCloseButton) {
+                mobileCloseButton.addEventListener("click",function(e) {
+                    document.querySelector(".mobile-navigation").classList.remove("open");
+                    document.querySelector("body").classList.remove("fixed");
+                });
+            }
+            let videoNavImage = document.querySelectorAll(".navigation-video-image");
+            videoNavImage.forEach(el => {
+                el.addEventListener("click", function(e) {
+                    let videoElement = document.querySelector(".video");
+                    if (videoElement) {
+                        videoElement.scrollIntoView();
+                    }
+                });
+            })
             // document.querySelector(".navigation").innerHTML= `<div class="title">Article quick links</div>${contentHTML}`;
         },
         setCollapsible: function() {
             let collapsibleElements = document.querySelectorAll(".collapsible");
             collapsibleElements.forEach(el => {
                 el.addEventListener('click', event => {
+                    let collapsibleItems = document.querySelectorAll(".collapsible");
+                    collapsibleItems.forEach(item => {
+                        if (item === event.target) return true;
+                        item.classList.remove("open");
+                    });
                     if (event.target.classList.contains("open")) {
                         event.target.classList.remove("open");
                         return;
@@ -202,6 +235,29 @@ export default {
                     event.target.classList.add("open");
                 });
             })
+        },
+        setVideo: function() {
+            let videoElement = document.querySelector(".video");
+            if (videoElement) {
+                let iframeElement = document.createElement("iframe");
+                iframeElement.setAttribute("allowfullscreen", true);
+                iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
+                videoElement.appendChild(iframeElement);
+                videoElement.classList.add("active");
+                let videoNavElements = document.querySelectorAll(".navigation-video-image");
+                videoNavElements.forEach(el => {
+                    el.addEventListener("click", event => {
+                        let ve = document.querySelector(".video iframe");
+                        if (ve) {
+                            let veSrc = ve.getAttribute("src");
+                            if (veSrc.indexOf("?") !== -1) {
+                                veSrc = veSrc.substring(0, veSrc.indexOf("?"));
+                            }
+                            ve.setAttribute("src", veSrc + "?autoPlay=true");
+                        }
+                    })
+                })
+            }
         },
         getDomainContent: function() {
             if (this.domainContent) {
@@ -229,6 +285,7 @@ export default {
                 setTimeout(function() {
                     this.setNav();
                     this.setCollapsible();
+                    this.setVideo();
                 }.bind(this), 50);
                 this.setCurrentView("domain");
             }).catch(e => {
