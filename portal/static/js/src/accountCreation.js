@@ -7,20 +7,33 @@ import ProcApp from "./modules/Procedures.js";
 import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
 (function() {
-    var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global $ tnthDates Utility*/
+    var AccountCreationObj = window.AccountCreationObj = function (dependencies) { /*global $ tnthDates Utility*/
         this.attempts = 0;
         this.maxAttempts = 3;
         this.params = null;
-        this.roles = roles;
+        this.roles = [];
         this.userId = "None created";
         this.dependencies = dependencies||{};
         this.treatmentIntervalVar = null;
         this.CONSENT_WITH_TOP_LEVEL_ORG = false;
+        this.isStaffContext = ($("#accountCreationContentContainer").attr("data-account") === "staff");
 
         $.ajaxSetup({
             timeout: 5000,
             retryAfter:3000
         });
+
+        this.isStaffContext = function() {
+            return $("#accountCreationContentContainer").attr("data-account") === "staff";
+        }
+
+        this.setDefaultRoles = function() {
+            this.roles =  [{"name": "patient"}, {"name": "write_only"}];
+            if (this.isStaffContext()) {
+                //roles = [{"name": "staff"}, {"name": "write_only"}];
+                this.roles = [{"name": "write_only"}];
+            }
+        }
 
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
@@ -348,7 +361,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 }
             });
             /* check email field */
-            if ($("#noEmail").length > 0 && !$("#noEmail").is(":checked")) {
+            if (!hasError && $("#noEmail").length > 0 && !$("#noEmail").is(":checked")) {
                 if ($("#emailGroup").hasClass("has-error")) {
                     hasError = true;
                 } else {
@@ -363,7 +376,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 }
             }
             /* check organization */
-            if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length === 0) {
+            if (!hasError && $("#userOrgs input").length > 0 && $("#userOrgs input:checked").length === 0) {
                 if (!silent) {
                     this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
                 }
@@ -373,11 +386,33 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
 
             /* finally check fields to make sure there isn't error, e.g. due to validation error */
-            $("#createProfileForm .help-block.with-errors").each(function() {
-                if ($(this).text() !== "") {
+            if (!hasError) {
+                $("#createProfileForm .help-block.with-errors").each(function() {
+                    if ($(this).text() !== "") {
+                        hasError = true;
+                    }
+                });
+            }
+
+            let rolesList = $("#rolesContainer .input-role");
+            /* check if at least one required role is checked */
+            if (!hasError && rolesList.length) {
+                let requiredRoleSelected = false;
+                rolesList.each(function() {
+                    if (requiredRoleSelected) {
+                        return false;
+                    }
+                    if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
+                        requiredRoleSelected = true;
+                    }
+                });
+                if (!requiredRoleSelected) {
                     hasError = true;
+                    this.setHelpText("rolesContainer", i18next.t("A role must be selected."), true);
+                } else {
+                    this.setHelpText("rolesContainer", "", false);
                 }
-            });
+            }
 
             if (hasError) {
                 if (!silent) {
@@ -395,10 +430,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         };
         this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
-                $("#" + elementId).find(".help-block").text(message).addClass("error-message");
+                $("#" + elementId).find(".help-block, .error-message").text(message).addClass("error-message");
             }
             else {
-                $("#" + elementId).find(".help-block").text("").removeClass("error-message");
+                $("#" + elementId).find(".help-block, .error-message").text("").removeClass("error-message");
             }
         };
         this.getOrgs = function(callback, params) {
@@ -668,14 +703,12 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
     //events associated with elements on the account creation page
     $(document).ready(function(){
-        var isStaff = $("#accountCreationContentContainer").attr("data-account") === "staff";
-        var roles =  [{"name": "patient"}, {"name": "write_only"}];
-        if (isStaff) {
-            roles = [{"name": "staff"}, {"name": "write_only"}];
-        }
         /* global i18next, tnthAjax, OrgTool, SYSTEM_IDENTIFIER_ENUM */
-        var aco = new AccountCreationObj(roles, {"i18next": i18next});
-        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+        var aco = new AccountCreationObj({"i18next": i18next});
+        aco.setDefaultRoles();
+        /*** 
+         *** need to run this instead of the one function from main.js because we don't want to pre-check any org here
+         ***/
         aco.handleCurrentUser();
         aco.handleEditConsentDate();
         aco.initFieldEvents();

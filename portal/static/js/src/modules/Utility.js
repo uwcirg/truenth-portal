@@ -394,3 +394,22 @@ export default Utility;
 export var getExportFileName = Utility.getExportFileName; /* expose common functions */
 export var getUrlParameter= Utility.getUrlParameter;
 export var capitalize = Utility.capitalize;
+/*
+ * sorting an array of object by a field name, in ascending order
+ */
+export function sortArrayByField(arrObj, fieldName) {
+    if (!arrObj || !fieldName) return false;
+    let sortedArray = (arrObj).sort((a, b) => {
+        var nameA = a[fieldName].toUpperCase(); // ignore upper and lowercase
+        var nameB = b[fieldName].toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        // names must be equal
+        return 0;
+    });
+    return sortedArray;
+}
