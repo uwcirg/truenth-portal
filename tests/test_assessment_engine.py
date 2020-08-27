@@ -192,7 +192,7 @@ class TestAssessmentEngine(TestCase):
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
         data['status'] = 'in-progress'
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()
@@ -264,7 +264,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()
@@ -325,7 +325,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()

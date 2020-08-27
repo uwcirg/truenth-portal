@@ -139,9 +139,9 @@ def test_multiple_rps_in_fhir():
     yesterday = datetime.utcnow() - timedelta(days=1)
     lastyear = datetime.utcnow() - timedelta(days=365)
     org = Organization(name='Testy')
-    rp1 = ResearchProtocol(name='rp1')
-    rp2 = ResearchProtocol(name='yesterday')
-    rp3 = ResearchProtocol(name='last year')
+    rp1 = ResearchProtocol(name='rp1', research_study_id=0)
+    rp2 = ResearchProtocol(name='yesterday', research_study_id=0)
+    rp3 = ResearchProtocol(name='last year', research_study_id=0)
     with SessionScope(db):
         map(db.session.add, (org, rp1, rp2, rp3))
         db.session.commit()
@@ -414,7 +414,7 @@ def test_organization_extension_update(
         value='state:NY', system=PRACTICE_REGION))
     org.locales.append(en_AU)
     org.default_locale = 'en_AU'
-    rp = ResearchProtocol(name='rp1')
+    rp = ResearchProtocol(name='rp1', research_study_id=0)
 
     with SessionScope(db):
         db.session.add(rp)
