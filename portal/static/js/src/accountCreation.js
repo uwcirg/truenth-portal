@@ -16,25 +16,11 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.dependencies = dependencies||{};
         this.treatmentIntervalVar = null;
         this.CONSENT_WITH_TOP_LEVEL_ORG = false;
-        this.isStaffContext = ($("#accountCreationContentContainer").attr("data-account") === "staff");
 
         $.ajaxSetup({
             timeout: 5000,
             retryAfter:3000
         });
-
-        this.isStaffContext = function() {
-            return $("#accountCreationContentContainer").attr("data-account") === "staff";
-        }
-
-        this.setDefaultRoles = function() {
-            this.roles =  [{"name": "patient"}, {"name": "write_only"}];
-            if (this.isStaffContext()) {
-                //roles = [{"name": "staff"}, {"name": "write_only"}];
-                this.roles = [{"name": "write_only"}];
-            }
-        }
-
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
             if (!parentOrgId) {
@@ -58,6 +44,11 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.__isPatient = function() {
             return $("#accountCreationContentContainer").attr("data-account") === "patient";
         };
+
+        this.__isStaffContext = function() {
+            return $("#accountCreationContentContainer").attr("data-account") === "staff";
+        };
+
         this.__request = function(params) {
             params = params || {};
             params.callback = params.callback || function() {};
@@ -424,6 +415,14 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
             return hasError;
         };
+
+        this.setDefaultRoles = function() {
+            this.roles =  [{"name": "write_only"}];
+            if (this.__isPatient()) {
+                this.roles =  [{"name": "patient"}, {"name": "write_only"}];
+            }
+        };
+
         this.clearError = function() {
             var hasError = this.__checkFields(true);
             if (!hasError) { $("#errorMsg").html("").hide(); }
