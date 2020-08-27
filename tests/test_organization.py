@@ -24,6 +24,7 @@ from portal.models.organization import (
 )
 from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
+from portal.models.research_study import ResearchStudy
 from portal.models.role import ROLE
 from portal.system_uri import (
     IETF_LANGUAGE_TAG,
@@ -136,14 +137,18 @@ def test_as_fhir():
 
 
 def test_multiple_rps_in_fhir():
+    with SessionScope(db):
+        db.session.add(ResearchStudy(title='base study'))
+        db.session.commit()
+    rs_id = ResearchStudy.query.with_entities(ResearchStudy.id).first()
     yesterday = datetime.utcnow() - timedelta(days=1)
     lastyear = datetime.utcnow() - timedelta(days=365)
     org = Organization(name='Testy')
-    rp1 = ResearchProtocol(name='rp1', research_study_id=0)
-    rp2 = ResearchProtocol(name='yesterday', research_study_id=0)
-    rp3 = ResearchProtocol(name='last year', research_study_id=0)
+    rp1 = ResearchProtocol(name='rp1', research_study_id=rs_id)
+    rp2 = ResearchProtocol(name='yesterday', research_study_id=rs_id)
+    rp3 = ResearchProtocol(name='last year', research_study_id=rs_id)
     with SessionScope(db):
-        map(db.session.add, (org, rp1, rp2, rp3))
+        map(db.session.add, (org, rs, rp1, rp2, rp3))
         db.session.commit()
     org, rp1, rp2, rp3 = map(db.session.merge, (org, rp1, rp2, rp3))
     o_rp1 = OrganizationResearchProtocol(
