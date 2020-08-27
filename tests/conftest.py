@@ -150,6 +150,12 @@ def calc_date_params(backdate, setdate):
 
 
 @pytest.fixture
+def initialized_with_research_study(initialized_db):
+    add_static_research_studies()
+    db.session.commit()
+
+
+@pytest.fixture
 def initialize_static(initialized_db):
     add_static_concepts(only_quick=True)
     add_static_interventions()
