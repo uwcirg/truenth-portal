@@ -333,7 +333,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
 
-        this.__checkFields = function(validateOnly) {
+        this.__checkFields = function() {
            
             var hasError = false;
             // /* check all required fields to make sure all fields are filled in */
@@ -363,13 +363,14 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                     if (requiredRoleSelected) {
                         return false;
                     }
-                    if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
+                   // if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
+                    if ($(this).is(":checked")) {
                         requiredRoleSelected = true;
                     }
                 });
                 if (!requiredRoleSelected) {
                     hasError = true;
-                    this.setHelpText("rolesContainer", i18next.t("A role must be selected."), true, validateOnly);
+                    this.setHelpText("rolesContainer", i18next.t("A role must be selected."), true);
                 } else {
                     this.setHelpText("rolesContainer", "", false);
                 }
@@ -442,10 +443,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         };
         this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
-                $("#" + elementId).find(".help-block, .error-message").text(message).addClass("error-message");
+                $("#" + elementId).find(".help-block").text(message).addClass("error-message");
                 return;
             }
-            $("#" + elementId).find(".help-block, .error-message").text("").removeClass("error-message");
+            $("#" + elementId).find(".help-block").text("").removeClass("error-message");
         };
         this.getOrgs = function(callback, params) {
             var self = this;
