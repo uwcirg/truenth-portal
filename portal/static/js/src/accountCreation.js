@@ -400,13 +400,19 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 $("#updateProfile").attr("disabled", false);
                 setTimeout(function() { self.clearError(); }, 600);
             });
-            /* check email field */
+            /* email field */
             $("#email").on("change", function() {
                 if (!$("#noEmail").is(":checked")) {
                     if ($("#current_user_email").val() === $("#email").val()) {
                         self.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
                         return;
                     }
+                    self.setHelpText("emailGroup", "", false);
+                }
+            });
+            //clear error text if value changed
+            $("#email").on("keyup", function() {
+                if ($(this).val()) {
                     self.setHelpText("emailGroup", "", false);
                 }
             });
@@ -434,19 +440,12 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.clearError = function() {
             $("#errorMsg").html("").hide();
         };
-        this.setHelpText = function(elementId, message, hasError, validateOnly) {
+        this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
                 $("#" + elementId).find(".help-block, .error-message").text(message).addClass("error-message");
-            }
-            else {
-                $("#" + elementId).find(".help-block, .error-message").text("").removeClass("error-message");
-            }
-            console.log("silent ? ", validateOnly)
-            if (validateOnly) {
-                $("#" + elementId).find(".help-block, .error-message").addClass("silent");
                 return;
             }
-            $("#" + elementId).find(".help-block, .error-message").removeClass("silent");
+            $("#" + elementId).find(".help-block, .error-message").text("").removeClass("error-message");
         };
         this.getOrgs = function(callback, params) {
             var self = this;
