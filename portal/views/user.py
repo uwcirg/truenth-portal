@@ -419,7 +419,7 @@ def reactivate_user(user_id):
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
-     ROLE.STAFF.value])
+     ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
@@ -1965,7 +1965,8 @@ def upload_user_document(user_id):
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 def trigger_password_reset_email(user_id):
     """Trigger a password reset email for the specified user
 
@@ -2297,7 +2298,8 @@ def invite(user_id):
 @crossdomain()
 @oauth.require_oauth()
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 def get_user_messages(user_id):
     """Returns simple JSON defining user email messages
 
