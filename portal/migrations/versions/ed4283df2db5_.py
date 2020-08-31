@@ -1,0 +1,58 @@
+"""STAFF_ADMIN role stands alone - remove STAFF role from current STAFF_ADMINs
+
+Revision ID: ed4283df2db5
+Revises: 1977c23a53c8
+Create Date: 2020-08-31 11:12:30.249107
+
+"""
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
+
+from portal.models.role import ROLE, Role
+from portal.models.user import UserRoles
+
+# revision identifiers, used by Alembic.
+revision = 'ed4283df2db5'
+down_revision = '1977c23a53c8'
+
+Session = sessionmaker()
+bind = op.get_bind()
+session = Session(bind=bind)
+
+
+def all_staff_admins():
+    """returns list of all staff admins user ids"""
+    staff_admin_role_id = session.query(Role).filter(
+        Role.name == 'staff_admin').with_entities(Role.id).one()
+    return [ur.user_id for ur in session.query(UserRoles).filter(
+        UserRoles.role_id == staff_admin_role_id)]
+
+
+def staff_role_id():
+    """return staff role id"""
+    return session.query(Role).filter(
+        Role.name == 'staff').with_entities(Role.id).one()[0]
+
+
+def upgrade():
+    """Remove the STAFF role from existing STAFF_ADMIN accounts"""
+    conn = op.get_bind()
+    conn.execute(text(
+        "DELETE FROM user_roles WHERE role_id = :staff_id and"
+        " user_id in :staff_admin_ids"),
+        staff_id=staff_role_id(),
+        staff_admin_ids=tuple(all_staff_admins()))
+
+
+def downgrade():
+    """Reapply the STAFF role to existing STAFF_ADMIN accounts"""
+    conn = op.get_bind()
+    staff_id = staff_role_id()
+    for user_id in all_staff_admins():
+        conn.execute(text(
+            "INSERT INTO user_roles (user_id, role_id) VALUES "
+            "(:user_id, :role_id)"),
+            user_id=user_id,
+            role_id=staff_id)
