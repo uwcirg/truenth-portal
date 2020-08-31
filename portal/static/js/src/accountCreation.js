@@ -21,6 +21,9 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             timeout: 5000,
             retryAfter:3000
         });
+
+        const HELP_BLOCK_IDENTIFIER = ".help-block";
+
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
             if (!parentOrgId) {
@@ -336,23 +339,11 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.__checkFields = function() {
            
             var hasError = false;
-            // /* check all required fields to make sure all fields are filled in */
-            $("input[required], select[required]").each(function() {
-                if (!$(this).val()) {
-                    //this should display error message associated with empty field
-                    $(this).trigger("focusout");
-                    hasError = true;
-                }
-            });
 
             /* organization fields */
             if ($("#userOrgs input").length) {
-                if ($("#userOrgs input:checked").length === 0) {
-                    this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true, validateOnly);
-                    hasError = true;
-                } else {
-                    this.setHelpText("userOrgs", "", false);
-                }
+                hasError = $("#userOrgs input:checked").length === 0;
+                this.setHelpText("userOrgs", hasError?i18next.t("An organization must be selected."):"", hasError);
             }
     
             let rolesList = $("#rolesContainer .input-role");
@@ -363,32 +354,26 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                     if (requiredRoleSelected) {
                         return false;
                     }
-                   // if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
-                    if ($(this).is(":checked")) {
-                        requiredRoleSelected = true;
-                    }
+                    requiredRoleSelected = $(this).is(":checked");
                 });
-                if (!requiredRoleSelected) {
-                    hasError = true;
-                    this.setHelpText("rolesContainer", i18next.t("A role must be selected."), true);
-                } else {
-                    this.setHelpText("rolesContainer", "", false);
-                }
+                hasError = !requiredRoleSelected;
+                this.setHelpText("rolesContainer", hasError?i18next.t("A role must be selected."):"", hasError);
             }
 
             /* finally check fields to make sure there isn't error, e.g. due to validation error */
               if (!hasError) {
-                $("#createProfileForm .help-block").each(function() {
-                    if ($(this).text() !== "") {
-                        hasError = true;
+                $("#createProfileForm " + HELP_BLOCK_IDENTIFIER).each(function() {
+                    if (hasError) {
+                        return false;
                     }
+                    hasError = ($(this).text() !== "");
                 });
             }
+
             if (hasError) {
-                $("#errorMsg").fadeIn("slow");
+                this.showError();
             } else {
-                $("#errorMsg").hide();
-                $("#serviceErrorMsg").html("").hide();
+                this.clearError();
             }
     
             return hasError;
@@ -397,37 +382,19 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.initFieldEvents = function() {
             let self = this;
             Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
-            $("#createProfileForm input[required], #createProfileForm select[required]").on("change", function() {
+
+            $("#createProfileForm [required]").on("change", function() {
                 $("#updateProfile").attr("disabled", false);
                 setTimeout(function() { self.clearError(); }, 600);
             });
-            /* email field */
-            $("#email").on("change", function() {
-                if (!$("#noEmail").is(":checked")) {
-                    if ($("#current_user_email").val() === $("#email").val()) {
-                        self.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
-                        return;
-                    }
-                    self.setHelpText("emailGroup", "", false);
-                }
-            });
+    
             //clear error text if value changed
-            $("#email").on("keyup", function() {
-                if ($(this).val()) {
-                    self.setHelpText("emailGroup", "", false);
-                }
+            $("#createProfileForm input[type='text']").on("change keyup", function() {
+                $(this).closest(".profile-section").find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
             });
-            //clear error text for on changed org field(s)
-            $("#userOrgs input").on("change", function() {
-                if ($(this).is(":checked")) {
-                    self.setHelpText("userOrgs", "", false);
-                }
-            });
-            //clear error text for on change role field(s)
-            $("#rolesContainer .input-role").on("change", function() {
-                if ($(this).is(":checked")) {
-                    self.setHelpText("rolesContainer", "", false);
-                }
+            //clear error text when checkbox is checked
+            $("#createProfileForm input[type='checkbox']").on("change", function() {
+                $(this).closest(".profile-section").find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
             });
         };
 
@@ -438,15 +405,20 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
 
+        this.showError = function() {
+            $("#errorMsg").fadeIn("slow");
+        }
+
         this.clearError = function() {
             $("#errorMsg").html("").hide();
+            $("#serviceErrorMsg").html("").hide();
         };
         this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
-                $("#" + elementId).find(".help-block").text(message).addClass("error-message");
+                $("#" + elementId).find(HELP_BLOCK_IDENTIFIER).text(message).addClass("error-message");
                 return;
             }
-            $("#" + elementId).find(".help-block").text("").removeClass("error-message");
+            $("#" + elementId).find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
         };
         this.getOrgs = function(callback, params) {
             var self = this;
@@ -490,9 +462,6 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             } else {
                 this.populateStaffOrgs();
             }
-            $("#userOrgs input[name='organization']").on("click", function() {
-                $("#userOrgs").find(".help-block").html("");
-            });
             var visibleOrgs = $("#userOrgs input[name='organization']:visible");
             if (visibleOrgs.length === 1) {
                 visibleOrgs.prop("checked", true);
@@ -581,7 +550,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             $("#updateProfile").attr("disabled", true);
             $("#createProfileForm").on("submit", function (e) { //submit on clicking save button
                 if (e.isDefaultPrevented()) {
-                    self.__checkFields(); // handle the invalid form...
+                  //  self.__checkFields(); // handle the invalid form...
                     return false;
                 } 
                 var hasError = self.__checkFields();
