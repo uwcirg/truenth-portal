@@ -102,6 +102,7 @@ export default (function() {
             currentUserRoles: [],
             userOrgs: [],
             userRoles: [],
+            staffRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -520,7 +521,7 @@ export default (function() {
                 return this.orgTool;
             },
             isConsentEditable: function() {
-                var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
+                var isStaff = this.isStaff();
                 var isCurrentUserPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
@@ -541,8 +542,11 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
+            isStaffAdmin: function() {
+                return this.currentUserRoles.indexOf("staff_admin") !== -1;
+            },
             isStaff: function() {
-                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
+                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.isStaffAdmin();
             },
             isProxy: function() {
                 return (this.currenUserId !== "") && (this.subjectId !== "") && (this.currentUserId !== this.subjectId);
@@ -2037,11 +2041,18 @@ export default (function() {
                 var self = this;
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
+                    let roles = data.roles;
+                    if (self.isStaffAdmin()) {
+                        console.log("Wtf")
+                        roles = roles.filter(item => {
+                            return self.staffRoles.indexOf(item.name) >= 0
+                        });
+                    }
                     /*
                      * alphabetize role list by the name property of each item in the array
                      * for ease of viewing and selection
                      */
-                    self.roles.data = sortArrayByField(data.roles, "name");
+                    self.roles.data = sortArrayByField(roles, "name");
                 });
                 self.initUserRoles();
             },
