@@ -24,7 +24,7 @@ reporting_api = Blueprint('reporting', __name__)
 
 
 @reporting_api.route('/admin/overdue-table')
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def overdue_table(top_org=None):
     """View for staff access to generated email content
@@ -92,7 +92,8 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
 
 @reporting_api.route('/admin/overdue-numbers')
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
 
@@ -135,7 +136,8 @@ def generate_numbers():
 
 @reporting_api.route('/api/report/questionnaire_status')
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def questionnaire_status():
     """Return ad hoc JSON or CSV listing questionnaire_status

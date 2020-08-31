@@ -25,7 +25,8 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
 @patients.route('/', methods=('GET', 'POST'))
-@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required([
+    ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patients_root():
     """creates patients list dependent on user role
@@ -94,7 +95,7 @@ def patients_root():
 
 
 @patients.route('/patient-profile-create')
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_profile_create():
     user = current_user()
@@ -117,7 +118,8 @@ def session_report(subject_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required([
+    ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
