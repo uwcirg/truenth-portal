@@ -6,7 +6,6 @@ Create Date: 2020-08-31 11:12:30.249107
 
 """
 from alembic import op
-import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 
@@ -25,7 +24,7 @@ session = Session(bind=bind)
 def all_staff_admins():
     """returns list of all staff admins user ids"""
     staff_admin_role_id = session.query(Role).filter(
-        Role.name == 'staff_admin').with_entities(Role.id).one()
+        Role.name == ROLE.STAFF_ADMIN.value).with_entities(Role.id).one()
     return [ur.user_id for ur in session.query(UserRoles).filter(
         UserRoles.role_id == staff_admin_role_id)]
 
@@ -33,7 +32,7 @@ def all_staff_admins():
 def staff_role_id():
     """return staff role id"""
     return session.query(Role).filter(
-        Role.name == 'staff').with_entities(Role.id).one()[0]
+        Role.name == ROLE.STAFF.value).with_entities(Role.id).one()[0]
 
 
 def upgrade():
