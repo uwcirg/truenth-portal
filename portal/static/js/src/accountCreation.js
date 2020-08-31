@@ -44,11 +44,6 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         this.__isPatient = function() {
             return $("#accountCreationContentContainer").attr("data-account") === "patient";
         };
-
-        this.__isStaffContext = function() {
-            return $("#accountCreationContentContainer").attr("data-account") === "staff";
-        };
-
         this.__request = function(params) {
             params = params || {};
             params.callback = params.callback || function() {};
@@ -338,62 +333,38 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
 
-        this.__checkFields = function(silent) {
+        this.__checkFields = function() {
+           
             var hasError = false;
-
-            /* check all required fields to make sure all fields are filled in */
+            // /* check all required fields to make sure all fields are filled in */
             $("input[required], select[required]").each(function() {
                 if (!$(this).val()) {
                     //this should display error message associated with empty field
-                    if (!silent) {
-                        $(this).trigger("focusout");
-                    }
+                    $(this).trigger("focusout");
                     hasError = true;
                 }
             });
-            /* check email field */
-            if (!hasError && $("#noEmail").length > 0 && !$("#noEmail").is(":checked")) {
-                if ($("#emailGroup").hasClass("has-error")) {
+
+            /* organization fields */
+            if ($("#userOrgs input").length) {
+                if ($("#userOrgs input:checked").length === 0) {
+                    this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true, validateOnly);
                     hasError = true;
                 } else {
-                    if ($("#current_user_email").val() === $("#email").val()) {
-                        if (!silent) {
-                            this.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
-                        }
-                        hasError = true;
-                    } else {
-                        this.setHelpText("emailGroup", "", false);
-                    }
+                    this.setHelpText("userOrgs", "", false);
                 }
             }
-            /* check organization */
-            if (!hasError && $("#userOrgs input").length > 0 && $("#userOrgs input:checked").length === 0) {
-                if (!silent) {
-                    this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
-                }
-                hasError = true;
-            } else {
-                this.setHelpText("userOrgs", "", false);
-            }
-
-            /* finally check fields to make sure there isn't error, e.g. due to validation error */
-            if (!hasError) {
-                $("#createProfileForm .help-block.with-errors").each(function() {
-                    if ($(this).text() !== "") {
-                        hasError = true;
-                    }
-                });
-            }
-
+    
             let rolesList = $("#rolesContainer .input-role");
             /* check if at least one required role is checked */
-            if (!hasError && rolesList.length) {
+            if (rolesList.length) {
                 let requiredRoleSelected = false;
                 rolesList.each(function() {
                     if (requiredRoleSelected) {
                         return false;
                     }
-                    if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
+                   // if ($(this).attr("data-required-if-none") && $(this).is(":checked")) {
+                    if ($(this).is(":checked")) {
                         requiredRoleSelected = true;
                     }
                 });
@@ -405,15 +376,59 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 }
             }
 
+            /* finally check fields to make sure there isn't error, e.g. due to validation error */
+              if (!hasError) {
+                $("#createProfileForm .help-block").each(function() {
+                    if ($(this).text() !== "") {
+                        hasError = true;
+                    }
+                });
+            }
             if (hasError) {
-                if (!silent) {
-                    $("#errorMsg").fadeIn("slow");
-                }
+                $("#errorMsg").fadeIn("slow");
             } else {
                 $("#errorMsg").hide();
                 $("#serviceErrorMsg").html("").hide();
             }
+    
             return hasError;
+        };
+
+        this.initFieldEvents = function() {
+            let self = this;
+            Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
+            $("#createProfileForm input[required], #createProfileForm select[required]").on("change", function() {
+                $("#updateProfile").attr("disabled", false);
+                setTimeout(function() { self.clearError(); }, 600);
+            });
+            /* email field */
+            $("#email").on("change", function() {
+                if (!$("#noEmail").is(":checked")) {
+                    if ($("#current_user_email").val() === $("#email").val()) {
+                        self.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
+                        return;
+                    }
+                    self.setHelpText("emailGroup", "", false);
+                }
+            });
+            //clear error text if value changed
+            $("#email").on("keyup", function() {
+                if ($(this).val()) {
+                    self.setHelpText("emailGroup", "", false);
+                }
+            });
+            //clear error text for on changed org field(s)
+            $("#userOrgs input").on("change", function() {
+                if ($(this).is(":checked")) {
+                    self.setHelpText("userOrgs", "", false);
+                }
+            });
+            //clear error text for on change role field(s)
+            $("#rolesContainer .input-role").on("change", function() {
+                if ($(this).is(":checked")) {
+                    self.setHelpText("rolesContainer", "", false);
+                }
+            });
         };
 
         this.setDefaultRoles = function() {
@@ -424,16 +439,14 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
         };
 
         this.clearError = function() {
-            var hasError = this.__checkFields(true);
-            if (!hasError) { $("#errorMsg").html("").hide(); }
+            $("#errorMsg").html("").hide();
         };
         this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
-                $("#" + elementId).find(".help-block, .error-message").text(message).addClass("error-message");
+                $("#" + elementId).find(".help-block").text(message).addClass("error-message");
+                return;
             }
-            else {
-                $("#" + elementId).find(".help-block, .error-message").text("").removeClass("error-message");
-            }
+            $("#" + elementId).find(".help-block").text("").removeClass("error-message");
         };
         this.getOrgs = function(callback, params) {
             var self = this;
@@ -550,13 +563,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 }
             });
         };
-        this. setDisableAccountCreation = function() {
-            if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
+        this.setDisableAccountCreation = function() {
+            if (this.__isPatient()) { //creating an overlay that prevents user from editing fields
                 $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
             }
-        };
-        this.initFieldEvents = function() {
-            Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
         };
         this.initButtons = function() {
             var self = this;
@@ -569,21 +579,16 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 window.location = $(this).attr("href");
             });
             $("#updateProfile").attr("disabled", true);
-            $("#createProfileForm input, #createProfileForm select").on("focusout", function() {
-                $("#updateProfile").attr("disabled", false);
-                setTimeout(function() { self.clearError(); }, 600);
-            });
             $("#createProfileForm").on("submit", function (e) { //submit on clicking save button
                 if (e.isDefaultPrevented()) {
                     self.__checkFields(); // handle the invalid form...
                     return false;
-                } else {
-                    var hasError = self.__checkFields();
-                    if (hasError) { return false; }
-                    e.preventDefault(); // everything looks good!
-                    self.__handleButton("hide");
-                    setTimeout(function() { self.__setAccount(); } , 0);
-                }
+                } 
+                var hasError = self.__checkFields();
+                if (hasError) { return false; }
+                e.preventDefault(); // everything looks good!
+                self.__handleButton("hide");
+                setTimeout(function() { self.__setAccount(); } , 0);
             });
         };
         this.getConsentOrgId = function(element, CONSENT_WITH_TOP_LEVEL_ORG) {
