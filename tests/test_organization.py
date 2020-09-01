@@ -148,7 +148,7 @@ def test_multiple_rps_in_fhir():
     rp2 = ResearchProtocol(name='yesterday', research_study_id=rs_id)
     rp3 = ResearchProtocol(name='last year', research_study_id=rs_id)
     with SessionScope(db):
-        map(db.session.add, (org, rs, rp1, rp2, rp3))
+        map(db.session.add, (org, rp1, rp2, rp3))
         db.session.commit()
     org, rp1, rp2, rp3 = map(db.session.merge, (org, rp1, rp2, rp3))
     o_rp1 = OrganizationResearchProtocol(
