@@ -259,11 +259,15 @@ export default (function() { /*global i18next $ */
         return orgsList;
     };
     OrgTool.prototype.populateUI = function(){
+        let container = $("#"+this.getContainerElementId());
+        if (!container.length) {
+            return;
+        }
         if (sessionStorage.orgsHTML) {
             $("#" + this.getContainerElementId()).html(sessionStorage.orgsHTML);
             return true;
         }
-        var self = this, container = $("#"+this.getContainerElementId()), orgsList = this.orgsList, parentContent = "";
+        var self = this, orgsList = this.orgsList, parentContent = "";
         var getState = (item) => {
             if (!item.identifier) {
                 return "";
