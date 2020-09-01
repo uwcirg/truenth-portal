@@ -41,7 +41,7 @@ class TestReporting(TestCase):
             value='clever study id')
         self.add_system_user()
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()

@@ -121,8 +121,12 @@ def mock_questionnairebanks(eproms_or_tnth):
 
 def mock_eproms_questionnairebanks():
     # Define base ResearchProtocols
-    localized_protocol = ResearchProtocol(name='localized_protocol')
-    metastatic_protocol = ResearchProtocol(name='metastatic_protocol')
+    localized_protocol = ResearchProtocol(
+        name='localized_protocol',
+        research_study_id=0)
+    metastatic_protocol = ResearchProtocol(
+        name='metastatic_protocol',
+        research_study_id=0)
     with SessionScope(db):
         db.session.add(localized_protocol)
         db.session.add(metastatic_protocol)

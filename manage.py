@@ -37,6 +37,7 @@ from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import add_static_questionnaire_bank
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.url_token import (
     BadSignature,
@@ -154,6 +155,7 @@ def seed(keep_unmentioned=False):
     add_static_questionnaire_bank()
     add_static_relationships()
     add_static_roles()
+    add_static_research_studies()
     db.session.commit()
 
     # import site export file if found

@@ -4,6 +4,7 @@
       "id": 0,
       "title": "Base Study",
       "status": "active",
+      "research_study_id": 0,
       "resourceType": "ResearchStudy"
     }
   ],

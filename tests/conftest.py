@@ -29,6 +29,7 @@ from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
@@ -150,11 +151,27 @@ def calc_date_params(backdate, setdate):
 
 
 @pytest.fixture
+def initialized_with_research_study(initialized_db):
+    add_static_research_studies()
+    db.session.commit()
+
+
+@pytest.fixture
+def initialized_with_research_protocol(initialized_with_research_study):
+    rp = ResearchProtocol(name="test_rp", research_study_id=0)
+    with SessionScope(db):
+        db.session.add(rp)
+        db.session.commit()
+    return db.session.merge(rp)
+
+
+@pytest.fixture
 def initialize_static(initialized_db):
     add_static_concepts(only_quick=True)
     add_static_interventions()
     add_static_organization()
     add_static_relationships()
+    add_static_research_studies()
     add_static_roles()
     db.session.commit()
 

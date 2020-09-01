@@ -55,7 +55,7 @@ class TestQuestionnaireBank(TestCase):
                 org.research_protocols.append(existing_rp)
             return org, existing_rp, existing_rp.id
 
-        rp = ResearchProtocol(name=rp_name)
+        rp = ResearchProtocol(name=rp_name, research_study_id=0)
         with SessionScope(db):
             db.session.add(org)
             db.session.add(rp)
@@ -750,7 +750,7 @@ class TestQuestionnaireBank(TestCase):
             OrganizationResearchProtocol.organization_id == org_id,
             OrganizationResearchProtocol.research_protocol_id == rp_id).one()
         old_rp.retired_as_of = now - timedelta(days=1)
-        rp2 = ResearchProtocol(name='new_proto')
+        rp2 = ResearchProtocol(name='new_proto', research_study_id=0)
         qn2 = self.add_questionnaire(name='epic27')
         with SessionScope(db):
             db.session.add(rp2)
