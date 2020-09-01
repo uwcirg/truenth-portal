@@ -550,11 +550,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             $("#updateProfile").attr("disabled", true);
             $("#createProfileForm").on("submit", function (e) { //submit on clicking save button
                 if (e.isDefaultPrevented()) {
-                  //  self.__checkFields(); // handle the invalid form...
+                    // handle the invalid form...
                     return false;
                 } 
-                var hasError = self.__checkFields();
-                if (hasError) { return false; }
+                if (self.__checkFields()) { return false; }
                 e.preventDefault(); // everything looks good!
                 self.__handleButton("hide");
                 setTimeout(function() { self.__setAccount(); } , 0);

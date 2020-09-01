@@ -2042,8 +2042,7 @@ export default (function() {
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
                     let roles = data.roles;
-                    if (self.isStaffAdmin()) {
-                        console.log("Wtf")
+                    if (!self.isAdmin() && self.isStaffAdmin()) {
                         roles = roles.filter(item => {
                             return self.staffRoles.indexOf(item.name) >= 0
                         });
