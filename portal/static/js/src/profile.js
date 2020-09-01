@@ -102,7 +102,7 @@ export default (function() {
             currentUserRoles: [],
             userOrgs: [],
             userRoles: [],
-            staffRoles: ["clinician", "staff", "staff_admin"],
+            staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -2041,11 +2041,22 @@ export default (function() {
                 var self = this;
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
-                    let roles = data.roles;
+                    let roles = data.roles || [];
                     if (!self.isAdmin() && self.isStaffAdmin()) {
-                        roles = roles.filter(item => {
-                            return self.staffRoles.indexOf(item.name) >= 0
-                        });
+                        /*
+                         * admin staff should not be able to edit role(s) for a user that contains other roles
+                         */
+                        let diffRoles = self.userRoles.filter(item => !self.staffEditableRoles.includes(item));
+                        if (diffRoles.length) {
+                            $("#rolesGroup").closest(".profile-item-container").hide();
+                        } else {
+                            /*
+                             * filter down editable roles for a staff
+                             */
+                            roles = roles.filter(item => {
+                                return self.staffEditableRoles.indexOf(item.name) >= 0
+                            });
+                        }   
                     }
                     /*
                      * alphabetize role list by the name property of each item in the array
