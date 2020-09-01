@@ -5,7 +5,7 @@
   <div id="patientList">
     <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
     <div id="patientListOptions">
-      {%- if user.has_role(ROLE.STAFF.value) -%}
+      {%- if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
       <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
       {%- endif -%}
