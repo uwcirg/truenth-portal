@@ -150,7 +150,8 @@ export default {
         },
         getSelectedDomain: function() {
            //return this.activeDomain;
-           return "substudy";
+           //return "substudy";
+           return "hot_flashes"
         },
         getSearchURL: function() {
             //TODO use current domain name as tag
@@ -167,6 +168,12 @@ export default {
             }
             let anchorElements = document.querySelectorAll(".anchor-link");
             if (!anchorElements.length) {
+                let navParentElement = document.querySelector(".navigation");
+                let mobileNavElement = document.querySelector(".mobile-navigation");
+                let mobileQuickLinkElement = document.querySelector(".mobile-quick-links");
+                if (navParentElement) navParentElement.classList.add("hide");
+                if (mobileNavElement) mobileNavElement.classList.add("hide");
+                if (mobileQuickLinkElement) mobileQuickLinkElement.classList.add("hide");
                 return;
             }
             let contentHTML = "";
@@ -240,11 +247,22 @@ export default {
             let videoElement = document.querySelector(".video");
             if (videoElement) {
                 let iframeElement = document.createElement("iframe");
+                let iframeSrc = videoElement.getAttribute("data-iframe-src");
+                let videoNavElements = document.querySelectorAll(".navigation-video-image");
+                if (!iframeSrc) {
+                    let videoSection = document.querySelector(".video-section");
+                    if (videoSection) {
+                        videoSection.classList.add("hide");
+                    }
+                    videoNavElements.forEach(item => {
+                        item.classList.add("hide");
+                    });
+                    return;
+                }
                 iframeElement.setAttribute("allowfullscreen", true);
                 iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
                 videoElement.appendChild(iframeElement);
                 videoElement.classList.add("active");
-                let videoNavElements = document.querySelectorAll(".navigation-video-image");
                 videoNavElements.forEach(el => {
                     el.addEventListener("click", event => {
                         let ve = document.querySelector(".video iframe");
