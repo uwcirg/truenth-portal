@@ -394,7 +394,7 @@
                 </div>
             </div>
         </div>
-    {%- elif person and person.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
+    {%- elif person and person.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
