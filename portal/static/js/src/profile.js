@@ -2025,6 +2025,16 @@ export default (function() {
                     return {name: $(this).val()};
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
+                /*
+                 * refresh user roles list since it has been uploaded
+                 */
+                this.initUserRoles({clearCache: true});
+            },
+            updateRolesUI: function(roles) {
+                if (!roles) return;
+                roles.forEach(role => {
+                    $("#rolesGroup input[value='"+role+"']").attr("checked", true);
+                });
             },
             initUserRoles: function(params) {
                 if (!this.subjectId) { return false; }
@@ -2034,6 +2044,7 @@ export default (function() {
                         self.userRoles = data.roles.map(function(role) {
                             return role.name;
                         });
+                        self.updateRolesUI(self.userRoles);
                     }
                 }, params);
             },
@@ -2056,15 +2067,15 @@ export default (function() {
                             roles = roles.filter(item => {
                                 return self.staffEditableRoles.indexOf(item.name) >= 0
                             });
-                        }   
+                        }
                     }
                     /*
                      * alphabetize role list by the name property of each item in the array
                      * for ease of viewing and selection
                      */
                     self.roles.data = sortArrayByField(roles, "name");
+                    setTimeout(self.initUserRoles, 50);  
                 });
-                self.initUserRoles();
             },
             initAuditLogSection: function() {
                 var self = this, errorMessage = "";

@@ -830,7 +830,7 @@
     <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
         <div class='checkbox' v-for="item in roles.data">
             {% raw %}
-                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-model="userRoles" v-on:click="updateRolesData">{{item.display_name}}</label>
+                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData">{{item.display_name}}</label>
             {% endraw %}
         </div>
     </div>
