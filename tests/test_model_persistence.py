@@ -265,8 +265,8 @@ class TestModelPersistence(TestCase):
         from portal.system_uri import SHORTCUT_ALIAS, TRUENTH_CR_NAME
         from portal.models.identifier import Identifier
 
-        rp1 = ResearchProtocol(name='initial')
-        rp2 = ResearchProtocol(name='replacement')
+        rp1 = ResearchProtocol(name='initial', research_study_id=0)
+        rp2 = ResearchProtocol(name='replacement', research_study_id=0)
         org = Organization(name='testy')
         org.research_protocols.append(rp1)
         with SessionScope(db):

@@ -3,21 +3,25 @@
     {
       "created_at": "2019-12-16T14:00:00",
       "name": "IRONMAN v5",
+      "research_study_id": 0,
       "resourceType": "ResearchProtocol"
     },
     {
       "created_at": "2018-02-10T11:59:00",
       "name": "IRONMAN v3",
+      "research_study_id": 0,
       "resourceType": "ResearchProtocol"
     },
     {
       "created_at": "2017-11-10T05:22:17",
       "name": "IRONMAN v2",
+      "research_study_id": 0,
       "resourceType": "ResearchProtocol"
     },
     {
       "created_at": "2017-11-10T05:22:17",
       "name": "TNGR v1",
+      "research_study_id": 0,
       "resourceType": "ResearchProtocol"
     }
   ],

@@ -1,7 +1,7 @@
 """STAFF_ADMIN role stands alone - remove STAFF role from current STAFF_ADMINs
 
 Revision ID: ed4283df2db5
-Revises: 1977c23a53c8
+Revises: 30f20e54eb5c
 Create Date: 2020-08-31 11:12:30.249107
 
 """
@@ -14,7 +14,7 @@ from portal.models.user import UserRoles
 
 # revision identifiers, used by Alembic.
 revision = 'ed4283df2db5'
-down_revision = '1977c23a53c8'
+down_revision = '30f20e54eb5c'
 
 Session = sessionmaker()
 bind = op.get_bind()
