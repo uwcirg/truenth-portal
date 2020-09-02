@@ -102,7 +102,10 @@ def home():
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.STAFF_ADMIN.value):
         return redirect(url_for('staff.staff_index'))
-    if user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value):
+    if user.has_role(
+            ROLE.CLINICIAN.value,
+            ROLE.INTERVENTION_STAFF.value,
+            ROLE.STAFF.value):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))

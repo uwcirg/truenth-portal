@@ -26,7 +26,10 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/', methods=('GET', 'POST'))
 @roles_required([
-    ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    ROLE.CLINICIAN.value,
+    ROLE.INTERVENTION_STAFF.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def patients_root():
     """creates patients list dependent on user role
@@ -37,8 +40,9 @@ def patients_root():
 
     The returned list of patients depends on the users role:
       admin users: all non-deleted patients
+      clinicians: all patients in the sub-study with common consented orgs
       intervention-staff: all patients with common user_intervention
-      staff: all patients with common consented organizations
+      staff, staff_admin: all patients with common consented organizations
 
     NB: a single user with both staff and intervention-staff is not
     expected and will raise a 400: Bad Request
