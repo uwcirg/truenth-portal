@@ -8,7 +8,6 @@ Create Date: 2020-09-02 22:07:40.249193
 from alembic import op
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
 
 from portal.models.audit import Audit
 from portal.models.questionnaire_response import QuestionnaireResponse
@@ -42,16 +41,15 @@ def upgrade():
 
     query = session.query(QuestionnaireResponse).filter(
         QuestionnaireResponse.subject_id != fu.id).filter(or_(
-        QuestionnaireResponse.document[
-            "questionnaire"]["reference"].astext.endswith("irondemog"),
-        QuestionnaireResponse.document[
-            "questionnaire"]["reference"].astext.endswith("irondemog_v3"),
-    )).order_by(
-        QuestionnaireResponse.subject_id, QuestionnaireResponse.authored)
+            QuestionnaireResponse.document[
+                "questionnaire"]["reference"].astext.endswith("irondemog"),
+            QuestionnaireResponse.document[
+                "questionnaire"]["reference"].astext.endswith("irondemog_v3")
+        )).order_by(
+            QuestionnaireResponse.subject_id, QuestionnaireResponse.authored)
 
     if not query.count():
         return
-
 
     def reassign_unwanted(qnrs):
         first_completed = None
