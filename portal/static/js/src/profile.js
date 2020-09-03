@@ -6,6 +6,7 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_TITLE} from "./data/common/consts.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -2168,8 +2169,17 @@ export default (function() {
                 content += "</tr>";
                 return content;
             },
+            isSubStudyConsent: function(item) {
+                if (!item) {
+                    return false;
+                }
+                return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
+            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
+                if (this.isSubStudyConsent(item)) {
+                    return EPROMS_SUBSTUDY_TITLE;
+                }
                 var orgId = item.organization_id, OT = this.getOrgTool(), currentOrg = OT.orgsList[orgId], orgName = currentOrg ? currentOrg.name : item.organization_id;
                 if (!this.isConsentWithTopLevelOrg()) {
                     var topOrgID = OT.getTopLevelParentOrg(orgId), topOrg = OT.orgsList[topOrgID];
