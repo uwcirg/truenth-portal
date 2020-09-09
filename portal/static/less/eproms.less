@@ -2118,6 +2118,7 @@ div.footer-wrapper.right-panel {
 #adminTableToolbar {
   button {
     background-image: linear-gradient(to bottom, #FFF, #ececec 90%);
+    min-width: 220px;
   }
   .orgs-filter-warning {
     display: inline-block;
@@ -2339,17 +2340,33 @@ div.footer-wrapper.right-panel {
       padding: 12px 16px;
       border: 1px solid @inputBorderColor;
       position: relative;
-      &.loading:after {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: #FFF;
-        opacity: 0.6;
-        z-index: 10;
-        content: "";
-        display: block;
+      &.loading{
+        border: 1px solid @toolbarBorderColor;
+        &:after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          background: #FFF;
+          opacity: 0.6;
+          z-index: 10;
+          content: "";
+          display: block;
+        }
+        &:before {
+          position: absolute;
+          animation: borderLoader 1000ms infinite linear;
+          display: block;
+          content: " ";
+          bottom: 0;
+          left: 0;
+          width: 12px;
+          height: 2px;
+          background: darken(@inputBorderColor, 5%);
+          //border-radius: 100%;
+          z-index: 14;
+        }
       }
       a:hover, a:active, a:focus {
         text-decoration: none;
@@ -2359,6 +2376,7 @@ div.footer-wrapper.right-panel {
         vertical-align: middle;
         font-size: 14px;
         margin: 0;
+        cursor: pointer;
       }
       .label {
         color: @labelColor;
