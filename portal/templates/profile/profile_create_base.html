@@ -11,10 +11,13 @@
   </div>
 {%- endmacro %}
 {% macro addRoles() -%}
-    <div id="rolesContainer">
+    <div id="rolesContainer" class="profile-section">
         <label class="text-muted">{{_("Role")}}</label>
         <!-- note can add addtional role(s) if needed -->
-        <div><input class="input-role" type="checkbox" name="chkRoles" data-role="staff_admin">  <span class="text-muted">{{_("Admin staff")}}</span></div>
+        <div class="item"><input class="input-role" type="checkbox" name="chkRoles" data-role="staff">  <span class="text-muted">{{_("Staff")}}</span></div>
+        <div class="item"><input class="input-role" type="checkbox" name="chkRoles" data-role="clinician">  <span class="text-muted">{{_("Clinician")}}</span></div>
+        <div class="item"><input class="input-role" type="checkbox" name="chkRoles" data-role="staff_admin">  <span class="text-muted">{{_("Admin staff")}}</span></div>
+        <div class="help-block"></div>
         <div class="divider"></div>
     </div>
 {%- endmacro %}

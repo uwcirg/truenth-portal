@@ -6,6 +6,7 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+import {sortArrayByField} from "./modules/Utility.js";
 import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_TITLE} from "./data/common/consts.js";
 
 /*
@@ -102,6 +103,7 @@ export default (function() {
             currentUserRoles: [],
             userOrgs: [],
             userRoles: [],
+            staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -520,7 +522,7 @@ export default (function() {
                 return this.orgTool;
             },
             isConsentEditable: function() {
-                var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
+                var isStaff = this.isStaff();
                 var isCurrentUserPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
@@ -541,8 +543,11 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
+            isStaffAdmin: function() {
+                return this.currentUserRoles.indexOf("staff_admin") !== -1;
+            },
             isStaff: function() {
-                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
+                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.isStaffAdmin();
             },
             isProxy: function() {
                 return (this.currenUserId !== "") && (this.subjectId !== "") && (this.currentUserId !== this.subjectId);
@@ -2021,6 +2026,16 @@ export default (function() {
                     return {name: $(this).val()};
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
+                /*
+                 * refresh user roles list since it has been uploaded
+                 */
+                this.initUserRoles({clearCache: true});
+            },
+            updateRolesUI: function(roles) {
+                if (!roles) return;
+                roles.forEach(role => {
+                    $("#rolesGroup input[value='"+role+"']").attr("checked", true);
+                });
             },
             initUserRoles: function(params) {
                 if (!this.subjectId) { return false; }
@@ -2030,6 +2045,7 @@ export default (function() {
                         self.userRoles = data.roles.map(function(role) {
                             return role.name;
                         });
+                        self.updateRolesUI(self.userRoles);
                     }
                 }, params);
             },
@@ -2037,9 +2053,30 @@ export default (function() {
                 var self = this;
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
-                    self.roles.data = data.roles;
+                    let roles = data.roles || [];
+                    if (!self.isAdmin() && self.isStaffAdmin()) {
+                        /*
+                         * admin staff should not be able to edit role(s) for a user that contains other roles
+                         */
+                        let diffRoles = self.userRoles.filter(item => !self.staffEditableRoles.includes(item));
+                        if (diffRoles.length) {
+                            $("#rolesGroup").closest(".profile-item-container").hide();
+                        } else {
+                            /*
+                             * filter down editable roles for a staff
+                             */
+                            roles = roles.filter(item => {
+                                return self.staffEditableRoles.indexOf(item.name) >= 0
+                            });
+                        }
+                    }
+                    /*
+                     * alphabetize role list by the name property of each item in the array
+                     * for ease of viewing and selection
+                     */
+                    self.roles.data = sortArrayByField(roles, "name");
+                    setTimeout(self.initUserRoles, 50);  
                 });
-                self.initUserRoles();
             },
             initAuditLogSection: function() {
                 var self = this, errorMessage = "";

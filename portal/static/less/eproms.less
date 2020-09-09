@@ -3490,14 +3490,17 @@ input.clinic {
       padding: 0.3em 0.5em;
     }
   }
-  #rolesContainer {
-    margin: 0.5em 0 2.25em;
-  }
   .save-button-container {
     padding: 1.5em 0 0;
   }
   #tnthproc-submit {
     height: auto;
+  }
+}
+#rolesContainer {
+  margin: 0.5em 0 2.25em;
+  .item {
+    margin-bottom: 4px;
   }
 }
 .create-account-container {
@@ -3576,7 +3579,7 @@ input.clinic {
       min-height: 4em;
       display: none;
       z-index: 5;
-      background: #f2f2f2;
+      background: #F0F0F0;
     }
   }
   #profileEmailErrorMessage {
@@ -4471,6 +4474,11 @@ div.timezone-warning.text-warning {
 .invisible {
   display: none !important;
   visibility: hidden !important;
+}
+.help-block, .error-message {
+  &.silent {
+    display: none;
+  }
 }
 /** Responsive sizes **/
 @media (min-width: 423px) {

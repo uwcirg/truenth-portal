@@ -1721,7 +1721,9 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF.value)):
+                other.has_role(ROLE.STAFF_ADMIN.value) or
+                other.has_role(ROLE.STAFF.value) or
+                other.has_role(ROLE.CLINICIAN.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -1738,7 +1740,7 @@ class User(db.Model, UserMixin):
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, *roles):
-        """Given one or my roles by name, true if user has at least one"""
+        """Given one or more roles by name, true if user has at least one"""
         users_roles = set((r.name for r in self.roles))
         for item in roles:
             if item in users_roles:

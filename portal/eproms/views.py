@@ -78,7 +78,7 @@ def home():
 
     Present user with appropriate view dependent on roles.
 
-    The inital flow through authentication and data collection is
+    The initial flow through authentication and data collection is
     controlled by next_after_login().  Only expecting requests
     here after login and intermediate steps have been handled, and then
     only if the login didn't include a 'next' target.
@@ -100,12 +100,15 @@ def home():
         return next_after_login()
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value):
+    if user.has_role(ROLE.STAFF_ADMIN.value):
+        return redirect(url_for('staff.staff_index'))
+    if user.has_role(
+            ROLE.CLINICIAN.value,
+            ROLE.INTERVENTION_STAFF.value,
+            ROLE.STAFF.value):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
-    if user.has_role(ROLE.STAFF_ADMIN.value):
-        return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
@@ -234,7 +237,7 @@ def contact():
 
 
 @eproms.route('/website-consent-script/<int:patient_id>', methods=['GET'])
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)

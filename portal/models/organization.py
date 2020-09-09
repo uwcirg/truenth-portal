@@ -964,12 +964,8 @@ def org_restriction_by_role(user, requested_orgs):
         return requested_orgs
 
     org_list = set()
-    if user.has_role(ROLE.STAFF.value):
-        if user.has_role(ROLE.INTERVENTION_STAFF.value):
-            raise BadRequest(
-                "Patients list for staff and intervention-staff are"
-                " mutually exclusive - user shouldn't have both roles")
-
+    if user.has_role(
+            ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value):
         # Build list of all organization ids, and their descendants, the
         # user belongs to
         ot = OrgTree()

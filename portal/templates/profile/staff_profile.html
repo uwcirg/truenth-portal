@@ -19,7 +19,9 @@
         </div>
     </div>
     <div class="row"><div class="col-md-12 col-xs-12">{{profile_macro.profileLocaleTimeZone(user)}}</div></div>
-    {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value) and not user.has_role(ROLE.SERVICE.value) %}
+    
+    {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value) and not user.has_role(ROLE.SERVICE.value) %}
+        <!-- role list will be filtered if a staff admin user is accessing the roles list -->
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}
@@ -29,7 +31,7 @@
             </div>
         </div>
     {%- endif %}
-    {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
+    {%- if (user and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 {% call profile_macro.profileSection(editable=False) -%}

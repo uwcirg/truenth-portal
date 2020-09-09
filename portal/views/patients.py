@@ -25,7 +25,11 @@ patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
 @patients.route('/', methods=('GET', 'POST'))
-@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required([
+    ROLE.CLINICIAN.value,
+    ROLE.INTERVENTION_STAFF.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def patients_root():
     """creates patients list dependent on user role
@@ -36,8 +40,9 @@ def patients_root():
 
     The returned list of patients depends on the users role:
       admin users: all non-deleted patients
+      clinicians: all patients in the sub-study with common consented orgs
       intervention-staff: all patients with common user_intervention
-      staff: all patients with common consented organizations
+      staff, staff_admin: all patients with common consented organizations
 
     NB: a single user with both staff and intervention-staff is not
     expected and will raise a 400: Bad Request
@@ -94,7 +99,7 @@ def patients_root():
 
 
 @patients.route('/patient-profile-create')
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_profile_create():
     user = current_user()
@@ -117,7 +122,8 @@ def session_report(subject_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required([ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+@roles_required([
+    ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""

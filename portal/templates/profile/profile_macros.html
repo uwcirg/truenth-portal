@@ -1,5 +1,4 @@
 {% from "initial_queries_macros.html" import patientQGroup, consent_fields %}
-
 {% macro profileImage(person) -%}
     {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
 {%- endmacro %}
@@ -382,7 +381,7 @@
                               </div>
                             </div>
                         {%- endif %}
-                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
+                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
                          <div class="tab">
                           <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
                           <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
@@ -395,7 +394,7 @@
                 </div>
             </div>
         </div>
-    {%- elif person and person.has_role(ROLE.STAFF.value) and current_user and current_user.has_role(ROLE.STAFF_ADMIN.value)-%}
+    {%- elif person and person.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
@@ -489,7 +488,7 @@
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
                <p class="prompt">
-                {% if  current_user and current_user.has_role(ROLE.STAFF.value) %}
+                {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                     {{_("In what state is the patient currently receiving prostate cancer care?")}}
                 {% else %}
                     {{_("In what state are you currently receiving prostate cancer care?")}}
@@ -814,7 +813,7 @@
 </div>
 {%- endmacro %}
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar" data-profile-section-id="auditlog"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
@@ -823,22 +822,22 @@
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value) and not person.has_role(ROLE.SERVICE.value) %}
-        <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
+    <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
+    {% if current_user and current_user.has_role(ROLE.ADMIN.value) %}
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
-        <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
-            <div class='checkbox' v-for="item in roles.data">
-                {% raw %}
-                    <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-model="userRoles" v-on:click="updateRolesData">{{item.display_name}}</label>
-                {% endraw %}
-            </div>
-        </div>
-        {{saveLoaderDiv("rolesGroup")}}
-        <div class="get-roles-error error-message"></div>
-        <div class="put-roles-error error-message"></div>
-        <div class="delete-roles-error error-message"></div>
     {% endif %}
+    <!-- roles are populated in main.js -->
+    <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
+        <div class='checkbox' v-for="item in roles.data">
+            {% raw %}
+                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData">{{item.display_name}}</label>
+            {% endraw %}
+        </div>
+    </div>
+    {{saveLoaderDiv("rolesGroup")}}
+    <div class="get-roles-error error-message"></div>
+    <div class="put-roles-error error-message"></div>
+    <div class="delete-roles-error error-message"></div>
 {%- endmacro %}
 
 {% macro profileSessionList(person, current_user) -%}
@@ -1174,7 +1173,7 @@
                 {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
                 {% call editSection() -%}
                     <p class="title-text text-muted">
-                        {%-if current_user and current_user.has_role(ROLE.STAFF.value)-%}
+                        {%-if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
                             {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
                         {%-elif person and current_user and (person.id == current_user.id) -%}
                             {{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
