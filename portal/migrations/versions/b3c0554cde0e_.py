@@ -10,6 +10,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
+from portal.models.qb_timeline import QBT
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.user import User
 
@@ -53,9 +54,12 @@ def upgrade():
 
     def reassign_unwanted(qnrs):
         first_completed = None
+        need_relationship_assignments = set()
         for qnr in qnrs:
             if not first_completed and qnr.status == 'completed':
                 first_completed = qnr
+                if not qnr.questionnaire_bank_id:
+                    need_relationship_assignments.add(qnr.subject_id)
             elif first_completed:
                 msg = (
                     f"reassigning QuestionnaireResponse: {qnr.id} "
@@ -69,16 +73,30 @@ def upgrade():
                 session.add(aud)
                 qnr.subject_id = fu.id
 
+        return need_relationship_assignments
+
     cur_subject_id = 0
     batch = []
+    subj_needing_updates = set()
     for qnr in query:
         if cur_subject_id and qnr.subject_id != cur_subject_id:
-            reassign_unwanted(batch)
+            subj_needing_updates.update(reassign_unwanted(batch))
             batch.clear()
         cur_subject_id = qnr.subject_id
         batch.append(qnr)
-    reassign_unwanted(batch)
+    subj_needing_updates.update(reassign_unwanted(batch))
     session.commit()
+
+    # Flush timeline data / QNR->QB associations
+    for subj_id in subj_needing_updates:
+        print(f"purge timeline, QNR->QB associations for {subj_id}")
+        qnrs = session.query(QuestionnaireResponse).filter(
+            QuestionnaireResponse.subject_id == subj_id).filter(
+            QuestionnaireResponse.questionnaire_bank_id.isnot(None))
+        for qnr in qnrs:
+            qnr.questionnaire_bank_id = None
+            qnr.qb_iteration = None
+        session.query(QBT).filter(QBT.user_id == subj_id).delete()
 
 
 def downgrade():
