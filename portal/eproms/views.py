@@ -103,10 +103,11 @@ def home():
     if user.has_role(ROLE.STAFF_ADMIN.value):
         return redirect(url_for('staff.staff_index'))
     if user.has_role(
-            ROLE.CLINICIAN.value,
             ROLE.INTERVENTION_STAFF.value,
             ROLE.STAFF.value):
         return redirect(url_for('patients.patients_root'))
+    if user.has_role(ROLE.CLINICIAN.value):
+        return redirect(url_for('patients.patients_substudy'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
 

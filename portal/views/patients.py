@@ -20,13 +20,13 @@ from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
+import json
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
 @patients.route('/', methods=('GET', 'POST'))
 @roles_required([
-    ROLE.CLINICIAN.value,
     ROLE.INTERVENTION_STAFF.value,
     ROLE.STAFF.value,
     ROLE.STAFF_ADMIN.value])
@@ -98,6 +98,71 @@ def patients_root():
     return render_template(
         'admin/patients_by_org.html', patients_list=patients_list, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
+        include_test_role=include_test_role)
+
+
+@patients.route('/substudy', methods=('GET', 'POST'))
+@roles_required([
+    ROLE.CLINICIAN.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def patients_substudy():
+    """substudy patients list dependent on user role
+
+    :param reset_cache: (as query parameter).  If present, the cached
+     as_of_date key used in assessment status lookup will be reset to
+     current (forcing a refresh)
+
+    The returned list of patients depends on the users role:
+      clinicians: all patients in the sub-study with common consented orgs
+      staff, staff_admin: all patients with common consented organizations
+
+    """
+
+    def org_preference_filter(user):
+        """Obtain user's preference for filtering organizations
+
+        :returns: list of org IDs to use as filter, or None
+
+        """
+        # check user table preference for organization filters
+        pref = TablePreference.query.filter_by(
+            table_name='substudyPatientList', user_id=user.id).first()
+        if pref and pref.filters:
+            return pref.filters.get('orgs_filter_control')
+        return None
+
+    include_test_role = request.args.get('include_test_role')
+
+    if request.form.get('reset_cache'):
+        QB_StatusCacheKey().update(datetime.utcnow())
+
+    user = current_user()
+    query = patients_query(
+        acting_user=user,
+        include_test_role=include_test_role,
+        include_deleted=True,
+        requested_orgs=org_preference_filter(user))
+
+    # get assessment status only if it is needed as specified by config
+    qb_status_cache_age = 0
+    status_cache_key = QB_StatusCacheKey()
+    cached_as_of_key = status_cache_key.current()
+    qb_status_cache_age = status_cache_key.minutes_old()
+    patients_list = []
+    for patient in query:
+        if patient.deleted:
+            patients_list.append(patient)
+            continue
+        a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
+        patient.assessment_status = _(a_s)
+        patient.current_qb = visit
+        patients_list.append(patient)
+
+    return render_template(
+        'admin/patients_substudy.html', patients_list=patients_list,
+        user=user, qb_status_cache_age=qb_status_cache_age,
         include_test_role=include_test_role)
 
 
