@@ -17,7 +17,7 @@
   </div> 
 {% endblock %}
 {% block profile_content %}
-  {% if config.CUSTOM_PATIENT_DETAIL -%}
+  {% if config.CUSTOM_PATIENT_DETAIL and current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
     {{ profile_macro.profileCustomDetail(user) }}
     <div class="row">
       <div class="col-md-12 col-xs-12">
