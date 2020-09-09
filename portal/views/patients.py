@@ -39,7 +39,8 @@ def org_preference_filter(user, table_name):
     return None
 
 
-def render_patients_list(request, table_name, template_name):
+def render_patients_list(
+        request, research_study_id, table_name, template_name):
     include_test_role = request.args.get('include_test_role')
 
     if request.form.get('reset_cache'):
@@ -102,6 +103,7 @@ def patients_root():
     """
     return render_patients_list(
         request,
+        research_study_id=0,
         table_name='patientList',
         template_name='admin/patients_by_org.html')
 
@@ -126,6 +128,7 @@ def patients_substudy():
     """
     return render_patients_list(
         request,
+        research_study_id=1,
         table_name='substudyPatientList',
         template_name='admin/patients_substudy.html')
 
