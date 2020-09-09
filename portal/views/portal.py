@@ -753,13 +753,6 @@ def patient_reminder_email(user_id):
     return jsonify(subject=item.subject, body=item.body)
 
 
-@portal.route('/explore')
-def explore():
-    user = get_user(current_user().id, 'view')
-    """Explore TrueNTH page"""
-    return render_template('explore.html', user=user)
-
-
 @portal.route('/share-your-story')
 @portal.route('/shareyourstory')
 @portal.route('/shareYourStory')
