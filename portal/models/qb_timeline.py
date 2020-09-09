@@ -597,11 +597,10 @@ def ordered_qbs(user, classification=None):
             yield qbd
 
 
-def invalidate_users_QBT(user_id, commit=True):
+def invalidate_users_QBT(user_id):
     """Mark the given user's QBT rows invalid (by deletion)"""
     QBT.query.filter(QBT.user_id == user_id).delete()
-    if commit:
-        db.session.commit()
+    db.session.commit()
 
 
 def update_users_QBT(user_id, invalidate_existing=False):
