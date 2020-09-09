@@ -426,7 +426,7 @@ class QB_Status(object):
         already have one on file for the user.  Log an error if found, to
         alert staff.
 
-        Once but is found and resolved, remove!
+        Once bug is found and resolved, remove!
         """
         from flask import current_app
         from .questionnaire_response import QuestionnaireResponse
