@@ -21,8 +21,8 @@
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
 @mobileJumbotranSize: 1.45em;
-@headlineSize:    1.50em;
-@subheadSize:     1.20em;
+@headlineSize:    1.60em;
+@subheadSize:     1.30em;
 @subSmallHeadSize: 1.1em;
 @lgFontSize:      1.5em;
 @lgHeadlineSize:  1.35em;
@@ -2284,7 +2284,18 @@ div.footer-wrapper.right-panel {
   }
 }
 #patientList {
+  margin-top: 16px;
   position: relative;
+  @media (min-width: 768px) {
+    & {
+      margin-top: 80px;
+    }
+  }
+  @media (min-width: 992px) {
+    & {
+      margin-top: 16px;
+    }
+  }
   #adminTableToolbar {
     border: 1px solid @toolbarBorderColor;
     padding: 4px 8px 6px;
