@@ -1,4 +1,4 @@
-import {sendRequest, isInViewport} from "./Utility";
+import {sendRequest, isInViewport, getUrlParameter} from "./Utility";
 export default {
     mounted: function() {
         var self = this;
@@ -148,18 +148,6 @@ export default {
                 }
             );
         },
-        getSelectedDomain: function() {
-           //return this.activeDomain;
-           //return "substudy";
-           return "hot_flashes"
-        },
-        getSearchURL: function() {
-            //TODO use current domain name as tag
-            //pass in locale info
-            //return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
-            //CORS issue with querying LR directly, TODO: uncomment this when resolves
-            return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
-        },
         setNav: function() {
             let navElement = document.querySelector(".navigation .content");
             let mobileNavElement = document.querySelector(".mobile-navigation .content");
@@ -181,9 +169,11 @@ export default {
                 if (!el.getAttribute("id")) {
                     return true;
                 }
+                console.log(el.nextElementSibling.innerText)
                 contentHTML += `<a href="#${el.getAttribute("id")}">${
-                    el.nextSibling && el.nextSibling.innerHTML? 
-                    el.nextSibling.innerHTML : el.getAttribute("id")}</a>`;
+                    el.nextElementSibling &&
+                    el.nextElementSibling.innerText? 
+                    el.nextElementSibling.innerText : el.getAttribute("id").replace(/_/g, ' ')}</a>`;
             });
             let contentElement = document.createElement("div");
             contentElement.innerHTML = contentHTML;
@@ -277,6 +267,19 @@ export default {
                 })
             }
         },
+        getSelectedDomain: function() {
+            //return this.activeDomain;
+            //return "substudy";
+            //return "hot_flashes"
+            return getUrlParameter("topic") || "mood_changes";
+         },
+         getSearchURL: function() {
+             //TODO use current domain name as tag
+             //pass in locale info
+             return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
+             //CORS issue with querying LR directly, TODO: uncomment this when resolves
+            //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
+         },
         getDomainContent: function() {
             if (this.domainContent) {
                 //already populated
@@ -297,14 +300,19 @@ export default {
             //         console.log("failed ")
             //     });
             sendRequest(this.getSearchURL()).then(response => {
-                console.log("response? ", JSON.parse(response));
-                let content = JSON.parse(response);
-                this.setDomainContent(content["results"][0]["content"]);
-                setTimeout(function() {
-                    this.setNav();
-                    this.setCollapsible();
-                    this.setVideo();
-                }.bind(this), 50);
+                //LR URL returns this
+                //console.log("response? ", JSON.parse(response));
+                // let content = JSON.parse(response);
+                // this.setDomainContent(content["results"][0]["content"]);
+                console.log("response? ", response);
+                if (response) {
+                    this.setDomainContent(response);
+                    setTimeout(function() {
+                        this.setNav();
+                        this.setCollapsible();
+                        this.setVideo();
+                    }.bind(this), 50);
+                } else this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
                 this.setCurrentView("domain");
             }).catch(e => {
                 console.log("failed? ", e)

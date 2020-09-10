@@ -1,4 +1,5 @@
 @baseFontSize: 16px;
+@subtitleFontSize: 18px;
 @mobileFontSize: 14px;;
 @bodyBackgroundColor: #F5F6F6;
 @bodyColor: #444;
@@ -68,6 +69,13 @@ h1, h2, h3, h4, h5 {
 }
 h2, h3, h4, h5 {
   text-transform: capitalize;
+}
+h4, h5 {
+  line-height: 1.3;
+}
+
+small, .small {
+  font-size: @mobileFontSize;
 }
 
  ::placeholder,
@@ -185,6 +193,8 @@ ul {
 
 .error-message {
   color: #FFF;
+  //TODO remove this
+  display: none;
   background: @errorColor;
   &.content {
     padding: 8px;
@@ -264,6 +274,10 @@ section.main {
 }
 a {
   color: @linkColor;
+  &:active, &:hover, &:focus {
+    color: darken(@linkColor, 10%);
+    cursor: pointer;
+  }
 }
 .btn, button {
   border-radius: 0;
@@ -271,6 +285,7 @@ a {
   border: 2px solid @buttonColor;
   padding: 8px 16px;
   border-radius: 8px;
+  background: #FFF;
 }
 .btn-primary {
   background: @buttonBackgroundColor;
@@ -428,6 +443,11 @@ a {
       width: 50%;
     }
   }
+  .body-text {
+    width: 60%;
+  }
+}
+@media (min-width: 1400px) {
   .body-text {
     width: 50%;
   }
@@ -619,6 +639,7 @@ a {
     line-height: 1.45;
     padding-left: 32px;
     padding-right: 32px;
+    margin-bottom: 16px;
   }
 }
 
@@ -630,7 +651,7 @@ a {
 }
 @media (min-width: 768px) {
   .collapsible-container-title {
-    width: 50%;
+    width: 60%;
   }
 }
 
@@ -675,7 +696,8 @@ a {
   background-color: @featureItemBackgroundColor;
   padding: 16px 0;
   .subtitle {
-    margin-bottom: 0;
+    margin-bottom: 4px;
+    font-size: @subtitleFontSize;
   }
 }
 .tiles-container {
@@ -844,8 +866,12 @@ footer {
     color: @calloutColor;
     text-decoration: none;
     font-weight: 600;
-    text-align: center;
+    text-align: left;
     font-size: 18px;
+    &:hover {
+      color: darken(@calloutColor, 10%);
+      text-decoration: underline;
+    }
   }
   &.open {
     transform: translateX(0);

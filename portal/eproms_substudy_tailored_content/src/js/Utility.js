@@ -62,3 +62,10 @@ export function isInViewport(element) {
       rect.right <= (window.innerWidth || document.documentElement.clientWidth)
   );
 };
+
+export function getUrlParameter(name) {
+  name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+  var results = regex.exec(location.search);
+  return results === null ? "" : decodeURIComponent(results[1]);
+}
