@@ -618,6 +618,34 @@
     {
       "extension": [
         {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146149,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-149"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Peter MacCallum Cancer Centre",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
