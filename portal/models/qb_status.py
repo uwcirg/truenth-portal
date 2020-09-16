@@ -330,7 +330,9 @@ class QB_Status(object):
                 i for i in required_list if i not in completed_set
                 and i not in partial_set]
 
-        return self.__instruments_by_strategy(classification, needing_full)
+        results = self.__instruments_by_strategy(classification, needing_full)
+        self.warn_on_duplicate_request(set(results))
+        return results
 
     def instruments_completed(self, classification=None):
 
@@ -365,6 +367,7 @@ class QB_Status(object):
 
         in_progress = self.__instruments_by_strategy(
             classification, need_completion)
+        self.warn_on_duplicate_request(set(in_progress))
 
         def doc_id_lookup(instrument):
             """Obtain lookup keys from appropriate internals"""
@@ -415,3 +418,37 @@ class QB_Status(object):
     def withdrawn_by(self, timepoint):
         """Returns true if user had withdrawn by given timepoint"""
         return self._withdrawal_date and self._withdrawal_date <= timepoint
+
+    def warn_on_duplicate_request(self, requested_set):
+        """Ugly hack to catch TN-2747 in the act
+
+        If the requested set includes the `irondemog_v3` - confirm we don't
+        already have one on file for the user.  Log an error if found, to
+        alert staff.
+
+        Once bug is found and resolved, remove!
+        """
+        from flask import current_app
+        from .questionnaire_response import QuestionnaireResponse
+
+        requested = requested_set.intersection(('irondemog', 'irondemog_v3'))
+        if not requested:
+            return
+
+        # Can't imagine we'll ever request both versions!
+        if len(requested) != 1:
+            raise ValueError(f"both indefinites requested! {requested}")
+
+        # as the requested list includes one of the indefinites,
+        # make sure we don't already have a completed one
+        requested_indef = requested.pop()
+        query = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == self.user.id).filter(
+            QuestionnaireResponse.status == 'completed').filter(
+            QuestionnaireResponse.document[
+                ('questionnaire', 'reference')].astext.endswith(
+                requested_indef)).count()
+        if query != 0:
+            current_app.logger.error(
+                f"Caught TN-2747 in action!  User {self.user.id} completed"
+                f" {requested_indef} already!")

@@ -326,12 +326,16 @@ def patient_timeline(patient_id):
                 'status': str(qbt.status),
                 'at': FHIR_datetime.as_fhir(qbt.at)})
         else:
-            results.append({
+            data = {
                 'status': str(qbt.status),
                 'at': FHIR_datetime.as_fhir(qbt.at),
                 'qb (id, iteration)': "{} ({}, {})".format(
                     qbd.questionnaire_bank.name, qbd.qb_id, qbd.iteration),
-                'visit': visit_name(qbd)})
+                'visit': visit_name(qbd)}
+            if qbt.status == OverallStatus.due:
+                data['questionnaires'] = ','.join(
+                    [q.name for q in qbd.questionnaire_bank.questionnaires])
+            results.append(data)
 
     qb_names = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
 

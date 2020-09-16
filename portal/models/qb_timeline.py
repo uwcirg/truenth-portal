@@ -407,15 +407,18 @@ class RP_flyweight(object):
                             self.cur_start, self.nxt_start,
                             self.skipped_nxt_start))
         if self.cur_qbd:
-            trace("advanced to next QB: {} w/ start {}".format(
-                self.cur_qbd.questionnaire_bank.name, self.cur_start))
+            trace("advanced to next QB: {}({}) [{} - {})".format(
+                self.cur_qbd.questionnaire_bank.name,
+                self.cur_qbd.iteration,
+                self.cur_start,
+                self.cur_exp))
         else:
             trace("out of QBs!")
 
     def transition(self):
         """Transition internal state to 'next' Research Protocol"""
-        trace("transitioning to the next RP w/ cur_start {}".format(
-            self.cur_start))
+        trace("transitioning to the next RP [{} - {})".format(
+            self.cur_start, self.cur_exp))
         if self.cur_start > self.nxt_start + relativedelta(months=1):
             # The plus one month covers RP v5 shift
             raise ValueError(
