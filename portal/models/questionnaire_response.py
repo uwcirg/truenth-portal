@@ -533,8 +533,9 @@ class QNR_indef_results(QNR_results):
 
     """
 
-    def __init__(self, user, qb_id):
+    def __init__(self, user, research_study_id, qb_id):
         self.user = user
+        self.research_study_id = research_study_id
         # qb_id is the current indef qb - irrelevant if done in previous
         self.qb_id = qb_id
 
@@ -599,12 +600,14 @@ class QNR_indef_results(QNR_results):
 
 
 def aggregate_responses(
-        instrument_ids, current_user, research_study_id, patch_dstu2=False, celery_task=None):
+        instrument_ids, current_user, research_study_id, patch_dstu2=False,
+        celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
+    :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
     :param celery_task: if defined, send occasional progress updates
 
