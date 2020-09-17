@@ -7,5 +7,3 @@ from portal.models.research_study import add_static_research_studies
 def initialized_with_research_study(initialized_db):
     add_static_research_studies()
     db.session.commit()
-
-

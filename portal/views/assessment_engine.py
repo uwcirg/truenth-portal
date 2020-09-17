@@ -1589,9 +1589,9 @@ def present_needed():
     If `authored` date is different from utcnow(), any instruments found to be
     in an `in_progress` state will be treated as if they haven't been started.
 
-    Manages a single research study at a time.  For all research studies a user
-    is enrolled in, present-needed on the first found with outstanding work.  Call
-    again after completion to pick up the next study.
+    Manages a single research study at a time.  For all research studies a
+    user is enrolled in, present-needed on the first found with outstanding
+    work.  Call again after completion to pick up the next study.
 
     """
     from ..models.qb_status import QB_Status  # avoid cycle

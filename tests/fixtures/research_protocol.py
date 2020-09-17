@@ -12,5 +12,3 @@ def initialized_with_research_protocol(initialized_with_research_study):
         db.session.add(rp)
         db.session.commit()
     return db.session.merge(rp)
-
-
