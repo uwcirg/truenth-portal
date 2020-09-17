@@ -395,7 +395,7 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         assert not expected
 
     def test_st_undone(self):
-        # Symptom Tracker QB with incompleted should generate communication
+        # Symptom Tracker incomplete QB should generate communication
         mock_communication_request('symptom_tracker', '{"days": 30}')
 
         self.app.config['NO_CHALLENGE_WO_DATA'] = False
@@ -414,7 +414,6 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
-        invalidate_users_QBT(TEST_USER_ID, research_study_id='all')
         self.test_user = db.session.merge(self.test_user)
         qstats = QB_Status(
             self.test_user,
