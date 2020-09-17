@@ -1,6 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
 from datetime import datetime
+from glob import glob
 
 from flask import url_for
 from flask_webtest import SessionScope
@@ -40,15 +41,14 @@ from portal.models.user_consent import (
     STAFF_EDITABLE_MASK,
     UserConsent,
 )
-from portal.system_uri import (
-    IETF_LANGUAGE_TAG,
-    PRACTICE_REGION,
-    SHORTCUT_ALIAS,
-    SHORTNAME_ID,
-    SNOMED,
-    US_NPI,
-)
+from portal.system_uri import SNOMED, US_NPI
 from tests import TEST_USER_ID
+
+
+""" Include all fixtures found in nested fixtures dir as modules """
+pytest_plugins = [
+    f"tests.{fixture.replace('/', '.')}"[:-3]
+    for fixture in glob("fixtures/*.py")]
 
 
 def pytest_addoption(parser):
@@ -357,7 +357,7 @@ def add_user(app, initialized_db):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_users_QBT(test_user.id)
+        invalidate_users_QBT(test_user.id, research_study_id='all')
         return test_user
     return add_user
 

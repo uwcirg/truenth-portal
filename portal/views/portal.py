@@ -734,8 +734,13 @@ def patient_reminder_email(user_id):
         else:
             name_key = UserReminderEmail_ATMA.name_key()
 
+        # TODO research study
+        research_study_id = 0
         # If the user has a pending questionnaire bank, include for due date
-        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qstats = QB_Status(
+            user,
+            research_study_id=research_study_id,
+            as_of_date=datetime.utcnow())
         qbd = qstats.current_qbd()
         if qbd:
             qb_id, qb_iteration = qbd.qb_id, qbd.iteration
@@ -845,6 +850,14 @@ def settings():
             locale_code=user.locale_code)
 
     if form.patient_id.data and form.timestamp.data:
+        # TODO: is this in use?  would change all a user's QNR authored
+        # dates - guessing it is dead.  Remove soon unless needed
+        msg = (
+            "Attempt to use QNR authored adjustment from /settings by %s",
+            user.id)
+        current_app.logger.error(msg)
+        abort(400, msg)
+
         patient = get_user(form.patient_id.data, 'edit')
         try:
             dt = FHIR_datetime.parse(form.timestamp.data)
@@ -859,7 +872,7 @@ def settings():
                     QuestionnaireResponse.id == qnr.id
                 ).update({"document": document})
             db.session.commit()
-            invalidate_users_QBT(patient.id)
+            invalidate_users_QBT(patient.id)  # fenced out
         except ValueError as e:
             trace("Invalid date format {}".format(form.timestamp.data))
             trace("ERROR: {}".format(e))

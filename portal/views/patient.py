@@ -288,6 +288,16 @@ def post_patient_dob(patient_id):
 @patient_api.route('/api/patient/<int:patient_id>/timeline')
 @oauth.require_oauth()
 def patient_timeline(patient_id):
+    """Display details for the user's Questionnaire Bank Timeline
+
+    Optional query parameters
+    :param purge: set 'true' to recreate QBTimeline, 'all' to also reset
+      QNR -> QB assignments
+    :param study: set to alternative research study ID - defaults to 0
+    :param trace: set 'true' to view detailed logs generated, works best in
+      concert with purge
+
+    """
     from ..date_tools import FHIR_datetime
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
@@ -299,6 +309,7 @@ def patient_timeline(patient_id):
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
+    research_study_id = request.args.get('study', 0)
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
@@ -307,7 +318,10 @@ def patient_timeline(patient_id):
             QuestionnaireResponse.purge_qb_relationship(
                 subject_id=patient_id, acting_user_id=current_user().id)
 
-        update_users_QBT(patient_id, invalidate_existing=purge)
+        update_users_QBT(
+            patient_id,
+            research_study_id=research_study_id,
+            invalidate_existing=purge)
     except ValueError as ve:
         abort(500, str(ve))
 
@@ -315,7 +329,8 @@ def patient_timeline(patient_id):
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
     #  `due` == `completed`, but the row insertion defines priority
-    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(
+    for qbt in QBT.query.filter(QBT.user_id == patient_id).filter(
+            QBT.research_study_id == research_study_id).order_by(
             QBT.at, QBT.id):
         # build qbd for visit name
         qbd = QBD(
@@ -352,7 +367,9 @@ def patient_timeline(patient_id):
         } for qnr in qnrs]
 
     qbstatus = QB_Status(
-        user=User.query.get(patient_id), as_of_date=datetime.utcnow())
+        user=User.query.get(patient_id),
+        research_study_id=research_study_id,
+        as_of_date=datetime.utcnow())
     prev_qbd = qbstatus.prev_qbd
     current = qbstatus.current_qbd()
     next_qbd = qbstatus.next_qbd

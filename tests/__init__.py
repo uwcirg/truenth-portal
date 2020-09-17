@@ -184,7 +184,7 @@ class TestCase(Base):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_users_QBT(test_user.id)
+        invalidate_users_QBT(test_user.id, research_study_id='all')
         return test_user
 
     def add_user_identifier(self, user=None, system=None, value=None):

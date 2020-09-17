@@ -97,7 +97,12 @@ class QuestionnaireResponse(db.Model):
         authored = FHIR_datetime.parse(self.document['authored'])
         if qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
-            qbstatus = QB_Status(self.subject, as_of_date=authored)
+            # TODO handle research study
+            research_study_id = 0
+            qbstatus = QB_Status(
+                self.subject,
+                research_study_id=research_study_id,
+                as_of_date=authored)
 
             def qbstats_current_qbd(as_of_date, classification):
                 if as_of_date != authored:
@@ -152,7 +157,8 @@ class QuestionnaireResponse(db.Model):
             db.session.add(audit)
 
     @staticmethod
-    def purge_qb_relationship(subject_id, acting_user_id):
+    def purge_qb_relationship(
+            subject_id, research_study_id, acting_user_id):
         """Remove qb association from subject user's QuestionnaireResponses
 
         An event such as changing consent date potentially alters the
@@ -162,6 +168,7 @@ class QuestionnaireResponse(db.Model):
         recalculation
 
         """
+        # TODO: limit by research_study_id
         audits = []
         matching = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == subject_id).filter(
@@ -318,9 +325,11 @@ QNR = namedtuple('QNR', [
 class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
-    def __init__(self, user, qb_id=None, qb_iteration=None):
+    def __init__(
+            self, user, research_study_id, qb_id=None, qb_iteration=None):
         """Optionally include qb_id and qb_iteration to limit"""
         self.user = user
+        self.research_study_id = research_study_id
         self.qb_id = qb_id
         self.qb_iteration = qb_iteration
         self._qnrs = None
@@ -372,14 +381,19 @@ class QNR_results(object):
             raise ValueError(
                 "Can't associate results when restricted to single QB")
 
-        qbs = [qb for qb in qb_generator(self.user)]
-        indef_qbs = [qb for qb in qb_generator(
-            self.user, classification="indefinite")]
+        qbs = [
+            qb for qb in
+            qb_generator(self.user, research_study_id=self.research_study_id)]
+        indef_qbs = [
+            qb for qb in
+            qb_generator(
+                self.user, research_study_id=self.research_study_id,
+                classification="indefinite")]
 
-        td = trigger_date(user=self.user)
-        # TODO: address research_study_id
+        td = trigger_date(
+            user=self.user, research_study_id=self.research_study_id)
         old_td, withdrawal_date = consent_withdrawal_dates(
-            self.user, research_study_id=0)
+            self.user, research_study_id=self.research_study_id)
         if not td and old_td:
             td = old_td
 
@@ -393,9 +407,15 @@ class QNR_results(object):
             # Loop until date matching qb found, break if beyond
             for qbd in container:
                 qb_start = calc_and_adjust_start(
-                    user=self.user, qbd=qbd, initial_trigger=td)
+                    user=self.user,
+                    research_study_id=self.research_study_id,
+                    qbd=qbd,
+                    initial_trigger=td)
                 qb_expired = calc_and_adjust_expired(
-                    user=self.user, qbd=qbd, initial_trigger=td)
+                    user=self.user,
+                    research_study_id=self.research_study_id,
+                    qbd=qbd,
+                    initial_trigger=td)
                 if as_of_date < qb_start:
                     continue
                 if qb_start <= as_of_date < qb_expired:
@@ -579,7 +599,7 @@ class QNR_indef_results(QNR_results):
 
 
 def aggregate_responses(
-        instrument_ids, current_user, patch_dstu2=False, celery_task=None):
+        instrument_ids, current_user, research_study_id, patch_dstu2=False, celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -638,7 +658,7 @@ def aggregate_responses(
             document["subject"]["careProvider"] = providers
 
         _, timepoint = qb_status_visit_name(
-            subject.id, questionnaire_response.authored)
+            subject.id, research_study_id, questionnaire_response.authored)
         document["timepoint"] = timepoint
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance

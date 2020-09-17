@@ -43,6 +43,15 @@ class ResearchStudy(db.Model):
             self.status = data.get('status')
         return self
 
+    @staticmethod
+    def assigned_to(user):
+        """Returns set of all ResearchStudy IDs assigned to given user"""
+        if len(user.organizations) == 0:
+            return []
+
+        # TODO: combination of ResearchProtocols.assigned_to(user) and consents
+        return [0]
+
 
 def add_static_research_studies():
     """Seed database with default static research studies

@@ -265,7 +265,12 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
     now = datetime.utcnow()
     from .qb_status import QB_Status
-    qstats = QB_Status(user=user, as_of_date=datetime.utcnow())
+    # TODO pull research study id from questionnaire_bank parameter
+    research_study_id = 0
+    qstats = QB_Status(
+        user=user,
+        research_study_id=research_study_id,
+        as_of_date=datetime.utcnow())
     qbd = qstats.current_qbd()
     if not qbd:
         trace("no current QB found, can't continue")

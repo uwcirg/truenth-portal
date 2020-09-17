@@ -131,7 +131,7 @@ class TestCommunication(TestQuestionnaireSetup):
         dt = datetime(2017, 6, 10, 20, 00, 00, 000000)
         self.bless_with_basics(setdate=dt, local_metastatic='localized')
         user = db.session.merge(self.test_user)
-        update_users_QBT(user_id=TEST_USER_ID)
+        update_users_QBT(user_id=TEST_USER_ID, research_study_id=0)
 
         dd = load_template_args(user=user, questionnaire_bank_id=qb_id)
         assert dd['questionnaire_due_date'] == '10 Jun 2017'
@@ -359,7 +359,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert qbstatus.enrolled_in_classification('baseline')
 
         # Being a day short, shouldn't fire
@@ -377,7 +380,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert qbstatus.enrolled_in_classification('baseline')
 
         for instrument in symptom_tracker_instruments:
@@ -400,14 +406,20 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user.birthdate = '1969-07-16'
 
         # Confirm test user qualifies for ST QB
-        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qstats = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert qstats.enrolled_in_classification('baseline')
 
         # With most q's undone, should generate a message
         mock_qr(instrument_id='epic26')
-        invalidate_users_QBT(TEST_USER_ID)
+        invalidate_users_QBT(TEST_USER_ID, research_study_id='all')
         self.test_user = db.session.merge(self.test_user)
-        qstats = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qstats = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert OverallStatus.in_progress == qstats.overall_status
         update_patient_loop(update_cache=False, queue_messages=True)
         expected = Communication.query.first()
@@ -427,7 +439,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
             status='final', issued=None)
 
         # Confirm test user doesn't qualify for ST QB
-        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert not qbstatus.enrolled_in_classification('baseline')
 
         # shouldn't generate a message either
@@ -445,7 +460,10 @@ class TestCommunicationTnth(TestQuestionnaireSetup):
         self.test_user = db.session.merge(self.test_user)
 
         # Confirm test user qualifies for ST QB
-        qbstatus = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        qbstatus = QB_Status(
+            self.test_user,
+            research_study_id=0,
+            as_of_date=datetime.utcnow())
         assert qbstatus.enrolled_in_classification('baseline')
 
         # Add fresh procedure

@@ -31,6 +31,7 @@ from .models.reporting import (
     generate_and_send_summaries,
     research_report,
 )
+from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
 from .models.tou import update_tous
@@ -218,19 +219,20 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
     for user_id in patient_list:
-        if update_cache:
-            update_users_QBT(user_id)
-        if queue_messages:
-            user = User.query.get(user_id)
-            qbstatus = QB_Status(user, now)
-            qbd = qbstatus.current_qbd()
-            if qbd:
-                queue_outstanding_messages(
-                    user=user,
-                    questionnaire_bank=qbd.questionnaire_bank,
-                    iteration_count=qbd.iteration)
+        user = User.query.get(user_id)
+        for research_study_id in ResearchStudy.assigned_to(user):
+            if update_cache:
+                update_users_QBT(user_id, research_study_id)
+            if queue_messages:
+                qbstatus = QB_Status(user, research_study_id, now)
+                qbd = qbstatus.current_qbd()
+                if qbd:
+                    queue_outstanding_messages(
+                        user=user,
+                        questionnaire_bank=qbd.questionnaire_bank,
+                        iteration_count=qbd.iteration)
 
-        db.session.commit()
+            db.session.commit()
 
 
 @celery.task(queue=LOW_PRIORITY)
@@ -283,14 +285,20 @@ def send_user_messages(user, force_update=False):
         raise ValueError("Cannot send messages to {user}; {reason}".format(
             user=user, reason=reason))
 
+    users_rs_ids = ResearchStudy.assigned_to(user)
+
     if force_update:
-        invalidate_users_QBT(user_id=user.id)
-        qbd = QB_Status(user=user, as_of_date=datetime.utcnow()).current_qbd()
-        if qbd:
-            queue_outstanding_messages(
+        for rs_id in users_rs_ids:
+            invalidate_users_QBT(user_id=user.id, research_study_id=rs_id)
+            qbd = QB_Status(
                 user=user,
-                questionnaire_bank=qbd.questionnaire_bank,
-                iteration_count=qbd.iteration)
+                research_study_id=rs_id,
+                as_of_date=datetime.utcnow()).current_qbd()
+            if qbd:
+                queue_outstanding_messages(
+                    user=user,
+                    questionnaire_bank=qbd.questionnaire_bank,
+                    iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
         Communication.status == 'preparation').filter(User.id == user.id)

@@ -112,9 +112,14 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
+    # TODO research study
+    research_study_id = 0
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
-        a_s = QB_Status(user, as_of_date=datetime.utcnow())
+        a_s = QB_Status(
+            user,
+            research_study_id=research_study_id,
+            as_of_date=datetime.utcnow())
         email = (
             user.email.encode('ascii', 'ignore') if user.email else None)
         od = overdue(a_s)
@@ -175,6 +180,11 @@ def questionnaire_status():
         description: expects json or csv, defaults to json if not provided
         required: false
         type: string
+      - name: study
+        in: query
+        description: research study id, defaults to 0
+        required: false
+        type: integer
     produces:
       - application/json
       - text/csv
@@ -200,6 +210,7 @@ def questionnaire_status():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id'),
+        'research_study_id': request.args.get('study', 0),
         'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'json').lower()
     }

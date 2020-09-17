@@ -43,14 +43,11 @@ class QBT(db.Model):
      - user submits a QuestionnaireResponse
      - the definition of a QB or an organization's research protocol
 
-    The table is populated up to the next known event for a user.  If a
-    future date isn't found, that user's data is due for update.
-
     """
     __tablename__ = 'qb_timeline'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(
-        'users.id', ondelete='cascade'), nullable=False)
+        'users.id', ondelete='cascade'), nullable=False, index=True)
     at = db.Column(
         db.DateTime, nullable=False, index=True,
         doc="initial date time for state of row")
@@ -60,6 +57,9 @@ class QBT(db.Model):
         'recurs.id', ondelete='cascade'), nullable=True)
     qb_iteration = db.Column(db.Integer, nullable=True)
     status = db.Column(SQLA_Enum(OverallStatus), nullable=False, index=True)
+    research_study_id = db.Column(db.ForeignKey(
+        'research_studies.id', ondelete='cascade'),
+        nullable=False, index=True)
 
     def qbd(self):
         """Generate and return a QBD instance from self data"""
@@ -195,7 +195,7 @@ def indef_intervention_qbs(user, trigger_date):
         yield start
 
 
-def calc_and_adjust_start(user, qbd, initial_trigger):
+def calc_and_adjust_start(user, research_study_id, qbd, initial_trigger):
     """Calculate correct start for user on given QBD
 
     A QBD is initially generated with a generic trigger date for
@@ -203,13 +203,15 @@ def calc_and_adjust_start(user, qbd, initial_trigger):
     given QBD.relative_start to the users situation.
 
     :param user: subject user
+    :param research_study_id: research study being processed
     :param qbd: QBD with respect to system trigger
     :param initial_trigger: datetime value used in initial QBD calculation
 
     :returns adjusted `relative_start` for user
 
     """
-    users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    users_trigger = trigger_date(
+        user, research_study_id=research_study_id, qb=qbd.questionnaire_bank)
     if not users_trigger:
         trace(
             "no valid trigger, default to initial value: {}".format(
@@ -220,13 +222,18 @@ def calc_and_adjust_start(user, qbd, initial_trigger):
             "user {} has unexpected trigger date before consent date".format(
                 user.id))
 
-    delta = users_trigger - initial_trigger
     if not qbd.relative_start:
         raise RuntimeError("can't adjust without relative_start")
+
+    if users_trigger == initial_trigger:
+        return qbd.relative_start
+
+    delta = users_trigger - initial_trigger
+    current_app.logger.debug("calc_and_adjust_start delta: %s", str(delta))
     return qbd.relative_start + delta
 
 
-def calc_and_adjust_expired(user, qbd, initial_trigger):
+def calc_and_adjust_expired(user, research_study_id, qbd, initial_trigger):
     """Calculate correct expired for user on given QBD
 
     A QBD is initially generated with a generic trigger date for
@@ -234,13 +241,15 @@ def calc_and_adjust_expired(user, qbd, initial_trigger):
     given QBD.relative_start to the users situation.
 
     :param user: subject user
+    :param research_study_id: research study being processed
     :param qbd: QBD with respect to system trigger
     :param initial_trigger: datetime value used in initial QBD calculation
 
     :returns adjusted `relative_start` for user
 
     """
-    users_trigger = trigger_date(user, qbd.questionnaire_bank)
+    users_trigger = trigger_date(
+        user, research_study_id=research_study_id, qb=qbd.questionnaire_bank)
     if not users_trigger:
         trace(
             "no valid trigger, default to initial value: {}".format(
@@ -252,9 +261,15 @@ def calc_and_adjust_expired(user, qbd, initial_trigger):
                 user.id))
 
     expired = qbd.questionnaire_bank.expired
-    delta = users_trigger - initial_trigger + RelativeDelta(expired)
     if not qbd.relative_start:
         raise RuntimeError("can't adjust without relative_start")
+
+    if users_trigger != initial_trigger:
+        delta = users_trigger - initial_trigger + RelativeDelta(expired)
+        current_app.logger.debug(
+            "calc_and_adjust_expired delta: %s", str(delta))
+    else:
+        delta = RelativeDelta(expired)
     return qbd.relative_start + delta
 
 
@@ -334,14 +349,16 @@ class RP_flyweight(object):
 
     """
 
-    def __init__(self, user, trigger_date, classification):
+    def __init__(self, user, trigger_date, research_study_id, classification):
         """Initialize flyweight state
         :param user: the patient
         :param trigger_date: the patient's initial trigger date
+        :param research_study_id: the study being processed
         :param classification: `indefinite` or None
         """
         self.user = user
         self.td = trigger_date
+        self.research_study_id = research_study_id
         self.classification = classification
         self.rp_walker = cur_next_rp_gen(
             user=self.user, trigger_date=self.td,
@@ -370,16 +387,25 @@ class RP_flyweight(object):
             self.cur_qbd = next(self.cur_rpd.qbds, None)
         if self.cur_qbd:
             self.cur_start = calc_and_adjust_start(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+                user=self.user,
+                research_study_id=self.research_study_id,
+                qbd=self.cur_qbd,
+                initial_trigger=self.td)
             self.cur_exp = calc_and_adjust_expired(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+                user=self.user,
+                research_study_id=self.research_study_id,
+                qbd=self.cur_qbd,
+                initial_trigger=self.td)
 
         self.nxt_qbd, self.nxt_start = None, None
         if self.nxt_rpd:
             self.nxt_qbd = next(self.nxt_rpd.qbds, None)
         if self.nxt_qbd:
             self.nxt_start = calc_and_adjust_start(
-                user=self.user, qbd=self.nxt_qbd, initial_trigger=self.td)
+                user=self.user,
+                research_study_id=self.research_study_id,
+                qbd=self.nxt_qbd,
+                initial_trigger=self.td)
             if self.cur_qbd is None:
                 trace("Finished cur RP with remaining QBs in next")
                 self.cur_start = self.nxt_start
@@ -395,7 +421,9 @@ class RP_flyweight(object):
                 self.nxt_qbd = next(self.nxt_rpd.qbds, None)
                 if self.nxt_qbd:
                     self.nxt_start = calc_and_adjust_start(
-                        user=self.user, qbd=self.nxt_qbd,
+                        user=self.user,
+                        research_study_id=self.research_study_id,
+                        qbd=self.nxt_qbd,
                         initial_trigger=self.td)
                 if self.cur_start > self.nxt_start + relativedelta(months=1):
                     # Still no match means poorly defined RP QBs
@@ -454,13 +482,14 @@ class RP_flyweight(object):
             self.transition()
 
 
-def ordered_qbs(user, classification=None):
-    """Generator to yield ordered qbs for a user
+def ordered_qbs(user, research_study_id, classification=None):
+    """Generator to yield ordered qbs for a user, research_study
 
     This does NOT include the indefinite classification unless requested,
      as it plays by a different set of rules.
 
     :param user: the user to lookup
+    :param research_study_id: the research study being processed
     :param classification: set to ``indefinite`` for that special handling
     :returns: QBD for each (QB, iteration, recur)
 
@@ -473,10 +502,9 @@ def ordered_qbs(user, classification=None):
 
     # bootstrap problem - don't know initial `as_of_date` w/o a QB
     # call `trigger_date` w/o QB for best guess.
-    td = trigger_date(user=user)
-    # TODO: address research_study_id
+    td = trigger_date(user=user, research_study_id=research_study_id)
     old_td, withdrawal_date = consent_withdrawal_dates(
-        user, research_study_id=0)
+        user, research_study_id=research_study_id)
     if not td:
         if old_td:
             trace("withdrawn user, use previous trigger {}".format(old_td))
@@ -488,10 +516,13 @@ def ordered_qbs(user, classification=None):
         trace("initial trigger date {}".format(td))
 
     rp_flyweight = RP_flyweight(
-        user=user, trigger_date=td, classification=classification)
+        user=user,
+        trigger_date=td,
+        research_study_id=research_study_id,
+        classification=classification)
 
     if rp_flyweight.cur_rpd:
-        user_qnrs = QNR_results(user)
+        user_qnrs = QNR_results(user, research_study_id=research_study_id)
         rp_flyweight.next_qbd()
 
         if not rp_flyweight.cur_qbd:
@@ -577,9 +608,11 @@ def ordered_qbs(user, classification=None):
 
         # No applicable RPs, try intervention associated QBs
         if classification == 'indefinite':
-            iqbds = indef_intervention_qbs(user, trigger_date=td)
+            iqbds = indef_intervention_qbs(
+                user, trigger_date=td)
         else:
-            iqbds = ordered_intervention_qbs(user, trigger_date=td)
+            iqbds = ordered_intervention_qbs(
+                user, trigger_date=td)
 
         while True:
             try:
@@ -587,7 +620,10 @@ def ordered_qbs(user, classification=None):
             except StopIteration:
                 return
             users_start = calc_and_adjust_start(
-                user=user, qbd=qbd, initial_trigger=td)
+                user=user,
+                research_study_id=research_study_id,
+                qbd=qbd,
+                initial_trigger=td)
 
             qbd.relative_start = users_start
             # sanity check - make sure we don't adjust twice
@@ -597,35 +633,52 @@ def ordered_qbs(user, classification=None):
             yield qbd
 
 
-def invalidate_users_QBT(user_id):
-    """Mark the given user's QBT rows invalid (by deletion)"""
-    QBT.query.filter(QBT.user_id == user_id).delete()
+def invalidate_users_QBT(user_id, research_study_id):
+    """Mark the given user's QBT rows invalid (by deletion)
+
+    :param user_id: user for whom to purge all QBT rows
+    :param research_study_id: set to limit invalidation to research study or
+      use string 'all' to invalidate all QBT rows for a user
+
+    """
+    if research_study_id == 'all':
+        QBT.query.filter(QBT.user_id == user_id).delete()
+    else:
+        QBT.query.filter(QBT.user_id == user_id).filter(
+            QBT.research_study_id == research_study_id).delete()
     db.session.commit()
 
 
-def update_users_QBT(user_id, invalidate_existing=False):
-    """Populate the QBT rows for given user
+def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
+    """Populate the QBT rows for given user, research_study
 
     :param user: the user to add QBT rows for
+    :param research_study_id: the research study being processed
     :param invalidate_existing: set true to wipe any current rows first
 
+    A user may be eligible for any number of research studies.  QBT treats
+    each (user, research_study) independently, as should clients.
+
     """
-    def attempt_update(user_id, invalidate_existing):
+    def attempt_update(user_id, research_study_id, invalidate_existing):
         """Updates user's QBT or raises if lock is unattainable"""
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
         timeout = int(current_app.config.get("MULTIPROCESS_LOCK_TIMEOUT"))
-        key = "update_users_QBT user:{}".format(user_id)
+        key = "update_users_QBT user:study {}:{}".format(
+            user_id, research_study_id)
 
         with TimeoutLock(key=key, timeout=timeout):
             if invalidate_existing:
-                QBT.query.filter(QBT.user_id == user_id).delete()
+                QBT.query.filter(QBT.user_id == user_id).filter(
+                    QBT.research_study_id == research_study_id).delete()
 
-            # if any rows are found, assume this user is current
+            # if any rows are found, assume this user/study is current
             if QBT.query.filter(QBT.user_id == user_id).count():
                 trace(
-                    "found QBT rows, returning cached for {}".format(user_id))
+                    "found QBT rows, returning cached for {}:{}".format(
+                        user_id, research_study_id))
                 return
 
             user = User.query.get(user_id)
@@ -638,8 +691,8 @@ def update_users_QBT(user_id, invalidate_existing=False):
                         user, str([r.name for r in user.roles])))
 
             # Create time line for user, from initial trigger date
-            qb_generator = ordered_qbs(user)
-            user_qnrs = QNR_results(user)
+            qb_generator = ordered_qbs(user, research_study_id)
+            user_qnrs = QNR_results(user, research_study_id)
 
             # Force recalculation of QNR->QB association if needed
             if user_qnrs.qnrs_missing_qb_association():
@@ -648,12 +701,14 @@ def update_users_QBT(user_id, invalidate_existing=False):
             # As we move forward, capture state at each time point
 
             pending_qbts = AtOrderedList()
-            kwargs = {"user_id": user_id}
             for qbd in qb_generator:
                 qb_recur_id = qbd.recur.id if qbd.recur else None
                 kwargs = {
-                    "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
-                    "qb_iteration": qbd.iteration, "qb_recur_id": qb_recur_id}
+                    "user_id": user.id,
+                    "research_study_id": research_study_id,
+                    "qb_id": qbd.questionnaire_bank.id,
+                    "qb_iteration": qbd.iteration,
+                    "qb_recur_id": qb_recur_id}
                 start = qbd.relative_start
                 # Always add start (due)
                 pending_qbts.append(QBT(at=start, status='due', **kwargs))
@@ -718,15 +773,17 @@ def update_users_QBT(user_id, invalidate_existing=False):
 
             # If user withdrew from study - remove any rows post withdrawal
             num_stored = 0
-            # TODO: address research_study_id
             _, withdrawal_date = consent_withdrawal_dates(
-                user, research_study_id=0)
+                user, research_study_id=research_study_id)
             if withdrawal_date:
                 trace("withdrawn as of {}".format(withdrawal_date))
                 store_rows = [
                     qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
-                store_rows.append(
-                    QBT(at=withdrawal_date, status='withdrawn', **kwargs))
+                store_rows.append(QBT(
+                    at=withdrawal_date,
+                    status='withdrawn',
+                    user_id=user_id,
+                    research_study_id=research_study_id))
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
             else:
@@ -743,7 +800,9 @@ def update_users_QBT(user_id, invalidate_existing=False):
     for attempt in range(1, 6):
         try:
             attempt_update(
-                user_id=user_id, invalidate_existing=invalidate_existing)
+                user_id=user_id,
+                research_study_id=research_study_id,
+                invalidate_existing=invalidate_existing)
             success = True
             break
         except ConnectionError as ce:
@@ -844,7 +903,7 @@ class QB_StatusCacheKey(object):
 
 
 @cache.memoize(timeout=TWO_HOURS)
-def qb_status_visit_name(user_id, as_of_date):
+def qb_status_visit_name(user_id, research_study_id, as_of_date):
     """Return (status, visit name) for current QB for user as of given date
 
     NB to take advantage of caching, clients should use
@@ -853,15 +912,19 @@ def qb_status_visit_name(user_id, as_of_date):
 
     If no data is available for the user, returns (expired, None)
     """
+    from .research_study import ResearchStudy
 
+    assert isinstance(research_study_id, int)
     assert isinstance(as_of_date, datetime)
+
     # should be cached, unless recently invalidated - confirm
-    update_users_QBT(user_id)
+    update_users_QBT(user_id, research_study_id=research_study_id)
 
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
     #  `due` == `completed`, but the row insertion defines priority
     qbt = QBT.query.filter(QBT.user_id == user_id).filter(
+        QBT.research_study_id == research_study_id).filter(
         QBT.at <= as_of_date).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt:
@@ -875,14 +938,18 @@ def expires(user_id, qbd):
     :returns: the expires date for the given user/QBD; None if not found.
 
     """
+    # TODO pull research_study_id from qbd - should it be part of QBD?
+    research_study_id = 0
+
     # should be cached, unless recently invalidated
-    update_users_QBT(user_id)
+    update_users_QBT(user_id, research_study_id)
 
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
     #  `due` == `completed`, but the row insertion defines priority
     qbt = QBT.query.filter(QBT.user_id == user_id).filter(
         QBT.qb_id == qbd.qb_id).filter(
+        QBT.research_study_id == research_study_id).filter(
         QBT.qb_iteration == qbd.iteration).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt and qbt.status in (
