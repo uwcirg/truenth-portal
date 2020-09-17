@@ -745,17 +745,6 @@ class TestQB_Status(TestQuestionnaireSetup):
         # should include all from second recur
         assert set(a_s.instruments_needing_full_assessment()) == metastatic_4
 
-    def test_batch_lookup(self):
-        self.login()
-        self.bless_with_basics()
-        response = self.client.get(
-            '/api/consent-assessment-status?user_id=1&user_id=2')
-        assert response.status_code == 200
-        assert len(response.json['status']) == 1
-        assert (
-            response.json['status'][0]['consents'][0]['assessment_status'] ==
-            str(OverallStatus.expired))
-
     def test_none_org(self):
         # check users w/ none of the above org
         self.test_user = db.session.merge(self.test_user)
