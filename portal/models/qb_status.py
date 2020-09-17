@@ -6,8 +6,11 @@ API to lookup user's status with respect to assigned questionnaire banks.
 from ..trace import trace
 from .overall_status import OverallStatus
 from .qb_timeline import QBT, ordered_qbs, update_users_QBT
-from .questionnaire_response import QNR_results, qnr_document_id
-
+from .questionnaire_response import (
+    QNR_indef_results,
+    QNR_results,
+    qnr_document_id,
+)
 
 class NoCurrentQB(Exception):
     """Exception to raise when no current QB is available yet required"""
@@ -216,7 +219,7 @@ class QB_Status(object):
 
         # Indefinite is similar, but *special*
         if self._current_indef:
-            user_indef_qnrs = QNR_results(
+            user_indef_qnrs = QNR_indef_results(
                 self.user, qb_id=self._current_indef.qb_id)
             self._required_indef = user_indef_qnrs.required_qs(
                 qb_id=self._current_indef.qb_id)

@@ -506,14 +506,26 @@ class QNR_results(object):
 
 
 class QNR_indef_results(QNR_results):
-    """Specialized for indefinite QB"""
+    """Specialized for indefinite QB
+
+    Indefinite is special, in that once done - don't offer again, even if
+    the protocol changes.
+
+    """
 
     def __init__(self, user, qb_id):
         self.user = user
+        # qb_id is the current indef qb - irrelevant if done in previous
+        self.qb_id = qb_id
+
         query = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.subject_id == user.id).filter(
-            QuestionnaireResponse.questionnaire_bank_id == qb_id
+            QuestionnaireResponse.subject_id == user.id).join(
+            QuestionnaireBank).filter(
+            QuestionnaireResponse.questionnaire_bank_id ==
+            QuestionnaireBank.id).filter(
+            QuestionnaireBank.classification == 'indefinite'
         ).with_entities(
+            QuestionnaireResponse.id,
             QuestionnaireResponse.questionnaire_bank_id,
             QuestionnaireResponse.qb_iteration,
             QuestionnaireResponse.status,
@@ -523,15 +535,47 @@ class QNR_indef_results(QNR_results):
             QuestionnaireResponse.encounter_id).order_by(
             QuestionnaireResponse.authored)
 
-        self.qnrs = []
+        self._qnrs = []
         for qnr in query:
-            self.qnrs.append(QNR(
+            self._qnrs.append(QNR(
+                qnr_id=qnr.id,
                 qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=qnr.instrument_id.split('/')[-1],
                 authored=qnr.authored,
                 encounter_id=qnr.encounter_id))
+
+    def completed_qs(self, qb_id, iteration):
+        """Return set of completed Questionnaire results for Indefinite"""
+        # ignore the qb_id - as prior protocol versions picked up also count
+        return {
+            qnr.instrument for qnr in self.qnrs
+            if qnr.status == "completed"}
+
+    def partial_qs(self, qb_id, iteration):
+        """Return set of partial Questionnaire results for Indefinite"""
+        # ignore the qb_id - as prior protocol versions picked up also count
+        return {
+            qnr.instrument for qnr in self.qnrs
+            if qnr.status == "in-progress"}
+
+    def required_qs(self, qb_id):
+        """Return required list of Questionnaires for QB"""
+        # if user completed or started an indefinite questionnaire on prior
+        # RP, potentially with different name, report that as only required
+        # given indefinite special handling
+        completed = self.completed_qs(qb_id, None)
+        if completed:
+            return [q for q in completed]
+
+        partial = self.partial_qs(qb_id, None)
+        if partial:
+            return [q for q in partial]
+
+        from .questionnaire_bank import QuestionnaireBank  # avoid import cyc.
+        qb = QuestionnaireBank.query.get(qb_id)
+        return [q.name for q in qb.questionnaires]
 
 
 def aggregate_responses(
