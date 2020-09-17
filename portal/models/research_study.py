@@ -1,5 +1,6 @@
 from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
+from .questionnaire_bank import qbs_by_intervention
 
 status_types = (
     "active", "administratively-completed", "approved", "closed-to-accrual",
@@ -46,11 +47,19 @@ class ResearchStudy(db.Model):
     @staticmethod
     def assigned_to(user):
         """Returns set of all ResearchStudy IDs assigned to given user"""
+        base_study = 0
+        results = []
+        iqbs = qbs_by_intervention(user, classification=None)
+        if iqbs:
+            results.append(base_study)  # Use dummy till system need arises
+
         if len(user.organizations) == 0:
-            return []
+            return results
 
         # TODO: combination of ResearchProtocols.assigned_to(user) and consents
-        return [0]
+        if base_study not in results:
+            results.append(base_study)
+        return results
 
 
 def add_static_research_studies():
