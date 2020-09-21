@@ -49,7 +49,7 @@ class ResearchProtocol(db.Model):
 
     @staticmethod
     def assigned_to(user):
-        """Returns set of all ResearchProtocols assigned to given user"""
+        """Returns set of tuples (ResearchProtocol, retired) for user"""
         rps = set()
         for org in user.organizations:
             for r in org.rps_w_retired(consider_parents=True):
