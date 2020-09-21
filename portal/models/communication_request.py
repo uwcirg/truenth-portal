@@ -265,8 +265,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
     now = datetime.utcnow()
     from .qb_status import QB_Status
-    # TODO pull research study id from questionnaire_bank parameter
-    research_study_id = 0
+    research_study_id = questionnaire_bank.research_study_id
     qstats = QB_Status(
         user=user,
         research_study_id=research_study_id,
