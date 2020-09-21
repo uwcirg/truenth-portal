@@ -1,6 +1,8 @@
 from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
 from .questionnaire_bank import qbs_by_intervention
+from .research_protocol import ResearchProtocol
+from .user_consent import latest_consent
 
 status_types = (
     "active", "administratively-completed", "approved", "closed-to-accrual",
@@ -53,12 +55,14 @@ class ResearchStudy(db.Model):
         if iqbs:
             results.append(base_study)  # Use dummy till system need arises
 
-        if len(user.organizations) == 0:
-            return results
+        for rp, _ in ResearchProtocol.assigned_to(user):
+            rs_id = rp.research_study_id
+            if rs_id is None:
+                continue
 
-        # TODO: combination of ResearchProtocols.assigned_to(user) and consents
-        if base_study not in results:
-            results.append(base_study)
+            if latest_consent(user, rs_id) and rs_id not in results:
+                results.append(rs_id)
+        results.sort()
         return results
 
 
