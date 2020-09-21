@@ -93,6 +93,14 @@ class QuestionnaireBank(db.Model):
         instance = cls()
         return instance.update_from_json(data)
 
+    @property
+    def research_study_id(self):
+        """A questionnaire bank with a research protocol has a research study"""
+        if self.research_protocol_id is None:
+            return
+
+        return self.research_protocol.research_study_id
+
     def update_from_json(self, data):
         self.name = data['name']
         if 'classification' in data:

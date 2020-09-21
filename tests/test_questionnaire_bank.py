@@ -492,6 +492,7 @@ class TestQuestionnaireBank(TestCase):
         qb = QuestionnaireBank.from_json(data)
         assert len(qb.questionnaires) == 2
         assert qb.research_protocol_id == rp_id
+        assert qb.research_study_id == 0
 
     def test_lookup_for_user(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
