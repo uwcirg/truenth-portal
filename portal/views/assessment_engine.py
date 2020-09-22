@@ -756,17 +756,20 @@ def get_assessments():
     questionnaire_list = request.args.getlist('instrument_id')
     for q in questionnaire_list:
         research_studies.add(research_study_id_from_questionnaire(q))
-    if len(research_studies != 1):
+    if len(research_studies) != 1:
         abort(
             400,
             f"Requested instruments ({questionnaire_list}) span multiple "
             "research studies")
+    research_study_id = research_studies.pop()
+    if research_study_id is None:
+        research_study_id = 0
 
     # This frequently takes over a minute to produce.  Generate a serializable
     # form of all args for reliable hand off to a background task.
     kwargs = {
         'instrument_ids': questionnaire_list,
-        'research_study_id': research_studies.pop(),
+        'research_study_id': research_study_id,
         'acting_user_id': current_user().id,
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
