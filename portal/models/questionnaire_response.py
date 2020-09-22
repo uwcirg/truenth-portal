@@ -25,6 +25,7 @@ from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire import Questionnaire
 from .questionnaire_bank import QuestionnaireBank, trigger_date, visit_name
+from .research_study import research_study_id_from_questionnaire
 from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
@@ -95,10 +96,17 @@ class QuestionnaireResponse(db.Model):
 
         """
         authored = FHIR_datetime.parse(self.document['authored'])
+        qn_ref = self.document.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.find_by_name(name=qn_name)
+
         if qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
-            # TODO handle research study
-            research_study_id = 0
+            if self.questionnaire_bank is not None:
+                research_study_id = self.questionnaire_bank.research_study_id
+            else:
+                research_study_id = research_study_id_from_questionnaire(qn_name)
+
             qbstatus = QB_Status(
                 self.subject,
                 research_study_id=research_study_id,
@@ -117,9 +125,6 @@ class QuestionnaireResponse(db.Model):
         # clear both until current values are determined
         self.questionnaire_bank_id, self.qb_iteration = None, None
 
-        qn_ref = self.document.get("questionnaire").get("reference")
-        qn_name = qn_ref.split("/")[-1] if qn_ref else None
-        qn = Questionnaire.find_by_name(name=qn_name)
         qbd = qbd_accessor(as_of_date=authored, classification=None)
         if qbd and qn and qn.id in (
                 q.questionnaire.id for q in
@@ -168,13 +173,18 @@ class QuestionnaireResponse(db.Model):
         recalculation
 
         """
-        # TODO: limit by research_study_id
         audits = []
         matching = QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == subject_id).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None))
 
         for qnr in matching:
+            if (
+                    qnr.questionnaire_bank and
+                    qnr.questionnaire_bank.research_study_id !=
+                    research_study_id):
+                continue
+
             audit = Audit(
                 user_id=acting_user_id, subject_id=subject_id,
                 context='assessment',
