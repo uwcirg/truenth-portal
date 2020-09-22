@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
-from .questionnaire_bank import qbs_by_intervention
+from .questionnaire_bank import QuestionnaireBank, qbs_by_intervention
 from .research_protocol import ResearchProtocol
 from .user_consent import latest_consent
 
@@ -64,6 +64,25 @@ class ResearchStudy(db.Model):
                 results.append(rs_id)
         results.sort()
         return results
+
+
+def research_study_id_from_questionnaire(questionnaire_name):
+    """Reverse lookup research_study_id from a questionnaire_name"""
+    # TODO cache map and results
+    # expensive mapping - store cacheable value once determined
+    map = {}
+    for qb in QuestionnaireBank.query.all():
+        rs_id = qb.research_protocol_id
+        if rs_id is None:
+            continue
+        for q in qb.questionnaires:
+            if q.name in map:
+                if (map[q.name] != rs_id):
+                    raise ValueError(
+                        f"Configuration error, {q.name} belongs to multiple "
+                        "research studies")
+            map[q.name] = rs_id
+    return map.get(questionnaire_name)
 
 
 def add_static_research_studies():
