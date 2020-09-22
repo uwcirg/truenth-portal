@@ -72,9 +72,11 @@ def research_study_id_from_questionnaire(questionnaire_name):
     # expensive mapping - store cacheable value once determined
     map = {}
     for qb in QuestionnaireBank.query.all():
-        rs_id = qb.research_protocol_id
-        if rs_id is None:
+        rp_id = qb.research_protocol_id
+        if rp_id is None:
             continue
+
+        rs_id = qb.research_protocol.research_study_id
         for q in qb.questionnaires:
             if q.name in map:
                 if (map[q.name] != rs_id):
