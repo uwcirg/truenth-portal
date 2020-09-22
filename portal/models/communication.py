@@ -327,9 +327,9 @@ class Communication(db.Model):
                 "can't send communication to {user}; {reason}".format(
                     user=user, reason=reason))
 
-        research_study_id = self.communication_request.questionnaire_bank.research_study_id
+        rs_id = self.communication_request.questionnaire_bank.research_study_id
         qb_status, _ = qb_status_visit_name(
-            self.user_id, research_study_id, datetime.utcnow())
+            self.user_id, rs_id, datetime.utcnow())
         if qb_status == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
@@ -357,7 +357,7 @@ class Communication(db.Model):
             self.status = 'aborted'
 
     def preview(self):
-        "Collate message details and return preview (DOES NOT SEND)"
+        """Collate message details and return preview (DOES NOT SEND)"""
 
         msg = self.generate_message()
         msg.body = msg.style_message(msg.body)

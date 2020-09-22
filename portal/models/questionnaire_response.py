@@ -105,7 +105,8 @@ class QuestionnaireResponse(db.Model):
             if self.questionnaire_bank is not None:
                 research_study_id = self.questionnaire_bank.research_study_id
             else:
-                research_study_id = research_study_id_from_questionnaire(qn_name)
+                research_study_id = research_study_id_from_questionnaire(
+                    qn_name)
 
             qbstatus = QB_Status(
                 self.subject,

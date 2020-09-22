@@ -95,7 +95,7 @@ class QuestionnaireBank(db.Model):
 
     @property
     def research_study_id(self):
-        """A questionnaire bank with a research protocol has a research study"""
+        """A questionnaire bank w/ a research protocol has a research study"""
         if self.research_protocol_id is None:
             return
 
