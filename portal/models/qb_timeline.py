@@ -938,8 +938,7 @@ def expires(user_id, qbd):
     :returns: the expires date for the given user/QBD; None if not found.
 
     """
-    # TODO pull research_study_id from qbd - should it be part of QBD?
-    research_study_id = 0
+    research_study_id = qbd.questionnaire_bank.research_study_id
 
     # should be cached, unless recently invalidated
     update_users_QBT(user_id, research_study_id)
