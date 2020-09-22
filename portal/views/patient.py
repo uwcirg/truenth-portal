@@ -293,7 +293,7 @@ def patient_timeline(patient_id):
     Optional query parameters
     :param purge: set 'true' to recreate QBTimeline, 'all' to also reset
       QNR -> QB assignments
-    :param study: set to alternative research study ID - defaults to 0
+    :param research_study_id: set to alternative research study ID - default 0
     :param trace: set 'true' to view detailed logs generated, works best in
       concert with purge
 
@@ -309,14 +309,16 @@ def patient_timeline(patient_id):
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
-    research_study_id = request.args.get('study', 0)
+    research_study_id = request.args.get('research_study_id', 0)
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
         # questionnaire_response : qb relationships.
         if purge == 'all':
             QuestionnaireResponse.purge_qb_relationship(
-                subject_id=patient_id, acting_user_id=current_user().id)
+                subject_id=patient_id,
+                research_study_id=research_study_id,
+                acting_user_id=current_user().id)
 
         update_users_QBT(
             patient_id,
