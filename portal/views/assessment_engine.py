@@ -34,7 +34,10 @@ from ..models.questionnaire_response import (
     NoFutureDates,
     QuestionnaireResponse,
 )
-from ..models.research_study import ResearchStudy
+from ..models.research_study import (
+    ResearchStudy,
+    research_study_id_from_questionnaire,
+)
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..timeout_lock import LockTimeout, guarded_task_launch
@@ -748,14 +751,22 @@ def get_assessments():
 
     """
     from ..tasks import research_report_task
-    # TODO add research_study_id as a parameter?  sniff out from instruments?
-    research_study_id = 0
+
+    research_studies = set()
+    questionnaire_list = request.args.getlist('instrument_id')
+    for q in questionnaire_list:
+        research_studies.add(research_study_id_from_questionnaire(q))
+    if len(research_studies != 1):
+        abort(
+            400,
+            f"Requested instruments ({questionnaire_list}) span multiple "
+            "research studies")
 
     # This frequently takes over a minute to produce.  Generate a serializable
     # form of all args for reliable hand off to a background task.
     kwargs = {
-        'instrument_ids': request.args.getlist('instrument_id'),
-        'research_study_id': research_study_id,
+        'instrument_ids': questionnaire_list,
+        'research_study_id': research_studies.pop(),
         'acting_user_id': current_user().id,
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
