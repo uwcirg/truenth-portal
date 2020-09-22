@@ -270,7 +270,7 @@ def overdue_stats_by_org():
     overdue_stats = defaultdict(list)
     now = datetime.utcnow()
 
-    # TODO: handle research study id
+    # TODO: handle research study id; currently only reporting on id==0
     research_study_id = 0
     # use system user to avoid pruning any patients during cache population
     sys = User.query.filter_by(email='__system__').one()
