@@ -112,7 +112,7 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
-    # TODO research study
+    # TODO: handle research study id; currently only reporting on id==0
     research_study_id = 0
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
@@ -180,7 +180,7 @@ def questionnaire_status():
         description: expects json or csv, defaults to json if not provided
         required: false
         type: string
-      - name: study
+      - name: research_study_id
         in: query
         description: research study id, defaults to 0
         required: false
@@ -210,7 +210,7 @@ def questionnaire_status():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id'),
-        'research_study_id': request.args.get('study', 0),
+        'research_study_id': int(request.args.get('research_study_id', 0)),
         'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'json').lower()
     }

@@ -2398,6 +2398,11 @@ def get_current_user_qb(user_id):
         required: true
         type: integer
         format: int64
+      - name: research_study_id
+        in: query
+        description: research study id, defaults to 0
+        required: false
+        type: integer
       - name: as_of_date
         in: query
         description: Optional datetime for user-specific QB (otherwise, now)
@@ -2426,8 +2431,9 @@ def get_current_user_qb(user_id):
     # allow date and time info to be available
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 
-    # TODO: need research study ID as query param?
-    qstats = QB_Status(user=user, research_study_id=0, as_of_date=date)
+    research_study_id = int(request.args.get('research_study_id', 0))
+    qstats = QB_Status(
+        user=user, research_study_id=research_study_id, as_of_date=date)
     qbd = qstats.current_qbd()
 
     if not qbd:

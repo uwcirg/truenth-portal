@@ -723,19 +723,24 @@ def patient_invite_email(user_id):
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
-    """Patient Reminder Email Content"""
+    """Patient Reminder Email Content
+
+    Query string
+    :param research_study_id: set for targeted reminder emails, defaults to 0
+
+    """
     from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
-
+    research_study_id = int(request.args.get('research_study_id', 0))
     try:
         top_org = user.first_top_organization()
         if top_org:
+            # TODO lookup sub-study specific email content
+            #  if research_study_id == 1
             name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserReminderEmail_ATMA.name_key()
 
-        # TODO research study
-        research_study_id = 0
         # If the user has a pending questionnaire bank, include for due date
         qstats = QB_Status(
             user,

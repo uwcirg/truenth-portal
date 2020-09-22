@@ -309,7 +309,7 @@ def patient_timeline(patient_id):
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
-    research_study_id = request.args.get('research_study_id', 0)
+    research_study_id = int(request.args.get('research_study_id', 0))
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
