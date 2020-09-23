@@ -51,7 +51,7 @@
 	</caption>
 {%- endmacro -%}
 {%- macro patientListToggle(selected="mainStudy") -%}
-	<div id="patientListToggle" class="patientlist-toggle-container">
+	<div id="patientListToggle" class="patientlist-toggle-container eproms-substudy">
 		<a href="/patients">
 			<input type="radio" class="radio" name="patientListToggle" id="mainStudy" {%if selected == 'mainStudy'%}checked{%endif%}>
 			<span class="label">{{_("Main Study")}}</span>
