@@ -25,6 +25,7 @@ from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire import Questionnaire
 from .questionnaire_bank import QuestionnaireBank, trigger_date, visit_name
+from .research_study import research_study_id_from_questionnaire
 from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
@@ -95,9 +96,22 @@ class QuestionnaireResponse(db.Model):
 
         """
         authored = FHIR_datetime.parse(self.document['authored'])
+        qn_ref = self.document.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.find_by_name(name=qn_name)
+
         if qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
-            qbstatus = QB_Status(self.subject, as_of_date=authored)
+            if self.questionnaire_bank is not None:
+                research_study_id = self.questionnaire_bank.research_study_id
+            else:
+                research_study_id = research_study_id_from_questionnaire(
+                    qn_name)
+
+            qbstatus = QB_Status(
+                self.subject,
+                research_study_id=research_study_id,
+                as_of_date=authored)
 
             def qbstats_current_qbd(as_of_date, classification):
                 if as_of_date != authored:
@@ -112,9 +126,6 @@ class QuestionnaireResponse(db.Model):
         # clear both until current values are determined
         self.questionnaire_bank_id, self.qb_iteration = None, None
 
-        qn_ref = self.document.get("questionnaire").get("reference")
-        qn_name = qn_ref.split("/")[-1] if qn_ref else None
-        qn = Questionnaire.find_by_name(name=qn_name)
         qbd = qbd_accessor(as_of_date=authored, classification=None)
         if qbd and qn and qn.id in (
                 q.questionnaire.id for q in
@@ -152,7 +163,8 @@ class QuestionnaireResponse(db.Model):
             db.session.add(audit)
 
     @staticmethod
-    def purge_qb_relationship(subject_id, acting_user_id):
+    def purge_qb_relationship(
+            subject_id, research_study_id, acting_user_id):
         """Remove qb association from subject user's QuestionnaireResponses
 
         An event such as changing consent date potentially alters the
@@ -168,6 +180,12 @@ class QuestionnaireResponse(db.Model):
             QuestionnaireResponse.questionnaire_bank_id.isnot(None))
 
         for qnr in matching:
+            if (
+                    qnr.questionnaire_bank and
+                    qnr.questionnaire_bank.research_study_id !=
+                    research_study_id):
+                continue
+
             audit = Audit(
                 user_id=acting_user_id, subject_id=subject_id,
                 context='assessment',
@@ -318,9 +336,11 @@ QNR = namedtuple('QNR', [
 class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
-    def __init__(self, user, qb_id=None, qb_iteration=None):
+    def __init__(
+            self, user, research_study_id, qb_id=None, qb_iteration=None):
         """Optionally include qb_id and qb_iteration to limit"""
         self.user = user
+        self.research_study_id = research_study_id
         self.qb_id = qb_id
         self.qb_iteration = qb_iteration
         self._qnrs = None
@@ -372,14 +392,19 @@ class QNR_results(object):
             raise ValueError(
                 "Can't associate results when restricted to single QB")
 
-        qbs = [qb for qb in qb_generator(self.user)]
-        indef_qbs = [qb for qb in qb_generator(
-            self.user, classification="indefinite")]
+        qbs = [
+            qb for qb in
+            qb_generator(self.user, research_study_id=self.research_study_id)]
+        indef_qbs = [
+            qb for qb in
+            qb_generator(
+                self.user, research_study_id=self.research_study_id,
+                classification="indefinite")]
 
-        td = trigger_date(user=self.user)
-        # TODO: address research_study_id
+        td = trigger_date(
+            user=self.user, research_study_id=self.research_study_id)
         old_td, withdrawal_date = consent_withdrawal_dates(
-            self.user, research_study_id=0)
+            self.user, research_study_id=self.research_study_id)
         if not td and old_td:
             td = old_td
 
@@ -393,9 +418,15 @@ class QNR_results(object):
             # Loop until date matching qb found, break if beyond
             for qbd in container:
                 qb_start = calc_and_adjust_start(
-                    user=self.user, qbd=qbd, initial_trigger=td)
+                    user=self.user,
+                    research_study_id=self.research_study_id,
+                    qbd=qbd,
+                    initial_trigger=td)
                 qb_expired = calc_and_adjust_expired(
-                    user=self.user, qbd=qbd, initial_trigger=td)
+                    user=self.user,
+                    research_study_id=self.research_study_id,
+                    qbd=qbd,
+                    initial_trigger=td)
                 if as_of_date < qb_start:
                     continue
                 if qb_start <= as_of_date < qb_expired:
@@ -513,8 +544,9 @@ class QNR_indef_results(QNR_results):
 
     """
 
-    def __init__(self, user, qb_id):
+    def __init__(self, user, research_study_id, qb_id):
         self.user = user
+        self.research_study_id = research_study_id
         # qb_id is the current indef qb - irrelevant if done in previous
         self.qb_id = qb_id
 
@@ -579,12 +611,14 @@ class QNR_indef_results(QNR_results):
 
 
 def aggregate_responses(
-        instrument_ids, current_user, patch_dstu2=False, celery_task=None):
+        instrument_ids, current_user, research_study_id, patch_dstu2=False,
+        celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
+    :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
     :param celery_task: if defined, send occasional progress updates
 
@@ -638,7 +672,7 @@ def aggregate_responses(
             document["subject"]["careProvider"] = providers
 
         _, timepoint = qb_status_visit_name(
-            subject.id, questionnaire_response.authored)
+            subject.id, research_study_id, questionnaire_response.authored)
         document["timepoint"] = timepoint
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance

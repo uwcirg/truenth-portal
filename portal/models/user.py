@@ -1021,7 +1021,8 @@ class User(db.Model, UserMixin):
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
-        invalidate_users_QBT(self.id)
+        # TODO: limit invalidation to set of observations that may alter QBT
+        invalidate_users_QBT(self.id, research_study_id='all')
         return observation
 
     def clinical_history(self, requestURL=None, patch_dstu2=False):
@@ -1179,7 +1180,7 @@ class User(db.Model, UserMixin):
         Called when the ToU agreement language is updated.
 
         :param acting_user: user behind the request for permission checks
-        :param types: ToU types for which to invalide agreements (optional)
+        :param types: ToU types for which to invalid agreements (optional)
 
         """
         from .tou import ToU

@@ -48,6 +48,8 @@ def patients_root():
     expected and will raise a 400: Bad Request
 
     """
+    # TODO expecting view per study?
+    research_study_id = 0
 
     def org_preference_filter(user):
         """Obtain user's preference for filtering organizations
@@ -85,7 +87,8 @@ def patients_root():
             if patient.deleted:
                 patients_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
+            a_s, visit = qb_status_visit_name(
+                patient.id, research_study_id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
             patients_list.append(patient)

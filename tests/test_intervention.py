@@ -607,7 +607,7 @@ def test_card_html_update(
 
     user, ae = map(db.session.merge, (test_user, ae))
 
-    invalidate_users_QBT(user.id)
+    invalidate_users_QBT(user.id, research_study_id='all')
     card_html = ae.display_for_user(user).card_html
     assert "Thank you" in card_html
     assert ae.quick_access_check(user)

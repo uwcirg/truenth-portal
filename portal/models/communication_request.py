@@ -219,7 +219,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         questionnaire_bank, iteration_count))
 
     def existing_communication(user_id, communication_request_id):
-        "Return a matching communication, if found"
+        """Return a matching communication, if found"""
         existing = Communication.query.filter(
             Communication.user_id == user_id
         ).filter(
@@ -230,7 +230,7 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         return existing
 
     def unfinished_work(qstats):
-        """Return True if user has oustanding work and valid time remains
+        """Return True if user has outstanding work and valid time remains
 
         Users may have completed all the related questionnaires, or they may
         have failed to do so prior to expiration.
@@ -265,7 +265,11 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
     now = datetime.utcnow()
     from .qb_status import QB_Status
-    qstats = QB_Status(user=user, as_of_date=datetime.utcnow())
+    research_study_id = questionnaire_bank.research_study_id
+    qstats = QB_Status(
+        user=user,
+        research_study_id=research_study_id,
+        as_of_date=datetime.utcnow())
     qbd = qstats.current_qbd()
     if not qbd:
         trace("no current QB found, can't continue")
@@ -280,12 +284,12 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
         trace("zero communication requests in questionnaire_bank")
 
     for request in questionnaire_bank.communication_requests:
-        trace("process eligable {}".format(request))
+        trace("process eligible {}".format(request))
         if request.status != 'active':
             trace("found inactive request, skipping")
             continue
 
-        # The iteraction counts must match
+        # The interaction counts must match
         if qbd.iteration != request.qb_iteration:
             trace("iteration mismatch, request doesn't apply")
             continue
@@ -302,9 +306,9 @@ def queue_outstanding_messages(user, questionnaire_bank, iteration_count):
 
         notify_date = qbd.relative_start + RelativeDelta(
             request.notify_post_qb_start)
-        if (notify_date < now):
+        if notify_date < now:
             trace(
-                "notifiy_date {} has passed - add communication".format(
+                "notify_date {} has passed - add communication".format(
                     notify_date))
             newly_crafted.append((
                 notify_date,

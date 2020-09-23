@@ -19,9 +19,10 @@ class NoCurrentQB(Exception):
 
 class QB_Status(object):
 
-    def __init__(self, user, as_of_date):
+    def __init__(self, user, research_study_id, as_of_date):
         self.user = user
         self.as_of_date = as_of_date
+        self.research_study_id = research_study_id
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
         self._overall_status = None
@@ -33,7 +34,7 @@ class QB_Status(object):
         self.prev_qbd, self.next_qbd = None, None
 
         # Update QB_Timeline for user, if necessary
-        update_users_QBT(self.user.id)
+        update_users_QBT(self.user.id, self.research_study_id)
 
         # Every QB should have "due" - filter by to get one per QB
         users_qbs = QBT.query.filter(QBT.user_id == self.user.id).filter(
@@ -177,7 +178,9 @@ class QB_Status(object):
 
     def _indef_init(self):
         """Lookup stats for indefinite case - requires special handling"""
-        qbs = ordered_qbs(self.user, classification='indefinite')
+        qbs = ordered_qbs(
+            self.user, research_study_id=self.research_study_id,
+            classification='indefinite')
         self._current_indef = None
         for q in qbs:
             if self._current_indef is not None:
@@ -189,7 +192,10 @@ class QB_Status(object):
         if not self.enrolled_in_classification(classification='indefinite'):
             return None, None
 
-        qbd = next(ordered_qbs(self.user, classification='indefinite'))
+        qbd = next(ordered_qbs(
+            self.user,
+            research_study_id=self.research_study_id,
+            classification='indefinite'))
         self._response_lookup()
         if self.overall_status == OverallStatus.withdrawn:
             status = OverallStatus.withdrawn
@@ -209,7 +215,9 @@ class QB_Status(object):
         # As order counts, required is a list; partial and completed are sets
         if self._current:
             user_qnrs = QNR_results(
-                self.user, qb_id=self._current.qb_id,
+                self.user,
+                research_study_id=self.research_study_id,
+                qb_id=self._current.qb_id,
                 qb_iteration=self._current.iteration)
             self._required = user_qnrs.required_qs(self._current.qb_id)
             self._partial = user_qnrs.partial_qs(
@@ -220,7 +228,9 @@ class QB_Status(object):
         # Indefinite is similar, but *special*
         if self._current_indef:
             user_indef_qnrs = QNR_indef_results(
-                self.user, qb_id=self._current_indef.qb_id)
+                self.user,
+                research_study_id=self.research_study_id,
+                qb_id=self._current_indef.qb_id)
             self._required_indef = user_indef_qnrs.required_qs(
                 qb_id=self._current_indef.qb_id)
             self._partial_indef = user_indef_qnrs.partial_qs(
