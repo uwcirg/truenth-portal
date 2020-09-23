@@ -1985,8 +1985,11 @@ def get_user(
 
 def patients_query(
         acting_user,
-        include_test_role=False, include_deleted=False,
-        requested_orgs=None, filter_by_ids=None):
+        include_test_role=False,
+        include_deleted=False,
+        research_study_id=0,
+        requested_orgs=None,
+        filter_by_ids=None):
     """Return query for patients, filtered as specified
 
     Build live SQLAlchemy query for patients, to which the acting_user has
@@ -2000,6 +2003,7 @@ def patients_query(
       some criteria
     :param include_test_role: Set true to include users with ``test`` role
     :param include_deleted: Set true to include deleted users
+    :param research_study_id: Limit result to patients consented with study
     :param requested_orgs: Set if user requests a limited list of org IDs
     :return: Live SQLAlchemy ``Query``, for further filter additions or
      execution
@@ -2030,8 +2034,11 @@ def patients_query(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
 
+    if require_orgs or research_study_id:
+        """With required orgs or study id, require consent with given id"""
         consent_query = UserConsent.query.filter(and_(
             UserConsent.deleted_id.is_(None),
+            UserConsent.research_study_id == research_study_id,
             UserConsent.expires > datetime.utcnow()))
         consented_users = [
             u.user_id for u in consent_query if u.staff_editable]

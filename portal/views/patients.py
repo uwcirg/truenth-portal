@@ -20,7 +20,6 @@ from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
-import json
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -51,6 +50,7 @@ def render_patients_list(
         acting_user=user,
         include_test_role=include_test_role,
         include_deleted=True,
+        research_study_id=research_study_id,
         requested_orgs=org_preference_filter(user, table_name=table_name))
 
     # get assessment status only if it is needed as specified by config
