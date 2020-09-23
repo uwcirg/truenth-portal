@@ -7668,104 +7668,30 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.20",
-          "text": "In the last 7 days, how OFTEN did you have HOT FLASHES/FLUSHES?",
-          "option": [
-            {
-              "valueCoding": {
-                "display": "Never",
-                "code": "ironman_ss.20.1"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Rarely",
-                "code": "ironman_ss.20.2"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Occasionally",
-                "code": "ironman_ss.20.3"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Frequently",
-                "code": "ironman_ss.20.4"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Almost constantly",
-                "code": "ironman_ss.20.5"
-              }
-            }
-          ]
-        },
-        {
-          "type": "choice",
-          "linkId": "ironman_ss.21",
-          "text": "In the last 7 days, what was the SEVERITY of your HOT FLASHES/FLUSHES at their WORST?",
-          "option": [
-            {
-              "valueCoding": {
-                "display": "None",
-                "code": "ironman_ss.21.1"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Mild",
-                "code": "ironman_ss.21.2"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Moderate",
-                "code": "ironman_ss.21.3"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Severe",
-                "code": "ironman_ss.21.4"
-              }
-            },
-            {
-              "valueCoding": {
-                "display": "Very severe",
-                "code": "ironman_ss.21.5"
-              }
-            }
-          ]
-        },
-        {
-          "type": "choice",
-          "linkId": "ironman_ss.22",
           "text": "During the past week: Has your physical condition or medical treatment interfered with your social activities?",
           "option": [
             {
               "valueCoding": {
                 "display": "Not at all",
-                "code": "ironman_ss.22.1"
+                "code": "ironman_ss.20.1"
               }
             },
             {
               "valueCoding": {
                 "display": "A little",
-                "code": "ironman_ss.22.2"
+                "code": "ironman_ss.20.2"
               }
             },
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.22.3"
+                "code": "ironman_ss.20.3"
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.22.4"
+                "code": "ironman_ss.20.4"
               }
             }
           ]

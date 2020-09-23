@@ -1,5 +1,8 @@
 from sqlalchemy.dialects.postgresql import ENUM
 from ..database import db
+from .questionnaire_bank import QuestionnaireBank, qbs_by_intervention
+from .research_protocol import ResearchProtocol
+from .user_consent import latest_consent
 
 status_types = (
     "active", "administratively-completed", "approved", "closed-to-accrual",
@@ -42,6 +45,46 @@ class ResearchStudy(db.Model):
         if 'status' in data:
             self.status = data.get('status')
         return self
+
+    @staticmethod
+    def assigned_to(user):
+        """Returns set of all ResearchStudy IDs assigned to given user"""
+        base_study = 0
+        results = []
+        iqbs = qbs_by_intervention(user, classification=None)
+        if iqbs:
+            results.append(base_study)  # Use dummy till system need arises
+
+        for rp, _ in ResearchProtocol.assigned_to(user):
+            rs_id = rp.research_study_id
+            if rs_id is None:
+                continue
+
+            if latest_consent(user, rs_id) and rs_id not in results:
+                results.append(rs_id)
+        results.sort()
+        return results
+
+
+def research_study_id_from_questionnaire(questionnaire_name):
+    """Reverse lookup research_study_id from a questionnaire_name"""
+    # TODO cache map and results
+    # expensive mapping - store cacheable value once determined
+    map = {}
+    for qb in QuestionnaireBank.query.all():
+        rp_id = qb.research_protocol_id
+        if rp_id is None:
+            continue
+
+        rs_id = qb.research_protocol.research_study_id
+        for q in qb.questionnaires:
+            if q.name in map:
+                if (map[q.name] != rs_id):
+                    raise ValueError(
+                        f"Configuration error, {q.name} belongs to multiple "
+                        "research studies")
+            map[q.name] = rs_id
+    return map.get(questionnaire_name)
 
 
 def add_static_research_studies():

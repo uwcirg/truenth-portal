@@ -595,7 +595,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-08-26T14:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -610,6 +611,34 @@
       ],
       "language": "en_AU",
       "name": "St. Vincent's Hospital Sydney",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146149,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-149"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Peter MacCallum Cancer Centre",
       "partOf": {
         "reference": "api/organization/21000"
       },
@@ -697,7 +726,8 @@
         {
           "research_protocols": [
 			{"name": "IRONMAN v2", "retired_as_of": "2018-04-26T05:00:00Z"},
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-09-01T05:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -754,7 +784,7 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2020-05-26T04:00:00Z"},
+			{"name": "IRONMAN v3", "retired_as_of": "2020-05-26T04:00:00Z"},
 			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
@@ -841,7 +871,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-20T05:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -929,7 +960,8 @@
         {
           "research_protocols": [
             {"name": "IRONMAN v2", "retired_as_of": "2018-03-30T04:00:00Z"},
-            {"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-31T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1186,7 +1218,8 @@
         {
           "research_protocols": [
 			{"name": "IRONMAN v2", "retired_as_of": "2018-03-13T00:06:00"},
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-31T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1244,7 +1277,8 @@
         {
           "research_protocols": [
 			{"name": "IRONMAN v2", "retired_as_of": "2018-12-14T05:00:00Z"},
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-19T05:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1332,7 +1366,8 @@
         {
           "research_protocols": [
 			{"name": "IRONMAN v2", "retired_as_of": "2018-12-14T07:00:00Z"},
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-21T07:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1477,7 +1512,8 @@
         {
           "research_protocols": [
 			{"name": "IRONMAN v2", "retired_as_of": "2019-03-03T00:00:00Z"},
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-07T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1505,7 +1541,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-05T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1843,7 +1880,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-14T06:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1871,7 +1909,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+			{"name": "IRONMAN v3", "retired_as_of": "2020-08-07T04:00:00Z"},
+			{"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1886,6 +1925,34 @@
       ],
       "language": "en_US",
       "name": "Winship Cancer Institute Emory University",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14688,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-88"
+        }
+      ],
+      "language": "en_US",
+      "name": "Moffitt Cancer Center",
       "partOf": {
         "reference": "api/organization/22000"
       },

@@ -225,7 +225,12 @@ def update_card_html_on_completion():
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
         now = datetime.utcnow()
-        assessment_status = QB_Status(user=user, as_of_date=now)
+        # TODO handle research study id
+        research_study_id = 0
+        assessment_status = QB_Status(
+            user=user,
+            research_study_id=research_study_id,
+            as_of_date=now)
         current_app.logger.debug("{}".format(assessment_status))
         indefinite_questionnaires = (
             assessment_status.instruments_needing_full_assessment(

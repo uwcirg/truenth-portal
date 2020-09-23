@@ -39,7 +39,8 @@ def org_preference_filter(user, table_name):
     return None
 
 
-def render_patients_list(request, table_name, template_name):
+def render_patients_list(
+        request, research_study_id, table_name, template_name):
     include_test_role = request.args.get('include_test_role')
 
     if request.form.get('reset_cache'):
@@ -50,6 +51,7 @@ def render_patients_list(request, table_name, template_name):
         acting_user=user,
         include_test_role=include_test_role,
         include_deleted=True,
+        research_study_id=research_study_id,
         requested_orgs=org_preference_filter(user, table_name=table_name))
 
     # get assessment status only if it is needed as specified by config
@@ -63,7 +65,8 @@ def render_patients_list(request, table_name, template_name):
             if patient.deleted:
                 patients_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(patient.id, cached_as_of_key)
+            a_s, visit = qb_status_visit_name(
+                patient.id, research_study_id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
             patients_list.append(patient)
@@ -101,6 +104,7 @@ def patients_root():
     """
     return render_patients_list(
         request,
+        research_study_id=0,
         table_name='patientList',
         template_name='admin/patients_by_org.html')
 
@@ -125,6 +129,7 @@ def patients_substudy():
     """
     return render_patients_list(
         request,
+        research_study_id=1,
         table_name='substudyPatientList',
         template_name='admin/patients_substudy.html')
 

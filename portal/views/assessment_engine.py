@@ -34,6 +34,10 @@ from ..models.questionnaire_response import (
     NoFutureDates,
     QuestionnaireResponse,
 )
+from ..models.research_study import (
+    ResearchStudy,
+    research_study_id_from_questionnaire,
+)
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..timeout_lock import LockTimeout, guarded_task_launch
@@ -748,10 +752,24 @@ def get_assessments():
     """
     from ..tasks import research_report_task
 
+    research_studies = set()
+    questionnaire_list = request.args.getlist('instrument_id')
+    for q in questionnaire_list:
+        research_studies.add(research_study_id_from_questionnaire(q))
+    if len(research_studies) != 1:
+        abort(
+            400,
+            f"Requested instruments ({questionnaire_list}) span multiple "
+            "research studies")
+    research_study_id = research_studies.pop()
+    if research_study_id is None:
+        research_study_id = 0
+
     # This frequently takes over a minute to produce.  Generate a serializable
     # form of all args for reliable hand off to a background task.
     kwargs = {
-        'instrument_ids': request.args.getlist('instrument_id'),
+        'instrument_ids': questionnaire_list,
+        'research_study_id': research_study_id,
         'acting_user_id': current_user().id,
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
@@ -884,7 +902,7 @@ def assessment_update(patient_id):
         context='assessment',
     )
     response.update({'message': 'questionnaire response updated successfully'})
-    invalidate_users_QBT(patient.id)
+    invalidate_users_QBT(patient.id, research_study_id='all')
     return jsonify(response)
 
 
@@ -1481,8 +1499,6 @@ def assessment_add(patient_id):
       - ServiceToken: []
 
     """
-    from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
-
     if not hasattr(request, 'json') or not request.json:
         return jsonify(message='Invalid request - requires JSON'), 400
 
@@ -1564,17 +1580,15 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    invalidate_users_QBT(patient.id)
+    invalidate_users_QBT(patient.id, research_study_id='all')
     return jsonify(response)
 
 
 @assessment_engine_api.route('/api/invalidate/<int:user_id>')
 @oauth.require_oauth()
 def invalidate(user_id):
-    from ..models.qb_timeline import invalidate_users_QBT  # avoid cycle
-
     user = get_user(user_id, 'edit')
-    invalidate_users_QBT(user_id)
+    invalidate_users_QBT(user_id, research_study_id='all')
     return jsonify(invalidated=user.as_fhir())
 
 
@@ -1589,6 +1603,10 @@ def present_needed():
     If `authored` date is different from utcnow(), any instruments found to be
     in an `in_progress` state will be treated as if they haven't been started.
 
+    Manages a single research study at a time.  For all research studies a
+    user is enrolled in, present-needed on the first found with outstanding
+    work.  Call again after completion to pick up the next study.
+
     """
     from ..models.qb_status import QB_Status  # avoid cycle
 
@@ -1599,22 +1617,29 @@ def present_needed():
         request.args.get('authored'), none_safe=True)
     if not as_of_date:
         as_of_date = datetime.utcnow()
-    assessment_status = QB_Status(subject, as_of_date=as_of_date)
-    if assessment_status.overall_status == 'Withdrawn':
-        abort(400, 'Withdrawn; no pending work found')
 
-    args = dict(request.args.items())
-    args['instrument_id'] = (
-        assessment_status.instruments_needing_full_assessment(
-            classification='all'))
+    for rs in ResearchStudy.assigned_to(subject):
+        assessment_status = QB_Status(
+            subject, research_study_id=rs, as_of_date=as_of_date)
+        if assessment_status.overall_status == 'Withdrawn':
+            abort(400, 'Withdrawn; no pending work found')
 
-    # Instruments in progress need special handling.  Assemble
-    # the list of external document ids for reliable resume
-    # behavior at external assessment intervention.
-    resume_ids = assessment_status.instruments_in_progress(
-        classification='all')
-    if resume_ids:
-        args['resume_identifier'] = resume_ids
+        args = dict(request.args.items())
+        args['instrument_id'] = (
+            assessment_status.instruments_needing_full_assessment(
+                classification='all'))
+
+        # Instruments in progress need special handling.  Assemble
+        # the list of external document ids for reliable resume
+        # behavior at external assessment intervention.
+        resume_ids = assessment_status.instruments_in_progress(
+            classification='all')
+        if resume_ids:
+            args['resume_identifier'] = resume_ids
+
+        if args.get('instrument_id') or args.get('resume_identifier'):
+            # work to be done in this study, break out of loop
+            break
 
     if not args.get('instrument_id') and not args.get('resume_identifier'):
         flash(_('All available questionnaires have been completed'))
@@ -1825,178 +1850,3 @@ def complete_assessment():
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
-
-
-@assessment_engine_api.route('/api/consent-assessment-status')
-@crossdomain()
-@oauth.require_oauth()
-def batch_assessment_status():
-    """Return a batch of consent and assessment states for list of users
-
-    ---
-    operationId: batch_assessment_status
-    tags:
-      - Internal
-    parameters:
-      - name: user_id
-        in: query
-        description:
-          TrueNTH user ID for assessment status lookup.  Any number of IDs
-          may be provided
-        required: true
-        type: array
-        items:
-          type: integer
-          format: int64
-        collectionFormat: multi
-    produces:
-      - application/json
-    responses:
-      200:
-        description: successful operation
-        schema:
-          id: batch_assessment_response
-          properties:
-            status:
-              type: array
-              items:
-                type: object
-                required:
-                  - user_id
-                  - consents
-                properties:
-                  user_id:
-                    type: integer
-                    format: int64
-                    description: TrueNTH ID for user
-                  consents:
-                    type: array
-                    items:
-                      type: object
-                      required:
-                        - consent
-                        - assessment_status
-                      properties:
-                        consent:
-                          type: string
-                          description: Details of the consent
-                        assessment_status:
-                          type: string
-                          description: User's assessment status
-      401:
-        description: if missing valid OAuth token
-    security:
-      - ServiceToken: []
-
-    """
-    from ..models.qb_timeline import qb_status_visit_name
-
-    acting_user = current_user()
-    user_ids = request.args.getlist('user_id')
-    if not user_ids:
-        abort(400, "Requires at least one user_id")
-    results = []
-    for uid in user_ids:
-        check_int(uid)
-    users = User.query.filter(User.id.in_(user_ids))
-    as_of_key = QB_StatusCacheKey().current()
-    for user in users:
-        if not acting_user.check_role('view', user.id):
-            continue
-        details = []
-        status, _ = qb_status_visit_name(user.id, as_of_key)
-        for consent in user.all_consents:
-            details.append(
-                {'consent': consent.as_json(),
-                 'assessment_status': str(status)})
-        results.append({'user_id': user.id, 'consents': details})
-
-    return jsonify(status=results)
-
-
-@assessment_engine_api.route(
-    '/api/patient/<int:patient_id>/assessment-status')
-@crossdomain()
-@oauth.require_oauth()
-def patient_assessment_status(patient_id):
-    """Return current assessment status for a given patient
-
-    ---
-    operationId: patient_assessment_status
-    tags:
-      - Assessment Engine
-    parameters:
-      - name: patient_id
-        in: path
-        description: TrueNTH patient ID
-        required: true
-        type: integer
-        format: int64
-      - name: as_of_date
-        in: query
-        description: Optional UTC datetime for times other than ``utcnow``
-        required: false
-        type: string
-        format: date-time
-      - name: purge
-        in: query
-        description: Optional trigger to purge any cached data for given
-          user before (re)calculating assessment status
-        required: false
-        type: string
-    produces:
-      - application/json
-    responses:
-      200:
-        description: return current assessment status of given patient
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
-      404:
-        description: if patient id is invalid
-    security:
-      - ServiceToken: []
-
-    """
-    from ..models.qb_status import QB_Status
-
-    patient = get_user(patient_id, 'view')
-    date = request.args.get('as_of_date')
-    date = FHIR_datetime.parse(date) if date else datetime.utcnow()
-
-    trace = request.args.get('trace', False)
-    if trace:
-        establish_trace(
-            "BEGIN trace for assessment-status on {}".format(patient_id))
-
-    if request.args.get('purge', 'false').lower() == 'true':
-        invalidate_users_QBT(patient_id)
-    assessment_status = QB_Status(user=patient, as_of_date=date)
-
-    # indefinite assessments don't affect overall status, but need to
-    # be available if unfinished
-    outstanding_indefinite_work = len(
-        assessment_status.instruments_needing_full_assessment(
-            classification='indefinite') +
-        assessment_status.instruments_in_progress(classification='indefinite')
-    )
-    qbd = assessment_status.current_qbd()
-    qb_name = qbd.questionnaire_bank.name if qbd else None
-    response = {
-        'assessment_status': str(assessment_status.overall_status),
-        'outstanding_indefinite_work': outstanding_indefinite_work,
-        'questionnaires_ids': (
-            assessment_status.instruments_needing_full_assessment(
-                classification='all')),
-        'resume_ids': assessment_status.instruments_in_progress(
-            classification='all'),
-        'completed_ids': assessment_status.instruments_completed(
-            classification='all'),
-        'qb_name': qb_name
-    }
-
-    if trace:
-        response['trace'] = dump_trace()
-
-    return jsonify(response)

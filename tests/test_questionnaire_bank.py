@@ -279,13 +279,13 @@ class TestQuestionnaireBank(TestCase):
         qb.questionnaires.append(qbq)
 
         # user without consents or TX date should return None
-        assert not trigger_date(self.test_user)
+        assert not trigger_date(self.test_user, research_study_id=0)
 
         # user with consent should return consent date
         self.consent_with_org(org.id, setdate=now)
         self.test_user = db.session.merge(self.test_user)
-        assert trigger_date(self.test_user) == now
-        assert trigger_date(self.test_user, qb) == now
+        assert trigger_date(self.test_user, research_study_id=0) == now
+        assert trigger_date(self.test_user, research_study_id=0, qb=qb) == now
 
         # user with consent and TX date should return TX date (if qb.recurs)
         tx_date = datetime(2017, 6, 10, 20, 00, 00, 000000)
@@ -296,7 +296,8 @@ class TestQuestionnaireBank(TestCase):
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
         qb.recurs.append(recur)
-        assert trigger_date(self.test_user, qb) == tx_date
+        assert trigger_date(
+            self.test_user, research_study_id=0, qb=qb) == tx_date
 
     def test_intervention_trigger_date(self):
         # testing intervention-based QBs
@@ -314,7 +315,7 @@ class TestQuestionnaireBank(TestCase):
         qb.questionnaires.append(qbq)
 
         # user without biopsy or TX date should return None
-        assert not trigger_date(self.test_user)
+        assert not trigger_date(self.test_user, research_study_id=0)
 
         # user with biopsy should return biopsy date
         self.login()
@@ -325,14 +326,14 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
         assert obs.codeable_concept.codings[0].display == 'biopsy'
-        assert trigger_date(self.test_user) == obs.issued
+        assert trigger_date(self.test_user, research_study_id=0) == obs.issued
 
         # user with biopsy and TX date should return TX date
         tx_date = datetime.utcnow()
         self.add_procedure(code='7', display='Focal therapy',
                            system=ICHOM, setdate=tx_date)
         self.test_user = db.session.merge(self.test_user)
-        assert trigger_date(self.test_user) == tx_date
+        assert trigger_date(self.test_user, research_study_id=0) == tx_date
 
     def test_intervention_in_progress(self):
         # testing intervention-based QBs
@@ -359,12 +360,14 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
         assert obs.codeable_concept.codings[0].display == 'biopsy'
-        assert trigger_date(self.test_user, qb) == obs.issued
+        assert trigger_date(
+            self.test_user, research_study_id=0, qb=qb) == obs.issued
 
         # add mock in-process QB - confirm current qb is still correct
         mock_qr('q', 'in-progress', qb=qb)
         self.test_user, qb = map(db.session.merge, (self.test_user, qb))
-        qb_stat = QB_Status(user=self.test_user, as_of_date=now)
+        qb_stat = QB_Status(
+            user=self.test_user, research_study_id=0, as_of_date=now)
         assert qb_stat.current_qbd().questionnaire_bank == qb
 
     def test_start(self):
@@ -489,6 +492,7 @@ class TestQuestionnaireBank(TestCase):
         qb = QuestionnaireBank.from_json(data)
         assert len(qb.questionnaires) == 2
         assert qb.research_protocol_id == rp_id
+        assert qb.research_study_id == 0
 
     def test_lookup_for_user(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
@@ -521,11 +525,14 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         # Doesn't start for 7 days, initially shouldn't get any
-        qb_stat = QB_Status(user=self.test_user, as_of_date=now)
+        qb_stat = QB_Status(
+            user=self.test_user, research_study_id=0, as_of_date=now)
         assert qb_stat.current_qbd() is None
 
         qb_stat = QB_Status(
-            user=self.test_user, as_of_date=now + relativedelta(days=7))
+            user=self.test_user,
+            research_study_id=0,
+            as_of_date=now + relativedelta(days=7))
         qb = qb_stat.current_qbd().questionnaire_bank
         results = list(qb.questionnaires)
         assert len(results) == 3
@@ -566,6 +573,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         qb_status = QB_Status(
             self.test_user,
+            research_study_id=0,
             as_of_date=now+relativedelta(days=8))
         qb = qb_status.current_qbd().questionnaire_bank
         results = list(qb.questionnaires)
@@ -620,7 +628,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
-        qstats = QB_Status(self.test_user, now)
+        qstats = QB_Status(self.test_user, 0, now)
         qbd = qstats.current_qbd()
         assert visit_name(qbd) == "Baseline"
 
@@ -633,7 +641,9 @@ class TestQuestionnaireBank(TestCase):
         self.test_user.organizations.append(crv)
 
         qstats = QB_Status(
-            self.test_user, as_of_date=nowish+timedelta(hours=1))
+            self.test_user,
+            research_study_id=0,
+            as_of_date=nowish+timedelta(hours=1))
         qbd = qstats.current_qbd()
         assert visit_name(qbd) == "Month 3"
 
@@ -649,7 +659,9 @@ class TestQuestionnaireBank(TestCase):
         self.test_user.organizations.append(crv)
 
         qstats = QB_Status(
-            self.test_user, as_of_date=nowish + timedelta(hours=1))
+            self.test_user,
+            research_study_id=0,
+            as_of_date=nowish + timedelta(hours=1))
         qbd = qstats.current_qbd()
         assert visit_name(qbd) == "Month 6"
 
@@ -664,7 +676,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
-        qstats = QB_Status(self.test_user, nowish + timedelta(hours=1))
+        qstats = QB_Status(self.test_user, 0, nowish + timedelta(hours=1))
         qbd = qstats.current_qbd()
         assert visit_name(qbd) == "Month 9"
 
@@ -740,7 +752,7 @@ class TestQuestionnaireBank(TestCase):
         # User associated with CRV org should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        qb_stat = QB_Status(self.test_user, now)
+        qb_stat = QB_Status(self.test_user, 0, now)
         qb = qb_stat.current_qbd().questionnaire_bank
         assert qb.research_protocol.name == 'proto'
 
@@ -779,7 +791,7 @@ class TestQuestionnaireBank(TestCase):
 
         # outdated QB/RP should be used as long as User has in-progress QNR
         self.test_user = db.session.merge(self.test_user)
-        qb_stat = QB_Status(self.test_user, now)
+        qb_stat = QB_Status(self.test_user, 0, now)
         qb = qb_stat.current_qbd().questionnaire_bank
         assert qb.name == 'Test Questionnaire Bank'
         assert qb.research_protocol.name == 'proto'
@@ -791,8 +803,8 @@ class TestQuestionnaireBank(TestCase):
             timestamp=now, qb=qb)
 
         self.test_user = db.session.merge(self.test_user)
-        invalidate_users_QBT(TEST_USER_ID)
-        qb_stat = QB_Status(self.test_user, now)
+        invalidate_users_QBT(TEST_USER_ID, research_study_id='all')
+        qb_stat = QB_Status(self.test_user, 0, now)
         qb = qb_stat.current_qbd().questionnaire_bank
         assert qb.name == 'Test Questionnaire Bank'
         assert qb_stat.overall_status == OverallStatus.completed
@@ -835,7 +847,7 @@ class TestQuestionnaireBank(TestCase):
 
         # for today, should get the v3 baseline
         user = db.session.merge(self.test_user)
-        a_s = QB_Status(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=now)
         assert (['epic26', 'irondemog_v3'] ==
                 a_s.instruments_needing_full_assessment(classification='all'))
 
@@ -843,15 +855,15 @@ class TestQuestionnaireBank(TestCase):
         # belonging to older qb - confirm that clears indef work as of then
         mock_qr('irondemog', timestamp=weekago, qb=qb2_indef)
         user = db.session.merge(self.test_user)
-        invalidate_users_QBT(user_id=TEST_USER_ID)
-        a_s = QB_Status(user=user, as_of_date=weekago)
+        invalidate_users_QBT(user_id=TEST_USER_ID, research_study_id='all')
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=weekago)
         assert (a_s.instruments_needing_full_assessment(
             classification='indefinite') == [])
 
         # move forward in time; user should no longer need indefinite, even
         # tho RP changed
         qb2_indef = db.session.merge(qb2_indef)
-        a_s = QB_Status(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=now)
         assert qb2_indef == a_s.current_qbd(
             classification='indefinite').questionnaire_bank
         assert (a_s.instruments_needing_full_assessment(
@@ -884,7 +896,7 @@ class TestQuestionnaireBank(TestCase):
         user = db.session.merge(self.test_user)
 
         # Now, should still be rp v3, 3mo recurrence
-        a_s = QB_Status(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=now)
         assert (a_s.current_qbd().questionnaire_bank.name
                 == 'CRV_recurring_3mo_period v3')
         assert a_s.instruments_needing_full_assessment() == [
@@ -898,9 +910,9 @@ class TestQuestionnaireBank(TestCase):
 
         # Two weeks ago, should be completed
         user = db.session.merge(user)
-        a_s = QB_Status(user=user, as_of_date=twoweeksago)
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=twoweeksago)
         assert a_s.overall_status == OverallStatus.completed
 
         # Current should also be completed, even tho protocol changed
-        a_s = QB_Status(user=user, as_of_date=now)
+        a_s = QB_Status(user=user, research_study_id=0, as_of_date=now)
         assert a_s.overall_status == OverallStatus.completed
