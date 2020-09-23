@@ -1,0 +1,1 @@
+export var getContentAttempt = 0;

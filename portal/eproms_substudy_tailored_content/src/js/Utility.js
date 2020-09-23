@@ -69,3 +69,9 @@ export function getUrlParameter(name) {
   var results = regex.exec(location.search);
   return results === null ? "" : decodeURIComponent(results[1]);
 }
+
+export function isElementHidden(el) {
+  if (!el) return true; 
+  var style = window.getComputedStyle(el);
+  return (style.display === 'none');
+}

@@ -16,6 +16,7 @@ export default {
     domains: [],
     //chosen domain
     activeDomain: "",
-    domainContent: ""
+    domainContent: "",
+    getContentAttempt: 0
 };
 

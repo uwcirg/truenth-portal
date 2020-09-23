@@ -49,7 +49,7 @@ module.exports = function(_env, argv) {
           },
         },
         {
-          test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          test: /\.(woff2|eot|svg|ttf|woff|otf)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
           use: 'url-loader?limit=10000',
         },
         {

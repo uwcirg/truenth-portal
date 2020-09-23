@@ -55,6 +55,7 @@
     "mochapack": "^2.0.2",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "style-loader": "^1.2.1",
+    "url-loader": "^4.1.0",
     "vue": "^2.5.21",
     "vue-loader": "^15.5.1",
     "vue-style-loader": "^4.1.2",
