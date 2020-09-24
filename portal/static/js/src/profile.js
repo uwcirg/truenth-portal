@@ -1499,6 +1499,11 @@ export default (function() {
                             hidePopover();
                             self.reloadConsentList(subjectId);
                         });
+                        if (self.hasSubStudyConsent()) {
+                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
+                                research_study_id: EPROMS_SUBSTUDY_ID
+                            });
+                        }
                     });
                 });
                 $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
@@ -2143,7 +2148,7 @@ export default (function() {
                 return content;
             },
             getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
-                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
+                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2189,11 +2194,32 @@ export default (function() {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
             },
+            getSubStudyConsentUnknownRow: function() {
+                if (!this.hasCurrentConsent()) {
+                    return;
+                }
+                let currentConsentItem = this.consent.currentItems[0];
+                this.consent.consentDisplayRows.push(
+                    [{
+                        content: EPROMS_SUBSTUDY_TITLE
+
+                    },
+                    {
+                        content: i18next.t("Not consented") + this.getConsentEditDisplayIconHTML({
+                            organization_id: currentConsentItem.organization_id,
+                            statusText: "unknown",
+                            agreement_url: currentConsentItem.agreement_url,
+                            research_study_id: 1
+                        }, "profileConsentListModal"),
+                        "_class": "indent"
+                    }, {content: ""}]
+                );
+            },
             getConsentRow: function(item) {
                 if (!item) {return false;}
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
                 var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item) + (self.isConsentDateEditable(item) ? self.getSubStudyEditCheckbox(item) : "")
+                    content: self.getConsentOrgDisplayName(item)
                 }, {
                     content: sDisplay + (self.isConsentStatusEditable(item) ? self.getConsentEditDisplayIconHTML(item, "profileConsentListModal") : ""),
                     "_class": "indent"
@@ -2397,6 +2423,42 @@ export default (function() {
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
             },
+            hasSubStudyConsent: function() {
+                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
+            },
+            showSubStudyAddElement: function() {
+                return this.hasCurrentConsent() && !this.hasSubStudyConsent();
+            },
+            initAddSubStudyElementEvent: function() {
+                //addSubStudyConsentButton
+                if (!this.isConsentDateEditable()) return false;
+                if (!this.hasCurrentConsent()) return false;
+                let item = this.consent.currentItems[0];
+                let attrSet = "", self = this;
+                for (let prop in item) {
+                    if (["user_id", "expires", "recorded", "research_study_id"].indexOf(prop) === -1) {
+                        let value = item[prop];
+                        attrSet += ` consent__${prop}="${value}"`;
+                    }
+                }
+                $("body").delegate("#ckIsSubStudy", "change", function() {
+                    let attributes = [].slice.call(document.querySelector("#ckIsSubStudy").attributes)
+                    .map(function (attr) { return attr.nodeName; });
+                    let params = {};
+                    attributes.forEach(key => {
+                        if (String(key).indexOf("consent") !== -1) {
+                            params[key.split("__")[1]] = $(this).attr(key);
+                        }
+                    });
+                    params["research_study_id"] = $(this).is(":checked")?1:0;
+                    if (Object.keys(params).length > 1) {
+                        self.modules.tnthAjax.setConsent(self.subjectId, params, params.status, true, function() {
+                            self.reloadConsentList(self.subjectId)
+                        });
+                    }
+                });
+                return `<span class="substudy-checkbox-container"><input type="checkbox" id="ckIsSubStudy" ${attrSet} ${this.isSubStudyConsent(item)?"checked":""}>&nbsp;belong to sub-study?</input></span>`;
+            },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
             },
@@ -2457,11 +2519,14 @@ export default (function() {
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
-                    if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!(existingOrgs[item.organization_id+"_"+item.research_study_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
-                        existingOrgs[item.organization_id] = true;
+                        existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
+                if (this.showSubStudyAddElement()) {
+                     this.getSubStudyConsentUnknownRow();
+                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
@@ -2475,6 +2540,7 @@ export default (function() {
                         if (self.isConsentEditable()) {
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
+                            Consent.initConsentListModalEvent();
                         }
                         $("#consentListTable").animate({opacity: 1}, 1500);
                         clearInterval(self.consentListReadyIntervalId);
@@ -2489,7 +2555,7 @@ export default (function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
                     }
-                }, 150);
+                }, 350);
                 this.consent.consentLoading = false;
             },
             pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },
