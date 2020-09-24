@@ -2159,34 +2159,6 @@ export default (function() {
                 var dataShow = String(editorUrlEl.attr("data-show")) === "true";
                 return `<div class="button--LR" data-show="${dataShow}"><a href="${editorUrlEl.val()}" target="_blank">${i18next.t("Edit in Liferay")}</a></div>`
             },
-            getSubStudyEditCheckbox: function(item) {
-                if (!this.isConsentDateEditable()) return "";
-                if (!item) return "";
-                let attrSet = "", self = this;
-                for (let prop in item) {
-                    if (["user_id", "expires", "recorded", "research_study_id"].indexOf(prop) === -1) {
-                        let value = item[prop];
-                        attrSet += ` consent__${prop}="${value}"`;
-                    }
-                }
-                $("body").delegate("#ckIsSubStudy", "change", function() {
-                    let attributes = [].slice.call(document.querySelector("#ckIsSubStudy").attributes)
-                    .map(function (attr) { return attr.nodeName; });
-                    let params = {};
-                    attributes.forEach(key => {
-                        if (String(key).indexOf("consent") !== -1) {
-                            params[key.split("__")[1]] = $(this).attr(key);
-                        }
-                    });
-                    params["research_study_id"] = $(this).is(":checked")?1:0;
-                    if (Object.keys(params).length > 1) {
-                        self.modules.tnthAjax.setConsent(self.subjectId, params, params.status, true, function() {
-                            self.reloadConsentList(self.subjectId)
-                        });
-                    }
-                });
-                return `<span class="substudy-checkbox-container"><input type="checkbox" id="ckIsSubStudy" ${attrSet} ${this.isSubStudyConsent(item)?"checked":""}>&nbsp;belong to sub-study?</input></span>`;
-            },
             isConsentStatusEditable: function(item) {
                return this.isConsentEditable() && String(this.getConsentStatus(item)) === "active";
             },
@@ -2427,37 +2399,8 @@ export default (function() {
                 return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
             },
             showSubStudyAddElement: function() {
+                //TODO add check to see if user organization is in substudy
                 return this.hasCurrentConsent() && !this.hasSubStudyConsent();
-            },
-            initAddSubStudyElementEvent: function() {
-                //addSubStudyConsentButton
-                if (!this.isConsentDateEditable()) return false;
-                if (!this.hasCurrentConsent()) return false;
-                let item = this.consent.currentItems[0];
-                let attrSet = "", self = this;
-                for (let prop in item) {
-                    if (["user_id", "expires", "recorded", "research_study_id"].indexOf(prop) === -1) {
-                        let value = item[prop];
-                        attrSet += ` consent__${prop}="${value}"`;
-                    }
-                }
-                $("body").delegate("#ckIsSubStudy", "change", function() {
-                    let attributes = [].slice.call(document.querySelector("#ckIsSubStudy").attributes)
-                    .map(function (attr) { return attr.nodeName; });
-                    let params = {};
-                    attributes.forEach(key => {
-                        if (String(key).indexOf("consent") !== -1) {
-                            params[key.split("__")[1]] = $(this).attr(key);
-                        }
-                    });
-                    params["research_study_id"] = $(this).is(":checked")?1:0;
-                    if (Object.keys(params).length > 1) {
-                        self.modules.tnthAjax.setConsent(self.subjectId, params, params.status, true, function() {
-                            self.reloadConsentList(self.subjectId)
-                        });
-                    }
-                });
-                return `<span class="substudy-checkbox-container"><input type="checkbox" id="ckIsSubStudy" ${attrSet} ${this.isSubStudyConsent(item)?"checked":""}>&nbsp;belong to sub-study?</input></span>`;
             },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
