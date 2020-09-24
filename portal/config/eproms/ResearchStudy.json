@@ -2,13 +2,13 @@
   "entry": [
     {
       "id": 0,
-      "title": "Base Study",
+      "title": "IRONMAN Global Study",
       "status": "active",
       "resourceType": "ResearchStudy"
     },
     {
       "id": 1,
-      "title": "IRONMAN Sub Study - Improving Outcomes",
+      "title": "IRONMAN EMPRO Sub-study",
       "status": "active",
       "resourceType": "ResearchStudy"
     }
