@@ -2155,7 +2155,6 @@ export default (function() {
                 return `<div class="button--LR" data-show="${dataShow}"><a href="${editorUrlEl.val()}" target="_blank">${i18next.t("Edit in Liferay")}</a></div>`
             },
             getSubStudyEditCheckbox: function(item) {
-                //isSubStudyConsent
                 if (!this.isConsentDateEditable()) return "";
                 if (!item) return "";
                 let attrSet = "", self = this;
@@ -2170,7 +2169,6 @@ export default (function() {
                     .map(function (attr) { return attr.nodeName; });
                     let params = {};
                     attributes.forEach(key => {
-                        console.log("key? ", key)
                         if (String(key).indexOf("consent") !== -1) {
                             params[key.split("__")[1]] = $(this).attr(key);
                         }
