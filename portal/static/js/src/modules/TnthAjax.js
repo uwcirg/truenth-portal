@@ -601,7 +601,7 @@ export default { /*global $ */
     "getRoles": function(userId, callback, params) {
         callback = callback || function() {};
         var sessionStorageKey = "userRole_" + userId;
-        if (sessionStorage.getItem(sessionStorageKey)) {
+        if (!params.clearCache && sessionStorage.getItem(sessionStorageKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionStorageKey));
             callback(data);
         } else {
