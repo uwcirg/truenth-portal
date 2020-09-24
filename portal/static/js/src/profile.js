@@ -2166,6 +2166,9 @@ export default (function() {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
             },
+            /*
+             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
+             */
             getSubStudyConsentUnknownRow: function() {
                 if (!this.hasCurrentConsent()) {
                     return;
