@@ -299,7 +299,7 @@ export default { /*global $ */
             callback({"error": i18next.t("User id and parameters are required")});
             return false;
         }
-        var consented = this.hasConsent(userId, params.org, status);
+        var consented = this.hasConsent(userId, params.org, status, params);
         var __url = "/api/user/" + userId + "/consent";
         if (consented && !params.testPatient) {
             callback({"error": false});
@@ -333,7 +333,10 @@ export default { /*global $ */
             return false;
         }
         params = params || {};
-        var consented = this.getAllValidConsent(userId, params.org);
+        if (!params.research_study_id) {
+            params.research_study_id = 0;
+        }
+        var consented = this.getAllValidConsent(userId, params.org, params);
         if (!consented) {
             return false;
         }
@@ -346,7 +349,7 @@ export default { /*global $ */
         });
         var self = this;
         arrConsents.forEach(function(orgId) { //delete all consents for the org
-            self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify({"organization_id": parseInt(orgId)})}, function(data) {
+            self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify(Object.assign(params,{"organization_id": parseInt(orgId)}))}, function(data) {
                 if (!data) {
                     return false;
                 }
@@ -361,6 +364,9 @@ export default { /*global $ */
     withdrawConsent: function(userId, orgId, params, callback) {
         callback = callback || function() {};
         params = params || {};
+        if (!params.research_study_id) {
+            params.research_study_id = 0;
+        }
         if (!userId || !orgId) {
             callback({"error": i18next.t("User id and organization id are required.")});
             return false;
@@ -370,7 +376,10 @@ export default { /*global $ */
             if (data && data.consent_agreements && data.consent_agreements.length) {
                 arrConsent = $.grep(data.consent_agreements, function(item) {
                     var expired = tnthDates.getDateDiff(String(item.expires)); /*global tnthDates */
-                    return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && String(item.status) === "suspended";
+                    return (
+                        String(orgId) === String(item.organization_id) &&
+                        String(params.research_study_id) === String(item.research_study_id) && 
+                        !item.deleted && !(expired > 0) && String(item.status) === "suspended");
                 });
             }
             if (arrConsent.length) { //don't send request if suspended consent already existed
@@ -379,7 +388,7 @@ export default { /*global $ */
             }
             self.sendRequest("/api/user/" + userId + "/consent/withdraw",
                 "POST",
-                userId, {sync: params.sync,data: JSON.stringify({organization_id: orgId})},
+                userId, {sync: params.sync,data: JSON.stringify(Object.assign(params,{organization_id: orgId}))},
                 function(data) {
                     if (data.error) {
                         callback({"error": i18next.t("Error occurred setting suspended consent status.")});
@@ -389,8 +398,10 @@ export default { /*global $ */
                 });
         });
     },
-    getAllValidConsent: function(userId, orgId) {
+    getAllValidConsent: function(userId, orgId, params) {
         if (!userId || !orgId) { return false; }
+        params = params || {};
+        if (!params.research_study_id) params.research_study_id = 0;
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
             if (!data || data.error || !data.consent_agreements || !data.consent_agreements.length) {
@@ -398,7 +409,7 @@ export default { /*global $ */
             }
             consentedOrgIds = $.grep(data.consent_agreements, function(item) {
                 var expired = tnthDates.getDateDiff(String(item.expires));
-                return !item.deleted && !(expired > 0) && (String(orgId).toLowerCase() === "all" || String(orgId) === String(item.organization_id));
+                return !item.deleted && !(expired > 0) && (String(orgId).toLowerCase() === "all" || (String(orgId) === String(item.organization_id) && String(params.research_study_id) === String(item.research_study_id)));
             });
             consentedOrgIds = (consentedOrgIds).map(function(item) {
                 return item.organization_id;
@@ -407,17 +418,21 @@ export default { /*global $ */
         });
         return consentedOrgIds;
     },
-    hasConsent: function(userId, orgId, filterStatus) {  /****** NOTE - this will return the latest updated consent entry *******/
+    hasConsent: function(userId, orgId, filterStatus, params) {  /****** NOTE - this will return the latest updated consent entry *******/
         if (!userId || !orgId || String(filterStatus) === "default") { return false; }
         var consentedOrgIds = [];
         var __url = "/api/user/" + userId + "/consent", self = this;
+        params = params || {};
+        let researchStudyId = params.research_study_id || 0;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
             if (!data || data.error || (data.consent_agreements && data.consent_agreements.length === 0)) {
                 return false;
             }
             consentedOrgIds = $.grep(data.consent_agreements, function(item) {
                 var expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0; /*global tnthDates */
-                return (String(orgId) === String(item.organization_id)) && !item.deleted && !(expired > 0) && Consent.hasConsentedFlags(item);
+                return (String(orgId) === String(item.organization_id) &&
+                String(researchStudyId) === String(item.research_study_id)
+                ) && !item.deleted && !(expired > 0) && Consent.hasConsentedFlags(item);
             });
         });
         return consentedOrgIds.length;
@@ -600,6 +615,7 @@ export default { /*global $ */
     },
     "getRoles": function(userId, callback, params) {
         callback = callback || function() {};
+        params = params || {};
         var sessionStorageKey = "userRole_" + userId;
         if (!params.clearCache && sessionStorage.getItem(sessionStorageKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionStorageKey));
