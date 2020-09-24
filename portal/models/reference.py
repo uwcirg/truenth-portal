@@ -169,20 +169,20 @@ class Reference(object):
                     reference_dict))
 
         lookup = (
-            (re.compile('[Cc]linician/(\d+)'), User, 'id'),
-            (re.compile('[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'[Cc]linician/(\d+)'), User, 'id'),
+            (re.compile(r'[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
              Organization, 'identifier'),
-            (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
-            (re.compile('[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'[Oo]rganization/(\d+)'), Organization, 'id'),
+            (re.compile(r'[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
              Questionnaire, 'identifier'),
-            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
+            (re.compile(r'[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
              QuestionnaireBank, 'name'),
-            (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
-            (re.compile('[Pp]atient/(\d+)'), User, 'id'),
-            (re.compile('[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'[Ii]ntervention/(\w+)'), Intervention, 'name'),
+            (re.compile(r'[Pp]atient/(\d+)'), User, 'id'),
+            (re.compile(r'[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
              Practitioner, 'identifier'),
-            (re.compile('[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
-            (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
+            (re.compile(r'[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
+            (re.compile(r'[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
 
         for pattern, obj, attribute in lookup:
