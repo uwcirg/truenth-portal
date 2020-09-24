@@ -264,7 +264,7 @@ class User(db.Model, UserMixin):
     registered = db.Column(db.DateTime, default=datetime.utcnow)
     _email = db.Column(
         'email', db.String(120), unique=True, nullable=False,
-        default=default_email)
+        default=default_email, index=True)
     phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
                                                    ondelete='cascade'))
     alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
@@ -283,6 +283,7 @@ class User(db.Model, UserMixin):
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
     practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
+    clinician_id = db.Column(db.ForeignKey('users.id'), index=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -1115,6 +1116,9 @@ class User(db.Model, UserMixin):
         if self.practitioner_id:
             d['careProvider'].append(Reference.practitioner(
                 self.practitioner_id).as_fhir())
+        if self.clinician_id:
+            d['careProvider'].append(Reference.clinician(
+                self.clinician_id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
@@ -1455,6 +1459,8 @@ class User(db.Model, UserMixin):
                     org_list.append(parsed)
                 elif isinstance(parsed, Practitioner):
                     self.practitioner_id = parsed.id
+                elif isinstance(parsed, User):
+                    self.clinician_id = parsed.id
             self.update_orgs(org_list, acting_user)
 
         if 'name' in fhir:

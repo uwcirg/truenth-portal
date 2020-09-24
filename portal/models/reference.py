@@ -30,6 +30,16 @@ class Reference(object):
         return ''.join(result)
 
     @classmethod
+    def clinician(cls, clinician_id):
+        """Create a reference object from a known id
+
+        NB clinician is a user with the clinician role
+        """
+        instance = cls()
+        instance.clinician_id = int(clinician_id)
+        return instance
+
+    @classmethod
     def organization(cls, organization_id):
         """Create a reference object from a known organization id"""
         instance = cls()
@@ -45,7 +55,7 @@ class Reference(object):
 
     @classmethod
     def practitioner(cls, practitioner_id):
-        """Create a reference object from a known patient id"""
+        """Create a reference object from a known practitioner id"""
         instance = cls()
         instance.practitioner_id = int(practitioner_id)
         return instance
@@ -159,6 +169,7 @@ class Reference(object):
                     reference_dict))
 
         lookup = (
+            (re.compile('[Cc]linician/(\d+)'), User, 'id'),
             (re.compile('[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
              Organization, 'identifier'),
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
@@ -218,6 +229,9 @@ class Reference(object):
         from .practitioner import Practitioner
         from .user import User
 
+        if hasattr(self, 'clinician_id'):
+            ref = "api/clinician/{}".format(self.clinician_id)
+            display = User.query.get(self.clinician_id).display_name
         if hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name

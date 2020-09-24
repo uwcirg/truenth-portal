@@ -9,6 +9,15 @@ from tests import TEST_USER_ID, TestCase
 
 class TestReference(TestCase):
 
+    def test_clinician(self):
+        patient = Reference.clinician(TEST_USER_ID)
+        assert patient.as_fhir()['display'] == self.test_user.display_name
+
+    def test_clinician_parse(self):
+        ref = {'reference': f'api/clinician/{TEST_USER_ID}'}
+        parsed = Reference.parse(ref)
+        assert self.test_user == parsed
+
     def test_patient(self):
         patient = Reference.patient(TEST_USER_ID)
         assert patient.as_fhir()['display'] == self.test_user.display_name
@@ -61,7 +70,7 @@ class TestReference(TestCase):
         i = Reference.parse(ref)
         assert i.name == 'self_management'
 
-    def test_practioner(self):
+    def test_practitioner(self):
         p = self.add_practitioner()
         p_ref = Reference.practitioner(p.id)
         assert p_ref.as_fhir()['display'] == 'first last'
