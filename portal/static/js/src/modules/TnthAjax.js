@@ -307,14 +307,16 @@ export default { /*global $ */
         }
         var data = {};
         data.user_id = userId;
-        data.organization_id = params.org;
-        data.agreement_url = params.agreementUrl;
+        data.organization_id = params.org || params.organization_id;
+        data.agreement_url = params.agreementUrl || params.agreement_url;
         data.staff_editable = (String(params.staff_editable) !== "null"  && String(params.staff_editable) !== "undefined" ? params.staff_editable : false);
         data.include_in_reports = (String(params.include_in_reports) !== "null" && String(params.include_in_reports) !== "undefined" ? params.include_in_reports : false);
         data.send_reminders = (String(params.send_reminders) !== "null" &&  String(params.send_reminders) !== "undefined"? params.send_reminders : false);
         if (params.acceptance_date) {
             data.acceptance_date = params.acceptance_date;
         }
+        //research study id helps determine whether user is in a substudy
+        data.research_study_id = params.research_study_id ? params.research_study_id : 0;
         this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
             if (!data.error) {
                 $(".set-consent-error").html("");
@@ -598,9 +600,8 @@ export default { /*global $ */
     },
     "getRoles": function(userId, callback, params) {
         callback = callback || function() {};
-        params = params || {};
         var sessionStorageKey = "userRole_" + userId;
-        if (!params.clearCache && sessionStorage.getItem(sessionStorageKey)) {
+        if (sessionStorage.getItem(sessionStorageKey)) {
             var data = JSON.parse(sessionStorage.getItem(sessionStorageKey));
             callback(data);
         } else {

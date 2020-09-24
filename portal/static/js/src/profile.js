@@ -2154,6 +2154,36 @@ export default (function() {
                 var dataShow = String(editorUrlEl.attr("data-show")) === "true";
                 return `<div class="button--LR" data-show="${dataShow}"><a href="${editorUrlEl.val()}" target="_blank">${i18next.t("Edit in Liferay")}</a></div>`
             },
+            getSubStudyEditCheckbox: function(item) {
+                //isSubStudyConsent
+                if (!this.isConsentDateEditable()) return "";
+                if (!item) return "";
+                let attrSet = "", self = this;
+                for (let prop in item) {
+                    if (["user_id", "expires", "recorded", "research_study_id"].indexOf(prop) === -1) {
+                        let value = item[prop];
+                        attrSet += ` consent__${prop}="${value}"`;
+                    }
+                }
+                $("body").delegate("#ckIsSubStudy", "change", function() {
+                    let attributes = [].slice.call(document.querySelector("#ckIsSubStudy").attributes)
+                    .map(function (attr) { return attr.nodeName; });
+                    let params = {};
+                    attributes.forEach(key => {
+                        console.log("key? ", key)
+                        if (String(key).indexOf("consent") !== -1) {
+                            params[key.split("__")[1]] = $(this).attr(key);
+                        }
+                    });
+                    params["research_study_id"] = $(this).is(":checked")?1:0;
+                    if (Object.keys(params).length > 1) {
+                        self.modules.tnthAjax.setConsent(self.subjectId, params, params.status, true, function() {
+                            self.reloadConsentList(self.subjectId)
+                        });
+                    }
+                });
+                return `<span class="substudy-checkbox-container"><input type="checkbox" id="ckIsSubStudy" ${attrSet} ${this.isSubStudyConsent(item)?"checked":""}>&nbsp;belong to sub-study?</input></span>`;
+            },
             isConsentStatusEditable: function(item) {
                return this.isConsentEditable() && String(this.getConsentStatus(item)) === "active";
             },
@@ -2165,7 +2195,7 @@ export default (function() {
                 if (!item) {return false;}
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
                 var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item)
+                    content: self.getConsentOrgDisplayName(item) + (self.isConsentDateEditable(item) ? self.getSubStudyEditCheckbox(item) : "")
                 }, {
                     content: sDisplay + (self.isConsentStatusEditable(item) ? self.getConsentEditDisplayIconHTML(item, "profileConsentListModal") : ""),
                     "_class": "indent"
