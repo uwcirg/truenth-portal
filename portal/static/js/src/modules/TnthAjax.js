@@ -272,7 +272,7 @@ export default { /*global $ */
             }
         });
     },
-    "getClinicians": function(callback) {
+    "getCliniciansList": function(callback) {
         callback = callback || function() {};
         this.sendRequest("/api/clinician", "GET", "", false, function(data) {
             if (data.error) {
@@ -468,6 +468,7 @@ export default { /*global $ */
         }
         this.clearDemoSessionData(userId);
         this.sendRequest("/api/demographics/" + userId, "PUT", userId, {sync: sync, data: JSON.stringify(toSend),targetField: targetField}, function(data) {
+            let errorELement = targetField ? targetField.parent().find(".put-demo-error"): $(".put-demo-error");
             if (!data.error) {
                 $(".put-demo-error").html("");
             } else {

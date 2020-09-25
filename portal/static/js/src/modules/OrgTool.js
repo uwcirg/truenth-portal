@@ -115,8 +115,13 @@ export default (function() { /*global i18next $ */
         var orgsList = this.getOrgsList();
         if (!orgsList.hasOwnProperty(orgId)) return false;
         if (!orgsList[orgId].extension) return false;
-        return orgsList[orgId].extension.filter(org => {
-            return org.name.indexOf(EPROMS_SUBSTUDY_PROTOCOL) >= 0;
+        let researchProtocolSet = orgsList[orgId].extension.filter(ex => {
+            return ex.research_protocols;
+        });
+        if (!researchProtocolSet.length) return false;
+        console.log("research set? ", researchProtocolSet)
+        return researchProtocolSet[0]["research_protocols"].filter(p => {
+            return p.name.indexOf(EPROMS_SUBSTUDY_PROTOCOL) >= 0;
         }).length > 0;
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
@@ -617,12 +622,27 @@ export default (function() { /*global i18next $ */
             });
         });
     };
+    OrgTool.prototype.getOrgsByCareProvider = function(data) {
+        if (!data) return false;
+        let cloneSet = [...data];
+        let orgFilteredSet = cloneSet.filter(item => {
+            return item.reference.match(/^api\/organization/gi);
+        });
+        if (!orgFilteredSet.length) return false;
+        return orgFilteredSet.map(item => {
+            return item.reference.split("/")[2];
+        });
+    }
     OrgTool.prototype.setOrgsVis = function(data, callback) {
         callback = callback || function() {};
         if (!data || ! data.careProvider) { callback(); return false;}
-        for (var i = 0; i < data.careProvider.length; i++) {
-            let careProvider = data.careProvider[i];
-            let orgID = careProvider.reference.split("/").pop();
+        let orgsSet = this.getOrgsByCareProvider(data.careProvider);
+        if (!orgsSet || !orgsSet.length) return false;
+        for (var i = 0; i < orgsSet.length; i++) {
+            //let careProvider = data.careProvider[i];
+           // let orgID = careProvider.reference.split("/").pop();
+           let orgID = orgsSet[i];
+           console.log("org id? ", orgID)
             if (parseInt(orgID) === 0) {
                 $("#userOrgs #noOrgs").prop("checked", true);
                 if ($("#stateSelector").length > 0) {
@@ -661,7 +681,8 @@ export default (function() { /*global i18next $ */
             var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val();
             if (existingDemoData && existingDemoData.careProvider) {
                 //make sure we don't wipe out reference to other than organization
-                demoArray.careProvider = existingDemoData.careProvider.filter(item => {
+                let cloneSet = [...existingDemoData.careProvider];
+                demoArray.careProvider = cloneSet.filter(item => {
                     return !item.reference.match(/^api\/organization/gi);
                 });
             } else {

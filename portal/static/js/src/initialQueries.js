@@ -769,12 +769,16 @@ import Consent from "./modules/Consent.js";
                         async: false
                     }).done(function(data) {
                         if (data && data.careProvider) {
-                            (data.careProvider).forEach(function(item) {
-                                if (!userOrgId) {
-                                    userOrgId = item.reference.split("/").pop();
-                                    return true;
-                                }
-                            });
+                            // (data.careProvider).forEach(function(item) {
+                            //     if (!userOrgId) {
+                            //         userOrgId = item.reference.split("/").pop();
+                            //         return true;
+                            //     }
+                            // });
+                            let userOrgs = orgTool.getOrgTool(data.careProvider);
+                            if (userOrgs && userOrgs.length) {
+                                userOrgId = userOrgs[0];
+                            }
                         }
                     }).fail(function() {});
                 }

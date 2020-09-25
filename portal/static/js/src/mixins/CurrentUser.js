@@ -103,10 +103,16 @@ var CurrentUser = { /* global $ i18next */
                 url: "/api/demographics/" + this.userId
             }).done(function (data) {
                 if (data && data.careProvider) {
-                    self.userOrgs = (data.careProvider).map(function (val) {
+                    // let cloneSet = [...data.careProvider];
+                    // let orgFilteredSet = cloneSet.filter(item => {
+                    //     return item.reference.match(/^api\/organization/gi);
+                    // });
+                    let orgFilteredSet = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
+                    self.userOrgs = (orgFilteredSet).map(function (val) {
                         var orgID = val.reference.split("/").pop();
                         return orgID;
                     });
+                    console.log("userOrgs ", self.userOrgs)
                 }
             }).fail(function () {
                 alert(i18next.t("Error occurred setting user organizations"));

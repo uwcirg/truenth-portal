@@ -839,20 +839,21 @@
     <div class="put-roles-error error-message"></div>
     <div class="delete-roles-error error-message"></div>
 {%- endmacro %}
-{% macro profileTreatingClinicians(person) %}
+{% macro profileTreatingClinician(person) %}
     {% call profileSection(data_sections="locale, timezone") %}
-        {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinicians")}}{%- endcall %}
+        {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
         {% call viewSection(id="profileTreatingCliniciansViewContainer") -%}
             <table>
-                <tr class="clinicians-view"><td class="text-muted">{{_("Treating Clinicians")}}</td><td>{% raw %}<section-view v-bind:data="demo.data.clinicians" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
+                <tr class="clinicians-view"><td>{% raw %}<section-view v-bind:data="demo.data.clinician.display" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
             </table>
         {%- endcall %}
         {% call editSection() -%}
-            <div id="treatingCliniciansContainer" class="eproms-substudy" data-profile-section-id="treatingclinicians">
+            <div id="treatingClinicianContainer" class="eproms-substudy" data-profile-section-id="treatingclinician">
                 <div class="select-list"></div>
             </div>
+            {{saveLoaderDiv("treatingClinicianContainer")}}
         {%- endcall %}
-        {{saveLoaderDiv("treatingCliniciansContainer")}}
+        <div class="put-demo-error error-message"></div>
         <div class="get-clinicians-error error-message"></div>
     {% endcall %}
 {%- endmacro %}
