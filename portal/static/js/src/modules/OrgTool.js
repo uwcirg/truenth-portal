@@ -1,6 +1,7 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
 import Consent from "./Consent.js";
+import {EPROMS_SUBSTUDY_PROTOCOL} from "../data/common/consts.js";
 
 export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
@@ -108,6 +109,15 @@ export default (function() { /*global i18next $ */
             return orgsList[orgId].name;
         }
         return "";
+    };
+    OrgTool.prototype.isSubStudyOrg = function(orgId) {
+        if (!orgId) return false;
+        var orgsList = this.getOrgsList();
+        if (!orgsList.hasOwnProperty(orgId)) return false;
+        if (!orgsList[orgId].extension) return false;
+        return orgsList[orgId].extension.filter(org => {
+            return org.name.indexOf(EPROMS_SUBSTUDY_PROTOCOL) >= 0;
+        }).length > 0;
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
@@ -647,31 +657,40 @@ export default (function() { /*global i18next $ */
     };
     OrgTool.prototype.updateOrgs = function(userId, targetField, sync, callback) {
         callback = callback || function() {};
-        var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val();
-        if (preselectClinic) {
-            demoArray.careProvider = [{reference: "api/organization/" + preselectClinic}]; /* add this regardless of consent */
-        } else {
-            var orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
-                return {reference: "api/organization/" + $(this).val()};
-            }).get();
-            if (orgIDs && orgIDs.length > 0) {
-                demoArray.careProvider = orgIDs;
+        tnthAjax.getDemo(userId, "", function(existingDemoData) {
+            var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val();
+            if (existingDemoData && existingDemoData.careProvider) {
+                //make sure we don't wipe out reference to other than organization
+                demoArray.careProvider = existingDemoData.careProvider.filter(item => {
+                    return !item.reference.match(/^api\/organization/gi);
+                });
+            } else {
+                demoArray.careProvider = [];
             }
-            /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
-            $("#fillOrgs legend[data-checked]").each(function() {
-                var tOrg = $(this).attr("orgid");
-                if (tOrg) {
-                    demoArray.careProvider = demoArray.careProvider || [];
-                    demoArray.careProvider.push({reference: "api/organization/" + tOrg});
+            if (preselectClinic) {
+                demoArray.careProvider.push({reference: "api/organization/" + preselectClinic}); /* add this regardless of consent */
+            } else {
+                var orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
+                    return {reference: "api/organization/" + $(this).val()};
+                }).get();
+                if (orgIDs && orgIDs.length > 0) {
+                    demoArray.careProvider = orgIDs;
                 }
+                /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
+                $("#fillOrgs legend[data-checked]").each(function() {
+                    var tOrg = $(this).attr("orgid");
+                    if (tOrg) {
+                        demoArray.careProvider.push({reference: "api/organization/" + tOrg});
+                    }
+                });
+            }
+            if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
+                demoArray.careProvider.push({reference: "api/organization/" + 0});
+            }
+            tnthAjax.putDemo(userId, demoArray, targetField, sync, function() {
+                $("#clinics").trigger("updated");
+                callback();
             });
-        }
-        if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
-            demoArray.careProvider = [{reference: "api/organization/" + 0}];
-        }
-        tnthAjax.putDemo(userId, demoArray, targetField, sync, function() {
-            $("#clinics").trigger("updated");
-            callback();
         });
     };
     OrgTool.prototype.getShortName = function(orgId) {

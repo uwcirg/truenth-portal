@@ -818,6 +818,9 @@ export default (function() {
                     this.initResetPasswordSection();
                     this.initCommunicationSection();
                     break;
+                case "treatingclinicians":
+                    this.initTreatingClinicianSection();
+                    break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1082,6 +1085,36 @@ export default (function() {
                 var self = this;
                 $("#profileStudyId, #profileSiteId").on("update", function() {
                     self.updateIdentifierData(this);
+                });
+            },
+            initTreatingClinicianSection: function() {
+                console.log(this.demo.data.careProvider.length);
+                let self = this;
+                this.modules.tnthAjax.getClinicians(function(data) {
+                    if (!data || !data.entry || !data.entry.length) {
+                        $("#treatingCliniciansContainer .select-list").html(i18next.t("No treating clinician available"));
+                        return;
+                    }
+                    let selectListHTML = `<select id="clinciansSelector" class="form-control">`;
+                    selectListHTML += `<option value="">Select</option>`;
+                    (data.entry).forEach(item => {
+                        selectListHTML += `<option value="${item.identifier[0].value}">${item.name[0].given} ${item.name[0].family}</option>`
+                    });
+                    selectListHTML += "</select>";
+                    $("#treatingCliniciansContainer .select-list").append(selectListHTML);
+                    $( "#treatingCliniciansContainer" ).delegate( "select", "change", function() {
+                        if ($(this).val() === "") return false;
+                        let postData = {"careProvider": []};
+                        if (self.demo.data.careProvider) {
+                            postData.careProvider = [...self.demo.data.careProvider];
+                        }
+                        postData.careProvider.push({
+                            display: $("#clinciansSelector option:selected").text(),
+                            reference: `/api/clinician/${$(this).val()}`
+                        });
+                        console.log(postData)
+                        self.postDemoData($(this), {"careProvider": postData});
+                    });
                 });
             },
             getAccessUrl: function() {
@@ -1499,6 +1532,11 @@ export default (function() {
                             hidePopover();
                             self.reloadConsentList(subjectId);
                         });
+                        if (self.hasSubStudyConsent()) {
+                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
+                                research_study_id: EPROMS_SUBSTUDY_ID
+                            });
+                        }
                     });
                 });
                 $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
@@ -2143,7 +2181,7 @@ export default (function() {
                 return content;
             },
             getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
-                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
+                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2160,6 +2198,30 @@ export default (function() {
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
+            },
+            /*
+             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
+             */
+            getSubStudyConsentUnknownRow: function() {
+                if (!this.hasCurrentConsent()) {
+                    return;
+                }
+                let currentConsentItem = this.consent.currentItems[0];
+                this.consent.consentDisplayRows.push(
+                    [{
+                        content: EPROMS_SUBSTUDY_TITLE
+
+                    },
+                    {
+                        content: i18next.t("Not consented") + this.getConsentEditDisplayIconHTML({
+                            organization_id: currentConsentItem.organization_id,
+                            statusText: "unknown",
+                            agreement_url: currentConsentItem.agreement_url,
+                            research_study_id: 1
+                        }, "profileConsentListModal"),
+                        "_class": "indent"
+                    }, {content: ""}]
+                );
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
@@ -2369,6 +2431,13 @@ export default (function() {
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
             },
+            hasSubStudyConsent: function() {
+                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
+            },
+            showSubStudyAddElement: function() {
+                //TODO add check to see if user organization is in substudy
+                return this.hasCurrentConsent() && !this.hasSubStudyConsent();
+            },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
             },
@@ -2429,11 +2498,14 @@ export default (function() {
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
-                    if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!(existingOrgs[item.organization_id+"_"+item.research_study_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
-                        existingOrgs[item.organization_id] = true;
+                        existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
+                if (this.showSubStudyAddElement()) {
+                     this.getSubStudyConsentUnknownRow();
+                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
@@ -2447,6 +2519,7 @@ export default (function() {
                         if (self.isConsentEditable()) {
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
+                            Consent.initConsentListModalEvent();
                         }
                         $("#consentListTable").animate({opacity: 1}, 1500);
                         clearInterval(self.consentListReadyIntervalId);
@@ -2461,7 +2534,7 @@ export default (function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
                     }
-                }, 150);
+                }, 350);
                 this.consent.consentLoading = false;
             },
             pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },

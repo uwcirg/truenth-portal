@@ -272,6 +272,18 @@ export default { /*global $ */
             }
         });
     },
+    "getClinicians": function(callback) {
+        callback = callback || function() {};
+        this.sendRequest("/api/clinician", "GET", "", false, function(data) {
+            if (data.error) {
+                var errorMessage = i18next.t("Server error occurred retrieving clinicians.");
+                $(".get-clinicians-error").html(errorMessage);
+                callback({"error": errorMessage});
+                return;
+            }
+            callback(data);
+        });
+    },
     "getConsent": function(userId, params, callback) {
         callback = callback || function() {};
         if (!userId) {
