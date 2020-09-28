@@ -34,8 +34,8 @@ from .model_persistence import ModelPersistence
 ModelDetails = namedtuple(
     'ModelDetails', ['cls', 'sequence_name', 'lookup_field'])
 models = (
-    ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
     ModelDetails(ResearchStudy, 'research_studies_id_seq', 'id'),
+    ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
     ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
     ModelDetails(Organization, 'organizations_id_seq', 'id'),
     ModelDetails(Questionnaire, 'questionnaires_id_seq', 'identifier'),
