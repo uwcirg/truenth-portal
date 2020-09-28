@@ -2414,10 +2414,16 @@ export default (function() {
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
-                    return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
-                });
+                // var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
+                //     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
+                // });
                 items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
+                var items = items.sort(function(a, b) { 
+                    //sort items by last updated date in descending order
+                    let bLastUpdated = b.deleted ? b.deleted.lastUpdated : b.recorded.lastUpdated;
+                    let aLastUpdated = a.deleted ? a.deleted.lastUpdated : a.recorded.lastUpdated;
+                    return new Date(bLastUpdated) - new Date(aLastUpdated);
+                });
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2462,7 +2468,7 @@ export default (function() {
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
                     return self.getConsentStatus(item) === "active";
                 });
-                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //filtered out deleted items from all consents
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
