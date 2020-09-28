@@ -112,6 +112,7 @@ export default (function() { /*global i18next $ */
     };
     OrgTool.prototype.isSubStudyOrg = function(orgId) {
         if (!orgId) return false;
+        //TODO get this from API!
         var orgsList = this.getOrgsList();
         if (!orgsList.hasOwnProperty(orgId)) return false;
         if (!orgsList[orgId].extension) return false;
@@ -639,10 +640,7 @@ export default (function() { /*global i18next $ */
         let orgsSet = this.getOrgsByCareProvider(data.careProvider);
         if (!orgsSet || !orgsSet.length) return false;
         for (var i = 0; i < orgsSet.length; i++) {
-            //let careProvider = data.careProvider[i];
-           // let orgID = careProvider.reference.split("/").pop();
            let orgID = orgsSet[i];
-           console.log("org id? ", orgID)
             if (parseInt(orgID) === 0) {
                 $("#userOrgs #noOrgs").prop("checked", true);
                 if ($("#stateSelector").length > 0) {

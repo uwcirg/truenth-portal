@@ -291,11 +291,7 @@ export default (function() {
                         return false;
                     }
                     var orgTool = self.getOrgTool();
-                    // self.userOrgs = data.careProvider.map(function(item) {
-                    //     return item.reference.split("/").pop();
-                    // });
                     self.userOrgs = orgTool.getOrgsByCareProvider(data.careProvider) || [];
-                    console.log("SET USER ORGS ? ", self.userOrgs);
                     var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(self.userOrgs);
                     self.topLevelOrgs = topLevelOrgs.map(function(item) {
                         return orgTool.getOrgName(item);
@@ -495,14 +491,9 @@ export default (function() {
                             });
                             self.demo.data.clinician = clinicianFilteredSet.length? clinicianFilteredSet[0] : {};
                             self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
-                            console.log("Subjects orgs? ", self.subjectOrgs)
-                            // let clone2 = [...data.careProvider];
-                            // let orgFilterdSet = clone2.filter(item => {
-                            //     return item.reference.match(/^api\/organization/gi);
-                            // });
-                            // self.subjectOrgs = orgFilterdSet.map(function(item) {
-                            //     return item.reference.split("/").pop();
-                            // });
+                        } else {
+                            self.demo.data.clinician = {};
+                            self.subjectOrgs = [];
                         }
                     }
                     callback(data);
@@ -564,6 +555,7 @@ export default (function() {
             },
             isSubStudyPatient: function() {
                 var orgTool = this.getOrgTool();
+                //TODO: get this from API
                 return this.subjectOrgs.filter(orgId => {
                     return  orgTool.isSubStudyOrg(orgId);
                 }).length;
@@ -1565,11 +1557,6 @@ export default (function() {
                             hidePopover();
                             self.reloadConsentList(subjectId);
                         });
-                        if (self.hasSubStudyConsent()) {
-                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
-                                research_study_id: EPROMS_SUBSTUDY_ID
-                            });
-                        }
                     });
                 });
                 $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
@@ -2214,7 +2201,7 @@ export default (function() {
                 return content;
             },
             getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
-                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
+                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2231,30 +2218,6 @@ export default (function() {
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
-            },
-            /*
-             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
-             */
-            getSubStudyConsentUnknownRow: function() {
-                if (!this.hasCurrentConsent()) {
-                    return;
-                }
-                let currentConsentItem = this.consent.currentItems[0];
-                this.consent.consentDisplayRows.push(
-                    [{
-                        content: EPROMS_SUBSTUDY_TITLE
-
-                    },
-                    {
-                        content: i18next.t("Not consented") + this.getConsentEditDisplayIconHTML({
-                            organization_id: currentConsentItem.organization_id,
-                            statusText: "unknown",
-                            agreement_url: currentConsentItem.agreement_url,
-                            research_study_id: 1
-                        }, "profileConsentListModal"),
-                        "_class": "indent"
-                    }, {content: ""}]
-                );
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
@@ -2464,13 +2427,6 @@ export default (function() {
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
             },
-            hasSubStudyConsent: function() {
-                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
-            },
-            showSubStudyAddElement: function() {
-                //TODO add check to see if user organization is in substudy
-                return this.hasCurrentConsent() && !this.hasSubStudyConsent();
-            },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
             },
@@ -2531,14 +2487,11 @@ export default (function() {
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
-                    if (!(existingOrgs[item.organization_id+"_"+item.research_study_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
-                        existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
+                        existingOrgs[item.organization_id] = true;
                     }
                 });
-                if (this.showSubStudyAddElement()) {
-                     this.getSubStudyConsentUnknownRow();
-                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
@@ -2552,7 +2505,6 @@ export default (function() {
                         if (self.isConsentEditable()) {
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
-                            Consent.initConsentListModalEvent();
                         }
                         $("#consentListTable").animate({opacity: 1}, 1500);
                         clearInterval(self.consentListReadyIntervalId);
@@ -2567,7 +2519,7 @@ export default (function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
                     }
-                }, 350);
+                }, 150);
                 this.consent.consentLoading = false;
             },
             pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },
@@ -2587,7 +2539,6 @@ export default (function() {
                     }[a];
                 });
             }
-
         }
     });
     return ProfileObj;

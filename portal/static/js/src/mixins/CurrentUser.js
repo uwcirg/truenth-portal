@@ -103,14 +103,8 @@ var CurrentUser = { /* global $ i18next */
                 url: "/api/demographics/" + this.userId
             }).done(function (data) {
                 if (data && data.careProvider) {
-                    // let cloneSet = [...data.careProvider];
-                    // let orgFilteredSet = cloneSet.filter(item => {
-                    //     return item.reference.match(/^api\/organization/gi);
-                    // });
                     let orgFilteredSet = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
-                    console.log("Filtered set ? ", orgFilteredSet)
                     self.userOrgs = orgFilteredSet;
-                    console.log("userOrgs ", self.userOrgs)
                 }
             }).fail(function () {
                 alert(i18next.t("Error occurred setting user organizations"));

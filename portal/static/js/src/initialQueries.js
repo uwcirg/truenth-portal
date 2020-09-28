@@ -769,15 +769,8 @@ import Consent from "./modules/Consent.js";
                         async: false
                     }).done(function(data) {
                         if (data && data.careProvider) {
-                            // (data.careProvider).forEach(function(item) {
-                            //     if (!userOrgId) {
-                            //         userOrgId = item.reference.split("/").pop();
-                            //         return true;
-                            //     }
-                            // });
                             let orgTool = __self.getOrgTool();
                             let userOrgs = orgTool.getOrgsByCareProvider(data.careProvider);
-                            console.log("USER ORGS? ", userOrgs)
                             if (userOrgs && userOrgs.length) {
                                 userOrgId = userOrgs[0];
                             }
