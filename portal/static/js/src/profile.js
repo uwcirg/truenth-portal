@@ -2403,7 +2403,8 @@ export default (function() {
             },
             showSubStudyAddElement: function() {
                 //TODO add check to see if user organization is in substudy
-                return this.hasCurrentConsent() && !this.hasSubStudyConsent();
+                //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
+                return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
             },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
