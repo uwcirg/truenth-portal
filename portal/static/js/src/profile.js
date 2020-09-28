@@ -2414,9 +2414,6 @@ export default (function() {
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                // var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
-                //     return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
-                // });
                 items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
                 var items = items.sort(function(a, b) { 
                     //sort items by last updated date in descending order
