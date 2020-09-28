@@ -316,7 +316,7 @@ export default { /*global $ */
             data.acceptance_date = params.acceptance_date;
         }
         //research study id helps determine whether user is in a substudy
-        data.research_study_id = params.research_study_id ? params.research_study_id : 0;
+        data.research_study_id = params.research_study_id ? parseInt(params.research_study_id) : 0;
         this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
             if (!data.error) {
                 $(".set-consent-error").html("");
@@ -328,16 +328,20 @@ export default { /*global $ */
             }
         });
     },
-    deleteConsent: function(userId, params) {
+    deleteConsent: function(userId, params, callback) {
+        callback = callback || function() {};
         if (!userId) {
+            callback();
             return false;
         }
         params = params || {};
         if (!params.research_study_id) {
             params.research_study_id = 0;
         }
+        params.research_study_id = parseInt(params.research_study_id);
         var consented = this.getAllValidConsent(userId, params.org, params);
         if (!consented) {
+            callback();
             return false;
         }
         var arrExcludedOrgIds = params.exclude ? params.exclude.split(","): [];
@@ -348,6 +352,7 @@ export default { /*global $ */
             return !(inArray.length); //filter out org Id(s) that are in the array of org Ids to be excluded;
         });
         var self = this;
+        console.log("delete params? ", params)
         arrConsents.forEach(function(orgId) { //delete all consents for the org
             self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify(Object.assign(params,{"organization_id": parseInt(orgId)}))}, function(data) {
                 if (!data) {
@@ -358,6 +363,7 @@ export default { /*global $ */
                 } else {
                     $(".delete-consent-error").html(i18next.t("Server error occurred removing consent."));
                 }
+                callback();
             });
         });
     },
@@ -367,6 +373,7 @@ export default { /*global $ */
         if (!params.research_study_id) {
             params.research_study_id = 0;
         }
+        params.research_study_id = parseInt(params.research_study_id);
         if (!userId || !orgId) {
             callback({"error": i18next.t("User id and organization id are required.")});
             return false;
@@ -402,6 +409,7 @@ export default { /*global $ */
         if (!userId || !orgId) { return false; }
         params = params || {};
         if (!params.research_study_id) params.research_study_id = 0;
+        params.research_study_id = parseInt(params.research_study_id);
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
             if (!data || data.error || !data.consent_agreements || !data.consent_agreements.length) {

@@ -112,14 +112,14 @@ export default { /*global i18next datepicker $*/
                     o.research_study_id = $(this).attr("data-researchStudyId");
                 }
                 if (String($(this).val()) === "purged") {
-                    tnthAjax.deleteConsent($(this).attr("data-userId"), {
-                        org: $(this).attr("data-orgId")
-                    }, o);
+                    tnthAjax.deleteConsent($(this).attr("data-userId"), o, function() {
+                        $("#profileConsentListModal").removeClass("fade").modal("hide");
+                        $("#profileConsentListModal").trigger("updated");
+                    });
                     $("#profileConsentListModal").trigger("updated");
                 } else if (String($(this).val()) === "suspended") {
-                    var modalElement = $("#profileConsentListModal");
                     tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"), o, function() {
-                        modalElement.removeClass("fade").modal("hide");
+                        $("#profileConsentListModal").removeClass("fade").modal("hide");
                         $("#profileConsentListModal").trigger("updated");
                     });
                 } else {
