@@ -532,7 +532,6 @@ export default (function() {
                 return String(this.settings.SYSTEM_TYPE).toLowerCase() !== "production";
             },
             isAdmin: function() {
-                console.log("user roles? ", this.currentUserRoles)
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
             isSubjectPatient: function() {
