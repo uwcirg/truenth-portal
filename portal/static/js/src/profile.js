@@ -104,6 +104,7 @@ export default (function() {
             userOrgs: [],
             subjectOrgs: [],
             userRoles: [],
+            cliniciansList: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
@@ -1108,19 +1109,24 @@ export default (function() {
                 let self = this;
                 this.modules.tnthAjax.getCliniciansList(function(data) {
                     if (!data || !data.entry || !data.entry.length) {
-                        $("#treatingClinicianContainer .select-list").html(i18next.t("No treating clinician available"));
+                        let errorMessage = i18next.t("No treating clinician available for this site");
+                        $("#treatingClinicianContainer .select-list-error").text(errorMessage);
                         return;
                     }
                     let selectedValue = (self.demo.data.clinician).reference? (self.demo.data.clinician.reference).split("/")[2]: "";
-                    let selectListHTML = `<select id="clincianSelector" class="form-control">`;
-                    selectListHTML += `<option value="">Select</option>`;
+                    let selectListHTML = `<select id="clincianSelector" class="form-control">;
+                                            <option value="">Select</option>`;
                     (data.entry).forEach(item => {
                         selectListHTML += `<option value="${item.identifier[0].value}" ${String(item.identifier[0].value) === String(selectedValue) ? "selected": ""}>${item.name[0].given} ${item.name[0].family}</option>`
                     });
                     selectListHTML += "</select>";
                     $("#treatingClinicianContainer .select-list").append(selectListHTML);
                     $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
-                        if ($(this).val() === "") return false;
+                        if ($(this).val() === "") {
+                            $("#treatingClinicianContainer .select-list-error").text(i18next.t("You must select a clinician"));
+                            return false;
+                        }
+                        $("#treatingClinicianContainer .select-list-error").text("");
                         let postData = {"careProvider": []};
                         if (self.demo.data.careProvider) {
                             postData.careProvider = [...self.demo.data.careProvider];
