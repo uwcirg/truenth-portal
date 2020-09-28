@@ -532,6 +532,7 @@ export default (function() {
                 return String(this.settings.SYSTEM_TYPE).toLowerCase() !== "production";
             },
             isAdmin: function() {
+                console.log("user roles? ", this.currentUserRoles)
                 return this.currentUserRoles.indexOf("admin") !== -1;
             },
             isSubjectPatient: function() {
@@ -2187,7 +2188,7 @@ export default (function() {
                             research_study_id: 1
                         }, "profileConsentListModal"),
                         "_class": "indent"
-                    }, {content: ""}]
+                    }, {content: `<span class="agreement">&nbsp;</span>`}, {content: "&nbsp;"}]
                 );
             },
             getConsentRow: function(item) {
@@ -2208,7 +2209,7 @@ export default (function() {
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "")
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "&nbsp;")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2369,7 +2370,7 @@ export default (function() {
                 Consent.initConsentListModalEvent();
                 $("#profileConsentListModal").on("show.bs.modal", function() {
                     if (self.isAdmin()) {
-                        $(this).find(".admin-radio").show();
+                        $(this).find(".admin-radio").removeClass("tnth-hide").show();
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").on("click", function() {
@@ -2485,9 +2486,9 @@ export default (function() {
                             $("#consentListTable .agreement").each(function() { $(this).parent().hide(); });
                         }
                         if (self.isConsentEditable()) {
+                            Consent.initConsentListModalEvent();
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
-                            Consent.initConsentListModalEvent();
                         }
                         $("#consentListTable").animate({opacity: 1}, 1500);
                         clearInterval(self.consentListReadyIntervalId);
@@ -2502,7 +2503,7 @@ export default (function() {
                             $("#viewConsentHistoryButton").removeClass("tnth-hide");
                         }, 550);
                     }
-                }, 350);
+                }, 150);
                 this.consent.consentLoading = false;
             },
             pad : function(n) { n = parseInt(n); return (n < 10) ? "0" + n : n; },
