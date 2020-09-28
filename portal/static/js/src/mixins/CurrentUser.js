@@ -108,10 +108,8 @@ var CurrentUser = { /* global $ i18next */
                     //     return item.reference.match(/^api\/organization/gi);
                     // });
                     let orgFilteredSet = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
-                    self.userOrgs = (orgFilteredSet).map(function (val) {
-                        var orgID = val.reference.split("/").pop();
-                        return orgID;
-                    });
+                    console.log("Filtered set ? ", orgFilteredSet)
+                    self.userOrgs = orgFilteredSet;
                     console.log("userOrgs ", self.userOrgs)
                 }
             }).fail(function () {

@@ -775,7 +775,9 @@ import Consent from "./modules/Consent.js";
                             //         return true;
                             //     }
                             // });
-                            let userOrgs = orgTool.getOrgTool(data.careProvider);
+                            let orgTool = __self.getOrgTool();
+                            let userOrgs = orgTool.getOrgsByCareProvider(data.careProvider);
+                            console.log("USER ORGS? ", userOrgs)
                             if (userOrgs && userOrgs.length) {
                                 userOrgId = userOrgs[0];
                             }
