@@ -371,14 +371,20 @@ class Organization(db.Model):
         self.default_locale = data.get('language')
         return self
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
         """Return JSON representation of organization
 
         :param include_empties: if True, returns entire object definition;
             if False, empty elements are removed from the result
+        :param include_inherited: if True, attributes not defined at instance
+            level will be looked up climbing the org tree - first found
+            defines.  by default (False) only attributes set directly on
+            the (self) organization are included.  Only implemented on
+            the following attributes {timezone, research_protocol}
         :return: JSON representation of a FHIR Organization resource
 
         """
+        # TODO implement `include_inherited` on additional attributes
         d = {}
         d['resourceType'] = 'Organization'
         d['id'] = self.id
@@ -401,7 +407,9 @@ class Organization(db.Model):
         extensions = []
         for kls in org_extension_classes:
             instance = org_extension_map(self, {'url': kls.extension_url})
-            data = instance.as_fhir(include_empties)
+            data = instance.as_fhir(
+                include_empties=include_empties,
+                include_inherited=include_inherited)
             if data:
                 extensions.append(data)
         d['extension'] = extensions
@@ -542,17 +550,36 @@ class ResearchProtocolExtension(CCExtension):
 
     extension_url = TRUENTH_RP_EXTENSION
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
         rps = []
-        for rp, retired_as_of in self.organization.rps_w_retired():
-            d = {'name': rp.name}
-            if retired_as_of:
-                d['retired_as_of'] = FHIR_datetime.as_fhir(retired_as_of)
-            rps.append(d)
+
+        def rps_from_org(org):
+            for rp, retired_as_of in org.rps_w_retired():
+                d = {
+                    'name': rp.name,
+                    'research_study_id': rp.research_study_id}
+                if retired_as_of:
+                    d['retired_as_of'] = FHIR_datetime.as_fhir(retired_as_of)
+                rps.append(d)
+            return rps
+
+        rps = rps_from_org(self.organization)
         if rps:
             return {'url': self.extension_url, 'research_protocols': rps}
         elif include_empties:
             return {'url': self.extension_url}
+        elif include_inherited:
+            # Climb the org inheritance tree till an rp is found
+            org = self.organization
+            while True:
+                if org.partOf_id is None:
+                    return
+                org = Organization.query.get(org.partOf_id)
+                rps = rps_from_org(org)
+                if rps:
+                    return {
+                        'url': self.extension_url,
+                        'research_protocols': rps}
 
     def apply_fhir(self):
         if self.extension['url'] != self.extension_url:
