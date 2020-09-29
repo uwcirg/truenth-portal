@@ -187,6 +187,11 @@ def organization_get(id_or_code):
         description: Identifier system
         required: false
         type: string
+      - name: include_inherited_attributes
+        in: query
+        description: include attributes defined at a parent or higher level
+        required: false
+        type: string
     responses:
       200:
         description:
@@ -225,7 +230,10 @@ def organization_get(id_or_code):
                 400, "invalid input '{}' - expected integer without system "
                      "parameter".format(id_or_code))
 
-    return jsonify(org.as_fhir(include_empties=False))
+    include_inherited = request.args.get(
+        'included_inherited_attributes', 'false').lower() != 'false'
+    return jsonify(org.as_fhir(
+        include_empties=False, include_inherited=include_inherited))
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))

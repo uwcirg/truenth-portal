@@ -46,9 +46,14 @@ from tests import TEST_USER_ID
 
 
 """ Include all fixtures found in nested fixtures dir as modules """
+# The double load attempt is necessary given different IDE/tox/CI envs
 pytest_plugins = [
     f"tests.{fixture.replace('/', '.')}"[:-3]
     for fixture in glob("fixtures/*.py")]
+if not pytest_plugins:
+    pytest_plugins = [
+        f"{fixture.replace('/', '.')}"[:-3]
+        for fixture in glob("tests/fixtures/*.py")]
 
 
 def pytest_addoption(parser):
