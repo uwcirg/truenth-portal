@@ -31,9 +31,17 @@ from portal.system_uri import (
     PRACTICE_REGION,
     SHORTCUT_ALIAS,
     SHORTNAME_ID,
+    TRUENTH_RP_EXTENSION,
     US_NPI,
 )
 from tests import TEST_USER_ID
+
+
+def item_from_extensions(extensions, item_url):
+    """test helper to extract and return just the requested extension"""
+    for ext in extensions:
+        if ext['url'] == item_url:
+            return ext
 
 
 def test_from_fhir():
@@ -108,6 +116,10 @@ def test_timezone_inheritance():
         db.session.commit()
     parent, org = map(db.session.merge, (parent, org))
     assert org.timezone == 'UTC'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'UTC'
 
     # test that timezone-less child org inherits from parent
     parent.timezone = 'Asia/Tokyo'
@@ -116,6 +128,10 @@ def test_timezone_inheritance():
         db.session.commit()
     parent, org = map(db.session.merge, (parent, org))
     assert org.timezone == 'Asia/Tokyo'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'Asia/Tokyo'
 
     # test that child org with timezone does NOT inherit from parent
     org.timezone = 'Europe/Rome'
@@ -124,6 +140,10 @@ def test_timezone_inheritance():
         db.session.commit()
     org = db.session.merge(org)
     assert org.timezone == 'Europe/Rome'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'Europe/Rome'
 
 
 def test_as_fhir():
@@ -403,6 +423,28 @@ def test_organization_put_update(
     assert org.default_locale == 'en_AU'
     assert org.locales[0] == en_AU
     assert org.timezone == 'US/Pacific'
+
+
+def test_org_rp_inheritance(initialized_with_org):
+    fhir = initialized_with_org.as_fhir()
+    assert fhir['resourceType'] == 'Organization'
+    rp_ext = item_from_extensions(fhir['extension'], TRUENTH_RP_EXTENSION)
+    assert rp_ext['research_protocols'][0]['research_study_id'] == 0
+
+    # Add child org, w/o a research protocol to pick up parent value
+    child = Organization(name='child', partOf_id=initialized_with_org.id)
+    with SessionScope(db):
+        db.session.add(child)
+        db.session.commit()
+    child = db.session.merge(child)
+    child_fhir = child.as_fhir()
+    rp_ext = item_from_extensions(
+        child_fhir['extension'], TRUENTH_RP_EXTENSION)
+    assert 'research_protocols' not in rp_ext
+    inherited = child.as_fhir(include_empties=False, include_inherited=True)
+    rp_ext = item_from_extensions(
+        inherited['extension'], TRUENTH_RP_EXTENSION)
+    assert 'research_protocols' in rp_ext
 
 
 def test_organization_extension_update(
