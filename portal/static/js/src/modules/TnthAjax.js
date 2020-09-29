@@ -272,6 +272,30 @@ export default { /*global $ */
             }
         });
     },
+    "getOrg": function(orgId, params, callback) {
+        callback = callback || function() {};
+        if (!orgId) {
+            callback({error: i18next.t("Organization id is required.")});
+            return false;
+        }
+        if (sessionStorage[`orgData_${orgId}`]) {
+            callback(JSON.parse(sessionStorage[`orgData_${orgId}`]));
+            return true;
+        }
+        params = params || {};
+        /* individual org */
+        this.sendRequest("/api/organization/"+orgId, "GET", "", params, function(data) {
+            if (!data.error) {
+                $(".get-orgs-error").html("");
+                sessionStorage.setItem(`orgData_${orgId}`, JSON.stringify(data));
+                callback(data);
+            } else {
+                var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
+                $(".get-orgs-error").html(errorMessage);
+                callback({"error": errorMessage});
+            }
+        });
+    },
     "getCliniciansList": function(callback) {
         callback = callback || function() {};
         this.sendRequest("/api/clinician", "GET", "", false, function(data) {

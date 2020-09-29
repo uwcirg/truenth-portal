@@ -554,12 +554,19 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
-            isSubStudyPatient: function() {
+            hasSubjectSubStudyOrg: function() {
                 var orgTool = this.getOrgTool();
+                console.log("subject orgs? ", this.subjectOrgs)
                 //TODO: get this from API
                 return this.subjectOrgs.filter(orgId => {
                     return  orgTool.isSubStudyOrg(orgId);
                 }).length;
+            },
+            isSubStudyPatient: function() {
+                var orgTool = this.getOrgTool();
+                console.log("org? ", this.hasSubjectSubStudyOrg(), " consent? ", this.hasSubStudyConsent())
+                //TODO: get this from API
+                return this.hasSubjectSubStudyOrg() && this.hasSubStudyConsent();
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
@@ -2275,6 +2282,9 @@ export default (function() {
                     return false;
                 }
                 return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
+            },
+            hasSubStudyConsent: function() {
+                return this.consent.currentItems.filter( item => parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID).length;
             },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}

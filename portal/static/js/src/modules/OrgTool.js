@@ -1,7 +1,7 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
 import Consent from "./Consent.js";
-import {EPROMS_SUBSTUDY_PROTOCOL} from "../data/common/consts.js";
+import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
 export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
@@ -110,19 +110,37 @@ export default (function() { /*global i18next $ */
         }
         return "";
     };
-    OrgTool.prototype.isSubStudyOrg = function(orgId) {
-        if (!orgId) return false;
-        //TODO get this from API!
+    OrgTool.prototype.getResearchStudyIdsByOrg = function(orgId) {
         var orgsList = this.getOrgsList();
-        if (!orgsList.hasOwnProperty(orgId)) return false;
-        if (!orgsList[orgId].extension) return false;
-        let researchProtocolSet = orgsList[orgId].extension.filter(ex => {
+        if (!orgId || !orgsList.hasOwnProperty(orgId) || !orgsList[orgId].extension) return [];
+        let arrResearchProtocols = orgsList[orgId].extension.filter(ex => {
             return ex.research_protocols;
         });
+        console.log("HERE? ", arrResearchProtocols)
+        if (arrResearchProtocols.length) {
+            return arrResearchProtocols.filter(p => {
+                return p.research_protocols.filter(item => item.hasOwnProperty("research_study_id")).length;
+            });
+        }
+        return [];
+    }
+    OrgTool.prototype.isSubStudyOrg = function(orgId) {
+        if (!orgId) return false;
+        var orgsList = this.getOrgsList();
+        console.log("orgs List ", orgsList)
+        if (!orgsList.hasOwnProperty(orgId)) return false;
+        console.log("org list? ", orgsList[orgId])
+        if (!orgsList[orgId].extension) {
+            return false;
+        }
+        let researchProtocolSet = this.getResearchStudyIdsByOrg(orgId);
         if (!researchProtocolSet.length) return false;
-        console.log("research set? ", researchProtocolSet)
+
+        /*
+         * match substudy research protocol study id with that from the org
+         */
         return researchProtocolSet[0]["research_protocols"].filter(p => {
-            return p.name.indexOf(EPROMS_SUBSTUDY_PROTOCOL) >= 0;
+            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
         }).length > 0;
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
