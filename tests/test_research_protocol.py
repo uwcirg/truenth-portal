@@ -59,5 +59,5 @@ def test_rp_inheritance(initialized_with_research_protocol):
     assert parent.research_protocols[0].id == rp.id
     assert parent.research_protocols[0].research_study_id == 0
     assert len(child.research_protocols) == 0
-    assert (child.research_protocol(as_of_date=datetime.utcnow()).id
-            == rp.id)
+    assert (child.research_protocol(
+        research_study_id=0, as_of_date=datetime.utcnow()).id == rp.id)

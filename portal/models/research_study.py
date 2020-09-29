@@ -55,7 +55,8 @@ class ResearchStudy(db.Model):
         if iqbs:
             results.append(base_study)  # Use dummy till system need arises
 
-        for rp, _ in ResearchProtocol.assigned_to(user):
+        for rp, _ in ResearchProtocol.assigned_to(
+                user, research_study_id='all'):
             rs_id = rp.research_study_id
             if rs_id is None:
                 continue

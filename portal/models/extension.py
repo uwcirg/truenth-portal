@@ -26,16 +26,22 @@ class CCExtension(Extension, metaclass=ABCMeta):
     def children(self):  # pragma: no cover
         pass
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
         if self.children.count():
             return {
                 'url': self.extension_url,
                 'valueCodeableConcept': {
                     'coding': [c.as_fhir() for c in self.children]}
             }
-        # Return valid empty if none are currently defined and requested
         if include_empties:
+            # Return valid empty if none are currently defined and requested
             return {'url': self.extension_url}
+
+        if include_inherited:
+            # TODO in the organization instance, need a `parent()`
+            #  implementation, and to climb tree till exhaused or value
+            return None
+
         return None
 
     def apply_fhir(self):
@@ -66,7 +72,9 @@ class TimezoneExtension(CCExtension):
     extension_url = \
         "http://hl7.org/fhir/StructureDefinition/user-timezone"
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
+        # Include inherited is NOP in this case, as self.source.timezone
+        # does its own inheritance lookup
         timezone = self.source.timezone
         if not timezone or timezone == 'None':
             timezone = 'UTC'

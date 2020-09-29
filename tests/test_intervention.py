@@ -23,6 +23,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.research_study import ResearchStudy
 from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.models.user_consent import UserConsent
@@ -1266,6 +1267,7 @@ def setUp(initialize_static):
     # Load minimal set of persistence files for access_strategy, in same
     # order defined in site_persistence
     needed = {
+        ResearchStudy,
         ResearchProtocol,
         Coding,
         Organization,
