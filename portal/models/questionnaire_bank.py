@@ -378,7 +378,7 @@ def trigger_date(user, research_study_id, qb=None):
     # the intervention method.  (Yes, it's possible the user has neither
     # intervention nor RP, but the intervention method is too expensive
     # for a simple trigger date lookup - will be caught in qb_timeline)
-    if ResearchProtocol.assigned_to(user):
+    if ResearchProtocol.assigned_to(user, research_study_id):
         return consent_date(user, research_study_id=research_study_id)
     else:
         return intervention_trigger(user)

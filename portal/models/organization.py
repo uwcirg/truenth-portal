@@ -210,7 +210,7 @@ class Organization(db.Model):
     def timezone(self, value):
         self._timezone = value
 
-    def rps_w_retired(self, consider_parents=False):
+    def rps_w_retired(self, research_study_id, consider_parents=False):
         """accessor to collate research protocols and retired_as_of values
 
         The SQLAlchemy association proxy doesn't provide easy access to
@@ -219,6 +219,7 @@ class Organization(db.Model):
         in the intermediary table, `retired_as_of` with the research protocols
         for this organization.
 
+        :param research_study_id: the study being processed, or "all"
         :param consider_parents: if set and the org doesn't have an
          associated RP, continue up the org hiearchy till one is found.
 
@@ -238,6 +239,10 @@ class Organization(db.Model):
                 ResearchProtocol,
                 OrganizationResearchProtocol.retired_as_of).order_by(
                 OrganizationResearchProtocol.retired_as_of.desc())
+
+            if research_study_id != "all":
+                items = items.filter(
+                    ResearchProtocol.research_study_id == research_study_id)
             return items
 
         items = fetch_for_org(self.id)
@@ -253,7 +258,7 @@ class Organization(db.Model):
         # no match found; return valid (empty) query for client iteration
         return items
 
-    def research_protocol(self, as_of_date):
+    def research_protocol(self, research_study_id, as_of_date):
         """Lookup research protocol for this org valid at as_of_date
 
         Complicated scenario as it may only be defined on the parent or
@@ -266,7 +271,7 @@ class Organization(db.Model):
 
         def rp_from_org(org):
             best_candidate = None
-            for rp, retired_as_of in org.rps_w_retired():
+            for rp, retired_as_of in org.rps_w_retired(research_study_id):
                 if not retired_as_of:
                     best_candidate = rp
                 elif retired_as_of > as_of_date:
@@ -554,7 +559,8 @@ class ResearchProtocolExtension(CCExtension):
         rps = []
 
         def rps_from_org(org):
-            for rp, retired_as_of in org.rps_w_retired():
+            for rp, retired_as_of in org.rps_w_retired(
+                    research_study_id='all'):
                 d = {
                     'name': rp.name,
                     'research_study_id': rp.research_study_id}
@@ -957,20 +963,6 @@ class OrgTree(object):
 
         if first:
             return next(iter(results)) if results else None
-        return results
-
-    @staticmethod
-    def all_ids_with_rp(research_protocol):
-        """Returns set of org IDs that are associated with Research Protocol
-
-        As child orgs are considered to be associated if the parent org
-        is, this will return the full list for optimized comparisons.
-
-        """
-        results = set()
-        for o in Organization.query.all():
-            if research_protocol == o.research_protocol:
-                results.add(o.id)
         return results
 
 
