@@ -188,6 +188,7 @@ def organization_get(id_or_code):
         required: false
         type: string
       - name: include_inherited_attributes
+        in: query
         description: include attributes defined at a parent or higher level
         required: false
         type: string
