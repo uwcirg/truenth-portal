@@ -36,6 +36,7 @@ from ..views.auth import (
 )
 from ..views.client import client_api
 from ..views.clinical import clinical_api
+from ..views.clinician import clinician_api
 from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
 from ..views.extend_flask_user import (
@@ -77,6 +78,7 @@ DEFAULT_BLUEPRINTS = (
     client_api,
     coredata_api,
     clinical_api,
+    clinician_api,
     csrf_blueprint,
     demographics_api,
     facebook_blueprint,

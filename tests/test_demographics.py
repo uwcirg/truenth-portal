@@ -109,6 +109,7 @@ class TestDemographics(TestCase):
                     {"reference": "Organization/{}".format(org_id)},
                     {"reference": "api/organization/{}".format(org2_id)},
                     {"reference": "Practitioner/{}".format(pract_id)},
+                    {"reference": "Clinician/{}".format(TEST_USER_ID)},
                 ]
                 }
 
@@ -140,9 +141,13 @@ class TestDemographics(TestCase):
         # ignore added timezone and empty extensions
         assert 2 == len([ext for ext in fhir['extension']
                          if 'valueCodeableConcept' in ext])
-        assert 3 == len(fhir['careProvider'])
+        assert 4 == len(fhir['careProvider'])
         assert (
-            Reference.practitioner(pract_id).as_fhir() in fhir['careProvider'])
+            Reference.practitioner(pract_id).as_fhir()
+            in fhir['careProvider'])
+        assert (
+            Reference.clinician(TEST_USER_ID).as_fhir()
+            in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
         assert user._email.startswith('__no_email__')
@@ -155,6 +160,7 @@ class TestDemographics(TestCase):
         assert user.organizations[0].name == org_name
         assert user.organizations[1].name == org2_name
         assert user.practitioner_id == pract_id
+        assert user.clinician_id == TEST_USER_ID
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
