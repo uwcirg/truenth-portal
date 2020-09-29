@@ -286,20 +286,21 @@ def second_null_safe_datetime(x):
 RPD = namedtuple("RPD", ['rp', 'retired', 'qbds'])
 
 
-def cur_next_rp_gen(user, classification, trigger_date):
+def cur_next_rp_gen(user, research_study_id, classification, trigger_date):
     """Generator to manage transitions through research protocols
 
     Returns a *pair* of research protocol data (RPD) namedtuples,
     one for current (active) RP data, one for the "next".
 
     :param user: applicable patient
+    :param research_study_id: study being processed
     :param classification: None or 'indefinite' for special handling
     :param trigger_date: patient's initial trigger date
 
     :yields: cur_RPD, next_RPD
 
     """
-    rps = ResearchProtocol.assigned_to(user)
+    rps = ResearchProtocol.assigned_to(user, research_study_id)
     sorted_rps = sorted(
         list(rps), key=second_null_safe_datetime, reverse=True)
 
@@ -361,7 +362,9 @@ class RP_flyweight(object):
         self.research_study_id = research_study_id
         self.classification = classification
         self.rp_walker = cur_next_rp_gen(
-            user=self.user, trigger_date=self.td,
+            user=self.user,
+            research_study_id=self.research_study_id,
+            trigger_date=self.td,
             classification=self.classification)
         self.cur_rpd, self.nxt_rpd = next(self.rp_walker, (None, None))
         self.skipped_nxt_start = None

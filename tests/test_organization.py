@@ -191,7 +191,9 @@ def test_multiple_rps_in_fhir():
     assert len(rps[0]['research_protocols']) == 3
 
     # confirm the order is descending in the custom accessor method
-    results = [(rp, retired) for rp, retired in org.rps_w_retired()]
+    results = [
+        (rp, retired) for rp, retired in
+        org.rps_w_retired(research_study_id=rs_id)]
     assert [(rp1, None), (rp2, yesterday), (rp3, lastyear)] == results
 
 
@@ -496,7 +498,8 @@ def test_organization_extension_update(
     assert org.default_locale == 'en_AU'
     assert org.locales.count() == 0
     assert org.timezone == 'US/Pacific'
-    assert org.research_protocol(as_of_date=datetime.utcnow()).id == rp_id
+    assert org.research_protocol(
+        research_study_id=0, as_of_date=datetime.utcnow()).id == rp_id
 
     # Confirm empty extension isn't included in result
     results = response.json
