@@ -136,12 +136,10 @@ export default (function() { /*global i18next $ */
                 }
             });
         }
-        console.log("HERE? ", orgsList[orgId])
         if (!orgsList[orgId].extension) {
             return false;
         }
         let researchProtocolSet = this.getResearchProtocolsByOrg(orgId);
-        console.log("research set? ", researchProtocolSet)
         if (!researchProtocolSet.length) return false;
 
         /*

@@ -375,7 +375,6 @@ export default { /*global $ */
             return !(inArray.length); //filter out org Id(s) that are in the array of org Ids to be excluded;
         });
         var self = this;
-        console.log("delete params? ", params)
         arrConsents.forEach(function(orgId) { //delete all consents for the org
             self.sendRequest("/api/user/" + userId + "/consent", "DELETE", userId, {data: JSON.stringify(Object.assign(params,{"organization_id": parseInt(orgId)}))}, function(data) {
                 if (!data) {
