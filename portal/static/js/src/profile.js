@@ -102,6 +102,7 @@ export default (function() {
             initIntervalId: 0,
             currentUserRoles: [],
             userOrgs: [],
+            subjectOrgs: [],
             userRoles: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
@@ -485,6 +486,11 @@ export default (function() {
                             });
                         }
                         self.demo.data.raceCodes = self.demo.data.raceCodes || [];
+                        if (data.careProvider && data.careProvider.length) {
+                            self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
+                        } else {
+                            self.subjectOrgs = [];
+                        }
                     }
                     callback(data);
                 });
@@ -542,6 +548,13 @@ export default (function() {
                     this.initUserRoles({sync:true});
                 }
                 return this.userRoles.indexOf("patient") !== -1;
+            },
+            isSubStudyPatient: function() {
+                var orgTool = this.getOrgTool();
+                //check via organization API
+                return this.subjectOrgs.filter(orgId => {
+                    return  orgTool.isSubStudyOrg(orgId);
+                }).length;
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
@@ -2265,8 +2278,14 @@ export default (function() {
             },
             getRecordedDisplayDate: function(item) {
                 if (!item) {return "";}
-                var recordedDate = item.recorded? item.recorded.lastUpdated : "";
-                return this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss");
+                let recordedDate;
+                if (item.deleted) {
+                    recordedDate = item.deleted.lastUpdated;
+                }
+                if (!recordedDate && item.recorded) {
+                    recordedDate = item.recorded.lastUpdated;
+                } 
+                return recordedDate ? this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss") : "";
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2402,7 +2421,10 @@ export default (function() {
                 return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
             },
             showSubStudyAddElement: function() {
-                //TODO add check to see if user organization is in substudy
+                //check to see if user organization is in substudy
+                if (!this.isSubStudyPatient()) {
+                    return false;
+                }
                 //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
                 return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
             },
