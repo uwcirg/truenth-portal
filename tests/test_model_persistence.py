@@ -312,5 +312,7 @@ class TestModelPersistence(TestCase):
         # Make sure retired_as_of was set properly on old
         rp1, rp2 = map(db.session.merge, (rp1, rp2))
         expected = [(rp2, None), (rp1, now)]
-        results = [(rp, retired) for rp, retired in org.rps_w_retired()]
+        results = [
+            (rp, retired) for rp, retired in
+            org.rps_w_retired(research_study_id=0)]
         assert results == expected

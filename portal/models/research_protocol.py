@@ -48,10 +48,11 @@ class ResearchProtocol(db.Model):
         return ' '.join([n.title() for n in word_list])
 
     @staticmethod
-    def assigned_to(user):
+    def assigned_to(user, research_study_id):
         """Returns set of tuples (ResearchProtocol, retired) for user"""
         rps = set()
         for org in user.organizations:
-            for r in org.rps_w_retired(consider_parents=True):
+            for r in org.rps_w_retired(
+                    research_study_id, consider_parents=True):
                 rps.add(r)
         return rps
