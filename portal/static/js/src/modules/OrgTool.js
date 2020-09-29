@@ -120,7 +120,6 @@ export default (function() { /*global i18next $ */
         return orgsList[orgId].extension.filter(ex => {
             return ex.research_protocols;
         });
-
     }
     OrgTool.prototype.isSubStudyOrg = function(orgId) {
         if (!orgId) return false;
