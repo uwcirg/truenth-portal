@@ -11,7 +11,6 @@ from ..models.role import ROLE
 from ..models.user import get_user
 from .crossdomain import crossdomain
 
-
 research_study_api = Blueprint('research_study_api', __name__)
 
 
@@ -78,7 +77,8 @@ def rs_for_user(user_id):
             orgs.update(ot.here_and_below_id(org.id))
         studies = OrganizationResearchProtocol.query.filter(
             OrganizationResearchProtocol.organization_id.in_(
-                tuple(orgs))).join(ResearchProtocol,
+                tuple(orgs))).join(
+            ResearchProtocol,
             OrganizationResearchProtocol.research_protocol_id ==
             ResearchProtocol.id).with_entities(
             ResearchProtocol.research_study_id).distinct()
