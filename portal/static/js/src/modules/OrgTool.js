@@ -121,33 +121,6 @@ export default (function() { /*global i18next $ */
             return ex.research_protocols;
         });
     }
-    OrgTool.prototype.isSubStudyOrg = function(orgId) {
-        if (!orgId) return false;
-        var orgsList = this.getOrgsList();
-        if (!orgsList.hasOwnProperty(orgId)) return false;
-        if (!this.getResearchProtocolsByOrg(orgId)) {
-            /*
-             * include flag for inherited attributes to find added inherited attributes
-             */
-            tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: true}, function(data) {
-                if (data && data.extension) {
-                    orgsList[orgId].extension = [...data.extension];
-                }
-            });
-        }
-        if (!orgsList[orgId].extension) {
-            return false;
-        }
-        let researchProtocolSet = this.getResearchProtocolsByOrg(orgId);
-        if (!researchProtocolSet.length) return false;
-
-        /*
-         * match substudy research protocol study id with that from the org
-         */
-        return researchProtocolSet[0]["research_protocols"].filter(p => {
-            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
-        }).length > 0;
-    };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }

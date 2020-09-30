@@ -283,7 +283,7 @@ export default { /*global $ */
             return true;
         }
         params = params || {};
-        this.sendRequest("/api/organization", "GET", "", params, function(data) {
+        this.sendRequest("/api/organization/"+orgId, "GET", "", params, function(data) {
             if (!data.error) {
                 $(".get-orgs-error").html("");
                 sessionStorage.setItem(`orgData_${orgId}`, JSON.stringify(data));
@@ -292,6 +292,24 @@ export default { /*global $ */
                 var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
                 $(".get-orgs-error").html(errorMessage);
                 callback({"error": errorMessage});
+            }
+        });
+    },
+    "getResearchStudies": function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({error: i18next.t("User id is required.")});
+            return false;
+        }
+        this.sendRequest("/api/user/" + userId + "/research_study", "GET", userId, params, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                    return true;
+                } else {
+                    callback({"error": i18next.t("Server error occurred retrieving research study information.")});
+                    return false;
+                }
             }
         });
     },

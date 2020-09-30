@@ -48,6 +48,7 @@ export default (function() {
             this.registerDependencies();
             this.getOrgTool();
             this.setUserSettings();
+            this.setSubjectResearchStudies();
             this.onBeforeSectionsLoad();
             this.setCurrentUserOrgs();
             this.initStartTime = new Date();
@@ -103,6 +104,7 @@ export default (function() {
             currentUserRoles: [],
             userOrgs: [],
             subjectOrgs: [],
+            subjectReseachStudies: [],
             userRoles: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
@@ -512,6 +514,16 @@ export default (function() {
                     this.mode = acoContainer.getAttribute("data-account") === "patient" ? "createPatientAccount": "createUserAccount";
                 }
             },
+            setSubjectResearchStudies: function() {
+                this.modules.tnthAjax.getResearchStudies(this.subjectId, "", data => {
+                    if (data && data.research_study) {
+                        this.subjectReseachStudies = data.research_study.map(item => {
+                            return item.id
+                        });
+                        console.log("research studies ", this.subjectReseachStudies)
+                    }
+                });
+            },
             getOrgTool: function(callback) {
                 callback = callback || function() {};
                 if (!this.orgTool) {
@@ -550,11 +562,7 @@ export default (function() {
                 return this.userRoles.indexOf("patient") !== -1;
             },
             isSubStudyPatient: function() {
-                var orgTool = this.getOrgTool();
-                //check via organization API
-                return this.subjectOrgs.filter(orgId => {
-                    return  orgTool.isSubStudyOrg(orgId);
-                }).length;
+                return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
