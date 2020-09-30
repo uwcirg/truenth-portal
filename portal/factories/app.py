@@ -63,6 +63,7 @@ from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
 from ..views.questionnaire import questionnaire_api
 from ..views.reporting import reporting_api
+from ..views.research_study import research_study_api
 from ..views.role import role_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.staff import staff
@@ -98,6 +99,7 @@ DEFAULT_BLUEPRINTS = (
     portal,
     questionnaire_api,
     reporting_api,
+    research_study_api,
     role_api,
     scheduled_job_api,
     staff,
