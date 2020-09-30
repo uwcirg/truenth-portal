@@ -2,6 +2,7 @@ import tnthAjax from "./modules/TnthAjax.js";
 import tnthDates from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
 import CurrentUser from "./mixins/CurrentUser.js";
+import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
 
 (function () { /*global Vue DELAY_LOADING i18next $ */
     var DELAY_LOADING = true; //a workaround for hiding of loading indicator upon completion of loading of portal wrapper - loading indicator needs to continue displaying until patients list has finished loading
@@ -152,6 +153,17 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 this.initCurrentUser(function() {
                     self.onCurrentUserInit();
                 }, true);
+            },
+            allowSubStudyView: function() {
+                console.log("here? ",this.userResearchStudyIds)
+                return this.userResearchStudyIds.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
+            },
+            setSubStudyUIElements: function() {
+                if (this.allowSubStudyView()) {
+                    $("#patientList .eproms-substudy").removeClass("tnth-hide").show();
+                    return;
+                }
+                $("#patientList .eproms-substudy").hide();
             },
             getExportReportUrl: function(dataType) {
                 dataType = dataType||"json";
@@ -310,6 +322,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     this.initOrgsFilter();
                     this.initOrgsEvent();
                 }
+                this.setSubStudyUIElements();
                 this.initRoleBasedEvent();
                 this.fadeLoader();
             },
