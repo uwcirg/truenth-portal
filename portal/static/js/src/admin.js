@@ -155,7 +155,6 @@ import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
                 }, true);
             },
             allowSubStudyView: function() {
-                console.log("here? ",this.userResearchStudyIds)
                 return this.userResearchStudyIds.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
             setSubStudyUIElements: function() {
