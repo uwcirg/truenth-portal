@@ -25,7 +25,7 @@ def rs_for_user(user_id):
     tags:
       - User
       - ResearchStudy
-    operationId: rs_for_user
+    operationId: research_studies_for_user
     parameters:
       - name: user_id
         in: path
