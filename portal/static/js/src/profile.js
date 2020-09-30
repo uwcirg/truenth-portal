@@ -2197,15 +2197,16 @@ export default (function() {
                 this.consent.consentDisplayRows.push(
                     [{
                         content: EPROMS_SUBSTUDY_TITLE
-
                     },
                     {
-                        content: i18next.t("Not consented") + this.getConsentEditDisplayIconHTML({
-                            organization_id: currentConsentItem.organization_id,
-                            statusText: "unknown",
-                            agreement_url: currentConsentItem.agreement_url,
-                            research_study_id: 1
-                        }, "profileConsentListModal"),
+                        content: i18next.t("Not consented") + 
+                                this.getConsentEditDisplayIconHTML({
+                                    organization_id: currentConsentItem.organization_id,
+                                    statusText: "unknown",
+                                    agreement_url: currentConsentItem.agreement_url,
+                                    research_study_id: EPROMS_SUBSTUDY_ID
+                                }
+                        , "profileConsentListModal"),
                         "_class": "indent"
                     }, {content: `<span class="agreement">&nbsp;</span>`}, {content: "&nbsp;"}]
                 );
