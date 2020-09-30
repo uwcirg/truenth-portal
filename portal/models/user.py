@@ -1694,7 +1694,7 @@ class User(db.Model, UserMixin):
         orgtree = OrgTree()
         if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value,
                           ROLE.CLINICIAN.value) and
-                        other.has_role(ROLE.PATIENT.value)):
+                other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
