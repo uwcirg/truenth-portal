@@ -114,13 +114,6 @@ export default (function() { /*global i18next $ */
         }
         return "";
     };
-    OrgTool.prototype.getResearchProtocolsByOrg = function(orgId) {
-        var orgsList = this.getOrgsList();
-        if (!orgId || !orgsList.hasOwnProperty(orgId) || !orgsList[orgId].extension) return [];
-        return orgsList[orgId].extension.filter(ex => {
-            return ex.research_protocols;
-        });
-    }
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }

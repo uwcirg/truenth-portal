@@ -520,7 +520,6 @@ export default (function() {
                         this.subjectReseachStudies = data.research_study.map(item => {
                             return item.id
                         });
-                        console.log("research studies ", this.subjectReseachStudies)
                     }
                 });
             },
