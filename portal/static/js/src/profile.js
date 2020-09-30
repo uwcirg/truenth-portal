@@ -566,7 +566,6 @@ export default (function() {
                 return this.userRoles.indexOf("patient") !== -1;
             },
             isSubStudyPatient: function() {
-                console.log("isSubStudy? ", this.subjectReseachStudies)
                 return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
             isStaffAdmin: function() {
@@ -1151,7 +1150,6 @@ export default (function() {
                             display: $("#clincianSelector option:selected").text(),
                             reference: `api/clinician/${$(this).val()}`
                         });
-                        console.log(postData)
                         self.postDemoData($("#treatingClinicianContainer"), postData);
                     });
                 });
