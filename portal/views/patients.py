@@ -135,7 +135,7 @@ def patients_substudy():
 
 
 @patients.route('/patient-profile-create')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_profile_create():
     user = current_user()
