@@ -114,6 +114,40 @@ export default (function() { /*global i18next $ */
         }
         return "";
     };
+    OrgTool.prototype.getResearchProtocolsByOrgId = function(orgId) {
+        var orgsList = this.getOrgsList();
+        if (!orgId || !orgsList.hasOwnProperty(orgId) || !orgsList[orgId].extension) return [];
+        let researchProtocols =  orgsList[orgId].extension.filter(ex => {
+            return ex.research_protocols;
+        });
+        if (!researchProtocols.length) return [];
+        return researchProtocols[0].research_protocols;
+    }
+    OrgTool.prototype.isSubStudyOrg = function(orgId) {
+        if (!orgId) return false;
+        var orgsList = this.getOrgsList();
+        if (!orgsList.hasOwnProperty(orgId)) return false;
+        if (!this.getResearchProtocolsByOrgId(orgId).length) {
+            /*
+             * include flag for inherited attributes to find added inherited attributes that include research study
+             * information
+             */
+            tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: true}, function(data) {
+                if (data && data.extension) {
+                    orgsList[orgId].extension = [...data.extension];
+                }
+            });
+        }
+        let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
+        console.log("research protocol? ", researchProtocolSet)
+
+        /*
+         * match substudy research protocol study id with that from the org
+         */
+        return researchProtocolSet.filter(p => {
+            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
+        }).length > 0;
+    };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }

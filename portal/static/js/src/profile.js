@@ -560,6 +560,13 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
+            hasSubStudySubjectOrgs: function() {
+                var orgTool = this.getOrgTool();
+                //check via organization API
+                return this.subjectOrgs.filter(orgId => {
+                    return  orgTool.isSubStudyOrg(orgId);
+                }).length;
+            },
             isSubStudyPatient: function() {
                 return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
@@ -2428,9 +2435,13 @@ export default (function() {
             hasSubStudyConsent: function() {
                 return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
             },
-            showSubStudyAddElement: function() {
+            showSubStudyConsentAddElement: function() {
                 //check to see if user organization is in substudy
-                if (!this.isSubStudyPatient()) {
+                if (!this.hasSubStudySubjectOrgs()) {
+                    return false;
+                }
+                //adding a test substudy consent should only be allowed in Test environment
+                if (!this.isTestEnvironment()) {
                     return false;
                 }
                 //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
@@ -2504,7 +2515,7 @@ export default (function() {
                         existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
-                if (this.showSubStudyAddElement()) {
+                if (this.showSubStudyConsentAddElement()) {
                      this.getSubStudyConsentUnknownRow();
                 }
                 clearInterval(this.consentListReadyIntervalId);
