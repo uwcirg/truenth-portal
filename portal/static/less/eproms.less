@@ -21,8 +21,8 @@
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
 @mobileJumbotranSize: 1.45em;
-@headlineSize:    1.50em;
-@subheadSize:     1.20em;
+@headlineSize:    1.60em;
+@subheadSize:     1.30em;
 @subSmallHeadSize: 1.1em;
 @lgFontSize:      1.5em;
 @lgHeadlineSize:  1.35em;
@@ -63,6 +63,7 @@
 @linkHover:       #576e76;
 @btnDefaultColor: #333f4b;
 @btnDefaultBorderColor: #bdb9b9;
+@inputBorderColor: #bdb9b9;
 @btnColor:        #7C959E;
 @featureBtnColor: #7C959E;
 @featureBtnHoverColor: #FFF;
@@ -100,6 +101,7 @@
 @landingInputBorderColor: #AFB8C2;
 @reportContentBorderColor: #ececec;
 @profileItemBgColor: #e8e8e8;
+@toolbarBorderColor: #f5f4f4;
 
 
 /**
@@ -137,6 +139,7 @@ body {
   background: #FFF;
   opacity: 0.5;
 }
+
 /* landing page/un-authenticated page only */
 .watermark-nowrapper {
   position: absolute;
@@ -1805,6 +1808,7 @@ div.footer-wrapper.right-panel {
     margin-left: 0;
     button {
       padding: 0.73em !important;
+      min-height: 42px;
     }
   }
   div.pull-right.search {
@@ -1824,7 +1828,7 @@ div.footer-wrapper.right-panel {
     min-width: 60px;
     margin-left: 6px;
     border-radius: 0;
-    min-height: 3.15em;
+    min-height: 42px;
     cursor: pointer;
   }
   .dropdown-menu {
@@ -2115,6 +2119,7 @@ div.footer-wrapper.right-panel {
 #adminTableToolbar {
   button {
     background-image: linear-gradient(to bottom, #FFF, #ececec 90%);
+    min-width: 220px;
   }
   .orgs-filter-warning {
     display: inline-block;
@@ -2280,9 +2285,20 @@ div.footer-wrapper.right-panel {
   }
 }
 #patientList {
+  margin-top: 16px;
   position: relative;
+  @media (min-width: 768px) {
+    & {
+      margin-top: 80px;
+    }
+  }
+  @media (min-width: 992px) {
+    & {
+      margin-top: 16px;
+    }
+  }
   #adminTableToolbar {
-    border: 1px solid #f5f4f4;
+    border: 1px solid @toolbarBorderColor;
     padding: 4px 8px 6px;
     display: flex;
     flex-wrap: wrap;
@@ -2302,7 +2318,7 @@ div.footer-wrapper.right-panel {
         margin-bottom: 1em;
       }
       .button {
-        font-size: @mediumText * 0.999;
+        font-size: @mediumText * 0.89;
       }
       .byline-text {
         display: block;
@@ -2323,6 +2339,69 @@ div.footer-wrapper.right-panel {
           display: inline-block;
           position: relative;
         }
+      }
+    }
+  }
+
+  .patientList-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    .patientlist-toggle-container {
+      padding: 12px 16px;
+      border: 1px solid @inputBorderColor;
+      position: relative;
+      &.loading{
+        border: 1px solid @toolbarBorderColor;
+        &:after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          background: #FFF;
+          opacity: 0.6;
+          z-index: 10;
+          content: "";
+          display: block;
+        }
+        &:before {
+          position: absolute;
+          animation: borderLoader 1000ms infinite linear;
+          display: block;
+          content: " ";
+          bottom: 0;
+          left: 0;
+          width: 12px;
+          height: 2px;
+          background: darken(@inputBorderColor, 5%);
+          //border-radius: 100%;
+          z-index: 14;
+        }
+      }
+      a:hover, a:active, a:focus {
+        text-decoration: none;
+      }
+      .radio {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+        margin: 0;
+        cursor: pointer;
+      }
+      .label {
+        color: @labelColor;
+        padding: 0;
+        font-size: 14px;
+        font-weight: 400;
+        vertical-align: middle;
+        &:first-of-type {
+          margin-right: 8px;
+        }
+      }
+      .radio:checked + .label {
+        font-weight: 600;
       }
     }
   }
@@ -3874,9 +3953,11 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     max-width: 100%;
   }
 }
-.pagination,
-.pagination button,
 .btn-group>.btn:first-child {
+  font-size: @mediumText * 0.89 !important;
+}
+.pagination,
+.pagination button {
   font-size: @mediumText !important;
 }
 .pagination-detail {
@@ -4571,6 +4652,7 @@ div.timezone-warning.text-warning {
       font-size: @mediumText;
     }
     overflow-x: hidden;
+    min-width: 250px;
   }
   .admin-table {
       th.id-field div.th-inner,
