@@ -156,7 +156,7 @@ export default {
             //let mobileNavElement = document.querySelector(".mobile-navigation .content");
             let mobileNavElement = document.querySelector(".mobile-navigation");
             let mobileQuickLinkElement = document.querySelector(".mobile-quick-links");
-            console.log("nav? ", navElement)
+            //console.log("nav? ", navElement)
             if (!navElement) {
                 if (mobileNavElement) {
                     mobileNavElement.classList.add("hide");
@@ -188,14 +188,14 @@ export default {
                 if (!el.getAttribute("id")) {
                     return true;
                 }
-                console.log("Next element? " , el.nextElementSibling.innerText)
+                //console.log("Next element? " , el.nextElementSibling.innerText)
                 contentHTML += `<a href="#${el.getAttribute("id")}">${
                     el.nextElementSibling &&
                     el.nextElementSibling.innerText? 
                     el.nextElementSibling.innerText : el.getAttribute("id").replace(/_/g, ' ')}</a>`;
             });
             let contentElement = document.createElement("div");
-            contentElement.innerHTML = contentHTML;
+                contentElement.innerHTML = contentHTML;
             let mobileContentElement = contentElement.cloneNode(true);
             navContentContainerElement.appendChild(contentElement);
             if (mobileNavElement) {
@@ -215,7 +215,7 @@ export default {
                 window.requestAnimationFrame(function() {
                     let topPosition = 48;
                     if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
-                        topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + 48;
+                        topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
                     }
                     document.querySelector(".navigation").style.top = topPosition+"px";
                 });
@@ -330,7 +330,7 @@ export default {
             videoElement.appendChild(iframeElement);
             videoElement.classList.add("active");
             videoNavElements.forEach(el => {
-                el.addEventListener("click", event => {
+                el.addEventListener("click", () => {
                     let ve = document.querySelector(".video iframe");
                     if (ve) {
                         let veSrc = ve.getAttribute("src");
@@ -355,6 +355,16 @@ export default {
              //CORS issue with querying LR directly, TODO: uncomment this when resolves
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
+        onDomainContentDidLoad: function() {
+            this.setNav();
+            this.setCollapsible();
+            this.setVideo();
+            this.setTileLinkEvent();
+            setTimeout(function() {
+                this.setInitView();
+                this.setCurrentView("domain");
+            }.bind(this), 150);
+        },
         getDomainContent: function() {
             if (this.domainContent) {
                 //already populated
@@ -387,15 +397,16 @@ export default {
                     Vue.nextTick()
                     .then(function () {
                         // DOM updated
-                        self.setNav();
-                        self.setCollapsible();
-                        self.setVideo();
-                        self.setTileLinkEvent();
-                        setTimeout(function() {
-                            this.setInitView();
-                            this.setCurrentView("domain");
-                        }.bind(self), 150);
-                    })
+                        self.onDomainContentDidLoad();
+                        // self.setNav();
+                        // self.setCollapsible();
+                        // self.setVideo();
+                        // self.setTileLinkEvent();
+                        // setTimeout(function() {
+                        //     this.setInitView();
+                        //     this.setCurrentView("domain");
+                        // }.bind(self), 150);
+                    });
                     // setTimeout(function() {
                     //     this.setNav();
                     //     this.setCollapsible();
