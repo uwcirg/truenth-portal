@@ -565,6 +565,13 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
+            hasSubStudySubjectOrgs: function() {
+                var orgTool = this.getOrgTool();
+                //check via organization API
+                return this.subjectOrgs.filter(orgId => {
+                    return  orgTool.isSubStudyOrg(orgId);
+                }).length;
+            },
             isSubStudyPatient: function() {
                 return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
