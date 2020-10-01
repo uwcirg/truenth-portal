@@ -139,7 +139,6 @@ export default (function() { /*global i18next $ */
             });
         }
         let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
-        console.log("research protocol? ", researchProtocolSet)
 
         /*
          * match substudy research protocol study id with that from the org
