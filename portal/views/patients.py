@@ -20,50 +20,27 @@ from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
+import json
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-@patients.route('/', methods=('GET', 'POST'))
-@roles_required([
-    ROLE.CLINICIAN.value,
-    ROLE.INTERVENTION_STAFF.value,
-    ROLE.STAFF.value,
-    ROLE.STAFF_ADMIN.value])
-@oauth.require_oauth()
-def patients_root():
-    """creates patients list dependent on user role
+def org_preference_filter(user, table_name):
+    """Obtain user's preference for filtering organizations
 
-    :param reset_cache: (as query parameter).  If present, the cached
-     as_of_date key used in assessment status lookup will be reset to
-     current (forcing a refresh)
-
-    The returned list of patients depends on the users role:
-      admin users: all non-deleted patients
-      clinicians: all patients in the sub-study with common consented orgs
-      intervention-staff: all patients with common user_intervention
-      staff, staff_admin: all patients with common consented organizations
-
-    NB: a single user with both staff and intervention-staff is not
-    expected and will raise a 400: Bad Request
+    :returns: list of org IDs to use as filter, or None
 
     """
-    # TODO expecting view per study?
-    research_study_id = 0
+    # check user table preference for organization filters
+    pref = TablePreference.query.filter_by(
+        table_name=table_name, user_id=user.id).first()
+    if pref and pref.filters:
+        return pref.filters.get('orgs_filter_control')
+    return None
 
-    def org_preference_filter(user):
-        """Obtain user's preference for filtering organizations
 
-        :returns: list of org IDs to use as filter, or None
-
-        """
-        # check user table preference for organization filters
-        pref = TablePreference.query.filter_by(
-            table_name='patientList', user_id=user.id).first()
-        if pref and pref.filters:
-            return pref.filters.get('orgs_filter_control')
-        return None
-
+def render_patients_list(
+        request, research_study_id, table_name, template_name):
     include_test_role = request.args.get('include_test_role')
 
     if request.form.get('reset_cache'):
@@ -74,7 +51,8 @@ def patients_root():
         acting_user=user,
         include_test_role=include_test_role,
         include_deleted=True,
-        requested_orgs=org_preference_filter(user))
+        research_study_id=research_study_id,
+        requested_orgs=org_preference_filter(user, table_name=table_name))
 
     # get assessment status only if it is needed as specified by config
     qb_status_cache_age = 0
@@ -96,13 +74,68 @@ def patients_root():
         patients_list = query
 
     return render_template(
-        'admin/patients_by_org.html', patients_list=patients_list, user=user,
+        template_name, patients_list=patients_list, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
         include_test_role=include_test_role)
 
 
+@patients.route('/', methods=('GET', 'POST'))
+@roles_required([
+    ROLE.INTERVENTION_STAFF.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def patients_root():
+    """creates patients list dependent on user role
+
+    :param reset_cache: (as query parameter).  If present, the cached
+     as_of_date key used in assessment status lookup will be reset to
+     current (forcing a refresh)
+
+    The returned list of patients depends on the users role:
+      admin users: all non-deleted patients
+      clinicians: all patients in the sub-study with common consented orgs
+      intervention-staff: all patients with common user_intervention
+      staff, staff_admin: all patients with common consented organizations
+
+    NB: a single user with both staff and intervention-staff is not
+    expected and will raise a 400: Bad Request
+
+    """
+    return render_patients_list(
+        request,
+        research_study_id=0,
+        table_name='patientList',
+        template_name='admin/patients_by_org.html')
+
+
+@patients.route('/substudy', methods=('GET', 'POST'))
+@roles_required([
+    ROLE.CLINICIAN.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def patients_substudy():
+    """substudy patients list dependent on user role
+
+    :param reset_cache: (as query parameter).  If present, the cached
+     as_of_date key used in assessment status lookup will be reset to
+     current (forcing a refresh)
+
+    The returned list of patients depends on the users role:
+      clinicians: all patients in the sub-study with common consented orgs
+      staff, staff_admin: all patients with common consented organizations
+
+    """
+    return render_patients_list(
+        request,
+        research_study_id=1,
+        table_name='substudyPatientList',
+        template_name='admin/patients_substudy.html')
+
+
 @patients.route('/patient-profile-create')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_profile_create():
     user = current_user()
@@ -126,7 +159,10 @@ def session_report(subject_id, instrument_id, authored_date):
 
 @patients.route('/patient_profile/<int:patient_id>')
 @roles_required([
-    ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    ROLE.CLINICIAN.value,
+    ROLE.STAFF_ADMIN.value,
+    ROLE.STAFF.value,
+    ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""

@@ -2,6 +2,7 @@ import tnthAjax from "./modules/TnthAjax.js";
 import tnthDates from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
 import CurrentUser from "./mixins/CurrentUser.js";
+import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
 
 (function () { /*global Vue DELAY_LOADING i18next $ */
     var DELAY_LOADING = true; //a workaround for hiding of loading indicator upon completion of loading of portal wrapper - loading indicator needs to continue displaying until patients list has finished loading
@@ -36,6 +37,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.setLoaderContent();
                     self.rowLinkEvent();
                     self.setColumnSelections();
+                    self.initToggleListEvent();
                     self.initExportReportDataSelector();
                     self.setTableFilters(self.userId); //set user's preference for filter(s)
                     self.initTableEvents();
@@ -44,6 +46,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.setRowItemEvent();
                     self.handleAffiliatedUIVis();
                     self.addFilterPlaceHolders();
+                    self.setContainerVis();
                 } else {
                     self.handleCurrentUser();
                 }
@@ -151,6 +154,16 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     self.onCurrentUserInit();
                 }, true);
             },
+            allowSubStudyView: function() {
+                return this.userResearchStudyIds.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
+            },
+            setSubStudyUIElements: function() {
+                if (this.allowSubStudyView()) {
+                    $("#patientList .eproms-substudy").removeClass("tnth-hide").show();
+                    return;
+                }
+                $("#patientList .eproms-substudy").hide();
+            },
             getExportReportUrl: function(dataType) {
                 dataType = dataType||"json";
                 return `/api/report/questionnaire_status?format=${dataType}`;
@@ -182,6 +195,16 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 $("#exportReportContainer").popover("hide");
                 $(".exportReport__error .message").html("");
                 $(".exportReport__retry").addClass("tnth-hide");
+            },
+            initToggleListEvent: function() {
+                if (!$("#patientListToggle").length) return;
+                $("#patientListToggle .radio").on("click", function(e) {
+                    e.stopPropagation();
+                    $("#patientListToggle").addClass("loading");
+                    setTimeout(function() {
+                        window.location = $(this).closest("a").attr("href");
+                    }.bind(this), 50);
+                });
             },
             initExportReportDataSelector: function() {
                 let self = this;
@@ -298,6 +321,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                     this.initOrgsFilter();
                     this.initOrgsEvent();
                 }
+                this.setSubStudyUIElements();
                 this.initRoleBasedEvent();
                 this.fadeLoader();
             },
@@ -365,6 +389,9 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 if (adminTableContainer.hasClass("staff-view")) {
                     this.tableIdentifier = "staffList";
                 }
+                if (adminTableContainer.hasClass("substudy")) {
+                    this.tableIdentifier = "substudyPatientList";
+                }
             },
             setOrgsSelector: function (obj) {
                 if (!obj) {
@@ -378,7 +405,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 }
             },
             setSortFilterProp: function () {
-                this.sortFilterEnabled = this.tableIdentifier === "patientList";
+                this.sortFilterEnabled = (this.tableIdentifier === "patientList" || this.tableIdentifier === "substudyPatientList");
             },
             configTable: function () {
                 var options = {};
@@ -387,7 +414,7 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 options.sortName = sortObj.sort_field;
                 options.sortOrder = sortObj.sort_order;
                 options.filterBy = sortObj;
-                options.exportOptions = { /* global  Utility getExportFileName*/
+                options.exportOptions = { /* global Utility getExportFileName*/
                     fileName: Utility.getExportFileName($("#adminTableContainer").attr("data-export-prefix"))
                 };
                 $("#adminTable").bootstrapTable(this.getTableConfigOptions(options));
@@ -447,13 +474,19 @@ import CurrentUser from "./mixins/CurrentUser.js";
                 }
                 $("#adminTableToolbar .orgs-filter-warning").popover();
             },
+            allowDeletedUserFilter: function() {
+                return $("#chkDeletedUsersFilter").length;
+            },
             setShowDeletedUsersFlag: function () {
-                if (!$("#chkDeletedUsersFilter").length) {
+                if (!this.allowDeletedUserFilter()) {
                     return;
                 }
                 this.showDeletedUsers = $("#chkDeletedUsersFilter").is(":checked");
             },
             handleDeletedUsersVis: function () {
+                if (!this.allowDeletedUserFilter()) {
+                    return;
+                }
                 this.setShowDeletedUsersFlag();
                 if (this.showDeletedUsers) {
                     $("#adminTable").bootstrapTable("filterBy", {
