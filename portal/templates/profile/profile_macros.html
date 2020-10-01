@@ -706,12 +706,12 @@
                             <h4>{{_("Modify the consent status for this user to")}}</h4>
                             <div class="radio">
                                 <label>
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="consented" data-orgId="" data-agreementUrl="" data-userId="">{{_("Consented / Enrolled")}}</input>
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="consented" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">{{_("Consented / Enrolled")}}</input>
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="text-warning">
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="suspended" data-orgId="" data-agreementUrl="" data-userId="">
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="suspended" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">
                                         <span class="withdrawn-label">
                                             <span data-eproms='true'>{{_("Withdrawn - Suspend Data Collection and Report Historic Data")}}</span>
                                             <span data-truenth='true'>{{_("Suspend Data Collection and Report Historic Data")}}</span>
@@ -721,7 +721,7 @@
                             </div>
                             <div class="radio admin-radio tnth-hide">
                                 <label class="text-danger">
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="purged" data-orgId="" data-agreementUrl="" data-userId="">{{_("Purged / Removed")}}</input>
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="purged" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">{{_("Purged / Removed")}}</input>
                                 </label>
                             </div>
                             <div id="#profileConsentListModalErrorMessage" class="text-danger"></div>

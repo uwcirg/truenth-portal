@@ -1,6 +1,7 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
 import Consent from "./Consent.js";
+import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
 export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
@@ -100,6 +101,10 @@ export default (function() { /*global i18next $ */
         return orgList;
     };
     OrgTool.prototype.getOrgsList = function(){
+        if (!Object.keys(this.orgsList).length) {
+            this.init();
+            return this.orgsList;
+        }
         return this.orgsList;
     };
     OrgTool.prototype.getOrgName = function(orgId){
@@ -108,6 +113,39 @@ export default (function() { /*global i18next $ */
             return orgsList[orgId].name;
         }
         return "";
+    };
+    OrgTool.prototype.getResearchProtocolsByOrgId = function(orgId) {
+        var orgsList = this.getOrgsList();
+        if (!orgId || !orgsList.hasOwnProperty(orgId) || !orgsList[orgId].extension) return [];
+        let researchProtocols =  orgsList[orgId].extension.filter(ex => {
+            return ex.research_protocols;
+        });
+        if (!researchProtocols.length) return [];
+        return researchProtocols[0].research_protocols;
+    }
+    OrgTool.prototype.isSubStudyOrg = function(orgId) {
+        if (!orgId) return false;
+        var orgsList = this.getOrgsList();
+        if (!orgsList.hasOwnProperty(orgId)) return false;
+        if (!this.getResearchProtocolsByOrgId(orgId).length) {
+            /*
+             * include flag for inherited attributes to find added inherited attributes that include research study
+             * information
+             */
+            tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: true}, function(data) {
+                if (data && data.extension) {
+                    orgsList[orgId].extension = [...data.extension];
+                }
+            });
+        }
+        let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
+
+        /*
+         * match substudy research protocol study id with that from the org
+         */
+        return researchProtocolSet.filter(p => {
+            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
+        }).length > 0;
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
@@ -605,6 +643,17 @@ export default (function() { /*global i18next $ */
                     Consent.setConsentBySelectedOrg(userId, thisElement, isConsentWithTopLevelOrg);
                 }, 500);
             });
+        });
+    };
+    OrgTool.prototype.getOrgsByCareProvider = function(data) {
+        if (!data) return false;
+        let cloneSet = [...data];
+        let orgFilteredSet = cloneSet.filter(item => {
+            return item.reference.match(/^api\/organization/gi);
+        });
+        if (!orgFilteredSet.length) return false;
+        return orgFilteredSet.map(item => {
+            return item.reference.split("/")[2];
         });
     };
     OrgTool.prototype.setOrgsVis = function(data, callback) {
