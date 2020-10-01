@@ -3,6 +3,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID} from "../data/common/consts.js";
 export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
@@ -34,10 +35,10 @@ export default { /*global $ */
                     return false;
                 }
                 if (!data) {
-                    callback({"error": true, "data": "no data returned"});
+                    callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": "no data returned"});
                     fieldHelper.showError(targetField);
                 } else if (data.error) {
-                    callback({"error": true, "data": data});
+                    callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": data});
                     self.sendError(data, url, userId, params);
                     fieldHelper.showError(targetField);
                 } else {
@@ -61,7 +62,7 @@ export default { /*global $ */
                 callback(data);
             } else {
                 fieldHelper.showError(targetField);
-                callback({"error": true, "data": "no data returned"});
+                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
             }
         }).fail(function(xhr) {
             if (params.attempts < params.max_attempts) {
@@ -72,7 +73,7 @@ export default { /*global $ */
                 })(self, url, method, userId, params, callback);
             } else {
                 fieldHelper.showError(targetField);
-                callback({"error": true, "data": xhr});
+                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
                 self.sendError(xhr, url, userId, params);
                 //reset attempts after reporting error so we know how many attempts have been made
                 //multiple attempts can signify server not being responsive or busy network
@@ -289,8 +290,7 @@ export default { /*global $ */
                 sessionStorage.setItem(`orgData_${orgId}`, JSON.stringify(data));
                 callback(data);
             } else {
-                var errorMessage = i18next.t("Server error occurred retrieving organization/clinic information.");
-                $(".get-orgs-error").html(errorMessage);
+                $(".get-orgs-error").html(data.error);
                 callback({"error": errorMessage});
             }
         });
@@ -307,7 +307,7 @@ export default { /*global $ */
                     callback(data);
                     return true;
                 } else {
-                    callback({"error": i18next.t("Server error occurred retrieving research study information.")});
+                    callback({"error": data.error});
                     return false;
                 }
             }
@@ -357,7 +357,7 @@ export default { /*global $ */
             data.acceptance_date = params.acceptance_date;
         }
         //research study id helps determine whether user is in a substudy
-        data.research_study_id = params.research_study_id ? parseInt(params.research_study_id) : 0;
+        data.research_study_id = params.research_study_id ? parseInt(params.research_study_id) : EPROMS_MAIN_STUDY_ID;
         this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
             if (!data.error) {
                 $(".set-consent-error").html("");
@@ -377,7 +377,7 @@ export default { /*global $ */
         }
         params = params || {};
         if (!params.research_study_id) {
-            params.research_study_id = 0;
+            params.research_study_id = EPROMS_MAIN_STUDY_ID;
         }
         params.research_study_id = parseInt(params.research_study_id);
         var consented = this.getAllValidConsent(userId, params.org, params);
@@ -411,7 +411,7 @@ export default { /*global $ */
         callback = callback || function() {};
         params = params || {};
         if (!params.research_study_id) {
-            params.research_study_id = 0;
+            params.research_study_id = EPROMS_MAIN_STUDY_ID;
         }
         params.research_study_id = parseInt(params.research_study_id);
         if (!userId || !orgId) {
@@ -448,7 +448,7 @@ export default { /*global $ */
     getAllValidConsent: function(userId, orgId, params) {
         if (!userId || !orgId) { return false; }
         params = params || {};
-        if (!params.research_study_id) params.research_study_id = 0;
+        if (!params.research_study_id) params.research_study_id = EPROMS_MAIN_STUDY_ID;
         params.research_study_id = parseInt(params.research_study_id);
         var consentedOrgIds = [];
         this.sendRequest("/api/user/" + userId + "/consent", "GET", userId, {sync: true}, function(data) {
@@ -471,7 +471,7 @@ export default { /*global $ */
         var consentedOrgIds = [];
         var __url = "/api/user/" + userId + "/consent", self = this;
         params = params || {};
-        let researchStudyId = params.research_study_id || 0;
+        let researchStudyId = params.research_study_id || EPROMS_MAIN_STUDY_ID;
         self.sendRequest(__url, "GET", userId, {sync: true}, function(data) {
             if (!data || data.error || (data.consent_agreements && data.consent_agreements.length === 0)) {
                 return false;
