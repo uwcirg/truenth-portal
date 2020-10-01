@@ -284,6 +284,7 @@ export default { /*global $ */
             return true;
         }
         params = params || {};
+        /* individual org */
         this.sendRequest("/api/organization/"+orgId, "GET", "", params, function(data) {
             if (!data.error) {
                 $(".get-orgs-error").html("");
@@ -311,6 +312,18 @@ export default { /*global $ */
                     return false;
                 }
             }
+        });
+    },
+    "getCliniciansList": function(callback) {
+        callback = callback || function() {};
+        this.sendRequest("/api/clinician", "GET", "", false, function(data) {
+            if (data.error) {
+                var errorMessage = i18next.t("Server error occurred retrieving clinicians.");
+                $(".get-clinicians-error").html(errorMessage);
+                callback({"error": errorMessage});
+                return;
+            }
+            callback(data);
         });
     },
     "getConsent": function(userId, params, callback) {

@@ -106,6 +106,7 @@ export default (function() {
             subjectOrgs: [],
             subjectReseachStudies: [],
             userRoles: [],
+            cliniciansList: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
@@ -115,7 +116,7 @@ export default (function() {
             },
             mode: "profile",
             demo: { //skeleton
-                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
+                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: "", clinician: {}}
             },
             stateDict: {AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")},
             roles: {data: []},
@@ -293,9 +294,7 @@ export default (function() {
                         return false;
                     }
                     var orgTool = self.getOrgTool();
-                    self.userOrgs = data.careProvider.map(function(item) {
-                        return item.reference.split("/").pop();
-                    });
+                    self.userOrgs = orgTool.getOrgsByCareProvider(data.careProvider) || [];
                     var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(self.userOrgs);
                     self.topLevelOrgs = topLevelOrgs.map(function(item) {
                         return orgTool.getOrgName(item);
@@ -489,8 +488,14 @@ export default (function() {
                         }
                         self.demo.data.raceCodes = self.demo.data.raceCodes || [];
                         if (data.careProvider && data.careProvider.length) {
+                            let clone = [...data.careProvider];
+                            let clinicianFilteredSet = clone.filter(item => {
+                                return item.reference.match(/^api\/clinician/gi);
+                            });
+                            self.demo.data.clinician = clinicianFilteredSet.length? clinicianFilteredSet[0] : {};
                             self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
                         } else {
+                            self.demo.data.clinician = {};
                             self.subjectOrgs = [];
                         }
                     }
@@ -845,6 +850,9 @@ export default (function() {
                     this.initResetPasswordSection();
                     this.initCommunicationSection();
                     break;
+                case "treatingclinician":
+                    this.initTreatingClinicianSection();
+                    break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1109,6 +1117,48 @@ export default (function() {
                 var self = this;
                 $("#profileStudyId, #profileSiteId").on("update", function() {
                     self.updateIdentifierData(this);
+                });
+            },
+            initTreatingClinicianSection: function() {
+                let self = this;
+                this.modules.tnthAjax.getCliniciansList(function(data) {
+                    if (!data || !data.entry || !data.entry.length) {
+                        let errorMessage = i18next.t("No treating clinician available for this site");
+                        $("#treatingClinicianContainer .select-list-error").text(errorMessage);
+                        return;
+                    }
+                    let selectedValue = (self.demo.data.clinician).reference? (self.demo.data.clinician.reference).split("/")[2]: "";
+                    let selectListHTML = `<select id="clincianSelector" class="form-control">;
+                                            <option value="">Select</option>`;
+                    (data.entry).forEach(item => {
+                        selectListHTML += `<option value="${item.identifier[0].value}" ${String(item.identifier[0].value) === String(selectedValue) ? "selected": ""}>${item.name[0].given} ${item.name[0].family}</option>`
+                    });
+                    selectListHTML += "</select>";
+                    $("#treatingClinicianContainer .select-list").append(selectListHTML);
+                    $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
+                        if ($(this).val() === "") {
+                            $("#treatingClinicianContainer .select-list-error").text(i18next.t("You must select a clinician"));
+                            return false;
+                        }
+                        $("#treatingClinicianContainer .select-list-error").text("");
+                        let postData = {"careProvider": []};
+                        if (self.demo.data.careProvider) {
+                            postData.careProvider = [...self.demo.data.careProvider];
+                            /*
+                             * exclude pre-existing clinician reference
+                             */
+                            let filteredSet = (postData.careProvider).filter(item => {
+                                return !item.reference.match(/^api\/clinician/gi);
+                            });
+                            postData.careProvider = filteredSet;
+                        }
+                        //post data
+                        postData.careProvider.push({
+                            display: $("#clincianSelector option:selected").text(),
+                            reference: `api/clinician/${$(this).val()}`
+                        });
+                        self.postDemoData($("#treatingClinicianContainer"), postData);
+                    });
                 });
             },
             getAccessUrl: function() {
@@ -2269,6 +2319,9 @@ export default (function() {
                 }
                 return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
             },
+            hasSubStudyConsent: function() {
+                return this.consent.currentItems.filter( item => parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID).length;
+            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
                 if (this.isSubStudyConsent(item)) {
@@ -2566,7 +2619,6 @@ export default (function() {
                     }[a];
                 });
             }
-
         }
     });
     return ProfileObj;
