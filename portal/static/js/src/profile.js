@@ -1569,6 +1569,11 @@ export default (function() {
                             hidePopover();
                             self.reloadConsentList(subjectId);
                         });
+                        if (self.hasSubStudyConsent()) {
+                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
+                                research_study_id: EPROMS_SUBSTUDY_ID
+                            });
+                        }
                     });
                 });
                 $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
@@ -2213,7 +2218,7 @@ export default (function() {
                 return content;
             },
             getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
-                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
+                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2230,6 +2235,31 @@ export default (function() {
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
+            },
+            /*
+             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
+             */
+            getSubStudyConsentUnknownRow: function() {
+                if (!this.hasCurrentConsent()) {
+                    return;
+                }
+                let currentConsentItem = this.consent.currentItems[0];
+                this.consent.consentDisplayRows.push(
+                    [{
+                        content: EPROMS_SUBSTUDY_TITLE
+                    },
+                    {
+                        content: i18next.t("Not consented") + 
+                                this.getConsentEditDisplayIconHTML({
+                                    organization_id: currentConsentItem.organization_id,
+                                    statusText: "unknown",
+                                    agreement_url: currentConsentItem.agreement_url,
+                                    research_study_id: EPROMS_SUBSTUDY_ID
+                                }
+                        , "profileConsentListModal"),
+                        "_class": "indent"
+                    }, {content: `<span class="agreement">&nbsp;</span>`}, {content: "&nbsp;"}]
+                );
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
@@ -2249,7 +2279,7 @@ export default (function() {
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "")
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "&nbsp;")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2309,8 +2339,14 @@ export default (function() {
             },
             getRecordedDisplayDate: function(item) {
                 if (!item) {return "";}
-                var recordedDate = item.recorded? item.recorded.lastUpdated : "";
-                return this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss");
+                let recordedDate;
+                if (item.deleted) {
+                    recordedDate = item.deleted.lastUpdated;
+                }
+                if (!recordedDate && item.recorded) {
+                    recordedDate = item.recorded.lastUpdated;
+                } 
+                return recordedDate ? this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss") : "";
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2413,7 +2449,7 @@ export default (function() {
                 Consent.initConsentListModalEvent();
                 $("#profileConsentListModal").on("show.bs.modal", function() {
                     if (self.isAdmin()) {
-                        $(this).find(".admin-radio").show();
+                        $(this).find(".admin-radio").removeClass("tnth-hide").show();
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").on("click", function() {
@@ -2442,6 +2478,21 @@ export default (function() {
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
             },
+            hasSubStudyConsent: function() {
+                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
+            },
+            showSubStudyConsentAddElement: function() {
+                //check to see if user organization is in substudy
+                if (!this.hasSubStudySubjectOrgs()) {
+                    return false;
+                }
+                //adding a test substudy consent should only be allowed in Test environment
+                if (!this.isTestEnvironment()) {
+                    return false;
+                }
+                //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
+                return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
+            },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
             },
@@ -2450,10 +2501,13 @@ export default (function() {
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
-                    return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
-                });
                 items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
+                var items = items.sort(function(a, b) { 
+                    //sort items by last updated date in descending order
+                    let bLastUpdated = b.deleted ? b.deleted.lastUpdated : b.recorded.lastUpdated;
+                    let aLastUpdated = a.deleted ? a.deleted.lastUpdated : a.recorded.lastUpdated;
+                    return new Date(bLastUpdated) - new Date(aLastUpdated);
+                });
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2498,15 +2552,18 @@ export default (function() {
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
                     return self.getConsentStatus(item) === "active";
                 });
-                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //filtered out deleted items from all consents
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
-                    if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!(existingOrgs[item.organization_id+"_"+item.research_study_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
-                        existingOrgs[item.organization_id] = true;
+                        existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
+                if (this.showSubStudyConsentAddElement()) {
+                     this.getSubStudyConsentUnknownRow();
+                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
@@ -2518,6 +2575,7 @@ export default (function() {
                             $("#consentListTable .agreement").each(function() { $(this).parent().hide(); });
                         }
                         if (self.isConsentEditable()) {
+                            Consent.initConsentListModalEvent();
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
                         }
