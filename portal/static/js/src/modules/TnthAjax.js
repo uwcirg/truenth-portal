@@ -308,7 +308,7 @@ export default { /*global $ */
                     callback(data);
                     return true;
                 } else {
-                    callback({"error": i18next.t("Server error occurred retrieving research study information.")});
+                    callback({"error": i18next.t("Error retrieving data from server")});
                     return false;
                 }
             }
