@@ -1,12 +1,15 @@
 <div class="portal-body">
     <div class="portal-item">
-        {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
+        {% if assessment_status.overall_status == OverallStatus.withdrawn %}
+            <!-- patient withdrawn just show completed questionnaire block -->
+            {{ complete_block | safe }}
+        {% elif assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
             {{ due_block | safe }}
         <!-- TODO CHECK IF THIS CHECK FOR INDEFINITE QUESTIONNAIRE IS CORRECT????-->
         {% elif (indefinite_questionnaires[0] or indefinite_questionnaires[1]) and
                 assessment_status.overall_status != 'Withdrawn' %}
             {{ indefinite_due_block | safe }}
-        {% elif assessment_status.overall_status in (OverallStatus.completed, OverallStatus.withdrawn) %}
+        {% elif assessment_status.overall_status == OverallStatus.completed %}
             {{ complete_block | safe }}
         {% else %}
             <!-- TODO CHECK IF THIS FUNCTION CALL WILL WORK IN TEMPLATE???-->
