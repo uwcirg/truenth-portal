@@ -111,13 +111,15 @@ def assessment_engine_view(user):
     # variables needed for the templates
     due_date = localize_datetime(
         assessment_status.due_date, user) \
-            if assessment_status.due_date else None
+        if assessment_status.due_date else None
     expired_date = localize_datetime(assessment_status.expired_date, user) \
-            if assessment_status.expired_date else None
+        if assessment_status.expired_date else None
     comp_date = localize_datetime(assessment_status.completed_date, user) \
-            if assessment_status.completed_date else None
-    assessment_is_due=(assessment_status.overall_status == OverallStatus.overdue) \
-            or (assessment_status.due_date is not None and assessment_status.due_date < now)
+        if assessment_status.completed_date else None
+    assessment_is_due = (
+        assessment_status.overall_status == OverallStatus.overdue) \
+        or (assessment_status.due_date is not None \
+        and assessment_status.due_date < now)
 
     # TODO resolve what portions of this logic could better be handled
     #  within the templates
@@ -155,7 +157,6 @@ def assessment_engine_view(user):
         "eproms/assessment_engine/ae_not_available.html",
         full_name=user.display_name,
     )
-    
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
