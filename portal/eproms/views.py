@@ -12,6 +12,7 @@ from flask import (
 from flask_user import roles_required
 
 from ..database import db
+from ..date_tools import localize_datetime
 from ..extensions import oauth, recaptcha
 from ..models.app_text import (
     AboutATMA,
@@ -27,6 +28,7 @@ from ..models.coredata import Coredata
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.overall_status import OverallStatus
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..views.auth import next_after_login
@@ -106,6 +108,8 @@ def assessment_engine_view(user):
             classification='indefinite'),
         assessment_status.instruments_in_progress(
             classification='indefinite'))
+    comp_date = localize_datetime(assessment_status.completed_date, user) \
+                if assessment_status.completed_date else ""
 
     # TODO resolve what portions of this logic could better be handled
     #  within the templates
@@ -115,13 +119,27 @@ def assessment_engine_view(user):
         "eproms/ae_thankyou.html",
         full_name=user.display_name,
         registry=assessment_status.assigning_authority)
+    
+    #TODO
+    intro_block = render_template(
+        "eproms/ae_intro.html")
+    
+    completed_card_block = render_template(
+        "eproms/ae_completed_card.html",
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        comp_date=comp_date,
+        recent_survey_link=url_for(
+                        "portal.profile", _anchor="proAssessmentsLoc"))
 
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
         assessment_status=assessment_status,
         indefinite_questionnaires=indefinite_questionnaires,
-        thankyou_block=thankyou_block
+        intro_block=intro_block,
+        thankyou_block=thankyou_block,
+        completed_card_block=completed_card_block
     )
 
 
