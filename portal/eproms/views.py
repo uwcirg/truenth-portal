@@ -118,8 +118,8 @@ def assessment_engine_view(user):
         if assessment_status.completed_date else None
     assessment_is_due = (
         assessment_status.overall_status == OverallStatus.overdue) \
-        or (assessment_status.due_date is not None \
-        and assessment_status.due_date < now)
+        or (assessment_status.due_date is not None
+            and assessment_status.due_date < now)
 
     # TODO resolve what portions of this logic could better be handled
     #  within the templates
