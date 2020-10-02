@@ -108,19 +108,15 @@ def assessment_engine_view(user):
             classification='indefinite'),
         assessment_status.instruments_in_progress(
             classification='indefinite'))
-    
     # variables needed for the templates
     due_date = localize_datetime(
         assessment_status.due_date, user) \
             if assessment_status.due_date else None
-    expired_date = localize_datetime(
-        assessment_status.expired_date, user) \
+    expired_date = localize_datetime(assessment_status.expired_date, user) \
             if assessment_status.expired_date else None
-    comp_date = localize_datetime(
-        assessment_status.completed_date, user) \
+    comp_date = localize_datetime(assessment_status.completed_date, user) \
             if assessment_status.completed_date else None
-    assessment_is_due=(
-            assessment_status.overall_status == OverallStatus.overdue) \
+    assessment_is_due=(assessment_status.overall_status == OverallStatus.overdue) \
             or (assessment_status.due_date is not None and assessment_status.due_date < now)
 
     # TODO resolve what portions of this logic could better be handled
@@ -133,18 +129,6 @@ def assessment_engine_view(user):
         OverallStatus=OverallStatus,
         full_name=user.display_name,
         registry=assessment_status.assigning_authority)
-
-    # intro_block = render_template(
-    #     "eproms/ae_intro.html",
-    #     full_name=user.display_name,
-    #     assessment_status=assessment_status,
-    #     OverallStatus=OverallStatus,
-    #     due_date=due_date,
-    #     expired_date=expired_date,
-    #     assessment_is_due=assessment_is_due,
-    #     indefinite_questionnaires=indefinite_questionnaires,
-    #     registry=assessment_status.assigning_authority)
-    
     due_block = render_template(
         "eproms/assessment_engine/ae_due.html",
         assessment_status=assessment_status,
@@ -154,7 +138,6 @@ def assessment_engine_view(user):
         expired_date=expired_date,
         assessment_is_due=assessment_is_due,
         comp_date=comp_date)
-    
     indefinite_due_block = render_template(
         "eproms/assessment_engine/ae_indefinite_due.html",
         assessment_status=assessment_status,
@@ -162,14 +145,12 @@ def assessment_engine_view(user):
         OverallStatus=OverallStatus,
         full_name=user.display_name,
         comp_date=comp_date)
-    
     complete_block = render_template(
         "eproms/assessment_engine/ae_complete.html",
         assessment_status=assessment_status,
         OverallStatus=OverallStatus,
         full_name=user.display_name,
         comp_date=comp_date)
-    
     not_available_block = render_template(
         "eproms/assessment_engine/ae_not_available.html",
         full_name=user.display_name,
