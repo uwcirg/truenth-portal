@@ -1,7 +1,0 @@
-{%- from "eproms/ae_macros.html" import render_header, render_logout -%}
-{% call render_header(_("Thank you, %(full_name)s.", full_name=full_name)) %}
-  <p>{{ _("You've completed the %(registry)s questionnaire.", registry=_(registry)) }}</p>
-  <p>{{ _("You will be notified when the next questionnaire is ready to complete.") }}</p>
-{% endcall %}
-{{render_logout()}}
-

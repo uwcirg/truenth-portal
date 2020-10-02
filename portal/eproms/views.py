@@ -28,7 +28,6 @@ from ..models.coredata import Coredata
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
-from ..models.overall_status import OverallStatus
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..views.auth import next_after_login
@@ -92,6 +91,7 @@ def assessment_engine_view(user):
 
     """
     from datetime import datetime
+    from ..models.overall_status import OverallStatus
     from ..models.qb_status import QB_Status  # avoid cycle
     now = datetime.utcnow()
 
@@ -108,38 +108,84 @@ def assessment_engine_view(user):
             classification='indefinite'),
         assessment_status.instruments_in_progress(
             classification='indefinite'))
-    comp_date = localize_datetime(assessment_status.completed_date, user) \
-                if assessment_status.completed_date else ""
+    
+    # variables needed for the templates
+    due_date = localize_datetime(
+        assessment_status.due_date, user) \
+            if assessment_status.due_date else None
+    expired_date = localize_datetime(
+        assessment_status.expired_date, user) \
+            if assessment_status.expired_date else None
+    comp_date = localize_datetime(
+        assessment_status.completed_date, user) \
+            if assessment_status.completed_date else None
+    assessment_is_due=(
+            assessment_status.overall_status == OverallStatus.overdue) \
+            or (assessment_status.due_date is not None and assessment_status.due_date < now)
 
     # TODO resolve what portions of this logic could better be handled
     #  within the templates
 
     # From thank you block:
     thankyou_block = render_template(
-        "eproms/ae_thankyou.html",
-        full_name=user.display_name,
-        registry=assessment_status.assigning_authority)
-    
-    #TODO
-    intro_block = render_template(
-        "eproms/ae_intro.html")
-    
-    completed_card_block = render_template(
-        "eproms/ae_completed_card.html",
+        "eproms/assessment_engine/ae_thankyou.html",
         assessment_status=assessment_status,
         OverallStatus=OverallStatus,
-        comp_date=comp_date,
-        recent_survey_link=url_for(
-                        "portal.profile", _anchor="proAssessmentsLoc"))
+        full_name=user.display_name,
+        registry=assessment_status.assigning_authority)
 
+    # intro_block = render_template(
+    #     "eproms/ae_intro.html",
+    #     full_name=user.display_name,
+    #     assessment_status=assessment_status,
+    #     OverallStatus=OverallStatus,
+    #     due_date=due_date,
+    #     expired_date=expired_date,
+    #     assessment_is_due=assessment_is_due,
+    #     indefinite_questionnaires=indefinite_questionnaires,
+    #     registry=assessment_status.assigning_authority)
+    
+    due_block = render_template(
+        "eproms/assessment_engine/ae_due.html",
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        full_name=user.display_name,
+        due_date=due_date,
+        expired_date=expired_date,
+        assessment_is_due=assessment_is_due,
+        comp_date=comp_date)
+    
+    indefinite_due_block = render_template(
+        "eproms/assessment_engine/ae_indefinite_due.html",
+        assessment_status=assessment_status,
+        indefinite_questionnaires=indefinite_questionnaires,
+        OverallStatus=OverallStatus,
+        full_name=user.display_name,
+        comp_date=comp_date)
+    
+    complete_block = render_template(
+        "eproms/assessment_engine/ae_complete.html",
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        full_name=user.display_name,
+        comp_date=comp_date)
+    
+    not_available_block = render_template(
+        "eproms/assessment_engine/ae_not_available.html",
+        full_name=user.display_name,
+    )
+    
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
         assessment_status=assessment_status,
         indefinite_questionnaires=indefinite_questionnaires,
-        intro_block=intro_block,
+        OverallStatus=OverallStatus,
         thankyou_block=thankyou_block,
-        completed_card_block=completed_card_block
+        indefinite_due_block=indefinite_due_block,
+        due_block=due_block,
+        complete_block=complete_block,
+        not_available_block=not_available_block
     )
 
 

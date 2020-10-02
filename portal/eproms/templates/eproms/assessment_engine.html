@@ -1,6 +1,21 @@
-<section class="portal-body">
+<div class="portal-body">
     <div class="portal-item">
-        {{ thankyou_block | safe }}
-        {{ completed_card_block | safe}}
+        {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
+            {{ due_block | safe }}
+        <!-- TODO CHECK IF THIS CHECK FOR INDEFINITE QUESTIONNAIRE IS CORRECT????-->
+        {% elif (indefinite_questionnaires[0] or indefinite_questionnaires[1]) and
+                assessment_status.overall_status != 'Withdrawn' %}
+            {{ indefinite_due_block | safe }}
+        {% elif assessment_status.overall_status in (OverallStatus.completed, OverallStatus.withdrawn) %}
+            {{ complete_block | safe }}
+        {% else %}
+            <!-- TODO CHECK IF THIS FUNCTION CALL WILL WORK IN TEMPLATE???-->
+            <!-- HOW TO GET HERE??-->
+            {% if assessment_status.enrolled_in_classification('indefinite') %}
+                {{ thankyou_block | safe }}
+            {% else %}
+                {{ not_available_block | safe}}
+            {% endif %}
+        {% endif %}
     </div>
-</section>
+</div>

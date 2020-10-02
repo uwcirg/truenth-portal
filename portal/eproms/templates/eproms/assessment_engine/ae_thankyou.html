@@ -1,0 +1,7 @@
+{% extends "eproms/assessment_engine/ae_base.html" %}
+{%- from "eproms/assessment_engine/ae_macros.html" import thankyou_card -%}
+{% block body %}
+  {{thankyou_card(full_name=full_name, registry=_(registry))}}
+{% endblock %}
+
+
