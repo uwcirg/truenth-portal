@@ -1,9 +1,9 @@
 {%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
+<!-- questionnaire no longer available -->
 {% block head %}
     {% call render_header(title_text=_("Hi, %(full_name)s", full_name=full_name)) %}{% endcall %}
 {% endblock %}
-<!-- questionnaire no longer available -->
 {% block body %}
     {%- call render_card_content(title_text=_("Questionnaire Expired"),
                                  card_class="portal-no-description-container full-width") -%}
