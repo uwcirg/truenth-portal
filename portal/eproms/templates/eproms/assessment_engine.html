@@ -1,19 +1,23 @@
 <div class="portal-body">
     <div class="portal-item">
         {% if assessment_status.overall_status == OverallStatus.withdrawn %}
-            <!-- patient withdrawn just show completed questionnaire block -->
-            {{ complete_block | safe }}
+            <!-- patient withdrawn, show questionnaire unavailable anymore? -->
+            {{ not_available_block | safe}}
         {% elif assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
             {{ due_block | safe }}
-        <!-- TODO CHECK IF THIS CHECK FOR INDEFINITE QUESTIONNAIRE IS CORRECT????-->
+        <!-- TODO: CHECK IF THIS CHECK FOR INDEFINITE QUESTIONNAIRE IS CORRECT????-->
+        <!--User completed baseline, but has outstanding indefinite work-->
         {% elif (indefinite_questionnaires[0] or indefinite_questionnaires[1]) and
                 assessment_status.overall_status != 'Withdrawn' %}
             {{ indefinite_due_block | safe }}
+        <!-- User completed both baseline and indefinite -->
         {% elif assessment_status.overall_status == OverallStatus.completed %}
             {{ complete_block | safe }}
         {% else %}
-            <!-- TODO CHECK IF THIS FUNCTION CALL WILL WORK IN TEMPLATE???-->
-            <!-- HOW TO GET HERE??-->
+            <!-- TODO: CHECK IF THIS FUNCTION CALL WILL WORK IN TEMPLATE???-->
+            <!-- TODO: TEST THIS, HOW TO GET HERE??-->
+            <!--If the user was enrolled in indefinite work and lands
+                here, they should see the thank you text. -->
             {% if assessment_status.enrolled_in_classification('indefinite') %}
                 {{ thankyou_block | safe }}
             {% else %}
