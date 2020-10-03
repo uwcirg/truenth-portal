@@ -123,8 +123,7 @@ def assessment_engine_view(user):
 
     # TODO resolve what portions of this logic could better be handled
     #  within the templates
-
-    # From thank you block:
+    
     thankyou_block = render_template(
         "eproms/assessment_engine/ae_thankyou.html",
         assessment_status=assessment_status,
