@@ -9,7 +9,8 @@
 {% endblock %}
 {% block body %}
     {%- set button_label = _('Continue questionnaire') if indefinite_questionnaires[1] else _('Go to questionnaire') -%}
-    {%- call render_card_content(title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
+    {%- call render_card_content(
+        title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
         <p>{{_("Please complete your %(registry)s questionnaire here.", registry=_(assessment_status.assigning_authority))}}</p>
         {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
     {%- endcall -%}

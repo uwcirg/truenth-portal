@@ -10,7 +10,7 @@
                 expired_date=expired_date
             )}}
         {% endcall %}
-        {%- else -%}
+    {%- else -%}
         {% call render_header(title_text=greeting) %}
             {{_("Please complete your %(registry)s questionnaire by %(due_date)s",
                 registry=_(assessment_status.assigning_authority),
@@ -21,9 +21,15 @@
 {% endblock %}
 {% block body %}
     {% set button_label =  _('Continue questionnaire') if assessment_status.overall_status == OverallStatus.in_progress else _('Go to questionnaire') %}
-    {%- call render_card_content(title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
+    {%- call render_card_content(
+        title_text=_("Open Questionnaire"),
+        card_class="portal-description-incomplete") -%}
         <p>{{_("Please complete your %(registry)s questionnaire here.", registry=_(assessment_status.assigning_authority))}}</p>
         {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
     {%- endcall -%}
-    {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    {{completed_card(
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        comp_date=comp_date)
+    }}
 {% endblock %}
