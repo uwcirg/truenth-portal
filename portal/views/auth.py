@@ -605,7 +605,7 @@ def next_after_login():
 
 
 @auth.route('/login-as/<user_id>')
-@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def login_as(user_id, auth_method='staff_authenticated'):
     """Provide direct login w/o auth to user account, but only if qualified
