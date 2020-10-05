@@ -10,7 +10,7 @@
 <script>
     export default { 
         methods: {
-            getAppObj: function() {
+            getAppObj() {
                 return this.$parent;
             },
         }

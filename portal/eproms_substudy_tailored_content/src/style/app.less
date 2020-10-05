@@ -200,14 +200,6 @@ select::-ms-expand {
     display: none;
 }
 
-ul {
-  margin-bottom: 16px;
-  padding: 0 16px;
-  li:not(:last-of-type) {
-    margin-bottom: 16px;
-  }
-}
-
 .disabled,
 .inactive {
     opacity: 0.5;
@@ -300,6 +292,13 @@ section.main {
           animation-duration: 750ms;
           animation-timing-function: @defaultAnimationSpeed;
           animation-fill-mode: forwards;
+      }
+    }
+    ul {
+      margin-bottom: 16px;
+      padding: 0 16px;
+      li:not(:last-of-type) {
+        margin-bottom: 16px;
       }
     }
 }

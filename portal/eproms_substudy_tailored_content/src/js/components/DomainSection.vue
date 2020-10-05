@@ -12,10 +12,8 @@
                 required: true
             }
         },
-        components: {
-        },
         methods: {
-            getAppObj: function() {
+            getAppObj() {
                 return this.$parent;
             }
         }

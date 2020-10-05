@@ -1,156 +1,154 @@
-import {sendRequest, isInViewport, getUrlParameter} from "./Utility";
+import {isInViewport, getUrlParameter, tryParseJSON} from "./Utility";
 export default {
     mounted: function() {
-        var self = this;
         Promise.all([
-            sendRequest(self.settingsURL).catch(error => { return error }),
-            sendRequest(self.meURL).catch(error => { return error }),
+            this.$http(this.settingsURL).catch(error => { return error }),
+            this.$http(this.meURL).catch(error => { return error }),
         ]).then(responses => {
             try {
                 this.setSettings(JSON.parse(responses[0]));
             } catch(e) {
-                self.setErrorMessage(`Error parsing data ${e}`);
+                this.setErrorMessage(`Error parsing data ${e}`);
             }
             try {
-                self.userInfo = JSON.parse(responses[1]);
+                this.userInfo = JSON.parse(responses[1]);
             } catch(e) {
-                self.setErrorMessage(`Error parsing data ${e}`);
+                this.setErrorMessage(`Error parsing data ${e}`);
             }
-            self.initApp();
-            console.log("settings? ", self.settings);
-            console.log("user? ", self.userInfo)
+            this.initApp();
+            console.log("settings? ", this.settings);
+            console.log("user? ", this.userInfo)
         }).catch(error => {
-            self.setErrorMessage(`Error in promises ${error}`);
-            self.initApp();
+            this.setErrorMessage(`Error in promises ${error}`);
+            this.initApp();
         });
     },
     /*
      * methods available to the application
      */
     methods: {
-        isLoading: function() {
+        isLoading() {
             return this.loading;
         },
-        isInitialized: function() {
+        isInitialized() {
             return this.initialized;
         },
-        initApp: function() {
-            let self = this;
+        initApp() {
+           // let self = this;
             this.setSettings(this.settings);
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
             this.initialized = true;
             Promise.all([
                  //TODO init user domains, call api based on user id
-                sendRequest(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
+                this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
             ]).then(responses => {
                 try {
                     this.setLocale(JSON.parse(responses[0]));
                 } catch(e) {
-                    self.setErrorMessage(`Error parsing data ${e}`);
+                    this.setErrorMessage(`Error parsing data ${e}`);
                 }
                 console.log("user locale? ", this.getLocale())
                 //get welcome page
                 //TODO filter content based on user's domains?
                 //each domain link on the intro/welcome page should have a representative attribute or css class
                 //that denote which domain it represents
-                self.getDomainContent();
+                this.getDomainContent();
                // self.setInitView();
             }).catch(error => {
-                self.setErrorMessage(`Error in promises ${error}`);
-                self.setInitView();
+                this.setErrorMessage(`Error in promises ${error}`);
+                this.setInitView();
             });
         },
-        setInitView: function() {
-            let self = this;
-            Vue.nextTick(
-                function() {
+        setInitView() {
+            //let self = this;
+            Vue.nextTick(() => {
                     setTimeout(function() {
                         this.setCurrentView("domain");
                         this.loading = false;
-                    }.bind(self), 350);
+                    }.bind(this), 350);
                 }
             );
         },
-        hasError: function() {
+        hasError() {
             return this.errorMessage !== "";
         },
-        resetError: function() {
+        resetError() {
             this.setErrorMessage("");
         },
-        setErrorMessage: function(message) {
+        setErrorMessage(message) {
             this.errorMessage += (this.errorMessage?"<br/>": "") + message;
         },
-        getUserID: function() {
+        getUserID() {
             return this.userId;
         },
-        setUserID: function(id) {
+        setUserID(id) {
             this.userId = id;
         },
-        getLocale: function() {
+        getLocale() {
             return this.locale.replace('_', '-');
         },
-        setLocale: function(data) {
-            let self = this;
+        setLocale(data) {
+            //let self = this;
             if (!data || !data.communication) {
                 return false;
             }
-            data.communication.forEach(function(item) {
+            data.communication.forEach(item => {
                 if (item.language &&
                     item.language.coding &&
                     item.language.coding.length) {
-                    self.locale = item.language.coding[0].code;
+                    this.locale = item.language.coding[0].code;
                 }
             });
             console.log("Locale ", this.locale);
         },
-        getSettings: function() {
+        getSettings() {
             return this.settings;
         },
-        setSettings: function(data) {
+        setSettings(data) {
             if (data) {
                 this.settings = data;
             }
         },
-        getUserInfo: function() {
+        getUserInfo() {
             return this.userInfo;
         },
-        setUserInfo: function(data) {
+        setUserInfo(data) {
             if (data) {
                 this.userInfo = data;
             }
         },
-        getLRBaseURL: function() {
+        getLRBaseURL() {
             return this.LifeRayBaseURL;
         },
-        setLRBaseURL: function(data) {
+        setLRBaseURL(data) {
             if (data) {
                 this.LifeRayBaseURL = data;
             }
         },
-        getCurrentView: function() {
+        getCurrentView() {
             return this.currentView;
         },
-        setCurrentView: function(viewId) {
+        setCurrentView(viewId) {
             viewId = viewId || "domain";
             this.currentView = viewId;
         },
-        isCurrentView: function(viewId) {
+        isCurrentView(viewId) {
             //return !this.hasError() && !this.isLoading() && this.isMatchView(viewId);
             return !this.isLoading() && this.isMatchView(viewId);
         },
-        isMatchView: function(viewId) {
+        isMatchView(viewId) {
             return this.currentView === viewId;
         },
-        goToView: function(viewId) {
+        goToView(viewId) {
             Vue.nextTick(
-                function() {
-                    self.resetError();
-                    self.setCurrentView(viewId);
+                () => {
+                    this.resetError();
+                    this.setCurrentView(viewId);
                 }
             );
         },
-        setNav: function() {
+        setNav() {
             //let navElement = document.querySelector(".navigation .content");
             let navElement = document.querySelector(".navigation");
             //let mobileNavElement = document.querySelector(".mobile-navigation .content");
@@ -256,15 +254,7 @@ export default {
                 });
             });
         },
-        // setNavLeftPos: function() {
-        //     if (isElementHidden(document.querySelector(".navigation"))) return;
-        //  //   console.log("WTF?? ", document.querySelector("#domainSection").offsetWidth)
-        //  let sectionElement = document.querySelector("#domainSection");
-        //  let width = sectionElement.innerWidth || sectionElement.clientWidth || sectionElement.clientWidth;
-        //  console.log("wtf? ", width)
-        //     document.querySelector(".navigation").style.left = (width - document.querySelector(".navigation").offsetWidth - 16) + "px";
-        // },
-        setCollapsible: function() {
+        setCollapsible() {
             let collapsibleElements = document.querySelectorAll(".collapsible");
             collapsibleElements.forEach(el => {
                 el.addEventListener('click', event => {
@@ -284,7 +274,7 @@ export default {
                 });
             })
         },
-        setTileLinkEvent: function() {
+        setTileLinkEvent() {
             let tileElements = document.querySelectorAll(".tiles-container .tile");
             tileElements.forEach(el => {
                 let anchorLink = el.querySelector("a");
@@ -307,7 +297,7 @@ export default {
             //     }
             // });
         },
-        setVideo: function() {
+        setVideo() {
             let videoElement = document.querySelector(".video");
             if (!videoElement) {
                 return;
@@ -342,20 +332,20 @@ export default {
                 })
             });
         },
-        getSelectedDomain: function() {
+        getSelectedDomain() {
             //return this.activeDomain;
             //return "substudy";
             //return "hot_flashes"
             return getUrlParameter("topic") || "mood_changes";
          },
-         getSearchURL: function() {
+         getSearchURL() {
              //TODO use current domain name as tag
              //pass in locale info
              return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
              //CORS issue with querying LR directly, TODO: uncomment this when resolves
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
-        onDomainContentDidLoad: function() {
+        onDomainContentDidLoad() {
             this.setNav();
             this.setCollapsible();
             this.setVideo();
@@ -365,13 +355,13 @@ export default {
                 this.setCurrentView("domain");
             }.bind(this), 150);
         },
-        getDomainContent: function() {
+        getDomainContent() {
             if (this.domainContent) {
                 //already populated
                 this.setInitView();
                 return this.domainContent;
             }
-            let self = this;
+            //let self = this;
             // $.ajax({
             //     url : this.getSearchURL(),
             //     crossDomain : true,
@@ -386,7 +376,8 @@ export default {
             //     }).fail(function(e) {
             //         console.log("failed ")
             //     });
-            sendRequest(this.getSearchURL()).then(response => {
+            this.$http(this.getSearchURL()).then(
+                response => {
                 //LR URL returns this
                 //console.log("response? ", JSON.parse(response));
                 // let content = JSON.parse(response);
@@ -395,9 +386,9 @@ export default {
                 if (response) {
                     this.setDomainContent(response);
                     Vue.nextTick()
-                    .then(function () {
+                    .then(() => {
                         // DOM updated
-                        self.onDomainContentDidLoad();
+                        this.onDomainContentDidLoad();
                         // self.setNav();
                         // self.setCollapsible();
                         // self.setVideo();
@@ -437,6 +428,11 @@ export default {
             });
         },
         setDomainContent: function(data) {
+            let content = tryParseJSON(data);
+            if (content) {
+                this.domainContent = content["results"][0]["content"];
+                return;
+            }
             this.domainContent = data;
         },
         goHome: function() {

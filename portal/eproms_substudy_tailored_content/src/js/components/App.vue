@@ -25,6 +25,9 @@
     //import IntroSection from "./IntroSection.vue";
     import AppData from "../../data/data.js";
     import BaseMethods from "../Base.js";
+    import {sendRequest} from "../Utility.js";
+
+    Vue.prototype.$http = sendRequest;
 
     export default {
         components: {
@@ -35,11 +38,11 @@
             //IntroSection
         },
         mixins: [BaseMethods],
-        errorCaptured: function(Error, Component, info) {
+        errorCaptured(Error, Component, info) {
             console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
             return false;
         },
-        errorHandler: function(err, vm) {
+        errorHandler(err, vm) {
             this.dataError = true;
             var errorElement = document.getElementById("errorMessage");
             if (errorElement) {
@@ -48,7 +51,7 @@
             console.warn("Vue instance threw an error: ", vm, this);
             console.error("Error thrown: ", err);
         },
-        data: function() {
+        data() {
             return {
                 loading: true,
                 initialized: false,

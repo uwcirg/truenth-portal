@@ -6,32 +6,28 @@
     </footer>
 </template>
 <script>
-    import {sendRequest} from "../Utility.js";
     export default {
-        components: {
-        },
-        mounted: function() {
-            let self = this;
-            Vue.nextTick(function() {
-                sendRequest(self.getAppObj().portalFooterURL)
-                .then(
-                    response => {
-                        self.content = response;
+        mounted() {
+            this.$http(this.getAppObj().portalFooterURL)
+            .then(
+                response => {
+                    this.content = response;
+                    Vue.nextTick(() => {
                         setTimeout(function() {
-                            self.loaded = true;
-                        }, 350);
-                }).catch(e => {
-                    self.content = `Error loading portal wrapper ${e}`;
-                    self.loaded = true;
-                });
+                            this.loaded = true;
+                        }.bind(this), 350);
+                    })
+            }).catch(e => {
+                this.content = `Error loading portal wrapper ${e}`;
+                this.loaded = true;
             });
         },
         methods: {
-            getAppObj: function() {
+            getAppObj() {
                 return this.$parent;
             },
         },
-        data: function() {
+        data() {
             return {
                 sectionId: "footerSection",
                 content: "",

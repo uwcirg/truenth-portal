@@ -1,40 +1,35 @@
 <!-- portal wrapper banner -->
-<!-- we need this right? -->
 <template>
     <header :id="sectionId" ref="header" v-bind:class="{active : loaded}">
         <div class="content" v-html="content"></div>
     </header>
 </template>
 <script>
-    import {sendRequest, getWrapperJS} from "../Utility.js";
+    import {getWrapperJS} from "../Utility.js";
     export default {
-        components: {
-        },
-        mounted: function() {
-            let self = this;
-            Vue.nextTick(function() {
-                sendRequest(self.getAppObj().portalWrapperURL)
-                .then(
-                    response => {
-                        self.content = response;
-                        setTimeout(function() {
-                            getWrapperJS(`#${self.sectionId}`);
-                        }, 50);
-                        setTimeout(function() {
-                            self.loaded = true;
-                        }, 350);
+        mounted() {
+            Vue.nextTick(() => {
+                this.$http(this.getAppObj().portalWrapperURL)
+                .then(response => {
+                        this.content = response;
+                        Vue.nextTick(() => {
+                            getWrapperJS(`#${this.sectionId}`);
+                            setTimeout(function() {
+                                this.loaded = true;
+                            }.bind(this), 300);
+                    });
                 }).catch(e => {
-                    self.content = `Error loading portal wrapper ${e}`;
-                    self.loaded = true;
+                    this.content = `Error loading portal wrapper ${e}`;
+                    this.loaded = true;
                 });
             });
         },
         methods: {
-            getAppObj: function() {
+            getAppObj() {
                 return this.$parent;
             },
         },
-        data: function() {
+        data() {
             return {
                 sectionId: "headerSection",
                 content: "",
