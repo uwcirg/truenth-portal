@@ -336,6 +336,10 @@ export default {
             //return this.activeDomain;
             //return "substudy";
             //return "hot_flashes"
+            //example URL that works: https://amy-dev.cirg.washington.edu/substudy-tailored-content#/insomnia
+            if (this.$route && this.$route.params && this.$route.params.topic) {
+                return this.$route.params.topic;
+            }
             return getUrlParameter("topic") || "mood_changes";
          },
          getSearchURL() {
@@ -356,6 +360,7 @@ export default {
             }.bind(this), 150);
         },
         getDomainContent() {
+            console.log("router param ", (this.$route? this.$route.params.topic: "WTF"))
             if (this.domainContent) {
                 //already populated
                 this.setInitView();
@@ -412,7 +417,7 @@ export default {
                     
                 } else {
                     this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
-                    this.setInitView();
+                    this.setInitView(true);
                 }
             }).catch(e => {
                 console.log("failed? ", e)
@@ -423,12 +428,15 @@ export default {
                 } else {
                     this.getContentAttempt = 0;
                 }
-                this.setErrorMessage(`Error occurred retrieving content: ${e.responseText}`);
-                this.setInitView();
+                console.log(e)
+                this.setErrorMessage(`Error occurred retrieving content: ${e.statusText}`);
+                this.loading = false;
+               // this.setInitView();
             });
         },
         setDomainContent: function(data) {
             let content = tryParseJSON(data);
+            console.log(content)
             if (content) {
                 this.domainContent = content["results"][0]["content"];
                 return;

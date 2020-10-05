@@ -205,15 +205,19 @@ select::-ms-expand {
     opacity: 0.5;
 }
 
+#errorMessage {
+  margin-top: 16px;
+}
 .error-message {
   color: #FFF;
   //TODO remove this
-  display: none;
+ // display: none;
   background: @errorColor;
+
   &.content {
     padding: 8px;
     &, & > * {
-      font-size: 16px;
+      font-size: @baseFontSize;
     }
   }
 }

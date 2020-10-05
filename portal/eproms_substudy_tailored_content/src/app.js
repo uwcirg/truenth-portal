@@ -2,8 +2,21 @@
  * application main component
  */
 import App from './js/components/App.vue';
-var SubStudyAppObj = window.SubStudyAppObj = new Vue({ /*global Vue $ */
+import VueRouter from 'vue-router';
+
+Vue.use(VueRouter);
+
+const router = new VueRouter({
+    routes: [
+        { path: "/", component: App},
+        { path: "/:topic", component: App }
+    ]
+})
+
+const app  = new Vue({ /*global Vue $ */
     el: "#app",
-    render: h => h(App)
+    render: h => h(App),
+    router,
 }).$mount("#app");
 
+export default router;
