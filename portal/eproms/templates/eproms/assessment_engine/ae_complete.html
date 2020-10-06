@@ -7,7 +7,7 @@
 {% block body %}
     {%- call render_card_content(title_text=_("Open Questionnaire"), card_class="portal-completed-container") -%}
         <p>{{_("No questionnaire is due.")}}</p>
-        {{render_call_to_button(button_label=_("View previous questionnaire'"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
+        {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
     {%- endcall -%}
     {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
 {% endblock %}
