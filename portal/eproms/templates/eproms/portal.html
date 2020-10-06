@@ -1,15 +1,6 @@
 {% extends "eproms/base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
-{#
-{%- if not user.is_registered()) -%}
-    <div class="portal-item">
-        <h2 class="tnth-subhead">{{ _("Explore TrueNTH") }}</h2>
-        <p>{{ _("Discover online tools to guide you through the cancer journey.") }}</p>
-        <a class="btn-lg btn-tnth-primary" href="{{url_for('portal.explore')}}">{{ _("Learn More") }}</a>
-    </div>
-{%- endif -%}
-#}
 {%- if config.get("SHOW_WELCOME") and user.has_role(ROLE.WRITE_ONLY.value) -%}
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Welcome to TrueNTH") }}</h2>

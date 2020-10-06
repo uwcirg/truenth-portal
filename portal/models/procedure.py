@@ -76,7 +76,7 @@ class Procedure(db.Model):
         if 'encounter' in data:
             p.encounter = Encounter.from_fhir(data['encounter'])
         else:
-            p.encounter = User.query.get(audit.user_id).current_encounter
+            p.encounter = User.query.get(audit.user_id).current_encounter()
         p.user_id = Reference.parse(data['subject']).id
         if 'performedDateTime' in data:
             p.start_time = FHIR_datetime.parse(

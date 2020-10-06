@@ -58,7 +58,7 @@
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
                 <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                {%- if not user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value) -%}
+                {%- if not user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
                   {{deletedUserCell(user)}}
                 {%- else -%}
                   <td class="text-center">-</td>

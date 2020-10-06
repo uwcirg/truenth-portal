@@ -56,7 +56,8 @@ def procedure(patient_id):
       - ServiceToken: []
 
     """
-    patient = get_user(patient_id, 'view')
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
@@ -157,7 +158,7 @@ def post_procedure():
     auditable_event(
         "added {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
-    invalidate_users_QBT(patient_id)
+    invalidate_users_QBT(patient_id, research_study_id='all')
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
@@ -212,7 +213,7 @@ def procedure_delete(procedure_id):
     auditable_event(
         "deleted {}".format(procedure), user_id=current_user().id,
         subject_id=patient_id, context='procedure')
-    invalidate_users_QBT(patient_id)
+    invalidate_users_QBT(patient_id, research_study_id='all')
     return jsonify(message='deleted procedure')
 
 

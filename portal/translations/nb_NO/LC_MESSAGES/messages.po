@@ -1,0 +1,4850 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: portal 20.5.14.7.dev21+g21ec302c\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-08-03 21:29+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: eproms/templates/eproms/404.html:32
+msgid "Page Not Found."
+msgstr "Siden ble ikke funnet."
+
+#: eproms/templates/eproms/404.html:34
+msgid "Sorry, the page you requested is not found. It may have been moved."
+msgstr "Beklager, siden du ba om ble ikke funnet. Den kan ha blitt flyttet."
+
+#: eproms/templates/eproms/404.html:37 eproms/templates/eproms/500.html:39
+msgid "Back To Home"
+msgstr "Tilbake til Hjem"
+
+#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
+msgid "Explore How This Works"
+msgstr ""
+
+#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
+msgid "Explore"
+msgstr ""
+
+#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
+msgid "Learn About TrueNTH"
+msgstr ""
+
+#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
+msgid "Learn"
+msgstr ""
+
+#: eproms/templates/eproms/500.html:32 gil/templates/gil/500.html:9
+msgid "Internal Server Error"
+msgstr ""
+
+#: eproms/templates/eproms/500.html:34
+msgid "Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
+msgstr "Din forespørsel ble ikke behandlet på grunn av serverfeil. Hvis du fortsatt har problemer.  Bruk lenken nedenfor."
+
+#: eproms/templates/eproms/about.html:4 eproms/templates/eproms/contact.html:4
+#: eproms/templates/eproms/privacy.html:4 eproms/templates/eproms/terms.html:4
+#: exercise_diet/templates/exercise_diet/base.html:19
+#: exercise_diet/templates/exercise_diet/base.html:32
+#: gil/templates/gil/base.html:67 templates/explore.html:48
+#: templates/portal_footer.html:29
+msgid "Home"
+msgstr "Hjem"
+
+#: eproms/templates/eproms/about.html:5 gil/templates/gil/base.html:74
+#: gil/templates/gil/portal.html:28 templates/portal_wrapper.html:70
+#: templates/portal_wrapper.html:127
+msgid "About TrueNTH"
+msgstr "Om TrueNTH"
+
+#: eproms/templates/eproms/base.html:34 eproms/templates/eproms/landing.html:8
+#: exercise_diet/templates/exercise_diet/recipes.html:132
+msgid "Loading..."
+msgstr "Laster..."
+
+#: eproms/templates/eproms/base.html:45 templates/layout.html:44
+msgid "You are using an outdated browser. Please upgrade your browser to improve your experience."
+msgstr "Du bruker en utdatert nettleser. Oppgrader nettleseren for å forbedre opplevelsen din."
+
+#: eproms/templates/eproms/base.html:77 eproms/templates/eproms/base.html:89
+#: gil/templates/gil/base.html:261 gil/templates/gil/base.html:289
+#: templates/admin/admin_base.html:24 templates/admin/patients_by_org.html:125
+#: templates/admin/patients_by_org.html:151
+#: templates/flask_user/_macros.html:119 templates/flask_user/_macros.html:131
+#: templates/flask_user/register.html:89 templates/layout.html:77
+#: templates/layout.html:89 templates/profile/profile_macros.html:449
+#: templates/profile/profile_macros.html:618
+#: templates/profile/profile_macros.html:695
+#: templates/profile/profile_macros.html:705
+#: templates/profile/profile_macros.html:734
+#: templates/profile/profile_macros.html:743
+#: templates/profile/profile_macros.html:771
+msgid "Close"
+msgstr "Lukk"
+
+#: eproms/templates/eproms/base.html:78 gil/templates/gil/base.html:7
+#: templates/layout.html:78 templates/portal_footer.html:28
+msgid "TrueNTH"
+msgstr "TrueNTH"
+
+#: eproms/templates/eproms/contact.html:6 templates/contact_sent.html:5
+msgid "Contact TrueNTH"
+msgstr "Kontakt TrueNTH"
+
+#: eproms/templates/eproms/contact.html:7
+msgid "Use this form to get in touch with TrueNTH"
+msgstr "Bruk dette skjemaet for å komme i kontakt med TrueNTH"
+
+#: eproms/templates/eproms/contact.html:15 templates/challenge_identity.html:16
+#: templates/profile/profile_macros.html:48
+#: templates/profile/profile_macros.html:175
+msgid "Name"
+msgstr "Navn"
+
+#: eproms/templates/eproms/contact.html:17
+msgid "Please enter your name"
+msgstr "Skriv inn navnet ditt"
+
+#: eproms/templates/eproms/contact.html:18
+msgid "Your Name"
+msgstr "Ditt navn"
+
+#: eproms/templates/eproms/contact.html:22 templates/admin/admin.html:44
+#: templates/admin/patients_by_org.html:61 templates/admin/staff_by_org.html:43
+#: templates/flask_user/register.html:17
+#: templates/profile/profile_macros.html:50
+msgid "Email"
+msgstr "Epost"
+
+#: eproms/templates/eproms/contact.html:24 gil/templates/gil/contact.html:50
+msgid "Your Email"
+msgstr "Din epost"
+
+#: eproms/templates/eproms/contact.html:25
+msgid "This is not a valid e-mail address, please double-check."
+msgstr "Dette er ikke en gyldig e-postadresse, vennligst dobbeltsjekk."
+
+#: eproms/templates/eproms/contact.html:31 gil/templates/gil/contact.html:57
+msgid "Enquiry Type"
+msgstr "Forespørselstype"
+
+#: eproms/templates/eproms/contact.html:36 gil/templates/gil/contact.html:62
+msgid "Not sure"
+msgstr ""
+
+#: eproms/templates/eproms/contact.html:41 gil/templates/gil/contact.html:69
+#: gil/templates/gil/contact.html:70 templates/invite.html:12
+#: templates/invite_sent.html:18
+msgid "Subject"
+msgstr "Emne"
+
+#: eproms/templates/eproms/contact.html:42
+msgid "What is this about?"
+msgstr "Hva handler dette om?"
+
+#: eproms/templates/eproms/contact.html:45
+msgid "Text"
+msgstr "Tekst"
+
+#: eproms/templates/eproms/contact.html:46
+msgid "Please add a message for TrueNTH"
+msgstr "Legg til en melding for TrueNTH"
+
+#: eproms/templates/eproms/contact.html:46
+msgid "What is on your mind?"
+msgstr "Hva tenker du på?"
+
+#: eproms/templates/eproms/contact.html:57 gil/templates/gil/base.html:250
+#: gil/templates/gil/contact.html:96 templates/profile/profile_macros.html:770
+msgid "Submit"
+msgstr "Send"
+
+#: eproms/templates/eproms/contact.html:62
+msgid "Please confirm all fields are filled."
+msgstr "Kontroller at alle feltene er fylt ut."
+
+#: eproms/templates/eproms/landing.html:6
+#, python-format
+msgid "%(env)s version - Not for study or clinical use"
+msgstr "%(env)s-versjon - ikke for studier eller klinisk bruk"
+
+#: eproms/templates/eproms/landing.html:13
+msgid "TrueNTH Logo"
+msgstr "TrueNTH-logo"
+
+#: eproms/templates/eproms/landing.html:26
+msgid "log in"
+msgstr "Logg inn"
+
+#: eproms/templates/eproms/landing.html:27 gil/templates/gil/base.html:195
+#: gil/templates/gil/contact.html:51
+#: templates/profile/patient_profile_create.html:12
+#: templates/profile/patient_profile_create.html:13
+#: templates/profile/profile_macros.html:278
+#: templates/profile/profile_macros.html:279
+#: templates/profile/staff_profile_create.html:12
+#: templates/profile/staff_profile_create.html:13
+msgid "Email Address"
+msgstr "Epostadresse"
+
+#: eproms/templates/eproms/landing.html:31 gil/templates/gil/base.html:196
+#: templates/flask_user/register.html:22
+msgid "Password"
+msgstr "Passord"
+
+#: eproms/templates/eproms/landing.html:35 gil/templates/gil/base.html:199
+#: templates/flask_user/forgot_password.html:9
+#: templates/flask_user/login.html:22
+#: templates/flask_user/login_or_register.html:104
+#: templates/flask_user/login_or_register.html:152
+msgid "Having trouble logging in?"
+msgstr "Har du problemer med å logge inn?"
+
+#: eproms/templates/eproms/landing.html:39
+msgid "You have been logged out due to inactivity. Please log in again to continue."
+msgstr "Du har blitt logget av på grunn av inaktivitet. Vennligst logg inn igjen for å fortsette."
+
+#: eproms/templates/eproms/landing.html:50
+#: eproms/templates/eproms/landing.html:51
+msgid "TrueNTH Footer Logo"
+msgstr "TrueNTH-bunntekstlogo"
+
+#: eproms/templates/eproms/portal.html:15 templates/explore.html:12
+msgid "Welcome to TrueNTH"
+msgstr "Velkommen til TrueNTH"
+
+#: eproms/templates/eproms/portal.html:16
+msgid "Tools for navigating the prostate cancer journey"
+msgstr ""
+
+#: eproms/templates/eproms/portal.html:39
+msgid "Not available"
+msgstr "Ikke tilgjengelig"
+
+#: eproms/templates/eproms/portal.html:57
+msgid "Not Available"
+msgstr ""
+
+#: eproms/templates/eproms/portal.html:61
+msgid "Go to link"
+msgstr ""
+
+#: eproms/templates/eproms/privacy.html:5 templates/flask_user/_macros.html:80
+msgid "Privacy"
+msgstr "Personvern"
+
+#: eproms/templates/eproms/resources.html:3 templates/portal_wrapper.html:90
+#: templates/portal_wrapper.html:143
+msgid "Resources"
+msgstr ""
+
+#: eproms/templates/eproms/resources.html:10
+msgid "Training Slides and Video"
+msgstr ""
+
+#: eproms/templates/eproms/resources.html:22
+#: eproms/templates/eproms/work_instruction.html:4
+msgid "Work Instructions"
+msgstr ""
+
+#: eproms/templates/eproms/terms.html:5
+msgid "General Terms"
+msgstr "Generelle vilkår"
+
+#: eproms/templates/eproms/website_consent_script.html:13
+#: templates/initial_queries.html:45
+msgid "Continue to TrueNTH"
+msgstr "Fortsett til TrueNTH"
+
+#: eproms/templates/eproms/work_instruction.html:6
+#: templates/initial_queries_macros.html:180
+msgid "Print"
+msgstr "Skriv ut"
+
+#: eproms/templates/eproms/work_instruction.html:7
+msgid "Back to Resources"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:2
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:13
+#: gil/templates/gil/base.html:94 gil/templates/gil/exercise-and-diet.html:2
+#: gil/templates/gil/exercise-and-diet.html:9
+msgid "Exercise and Diet"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:13
+msgid ""
+"\n"
+"                    <button class=\"navbar-toggle collapsed\" data-target=\"#mainNavbar\" data-toggle=\"collapse\" type=\"type\">Show TrueNTH USA Exercise and Diet Links</button>\n"
+"                    "
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:20
+msgid "Exercise"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:21
+msgid "Diet"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:22
+msgid "Recipes &amp; Tips"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:38
+msgid "ACKNOWLEDGEMENT"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/base.html:40
+msgid "This resource was designed and developed by a multi-disciplinary team of scientists and health care professionals as part of the TrueNTH collaborative network, led by:"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/diet.html:21
+msgid ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary-top\" data-dismiss=\"modal\"><span>X</span></button>\n"
+"                        "
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/diet.html:45
+#: exercise_diet/templates/exercise_diet/exercise.html:38
+msgid ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>\n"
+"                        "
+msgstr ""
+"\n"
+"                        <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>lukk</b><span>X</span></button>\n"
+"                        "
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:3
+#: gil/templates/gil/about.html:44
+msgid "Exercise And Diet"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:14
+msgid "Staying on top of exercising and healthy eating may not be easy, but it's important for men with prostate cancer and their loved ones. Use this tool to guide you on:"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:16
+msgid "Choosing cancer-busting foods"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:17
+msgid "Making exercise fun, safe and worth it"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:18
+msgid "Delicious recipes and quick grocery shopping tips"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:21
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:23
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:44
+msgid "start <span class=\"figure\">&rarr;</span>"
+msgstr "start <span class=\"figure\">→</span>"
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:29
+msgid "watch"
+msgstr "se"
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:33
+msgid "Objective N<em>o</em>&nbsp;6: CUSTOM TOOLS &mdash; EXERCISE AND DIET"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:34
+msgid "Healthy Lifestyle"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:35
+msgid "We've looked at what helps - and what doesn't - when it comes to prostate cancer and your health. Exercising and making healthy food choices are 2 great ways to keep prostate cancer in check. Being active combined with eating fruits, veggies (and other healthy foods) can really make a difference."
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:36
+msgid "Log in to start living a healthier and more active lifestyle."
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:39
+msgid "TOOL N<em>o</em> 4: WELLNESS"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:40
+msgid "EXERCISE AND DIET"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:41
+msgid "EXERCISE / DIET / RECIPES"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:46
+msgid "start"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipe.html:1
+msgid "<button type=\"button\" class=\"btn btn-secondary-top\" data-dismiss=\"modal\" title=\"close\"><span>X</span></button>"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipe.html:16
+msgid "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>close</b><span>X</span></button>"
+msgstr "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\"><b>lukk</b><span>X</span></button>"
+
+#: exercise_diet/templates/exercise_diet/recipes.html:10
+msgid "Healthy Fats from Oils and Nuts"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipes.html:33
+msgid "Vegetables"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipes.html:56
+msgid "Cooked tomatoes"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipes.html:79
+msgid "Fish"
+msgstr ""
+
+#: exercise_diet/templates/exercise_diet/recipes.html:102
+msgid "Alternatives to Processed Meats"
+msgstr ""
+
+#: gil/templates/gil/404.html:2
+msgid "TrueNTH Page Not Found"
+msgstr "TrueNTH-side ikke funnet"
+
+#: gil/templates/gil/404.html:9
+msgid "Page Not found"
+msgstr "Side ikke funnet"
+
+#: gil/templates/gil/404.html:10
+msgid "Sorry, the page you requested was not found. It may have been moved."
+msgstr "Beklager, siden du ba om ble ikke funnet. Den kan ha blitt flyttet."
+
+#: gil/templates/gil/500.html:2
+msgid "Error"
+msgstr "Feil"
+
+#: gil/templates/gil/500.html:10
+msgid "Your request was not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
+msgstr "Din forespørsel ble ikke behandlet på grunn av serverfeil. Vennligst bruk lenken nedenfor hvis du fortsatt har problemer."
+
+#: gil/templates/gil/500.html:12
+msgid "Send Message"
+msgstr "Send melding"
+
+#: gil/templates/gil/about.html:2 templates/flask_user/_macros.html:80
+#: templates/portal_footer.html:32
+msgid "About"
+msgstr "Om"
+
+#: gil/templates/gil/about.html:9
+msgid ""
+"\n"
+"          <h1 class=\"page-intro__main\">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>\n"
+"          "
+msgstr ""
+"\n"
+"          <h1 class=\"page-intro__main\">Vi er et samarbeidsprogram<br/>finansiert og opprettet av<a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>\n"
+"          "
+
+#: gil/templates/gil/about.html:12
+msgid "Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers."
+msgstr "Vår oppgave er å forbedre reisen med prostatakreft for menn og deres samarbeidspartnere og omsorgspersoner, ved å bringe deres stemmer sammen med leger, forskere og frivillige."
+
+#: gil/templates/gil/about.html:14 gil/templates/gil/about.html:19
+#: gil/templates/gil/decision-support.html:11
+#: gil/templates/gil/symptom-tracker.html:11
+#: gil/templates/gil/symptom-tracker.html:16
+#: gil/templates/gil/what-is-prostate-cancer.html:11
+msgid "Learn More"
+msgstr "Finn ut mer"
+
+#: gil/templates/gil/about.html:21 gil/templates/gil/decision-support.html:18
+#: gil/templates/gil/index.html:38 gil/templates/gil/symptom-tracker.html:18
+msgid "Watch"
+msgstr "Se"
+
+#: gil/templates/gil/about.html:26
+msgid "Objective N<em>o</em>6: Custom Tools\""
+msgstr ""
+
+#: gil/templates/gil/about.html:27
+msgid "Our Current Projects"
+msgstr ""
+
+#: gil/templates/gil/about.html:28
+msgid "We have two tools currently running and more on the way."
+msgstr ""
+
+#: gil/templates/gil/about.html:31
+msgid "Tool N<em>o</em>1: Post Diagnosis "
+msgstr ""
+
+#: gil/templates/gil/about.html:32 gil/templates/gil/base.html:90
+#: gil/templates/gil/decision-support.html:2
+#: gil/templates/gil/decision-support.html:9
+#: gil/templates/gil/decision-support.html:62 gil/templates/gil/index.html:81
+#: templates/portal_footer.html:38
+msgid "Decision Support"
+msgstr ""
+
+#: gil/templates/gil/about.html:32 gil/templates/gil/decision-support.html:62
+#: gil/templates/gil/index.html:81
+msgid "Questionnaire / Education / Report"
+msgstr ""
+
+#: gil/templates/gil/about.html:36
+msgid "Tool N<em>o</em>2: Monitoring"
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:9 templates/portal_footer.html:41
+#: Intervention:self_management gil/templates/gil/index.html:121
+#: gil/templates/gil/about.html:37 models/communication.py:210
+#: gil/templates/gil/base.html:92 gil/templates/gil/symptom-tracker.html:2
+#: gil/templates/gil/symptom-tracker.html:33
+msgid "Symptom Tracker"
+msgstr ""
+
+#: gil/templates/gil/about.html:37 gil/templates/gil/index.html:121
+msgid "Questionnaire / Reports / Tips"
+msgstr ""
+
+#: gil/templates/gil/about.html:43
+msgid "Tool N<em>o</em>3: All Stages"
+msgstr ""
+
+#: gil/templates/gil/about.html:45
+msgid "Personalized Guides"
+msgstr ""
+
+#: gil/templates/gil/about.html:53
+msgid "Tool N<em>o</em>4: All Stages"
+msgstr ""
+
+#: gil/templates/gil/about.html:54 gil/templates/gil/base.html:95
+#: gil/templates/gil/lived-experience.html:2
+msgid "Lived Experience"
+msgstr ""
+
+#: gil/templates/gil/about.html:54
+msgid "Shared Stories"
+msgstr ""
+
+#: gil/templates/gil/about.html:61
+msgid "Tool N<em>o</em>5: All Stages"
+msgstr ""
+
+#: gil/templates/gil/about.html:62 gil/templates/gil/index.html:104
+msgid "Sexual Health"
+msgstr ""
+
+#: gil/templates/gil/about.html:62
+msgid "Recovery Plans"
+msgstr ""
+
+#: gil/templates/gil/about.html:69
+msgid "Tool N<em>o</em>6: Post Diagnosis"
+msgstr ""
+
+#: Intervention:care_plan gil/templates/gil/about.html:70
+msgid "Care Plan"
+msgstr ""
+
+#: gil/templates/gil/about.html:70
+msgid "Navigation Resources"
+msgstr ""
+
+#: gil/templates/gil/about.html:82 gil/templates/gil/about.html:107
+#: gil/templates/gil/base.html:135 gil/templates/gil/contact.html:32
+msgid "Objective N<em>o</em>1: TrueNTH Community"
+msgstr ""
+
+#: gil/templates/gil/about.html:83
+msgid "Our USA Partners"
+msgstr ""
+
+#: gil/templates/gil/about.html:84
+msgid "We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/about.html:86
+msgid "University of Colorado Cancer Center"
+msgstr "University of Colorado Cancer Center"
+
+#: gil/templates/gil/about.html:87
+msgid "Dana Farber Cancer Institute"
+msgstr "Dana Farber Cancer Institute"
+
+#: gil/templates/gil/about.html:88
+msgid "Duke University"
+msgstr "Duke University"
+
+#: gil/templates/gil/about.html:89
+msgid "Emory University"
+msgstr "Emory University"
+
+#: gil/templates/gil/about.html:90
+msgid "Johns Hopkins University"
+msgstr "Johns Hopkins University"
+
+#: gil/templates/gil/about.html:91
+msgid "Karmanos Cancer Institute"
+msgstr "Karmanos Cancer Institute"
+
+#: gil/templates/gil/about.html:92 Organization:Memorial Sloan Kettering Cancer
+#: Center
+msgid "Memorial Sloan Kettering Cancer Center"
+msgstr "Memorial Sloan Kettering Cancer Center"
+
+#: gil/templates/gil/about.html:93 Organization:University of Michigan
+msgid "University of Michigan"
+msgstr "University of Michigan"
+
+#: gil/templates/gil/about.html:94
+msgid "Moffitt Cancer Center"
+msgstr "Moffitt Cancer Center"
+
+#: gil/templates/gil/about.html:96
+msgid "OHSU"
+msgstr "OHSU"
+
+#: gil/templates/gil/about.html:97
+msgid "UC Davis"
+msgstr "UC Davis"
+
+#: gil/templates/gil/about.html:98
+msgid "UCLA"
+msgstr "UCLA"
+
+#: gil/templates/gil/about.html:99
+msgid "UCSF"
+msgstr "UCSF"
+
+#: gil/templates/gil/about.html:100
+msgid "UNC"
+msgstr "UNC"
+
+#: gil/templates/gil/about.html:101 Organization:University of Washington
+msgid "University of Washington"
+msgstr "University of Washington"
+
+#: gil/templates/gil/about.html:108
+msgid "Global Strategy"
+msgstr "Global strategi"
+
+#: gil/templates/gil/about.html:109
+msgid "TrueNTH is currently active in 7 countries around the world:"
+msgstr ""
+
+#: gil/templates/gil/about.html:110
+msgid "World Map"
+msgstr "Verdenskart"
+
+#: gil/templates/gil/about.html:112
+msgid "USA"
+msgstr "USA"
+
+#: gil/templates/gil/about.html:112
+msgid "US"
+msgstr "US"
+
+#: gil/templates/gil/about.html:115
+msgid "Canada"
+msgstr "Canada"
+
+#: gil/templates/gil/about.html:115
+msgid "CA"
+msgstr ""
+
+#: gil/templates/gil/about.html:118
+msgid "Ireland"
+msgstr "Irland"
+
+#: gil/templates/gil/about.html:118
+msgid "IE"
+msgstr ""
+
+#: gil/templates/gil/about.html:121
+msgid "UK"
+msgstr ""
+
+#: gil/templates/gil/about.html:124
+msgid "Singapore"
+msgstr "Singapore"
+
+#: gil/templates/gil/about.html:124
+msgid "SG"
+msgstr ""
+
+#: gil/templates/gil/about.html:127
+msgid "Australia"
+msgstr "Australia"
+
+#: gil/templates/gil/about.html:127
+msgid "AU"
+msgstr ""
+
+#: gil/templates/gil/about.html:130
+msgid "New Zealand"
+msgstr "New Zealand"
+
+#: gil/templates/gil/about.html:130
+msgid "NZ"
+msgstr ""
+
+#: gil/templates/gil/about.html:135
+msgid "TrueNTH has invested 42 million USD to support the work of more than 350 global experts in prostate cancer care in these countries."
+msgstr ""
+
+#: gil/templates/gil/alonzo_mccann_story.html:2
+msgid "Lived Experience - Alonzo McCann Story"
+msgstr ""
+
+#: gil/templates/gil/alonzo_mccann_story.html:10
+msgid "Objective N<em>o</em><span class=\"text-uppercase\">2: Lived Experience</span>"
+msgstr ""
+
+#: gil/templates/gil/alonzo_mccann_story.html:13
+#: gil/templates/gil/lived-experience.html:28
+msgid "ALONZO McCANN"
+msgstr ""
+
+#: gil/templates/gil/alonzo_mccann_story.html:14
+msgid "A Detroit football coach, preacher, husband and father, Alonzo McCann has dedicated his life to helping others. 9 years after his prostate cancer diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on his path and his own trials in finding the help he needs."
+msgstr ""
+
+#: gil/templates/gil/alonzo_mccann_story.html:17
+#: gil/templates/gil/hirsch_brothers_story.html:16
+msgid "WATCH THE FILM"
+msgstr ""
+
+#: gil/templates/gil/base.html:39
+msgid "Loading"
+msgstr "Laster"
+
+#: gil/templates/gil/base.html:65
+msgid "Navigation"
+msgstr "Navigasjon"
+
+#: gil/templates/gil/base.html:69 templates/portal_wrapper.html:75
+#: templates/portal_wrapper.html:129
+msgid "Patients"
+msgstr "Pasienter"
+
+#: gil/templates/gil/base.html:72 templates/portal_wrapper.html:68
+#: templates/portal_wrapper.html:126 templates/profile/my_profile.html:4
+msgid "My TrueNTH Profile"
+msgstr "Min TrueNTH-profil"
+
+#: gil/templates/gil/base.html:76 templates/portal_wrapper.html:72
+#: templates/portal_wrapper.html:128
+msgid "Client Applications"
+msgstr ""
+
+#: gil/templates/gil/base.html:79 templates/portal_wrapper.html:87
+#: templates/portal_wrapper.html:140 templates/research.html:3
+msgid "Research Data"
+msgstr ""
+
+#: gil/templates/gil/base.html:82 templates/portal_wrapper.html:77
+#: templates/portal_wrapper.html:130
+msgid "Staff List"
+msgstr "Personalliste"
+
+#: gil/templates/gil/base.html:85 templates/admin/admin.html:12
+#: templates/portal_wrapper.html:79 templates/portal_wrapper.html:132
+msgid "User Administration"
+msgstr "Brukeradministrasjon"
+
+#: gil/templates/gil/base.html:86 templates/admin/admin.html:8
+#: templates/portal_wrapper.html:80 templates/portal_wrapper.html:133
+msgid "Scheduled Jobs"
+msgstr "Planlagte jobber"
+
+#: gil/templates/gil/base.html:87 templates/portal_wrapper.html:81
+#: templates/portal_wrapper.html:134
+msgid "Settings"
+msgstr "Innstillinger"
+
+#: gil/templates/gil/base.html:93 gil/templates/gil/sexual_wellbeing.html:2
+#: templates/portal_footer.html:30
+msgid "Sexual Wellbeing"
+msgstr ""
+
+#: Intervention:psa_tracker templates/portal_footer.html:39
+#: gil/templates/gil/base.html:96
+msgid "PSA Tracker"
+msgstr ""
+
+#: gil/templates/gil/base.html:97 gil/templates/gil/index.html:48
+#: templates/portal_footer.html:31
+msgid "Prostate Cancer Facts"
+msgstr ""
+
+#: gil/templates/gil/base.html:98 gil/templates/gil/contact.html:2
+#: templates/flask_user/_macros.html:80
+msgid "Contact"
+msgstr "Kontakt"
+
+#: gil/templates/gil/base.html:100 gil/templates/gil/base.html:126
+#: gil/templates/gil/base.html:139 gil/templates/gil/base.html:165
+#: gil/templates/gil/base.html:227 gil/templates/gil/contact.html:16
+#: gil/templates/gil/index.html:33 gil/templates/gil/lived-experience.html:16
+#: gil/templates/gil/lived_experience_base.html:11
+msgid "Join Us"
+msgstr "Bli med oss"
+
+#: gil/templates/gil/base.html:101 gil/templates/gil/base.html:126
+#: gil/templates/gil/contact.html:16 gil/templates/gil/lived-experience.html:16
+#: templates/explore.html:31
+msgid "Log In"
+msgstr "Logg inn"
+
+#: gil/templates/gil/base.html:103 templates/portal_wrapper.html:166
+msgid "Log Out"
+msgstr "Logg ut"
+
+#: gil/templates/gil/base.html:111
+msgid "Click here to join us"
+msgstr ""
+
+#: gil/templates/gil/base.html:121 gil/templates/gil/contact.html:11
+#: gil/templates/gil/lived-experience.html:11
+msgid "Menu"
+msgstr "Meny"
+
+#: gil/templates/gil/base.html:136
+#: gil/templates/gil/lived_experience_base.html:7
+msgid "Everyone has a part to play in improving the prostate cancer journey."
+msgstr ""
+
+#: gil/templates/gil/base.html:137
+#: gil/templates/gil/lived_experience_base.html:8
+msgid "The more people that join us, the better the tools will become for you and future generations."
+msgstr ""
+
+#: gil/templates/gil/base.html:149 gil/templates/gil/base.html:151
+msgid "TrueNTH Version"
+msgstr "TrueNTH-versjon"
+
+#: gil/templates/gil/base.html:166 gil/templates/gil/base.html:228
+msgid "It’s going to take a group effort to improve the prostate cancer experience for future generations."
+msgstr ""
+
+#: gil/templates/gil/base.html:168
+msgid "Do you have an access code?"
+msgstr ""
+
+#: gil/templates/gil/base.html:171
+msgid "Enter Access Code"
+msgstr ""
+
+#: gil/templates/gil/base.html:175 templates/initial_queries.html:44
+#: templates/shortcut_alias.html:13
+msgid "Next"
+msgstr "Neste"
+
+#: gil/templates/gil/base.html:179
+msgid "otherwise"
+msgstr "ellers"
+
+#: gil/templates/gil/base.html:182 gil/templates/gil/base.html:228
+msgid "Create Account"
+msgstr "Opprett konto"
+
+#: gil/templates/gil/base.html:191 gil/templates/gil/base.html:221
+#: gil/templates/gil/base.html:222
+msgid "Login"
+msgstr "Logg inn"
+
+#: gil/templates/gil/base.html:201 gil/templates/gil/base.html:224
+#: templates/explore.html:30 templates/flask_user/login.html:28
+#: templates/flask_user/register.html:38
+msgid "or"
+msgstr "eller"
+
+#: gil/templates/gil/base.html:208
+msgid "Log in with Facebook"
+msgstr ""
+
+#: gil/templates/gil/base.html:211
+msgid "Log in with Google"
+msgstr "Logg inn med Google"
+
+#: gil/templates/gil/base.html:238 templates/initial_queries_macros.html:403
+#: templates/profile/profile_macros.html:502
+msgid "What is your main clinic for prostate cancer care?"
+msgstr "Hva er din hovedklinikk for prostatakreftbehandling?"
+
+#: gil/templates/gil/base.html:248 templates/profile/profile_macros.html:508
+#: templates/profile/profile_macros.html:539
+msgid "None of the Above"
+msgstr "Ingen av ovenstående"
+
+#: gil/templates/gil/base.html:262
+msgid "Session Timed Out"
+msgstr "Økt utløpt"
+
+#: gil/templates/gil/base.html:262
+msgid "You have been logged out due to inactivity.  Please log in again to continue."
+msgstr "Du har blitt logget av på grunn av inaktivitet. Vennligst logg inn igjen for å fortsette."
+
+#: gil/templates/gil/base.html:265 gil/templates/gil/base.html:300
+#: templates/initial_queries_macros.html:111
+#: templates/profile/patient_profile.html:43
+#: templates/profile/profile_macros.html:1133
+msgid "OK"
+msgstr "OK"
+
+#: gil/templates/gil/base.html:290
+msgid "System Message"
+msgstr "Systemmelding"
+
+#: gil/templates/gil/base.html:315
+msgid "Consent checkbox"
+msgstr "Avkrysningsrute for samtykke"
+
+#: gil/templates/gil/contact.html:22 templates/portal_footer.html:33
+msgid "Contact Us"
+msgstr "Kontakt oss"
+
+#: gil/templates/gil/contact.html:23
+msgid "Please connect with us, ask questions, share your story, and make suggestions for how we can do better."
+msgstr "Vennligst ta kontakt med oss, still spørsmål, del din historie og kom med forslag til hvordan vi kan forbedre oss."
+
+#: gil/templates/gil/contact.html:33
+msgid "Contact Form"
+msgstr "Kontaktskjema"
+
+#: gil/templates/gil/contact.html:34
+msgid "Use this form to get in touch with TrueNTH USA."
+msgstr "Bruk dette skjemaet for å komme i kontakt med TrueNTH USA."
+
+#: gil/templates/gil/contact.html:40 gil/templates/gil/contact.html:41
+#: templates/admin/admin.html:42 templates/admin/patients_by_org.html:58
+#: templates/admin/staff_by_org.html:41 templates/challenge_identity.html:21
+#: templates/initial_queries_macros.html:219
+#: templates/profile/profile_macros.html:179
+msgid "First Name"
+msgstr "Fornavn"
+
+#: gil/templates/gil/contact.html:44 gil/templates/gil/contact.html:45
+#: templates/admin/admin.html:43 templates/admin/patients_by_org.html:59
+#: templates/admin/staff_by_org.html:42 templates/challenge_identity.html:29
+#: templates/initial_queries_macros.html:226
+#: templates/profile/profile_macros.html:187
+msgid "Last Name"
+msgstr "Etternavn"
+
+#: gil/templates/gil/contact.html:75 templates/invite_sent.html:22
+msgid "Message"
+msgstr "Melding"
+
+#: gil/templates/gil/contact.html:81
+msgid "About You"
+msgstr "Om deg"
+
+#: gil/templates/gil/contact.html:83 templates/profile/profile_macros.html:918
+msgid "Select"
+msgstr "Velg"
+
+#: gil/templates/gil/contact.html:84
+msgid "I've been diagnosed with prostate cancer"
+msgstr "Jeg har fått diagnosen prostatakreft"
+
+#: gil/templates/gil/contact.html:85
+msgid "I want to learn more about prostate cancer"
+msgstr "Jeg vil lære mer om prostatakreft"
+
+#: gil/templates/gil/david_andrew_story.html:2
+msgid "Lived Experience - David and Andrew Perez Story"
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:10
+#: gil/templates/gil/hirsch_brothers_story.html:10
+#: gil/templates/gil/lived-experience.html:22
+msgid "Objective N<em>o</em>2: LIVED EXPERIENCE"
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:13
+#: gil/templates/gil/lived-experience.html:36
+msgid "DAVID AND ANDREW PEREZ"
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:14
+msgid "In 2009, Dave was diagnosed with prostate cancer. He began visiting doctors with his family and weighing up his treatment options. His son Andrew felt that this was one situation where there wasn’t much he could do to pitch in and help. But he accompanied his father in making significant dietary and lifestyle changes as required in active surveillance, and now they both strive to help other men in similar situations understand their options and consider alternatives to treatment."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:16
+msgid "DAVE PEREZ:"
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:18
+msgid "After I was diagnosed with prostate cancer, 5 doctors in a row told me to get treatment.  I was fortunate to have spent years advocating for my disabled son’s medical care before it was my turn to advocate for myself. I kept asking.  Finally I found my way to an Active Surveillance study at UCSF."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:20
+msgid ""
+"There they embraced my interest in delaying or possibly avoiding treatment altogether.\n"
+"            And that gave me the time I needed to find the right alternatives, lifestyle and dietary changes necessary to beat the cancer without ever having treatment and the terrible side effects associated with that treatment."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:23
+msgid "At least once or twice a month I get a call from a woman saying that her husband/brother/dad/uncle/etc. was diagnosed and asking if I would be willing to talk to them. I always say yes, absolutely. And the men never call. A few months later I will learn that they got treatment. That they never looked at alternatives. That they never made any lifestyle changes."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:25
+msgid "And what is worse, sometimes those men wind up with a recurrence or another cancer. It breaks my heart to see them blindly accept whatever they are told."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:27
+msgid "ANDREW PEREZ:"
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:29
+msgid "On the day that Michael Jackson and Farrah Fawcett died, I got a phone call from my dad telling me that he had been diagnosed with prostate cancer. I don't actually remember the phone call very clearly, but I remember everything that happened afterward."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:31
+msgid "My dad doesn't half-ass anything. He also doesn't leap into any decisions blindly. So when he told me that the doctors had caught the cancer early and that he still had myriad options to explore before deciding on a course of action, not a shred of me doubted him."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:33
+msgid "However, I'm not the type of person to wait and hope for the best. Growing up the older sibling of a disabled brother, my default setting is to do as much of the work as I possibly can in any situation. Much to my dismay, I realized quickly that there wasn't much I could do in this particular instance. My dad continued to explore options."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:35
+msgid "Eventually he found the UCSF Active Surveillance program and made a series of lifestyle changes, including diet, exercise and stress reduction. Finally I had a way of helping my dad, even if it was only in my head. I threw myself into changing my lifestyle along with him, altering my eating to better reflect his, keeping up with my exercise, and even beginning yoga and meditation practices. We read the same books, had the same shopping lists, and swapped yoga stories often."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:37
+msgid "Too many men in America and across the globe believe that they cannot show emotion, believe that they cannot show weakness, believe that they cannot ask for help. And as a result of that mentality, which has been taught for far too long, generations of men are facing various cancers silently, often resignedly, when they do not have to. We need to have conversations about our health. We need to share what works and be open-minded enough to try something out of the ordinary."
+msgstr ""
+
+#: gil/templates/gil/david_andrew_story.html:44
+msgid "David and Andrew Perez, Los Angeles, 2016"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:10
+msgid "Choosing which treatment path to go down can be confusing and overwhelming. Being informed of the different options and how each fits into your life is critical in making the best choice for you."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:11
+#: gil/templates/gil/decision-support.html:67 gil/templates/gil/portal.html:45
+#: gil/templates/gil/symptom-tracker.html:11
+#: gil/templates/gil/symptom-tracker.html:38
+msgid "Start"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:16 gil/templates/gil/index.html:36
+msgid "Learn more"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:23 gil/templates/gil/index.html:53
+msgid "Objective N<em>o</em>6: Custom Tools – Decision Support"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:24
+msgid "Making Your Decision"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:25
+msgid "As you decide which treatment is best for you, it is important to prepare for the discussions with your doctor:"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:27
+msgid "Helpful Tip N<em>o</em>3: Decision Making Checklist"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:33
+msgid "Make a list of your questions."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:39
+msgid "Include people who are important to you in your decision making."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:45
+msgid "Take your questions to your appointments."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:54
+#: gil/templates/gil/decision-support.html:61 gil/templates/gil/index.html:80
+msgid "Tool N<em>o</em>1: Post Diagnosis"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:55
+msgid "Decision Support Tool"
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:56
+msgid "Our tool was created to help you determine which option is best for you."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:57
+msgid "After you have answered the questionnaire, you will receive personalized education and support to discuss the best path forward with your doctor."
+msgstr ""
+
+#: gil/templates/gil/decision-support.html:58
+msgid "You can then download the report and share it with your doctor."
+msgstr ""
+
+#: gil/templates/gil/exercise-and-diet.html:10
+msgid "Coming in 2017."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:2
+msgid "Lived Experience - Hirsch Brothers Story"
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:13
+#: gil/templates/gil/lived-experience.html:44
+msgid "THE HIRSCH BROTHERS"
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:19
+msgid "Family history plays a role in many cancer diagnoses. Twin brothers Mark and Jon Hirsch know that first hand. Following their Dad’s diagnosis, the brothers began monitoring their PSA which lead to early diagnosis and treatment for their prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:21
+msgid "Jon and Mark Hirsch have a lot in common. For starters, they are identical twins. They are 56 years old. They are outdoorsmen, and both spend a lot of time staying active with their families. And, in 2014, they were both diagnosed with prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:23
+msgid "Jon Hirsch discovered his cancer first. Knowing they had a family history of prostate cancer, Jon was proactive about his health. Their grandfather had prostate cancer when he passed away at 86 from various health problems. Their father was diagnosed at 70 years old with an aggressive form of prostate cancer that spread to his bones. While their father is still alive today, he has been battling cancer and trying different treatments for the past six years."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:25
+msgid "Jon went in for an annual physical where he requested a PSA test even though his doctor told him it was unnecessary.  When the results came in his PSA level was up to 5.5, and Jon asked to see a urologist for a biopsy. Advocating for himself was the right move. In his words, \"If I wasn’t persistent, I wouldn’t have known.\""
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:27
+msgid "With a new diagnosis of prostate cancer, Jon urged his brother Mark to get checked as well. Mark went to their father’s urologist and although his prostate wasn’t enlarged, the Hirsch family history led him to get further tests. He was eventually diagnosed with prostate cancer, with a Gleason grade of 4 + 3. His cancer was even more aggressive than Jon’s."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:29
+msgid "\"Our dad felt terrible. He was almost apologetic, like he passed on bad genes. I think he felt guilty. But we weren&apos;t blaming anyone. We were all shocked and frightened,\" said Jon."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:31
+msgid "The twins began trying to figure out the best treatment plan to tackle their disease. Sharing research and going through the experience with each other made the process a lot less difficult."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:33
+msgid "We’ve gone through prostate cancer like we’ve gone through everything in our lives – together. For men, once you’re diagnosed it’s like learning a whole new language. I only knew a little bit because our dad had it. We became extremely informed and visited with many different doctors and researched various therapies."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:35
+msgid "Ultimately the brothers both decided to have a robotic prostatectomy (removal of all or part of the prostate gland). At different hospitals, they had surgery just three days apart from one another."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:37
+msgid "\"We both had amazing outcomes with no adverse effects or consequences,\" said Jon. Both brothers are now functioning almost 100 percent as well as they were before the surgery."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:39
+msgid "\"Our dad hasn&apos;t had the positive outcome we&apos;ve had. I count my blessings every day for the positive outcome of our treatment,\" said Mark."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:41
+msgid "Men with a father, brother or son who have a history of prostate cancer are more than two times as likely to develop the disease, while those with two or more relatives are nearly four times as likely to be diagnosed. The risk is highest in men whose family members were diagnosed before age 65."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:43
+msgid "With three generations of prostate cancer diagnoses, Jon and Mark are now trying to educate the rest of their family about the health risks they face. Their three brothers have all been checked and are staying vigilant. Mark’s 19-year-old son is aware that he will need to begin prostate cancer screening earlier than most men. Jon and Mark’s daughters know that if they have sons they will have a genetic predisposition to prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:45
+msgid "\"Reflecting on how fortunate I am,\" said Mark, \"I just remember that tomorrow is not guaranteed. Men need to be aware that they will have a better propensity for tomorrow if they take care of their health today.\""
+msgstr ""
+
+#: gil/templates/gil/hirsch_brothers_story.html:52
+msgid "The Hirsch Brothers on their Farm in Wisconsin, 2016"
+msgstr ""
+
+#: gil/templates/gil/index.html:11
+msgid "Truenth Home"
+msgstr "TrueNTH Hjem"
+
+#: gil/templates/gil/index.html:13
+msgid "TrueNTH is a collective approach to improving your quality of life throughout your prostate cancer journey."
+msgstr ""
+
+#: gil/templates/gil/index.html:18
+#: gil/templates/gil/lived_experience_base.html:6
+msgid "Objective N<em>o</em>1: TrueNTH Community "
+msgstr ""
+
+#: gil/templates/gil/index.html:19
+msgid "We are here to help you navigate your prostate cancer journey."
+msgstr ""
+
+#: gil/templates/gil/index.html:20
+msgid "More About TrueNTH"
+msgstr "Mer om TrueNTH"
+
+#: gil/templates/gil/index.html:23
+msgid "Jim Williams"
+msgstr ""
+
+#: gil/templates/gil/index.html:24
+msgid "Jon and Mark Hirsch"
+msgstr ""
+
+#: gil/templates/gil/index.html:25
+msgid "Dr. Drew Peterson"
+msgstr ""
+
+#: gil/templates/gil/index.html:25
+msgid "UROLOGIST"
+msgstr ""
+
+#: gil/templates/gil/index.html:25
+msgid "Drew Peterson"
+msgstr ""
+
+#: gil/templates/gil/index.html:26
+msgid "Alonzo McCann"
+msgstr ""
+
+#: gil/templates/gil/index.html:27
+msgid "Dr. Elisabeth Heath"
+msgstr ""
+
+#: gil/templates/gil/index.html:27
+msgid "ONCOLOGIST"
+msgstr ""
+
+#: gil/templates/gil/index.html:27
+msgid "Elisabeth Heath"
+msgstr ""
+
+#: gil/templates/gil/index.html:28
+msgid "Andrew Maguire"
+msgstr ""
+
+#: gil/templates/gil/index.html:28
+msgid "FILM MAKER"
+msgstr ""
+
+#: gil/templates/gil/index.html:29
+msgid "Lois Williams"
+msgstr ""
+
+#: gil/templates/gil/index.html:30
+msgid "David Perez"
+msgstr ""
+
+#: gil/templates/gil/index.html:43
+msgid "Objective N<em>o</em>3: Useful Information"
+msgstr ""
+
+#: gil/templates/gil/index.html:44
+msgid "What is Prostate Cancer?"
+msgstr ""
+
+#: gil/templates/gil/index.html:45
+msgid "Prostate cancer is the second most common cancer in men."
+msgstr ""
+
+#: gil/templates/gil/index.html:46
+msgid "1 in 9 men will be diagnosed with prostate cancer in their lifetime."
+msgstr ""
+
+#: gil/templates/gil/index.html:47
+#, python-format
+msgid "In %(year)d, over %(population)s men will be diagnosed with prostate cancer in the USA."
+msgstr "I %(year)d,vil over %(population)s menn få diagnosen prostatakreft i USA."
+
+#: gil/templates/gil/index.html:54
+msgid "Men have different stages of prostate cancer and have different treatment options available to them."
+msgstr ""
+
+#: gil/templates/gil/index.html:58
+msgid "Preferences"
+msgstr "Preferanser"
+
+#: gil/templates/gil/index.html:59
+msgid "Understanding what is important to you"
+msgstr ""
+
+#: gil/templates/gil/index.html:64
+#: gil/templates/gil/what-is-prostate-cancer.html:45
+msgid "Education"
+msgstr "Utdannelse"
+
+#: gil/templates/gil/index.html:65
+msgid "Learning about the factors that impact your decision"
+msgstr ""
+
+#: gil/templates/gil/index.html:70 templates/admin/patients_by_org.html:62
+msgid "Reports"
+msgstr "Rapporter"
+
+#: gil/templates/gil/index.html:71
+msgid "Results to use during the visit with your doctor"
+msgstr ""
+
+#: gil/templates/gil/index.html:76
+msgid "We have tools to help you determine which treatment option is best for you."
+msgstr ""
+
+#: gil/templates/gil/index.html:86 gil/templates/gil/index.html:126
+msgid "More Info"
+msgstr "Mer informasjon"
+
+#: gil/templates/gil/index.html:93
+msgid "Objective N<em>o</em>6: Custom Tools – Symptom Tracker"
+msgstr ""
+
+#: gil/templates/gil/index.html:94
+msgid "Managing symptoms and side effects is an important part of the prostate cancer journey."
+msgstr ""
+
+#: gil/templates/gil/index.html:98
+msgid "Urinary Incontinence"
+msgstr "Urininkontinens"
+
+#: gil/templates/gil/index.html:99
+msgid "Not being able to control your urine"
+msgstr "Kan ikke kontrollere urinen"
+
+#: gil/templates/gil/index.html:105
+msgid "Physical and emotional changes to your sex life and erectile function"
+msgstr "Fysiske og emosjonelle endringer i sexlivet og erektil funksjon"
+
+#: gil/templates/gil/index.html:110
+msgid "Fatigue"
+msgstr "Utmattelse"
+
+#: gil/templates/gil/index.html:111
+msgid "Feeling tired due to treatment for prostate cancer"
+msgstr "Føler meg trøtt på grunn av prostatakreftbehandling"
+
+#: gil/templates/gil/index.html:116
+msgid "We’ve created a tool to track your experience and symptoms over time and provide personal guidance."
+msgstr ""
+
+#: gil/templates/gil/index.html:120
+msgid " N<em>o</em>2: Monitoring "
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:23
+msgid "TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey."
+msgstr "TrueNTH formidler erfaringer fra menn, deres omsorgspersoner og klinikere for å hjelpe deg i din prostatakreftreise."
+
+#: gil/templates/gil/lived-experience.html:29
+msgid "Alonzo McCann Mobile Image"
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:30
+msgid "Alonzo McCann is a Detroit football coach, preacher, husband and father. After one of the darkest periods of his life, he now reflects on the route he took through recovery."
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:31
+msgid "Watch Alonzo's Film"
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:37
+msgid "David and Andrew Perez Mobile Image"
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:38
+msgid "Andrew proved he would be there for his father as he began his Prostate Cancer journey."
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:39
+msgid "READ DAVID AND ANDREW'S STORY"
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:45
+msgid "Hirsch Brothers Mobile Image"
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:46
+msgid "Twin brothers Mark and Jon Hirsch learned how family history and early detection would play a role in their shared Prostate Cancer journey."
+msgstr ""
+
+#: gil/templates/gil/lived-experience.html:47
+msgid "Watch Mark and Jon's Film"
+msgstr ""
+
+#: gil/templates/gil/lived_experience_base.html:13
+msgid "Share Your Story"
+msgstr ""
+
+#: gil/templates/gil/lived_experience_base.html:14
+msgid "Read More Stories"
+msgstr ""
+
+#: gil/templates/gil/portal.html:2
+msgid "Dashboard"
+msgstr "Skrivebord"
+
+#: gil/templates/gil/portal.html:9
+msgid "Welcome to your TrueNTH Dashboard"
+msgstr "Velkommen til TrueNTH-skrivebordet"
+
+#: gil/templates/gil/portal.html:12
+msgid "More tools for you will be available as TrueNTH develops."
+msgstr "Flere verktøy vil bli tilgjengelige for deg etter hvert som TrueNTH utvikles."
+
+#: gil/templates/gil/portal.html:13
+msgid "For now, learn more about TrueNTH:"
+msgstr "Foreløpig kan du lære mer om TrueNTH:"
+
+#: gil/templates/gil/portal.html:15
+msgid "Below are the TrueNTH tools available to you."
+msgstr ""
+
+#: gil/templates/gil/portal.html:16
+msgid "More will become available as TrueNTH evolves."
+msgstr ""
+
+#: gil/templates/gil/portal.html:31
+msgid "About Prostate Cancer"
+msgstr "Om prostatakreft"
+
+#: gil/templates/gil/portal.html:57
+msgid "Complete Registration"
+msgstr "Fullfør registrering"
+
+#: gil/templates/gil/portal.html:58
+msgid "Completing your registration will allow you to return here in the future to see the information you've previously entered."
+msgstr ""
+
+#: gil/templates/gil/portal.html:60
+msgid "Registration"
+msgstr "Registrering"
+
+#: gil/templates/gil/privacy.html:2
+msgid "Privacy Statement"
+msgstr "Personvernerklæring"
+
+#: gil/templates/gil/symptom-tracker.html:10
+msgid "Track your symptoms to see how they are changing over time, and how they compare to other men with prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:23
+msgid "Objective N<em>o</em>6: Custom Tools – Symptom Tracker "
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:24
+msgid "Monitoring and Tracking"
+msgstr "Overvåking og sporing"
+
+#: gil/templates/gil/symptom-tracker.html:25
+msgid "We’ve created a tool that asks you questions about your symptoms and side-effects throughout your prostate cancer journey from diagnosis through recovery."
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:26
+msgid "Every time you complete the tracking questionnaire it adds data to your graph, shows you how your experience compares with other men, and provides relevant tips."
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:26
+msgid "Symptom Tracker Graph"
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:28
+msgid "We’ve created a tool to track your prostate cancer treatment side effects over time and provide personal guidance."
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:32
+msgid "Tool N<em>o</em>2: Monitoring "
+msgstr ""
+
+#: gil/templates/gil/symptom-tracker.html:33
+msgid "Questionnaire / 10 Mins"
+msgstr ""
+
+#: gil/templates/gil/terms.html:2
+msgid "Terms and Conditions"
+msgstr "Vilkår og betingelser"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:2
+msgid "Prostate Cancer Information"
+msgstr "Informasjon om prostatakreft"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:9
+msgid "What is <span class=\"page-intro__main--accent\">Prostate Cancer</span>?"
+msgstr "Hva er <span class=\"page-intro__main--accent\">prostatakreft</span>?"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:10
+msgid "Cancer is a disease in which cells in the body grow out of control. Prostate Cancer is when cancer starts in the prostate. Many men with prostate cancer die of other causes without ever having any symptoms from the cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:18
+msgid "CURRENT U.S. STATISTICS"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:22
+msgid "Prostate cancer is the most common non-skin cancer in the United States, affecting 1 in 9 men."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:27
+msgid "In 2019, over 174,500 men will be diagnosed with prostate cancer in the USA."
+msgstr "I 2019 får over 174 500 menn diagnosen prostatakreft i USA."
+
+#: gil/templates/gil/what-is-prostate-cancer.html:32
+msgid "It is estimated that there are nearly 3 million U.S. men currently living with prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:37
+msgid "African American men are 56 percent more likely to develop prostate cancer compared with Caucasian men and nearly 2.5 times as likely to die from the disease."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:46
+msgid "What is the <span class=\"module__heading--accent\">Prostate</span>?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:47
+msgid "The prostate is a part of the male reproductive system and is located just below the bladder and in front of the rectum. It produces fluid that makes up a part of semen."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:48
+msgid "Prostate Cancer Graph"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:53
+msgid "What are the <span class=\"module__heading--accent\">Risk Factors</span> for<br/> Prostate Cancer?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:54
+msgid "There are some risk factors that increase your chances of getting prostate cancer:"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:58
+msgid "Age"
+msgstr "Alder"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:59
+msgid "The older a man is, the greater his risk for getting prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:62 templates/coredata.html:31
+#: templates/profile/profile_macros.html:91
+#: templates/profile/profile_macros.html:219
+msgid "Race"
+msgstr "Rase"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:63
+msgid "Prostate cancer is more common in African-American men, tends to start at younger ages, and grow faster than in other racial or ethnic groups."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:68
+msgid "Family History"
+msgstr "Familiehistorie"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:69
+msgid "Certain genes, passed from parent to child, that you inherited from your parents may affect your prostate cancer risk. A man that has a father, brother, or son who has had prostate cancer is two to three times more likely to develop the disease himself."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:77
+msgid "What are the <span class=\"module__heading--accent\">Symptoms</span> of <br/> Prostate Cancer?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:78
+msgid "Most men will not experience any symptoms, especially when the prostate cancer is caught at early stages. Some men do have symptoms for prostate cancer which might include:"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:82
+msgid "POSSIBLE SYMPTOMS"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:84
+msgid "Difficulty starting urination"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:85
+msgid "Weak or interrupted flow of urine"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:86
+msgid "Frequent urination (especially at night)"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:87
+msgid "Difficulty emptying bladder completely"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:88
+msgid "Pain in the back, hips or pelvis that doesn’t go away"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:93
+msgid "If you have any symptoms that worry you, be sure to see your doctor right away."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:93
+msgid "Keep in mind that these symptoms may be caused by conditions other than prostate cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:98
+msgid "What <span class=\"module__heading--accent\">Screening Tests</span> Are There for <br/>Prostate Cancer?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:99
+msgid "Cancer screening means looking for cancer before it causes symptoms. However, most prostate cancers grow slowly or not at all.\n"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:101
+msgid "Two tests are commonly used to screen for prostate cancer:\n"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:106
+msgid "DIGITAL RECTAL EXAM (DRE)"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:107
+msgid "A doctor or nurse inserts a gloved, lubricated finger into the rectum to estimate the size of the prostate and feel for lumps or other abnormalities."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:114
+#: gil/templates/gil/what-is-prostate-cancer.html:138
+msgid "PROSTATE SPECIFIC ANTIGEN (PSA) TEST"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:115
+msgid "Measures the level of PSA in the blood. PSA is a substance made by the prostate. The levels of PSA in the blood can be higher in men who have prostate cancer. The PSA level may also be elevated in other conditions that affect the prostate."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:116
+msgid "Because many factors can affect PSA levels, your doctor is the best person to interpret your PSA test results. Only a biopsy can diagnose prostate cancer for sure."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:124
+msgid "Diagnosis"
+msgstr "Diagnose"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:125
+msgid "How Is Prostate Cancer <span class=\"module__heading--accent\">Diagnosed</span>?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:126
+msgid "If your prostate specific antigen (PSA) test or digital rectal exam (DRE) is abnormal, doctors may do more tests to find or diagnose prostate cancer. A biopsy is the main tool for diagnosing prostate cancer. A biopsy is when a small piece of tissue is removed from the prostate and looked at under a microscope to see if there are cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:130
+msgid "Gleason Score"
+msgstr "Gleason-poengsum"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:131
+msgid "If there is cancer a Gleason score assigned. It indicates how likely it is to spread. The score ranges from 2 to 10. The lower the score, the less likely it is that the cancer will spread."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:139
+msgid "The staging of prostate cancer is important in choosing treatment options and predicting a man’s outlook for survival (prognosis). Staging is based on:"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:141
+msgid "The prostate biopsy results (including the Gleason score)"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:142
+msgid "The blood PSA level at the time of diagnosis"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:143
+msgid "The results of any other exams or tests that were done to find out how far the cancer has spread"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:152
+msgid "Treatment"
+msgstr "Behandling"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:153
+msgid "How Is Prostate Cancer <span class=\"module__heading--accent\">Treated</span>?"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:154
+msgid "Men have different stages of prostate cancer and have different treatment options available to them:"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:158
+msgid "Active Surveillance"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:159
+msgid "Closely monitoring prostate cancer to determine if treatment is needed."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:164
+msgid "Surgery"
+msgstr "Kirurgi"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:165
+msgid "Procedure to remove the prostate called prostatectomy."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:172
+msgid "RADIATION THERAPY"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:173
+msgid "Use of high-energy rays to destroy cancer cells. There are two types of radiation therapy:"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:174
+msgid "External Radiation Therapy"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:175
+msgid "A machine outside the body directs radiation at the cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:176
+msgid "Internal Radiation Therapy (brachytherapy)"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:177
+msgid "Radioactive seeds or pellets are surgically placed into or near the cancer to destroy the cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:182
+msgid "SYSTEMIC THERAPY"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:183
+msgid "Use of medications to fight cancer cells throughout the body."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:184
+msgid "Hormone Therapy"
+msgstr "Hormonterapi"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:185
+msgid "Lowering levels of hormones to help slow the growth of cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:186
+msgid "Chemotherapy"
+msgstr "Kjemoterapi"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:187
+msgid "Using special drugs to shrink or kill the cancer."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:188
+msgid "Immunotherapy"
+msgstr "Immunterapi"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:189
+msgid "Medications that use the power of the immune system to target cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:196
+msgid "CRYOTHERAPY"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:197
+msgid "Placing a special probe inside or near the prostate cancer to freeze and kill the cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:202
+msgid "BIOLOGICAL THERAPY"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:203
+msgid "Works with your body’s immune system to help it fight cancer or to control side effects from other cancer treatments."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:210
+msgid "High-intensity focused ultrasound (HIFU)"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:211
+msgid "This therapy directs high-energy sound waves (ultrasound) at the cancer to kill cancer cells."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:216
+msgid "COMPLIMENTARY AND <br/>ALTERNATIVE MEDICINE"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:217
+msgid "Medicines and health practices that are not standard cancer treatments."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:218
+msgid "Meditation, yoga, and supplements like vitamins and herbs are some examples. Many kinds of complementary and alternative medicine have not been tested scientifically and may not be safe. Talk to your doctor about the risks and benefits before you start any kind of complementary or alternative medicine."
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:226
+msgid "ADDITIONAL RESOURCES"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:228
+msgid "Centers for Disease Control and Prevention"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:228
+msgid "Information about Prostate Cancer"
+msgstr "Informasjon om prostatakreft"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:232
+msgid "Prostate Cancer Foundation"
+msgstr "Prostate Cancer Foundation"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:232
+msgid "Understanding Prostate Cancer"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:236
+#: gil/templates/gil/what-is-prostate-cancer.html:240
+msgid "UsTOO"
+msgstr "UsTOO"
+
+#: gil/templates/gil/what-is-prostate-cancer.html:236
+msgid "Education & Support for Prostate Cancer Patients & their Caregivers"
+msgstr ""
+
+#: gil/templates/gil/what-is-prostate-cancer.html:240
+msgid "Online Prostate Cancer Discussion Forum and Community"
+msgstr "Nettdiskusjonsforum og -fellesskap rundt prostatakreft"
+
+#: models/communication.py:104
+msgid "Complete Questionnaire"
+msgstr "Fyll ut spørreskjema"
+
+#: models/communication.py:128
+msgid "TrueNTH P3P"
+msgstr ""
+
+#: models/communication.py:166
+msgid "Password Reset"
+msgstr "Passordtilbakestilling"
+
+#: models/communication.py:227
+msgid "Verify Account"
+msgstr "Bekreft konto"
+
+#: models/intervention_strategies.py:237
+#, python-format
+msgid "Thank you, %(full_name)s."
+msgstr "Takk, %(full_name)s."
+
+#: models/intervention_strategies.py:238
+#, python-format
+msgid "You've completed the %(registry)s questionnaire."
+msgstr "Du har fylt ut %(registry)s-spørreskjemaet."
+
+#: models/intervention_strategies.py:241
+msgid "You will be notified when the next questionnaire is ready to complete."
+msgstr "Du får beskjed når neste spørreskjema er klart til å fylles ut."
+
+#: models/intervention_strategies.py:244
+msgid "Log out"
+msgstr "Logg ut"
+
+#: models/intervention_strategies.py:270 models/intervention_strategies.py:302
+#: models/intervention_strategies.py:479
+#, python-format
+msgid "Hi, %(full_name)s"
+msgstr "Hei %(full_name)s"
+
+#: models/intervention_strategies.py:276
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
+msgstr "Vennligst fyll ut ditt %(assigning_authority)s-spørreskjema så snart som mulig. Det utløper %(expired_date)s."
+
+#: models/intervention_strategies.py:286
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
+msgstr "Vennligst fyll ut ditt %(assigning_authority)s-spørreskjema innen %(due_date)s."
+
+#: models/intervention_strategies.py:303
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
+msgstr "Vennligst fyll ut ditt %(assigning_authority)s-spørreskjema når det passer for deg."
+
+#: models/intervention_strategies.py:325 models/intervention_strategies.py:354
+msgid "Completed Questionnaires"
+msgstr "Utfylte spørreskjemaer"
+
+#: models/intervention_strategies.py:326
+msgid "When you are done, completed questionnaires will be shown here."
+msgstr "Når du er ferdig, vises utfylte spørreskjemaer her."
+
+#: models/intervention_strategies.py:357
+#, python-format
+msgid "View questionnaire completed on %(comp_date)s"
+msgstr "Vis spørreskjema utfylt på %(comp_date)s"
+
+#: models/intervention_strategies.py:375 models/intervention_strategies.py:409
+msgid "Go to questionnaire"
+msgstr "Gå til spørreskjema"
+
+#: models/intervention_strategies.py:378 models/intervention_strategies.py:407
+msgid "Continue questionnaire"
+msgstr "Fortsett spørreskjema"
+
+#: models/intervention_strategies.py:381 models/intervention_strategies.py:411
+#: models/intervention_strategies.py:440
+msgid "Open Questionnaire"
+msgstr "Åpent spørreskjema"
+
+#: models/intervention_strategies.py:382 models/intervention_strategies.py:412
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire here."
+msgstr "Vennligst fyll ut ditt %(assigning_authority)s-spørreskjema her."
+
+#: models/intervention_strategies.py:438
+msgid "View previous questionnaire"
+msgstr "Vis forrige spørreskjema"
+
+#: models/intervention_strategies.py:441
+msgid "No questionnaire is due."
+msgstr "Intet spørreskjema venter."
+
+#: models/intervention_strategies.py:480
+msgid "Questionnaire Expired"
+msgstr "Spørreskjemaet har utløpt"
+
+#: models/intervention_strategies.py:481
+msgid ""
+"The assessment is no longer available.\n"
+"A research staff member will contact you for assistance."
+msgstr ""
+
+#: models/questionnaire_bank.py:552
+#, python-format
+msgid "Month %(month_total)d"
+msgstr "Måned %(month_total)d"
+
+#: models/user.py:555 models/user.py:566
+msgid "invalid email address"
+msgstr "Ugyldig epostadresse"
+
+#: models/user.py:560
+msgid "user requests no email"
+msgstr "bruker ønsker ikke e-post"
+
+#: models/user.py:575
+msgid "missing required data: "
+msgstr "manglende nødvendig data: "
+
+#: templates/challenge_identity.html:5
+msgid "Identity Verification"
+msgstr "Identitetsbekreftelse"
+
+#: templates/challenge_identity.html:7
+msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
+msgstr ""
+
+#: templates/challenge_identity.html:21
+#: templates/initial_queries_macros.html:219
+msgid "First name is required"
+msgstr "Fornavn er påkrevd"
+
+#: templates/challenge_identity.html:29
+#: templates/initial_queries_macros.html:226
+msgid "Last name is required"
+msgstr "Etternavn er påkrevd"
+
+#: templates/challenge_identity.html:35
+#: templates/initial_queries_macros.html:253
+#: templates/profile/profile_macros.html:125
+#: templates/profile/profile_macros.html:127
+msgid "Birth Date"
+msgstr "Fødselsdato"
+
+#: templates/challenge_identity.html:41
+msgid "Day"
+msgstr "Dag"
+
+#: templates/challenge_identity.html:42
+msgid "Day is required"
+msgstr "Dag må fylles ut"
+
+#: templates/challenge_identity.html:50 templates/challenge_identity.html:52
+#: templates/initial_queries_macros.html:260
+#: templates/initial_queries_macros.html:303
+#: templates/profile/profile_macros.html:132
+#: templates/profile/profile_macros.html:792
+#: templates/profile/profile_macros.html:993
+#: templates/profile/profile_macros.html:1102
+#: templates/profile/profile_macros.html:1103
+#: templates/profile/profile_macros.html:1206
+msgid "Month"
+msgstr "Måned"
+
+#: templates/challenge_identity.html:51
+msgid "Month is required"
+msgstr "Måned må fylles ut"
+
+#: templates/challenge_identity.html:53
+#: templates/initial_queries_macros.html:261
+#: templates/initial_queries_macros.html:304
+#: templates/profile/profile_macros.html:133
+#: templates/profile/profile_macros.html:793
+#: templates/profile/profile_macros.html:994
+#: templates/profile/profile_macros.html:1104
+#: templates/profile/profile_macros.html:1207
+msgid "January"
+msgstr "Januar"
+
+#: templates/challenge_identity.html:54
+#: templates/initial_queries_macros.html:262
+#: templates/initial_queries_macros.html:305
+#: templates/profile/profile_macros.html:134
+#: templates/profile/profile_macros.html:794
+#: templates/profile/profile_macros.html:995
+#: templates/profile/profile_macros.html:1105
+#: templates/profile/profile_macros.html:1208
+msgid "February"
+msgstr "Februar"
+
+#: templates/challenge_identity.html:55
+#: templates/initial_queries_macros.html:263
+#: templates/initial_queries_macros.html:306
+#: templates/profile/profile_macros.html:135
+#: templates/profile/profile_macros.html:795
+#: templates/profile/profile_macros.html:996
+#: templates/profile/profile_macros.html:1106
+#: templates/profile/profile_macros.html:1209
+msgid "March"
+msgstr "Mars"
+
+#: templates/challenge_identity.html:56
+#: templates/initial_queries_macros.html:264
+#: templates/initial_queries_macros.html:307
+#: templates/profile/profile_macros.html:136
+#: templates/profile/profile_macros.html:796
+#: templates/profile/profile_macros.html:997
+#: templates/profile/profile_macros.html:1107
+#: templates/profile/profile_macros.html:1210
+msgid "April"
+msgstr "April"
+
+#: templates/challenge_identity.html:57
+#: templates/initial_queries_macros.html:265
+#: templates/initial_queries_macros.html:308
+#: templates/profile/profile_macros.html:137
+#: templates/profile/profile_macros.html:797
+#: templates/profile/profile_macros.html:998
+#: templates/profile/profile_macros.html:1108
+#: templates/profile/profile_macros.html:1211
+msgid "May"
+msgstr "Mai"
+
+#: templates/challenge_identity.html:58
+#: templates/initial_queries_macros.html:266
+#: templates/initial_queries_macros.html:309
+#: templates/profile/profile_macros.html:138
+#: templates/profile/profile_macros.html:798
+#: templates/profile/profile_macros.html:999
+#: templates/profile/profile_macros.html:1109
+#: templates/profile/profile_macros.html:1212
+msgid "June"
+msgstr "Juni"
+
+#: templates/challenge_identity.html:59
+#: templates/initial_queries_macros.html:267
+#: templates/initial_queries_macros.html:310
+#: templates/profile/profile_macros.html:139
+#: templates/profile/profile_macros.html:799
+#: templates/profile/profile_macros.html:1000
+#: templates/profile/profile_macros.html:1110
+#: templates/profile/profile_macros.html:1213
+msgid "July"
+msgstr "Juli"
+
+#: templates/challenge_identity.html:60
+#: templates/initial_queries_macros.html:268
+#: templates/initial_queries_macros.html:311
+#: templates/profile/profile_macros.html:140
+#: templates/profile/profile_macros.html:800
+#: templates/profile/profile_macros.html:1001
+#: templates/profile/profile_macros.html:1111
+#: templates/profile/profile_macros.html:1214
+msgid "August"
+msgstr "August"
+
+#: templates/challenge_identity.html:61
+#: templates/initial_queries_macros.html:269
+#: templates/initial_queries_macros.html:312
+#: templates/profile/profile_macros.html:141
+#: templates/profile/profile_macros.html:801
+#: templates/profile/profile_macros.html:1002
+#: templates/profile/profile_macros.html:1112
+#: templates/profile/profile_macros.html:1215
+msgid "September"
+msgstr "September"
+
+#: templates/challenge_identity.html:62
+#: templates/initial_queries_macros.html:270
+#: templates/initial_queries_macros.html:313
+#: templates/profile/profile_macros.html:142
+#: templates/profile/profile_macros.html:802
+#: templates/profile/profile_macros.html:1003
+#: templates/profile/profile_macros.html:1113
+#: templates/profile/profile_macros.html:1216
+msgid "October"
+msgstr "Oktober"
+
+#: templates/challenge_identity.html:63
+#: templates/initial_queries_macros.html:271
+#: templates/initial_queries_macros.html:314
+#: templates/profile/profile_macros.html:143
+#: templates/profile/profile_macros.html:803
+#: templates/profile/profile_macros.html:1004
+#: templates/profile/profile_macros.html:1114
+#: templates/profile/profile_macros.html:1217
+msgid "November"
+msgstr "November"
+
+#: templates/challenge_identity.html:64
+#: templates/initial_queries_macros.html:272
+#: templates/initial_queries_macros.html:315
+#: templates/profile/profile_macros.html:144
+#: templates/profile/profile_macros.html:804
+#: templates/profile/profile_macros.html:1005
+#: templates/profile/profile_macros.html:1115
+#: templates/profile/profile_macros.html:1218
+msgid "December"
+msgstr "Desember"
+
+#: templates/challenge_identity.html:73
+msgid "Year"
+msgstr "År"
+
+#: templates/challenge_identity.html:74
+msgid "Year is required"
+msgstr "År må fylles ut"
+
+#: templates/challenge_identity.html:82
+msgid "Confirm Identity"
+msgstr "Bekreft identitet"
+
+#: templates/confirm_identity.html:8
+msgid "Identity verification"
+msgstr "Identitetsbekreftelse"
+
+#: templates/confirm_identity.html:12
+msgid "I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself."
+msgstr "Jeg bekrefter at jeg er deltaker i IRONMAN Registry Study og fyller ut dette spørreskjemaet selv."
+
+#: templates/confirm_identity.html:17 templates/initial_queries_macros.html:291
+#: templates/initial_queries_macros.html:363
+#: templates/initial_queries_macros.html:384
+#: templates/profile/profile_macros.html:609
+#: templates/profile/profile_macros.html:976
+#: templates/profile/profile_macros.html:1255
+msgid "Yes"
+msgstr "Ja"
+
+#: templates/confirm_identity.html:18 templates/initial_queries_macros.html:327
+#: templates/initial_queries_macros.html:389
+#: templates/profile/profile_macros.html:611
+#: templates/profile/profile_macros.html:976
+#: templates/profile/profile_macros.html:1255
+msgid "No"
+msgstr "Nei"
+
+#: templates/contact_sent.html:7
+msgid "Thank you for contacting us."
+msgstr "Takk for at du kontaktet oss."
+
+#: templates/contact_sent.html:9
+msgid "We have sent an email to the team supporting TrueNTH."
+msgstr "Vi har sendt en epost til teamet som støtter TrueNTH."
+
+#: templates/contact_sent.html:11 templates/portal_wrapper.html:66
+#: templates/portal_wrapper.html:125
+msgid "TrueNTH Home"
+msgstr "TrueNTH (Hjem)"
+
+#: templates/coredata.html:5
+msgid "More About You"
+msgstr "Mer om deg"
+
+#: templates/coredata.html:6
+msgid "The TrueNTH system asks these questions in order to give you information that best fits"
+msgstr "TrueNTH-systemet stiller disse spørsmålene for å gi deg best mulig informasjon"
+
+#: templates/coredata.html:6
+msgid ""
+"You may\n"
+"    skip any question you prefer not to answer."
+msgstr ""
+"Du kan\n"
+" hoppe over spørsmål som du ikke ønsker å besvare."
+
+#: templates/coredata.html:13 templates/profile/profile_macros.html:90
+#: templates/profile/profile_macros.html:259
+msgid "Ethnicity"
+msgstr "Etnisitet"
+
+#: templates/coredata.html:18 templates/profile/profile_macros.html:263
+msgid "Hispanic or Latino"
+msgstr "Latinamerikansk"
+
+#: templates/coredata.html:23 templates/profile/profile_macros.html:268
+msgid "Not Hispanic or Latino"
+msgstr "Ikke latinamerikansk"
+
+#: templates/coredata.html:35 templates/profile/profile_macros.html:223
+msgid "American Indian or Alaska Native"
+msgstr "Urbefolkning i Amerika eller Alaska"
+
+#: templates/coredata.html:40 templates/profile/profile_macros.html:228
+msgid "Asian"
+msgstr "Asiatisk"
+
+#: templates/coredata.html:45 templates/profile/profile_macros.html:233
+msgid "Black or African American"
+msgstr "Svart eller afroamerikaner"
+
+#: templates/coredata.html:50 templates/profile/profile_macros.html:238
+msgid "Native Hawaiian or Other Pacific Islander"
+msgstr "Urbefolkning i Hawaii eller andre Stillehavsøyer"
+
+#: templates/coredata.html:55 templates/profile/profile_macros.html:243
+msgid "White"
+msgstr "Hvit"
+
+#: templates/profile/profile_macros.html:248 classification_enum:Other
+#: templates/coredata.html:60 templates/profile/profile_macros.html:210
+msgid "Other"
+msgstr "Annet"
+
+#: templates/coredata.html:69
+msgid "Skip This"
+msgstr "Hopp over dette"
+
+#: templates/coredata.html:77
+msgid "Continue"
+msgstr "Fortsett"
+
+#: templates/explore.html:13
+msgid "Explore How TrueNTH Works"
+msgstr ""
+
+#: templates/explore.html:20
+msgid "A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers."
+msgstr ""
+
+#: templates/explore.html:21
+msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
+msgstr ""
+
+#: templates/explore.html:29
+msgid "Register Now"
+msgstr ""
+
+#: templates/initial_queries.html:17
+msgid "Tell us a little about yourself."
+msgstr "Fortell oss litt om deg selv."
+
+#: templates/initial_queries.html:17
+msgid "your information"
+msgstr "din informasjon"
+
+#: templates/initial_queries.html:26
+msgid "Now it is time to build your prostate cancer profile."
+msgstr ""
+
+#: templates/initial_queries.html:26
+msgid "your clinical profile"
+msgstr "din kliniske profil"
+
+#: templates/initial_queries.html:27
+msgid "The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey."
+msgstr ""
+
+#: templates/initial_queries.html:30
+msgid "Your clinic of care."
+msgstr "Din behandlingsklinikk."
+
+#: templates/initial_queries.html:30
+msgid "your clinic"
+msgstr "din klinikk"
+
+#: templates/initial_queries.html:39
+msgid "Thank you."
+msgstr "Takk skal du ha."
+
+#: templates/initial_queries.html:40
+msgid "Click continue to start using TrueNTH"
+msgstr "Klikk på Fortsett for å begynne å bruke TrueNTH"
+
+#: templates/initial_queries_macros.html:4
+msgid "Data Saved"
+msgstr "Data lagret"
+
+#: templates/initial_queries_macros.html:5
+msgid "Unable to Save Data. System error."
+msgstr "Data kunne ikke lagres. Systemfeil."
+
+#: templates/initial_queries_macros.html:9
+msgid "saving data..."
+msgstr "lagrer data..."
+
+#: templates/initial_queries_macros.html:24
+msgid "terms"
+msgstr "vilkår"
+
+#: templates/initial_queries_macros.html:27
+msgid "Terms of Use"
+msgstr "Bruksvilkår"
+
+#: templates/initial_queries_macros.html:30
+msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
+msgstr ""
+
+#: templates/initial_queries_macros.html:37
+msgid "View TrueNTH Terms"
+msgstr "Vis TrueNTH-vilkår"
+
+#: templates/initial_queries_macros.html:40
+#, python-format
+msgid ""
+"\n"
+"                <div class=\"text-warning links-container\">\n"
+"                  By clicking \"NEXT\" you agree to the <a href=\"%(terms_url)s\" target=\"_blank\">Terms</a>, <a href=\"%(privacy_url)s\" target=\"_blank\">Privacy Policy</a>, and <a href=\"\" class=\"terms-url\" target=\"_blank\">General Terms of Use</a> for the TrueNTH USA website.\n"
+"                </div>\n"
+"              "
+msgstr ""
+
+#: templates/initial_queries_macros.html:52
+msgid "By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent."
+msgstr "Ved å krysse av i denne boksen, bekrefter jeg at jeg har lest informasjonsvarselet ovenfor og samtykker til behandlingen av min personlige informasjon (inkludert min helseinformasjon) på vilkårene som er beskrevet i dette samtykket."
+
+#: templates/initial_queries_macros.html:55
+msgid "You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact."
+msgstr "Du har tidligere gitt samtykke til nettstedet under et besøk på din behandlingsside. Hvis du ønsker kopi av dette, vennligst kontakt din studiekontakt."
+
+#: templates/initial_queries_macros.html:73
+#, python-format
+msgid "<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class=\"required-link\">terms</a>.</span>"
+msgstr "<span class=\"terms-tick-box-text\"> Ved å merke av denne ruten bekrefter jeg at jeg har lest og godtatt nettstedets <a href=\"%(privacy_url)s\" class=\"required-link\">personvernerklæring</a> og <a href=\"%(terms_url)s\" class=\"required-link\">vilkår</a>.</span>"
+
+#: templates/initial_queries_macros.html:103
+msgid "To Continue"
+msgstr "Fortsett"
+
+#: templates/initial_queries_macros.html:107
+msgid "You must agree to the terms and conditions by checking the provided checkbox."
+msgstr "Du må samtykke til våre vilkår og betingelser ved å merke av den aktuelle avmerkingsruten."
+
+#: templates/initial_queries_macros.html:120
+msgid "Website Consent Script - Enter Manually - Paper Form"
+msgstr "Nettstedssamtykketekst - åpne manuelt - papirform"
+
+#: templates/initial_queries_macros.html:121
+#: templates/initial_queries_macros.html:144
+msgid "For Staff Use Only"
+msgstr "Bare for personalets bruk"
+
+#: templates/initial_queries_macros.html:133
+msgid "By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures."
+msgstr "Ved å krysse av i denne boksen, bekrefter jeg at pasienten har lest nettstedets samtykke og samtykker til behandlingen av deres personlige informasjon (inkludert deres helseinformasjon) på vilkårene som er beskrevet i dette samtykket og vilkårene, og kopier av dette samtykket og informasjon gitt av pasienten har blitt lagret sikkert i henhold til prosedyrene for mitt lokale sted."
+
+#: templates/initial_queries_macros.html:143
+msgid "Website Consent Script - Enter Manually - Interview Assisted"
+msgstr "Nettstedets samtykkeskript - legg inn manuelt - intervjuassistert"
+
+#: templates/initial_queries_macros.html:148
+msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study."
+msgstr "Vi inviterer deg til å bruke TrueNTH-nettstedsverktøyet fordi du har samtykket til å delta i [organization]s registerstudie."
+
+#: templates/initial_queries_macros.html:149
+msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
+msgstr "Informasjonen du gir vil bli brukt i en global studie og vil komme pasienter i fremtiden til gode med bedre behandlingsalternativer. Høres dette ut som noe du kunne tenke deg å delta i?"
+
+#: templates/initial_queries_macros.html:151
+msgid "If yes, continue to read below text and Consent."
+msgstr "Hvis ja, fortsett å lese teksten nedenfor og gi samtykke."
+
+#: templates/initial_queries_macros.html:152
+#: templates/initial_queries_macros.html:165
+msgid "If no, thank them for their time."
+msgstr "Hvis nei, takk for hjelpen."
+
+#: templates/initial_queries_macros.html:154
+msgid "Read consent [exactly as written]"
+msgstr "Les opp samtykket [nøyaktig som skrevet]"
+
+#: templates/initial_queries_macros.html:161
+msgid "Do you have any questions?"
+msgstr "Har du noen spørsmål?"
+
+#: templates/initial_queries_macros.html:162
+msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
+msgstr "Er du enig i å delta i TrueNTH-nettstedsverktøyet og samtykker du til behandlingen av din personlige informasjon (inkludert din helseinformasjon) på vilkårene som jeg nettopp har lest opp for deg?"
+
+#: templates/initial_queries_macros.html:164
+msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
+msgstr "Hvis ja, dokumenter muntlig samtykket nedenfor. [MERKNAD: Dette samtykket må absolutt leses opp for dem før du samler inn personlig informasjon. Pasienten må si 'ja, jeg er enig'. 'Mmmm', 'jep', 'ok' eller noe like diffust er ikke tilfredsstillende.]"
+
+#: templates/initial_queries_macros.html:172
+msgid "Please print and fill out the form"
+msgstr "Vennligst skriv ut og fyll ut skjemaet"
+
+#: templates/initial_queries_macros.html:181
+msgid "CLOSE"
+msgstr "LUKK"
+
+#: templates/initial_queries_macros.html:188
+msgid "View/print website declaration form"
+msgstr "Vis/skriv ut skjema for nettstederklæring"
+
+#: templates/initial_queries_macros.html:204
+msgid "By checking this box, I confirm that I have read the required information to the patient and provided the opportunity for the patient to ask questions. I have addressed the questions to the patient’s satisfaction and have created an electronic copy of this declaration and have stored this copy. The patient has provided oral consent to participate in the TrueNTH Global Registry on the terms set out above."
+msgstr "Ved å krysse av i denne boksen, bekrefter jeg at jeg har lest den nødvendige informasjonen til pasienten og gitt muligheten for pasienten til å stille spørsmål. Jeg har adressert spørsmålene til pasientens tilfredshet og har opprettet elektronisk kopi av denne erklæringen og har lagret denne kopien. Pasienten har gitt muntlig samtykke til å delta i TrueNTH Global register på betingelsene angitt ovenfor."
+
+#: templates/initial_queries_macros.html:205
+msgid "By checking this box, I confirm that I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
+msgstr "Ved å krysse av i denne boksen, bekrefter jeg at jeg har lest og/eller gått gjennom nødvendig informasjon med personen og har fullført det nødvendige samtykket til bruken av TrueNTH-nettstedsverktøyet og har opprettet en elektronisk kopi av denne erklæringen og lagret nevnte kopi."
+
+#: templates/initial_queries_macros.html:207
+msgid "Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration.."
+msgstr "Personen har gitt samtykke tidligere og du hadde tidligere signert og lagret en elektronisk kopi av samtykkeerklæringen."
+
+#: templates/initial_queries_macros.html:219
+#: templates/profile/profile_macros.html:179
+msgid "First name"
+msgstr "Fornavn"
+
+#: templates/initial_queries_macros.html:226
+#: templates/profile/profile_macros.html:187
+msgid "Last name"
+msgstr "Etternavn"
+
+#: templates/initial_queries_macros.html:236
+msgid "I'm a man who is concerned about prostate cancer for myself"
+msgstr ""
+
+#: templates/initial_queries_macros.html:241
+msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
+msgstr ""
+
+#: templates/initial_queries_macros.html:253
+msgid "(optional)"
+msgstr "(valgfri)"
+
+#: templates/initial_queries_macros.html:256
+msgid "Birth date"
+msgstr "Fødselsdato"
+
+#: templates/initial_queries_macros.html:256
+msgid "The birth day field is required and must be valid format"
+msgstr "Fødselsdatofeltet er påkrevd og må ha gyldig format"
+
+#: templates/initial_queries_macros.html:259
+msgid "Birth month"
+msgstr "Fødselsmåned"
+
+#: templates/initial_queries_macros.html:259
+msgid "A birth month must be selected"
+msgstr "Fødselsmåned må velges"
+
+#: templates/initial_queries_macros.html:276
+msgid "The birth year is required and must be in valid format"
+msgstr "Fødselsår må fylles ut og være i gyldig format"
+
+#: templates/initial_queries_macros.html:287
+#: templates/profile/profile_macros.html:877
+msgid "Have you had a prostate cancer biopsy?"
+msgstr ""
+
+#: templates/initial_queries_macros.html:295
+msgid "Biopsy Date"
+msgstr ""
+
+#: templates/initial_queries_macros.html:299
+msgid "The biopsy day field is required and must be valid format"
+msgstr ""
+
+#: templates/initial_queries_macros.html:302
+msgid "A biopsy month must be selected"
+msgstr ""
+
+#: templates/initial_queries_macros.html:319
+msgid "The biopsy year is required and must be in valid format"
+msgstr ""
+
+#: templates/initial_queries_macros.html:332
+#: templates/initial_queries_macros.html:352
+#: templates/initial_queries_macros.html:373
+msgid "I don't know"
+msgstr "Jeg vet ikke"
+
+#: templates/initial_queries_macros.html:338
+#: templates/profile/profile_macros.html:878
+msgid "Have you been diagnosed with prostate cancer?"
+msgstr "Har du fått diagnosen prostatakreft?"
+
+#: templates/initial_queries_macros.html:342
+msgid "Yes (my biopsy was positive)"
+msgstr ""
+
+#: templates/initial_queries_macros.html:347
+msgid "No (my biopsy was negative)"
+msgstr ""
+
+#: templates/initial_queries_macros.html:359
+#: templates/profile/profile_macros.html:879
+msgid "Is the prostate cancer only within the prostate?"
+msgstr "Er prostatakreft bare i prostata?"
+
+#: templates/initial_queries_macros.html:368
+msgid "No (the cancer is in other parts of my body, too)"
+msgstr ""
+
+#: templates/initial_queries_macros.html:380
+msgid "Have you begun prostate cancer treatment?"
+msgstr ""
+
+#: templates/initial_queries_macros.html:407
+msgid "I'm not receiving care at any of the above clinics"
+msgstr "Jeg får ingen behandling hos noen av klinikkene ovenfor"
+
+#: templates/invite.html:4 templates/invite_sent.html:6
+msgid "Email Invite"
+msgstr "Epostinvitasjon"
+
+#: templates/invite.html:5
+msgid "Send a TrueNTH email invite by filling in the form below."
+msgstr "Send en TrueNTH-epostinvitasjon ved å fylle ut skjemaet nedenfor."
+
+#: templates/invite.html:8
+msgid "To (separate multiple addresses with white space)"
+msgstr "Til (separer flere adresser med mellomrom)"
+
+#: templates/invite.html:13
+msgid "Invitation to try TrueNTH"
+msgstr "Invitasjon til å prøve TrueNTH"
+
+#: templates/invite.html:16
+msgid "Body"
+msgstr "Hoveddel"
+
+#: templates/invite.html:17
+msgid "TrueNTH Invitation"
+msgstr "TrueNTH-invitasjon"
+
+#: templates/invite.html:19
+msgid "Send Invite"
+msgstr "Send invitasjon"
+
+#: templates/invite_sent.html:8
+msgid "Email Invite Sent"
+msgstr "Epostinvitasjon sendt"
+
+#: templates/invite_sent.html:10
+msgid "To"
+msgstr "Til"
+
+#: templates/invite_sent.html:14
+msgid "Sent"
+msgstr "Sendt"
+
+#: templates/portal_footer.html:36
+msgid "Tools"
+msgstr "Verktøy"
+
+#: templates/portal_footer.html:44
+msgid "Socials"
+msgstr "Sosiale media"
+
+#: templates/portal_footer.html:45
+msgid "Facebook"
+msgstr ""
+
+#: templates/portal_footer.html:46
+msgid "Twitter"
+msgstr ""
+
+#: templates/portal_footer.html:52
+msgid "Terms & Conditions"
+msgstr "Vilkår & Betingelser"
+
+#: templates/portal_footer.html:53
+msgid "Privacy Policy"
+msgstr "Personvernpolicy"
+
+#: templates/portal_wrapper.html:46
+msgid "dismiss"
+msgstr "avvis"
+
+#: templates/portal_wrapper.html:55 templates/portal_wrapper.html:115
+msgid "TrueNTH logo"
+msgstr "TrueNTH-logo"
+
+#: templates/portal_wrapper.html:58 templates/portal_wrapper.html:118
+msgid "brand logo"
+msgstr "merkevarelogo"
+
+#: templates/portal_wrapper.html:84 Intervention:analytics
+#: templates/portal_wrapper.html:137
+msgid "Analytics"
+msgstr "Analyser"
+
+#: templates/portal_wrapper.html:92 templates/portal_wrapper.html:145
+msgid "Log Out of TrueNTH"
+msgstr "Logg ut av TrueNTH"
+
+#: templates/portal_wrapper.html:96 templates/portal_wrapper.html:113
+msgid "MENU"
+msgstr "MENY"
+
+#: templates/portal_wrapper.html:97 templates/portal_wrapper.html:113
+msgid "Profile image"
+msgstr "Profilbilde"
+
+#: templates/portal_wrapper.html:99 templates/portal_wrapper.html:104
+msgid "Welcome"
+msgstr "Velkommen"
+
+#: templates/portal_wrapper.html:103 templates/portal_wrapper.html:124
+msgid "Log In to TrueNTH"
+msgstr "Logg inn på TrueNTH"
+
+#: templates/portal_wrapper.html:114
+msgid "Return to TrueNTH home"
+msgstr "Gå tilbake til TrueNTH Hjem"
+
+#: templates/portal_wrapper.html:163
+msgid "Your session is about to expire"
+msgstr "Din økt utløper snart"
+
+#: templates/portal_wrapper.html:165
+msgid "Your session will expire in approximately {time} seconds due to inactivity."
+msgstr "Din økt går ut om ca. {time} sekunder på grunn av inaktivitet."
+
+#: templates/portal_wrapper.html:166
+msgid "Stay Logged In"
+msgstr "Forbli innlogget"
+
+#: templates/require_cookies.html:6
+msgid "Browser Cookies Disabled"
+msgstr "Informasjonskapsler (cookies) deaktivert"
+
+#: templates/require_cookies.html:9
+msgid "Our website needs to use cookies to bring you the best, personalized, browsing experience. Your web browser is currently <b>not</b> allowing cookies. Help us fix this."
+msgstr "Vårt nettsted må bruke informasjonskapsler for å gi deg best mulig tilpasset opplevelse på nettet. Din nettleser tillater for tiden <b>ikke</b> informasjonskapsler. Hjelp oss å fikse dette."
+
+#: templates/require_cookies.html:13
+msgid "Please enable cookies within your browser settings to continue. To learn how to allow cookies, check online for your web browser's specific instructions."
+msgstr "Vennligst aktiver informasjonskapsler hos dine nettleserinnstillinger for å fortsette. For å finne ut hvordan du tillater informasjonskapsler, sjekk på nettet for spesifikke instruksjoner for din nettleser."
+
+#: templates/require_cookies.html:15
+#, python-format
+msgid "For more information on how we use cookies, see our <u><a href=\"%(privacy_url)s\">Privacy Policy</a></u>."
+msgstr "For mer informasjon om hvordan vi bruker informasjonskapsler, se vår <u><a href=\"%(privacy_url)s\">personvernerklæring</a></u>."
+
+#: templates/require_cookies.html:20
+msgid "Try Again"
+msgstr "Prøv igjen"
+
+#: templates/require_cookies.html:49
+msgid "Browser cookie setting check complete"
+msgstr "Sjekk av informasjonskapselinnstilling fullført"
+
+#: templates/sessionReport.html:8
+msgid "Assessment Report Detail"
+msgstr "Detalj i evalueringsrapport"
+
+#: templates/sessionReport.html:9 Role:patient
+msgid "Patient"
+msgstr "Pasient"
+
+#: templates/sessionReport.html:13
+msgid "Back to Profile"
+msgstr "Tilbake til profil"
+
+#: templates/sessionReport.html:16
+msgid "Back to Patient Profile"
+msgstr "Tilbake til pasientprofil"
+
+#: templates/sessionReport.html:18
+msgid "Back to User Profile"
+msgstr "Tilbake til brukerprofil"
+
+#: templates/sessionReport.html:21
+msgid "Back to Truenth Home"
+msgstr "Tilbake til TrueNTH Hjem"
+
+#: templates/shortcut_alias.html:8
+msgid "Do you have an Access Code?"
+msgstr ""
+
+#: templates/shortcut_alias.html:18
+msgid "I do not have an Access Code"
+msgstr ""
+
+#: templates/shortcut_alias.html:19
+msgid "Continue registration without an Access Code"
+msgstr ""
+
+#: templates/flask_user/login_or_register.html:52
+#: templates/flask_user/login_or_register.html:159
+#: templates/flask_user/register.html:34 templates/shortcut_alias.html:20
+msgid "Register"
+msgstr "Registrer"
+
+#: templates/site_overdue_table.html:2
+msgid "Overdue Patients"
+msgstr "Forfalte pasienter"
+
+#: templates/site_overdue_table.html:5
+msgid "Site"
+msgstr "Nettsted"
+
+#: templates/admin/patients_by_org.html:56 templates/site_overdue_table.html:6
+msgid "TrueNTH ID"
+msgstr "TrueNTH-ID"
+
+#: templates/admin/patients_by_org.html:67
+#: templates/profile/profile_macros.html:1027
+#: templates/site_overdue_table.html:7
+msgid "Study ID"
+msgstr "Studie-ID"
+
+#: templates/site_overdue_table.html:8
+msgid "Visit Name"
+msgstr "Besøksnavn"
+
+#: templates/site_overdue_table.html:9
+msgid "Due Date"
+msgstr "Tidsfrist"
+
+#: templates/site_overdue_table.html:10
+msgid "Expired Date"
+msgstr "Utløpsdato"
+
+#: templates/admin/admin.html:4
+msgid "Admin Tools"
+msgstr "Admin-verktøy"
+
+#: templates/admin/admin.html:5
+msgid "Click on each for details"
+msgstr "Klikk på hver for detaljer"
+
+#: templates/admin/admin.html:14
+msgid "Select any user to view details or make changes."
+msgstr "Velg brukeren det skal vises detaljer eller foretas endringer for."
+
+#: templates/admin/admin.html:16
+msgid "AdminList_"
+msgstr ""
+
+#: templates/admin/admin.html:41 templates/admin/staff_by_org.html:40
+msgid "ID"
+msgstr "ID"
+
+#: templates/admin/admin.html:45
+msgid "Roles"
+msgstr "Roller"
+
+#: templates/admin/admin.html:46
+msgid "Sites"
+msgstr "Steder"
+
+#: templates/admin/admin.html:47 templates/admin/staff_by_org.html:46
+msgid "Deactivate Account"
+msgstr "Deaktiver konto"
+
+#: templates/admin/admin.html:48 templates/admin/patients_by_org.html:76
+#: templates/admin/staff_by_org.html:47
+msgid "activation status"
+msgstr "aktiveringsstatus"
+
+#: templates/admin/admin_base.html:14
+msgid "Filter list by site"
+msgstr "Filtrer liste etter side"
+
+#: templates/admin/admin_base.html:22
+msgid "Select All"
+msgstr "Velg alle"
+
+#: templates/admin/admin_base.html:23
+msgid "Clear All"
+msgstr "Fjern alle"
+
+#: templates/admin/admin_base.html:29
+msgid "Site filter applied"
+msgstr "Stedsfilter anvendt"
+
+#: templates/admin/admin_base.html:36
+msgid "View deactivated accounts"
+msgstr "Vis deaktiverte kontoer"
+
+#: templates/admin/admin_base.html:41 templates/admin/patients_by_org.html:74
+msgid "Deactivate"
+msgstr "Deaktiver"
+
+#: templates/admin/admin_base.html:41
+msgid "Inactive"
+msgstr "Uvirksom"
+
+#: templates/admin/admin_base.html:41
+msgid "Reactivate account"
+msgstr "Reaktiver konto"
+
+#: templates/admin/admin_base.html:48
+msgid "include test accounts"
+msgstr "inkluder testkontoer"
+
+#: templates/admin/patients_by_org.html:6
+msgid "Patient List"
+msgstr "Pasientliste"
+
+#: templates/admin/patients_by_org.html:9
+msgid "Create a patient record"
+msgstr "Opprett en pasientjournal"
+
+#: templates/admin/patients_by_org.html:12
+msgid "Select a patient below to view or update details."
+msgstr "Velg en pasient nedenfor for å vise eller oppdatere detaljer."
+
+#: templates/admin/patients_by_org.html:15
+msgid "PatientList_"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:23
+msgid "Refresh Patient List"
+msgstr "Oppdater pasientliste"
+
+#: templates/admin/patients_by_org.html:24
+#, python-format
+msgid "Last updated %(minutes)d minutes ago"
+msgstr "Sist oppdatert for %(minutes)d minutter siden"
+
+#: templates/admin/patients_by_org.html:57
+msgid "Username"
+msgstr "Brukernavn"
+
+#: templates/admin/patients_by_org.html:60
+#: templates/profile/profile_macros.html:49
+msgid "Date of Birth"
+msgstr "Fødselsdato"
+
+#: templates/admin/patients_by_org.html:64
+msgid "Questionnaire Status"
+msgstr "Spørreskjemastatus"
+
+#: templates/admin/patients_by_org.html:65
+#: templates/profile/profile_macros.html:850
+msgid "Visit"
+msgstr "Besøk"
+
+#: templates/admin/patients_by_org.html:68
+msgid "(GMT)"
+msgstr "(GMT)"
+
+#: templates/admin/patients_by_org.html:69 templates/admin/staff_by_org.html:44
+msgid "Site(s)"
+msgstr "Sted(er)"
+
+#: templates/admin/patients_by_org.html:71
+#: templates/profile/profile_macros.html:1149
+msgid "Interventions"
+msgstr "Intervensjoner"
+
+#: templates/admin/patients_by_org.html:93
+msgid "ST"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:93
+msgid "DS"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:126
+msgid "Patient Report"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:135
+msgid "Type"
+msgstr "Skriv"
+
+#: templates/admin/patients_by_org.html:135
+msgid "Report Name"
+msgstr "Rapporter navn"
+
+#: templates/admin/patients_by_org.html:135
+msgid "Generated (GMT)"
+msgstr "Generert (GMT)"
+
+#: templates/admin/patients_by_org.html:135
+msgid "Downloaded"
+msgstr "Lastet ned"
+
+#: templates/admin/patients_by_org.html:144
+msgid "View All"
+msgstr "Vis alle"
+
+#: templates/admin/patients_by_org.html:161
+msgid "Export report data"
+msgstr "Eksporter rapportdata"
+
+#: templates/admin/patients_by_org.html:162
+msgid "CSV"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:162
+msgid "JSON"
+msgstr ""
+
+#: templates/admin/patients_by_org.html:166
+msgid "Export request submitted"
+msgstr "Eksportforespørsel sendt"
+
+#: templates/admin/patients_by_org.html:167
+msgid "Note: due to the size of result data, this may take a while."
+msgstr "Merk: På grunn av størrelsen på resultatdata, kan dette ta en stund."
+
+#: templates/admin/patients_by_org.html:176
+msgid "Retry"
+msgstr "Prøv på nytt"
+
+#: templates/admin/staff_by_org.html:6
+msgid "Staff Administration"
+msgstr "Personaladministrasjon"
+
+#: templates/admin/staff_by_org.html:9
+msgid "Create a staff record"
+msgstr "Opprett en personalrekord"
+
+#: templates/admin/staff_by_org.html:11
+msgid "Select a user below to view or update details."
+msgstr "Velg en bruker nedenfor for å vise eller oppdatere detaljer."
+
+#: templates/admin/staff_by_org.html:15
+msgid "StaffList_"
+msgstr ""
+
+#: templates/admin/staff_by_org.html:45 Role:staff_admin
+msgid "Staff Admin"
+msgstr "Personaladministrator"
+
+#: templates/flask_user/_macros.html:55
+msgid "Back to"
+msgstr "Tilbake til"
+
+#: templates/flask_user/_macros.html:80
+msgid "Terms"
+msgstr "Vilkår"
+
+#: templates/flask_user/_macros.html:84 templates/flask_user/_macros.html:88
+msgid "Movember"
+msgstr "Movember"
+
+#: templates/flask_user/_macros.html:85
+msgid "Movember Logo"
+msgstr "Movember-logo"
+
+#: templates/flask_user/_macros.html:93
+#, python-format
+msgid "%(year)d Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
+msgstr "%(year)d Movember Foundation. Alle rettigheter forbeholdt. En registrert 501(c)3 ideell organisasjon."
+
+#: templates/flask_user/_macros.html:101
+msgid "Password must have at least:"
+msgstr "Passordet må ha minst:"
+
+#: templates/flask_user/_macros.html:103
+msgid "Eight characters"
+msgstr "Åtte tegn"
+
+#: templates/flask_user/_macros.html:104
+msgid "One lowercase letter"
+msgstr "1 liten bokstav"
+
+#: templates/flask_user/_macros.html:105
+msgid "One uppercase letter"
+msgstr "1 stor bokstav"
+
+#: templates/flask_user/_macros.html:106
+msgid "One number"
+msgstr "1 nummer"
+
+#: templates/flask_user/_macros.html:120
+msgid "Limited Access"
+msgstr "Begrenset tilgang"
+
+#: templates/flask_user/_macros.html:123
+msgid "To access this information, you will need to log in with your username and password."
+msgstr "For å få tilgang til denne informasjonen, må du logge inn med brukernavn og passord."
+
+#: templates/flask_user/_macros.html:126
+msgid "Continue with limited access"
+msgstr "Fortsett med begrenset tilgang"
+
+#: templates/flask_user/_macros.html:127
+msgid "Log in to see more"
+msgstr "Logg inn for å se mer"
+
+#: templates/flask_user/change_password.html:6
+#: templates/flask_user/user_profile.html:11
+msgid "Change password"
+msgstr "Endre passord"
+
+#: templates/flask_user/change_username.html:6
+#: templates/flask_user/user_profile.html:8
+msgid "Change username"
+msgstr "Endre brukernavn"
+
+#: templates/flask_user/invite.html:5
+msgid "Invite User"
+msgstr "Inviter bruker"
+
+#: templates/flask_user/login.html:39
+msgid "Login With Facebook"
+msgstr ""
+
+#: templates/flask_user/login.html:47
+msgid "Login With Google"
+msgstr ""
+
+#: templates/flask_user/login_or_register.html:127
+msgid "Sign in"
+msgstr "Logg inn"
+
+#: templates/flask_user/manage_emails.html:5
+msgid "Manage Emails"
+msgstr "Behandle eposter"
+
+#: templates/flask_user/register.html:13
+msgid "Email address"
+msgstr "Epostadresse"
+
+#: templates/flask_user/register.html:14
+msgid "Email address is required."
+msgstr "Epostadresse er påkrevd."
+
+#: templates/flask_user/register.html:23
+#: templates/flask_user/reset_password.html:12
+msgid "Oops, the password does not meet the minimum requirements."
+msgstr "Beklager, passordet oppfyller ikke minstekravene."
+
+#: templates/flask_user/register.html:27
+msgid "Retype Password"
+msgstr "Skriv inn passordet på nytt"
+
+#: templates/flask_user/register.html:28
+#: templates/flask_user/reset_password.html:13
+msgid "Oops, the two password fields do not match."
+msgstr "Beklager, de 2 passordfeltene stemmer ikke overens."
+
+#: templates/flask_user/register.html:29
+msgid "Please re-type your password."
+msgstr "Vennligst skriv inn ditt passord på nytt."
+
+#: templates/flask_user/register.html:44
+msgid "Register using:"
+msgstr "Registrer deg ved å bruke:"
+
+#: templates/flask_user/register.html:48
+msgid "Log In With Facebook"
+msgstr ""
+
+#: templates/flask_user/register.html:55
+msgid "Log In With Google"
+msgstr ""
+
+#: templates/flask_user/register.html:60
+msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
+msgstr ""
+
+#: templates/flask_user/register.html:75
+msgid "About Using Google or Facebook for TrueNTH"
+msgstr ""
+
+#: templates/flask_user/register.html:81
+msgid "We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Facebook or Google provides a few additional benefits to you:"
+msgstr ""
+
+#: templates/flask_user/register.html:83
+msgid "A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button."
+msgstr ""
+
+#: templates/flask_user/register.html:84
+msgid "TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image."
+msgstr ""
+
+#: templates/flask_user/register.html:85
+msgid "Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts."
+msgstr ""
+
+#: templates/flask_user/resend_confirm_email.html:5
+msgid "Resend Confirmation Email"
+msgstr "Send bekreftelseseposten på nytt"
+
+#: templates/flask_user/reset_password.html:5
+msgid "Reset Password"
+msgstr "Tilbakestill passord"
+
+#: templates/flask_user/reset_password.html:11
+msgid "Password must have at least eight characters with one lowercase letter, one uppercase letter and one number"
+msgstr "Passordet må ha minst 8 tegn med 1 liten bokstav, 1 stor bokstav og 1 tall"
+
+#: templates/flask_user/user_profile.html:5
+msgid "User profile"
+msgstr "Brukerprofil"
+
+#: templates/flask_user/emails/eproms_base_message.html:1
+#, python-format
+msgid "Hello %(first_name)s %(last_name)s,"
+msgstr "Hei %(first_name)s %(last_name)s"
+
+#: templates/flask_user/emails/eproms_base_message.html:5
+msgid ""
+"\n"
+"<p>Thank you,</p>\n"
+"<p>The TrueNTH Team</p>\n"
+msgstr ""
+"\n"
+"<p>Takk,</p>\n"
+"<p>TrueNTH-teamet</p>\n"
+
+#: templates/flask_user/emails/eproms_base_message.html:9
+#, python-format
+msgid ""
+"\n"
+"<p>Please do not reply to this email. If you have any questions about this message, reach out to your %(parent_org)s representative and they will gladly assist.</p>\n"
+msgstr ""
+
+#: templates/flask_user/emails/eproms_forgot_password_message.html:4
+#, python-format
+msgid ""
+"\n"
+"<p>We have received your password reset request.</p>\n"
+"\n"
+"<p>If you initiated this request, reset the password with the link below:<br/>\n"
+"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"%(reset_password_link)s\">Reset password</a>.</p>\n"
+"\n"
+"<p>If you did not initiate this password reset, you may safely ignore this email.</p>\n"
+msgstr ""
+
+#: templates/flask_user/emails/eproms_password_changed_message.html:4
+msgid "<p>Your password has been changed.</p>"
+msgstr "<p>Ditt passord har blitt endret. </p>"
+
+#: templates/flask_user/emails/eproms_password_changed_message.html:8
+#, python-format
+msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(organization_name)s."
+msgstr "Hvis du ikke igangsatte denne passordendringen, <a href=\"%(forgot_password_url)s\"> vennligst klikk her for å tilbakestille den </a> , eller kontakt din representant på %(organization_name)s."
+
+#: templates/flask_user/emails/eproms_password_changed_message.html:10
+#, python-format
+msgid "If you did not initiate this password change, <a href=\"%(forgot_password_url)s\">please click here to reset it</a>, or contact your representative at %(app_name)s."
+msgstr "Hvis du ikke igangsatte denne passordendringen, <a href=\"%(forgot_password_url)s\"> vennligst klikk her for å tilbakestille den </a> , eller kontakt din representant på %(app_name)s."
+
+#: templates/flask_user/emails/eproms_password_changed_message.html:16
+#, python-format
+msgid "If you did not initiate this password change, please contact your representative at %(organization_name)s."
+msgstr "Hvis du ikke startet denne passordendringen, vennligst kontakt din representant på %(organization_name)s."
+
+#: templates/flask_user/emails/eproms_password_changed_message.html:18
+#, python-format
+msgid "If you did not initiate this password change, please contact your representative at %(app_name)s."
+msgstr "Hvis du ikke startet denne passordendringen, vennligst kontakt din representant på %(app_name)s."
+
+#: templates/profile/my_profile.html:13 templates/profile/user_profile.html:48
+msgid "My Questionnaires"
+msgstr "Mine spørreskjemaer"
+
+#: templates/profile/my_profile.html:21
+msgid "My Reports"
+msgstr "Mine rapporter"
+
+#: templates/profile/my_profile.html:32 templates/profile/my_profile.html:42
+#: templates/profile/my_profile.html:61
+msgid "My Clinic"
+msgstr "Min klinikk"
+
+#: templates/profile/my_profile.html:51
+msgid "My Agreement"
+msgstr "Min avtale"
+
+#: templates/profile/my_profile.html:76
+msgid "My Roles"
+msgstr "Mine roller"
+
+#: templates/profile/patient_profile.html:4
+msgid "Patient Profile"
+msgstr "Pasientprofil"
+
+#: templates/profile/patient_profile.html:24
+msgid "Patient Details"
+msgstr "Pasientopplysninger"
+
+#: templates/profile/patient_profile.html:29
+msgid "For kiosk style administration of an assessment"
+msgstr "For \"datakiosk\"-administrering av en vurdering"
+
+#: templates/profile/patient_profile.html:29
+#: templates/profile/patient_profile.html:35
+msgid "Log in as this patient"
+msgstr "Logg inn som denne pasienten"
+
+#: templates/profile/patient_profile.html:39
+msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
+msgstr "Dette er ment for administrering av en vurdering via \"datakiosk\", hvor den ansatte \"logger inn som pasienten\", hvorpå den ansatte logges ut av sin økt og pasienten blir automatisk logget inn uten at vedkommende trenger å oppgi innloggingsinformasjon. Fortsett?"
+
+#: templates/profile/patient_profile.html:44
+#: templates/profile/profile_macros.html:1134
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: templates/profile/patient_profile.html:58
+#: templates/profile/staff_profile.html:16
+#: templates/profile/user_profile.html:24
+msgid "Clinic"
+msgstr "Klinikk"
+
+#: templates/profile/patient_profile.html:66
+#: templates/profile/user_profile.html:33
+msgid "Agreement to Share Clinical Information"
+msgstr "Avtale om å dele klinisk informasjon"
+
+#: templates/profile/patient_profile.html:66
+#: templates/profile/profile_macros.html:691
+#: templates/profile/user_profile.html:33
+msgid "Consent History"
+msgstr "Samtykkehistorie"
+
+#: templates/profile/patient_profile.html:77
+#: templates/profile/user_profile.html:48
+msgid "PRO Questionnaires"
+msgstr "PRO-spørreskjemaer"
+
+#: templates/profile/patient_profile.html:88
+#: templates/profile/user_profile.html:62
+msgid "Patient Reports"
+msgstr "Pasientrapporter"
+
+#: templates/profile/patient_profile.html:101
+#: templates/profile/staff_profile.html:26
+#: templates/profile/user_profile.html:76
+msgid "User Roles"
+msgstr "Brukerroller"
+
+#: templates/profile/patient_profile.html:111
+#: templates/profile/staff_profile.html:36
+#: templates/profile/user_profile.html:87
+msgid "Audit Log"
+msgstr "Revisjonslogg"
+
+#: templates/profile/patient_profile_create.html:15
+msgid "No email"
+msgstr "Ingen epost"
+
+#: templates/profile/patient_profile_create.html:15
+msgid "User does not have email address"
+msgstr "Bruker har ikke epostadresse"
+
+#: templates/profile/profile_base.html:12
+msgid "TrueNTH Profile"
+msgstr "TrueNTH-profil"
+
+#: templates/profile/profile_create_base.html:7
+#: templates/profile/profile_macros.html:532
+msgid "Clinics"
+msgstr "Klinikker"
+
+#: templates/profile/profile_create_base.html:15
+msgid "Role"
+msgstr "Rolle"
+
+#: templates/profile/profile_create_base.html:17
+msgid "Admin staff"
+msgstr "Administrasjonspersonell"
+
+#: templates/profile/profile_create_base.html:31
+msgid "New Patient"
+msgstr "Ny pasient"
+
+#: templates/profile/profile_macros.html:13
+msgid "loading section data..."
+msgstr "laster inn seksjonsdata..."
+
+#: templates/profile/profile_macros.html:14
+msgid "Edit"
+msgstr "Rediger"
+
+#: templates/profile/profile_macros.html:14
+msgid "Edit Button"
+msgstr "Rediger-knapp"
+
+#: templates/profile/profile_macros.html:26
+msgid "Updated"
+msgstr "Oppdatert"
+
+#: templates/profile/profile_macros.html:26
+msgid "Unable to Update. System error."
+msgstr "Kan ikke oppdatere. Systemfeil."
+
+#: templates/profile/profile_macros.html:37
+msgid "My Information"
+msgstr "Min informasjon"
+
+#: templates/profile/profile_macros.html:40
+msgid "Patient Information"
+msgstr "Pasientinformasjon"
+
+#: templates/profile/profile_macros.html:42
+msgid "User Information"
+msgstr "Brukerinformasjon"
+
+#: templates/profile/profile_macros.html:51
+msgid "Study Id"
+msgstr "Studie-ID"
+
+#: templates/profile/profile_macros.html:52
+msgid "Site Id"
+msgstr "Nettsteds-ID"
+
+#: templates/profile/profile_macros.html:53
+#: templates/profile/profile_macros.html:458
+msgid "Cell"
+msgstr "Mobil"
+
+#: templates/profile/profile_macros.html:54
+#: templates/profile/profile_macros.html:468
+msgid "Phone (Other)"
+msgstr "Telefon (annet)"
+
+#: templates/profile/profile_macros.html:78
+msgid "My Detail"
+msgstr "Mine opplysninger"
+
+#: templates/profile/profile_macros.html:81
+msgid "Patient Detail"
+msgstr "Pasientdetalj"
+
+#: templates/profile/profile_macros.html:83
+msgid "User Detail"
+msgstr "Brukeropplysninger"
+
+#: templates/profile/profile_macros.html:89
+#: templates/profile/profile_macros.html:198
+msgid "Gender"
+msgstr "Kjønn"
+
+#: templates/profile/profile_macros.html:108
+msgid "Locale / Time Zone"
+msgstr "Lokal/tidssone"
+
+#: templates/profile/profile_macros.html:111
+#: templates/profile/profile_macros.html:161
+msgid "Language"
+msgstr "Språk"
+
+#: templates/profile/profile_macros.html:112
+msgid "Time Zone"
+msgstr "Tidssone"
+
+#: templates/profile/profile_macros.html:127
+#: templates/profile/profile_macros.html:131
+#: templates/profile/profile_macros.html:149
+msgid "Birth date must be valid and in the required format."
+msgstr "Fødselsdato må være gyldig og ha korrekt format."
+
+#: templates/profile/profile_macros.html:131
+msgid "Birth Month"
+msgstr "Fødselsmåned"
+
+#: templates/profile/profile_macros.html:149
+msgid "Birth Year"
+msgstr "Fødselsår"
+
+#: templates/profile/profile_macros.html:164
+msgid "Default"
+msgstr "Standardinnstilling"
+
+#: templates/profile/profile_macros.html:179
+msgid "First name is required and must not contain invalid characters."
+msgstr "Fornavn er påkrevd og kan ikke inneholde ugyldige tegn."
+
+#: templates/profile/profile_macros.html:187
+msgid "Last name is required and must not contain invalid characters."
+msgstr "Etternavn er påkrevd og kan ikke inneholde ugyldige tegn."
+
+#: templates/profile/profile_macros.html:202
+msgid "Male"
+msgstr "Mann"
+
+#: templates/profile/profile_macros.html:206
+msgid "Female"
+msgstr "Kvinne"
+
+#: templates/profile/profile_macros.html:284
+msgid "Registration Status:"
+msgstr "Registreringsstatus:"
+
+#: templates/profile/profile_macros.html:284
+#: templates/profile/profile_macros.html:293
+msgid "not registered"
+msgstr "ikke registrert"
+
+#: templates/profile/profile_macros.html:291
+#: templates/profile/profile_macros.html:344
+msgid "registered"
+msgstr "registrert"
+
+#: templates/profile/profile_macros.html:296
+msgid "complete"
+msgstr "fullstendig"
+
+#: templates/profile/profile_macros.html:297
+msgid "incomplete"
+msgstr "ufullstendig"
+
+#: templates/profile/profile_macros.html:298
+msgid "View reports"
+msgstr "Vis rapporter"
+
+#: templates/profile/profile_macros.html:301
+msgid "Send email to patient"
+msgstr "Send epost til pasient"
+
+#: templates/profile/profile_macros.html:303
+msgid "Select Email..."
+msgstr "Velg epost..."
+
+#: templates/profile/profile_macros.html:308
+#: templates/profile/profile_macros.html:351
+#: templates/profile/profile_macros.html:478
+#: templates/profile/profile_macros.html:1050
+msgid "Send email"
+msgstr "Send epost"
+
+#: AppText:profileSendEmail option invite
+#: templates/profile/profile_macros.html:322
+msgid "TrueNTH Invite"
+msgstr "TrueNTH-invitasjon"
+
+#: templates/profile/profile_macros.html:324 AppText:profileSendEmail option
+#: reminder
+msgid "TrueNTH Reminder"
+msgstr "TrueNTH-påminnelse"
+
+#: templates/profile/profile_macros.html:330
+msgid "P3P Assessment Status:"
+msgstr ""
+
+#: templates/profile/profile_macros.html:330
+msgid "not available"
+msgstr "ikke tilgjengelig"
+
+#: templates/profile/profile_macros.html:331
+msgid "Initial invite to complete P3P assessment"
+msgstr ""
+
+#: templates/profile/profile_macros.html:332
+msgid "Reminder to complete P3P assessment"
+msgstr ""
+
+#: templates/profile/profile_macros.html:342
+msgid "Registration status:"
+msgstr "Registreringsstatus:"
+
+#: templates/profile/profile_macros.html:346
+msgid "not yet registered"
+msgstr "ennå ikke registrert"
+
+#: templates/profile/profile_macros.html:365
+#: templates/profile/profile_macros.html:402
+msgid "Communications"
+msgstr "Kommunikasjon"
+
+#: templates/profile/profile_macros.html:370
+msgid "Send reset password email to patient"
+msgstr "Send passordtilbakestillingsepost til pasient"
+
+#: templates/profile/profile_macros.html:379
+msgid "Send invitation and reminder emails to patient"
+msgstr "Send invitasjons- og påminnelseseposter til pasient"
+
+#: templates/profile/profile_macros.html:388
+#: templates/profile/profile_macros.html:414
+msgid "Email audit log"
+msgstr "Epostrevisjonslogg"
+
+#: templates/profile/profile_macros.html:407
+msgid "Send registration email to user"
+msgstr "Send registreringsmelding til bruker"
+
+#: templates/profile/profile_macros.html:423
+msgid "Send reset password email to staff"
+msgstr "Send passordtilbakestillingsepost til personalet"
+
+#: templates/profile/profile_macros.html:435
+msgid "None available"
+msgstr "Ingen tilgjengelig"
+
+#: templates/profile/profile_macros.html:443
+msgid "Email Message Content"
+msgstr "Epostmeldingens innhold"
+
+#: templates/profile/profile_macros.html:458
+#: templates/profile/profile_macros.html:468
+#: templates/profile/profile_macros.html:532
+#: templates/profile/profile_macros.html:1027
+msgid "Optional"
+msgstr "Valgfri"
+
+#: templates/profile/profile_macros.html:459
+#: templates/profile/profile_macros.html:469
+msgid "Phone number must be in numbers."
+msgstr "Telefonnummeret må være i tall."
+
+#: templates/profile/profile_macros.html:493
+msgid "In what state is the patient currently receiving prostate cancer care?"
+msgstr ""
+
+#: templates/profile/profile_macros.html:495
+msgid "In what state are you currently receiving prostate cancer care?"
+msgstr ""
+
+#: templates/profile/profile_macros.html:511
+msgid "No clinic found in selected state."
+msgstr ""
+
+#: templates/profile/profile_macros.html:531
+msgid "Main clinic for prostate cancer care"
+msgstr "Hovedklinikk for prostatakreftbehandling"
+
+#: templates/profile/profile_macros.html:592
+msgid "Consent to share information"
+msgstr "Samtykk til å dele informasjon"
+
+#: templates/profile/profile_macros.html:604
+#, python-format
+msgid ""
+"\n"
+"                                    I consent to sharing information with <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+msgstr ""
+"\n"
+"                                    Jeg samtykker til å dele informasjon med <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
+"                                "
+
+#: templates/profile/profile_macros.html:652
+msgid "No consent record found"
+msgstr "Ingen samtykkeoppføringer funnet"
+
+#: templates/profile/profile_macros.html:685
+msgid "History"
+msgstr "Historikk"
+
+#: templates/profile/profile_macros.html:706
+msgid "Consent Status Editor"
+msgstr "Redigering av samtykkedato"
+
+#: templates/profile/profile_macros.html:709
+msgid "Modify the consent status for this user to"
+msgstr "Endre samtykkestatus for denne brukeren til"
+
+#: templates/profile/profile_macros.html:712
+msgid "Consented / Enrolled"
+msgstr "Godkjent/påmeldt"
+
+#: templates/profile/profile_macros.html:719
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Tilbaketrukket - stopp datainnsamling og rapporter historisk data"
+
+#: templates/profile/profile_macros.html:720
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Stopp innsamling av data og rapporter historisk data"
+
+#: templates/profile/profile_macros.html:727
+msgid "Purged / Removed"
+msgstr "Tømt/fjernet"
+
+#: templates/profile/profile_macros.html:744
+msgid "Consent Date Editor"
+msgstr "Redigering av samtykkedato"
+
+#: templates/profile/profile_macros.html:747
+msgid "Current consent date: "
+msgstr "Gjeldende samtykkedato: "
+
+#: templates/profile/profile_macros.html:749
+msgid "Modify the consent date"
+msgstr "Endre samtykkedatoen"
+
+#: templates/profile/profile_macros.html:749
+msgid "GMT 24-hour format"
+msgstr "GMT 24-timersformat"
+
+#: templates/profile/profile_macros.html:749
+msgid "for this agreement to:"
+msgstr "for denne avtalen til:"
+
+#: templates/profile/profile_macros.html:788
+#: templates/profile/profile_macros.html:791
+#: templates/profile/profile_macros.html:808
+#: templates/profile/profile_macros.html:1099
+#: templates/profile/profile_macros.html:1102
+#: templates/profile/profile_macros.html:1119
+#: templates/profile/profile_macros.html:1202
+#: templates/profile/profile_macros.html:1205
+#: templates/profile/profile_macros.html:1222
+msgid "Date must be valid and in the required format."
+msgstr "Dato må være gyldig og ha korrekt format."
+
+#: templates/profile/profile_macros.html:827
+msgid "for"
+msgstr "for"
+
+#: templates/profile/profile_macros.html:828
+msgid "Editable by admins only."
+msgstr "Kan bare redigeres av administratorer."
+
+#: templates/profile/profile_macros.html:849
+msgid "Session History"
+msgstr "Økthistorikk"
+
+#: templates/profile/profile_macros.html:849
+msgid "click each row to review report"
+msgstr "klikk hver rad for å gjennomgå rapport"
+
+#: templates/profile/profile_macros.html:850
+msgid "Questionnaire Name"
+msgstr "Spørreskjemanavn"
+
+#: templates/profile/profile_macros.html:850
+msgid "Status"
+msgstr "Status"
+
+#: templates/profile/profile_macros.html:850
+msgid "Last Updated"
+msgstr "Sist oppdatert"
+
+#: templates/profile/profile_macros.html:850
+msgid "GMT, Y-M-D"
+msgstr "GMT, Å-M-D"
+
+#: templates/profile/profile_macros.html:872
+msgid "My Prostate Cancer Profile"
+msgstr "Min prostatakreftprofil"
+
+#: templates/profile/profile_macros.html:872
+msgid "Clinical Questions"
+msgstr "Kliniske spørsmål"
+
+#: templates/profile/profile_macros.html:874
+msgid "Questions asked of the patient at registration"
+msgstr "Spørsmål stilt av pasienten ved registrering"
+
+#: templates/profile/profile_macros.html:900
+msgid "Intervention Reports"
+msgstr "Intervensjonsrapporter"
+
+#: templates/profile/profile_macros.html:905
+msgid "No reports available."
+msgstr "Ingen rapporter tilgjengelig."
+
+#: templates/profile/profile_macros.html:919
+msgid "Africa/Johannesburg"
+msgstr "Afrika/Johannesburg"
+
+#: templates/profile/profile_macros.html:920
+msgid "America/Chicago"
+msgstr ""
+
+#: templates/profile/profile_macros.html:921
+msgid "America/Denver"
+msgstr ""
+
+#: templates/profile/profile_macros.html:922
+msgid "America/Los Angeles"
+msgstr ""
+
+#: templates/profile/profile_macros.html:923
+msgid "America/Indianapolis"
+msgstr ""
+
+#: templates/profile/profile_macros.html:924
+msgid "America/New York"
+msgstr ""
+
+#: templates/profile/profile_macros.html:925
+msgid "America/Sao Paulo"
+msgstr "Amerika/Sao Paulo"
+
+#: templates/profile/profile_macros.html:926
+msgid "Australia/Adelaide"
+msgstr ""
+
+#: templates/profile/profile_macros.html:927
+msgid "Australia/Brisbane"
+msgstr ""
+
+#: templates/profile/profile_macros.html:928
+msgid "Australia/Broken_Hill"
+msgstr ""
+
+#: templates/profile/profile_macros.html:929
+msgid "Australia/Canberra"
+msgstr ""
+
+#: templates/profile/profile_macros.html:930
+msgid "Australia/Currie"
+msgstr ""
+
+#: templates/profile/profile_macros.html:931
+msgid "Australia/Darwin"
+msgstr ""
+
+#: templates/profile/profile_macros.html:932
+msgid "Australia/Eucla"
+msgstr ""
+
+#: templates/profile/profile_macros.html:933
+msgid "Australia/Hobart"
+msgstr ""
+
+#: templates/profile/profile_macros.html:934
+msgid "Australia/Lindeman"
+msgstr ""
+
+#: templates/profile/profile_macros.html:935
+msgid "Australia/Lord_Howe"
+msgstr ""
+
+#: templates/profile/profile_macros.html:936
+msgid "Australia/Melbourne"
+msgstr "Australia/Melbourne"
+
+#: templates/profile/profile_macros.html:937
+msgid "Australia/North"
+msgstr "Australia/North"
+
+#: templates/profile/profile_macros.html:938
+msgid "Australia/Perth"
+msgstr "Australia/Perth"
+
+#: templates/profile/profile_macros.html:939
+msgid "Australia/Queensland"
+msgstr "Australia/Queensland"
+
+#: templates/profile/profile_macros.html:940
+msgid "Australia/South"
+msgstr "Australia/South"
+
+#: templates/profile/profile_macros.html:941
+msgid "Australia/Sydney"
+msgstr "Australia/Sydney"
+
+#: templates/profile/profile_macros.html:942
+msgid "Australia/Tasmania"
+msgstr "Australia/Tasmania"
+
+#: templates/profile/profile_macros.html:943
+msgid "Australia/Victoria"
+msgstr "Australia/Victoria"
+
+#: templates/profile/profile_macros.html:944
+msgid "Australia/West"
+msgstr "Australia/West"
+
+#: templates/profile/profile_macros.html:945
+msgid "Australia/Yancowinna"
+msgstr "Australia/Yancowinna"
+
+#: templates/profile/profile_macros.html:946
+#: templates/profile/profile_macros.html:949
+msgid "Europe/Andorra"
+msgstr "Europa/Andorra"
+
+#: templates/profile/profile_macros.html:947
+msgid "Europe/Vienna"
+msgstr ""
+
+#: templates/profile/profile_macros.html:948
+msgid "Europe/Brussels"
+msgstr ""
+
+#: templates/profile/profile_macros.html:950
+msgid "Europe/Stockholm"
+msgstr ""
+
+#: templates/profile/profile_macros.html:951
+msgid "Europe/Sofia"
+msgstr ""
+
+#: templates/profile/profile_macros.html:952
+msgid "Europe/Zurich"
+msgstr ""
+
+#: templates/profile/profile_macros.html:962
+msgid "Deceased Status"
+msgstr "Status død"
+
+#: templates/profile/profile_macros.html:965
+msgid "Patient is deceased"
+msgstr "Pasienten er død"
+
+#: templates/profile/profile_macros.html:971
+msgid "no data provided"
+msgstr "ingen data gitt"
+
+#: templates/profile/profile_macros.html:975
+msgid "Has the patient passed away?"
+msgstr "Har pasienten gått bort?"
+
+#: templates/profile/profile_macros.html:976
+#, python-format
+msgid "By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?"
+msgstr "Ved å merke av i denne ruten, vil pasientens samtykkestatus bli oppdatert til '%(new_consent_status)s'. Vil du fortsette?"
+
+#: templates/profile/profile_macros.html:976
+msgid "Withdrawn - Suspend Data Collection"
+msgstr "Tilbaketrukket - innstill datainnsamling"
+
+#: templates/profile/profile_macros.html:981
+msgid "Deceased Date"
+msgstr "Dødsdato"
+
+#: templates/profile/profile_macros.html:1036
+msgid "Site ID"
+msgstr "Nettsteds-ID"
+
+#: templates/profile/profile_macros.html:1046
+msgid "Three ways to complete questionnaire"
+msgstr "3 måter å fylle ut spørreskjema på"
+
+#: templates/profile/profile_macros.html:1052
+msgid "Invite or remind patient over email to complete their questionnaire"
+msgstr "Inviter eller påminn pasienten via epost om å fylle ut spørreskjema"
+
+#: templates/profile/profile_macros.html:1056
+#: templates/profile/profile_macros.html:1058
+msgid "Log in as patient"
+msgstr "Logg inn som pasient"
+
+#: templates/profile/profile_macros.html:1057
+msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
+msgstr "Dette logger deg ut og logger på pasienten uten at pasienten trenger å oppgi legitimasjon. På den måten kan pasienten fylle ut spørreskjemaer på denne enheten. Ideelt or nettbrett og kioskmaskiner."
+
+#: templates/profile/profile_macros.html:1061
+#: templates/profile/profile_macros.html:1065
+msgid "Enter manually"
+msgstr "Gå inn manuelt"
+
+#: templates/profile/profile_macros.html:1063
+msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
+msgstr "Legg inn spørreskjemasvar på pasientens vegne. Nyttig hvis svarene har blitt fullført på papir."
+
+#: templates/profile/profile_macros.html:1071
+msgid "Enter questionnaire manually on patient's behalf"
+msgstr "Legg inn spørreskjema manuelt på pasientens vegne"
+
+#: templates/profile/profile_macros.html:1078
+msgid "Select the method in which the questionnaire will be completed:"
+msgstr "Velg måten spørreskjemaet skal fylles ut på:"
+
+#: templates/profile/profile_macros.html:1086
+msgid "Interview assisted"
+msgstr "Intervju assistert"
+
+#: templates/profile/profile_macros.html:1091
+msgid "Paper"
+msgstr "Papir"
+
+#: templates/profile/profile_macros.html:1096
+msgid "Questionnaire completion date"
+msgstr "Spørreskjemautfyllingsdato"
+
+#: templates/profile/profile_macros.html:1099
+msgid "Completion Day"
+msgstr "Utfyllingsdato"
+
+#: templates/profile/profile_macros.html:1119
+msgid "Completion Year"
+msgstr "Utfyllingsår"
+
+#: templates/profile/profile_macros.html:1151
+msgid "Patient is participating in the following intervention(s): "
+msgstr "Pasienten deltar i følgende intervensjon(er): "
+
+#: templates/profile/profile_macros.html:1155
+#: templates/profile/profile_macros.html:1157
+msgid "None"
+msgstr "Ingen"
+
+#: templates/profile/profile_macros.html:1172
+msgid "My Treatments"
+msgstr "Mine behandlinger"
+
+#: templates/profile/profile_macros.html:1172
+msgid "Clinical Data"
+msgstr "Kliniske data"
+
+#: templates/profile/profile_macros.html:1172
+msgid "(Optional)"
+msgstr "(Valgfri)"
+
+#: templates/profile/profile_macros.html:1178
+#: templates/profile/profile_macros.html:1183
+msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
+msgstr ""
+
+#: templates/profile/profile_macros.html:1180
+msgid ""
+"Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
+"                            date, please make your best guess."
+msgstr ""
+
+#: templates/profile/profile_macros.html:1188
+msgid "Select an option"
+msgstr "Velg et alternativ"
+
+#: templates/profile/profile_macros.html:1199
+msgid "Date"
+msgstr "Dato"
+
+#: templates/profile/profile_macros.html:1227
+#: templates/profile/profile_macros.html:1269
+msgid "Save"
+msgstr "Lagre"
+
+#: templates/profile/profile_macros.html:1227
+msgid "Add"
+msgstr "Legg til"
+
+#: templates/profile/profile_macros.html:1237
+msgid "My History"
+msgstr "Min historikk"
+
+#: templates/profile/profile_macros.html:1239
+msgid "Past"
+msgstr "Tidligere"
+
+#: templates/profile/profile_macros.html:1239
+msgid "Management(s)"
+msgstr "Behandling(er)"
+
+#: templates/profile/profile_macros.html:1250
+msgid "Delete"
+msgstr "Slett"
+
+#: templates/profile/profile_macros.html:1253
+msgid "Are you sure you want to delete this treatment?"
+msgstr "Er du sikker på at du vil slette denne behandlingen?"
+
+#: templates/profile/profile_macros.html:1266
+msgid "You have updated your profile. Click the Save button to submit your changes."
+msgstr "Du har oppdatert din profil. Klikk på Lagre-knappen for å sende inn endringene."
+
+#: templates/profile/profile_macros.html:1266
+msgid "Or"
+msgstr "Eller"
+
+#: templates/profile/profile_macros.html:1266
+msgid "cancel"
+msgstr "Avbryt"
+
+#: templates/profile/profile_macros.html:1267
+msgid "There is a problem with your profile. Please correct it before saving."
+msgstr "Det er et problem med din profil. Vennligst rett det før du lagrer."
+
+#: templates/profile/profile_macros.html:1267
+msgid "Make sure all required fields are filled out and all entries are valid."
+msgstr "Forsikre deg om at alle obligatoriske felt er fylt ut og at alle oppføringene er gyldige."
+
+#: templates/profile/profile_macros.html:1270
+msgid "Profile changes have been saved"
+msgstr "Profilendringene har blitt lagret"
+
+#: templates/profile/staff_profile.html:5 templates/profile/user_profile.html:5
+#, python-format
+msgid "Profile for %(user_email)s"
+msgstr "Profil for %(user_email)s"
+
+#: templates/profile/staff_profile.html:7 templates/profile/user_profile.html:7
+#, python-format
+msgid "Profile for #%(user_id)s"
+msgstr "Profil for #%(user_id)s"
+
+#: templates/profile/staff_profile_create.html:2
+msgid "New Staff"
+msgstr "Nytt personale"
+
+#: views/assessment_engine.py:1620
+msgid "All available questionnaires have been completed"
+msgstr "Alle tilgjengelige spørreskjemaer har blitt fylt ut."
+
+#: views/extend_flask_user.py:79
+#, python-format
+msgid "We see you're having trouble - let us help.                 Your account will now be locked while we give it a refresh.                 Please try again in %(time)d minutes.                 If you're still having issues, please click                 \"Having trouble logging in?\" below."
+msgstr "Vi ser at du har problemer - la oss hjelpe. Din konto blir nå låst mens vi oppdaterer den. Vennligst prøv igjen om %(time)d minutter. Hvis du fremdeles har problemer, vennligst klikk på \"Har du problemer med å logge på?\" nedenfor."
+
+#: views/patch_flask_user.py:56
+#, python-format
+msgid "If the email address '%(email)s' is in the system, a reset password email will now have been sent to it. Please open that email and follow the instructions to reset your password."
+msgstr "Hvis epostadressen '%(email)s' er i systemet, vil en passordtilbakestillingsepost nå ha blitt sendt dit. Vennligst åpne eposten og følg instruksjonene for å tilbakestille ditt passord."
+
+#: views/portal.py:95
+msgid "This application requires Javascript enabled. Please check your browser settings."
+msgstr "Denne applikasjonen krever Javascript aktivert. Vennligst kontroller dine nettleserinnstillinger."
+
+#: views/portal.py:526
+msgid "Unable to match identity"
+msgstr "Finner ikke samsvarende identitet"
+
+#: views/portal.py:528
+msgid "User Not Found"
+msgstr "Bruker ikke funnet"
+
+#: views/portal.py:1282
+#, python-format
+msgid "I consent to sharing information with %(org_name)s"
+msgstr "Jeg samtykker til å dele informasjon med %(org_name)s"
+
+#: AppText:About TrueNTH URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
+
+#: AppText:Cellphone
+msgid "Mobile"
+msgstr "Mobil"
+
+#: AppText:IRONMAN organization website consent URL patient
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=de2e635f-1c63-5288-5b29-f68acde1edf1&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN patient privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=2ec99d60-714c-1133-4aa1-3abadf5a2007&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN patient terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e4206748-f26c-b8b2-f6b9-b67465b6f746&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=78472677-f03d-e950-0f1c-b6136fb2b5fd&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry staff website consent URL AppText:IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d7316b23-b563-0c36-76e4-a3ddd0ea3e81&editorUrl=true"
+msgstr ""
+
+#: AppText:IRONMAN website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry patient terms and conditions URL
+#: AppText:Initial Consent Terms
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry organization website consent URL patient
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=106e46a0-86e8-d61c-7173-1df271180503&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry patient privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=17a469bc-87ac-a887-7ac6-61ed816ec772&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry staff privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f8e89b22-7c95-2a15-08a4-169ac8db9311&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry staff registraion email URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=22d28841-2e07-ff91-8358-2658a576bc44&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry staff terms and conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=97ea8305-6786-41b6-99c3-14fd40bbc826&editorUrl=true"
+msgstr ""
+
+#: AppText:TrueNTH Global Registry website declaration form URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=f344d0ea-48c5-8889-fe2e-d42d599df796&editorUrl=true"
+msgstr ""
+
+#: AppText:consent date label
+msgid "Study Consent Date"
+msgstr "Studiesamtykkedato"
+
+#: AppText:landing sub-title
+msgid " "
+msgstr " "
+
+#: AppText:landing title
+msgid "Report your health in order to improve prostate cancer care."
+msgstr "Rapporter din helse for å forbedre prostatakreftbehandling."
+
+#: AppText:layout title
+msgid "Movember TrueNTH"
+msgstr "Movember TrueNTH"
+
+#: AppText:portal registration
+msgid "TrueNTH Registration"
+msgstr "TrueNTH-registrering"
+
+#: AppText:patient invite email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9d2bc012-aca4-975b-6f3c-1c6ddfb66c82"
+msgstr ""
+
+#: AppText:patient invite email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8a195-b34e-8c0f-c611-d990f9c42f23"
+msgstr ""
+
+#: AppText:patient reminder email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
+msgstr ""
+
+#: AppText:patient reminder email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+#: AppText:profileSendEmail invite email_body
+msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
+msgstr "<p>(hilsen),</p><p>Denne eposten ble sendt til deg fordi du er en pasient på (klinikknavn) og samtykket til å delta i prostatakreftresultatene - (foreldreorgan) registerundersøkelse.</p><p>Dette er en invitasjon til å bruke nettstedet TrueNTH, der du vil rapportere om din helse. Din deltakelse vil hjelpe oss å forbedre omsorgen som menn får under deres prostatakreftreise. </p><p>For å fullføre ditt første spørreskjema, vennligst først bekreft din konto. </p><div><a class=\"btn\" href=\"{0}\">Bekreft din konto</a></div><p>Du kan også gå til TrueNTH-nettstedet med denne lenken:<p/><p><a href=\"{0}\"></a></p>{0}<p></p><p>Lagre denne eposten slik at du når som helst kan gå tilbake til TrueNTH.</p>"
+
+#: AppText:profileSendEmail reminder email_body
+msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
+msgstr "<p>Hei </p><p>Denne eposten ble sendt til deg av (klinikknavn). Det er her du rapporterer om din helse under din prostatakreftreise. Informasjonen som samles inn vil bli brukt til å bestemme hvor forbedringer i prostatakreftbehandling kan gjøres.</p><p>Logg inn nå for å fylle ut ditt spørreskjema.</p><div><a class=\"btn\" href=\"{0}\">Bekreft din konto og svar på spørreskjemaet nå</a></div><p>Klikk på knappen over eller bruk lenken nedenfor for å besøke TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Hvis du har spørsmål eller bekymringer, vennligst kontakt (klinikknavn ).</p><p><em>- Denne epostmeldingen ble sendt fordi du samtykket til å delta i TrueNTH-registerprosjektet</em></p>"
+
+#: AppText:profileSendEmail reminder email_subject
+msgid "Report your health on TrueNTH. Email from (clinic name)"
+msgstr "Rapporter din helse på TrueNTH. Epost fra (klinikknavn)"
+
+#: AppText:registration prompt
+msgid "Create a password"
+msgstr "Opprett et passord"
+
+#: AppText:registration title
+msgid "Register for TrueNTH"
+msgstr "Registrer deg for TrueNTH"
+
+#: AppText:site summary email IRONMAN
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+msgstr ""
+
+#: AppText:site summary email TrueNTH Global Registry
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
+msgstr ""
+
+#: Intervention:assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+#: Intervention:care_plan
+msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
+msgstr "<p>Organisering og støtte for de mange detaljene i livet som en overlevende av prostatakreft</p>"
+
+#: Intervention:community_of_wellness
+msgid "Community of Wellness"
+msgstr ""
+
+#: Intervention:decision_support_p3p
+msgid "Decision Support tool"
+msgstr ""
+
+#: Intervention:decision_support_p3p
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
+msgstr ""
+
+#: Intervention:decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr ""
+
+#: Intervention:default
+msgid "OTHER: not yet officially supported"
+msgstr ""
+
+#: Intervention:self_management
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
+msgstr "<p>Lær om symptomer som er vanlige hos menn med prostatakreft, og om måter å håndtere og forbedre disse symptomene på.</p>"
+
+#: Intervention:sexual_recovery
+msgid "Sexual Recovery"
+msgstr ""
+
+#: Intervention:sexual_recovery
+msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
+msgstr ""
+
+#: Intervention:social_support
+msgid "Social Support Network"
+msgstr ""
+
+#: Intervention:music
+msgid "MUSIC Integration"
+msgstr ""
+
+#: Intervention:psa_tracker
+msgid "<p>Remember to update your PSA level.</p>"
+msgstr ""
+
+#: Organization:Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
+msgstr "Ottawa Hospital Cancer Centre"
+
+#: Organization:none of the above
+msgid "none of the above"
+msgstr "ingen av de ovennevnte"
+
+#: Organization:TrueNTH Global Registry
+msgid "TrueNTH Global Registry"
+msgstr ""
+
+#: Organization:AUA Local Data Center
+msgid "AUA Local Data Center"
+msgstr "AUA Local Data Center"
+
+#: Organization:Australian Urology Associates (AUA)
+msgid "Australian Urology Associates (AUA)"
+msgstr "Australian Urology Associates (AUA)"
+
+#: Organization:Queensland University of Technology LDC
+msgid "Queensland University of Technology LDC"
+msgstr "Queensland University of Technology LDC"
+
+#: Organization:Wesley Urology Clinic
+msgid "Wesley Urology Clinic"
+msgstr "Wesley Urology Clinic"
+
+#: Organization:Genesis Cancer Care Queensland
+msgid "Genesis Cancer Care Queensland"
+msgstr "Genesis Cancer Care Queensland"
+
+#: Organization:Australian Prostate Cancer Research Centre
+msgid "Australian Prostate Cancer Research Centre"
+msgstr "Australian Prostate Cancer Research Centre"
+
+#: Organization:Gc Urology
+msgid "Gc Urology"
+msgstr "Gc Urology"
+
+#: Organization:Medical Oncology, Division Of Cancer Services, Princess
+#: Alexandra Hospital
+msgid "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+msgstr "Medical Oncology, Division Of Cancer Services, Princess Alexandra Hospital"
+
+#: Organization:Urology South Brisbane
+msgid "Urology South Brisbane"
+msgstr "Urologi South Brisbane"
+
+#: Organization:Department Of Urology, Princess Alexandra Hospital
+msgid "Department Of Urology, Princess Alexandra Hospital"
+msgstr "Department Of Urology, Princess Alexandra Hospital"
+
+#: Organization:The Alfred
+msgid "The Alfred"
+msgstr "The Alfred"
+
+#: Organization:IRONMAN
+msgid "IRONMAN"
+msgstr "IRONMAN"
+
+#: Organization:Australia (Region/Country Site)
+msgid "Australia (Region/Country Site)"
+msgstr "Australia (region-/landside)"
+
+#: Organization:Australia Recruiting Site B
+msgid "Australia Recruiting Site B"
+msgstr "Australia rekrutteringsside B"
+
+#: Organization:AU B Child Site 1
+msgid "AU B Child Site 1"
+msgstr "AU B Barneside 1"
+
+#: Organization:AU B Child Site 2
+msgid "AU B Child Site 2"
+msgstr "AU B Barneside 2"
+
+#: Organization:Australian Prostate Cancer Research Centre-Qld (QUT)
+msgid "Australian Prostate Cancer Research Centre-Qld (QUT)"
+msgstr "Australian Prostate Cancer Research Center-Qld (QUT)"
+
+#: Organization:Princess Alexandra Hospital
+msgid "Princess Alexandra Hospital"
+msgstr "Princess Alexandra Hospital"
+
+#: Organization:Redland Hospital
+msgid "Redland Hospital"
+msgstr "Redland Hospital"
+
+#: Organization:Eastern Health
+msgid "Eastern Health"
+msgstr "Eastern Health"
+
+#: Organization:Westmead Hospital
+msgid "Westmead Hospital"
+msgstr "Westmead Hospital"
+
+#: Organization:Macquarie University Hospital
+msgid "Macquarie University Hospital"
+msgstr "Macquarie University Hospital"
+
+#: Organization:Epworth Healthcare
+msgid "Epworth Healthcare"
+msgstr "Epworth Healthcare"
+
+#: Organization:Australian Prostate Centre
+msgid "Australian Prostate Centre"
+msgstr "Australian Prostate Centre"
+
+#: Organization:St. Vincent's Hospital Sydney
+msgid "St. Vincent's Hospital Sydney"
+msgstr "St. Vincent's Hospital Sydney"
+
+#: Organization:USA (Region/Country Site)
+msgid "USA (Region/Country Site)"
+msgstr "USA (region-/landside)"
+
+#: Organization:Baylor College of Medicine
+msgid "Baylor College of Medicine"
+msgstr "Baylor College of Medicine"
+
+#: Organization:Dana-Farber Cancer Institute
+msgid "Dana-Farber Cancer Institute"
+msgstr "Dana-Farber Cancer Institute"
+
+#: Organization:Chesapeake Urology Associates
+msgid "Chesapeake Urology Associates"
+msgstr "Chesapeake Urology Associates"
+
+#: Organization:Columbia University
+msgid "Columbia University"
+msgstr "Columbia University"
+
+#: Organization:University of North Carolina
+msgid "University of North Carolina"
+msgstr "University of North Carolina"
+
+#: Organization:University of Wisconsin
+msgid "University of Wisconsin"
+msgstr "University of Wisconsin"
+
+#: Organization:Oregon Health and Sciences Cancer Center
+msgid "Oregon Health and Sciences Cancer Center"
+msgstr "Oregon Health and Sciences Cancer Center"
+
+#: Organization:Robert H. Lurie Comprehensive Cancer Center Northwestern
+#: University
+msgid "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
+msgstr "Robert H. Lurie Comprehensive Cancer Center Northwestern University"
+
+#: Organization:Roswell Park Cancer Institute
+msgid "Roswell Park Cancer Institute"
+msgstr "Roswell Park Cancer Institute"
+
+#: Organization:Thomas Jefferson University
+msgid "Thomas Jefferson University"
+msgstr "Thomas Jefferson University"
+
+#: Organization:Aria Health
+msgid "Aria Health"
+msgstr "Aria Health"
+
+#: Organization:Doylestown Health
+msgid "Doylestown Health"
+msgstr "Doylestown Health"
+
+#: Organization:Easton Hospital
+msgid "Easton Hospital"
+msgstr "Easton Hospital"
+
+#: Organization:Reading Health System
+msgid "Reading Health System"
+msgstr "Reading Health System"
+
+#: Organization:University of Virgina (UVA)
+msgid "University of Virgina (UVA)"
+msgstr "University of Virgina (UVA)"
+
+#: Organization:Duke Comprehensive Cancer Center
+msgid "Duke Comprehensive Cancer Center"
+msgstr "Duke Comprehensive Cancer Center"
+
+#: Organization:Sidney Kimmel Comprehensive Cancer Center
+msgid "Sidney Kimmel Comprehensive Cancer Center"
+msgstr "Sidney Kimmel Comprehensive Cancer Center"
+
+#: Organization:Tulane University
+msgid "Tulane University"
+msgstr "Tulane University"
+
+#: Organization:University of Alabama-Birmingham
+msgid "University of Alabama-Birmingham"
+msgstr "University of Alabama-Birmingham"
+
+#: Organization:University of California Los Angeles
+msgid "University of California Los Angeles"
+msgstr "University of California Los Angeles"
+
+#: Organization:University of California San Diego
+msgid "University of California San Diego"
+msgstr "University of California San Diego"
+
+#: Organization:University of Chicago
+msgid "University of Chicago"
+msgstr "University of Chicago"
+
+#: Organization:University of Illinois at Chicago
+msgid "University of Illinois at Chicago"
+msgstr "University of Illinois i Chicago"
+
+#: Organization:Wayne St. University Karmanos Cancer Institute
+msgid "Wayne St. University Karmanos Cancer Institute"
+msgstr "Wayne St. University Karmanos Cancer Institute"
+
+#: Organization:Weill Cornell Medical Center
+msgid "Weill Cornell Medical Center"
+msgstr "Weill Cornell Medical Center"
+
+#: Organization:Yale University
+msgid "Yale University"
+msgstr ""
+
+#: Organization:Northwestern Medicine Cancer Centers
+msgid "Northwestern Medicine Cancer Centers"
+msgstr ""
+
+#: Organization:Warrenville Cancer Center
+msgid "Warrenville Cancer Center"
+msgstr ""
+
+#: Organization:Delnor Cancer Center
+msgid "Delnor Cancer Center"
+msgstr ""
+
+#: Organization:Kishwaukee Cancer Center
+msgid "Kishwaukee Cancer Center"
+msgstr ""
+
+#: Organization:Canada (Region/Country Site)
+msgid "Canada (Region/Country Site)"
+msgstr "Canada (region-/landside)"
+
+#: Organization:BC Cancer Agency
+msgid "BC Cancer Agency"
+msgstr "BC Cancer Agency"
+
+#: Organization:CHU de Quebec - Universite Laval
+msgid "CHU de Quebec - Universite Laval"
+msgstr "CHU de Quebec - Universite Laval"
+
+#: Organization:Centre Hospitalier de l'Université Montréal
+msgid "Centre Hospitalier de l'Université de Montréal"
+msgstr "Centre Hospitalier de l'Université de Montréal"
+
+#: Organization:Juravinski Cancer Centre
+msgid "Juravinski Cancer Centre"
+msgstr "Juravinski Cancer Centre"
+
+#: Organization:Cross Cancer Institute (Alberta Health Services)
+msgid "Cross Cancer Institute (Alberta Health Services)"
+msgstr ""
+
+#: Organization:Winship Cancer Institute Emory University
+msgid "Winship Cancer Institute Emory University"
+msgstr "Winship Cancer Institute Emory University"
+
+#: Organization:Sweden (Region/Country Site)
+msgid "Sweden (Region/Country Site)"
+msgstr "Sverige (region-/landside)"
+
+#: Organization:Skane University Hospital
+msgid "Skane University Hospital"
+msgstr "Skåne University Hospital"
+
+#: Organization:Örebro University Hospital
+msgid "Örebro University Hospital"
+msgstr "Örebro University Hospital"
+
+#: Organization:Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
+msgstr "Sveits (region-/landside)"
+
+#: Organization:Kantonsspitals Chur
+msgid "Kantonsspitals Chur"
+msgstr "Kantonsspitals Chur"
+
+#: Organization:Universitätsspital Zürich
+msgid "Universitätsspital Zürich"
+msgstr "Universitätsspital Zürich"
+
+#: Organization:The Royal Marsden NHS Foundation Trust
+msgid "The Royal Marsden NHS Foundation Trust"
+msgstr "Royal Marsden NHS Foundation Trust"
+
+#: Organization:The Christie NHS Foundation Trust
+msgid "The Christie NHS Foundation Trust"
+msgstr "Christie NHS Foundation Trust"
+
+#: Organization:Velindre Cancer Centre
+msgid "Velindre Cancer Centre"
+msgstr ""
+
+#: Organization:South Tyneside and Sunderland NHS Foundation Trust
+msgid "South Tyneside and Sunderland NHS Foundation Trust"
+msgstr ""
+
+#: Organization:Lister Hospital
+msgid "Lister Hospital"
+msgstr ""
+
+#: Organization:South Tyneside District Hospital
+msgid "South Tyneside District Hospital"
+msgstr ""
+
+#: Organization:Lancashire Teaching Hospitals NHS Foundation Trust
+msgid "Lancashire Teaching Hospitals NHS Foundation Trust"
+msgstr ""
+
+#: Organization:Royal Brisbane & Women's Hospital
+msgid "Royal Brisbane & Women's Hospital"
+msgstr ""
+
+#: Organization:Southampton
+msgid "Southampton"
+msgstr "Southampton"
+
+#: Organization:Tygerberg Hospital
+msgid "Tygerberg Hospital"
+msgstr "Tygerberg Hospital"
+
+#: Organization:Centro de Pesquisa em Oncologia
+msgid "Centro de Pesquisa em Oncologia"
+msgstr "Centro de Pesquisa em Oncologia"
+
+#: Organization:Hospital Beneficência Portuguesa
+msgid "Hospital Beneficência Portuguesa"
+msgstr "Hospital Beneficência Portuguesa"
+
+#: Organization:Instituto Câncer do Estado de São Paulo
+msgid "Instituto Câncer do Estado de São Paulo"
+msgstr "Instituto Câncer do Estado de São Paulo"
+
+#: Organization:Vall d'Hebron Institute of Oncology
+msgid "Vall d'Hebron Institute of Oncology"
+msgstr "Vall d'Hebron Institute of Oncology"
+
+#: Organization:Hospital Clínic de Barcelona
+msgid "Hospital Clínic de Barcelona"
+msgstr "Hospital Clínic de Barcelona"
+
+#: Organization:Hospital Clinico San Carlos
+msgid "Hospital Clinico San Carlos"
+msgstr ""
+
+#: Organization:Hospital Provincial de Castellón
+msgid "Hospital Provincial de Castellón"
+msgstr ""
+
+#: Organization:Hospital Universitario La Princesa
+msgid "Hospital Universitario La Princesa"
+msgstr ""
+
+#: Organization:Institut Catalá d'Oncologia Badalona
+msgid "Institut Catalá d'Oncologia Badalona"
+msgstr ""
+
+#: Organization:Instituto Valenciano de Oncologia
+msgid "Instituto Valenciano de Oncologia"
+msgstr ""
+
+#: Organization:Beacon Hospital
+msgid "Beacon Hospital"
+msgstr "Beacon Hospital"
+
+#: Organization:St. Vincent's University Hospital
+msgid "St. Vincent's University Hospital"
+msgstr "St. Vincent's University Hospital"
+
+#: Organization:Test Site
+msgid "Test Site"
+msgstr "Teststed"
+
+#: Organization:Kantonsspitals St. Gallen
+msgid "Kantonsspitals St. Gallen"
+msgstr "Kantonsspitals St. Gallen"
+
+#: Organization:United Kingdom (Region/Country Site)
+msgid "United Kingdom (Region/Country Site)"
+msgstr "Storbritannia (region-/landside)"
+
+#: Organization:Guys St. Thomas NHS Foundation Trust
+msgid "Guys St. Thomas NHS Foundation Trust"
+msgstr "Guys St. Thomas NHS Foundation Trust"
+
+#: Organization:University Hospital Southampton NHS Foundation Trust
+msgid "University Hospital Southampton NHS Foundation Trust"
+msgstr "University Hospital Southampton NHS Foundation Trust"
+
+#: Organization:University Hospitals of Morecambe Bay NHS Trust
+msgid "University Hospitals of Morecambe Bay NHS Trust"
+msgstr ""
+
+#: Organization:Mount Vernon Cancer Centre
+msgid "Mount Vernon Cancer Centre"
+msgstr ""
+
+#: Organization:Clatterbridge Cancer Centre NHS Foundation Trust
+msgid "Clatterbridge Cancer Centre NHS Foundation Trust"
+msgstr ""
+
+#: Organization:Sunderland Royal Hospital
+msgid "Sunderland Royal Hospital"
+msgstr ""
+
+#: Organization:Sheffield Teaching Hospitals NHS Foundation Trust
+msgid "Sheffield Teaching Hospitals NHS Foundation Trust"
+msgstr ""
+
+#: Organization:TrueNTH Global
+msgid "TrueNTH Global"
+msgstr "TrueNTH Global"
+
+#: Organization:South Africa (Region/Country Site)
+msgid "South Africa (Region/Country Site)"
+msgstr "Sør-Afrika (region-/landside)"
+
+#: Organization:Brazil (Region/Country Site)
+msgid "Brazil (Region/Country Site)"
+msgstr "Brasil (region-/landside)"
+
+#: Organization:Centro de Paulista Oncologia
+msgid "Centro de Paulista de Oncologia"
+msgstr "Centro de Paulista de Oncologia"
+
+#: Organization:Instituto do Câncer e Transplante
+msgid "Instituto do Câncer e Transplante"
+msgstr "Instituto do Câncer e Transplante"
+
+#: Organization:Spain (Region/Country Site)
+msgid "Spain (Region/Country Site)"
+msgstr "Spania (region-/landside)"
+
+#: Organization:Hospital Universitario Virgen de la Victoria
+msgid "Hospital Universitario Virgen de la Victoria"
+msgstr "Hospital Universitario Virgen de la Victoria"
+
+#: Organization:Hospital Universitario 12 de Octubre
+msgid "Hospital Universitario 12 de Octubre"
+msgstr ""
+
+#: Organization:Hospital Universitario Central de Asturias
+msgid "Hospital Universitario Central de Asturias"
+msgstr ""
+
+#: Organization:Institut Catalá d'Oncologia Hospitalet
+msgid "Institut Catalá d'Oncologia Hospitalet"
+msgstr ""
+
+#: Organization:Hospital del Mar
+msgid "Hospital del Mar"
+msgstr ""
+
+#: Organization:Ireland (Region/Country Site)
+msgid "Ireland (Region/Country Site)"
+msgstr "Irland (region-/landside)"
+
+#: Organization:Tallaght University Hospital
+msgid "Tallaght University Hospital"
+msgstr ""
+
+#: Organization:Sligo University Hospital
+msgid "Sligo University Hospital"
+msgstr ""
+
+#: Organization:Test Site II
+msgid "Test Site II"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_recurring_3mo_pattern
+msgid "Ironman Recurring 3Mo Pattern"
+msgstr "Ironman gjentakende 3Mo-mønster"
+
+#: QuestionnaireBank:IRONMAN_v3_recurring_3mo_pattern
+msgid "Ironman V3 Recurring 3Mo Pattern"
+msgstr "Ironman V3 gjentakende 3Mo-mønster"
+
+#: QuestionnaireBank:IRONMAN_v5_recurring_3mo_pattern
+msgid "Ironman V5 Recurring 3Mo Pattern"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_recurring_6mo_pattern
+msgid "Ironman Recurring 6Mo Pattern"
+msgstr "Ironman gjentakende 6Mo-mønster"
+
+#: QuestionnaireBank:IRONMAN_v3_recurring_6mo_pattern
+msgid "Ironman V3 Recurring 6Mo Pattern"
+msgstr "Ironman V3 gjentakende 6Mo-mønster"
+
+#: QuestionnaireBank:IRONMAN_v5_start6mo_yearly_end30mo
+msgid "Ironman V5 Start6Mo Yearly End30Mo"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_v5_start3.5years_yearly
+msgid "Ironman V5 Start3.5Years Yearly"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_recurring_annual_pattern
+msgid "Ironman Recurring Annual Pattern"
+msgstr "Ironman gjentakende årsmønster"
+
+#: QuestionnaireBank:IRONMAN_v3_recurring_annual_pattern
+msgid "Ironman V3 Recurring Annual Pattern"
+msgstr "Ironman V3 gjentakende årsmønster"
+
+#: QuestionnaireBank:IRONMAN_v5_recurring_annual_pattern
+msgid "Ironman V5 Recurring Annual Pattern"
+msgstr ""
+
+#: QuestionnaireBank:none of the above
+msgid "None Of The Above"
+msgstr "Ingen av ovenstående"
+
+#: QuestionnaireBank:IRONMAN_baseline
+msgid "Ironman Baseline"
+msgstr "Ironman-baslinje"
+
+#: QuestionnaireBank:IRONMAN_indefinite
+msgid "Ironman Indefinite"
+msgstr "Ironman Indefinite"
+
+#: QuestionnaireBank:IRONMAN_v3_indefinite
+msgid "Ironman V3 Indefinite"
+msgstr "Ironman V3 Indefinite"
+
+#: QuestionnaireBank:IRONMAN_v5_baseline
+msgid "Ironman V5 Baseline"
+msgstr ""
+
+#: QuestionnaireBank:CRV_baseline
+msgid "Crv Baseline"
+msgstr ""
+
+#: QuestionnaireBank:IRONMAN_v3_baseline
+msgid "Ironman V3 Baseline"
+msgstr "Ironman V3-baslinje"
+
+#: QuestionnaireBank:IRONMAN_v5_indefinite
+msgid "Ironman V5 Indefinite"
+msgstr ""
+
+#: ResearchProtocol:IRONMAN v5
+msgid "Ironman V5"
+msgstr ""
+
+#: ResearchProtocol:IRONMAN v3
+msgid "Ironman V3"
+msgstr "Ironman V3"
+
+#: ResearchProtocol:IRONMAN v2
+msgid "Ironman V2"
+msgstr "Ironman V2"
+
+#: ResearchProtocol:TNGR v1
+msgid "Tngr V1"
+msgstr ""
+
+#: Role:access_on_verify
+msgid "Access On Verify"
+msgstr ""
+
+#: Role:admin
+msgid "Admin"
+msgstr ""
+
+#: Role:analyst
+msgid "Analyst"
+msgstr ""
+
+#: Role:anon
+msgid "Anon"
+msgstr "Anon"
+
+#: Role:application_developer
+msgid "Application Developer"
+msgstr ""
+
+#: Role:content_manager
+msgid "Content Manager"
+msgstr ""
+
+#: Role:intervention_staff
+msgid "Intervention Staff"
+msgstr ""
+
+#: Role:partner
+msgid "Partner"
+msgstr ""
+
+#: Role:promote_without_identity_challenge
+msgid "Promote Without Identity Challenge"
+msgstr ""
+
+#: Role:researcher
+msgid "Researcher"
+msgstr "Forsker"
+
+#: Role:staff
+msgid "Staff"
+msgstr "Personale"
+
+#: Role:service
+msgid "Service"
+msgstr ""
+
+#: Role:test
+msgid "Test"
+msgstr ""
+
+#: Role:write_only
+msgid "Write Only"
+msgstr "Bare skriv"
+
+#: OverallStatus:Completed
+msgid "Completed"
+msgstr "Fullført"
+
+#: OverallStatus:Due
+msgid "Due"
+msgstr "Frist"
+
+#: OverallStatus:Expired
+msgid "Expired"
+msgstr "Utløpt"
+
+#: OverallStatus:Overdue
+msgid "Overdue"
+msgstr "Forfalt"
+
+#: OverallStatus:Partially Completed
+msgid "Partially Completed"
+msgstr "Delvis fullført"
+
+#: OverallStatus:In Progress
+msgid "In Progress"
+msgstr "Behandles nå"
+
+#: OverallStatus:Withdrawn
+msgid "Withdrawn"
+msgstr "Tilbaketrukket"
+
+#: classification_enum:Baseline
+msgid "Baseline"
+msgstr "Baslinje"
+
+#: classification_enum:Recurring
+msgid "Recurring"
+msgstr "Gjentakende"
+
+#: classification_enum:Indefinite
+msgid "Indefinite"
+msgstr "Indefinite"

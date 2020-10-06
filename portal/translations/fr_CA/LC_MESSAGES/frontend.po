@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2019-05-07T23:40:16.794Z\n"
-"PO-Revision-Date: 2019-05-07T23:40:16.794Z\n"
+"POT-Creation-Date: 2020-08-03T21:28:10.475Z\n"
+"PO-Revision-Date: 2020-08-03T21:28:10.475Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,7 +61,7 @@ msgid "Export data"
 msgstr "Exporter des données"
 
 msgid "Export patient list"
-msgstr ""
+msgstr "Exporter la liste des patients"
 
 msgid "User Id is required"
 msgstr "L'id. de l'utilisateur est requis"
@@ -73,7 +73,7 @@ msgid "Error occurred updating user roles"
 msgstr ""
 
 msgid "Are you sure you want to deactivate this account?"
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir désactiver ce compte?"
 
 msgid "Yes"
 msgstr "Oui"
@@ -97,7 +97,7 @@ msgid "Patient Reports"
 msgstr "Rapports patients"
 
 msgid "Patient Report"
-msgstr "Rapport patient"
+msgstr ""
 
 msgid "No report data found."
 msgstr "Aucune donnée de rapport trouvée."
@@ -148,7 +148,7 @@ msgid "You must agree to the terms and conditions by checking the provided check
 msgstr "Vous devez accepter les conditions générales en cochant les cases ci-dessous."
 
 msgid "Try Again"
-msgstr ""
+msgstr "Réessayer"
 
 msgid "Missing information for consent agreement.  Unable to complete request."
 msgstr ""
@@ -187,7 +187,7 @@ msgid "District Of Columbia"
 msgstr "District de Columbia"
 
 msgid "Federated States Of Micronesia"
-msgstr "États fédérés de Micronésie"
+msgstr ""
 
 msgid "Florida"
 msgstr "Floride"
@@ -226,7 +226,7 @@ msgid "Maine"
 msgstr "Maine"
 
 msgid "Marshall Islands"
-msgstr "Îles Marshall"
+msgstr ""
 
 msgid "Maryland"
 msgstr "Maryland"
@@ -274,7 +274,7 @@ msgid "North Dakota"
 msgstr "Dakota du Nord"
 
 msgid "Northern Mariana Islands"
-msgstr "Îles Mariannes du Nord"
+msgstr ""
 
 msgid "Ohio"
 msgstr "Ohio"
@@ -286,7 +286,7 @@ msgid "Oregon"
 msgstr "Oregon"
 
 msgid "Palau"
-msgstr "Palau"
+msgstr ""
 
 msgid "Pennsylvania"
 msgstr "Pennsylvanie"
@@ -409,10 +409,10 @@ msgid "Subject id is required"
 msgstr ""
 
 msgid "Invalid field value."
-msgstr ""
+msgstr "Valeur de champ non valide."
 
 msgid "Validation error."
-msgstr ""
+msgstr "Erreur de validation."
 
 msgid "Date (GMT), Y-M-D"
 msgstr "Date (GMT), A-M-J"
@@ -513,11 +513,8 @@ msgstr "La date à laquelle le questionnaire est rempli est non valide. La date 
 msgid "All available questionnaires have been completed."
 msgstr "Tous les questionnaires disponibles ont été remplis."
 
-msgid "Problem retrieving audit log from server."
-msgstr "Problème lors de la récupération du journal d'audit du serveur."
-
-msgid "No audit log item found."
-msgstr "Aucune donnée d'audit trouvée."
+msgid "Error retrieving data from server"
+msgstr "Erreur lors de la récupération des données du serveur"
 
 msgid "More..."
 msgstr "Plus..."
@@ -645,8 +642,8 @@ msgstr "Vous n’avez encore saisi aucune option de gestion."
 msgid "error occurred retrieving user procedures"
 msgstr ""
 
-msgid "(data entered by %actor on %date)"
-msgstr ""
+msgid "(data entered by {actor} on {date})"
+msgstr "(données saisies par {actor} sur {date})"
 
 msgid "REMOVE"
 msgstr "RETIRER"
@@ -701,9 +698,6 @@ msgstr "Erreur du serveur lors de la récupération des données démographiques
 
 msgid "Server error occurred retrieving locale information."
 msgstr "Erreur du serveur lors de la récupération des informations locales."
-
-msgid "Error retrieving data from server"
-msgstr "Erreur lors de la récupération des données du serveur"
 
 msgid "Server error occurred saving procedure/treatment information."
 msgstr "Erreur du serveur lors de la procédure de sauvegarde ou de traitement des informations."
@@ -832,10 +826,10 @@ msgid "Error occurred processing request"
 msgstr "Erreur lors du traitement de la demande"
 
 msgid "Hi there."
-msgstr ""
+msgstr "Bonjour."
 
 msgid "Thanks for your patience while we upgrade our site."
-msgstr ""
+msgstr "Merci pour votre patience pendant que nous mettons à niveau notre site."
 
 msgid "Error occurred when verifying the uniqueness of email"
 msgstr ""
@@ -844,7 +838,7 @@ msgid "This e-mail address is already in use. Please enter a different address."
 msgstr "Cette adresse de courriel est déjà utilisée. Veuillez saisir une adresse différente."
 
 msgid "Invalid characters in text."
-msgstr ""
+msgstr "Caractères non valides dans le texte."
 
 msgid "Identifier value must be unique"
 msgstr ""
@@ -859,7 +853,7 @@ msgid "Server Error occurred retrieving report data"
 msgstr "Erreur du serveur lors de la récupération des données du rapport."
 
 msgid "No data returned from server"
-msgstr ""
+msgstr "Aucune donnée retournée par le serveur"
 
 msgid "Unable to load report data"
 msgstr "Impossible de charger les données du rapport"
@@ -881,3 +875,9 @@ msgstr "CSV"
 
 msgid "JSON"
 msgstr "JSON"
+
+msgid "Export request submitted"
+msgstr "Exporter les données demandées"
+
+msgid "Request to export data failed."
+msgstr ""

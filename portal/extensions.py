@@ -50,7 +50,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
         2. if the user appears to be locally logged in (i.e. browser
            session cookie with a valid user.id),
-           return the effecively undecorated function.
+           return the effectively undecorated function.
 
         """
 
@@ -80,7 +80,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
                 if hasattr(request, 'oauth') and request.oauth:
                     # Start MOD
                     # Need to log oauth user in for flask-user roles, etc.
-                    login_user(request.oauth.user, 'password_authenticated')
+                    login_user(request.oauth.user)
                     # End MOD
                     return eff(*args, **kwargs)
 
@@ -96,7 +96,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
                 request.oauth = req
                 # Start MOD
                 # Need to log oauth user in for flask-user roles, etc.
-                login_user(request.oauth.user, 'password_authenticated')
+                login_user(request.oauth.user)
                 # End MOD
                 return eff(*args, **kwargs)
 

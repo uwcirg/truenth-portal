@@ -65,7 +65,7 @@
         <h3 class="side-nav__heading">{{_("Navigation")}}</h3>
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="/">{{_("Home")}}</a></li>
-          {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
+          {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
               <li class="side-nav-items__item"><a href="{{url_for('patients.patients_root')}}">{{_("Patients")}}</a></li>
           {% endif %}
           {% if user %}

@@ -44,7 +44,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         # Basic case, without org, empty list
         self.setup_org_qbs()
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user=user)
+        gen = ordered_qbs(user=user, research_study_id=0)
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -54,7 +54,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
-        gen = ordered_qbs(user=self.test_user)
+        gen = ordered_qbs(user=self.test_user, research_study_id=0)
 
         # expect each in order despite overlapping nature
         expect_baseline = next(gen)
@@ -77,7 +77,7 @@ class TestQbTimeline(TestQuestionnaireBank):
             status='', issued=None)
         user = db.session.merge(self.test_user)
 
-        gen = ordered_qbs(user=user)
+        gen = ordered_qbs(user=user, research_study_id=0)
 
         # expect all intervention QBs - baseline then every 3mos
         expect_baseline = next(gen)
@@ -94,7 +94,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
         # expect (due, overdue, expired) for each QB (8)
         assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
         assert QBT.query.filter(
@@ -116,7 +116,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         mock_qr('epic26_v2', qb=threeMo, iteration=0)
 
         self.test_user = db.session.merge(self.test_user)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
@@ -147,7 +147,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         mock_qr('epic26_v2', qb=threeMo, iteration=0, timestamp=post_overdue)
 
         self.test_user = db.session.merge(self.test_user)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
@@ -179,7 +179,7 @@ class TestQbTimeline(TestQuestionnaireBank):
             mock_qr(q.name, qb=threeMo, iteration=0)
 
         self.test_user = db.session.merge(self.test_user)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
         # partially completed, matching expectations
@@ -219,7 +219,7 @@ class TestQbTimeline(TestQuestionnaireBank):
             qb_count += 1
 
         self.test_user = db.session.merge(self.test_user)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # prior to consent change, expect QNRs to have baseline association
         assert (qb_count == QuestionnaireResponse.query.filter(
@@ -250,7 +250,10 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # update QBT should not re-establish baseline connection given dates
         self.test_user = db.session.merge(self.test_user)
-        qbstatus = QB_Status(user=self.test_user, as_of_date=timepoint)
+        qbstatus = QB_Status(
+            user=self.test_user,
+            research_study_id=0,
+            as_of_date=timepoint)
         assert qbstatus.overall_status == OverallStatus.due
         assert (0 == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
@@ -282,7 +285,7 @@ class TestQbTimeline(TestQuestionnaireBank):
             qb_count += 1
 
         self.test_user = db.session.merge(self.test_user)
-        update_users_QBT(TEST_USER_ID)
+        update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # prior to consent change, expect QNRs to have baseline association
         assert (qb_count == QuestionnaireResponse.query.filter(
@@ -313,7 +316,10 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # update QBT should re-establish baseline connection
         self.test_user = db.session.merge(self.test_user)
-        qbstatus = QB_Status(user=self.test_user, as_of_date=timepoint)
+        qbstatus = QB_Status(
+            user=self.test_user,
+            research_study_id=0,
+            as_of_date=timepoint)
         assert (qb_count == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
@@ -335,8 +341,8 @@ class TestQbTimeline(TestQuestionnaireBank):
         user = db.session.merge(self.test_user)
         withdraw_consent(
             user=user, org_id=crv_id, acting_user=user,
-            acceptance_date=datetime.utcnow())
-        gen = ordered_qbs(user=user)
+            research_study_id=0, acceptance_date=datetime.utcnow())
+        gen = ordered_qbs(user=user, research_study_id=0)
 
         # expect each in order despite overlapping nature
         expect_baseline = next(gen)
@@ -358,7 +364,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.setup_org_qbs(org=org, rp_name='v3')
         self.consent_with_org(org_id=org_id, setdate=back14)
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user)
+        gen = ordered_qbs(user, research_study_id=0)
 
         # expect baseline and 3 month in v2, rest in v3
         expect_baseline = next(gen)
@@ -392,7 +398,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.setup_org_qbs(org=org, rp_name='v5')  # shouldn't hit v5
         self.consent_with_org(org_id=org_id, setdate=back7)
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user)
+        gen = ordered_qbs(user, research_study_id=0)
 
         # expect everything in v3
         expect_baseline = next(gen)
@@ -422,7 +428,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.setup_org_qbs(org=org, rp_name='v5')
         self.consent_with_org(org_id=org_id, setdate=back1)
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user)
+        gen = ordered_qbs(user, research_study_id=0)
 
         # expect everything in v5
         expect_baseline = next(gen)
@@ -456,7 +462,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         mock_qr('epic26_v2', qb=nineMo, iteration=1, timestamp=nowish)
 
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user)
+        gen = ordered_qbs(user, research_study_id=0)
 
         # expect baseline and 3 month in v2, rest in v3
         expect_baseline = next(gen)
@@ -494,7 +500,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         mock_qr('epic26_v2', qb=baseline, iteration=None, timestamp=back7)
 
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user)
+        gen = ordered_qbs(user, research_study_id=0)
 
         # expect everything in v3 post baseline
         expect_baseline = next(gen)
@@ -523,7 +529,8 @@ class TestQbTimeline(TestQuestionnaireBank):
         self.consent_with_org(org_id=org_id, setdate=back7)
 
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user, classification='indefinite')
+        gen = ordered_qbs(
+            user, research_study_id=0, classification='indefinite')
 
         # expect only v3
         expect_v3 = next(gen)
@@ -554,7 +561,8 @@ class TestQbTimeline(TestQuestionnaireBank):
         mock_qr("irondemog_v2", qb=i_v2, iteration=None)
 
         user = db.session.merge(self.test_user)
-        gen = ordered_qbs(user, classification='indefinite')
+        gen = ordered_qbs(
+            user, research_study_id=0, classification='indefinite')
 
         # expect only v2 given submission
         expect_v2 = next(gen)

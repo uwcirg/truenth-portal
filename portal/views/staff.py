@@ -76,20 +76,18 @@ def staff_profile(user_id):
 def staff_index():
     """staff view function, intended for staff admin
 
-    Present the logged in staff admin the list of staff matching
-    the staff admin's organizations (and any descendant organizations)
+    Present the logged in staff admin the list of staff and clinicians
+    matching the staff admin's organizations (and any descendant
+    organizations)
 
     """
     user = get_user(current_user().id, 'edit')
-
     ot = OrgTree()
-    staff_role_id = Role.query.filter(
-        Role.name == ROLE.STAFF.value).with_entities(Role.id).first()
+
     # empty patient query list to start, unionize with other relevant lists
     staff_list = User.query.filter(User.id == -1)
 
     org_list = set()
-
     user_orgs = set()
 
     # Build list of all organization ids, and their descendents, the
@@ -107,9 +105,12 @@ def staff_index():
         and_(User.id == UserRoles.user_id,
              # exclude users with admin role
              ~User.roles.any(Role.name == ROLE.ADMIN.value),
-             UserRoles.role_id == staff_role_id,
              # exclude current user from the list
              User.id != user.id)
+    ).join(Role).filter(
+        and_(Role.name.in_((
+            ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)),
+             UserRoles.role_id == Role.id)
     ).join(UserOrganization).filter(
         and_(UserOrganization.user_id == User.id,
              UserOrganization.organization_id.in_(org_list)))

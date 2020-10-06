@@ -388,9 +388,11 @@ def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
 
-    # After a successfull login make sure lockout is reset
+    # After a successful login make sure lockout is reset
     user.reset_lockout()
 
+    current_app.logger.debug(
+        "captured flask_user_login_event, login w/ 'password_authenticated'")
     login_user(user, 'password_authenticated')
 
 
@@ -603,7 +605,7 @@ def next_after_login():
 
 
 @auth.route('/login-as/<user_id>')
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF.value])
 @oauth.require_oauth()
 def login_as(user_id, auth_method='staff_authenticated'):
     """Provide direct login w/o auth to user account, but only if qualified

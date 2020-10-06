@@ -41,7 +41,7 @@ class TestReporting(TestCase):
             value='clever study id')
         self.add_system_user()
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()
@@ -77,7 +77,8 @@ class TestReporting(TestCase):
         self.test_user = db.session.merge(self.test_user)
 
         # test user with status = 'Expired' (should not show up)
-        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        a_s = QB_Status(
+            self.test_user, research_study_id=0, as_of_date=datetime.utcnow())
         assert a_s.overall_status == OverallStatus.expired
 
         ostats = self.get_ostats()
@@ -90,8 +91,9 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
-        invalidate_users_QBT(self.test_user.id)
-        a_s = QB_Status(self.test_user, as_of_date=datetime.utcnow())
+        invalidate_users_QBT(self.test_user.id, research_study_id='all')
+        a_s = QB_Status(
+            self.test_user, research_study_id=0, as_of_date=datetime.utcnow())
         assert a_s.overall_status == OverallStatus.overdue
 
         ostats = self.get_ostats()

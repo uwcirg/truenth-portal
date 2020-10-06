@@ -1,0 +1,883 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"POT-Creation-Date: 2020-08-03T21:28:27.906Z\n"
+"PO-Revision-Date: 2020-08-03T21:28:27.906Z\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Server error occurred updating data."
+msgstr "Det oppsto en serverfeil ved oppdatering av data."
+
+msgid "Invalid user id: %d"
+msgstr "Ugyldig bruker-ID: %d"
+
+msgid "Account created. Redirecting to profile..."
+msgstr "Konto opprettet. Omdirigerer til profil..."
+
+msgid "[Processing error] "
+msgstr "[Behandlingsfeil] "
+
+msgid "Email is already in use."
+msgstr "Eposten er allerede i bruk."
+
+msgid "An organization must be selected."
+msgstr "En organisasjon må velges."
+
+msgid "no data returned"
+msgstr "Ingen data ble sendt"
+
+msgid "Error occurred retrieving clinics data."
+msgstr "Det oppsto en feil ved henting av klinikkdata."
+
+msgid "No clinics data available."
+msgstr "Ingen klinikkdata tilgjengelig."
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} users"
+msgstr "Viser {pageFrom} til {pageTo} av {totalRows} brukere"
+
+msgid "{pageNumber} records per page"
+msgstr "{pageNumber} poster per side"
+
+msgid "Toggle"
+msgstr "Veksle"
+
+msgid "Columns"
+msgstr "Kolonner"
+
+msgid "All rows"
+msgstr "Alle rader"
+
+msgid "Search"
+msgstr "Søk"
+
+msgid "No matching records found"
+msgstr "Ingen matchende poster ble funnet"
+
+msgid "Export data"
+msgstr "Eksporter data"
+
+msgid "Export patient list"
+msgstr "Eksporter pasientliste"
+
+msgid "User Id is required"
+msgstr "Bruker-ID er påkrevd"
+
+msgid "Error occurred retrieving roles for user"
+msgstr "Det oppsto en feil under henting av roller for brukeren"
+
+msgid "Error occurred updating user roles"
+msgstr "Det oppsto en feil ved oppdatering av brukerroller"
+
+msgid "Are you sure you want to deactivate this account?"
+msgstr "Er du sikker på at du vil deaktivere denne kontoen?"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nei"
+
+msgid "Enter Text"
+msgstr "Skriv inn tekst"
+
+msgid "Select"
+msgstr "Velg"
+
+msgid "Error occurred retrieving patient report"
+msgstr "Det oppsto en feil ved henting av pasientrapport."
+
+msgid "Download"
+msgstr "Last ned"
+
+msgid "Patient Reports"
+msgstr "Pasientrapporter"
+
+msgid "Patient Report"
+msgstr ""
+
+msgid "No report data found."
+msgstr "Ingen rapportdata funnet."
+
+msgid "User id is required."
+msgstr "Bruker-ID er påkrevd."
+
+msgid "Inactive"
+msgstr "Uvirksom"
+
+msgid "Deactivate"
+msgstr "Deaktiver"
+
+msgid "Error occurred retrieving subject ID"
+msgstr "Det oppsto en feil under henting av personens ID"
+
+msgid "Error occurred - unable to reach destination"
+msgstr "Det oppsto en feil - kunne ikke nå målet"
+
+msgid "Unable to set session variable for organization modal viewed."
+msgstr "Kan ikke angi øktvariabel for organisasjonsmodal som vises."
+
+msgid "Error retrieving demographics information for user."
+msgstr "Feil ved henting av demografisk informasjon for brukeren."
+
+msgid "Error occurred updating user organization."
+msgstr "Det oppsto en feil ved oppdatering av brukerorganisasjonen."
+
+msgid "Error updating organization"
+msgstr "Feil ved oppdatering av organisasjonen"
+
+msgid "My Dashboard"
+msgstr "Mitt skrivebord"
+
+msgid "Thank you, your access code {shortcut_alias} indicates you are located at the {org_name}. Proceeding to registration ..."
+msgstr ""
+
+msgid "You have entered an invalid access code.  Please try again"
+msgstr "Du har oppgitt en ugyldig tilgangskode. Vennligst prøv igjen."
+
+msgid "System was unable to process your request."
+msgstr "Systemet kunne ikke behandle din forespørsel."
+
+msgid "Edit in Liferay"
+msgstr "Rediger i Liferay"
+
+msgid "You must agree to the terms and conditions by checking the provided checkboxes."
+msgstr "Du må godta vilkårene og betingelsene ved å merke av de angitte avmerkingsboksene."
+
+msgid "Try Again"
+msgstr "Prøv igjen"
+
+msgid "Missing information for consent agreement.  Unable to complete request."
+msgstr "Manglende informasjon for samtykkeavtale. Kan ikke fullføre forespørselen."
+
+msgid "Error occurred deleting notification"
+msgstr "Det oppsto en feil under sletting av varsel"
+
+msgid "Alabama"
+msgstr ""
+
+msgid "Alaska"
+msgstr ""
+
+msgid "American Samoa"
+msgstr "Amerikansk Samoa"
+
+msgid "Arizona"
+msgstr ""
+
+msgid "Arkansas"
+msgstr ""
+
+msgid "California"
+msgstr ""
+
+msgid "Colorado"
+msgstr ""
+
+msgid "Connecticut"
+msgstr ""
+
+msgid "Delaware"
+msgstr ""
+
+msgid "District Of Columbia"
+msgstr ""
+
+msgid "Federated States Of Micronesia"
+msgstr ""
+
+msgid "Florida"
+msgstr ""
+
+msgid "Georgia"
+msgstr ""
+
+msgid "Guam"
+msgstr ""
+
+msgid "Hawaii"
+msgstr ""
+
+msgid "Idaho"
+msgstr ""
+
+msgid "Illinois"
+msgstr ""
+
+msgid "Indiana"
+msgstr ""
+
+msgid "Iowa"
+msgstr ""
+
+msgid "Kansas"
+msgstr ""
+
+msgid "Kentucky"
+msgstr ""
+
+msgid "Louisiana"
+msgstr ""
+
+msgid "Maine"
+msgstr ""
+
+msgid "Marshall Islands"
+msgstr ""
+
+msgid "Maryland"
+msgstr ""
+
+msgid "Massachusetts"
+msgstr ""
+
+msgid "Michigan"
+msgstr ""
+
+msgid "Minnesota"
+msgstr ""
+
+msgid "Mississippi"
+msgstr ""
+
+msgid "Missouri"
+msgstr ""
+
+msgid "Montana"
+msgstr ""
+
+msgid "Nebraska"
+msgstr ""
+
+msgid "Nevada"
+msgstr ""
+
+msgid "New Hampshire"
+msgstr ""
+
+msgid "New Jersey"
+msgstr ""
+
+msgid "New Mexico"
+msgstr ""
+
+msgid "New York"
+msgstr ""
+
+msgid "North Carolina"
+msgstr "North Carolina"
+
+msgid "North Dakota"
+msgstr ""
+
+msgid "Northern Mariana Islands"
+msgstr ""
+
+msgid "Ohio"
+msgstr ""
+
+msgid "Oklahoma"
+msgstr ""
+
+msgid "Oregon"
+msgstr "Oregon"
+
+msgid "Palau"
+msgstr ""
+
+msgid "Pennsylvania"
+msgstr ""
+
+msgid "Puerto Rico"
+msgstr ""
+
+msgid "Rhode Island"
+msgstr ""
+
+msgid "South Carolina"
+msgstr ""
+
+msgid "South Dakota"
+msgstr ""
+
+msgid "Tennessee"
+msgstr ""
+
+msgid "Texas"
+msgstr ""
+
+msgid "Utah"
+msgstr ""
+
+msgid "Vermont"
+msgstr ""
+
+msgid "Virgin Islands"
+msgstr ""
+
+msgid "Virginia"
+msgstr ""
+
+msgid "Washington"
+msgstr ""
+
+msgid "West Virginia"
+msgstr ""
+
+msgid "Wisconsin"
+msgstr ""
+
+msgid "Wyoming"
+msgstr ""
+
+msgid "Organization"
+msgstr "Organisasjon"
+
+msgid "Consent Status"
+msgstr "Samtykkestatus"
+
+msgid "Agreement"
+msgstr "Avtale"
+
+msgid "Date"
+msgstr "Dato"
+
+msgid "Registration Date"
+msgstr "Registreringsdato"
+
+msgid "GMT"
+msgstr "GMT"
+
+msgid "Consent Date"
+msgstr "Samtykkedato"
+
+msgid "Last Updated"
+msgstr "Sist oppdatert"
+
+msgid "( GMT, Y-M-D )"
+msgstr "( GMT, Å-M-D )"
+
+msgid "User"
+msgstr "Bruker"
+
+msgid "Consented"
+msgstr "Samtykke gitt"
+
+msgid "Consented / Enrolled"
+msgstr "Godkjent/påmeldt"
+
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
+msgstr "Tilbaketrukket - stopp datainnsamling og rapporter historisk data"
+
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr "Stopp innsamling av data og rapporter historisk data"
+
+msgid "Purged / Removed"
+msgstr "Tømt/fjernet"
+
+msgid "Replaced"
+msgstr "Erstattet"
+
+msgid "Showing {pageFrom} to {pageTo} of {totalRows} records"
+msgstr "Viser {pageFrom} til {pageTo} av {totalRows} poster"
+
+msgid "not provided"
+msgstr "ikke inkludert"
+
+msgid "Unable to set user settings."
+msgstr "Kan ikke angi brukerinnstillinger."
+
+msgid "Unable to set current user orgs"
+msgstr "Kan ikke angi gjeldende brukerorganisasjoner"
+
+msgid "DONE"
+msgstr "FERDIG"
+
+msgid "EDIT"
+msgstr "REDIGER"
+
+msgid "No information available"
+msgstr "Ingen informasjon tilgjengelig"
+
+msgid "Unable to properly set session storage variable for login-as. "
+msgstr "Kan ikke angi øktlagringsvariabel riktig for login-as. "
+
+msgid "Subject id is required"
+msgstr "Person-ID er påkrevd"
+
+msgid "Invalid field value."
+msgstr "Ugyldig feltverdi."
+
+msgid "Validation error."
+msgstr "Valideringsfeil."
+
+msgid "Date (GMT), Y-M-D"
+msgstr "Dato (GMT), Å-M-D"
+
+msgid "Subject"
+msgstr "Emne"
+
+msgid "Email"
+msgstr "Epost"
+
+msgid "No email log entry found."
+msgstr "Ingen epostloggoppføringer funnet."
+
+msgid "{emailType} email will be sent to {email}"
+msgstr "{emailType} epost vil bli sendt til {email}"
+
+msgid "Url for email content is unavailable."
+msgstr "Lenken for epostinnhold er ikke tilgjengelig."
+
+msgid "Unable to send email. Missing content."
+msgstr "Kan ikke sende epost. Mangler innhold."
+
+msgid "failed request to get email invite url"
+msgstr "mislykket anmodning om å få epostinvitasjonslenken"
+
+msgid "Error occurred while sending invite email."
+msgstr "Det oppsto en feil under sending av invitasjonsepost."
+
+msgid "{emailType} email sent to {emailAddress}"
+msgstr "{emailType} epost sendt til {emailAddress}"
+
+msgid "Error occurred retreving email content via API."
+msgstr "Det oppsto en feil ved henting av epostinnhold via API."
+
+msgid "your clinic"
+msgstr "din klinikk"
+
+msgid "Hello, this is an invitation to complete your registration."
+msgstr "Hei, dette er en invitasjon til å fullføre registreringen."
+
+msgid "Verify your account to complete registration"
+msgstr "Bekreft din konto for å fullføre registrering"
+
+msgid "Registration invite from {clinicName}"
+msgstr "Registreringsinvitasjon fra {clinicName}"
+
+msgid "invite email sent to {email}"
+msgstr "invitasjonsepost sendt til {email}"
+
+msgid "Password reset email sent to {email}"
+msgstr "Passordtilbakestillingsepost sendt til {email}"
+
+msgid "Unable to send email."
+msgstr "Eposten ble ikke sendt."
+
+msgid "Error occurred suspending consent for subject."
+msgstr "Det oppsto en feil under suspendering av samtykke for person."
+
+msgid "Type"
+msgstr "Skriv"
+
+msgid "Report Name"
+msgstr "Rapporter navn"
+
+msgid "Generated (GMT)"
+msgstr "Generert (GMT)"
+
+msgid "Document Type"
+msgstr "Dokumenttype"
+
+msgid "No reports available."
+msgstr "Ingen rapporter tilgjengelig."
+
+msgid "Problem retrieving reports from server."
+msgstr "Problem med å hente rapporter fra server."
+
+msgid "No questionnaire data found."
+msgstr "Ingen spørreskjemadata funnet."
+
+msgid "Problem retrieving session data from server."
+msgstr "Problemer med å hente sesjonsdata fra serveren."
+
+msgid "Click to view report"
+msgstr "Klikk for å vise rapporten"
+
+msgid "No affiliated clinic"
+msgstr "Ingen tilknyttet klinikk"
+
+msgid "The user does not have a valid assessment link."
+msgstr "Brukeren har ikke en gyldig vurderingslenke."
+
+msgid "Server error occurred checking questionnaire window"
+msgstr "Det oppsto en serverfeil ved kontroll av spørreskjemavinduet"
+
+msgid "Invalid completion date. Date of completion is outside the days allowed."
+msgstr "Ugyldig fullføringsdato. Dato for fullføring er utenfor tillatte dager."
+
+msgid "All available questionnaires have been completed."
+msgstr "Alle tilgjengelige spørreskjemaer har blitt fylt ut."
+
+msgid "Error retrieving data from server"
+msgstr "Feil ved henting av data fra serveren"
+
+msgid "More..."
+msgstr "Mer..."
+
+msgid "Less..."
+msgstr "Mindre..."
+
+msgid "Comment"
+msgstr "Kommentar"
+
+msgid "Date/Time <span class='gmt'>{gmt}</span>"
+msgstr "Dato/tid <span class='gmt'> {gmt} </span>"
+
+msgid "Version"
+msgstr "Versjon"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "Sharing information with clinics"
+msgstr "Deling av informasjon med klinikker"
+
+msgid "expired"
+msgstr "utløpt"
+
+msgid "TrueNTH USA"
+msgstr "TrueNTH USA"
+
+msgid "Agreed to {documentType}"
+msgstr "Godkjent {documentType}"
+
+msgid "Agreed to terms"
+msgstr "Vilkår godtatt"
+
+msgid "{projectName} Terms of Use"
+msgstr "{projectName} Bruksvilkår"
+
+msgid "Error occurred retrieving consent list content."
+msgstr "Det oppsto en feil ved henting av innholdet på samtykkelisten."
+
+msgid "Error occurred setting user roles"
+msgstr "Det oppsto en feil ved innstilling av brukerroller"
+
+msgid "Error occurred setting user organizations"
+msgstr "Det oppsto en feil ved innstilling av brukerorganisasjoner"
+
+msgid "Date must in the valid format."
+msgstr "Datoen må være i gyldig format."
+
+msgid "Hour must be in valid format, range 0 to 23."
+msgstr "Time må være i gyldig format, rekkevidden 0 til 23."
+
+msgid "Minute must be in valid format, range 0 to 59."
+msgstr "Minutt må være i gyldig format, rekkevidden 0 til 59."
+
+msgid "Second must be in valid format, range 0 to 59."
+msgstr "Sekund må være i gyldig format, rekkevidden 0 til 59."
+
+msgid "You must enter a date/time"
+msgstr "Du må oppgi dato/tid"
+
+msgid "Error processing data.  Make sure the date is in the correct format."
+msgstr "Feil ved databehandling. Forsikre deg om at datoen er i riktig format."
+
+msgid "Consent to share information"
+msgstr "Samtykk til å dele informasjon"
+
+msgid "Close"
+msgstr "Lukk"
+
+msgid "Unable to set default consent agreement"
+msgstr "Kan ikke angi standardavtale for samtykke"
+
+msgid "Error loading portal wrapper"
+msgstr "Feil ved lasting av portalinnpakning"
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle rettigheter forbeholdt. En registrert 501 (c) 3 ideell organisasjon (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle rettigheter forbeholdt. Movember Foundation er et registrert veldedighetsorganisasjon i Australia ABN 48894537905 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation)."
+msgstr "© {year} Movember Foundation. Alle rettigheter forbeholdt. Movember Foundation har et New Zealand-registrert veldedighetsnummer CC51320 (Movember Foundation)."
+
+msgid "&copy; {year} Movember Foundation (Movember Foundation). All rights reserved."
+msgstr "© {year} Movember Foundation (Movember Foundation). Alle rettigheter forbeholdt."
+
+msgid "User id is required"
+msgstr "Bruker-ID er påkrevd"
+
+msgid "Error occurred retrieving notification."
+msgstr "Det oppsto en feil under henting av varsel."
+
+msgid "No organizations available"
+msgstr "Ingen organisasjoner tilgjengelig"
+
+msgid "What is your main clinic for prostate cancer care"
+msgstr "Hva er din hovedklinikk for prostatakreftbehandling"
+
+msgid "Other"
+msgstr "Annet"
+
+msgid "error occurred setting current user id"
+msgstr "det oppsto en feil ved innstilling av gjeldende bruker-ID"
+
+msgid "no data found"
+msgstr "ingen data funnet"
+
+msgid "you"
+msgstr "du"
+
+msgid "this patient"
+msgstr "denne pasienten"
+
+msgid "staff member"
+msgstr "personaladministrator"
+
+msgid "Added!"
+msgstr "Lagt til!"
+
+msgid "You haven't entered any management option yet."
+msgstr "Du har ikke lagt inn noe administrasjonsalternativ ennå."
+
+msgid "error occurred retrieving user procedures"
+msgstr "det oppsto en feil ved henting av brukerprosedyrer"
+
+msgid "(data entered by {actor} on {date})"
+msgstr "(data lagt inn av {actor} {date})"
+
+msgid "REMOVE"
+msgstr "FJERN"
+
+msgid "The procedure date must be valid and in required format."
+msgstr "Prosedyredatoen må være gyldig og i korrekt format."
+
+msgid "success"
+msgstr "vellykket"
+
+msgid "Unable to update. System/Server Error."
+msgstr "Kan ikke oppdatere. System-/serverfeil."
+
+msgid "unable to get needed core data"
+msgstr "ikke i stand til å få nødvendige kjernedata"
+
+msgid "unable to get required core data"
+msgstr "ikke i stand til å få påkrevde kjernedata"
+
+msgid "Unable to retrieve portal footer html"
+msgstr "Kan ikke hente portalfottekst html"
+
+msgid "No data found"
+msgstr "Ingen data funnet"
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr "Det oppsto en serverfeil ved henting av organisasjons-/klinikkinformasjon."
+
+msgid "Server error occurred retrieving consent information."
+msgstr "Det oppsto en serverfeil ved henting av samtykkeinformasjon."
+
+msgid "User id and parameters are required"
+msgstr "Bruker-ID og parametere er påkrevd"
+
+msgid "Server error occurred setting consent status."
+msgstr "Det oppsto en serverfeil ved innstilling av samtykkestatus."
+
+msgid "Server error occurred removing consent."
+msgstr "Det oppsto en serverfeil ved fjerning av samtykke."
+
+msgid "User id and organization id are required."
+msgstr "Bruker-ID og organisasjons-ID er påkrevd."
+
+msgid "Error occurred setting suspended consent status."
+msgstr "Det oppsto en feil ved innstilling av suspendert samtykkestatus."
+
+msgid "Server error occurred retrieving demographics information."
+msgstr "Det oppsto en serverfeil ved henting av demografisk informasjon."
+
+msgid "Server error occurred setting demographics information."
+msgstr "Det oppsto en serverfeil ved innstilling av demografisk informasjon."
+
+msgid "Server error occurred retrieving locale information."
+msgstr "Det oppsto en serverfeil ved henting av lokal informasjon."
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr "Det oppsto en serverfeil ved lagring av prosedyre/behandlingsinformasjon."
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr "Det oppsto en serverfeil ved fjerning av prosedyre/behandlingsinformasjon."
+
+msgid "Server error occurred retrieving roles information."
+msgstr "Det oppsto en serverfeil ved henting av rolleinformasjon."
+
+msgid "Server error occurred retrieving user role information."
+msgstr "Det oppsto en serverfeil ved henting av brukerrolleinformasjon."
+
+msgid "User Id is required."
+msgstr "Bruker-ID er påkrevd."
+
+msgid "Server error occurred setting user role information."
+msgstr "Det oppsto en serverfeil ved innstilling av brukerrolleinformasjon."
+
+msgid "Server error occurred deleting user role."
+msgstr "Det oppsto en serverfeil ved fjerning av brukerrolle."
+
+msgid "Server error occurred retrieving clinical data."
+msgstr "Det oppsto en serverfeil ved henting av klinisk data."
+
+msgid "Server error occurred updating clinical data."
+msgstr "Det oppsto en serverfeil ved oppdatering av klinisk data."
+
+msgid "no url returned"
+msgstr "ingen lenke returnert"
+
+msgid "Server error occurred retrieving tou url."
+msgstr "Det oppsto en serverfeil ved henting av tou-lenke."
+
+msgid "Server error"
+msgstr "Serverfeil"
+
+msgid "error retrieving instruments list"
+msgstr "feil ved henting av instrumentliste"
+
+msgid "Server error occurred retrieving tou data."
+msgstr "Det oppsto en serverfeil ved henting av tou-data"
+
+msgid "Server error occurred saving terms of use information."
+msgstr "Det oppsto en serverfeil ved lagring av bruksvilkårinformasjon."
+
+msgid "Error occurred retrieving access url."
+msgstr "Det oppsto en feil ved henting av tilgangslenke."
+
+msgid "Invite data are required."
+msgstr "Invitasjonsdata er påkrevd."
+
+msgid "Error occurred sending password reset request."
+msgstr "Det oppsto en feil ved forespørsel om passordtilbakestilling."
+
+msgid "Error occurred retrieving assessment status."
+msgstr "Det oppsto en feil ved henting av vurderingsstatus."
+
+msgid "Questionnaire response data is required."
+msgstr "Spørreskjemasvardata er påkrevd."
+
+msgid "Error occurred retrieving assessment list."
+msgstr "Det oppsto en feil ved henting av vurderingsliste."
+
+msgid "User id and instrument Id are required."
+msgstr "Bruker-ID og instrument-ID er påkrevd."
+
+msgid "Error occurred retrieving assessment report."
+msgstr "Det oppsto en feil ved henting av vurderingsrapport."
+
+msgid "Error occurred retrieving current questionnaire bank for user."
+msgstr "Det oppsto en feil ved henting av gjeldende spørreskjemabank for brukeren."
+
+msgid "Error occurred retrieving patient report."
+msgstr "Det oppsto en feil ved henting av pasientrapport."
+
+msgid "Error occurred setting table preference."
+msgstr "Det oppsto en feil ved innstilling av tabellinnstillinger."
+
+msgid "Error occurred retrieving email audit entries."
+msgstr "Det oppsto en feil ved henting av epostrevisjonsoppføringer."
+
+msgid "Error occurred retrieving audit log."
+msgstr "Det oppsto en feil ved henting av revisjonslogg."
+
+msgid "configuration key is required."
+msgstr "konfigurasjonsnøkkel er påkrevd."
+
+msgid "Error occurred retrieving content for configuration key."
+msgstr "Det oppsto en feil ved henting av innhold for konfigurasjonsnøkkelen."
+
+msgid "Error occurred deactivating user."
+msgstr "Det oppsto en feil ved deaktivering av brukeren."
+
+msgid "Error occurred reactivating user."
+msgstr "Det oppsto en feil ved reaktivering av brukeren."
+
+msgid "configuration variable name is required."
+msgstr "konfigurasjonsvariabelnavn er påkrevd."
+
+msgid "Invalid date. Please try again."
+msgstr "Ugyldig dato. Vennligst prøv igjen."
+
+msgid "Date must not be in the future. Please try again."
+msgstr "Datoen må ikke være i fremtiden. Vennligst prøv igjen."
+
+msgid "Date must not be before 1900. Please try again."
+msgstr "Datoen må ikke være før 1900. Vennligst prøv igjen."
+
+msgid "Year must be after 1900"
+msgstr "Året må være etter 1900"
+
+msgid "The date must not be in the future."
+msgstr "Datoen må ikke være i fremtiden."
+
+msgid "Invalid Date. Please enter a valid date."
+msgstr "Ugyldig dato. Vennligst oppgi en gyldig dato."
+
+msgid "Missing value."
+msgstr "Mangler verdi."
+
+msgid "Url is required."
+msgstr "Lenke er påkrevd."
+
+msgid "Error occurred processing request"
+msgstr "Det oppsto en feil under forespørselsbehandling."
+
+msgid "Hi there."
+msgstr "Hei du!"
+
+msgid "Thanks for your patience while we upgrade our site."
+msgstr "Takk for din tålmodighet mens vi oppgraderer vårt nettsted."
+
+msgid "Error occurred when verifying the uniqueness of email"
+msgstr "Det oppsto en feil ved bekreftelse av epostens unikhet"
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr "Denne epostadressen er allerede i bruk. Vennligst skriv inn en annen epostadresse."
+
+msgid "Invalid characters in text."
+msgstr "Ugyldige tegn i tekst."
+
+msgid "Identifier value must be unique"
+msgstr "Identifikasjonsverdien må være unik"
+
+msgid "Question"
+msgstr "Spørsmål"
+
+msgid "Response"
+msgstr "Respons"
+
+msgid "Server Error occurred retrieving report data"
+msgstr "Det oppsto en serverfeil ved henting av rapportdata"
+
+msgid "No data returned from server"
+msgstr "Ingen data returneres fra serveren"
+
+msgid "Unable to load report data"
+msgstr "Kan ikke laste inn rapportdata"
+
+msgid "Export questionnaire data"
+msgstr "Eksporter spørreskjemadata"
+
+msgid "Export"
+msgstr "Eksporter"
+
+msgid "Data type:"
+msgstr "Datatype:"
+
+msgid "Instrument(s) to export data from:"
+msgstr "Instrument(er) det skal eksporteres data fra:"
+
+msgid "CSV"
+msgstr ""
+
+msgid "JSON"
+msgstr ""
+
+msgid "Export request submitted"
+msgstr "Eksportforespørsel sendt"
+
+msgid "Request to export data failed."
+msgstr "Forespørsel om å eksportere data mislyktes."

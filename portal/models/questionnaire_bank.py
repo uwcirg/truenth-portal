@@ -93,6 +93,14 @@ class QuestionnaireBank(db.Model):
         instance = cls()
         return instance.update_from_json(data)
 
+    @property
+    def research_study_id(self):
+        """A questionnaire bank w/ a research protocol has a research study"""
+        if self.research_protocol_id is None:
+            return
+
+        return self.research_protocol.research_study_id
+
     def update_from_json(self, data):
         self.name = data['name']
         if 'classification' in data:
@@ -291,8 +299,8 @@ class QuestionnaireBank(db.Model):
         return start + RelativeDelta(self.overdue)
 
 
-def trigger_date(user, qb=None):
-    """Return trigger date for user
+def trigger_date(user, research_study_id, qb=None):
+    """Return trigger date for user, research_study
 
     The trigger date for a questionnaire bank depends on its
     association.  i.e. for org affiliated QBs, use the respective
@@ -307,6 +315,7 @@ def trigger_date(user, qb=None):
     new procedure or the consent date is modified).
 
     :param user: subject of query
+    :param research_study_id: research study being processed
     :param qb: QuestionnaireBank if available (really only necessary
         to distinguish different behavior on recurring RP case).
     :return: UTC datetime for the given user / QB, or None if N/A
@@ -319,8 +328,8 @@ def trigger_date(user, qb=None):
             trace("found biopsy {} for trigger_date".format(b_date))
             return b_date
 
-    def consent_date(user):
-        consent = latest_consent(user)
+    def consent_date(user, research_study_id):
+        consent = latest_consent(user, research_study_id=research_study_id)
         if consent:
             trace('found valid_consent with trigger_date {}'.format(
                 consent.acceptance_date))
@@ -353,7 +362,7 @@ def trigger_date(user, qb=None):
             trigger = tx_date(user)
 
         if not trigger:
-            trigger = consent_date(user)
+            trigger = consent_date(user, research_study_id=research_study_id)
 
         if not trigger:
             trace(
@@ -369,8 +378,8 @@ def trigger_date(user, qb=None):
     # the intervention method.  (Yes, it's possible the user has neither
     # intervention nor RP, but the intervention method is too expensive
     # for a simple trigger date lookup - will be caught in qb_timeline)
-    if ResearchProtocol.assigned_to(user):
-        return consent_date(user)
+    if ResearchProtocol.assigned_to(user, research_study_id):
+        return consent_date(user, research_study_id=research_study_id)
     else:
         return intervention_trigger(user)
 

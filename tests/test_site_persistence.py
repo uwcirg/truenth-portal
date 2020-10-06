@@ -119,7 +119,7 @@ class TestSitePersistence(TestCase):
         every_six_thereafter = Recur(
             start='{"days": 720}', cycle_length='{"days": 180}')
 
-        rp = ResearchProtocol(name='proto')
+        rp = ResearchProtocol(name='proto', research_study_id=0)
         with SessionScope(db):
             db.session.add(rp)
             db.session.commit()

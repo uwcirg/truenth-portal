@@ -264,7 +264,7 @@ class User(db.Model, UserMixin):
     registered = db.Column(db.DateTime, default=datetime.utcnow)
     _email = db.Column(
         'email', db.String(120), unique=True, nullable=False,
-        default=default_email)
+        default=default_email, index=True)
     phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
                                                    ondelete='cascade'))
     alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
@@ -283,6 +283,7 @@ class User(db.Model, UserMixin):
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
     practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
+    clinician_id = db.Column(db.ForeignKey('users.id'), index=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -426,8 +427,7 @@ class User(db.Model, UserMixin):
             name = self.username
         return escape(name) if name else None
 
-    @property
-    def current_encounter(self):
+    def current_encounter(self, generate_failsafe_if_missing=True):
         """Shortcut to current encounter, generate failsafe if not found
 
         An encounter is typically bound to the logged in user, not
@@ -437,9 +437,11 @@ class User(db.Model, UserMixin):
             Encounter.status == 'in-progress').order_by(
             Encounter.start_time.desc())
         if query.count() == 0:
+            if not generate_failsafe_if_missing:
+                return None
             current_app.logger.error(
-                "Failed to locate in-progress encounter for {}"
-                "; generate failsafe".format(self))
+                "Failed to locate in-progress encounter for %d"
+                "; generate failsafe", self.id)
             return initiate_encounter(self, auth_method='failsafe')
         if query.count() != 1:
             # Not good - we should only have one `active` encounter for
@@ -1016,11 +1018,12 @@ class User(db.Model, UserMixin):
         # The audit defines the acting user, to which the current
         # encounter is attached.
         acting_user = User.query.get(audit.user_id)
-        encounter = acting_user.current_encounter
+        encounter = acting_user.current_encounter()
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
-        invalidate_users_QBT(self.id)
+        # TODO: limit invalidation to set of observations that may alter QBT
+        invalidate_users_QBT(self.id, research_study_id='all')
         return observation
 
     def clinical_history(self, requestURL=None, patch_dstu2=False):
@@ -1113,6 +1116,9 @@ class User(db.Model, UserMixin):
         if self.practitioner_id:
             d['careProvider'].append(Reference.practitioner(
                 self.practitioner_id).as_fhir())
+        if self.clinician_id:
+            d['careProvider'].append(Reference.clinician(
+                self.clinician_id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
@@ -1127,8 +1133,8 @@ class User(db.Model, UserMixin):
         If the user had pre-existing consent agreements between the
         same organization_id, the new will replace the old
 
-        NB this will only modify/update consents between the user
-        and the organizations named in the given consent_list.
+        NB this will only modify/update consents between the (user,
+        organization, research_study_id) named in the given consent_list.
 
         """
         delete_consents = []  # capture consents being replaced
@@ -1140,10 +1146,13 @@ class User(db.Model, UserMixin):
                 subject_id=self.id,
                 comment="Consent agreement signed",
                 context='consent')
-            # Look for existing consent for this user/org
+            # Look for existing consent for this user/org/study
             for existing_consent in self.valid_consents:
-                if existing_consent.organization_id == int(
-                        consent.organization_id):
+                if (
+                        existing_consent.organization_id == int(
+                        consent.organization_id) and
+                        existing_consent.research_study_id == int(
+                        consent.research_study_id)):
                     current_app.logger.debug(
                         "deleting matching consent {} replacing with {} ".
                         format(existing_consent, consent))
@@ -1175,7 +1184,7 @@ class User(db.Model, UserMixin):
         Called when the ToU agreement language is updated.
 
         :param acting_user: user behind the request for permission checks
-        :param types: ToU types for which to invalide agreements (optional)
+        :param types: ToU types for which to invalid agreements (optional)
 
         """
         from .tou import ToU
@@ -1450,6 +1459,8 @@ class User(db.Model, UserMixin):
                     org_list.append(parsed)
                 elif isinstance(parsed, Practitioner):
                     self.practitioner_id = parsed.id
+                elif isinstance(parsed, User):
+                    self.clinician_id = parsed.id
             self.update_orgs(org_list, acting_user)
 
         if 'name' in fhir:
@@ -1657,9 +1668,9 @@ class User(db.Model, UserMixin):
         if (
                 not allow_on_url_authenticated_encounters and
                 current_app.config.get('ENABLE_URL_AUTHENTICATED') and
-                self.current_encounter.auth_method == 'url_authenticated'):
+                self.current_encounter().auth_method == 'url_authenticated'):
             abort(401, "inadequate auth_method: {}".format(
-                self.current_encounter.auth_method))
+                self.current_encounter().auth_method))
 
         if self.id == other_id:
             return True
@@ -1681,7 +1692,8 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) and
+        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value,
+                          ROLE.CLINICIAN.value) and
                 other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
@@ -1717,7 +1729,9 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF.value)):
+                other.has_role(ROLE.STAFF_ADMIN.value) or
+                other.has_role(ROLE.STAFF.value) or
+                other.has_role(ROLE.CLINICIAN.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -1734,7 +1748,7 @@ class User(db.Model, UserMixin):
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, *roles):
-        """Given one or my roles by name, true if user has at least one"""
+        """Given one or more roles by name, true if user has at least one"""
         users_roles = set((r.name for r in self.roles))
         for item in roles:
             if item in users_roles:
@@ -1978,8 +1992,11 @@ def get_user(
 
 def patients_query(
         acting_user,
-        include_test_role=False, include_deleted=False,
-        requested_orgs=None, filter_by_ids=None):
+        include_test_role=False,
+        include_deleted=False,
+        research_study_id=0,
+        requested_orgs=None,
+        filter_by_ids=None):
     """Return query for patients, filtered as specified
 
     Build live SQLAlchemy query for patients, to which the acting_user has
@@ -1993,6 +2010,7 @@ def patients_query(
       some criteria
     :param include_test_role: Set true to include users with ``test`` role
     :param include_deleted: Set true to include deleted users
+    :param research_study_id: Limit result to patients consented with study
     :param requested_orgs: Set if user requests a limited list of org IDs
     :return: Live SQLAlchemy ``Query``, for further filter additions or
      execution
@@ -2023,8 +2041,11 @@ def patients_query(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
 
+    if require_orgs or research_study_id:
+        """With required orgs or study id, require consent with given id"""
         consent_query = UserConsent.query.filter(and_(
             UserConsent.deleted_id.is_(None),
+            UserConsent.research_study_id == research_study_id,
             UserConsent.expires > datetime.utcnow()))
         consented_users = [
             u.user_id for u in consent_query if u.staff_editable]

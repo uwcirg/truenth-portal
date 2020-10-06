@@ -6,6 +6,8 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
+import {sortArrayByField} from "./modules/Utility.js";
+import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_TITLE} from "./data/common/consts.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -46,6 +48,7 @@ export default (function() {
             this.registerDependencies();
             this.getOrgTool();
             this.setUserSettings();
+            this.setSubjectResearchStudies();
             this.onBeforeSectionsLoad();
             this.setCurrentUserOrgs();
             this.initStartTime = new Date();
@@ -100,7 +103,11 @@ export default (function() {
             initIntervalId: 0,
             currentUserRoles: [],
             userOrgs: [],
+            subjectOrgs: [],
+            subjectReseachStudies: [],
             userRoles: [],
+            cliniciansList: [],
+            staffEditableRoles: ["clinician", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -109,7 +116,7 @@ export default (function() {
             },
             mode: "profile",
             demo: { //skeleton
-                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
+                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: "", clinician: {}}
             },
             stateDict: {AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")},
             roles: {data: []},
@@ -287,9 +294,7 @@ export default (function() {
                         return false;
                     }
                     var orgTool = self.getOrgTool();
-                    self.userOrgs = data.careProvider.map(function(item) {
-                        return item.reference.split("/").pop();
-                    });
+                    self.userOrgs = orgTool.getOrgsByCareProvider(data.careProvider) || [];
                     var topLevelOrgs = orgTool.getUserTopLevelParentOrgs(self.userOrgs);
                     self.topLevelOrgs = topLevelOrgs.map(function(item) {
                         return orgTool.getOrgName(item);
@@ -482,6 +487,17 @@ export default (function() {
                             });
                         }
                         self.demo.data.raceCodes = self.demo.data.raceCodes || [];
+                        if (data.careProvider && data.careProvider.length) {
+                            let clone = [...data.careProvider];
+                            let clinicianFilteredSet = clone.filter(item => {
+                                return item.reference.match(/^api\/clinician/gi);
+                            });
+                            self.demo.data.clinician = clinicianFilteredSet.length? clinicianFilteredSet[0] : {};
+                            self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
+                        } else {
+                            self.demo.data.clinician = {};
+                            self.subjectOrgs = [];
+                        }
                     }
                     callback(data);
                 });
@@ -503,6 +519,15 @@ export default (function() {
                     this.mode = acoContainer.getAttribute("data-account") === "patient" ? "createPatientAccount": "createUserAccount";
                 }
             },
+            setSubjectResearchStudies: function() {
+                this.modules.tnthAjax.getResearchStudies(this.subjectId, "", data => {
+                    if (data && data.research_study) {
+                        this.subjectReseachStudies = data.research_study.map(item => {
+                            return item.id
+                        });
+                    }
+                });
+            },
             getOrgTool: function(callback) {
                 callback = callback || function() {};
                 if (!this.orgTool) {
@@ -519,7 +544,7 @@ export default (function() {
                 return this.orgTool;
             },
             isConsentEditable: function() {
-                var isStaff = this.currentUserRoles.indexOf("staff") !== -1;
+                var isStaff = this.isStaff();
                 var isCurrentUserPatient = this.currentUserRoles.indexOf("patient") !== -1;
                 var isEditableByStaff = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("staff") !== -1;
                 var isEditableByPatient = this.settings.hasOwnProperty("CONSENT_EDIT_PERMISSIBLE_ROLES") && this.settings.CONSENT_EDIT_PERMISSIBLE_ROLES.indexOf("patient") !== -1;
@@ -540,8 +565,21 @@ export default (function() {
                 }
                 return this.userRoles.indexOf("patient") !== -1;
             },
+            hasSubStudySubjectOrgs: function() {
+                var orgTool = this.getOrgTool();
+                //check via organization API
+                return this.subjectOrgs.filter(orgId => {
+                    return  orgTool.isSubStudyOrg(orgId);
+                }).length;
+            },
+            isSubStudyPatient: function() {
+                return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
+            },
+            isStaffAdmin: function() {
+                return this.currentUserRoles.indexOf("staff_admin") !== -1;
+            },
             isStaff: function() {
-                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.currentUserRoles.indexOf("staff_admin") !== -1;
+                return this.currentUserRoles.indexOf("staff") !== -1 ||  this.isStaffAdmin();
             },
             isProxy: function() {
                 return (this.currenUserId !== "") && (this.subjectId !== "") && (this.currentUserId !== this.subjectId);
@@ -812,6 +850,9 @@ export default (function() {
                     this.initResetPasswordSection();
                     this.initCommunicationSection();
                     break;
+                case "treatingclinician":
+                    this.initTreatingClinicianSection();
+                    break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1076,6 +1117,48 @@ export default (function() {
                 var self = this;
                 $("#profileStudyId, #profileSiteId").on("update", function() {
                     self.updateIdentifierData(this);
+                });
+            },
+            initTreatingClinicianSection: function() {
+                let self = this;
+                this.modules.tnthAjax.getCliniciansList(function(data) {
+                    if (!data || !data.entry || !data.entry.length) {
+                        let errorMessage = i18next.t("No treating clinician available for this site");
+                        $("#treatingClinicianContainer .select-list-error").text(errorMessage);
+                        return;
+                    }
+                    let selectedValue = (self.demo.data.clinician).reference? (self.demo.data.clinician.reference).split("/")[2]: "";
+                    let selectListHTML = `<select id="clincianSelector" class="form-control">;
+                                            <option value="">Select</option>`;
+                    (data.entry).forEach(item => {
+                        selectListHTML += `<option value="${item.identifier[0].value}" ${String(item.identifier[0].value) === String(selectedValue) ? "selected": ""}>${item.name[0].given} ${item.name[0].family}</option>`
+                    });
+                    selectListHTML += "</select>";
+                    $("#treatingClinicianContainer .select-list").append(selectListHTML);
+                    $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
+                        if ($(this).val() === "") {
+                            $("#treatingClinicianContainer .select-list-error").text(i18next.t("You must select a clinician"));
+                            return false;
+                        }
+                        $("#treatingClinicianContainer .select-list-error").text("");
+                        let postData = {"careProvider": []};
+                        if (self.demo.data.careProvider) {
+                            postData.careProvider = [...self.demo.data.careProvider];
+                            /*
+                             * exclude pre-existing clinician reference
+                             */
+                            let filteredSet = (postData.careProvider).filter(item => {
+                                return !item.reference.match(/^api\/clinician/gi);
+                            });
+                            postData.careProvider = filteredSet;
+                        }
+                        //post data
+                        postData.careProvider.push({
+                            display: $("#clincianSelector option:selected").text(),
+                            reference: `api/clinician/${$(this).val()}`
+                        });
+                        self.postDemoData($("#treatingClinicianContainer"), postData);
+                    });
                 });
             },
             getAccessUrl: function() {
@@ -1493,6 +1576,11 @@ export default (function() {
                             hidePopover();
                             self.reloadConsentList(subjectId);
                         });
+                        if (self.hasSubStudyConsent()) {
+                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
+                                research_study_id: EPROMS_SUBSTUDY_ID
+                            });
+                        }
                     });
                 });
                 $("#btnDeceasedConsentNo").off("click").on("click", function(e) { //selecting no in the confirmation popover
@@ -2020,6 +2108,16 @@ export default (function() {
                     return {name: $(this).val()};
                 }).get();
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
+                /*
+                 * refresh user roles list since it has been uploaded
+                 */
+                this.initUserRoles({clearCache: true});
+            },
+            updateRolesUI: function(roles) {
+                if (!roles) return;
+                roles.forEach(role => {
+                    $("#rolesGroup input[value='"+role+"']").attr("checked", true);
+                });
             },
             initUserRoles: function(params) {
                 if (!this.subjectId) { return false; }
@@ -2029,6 +2127,7 @@ export default (function() {
                         self.userRoles = data.roles.map(function(role) {
                             return role.name;
                         });
+                        self.updateRolesUI(self.userRoles);
                     }
                 }, params);
             },
@@ -2036,9 +2135,30 @@ export default (function() {
                 var self = this;
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
-                    self.roles.data = data.roles;
+                    let roles = data.roles || [];
+                    if (!self.isAdmin() && self.isStaffAdmin()) {
+                        /*
+                         * admin staff should not be able to edit role(s) for a user that contains other roles
+                         */
+                        let diffRoles = self.userRoles.filter(item => !self.staffEditableRoles.includes(item));
+                        if (diffRoles.length) {
+                            $("#rolesGroup").closest(".profile-item-container").hide();
+                        } else {
+                            /*
+                             * filter down editable roles for a staff
+                             */
+                            roles = roles.filter(item => {
+                                return self.staffEditableRoles.indexOf(item.name) >= 0
+                            });
+                        }
+                    }
+                    /*
+                     * alphabetize role list by the name property of each item in the array
+                     * for ease of viewing and selection
+                     */
+                    self.roles.data = sortArrayByField(roles, "name");
+                    setTimeout(self.initUserRoles, 50);  
                 });
-                self.initUserRoles();
             },
             initAuditLogSection: function() {
                 var self = this, errorMessage = "";
@@ -2105,7 +2225,7 @@ export default (function() {
                 return content;
             },
             getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
-                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
+                return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
                 var LROrgId = (this.getOrgTool()).getTopLevelParentOrg(item.organization_id);
@@ -2122,6 +2242,31 @@ export default (function() {
             isConsentDateEditable: function(item) {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
+            },
+            /*
+             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
+             */
+            getSubStudyConsentUnknownRow: function() {
+                if (!this.hasCurrentConsent()) {
+                    return;
+                }
+                let currentConsentItem = this.consent.currentItems[0];
+                this.consent.consentDisplayRows.push(
+                    [{
+                        content: EPROMS_SUBSTUDY_TITLE
+                    },
+                    {
+                        content: i18next.t("Not consented") + 
+                                this.getConsentEditDisplayIconHTML({
+                                    organization_id: currentConsentItem.organization_id,
+                                    statusText: "unknown",
+                                    agreement_url: currentConsentItem.agreement_url,
+                                    research_study_id: EPROMS_SUBSTUDY_ID
+                                }
+                        , "profileConsentListModal"),
+                        "_class": "indent"
+                    }, {content: `<span class="agreement">&nbsp;</span>`}, {content: "&nbsp;"}]
+                );
             },
             getConsentRow: function(item) {
                 if (!item) {return false;}
@@ -2141,7 +2286,7 @@ export default (function() {
                         return s;
                     })(item)
                 }, {
-                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "")
+                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "&nbsp;")
                 }];
                 this.consent.consentDisplayRows.push(contentArray);
             },
@@ -2168,8 +2313,20 @@ export default (function() {
                 content += "</tr>";
                 return content;
             },
+            isSubStudyConsent: function(item) {
+                if (!item) {
+                    return false;
+                }
+                return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
+            },
+            hasSubStudyConsent: function() {
+                return this.consent.currentItems.filter( item => parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID).length;
+            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
+                if (this.isSubStudyConsent(item)) {
+                    return EPROMS_SUBSTUDY_TITLE;
+                }
                 var orgId = item.organization_id, OT = this.getOrgTool(), currentOrg = OT.orgsList[orgId], orgName = currentOrg ? currentOrg.name : item.organization_id;
                 if (!this.isConsentWithTopLevelOrg()) {
                     var topOrgID = OT.getTopLevelParentOrg(orgId), topOrg = OT.orgsList[topOrgID];
@@ -2189,8 +2346,14 @@ export default (function() {
             },
             getRecordedDisplayDate: function(item) {
                 if (!item) {return "";}
-                var recordedDate = item.recorded? item.recorded.lastUpdated : "";
-                return this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss");
+                let recordedDate;
+                if (item.deleted) {
+                    recordedDate = item.deleted.lastUpdated;
+                }
+                if (!recordedDate && item.recorded) {
+                    recordedDate = item.recorded.lastUpdated;
+                } 
+                return recordedDate ? this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss") : "";
             },
             isDefaultConsent: function(item) {
                 return item && /stock\-org\-consent/.test(item.agreement_url);
@@ -2293,7 +2456,7 @@ export default (function() {
                 Consent.initConsentListModalEvent();
                 $("#profileConsentListModal").on("show.bs.modal", function() {
                     if (self.isAdmin()) {
-                        $(this).find(".admin-radio").show();
+                        $(this).find(".admin-radio").removeClass("tnth-hide").show();
                     }
                 });
                 $("#profileConsentListModal input[class='radio_consent_input']").on("click", function() {
@@ -2322,6 +2485,21 @@ export default (function() {
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
             },
+            hasSubStudyConsent: function() {
+                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
+            },
+            showSubStudyConsentAddElement: function() {
+                //check to see if user organization is in substudy
+                if (!this.hasSubStudySubjectOrgs()) {
+                    return false;
+                }
+                //adding a test substudy consent should only be allowed in Test environment
+                if (!this.isTestEnvironment()) {
+                    return false;
+                }
+                //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
+                return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
+            },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
             },
@@ -2330,10 +2508,13 @@ export default (function() {
                 var self = this, content = "";
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
-                var items = this.consent.historyItems.sort(function(a, b) { //sort items by last updated date in descending order
-                    return new Date(b.deleted.lastUpdated) - new Date(a.deleted.lastUpdated);
-                });
                 items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
+                var items = items.sort(function(a, b) { 
+                    //sort items by last updated date in descending order
+                    let bLastUpdated = b.deleted ? b.deleted.lastUpdated : b.recorded.lastUpdated;
+                    let aLastUpdated = a.deleted ? a.deleted.lastUpdated : a.recorded.lastUpdated;
+                    return new Date(bLastUpdated) - new Date(aLastUpdated);
+                });
                 items.forEach(function(item, index) {
                     content += self.getConsentHistoryRow(item, index);
                 });
@@ -2378,15 +2559,18 @@ export default (function() {
                 this.consent.currentItems = $.grep(this.consent.consentItems, function(item) {
                     return self.getConsentStatus(item) === "active";
                 });
-                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //iltered out deleted items from all consents
+                this.consent.historyItems = $.grep(this.consent.consentItems, function(item) { //filtered out deleted items from all consents
                     return self.getConsentStatus(item) !== "active";
                 });
                 this.consent.currentItems.forEach(function(item, index) {
-                    if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!(existingOrgs[item.organization_id+"_"+item.research_study_id]) && !(/null/.test(item.agreement_url))) {
                         self.getConsentRow(item, index);
-                        existingOrgs[item.organization_id] = true;
+                        existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
+                if (this.showSubStudyConsentAddElement()) {
+                     this.getSubStudyConsentUnknownRow();
+                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {
@@ -2398,6 +2582,7 @@ export default (function() {
                             $("#consentListTable .agreement").each(function() { $(this).parent().hide(); });
                         }
                         if (self.isConsentEditable()) {
+                            Consent.initConsentListModalEvent();
                             self.initConsentItemEvent();
                             self.initConsentDateEvents();
                         }
@@ -2434,7 +2619,6 @@ export default (function() {
                     }[a];
                 });
             }
-
         }
     });
     return ProfileObj;
