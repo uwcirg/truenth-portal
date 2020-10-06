@@ -1,4 +1,4 @@
-import {isInViewport, getUrlParameter, tryParseJSON} from "./Utility";
+import {checkIE, isInViewport, getUrlParameter, tryParseJSON} from "./Utility";
 export default {
     mounted: function() {
         Promise.all([
@@ -350,8 +350,16 @@ export default {
             });
         },
         getRouterTopic() {
+
+            if (checkIE()) { // detect it's IE11
+                var currentPath = window.location.hash.slice(1)
+                if (this.$route.path !== currentPath) {
+                    this.$router.push(currentPath)
+                }
+            }
             console.log(this.domains)
             console.log("router topic??? ", this.$route.params.topic)
+
             if (this.$route &&
                 this.$route.params && 
                 this.$route.params.topic &&
