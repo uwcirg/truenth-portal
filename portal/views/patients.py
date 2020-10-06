@@ -80,7 +80,6 @@ def render_patients_list(
     else:
         patients_list = query
 
-    import pdb; pdb.set_trace()
     return render_template(
         template_name, patients_list=patients_list, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
