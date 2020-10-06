@@ -124,38 +124,6 @@ def assessment_engine_view(user):
             and assessment_status.due_date < now)
     enrolled_in_indefinite = assessment_status.enrolled_in_classification("indefinite")
     
-    thankyou_block = render_template(
-        "eproms/assessment_engine/ae_thankyou.html",
-        assessment_status=assessment_status,
-        OverallStatus=OverallStatus,
-        full_name=user.display_name,
-        registry=assessment_status.assigning_authority)
-    due_block = render_template(
-        "eproms/assessment_engine/ae_due.html",
-        assessment_status=assessment_status,
-        OverallStatus=OverallStatus,
-        full_name=user.display_name,
-        due_date=due_date,
-        expired_date=expired_date,
-        assessment_is_due=assessment_is_due,
-        comp_date=comp_date)
-    indefinite_due_block = render_template(
-        "eproms/assessment_engine/ae_indefinite_due.html",
-        assessment_status=assessment_status,
-        unfinished_indefinite_instruments=unfinished_indefinite_instruments,
-        OverallStatus=OverallStatus,
-        full_name=user.display_name,
-        comp_date=comp_date)
-    complete_block = render_template(
-        "eproms/assessment_engine/ae_complete.html",
-        assessment_status=assessment_status,
-        OverallStatus=OverallStatus,
-        full_name=user.display_name,
-        comp_date=comp_date)
-    not_available_block = render_template(
-        "eproms/assessment_engine/ae_not_available.html",
-        full_name=user.display_name,
-    )
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
@@ -164,11 +132,12 @@ def assessment_engine_view(user):
         unstarted_indefinite_instruments=unstarted_indefinite_instruments,
         unfinished_indefinite_instruments=unfinished_indefinite_instruments,
         OverallStatus=OverallStatus,
-        thankyou_block=thankyou_block,
-        indefinite_due_block=indefinite_due_block,
-        due_block=due_block,
-        complete_block=complete_block,
-        not_available_block=not_available_block
+        full_name=user.display_name,
+        registry=assessment_status.assigning_authority,
+        due_date=due_date,
+        expired_date=expired_date,
+        assessment_is_due=assessment_is_due,
+        comp_date=comp_date
     )
 
 

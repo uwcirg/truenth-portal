@@ -43,7 +43,7 @@
     {%- endif -%}
 {%- endmacro -%}
 {%- macro thankyou_card(full_name="", registry="") -%}
-    {% call render_header(title_text=_("Thank you, %(full_name)s.", full_name=full_name)) %}
+    {% call render_header(title_text=_("Thank you, %(full_name)s.", full_name=full_name if full_name else '')) %}
         <p>{{ _("You've completed the %(registry)s questionnaire.", registry=_(registry)) }}</p>
         <p>{{ _("You will be notified when the next questionnaire is ready to complete.") }}</p>
     {% endcall %}
