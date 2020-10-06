@@ -241,6 +241,7 @@ export default {
             let mobileLinkButton = document.querySelector(".mobile-quick-links button");
             if (mobileLinkButton) {
                 mobileLinkButton.addEventListener("click",function(e) {
+                    e.stopImmediatePropagation();
                     document.querySelector(".mobile-navigation").classList.add("open");
                     setTimeout(function() {
                         document.querySelector("body").classList.add("fixed");
@@ -346,7 +347,9 @@ export default {
                         }
                         ve.setAttribute("src", veSrc + "?autoPlay=true");
                     }
-                })
+                });
+                console.log("GET HERE ? ", el)
+                el.classList.remove("hide");
             });
         },
         getRouterTopic() {
