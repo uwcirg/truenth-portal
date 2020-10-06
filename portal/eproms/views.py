@@ -103,11 +103,13 @@ def assessment_engine_view(user):
         research_study_id=research_study_id,
         as_of_date=now)
     current_app.logger.debug("{}".format(assessment_status))
-    indefinite_questionnaires = (
+    unstarted_indefinite_instruments = (
         assessment_status.instruments_needing_full_assessment(
-            classification='indefinite'),
+            classification='indefinite'))
+    unfinished_indefinite_instruments = (
         assessment_status.instruments_in_progress(
             classification='indefinite'))
+
     # variables needed for the templates
     due_date = localize_datetime(
         assessment_status.due_date, user) \
@@ -120,9 +122,7 @@ def assessment_engine_view(user):
         assessment_status.overall_status == OverallStatus.overdue) \
         or (assessment_status.due_date is not None
             and assessment_status.due_date < now)
-
-    # TODO resolve what portions of this logic could better be handled
-    #  within the templates
+    enrolled_in_indefinite = assessment_status.enrolled_in_classification("indefinite")
     
     thankyou_block = render_template(
         "eproms/assessment_engine/ae_thankyou.html",
@@ -142,7 +142,7 @@ def assessment_engine_view(user):
     indefinite_due_block = render_template(
         "eproms/assessment_engine/ae_indefinite_due.html",
         assessment_status=assessment_status,
-        indefinite_questionnaires=indefinite_questionnaires,
+        unfinished_indefinite_instruments=unfinished_indefinite_instruments,
         OverallStatus=OverallStatus,
         full_name=user.display_name,
         comp_date=comp_date)
@@ -160,7 +160,9 @@ def assessment_engine_view(user):
         "eproms/assessment_engine.html",
         user=user,
         assessment_status=assessment_status,
-        indefinite_questionnaires=indefinite_questionnaires,
+        enrolled_in_indefinite=enrolled_in_indefinite,
+        unstarted_indefinite_instruments=unstarted_indefinite_instruments,
+        unfinished_indefinite_instruments=unfinished_indefinite_instruments,
         OverallStatus=OverallStatus,
         thankyou_block=thankyou_block,
         indefinite_due_block=indefinite_due_block,

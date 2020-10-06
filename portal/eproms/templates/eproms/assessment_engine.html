@@ -1,24 +1,21 @@
 <div class="portal-body">
     <div class="portal-item">
-        {% if assessment_status.overall_status == OverallStatus.withdrawn %}
+        {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
+            <!-- patient has pending work in base study -->
+            {{ due_block | safe }}
+        {% elif unstarted_indefinite_questionnaires or unfinished_indefinite_questionnaires and assessment_status.overall_status != OverallStatus.withdrawn %}
+            <!-- patient completed base study, but has outstanding indefinite work-->
+            {{ indefinite_due_block | safe }}
+        {% elif assessment_status.overall_status == OverallStatus.completed %}
+            <!-- patient completed both base and indefinite or withdrew -->
+            {{ complete_block | safe }}
+        {% elif assessment_status.overall_status == OverallStatus.withdrawn %}
             <!-- patient withdrawn, show questionnaire unavailable anymore? -->
             {{ not_available_block | safe}}
-        {% elif assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
-            {{ due_block | safe }}
-        <!-- TODO: CHECK IF THIS CHECK FOR INDEFINITE QUESTIONNAIRE IS CORRECT????-->
-        <!--User completed baseline, but has outstanding indefinite work-->
-        {% elif (indefinite_questionnaires[0] or indefinite_questionnaires[1]) and
-                assessment_status.overall_status != 'Withdrawn' %}
-            {{ indefinite_due_block | safe }}
-        <!-- User completed both baseline and indefinite -->
-        {% elif assessment_status.overall_status == OverallStatus.completed %}
-            {{ complete_block | safe }}
         {% else %}
-            <!-- TODO: CHECK IF THIS FUNCTION CALL WILL WORK IN TEMPLATE???-->
-            <!-- TODO: TEST THIS, HOW TO GET HERE??-->
             <!--If the user was enrolled in indefinite work and lands
                 here, they should see the thank you text. -->
-            {% if assessment_status.enrolled_in_classification('indefinite') %}
+            {% if enrolled_in_indefinite %}
                 {{ thankyou_block | safe }}
             {% else %}
                 {{ not_available_block | safe}}
