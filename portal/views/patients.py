@@ -12,6 +12,7 @@ from flask import (
 from flask_babel import gettext as _
 from flask_user import roles_required
 
+from .clinician import clinician_query
 from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
@@ -20,7 +21,7 @@ from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
-import json
+
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -45,6 +46,10 @@ def render_patients_list(
 
     if request.form.get('reset_cache'):
         QB_StatusCacheKey().update(datetime.utcnow())
+    if research_study_id:
+        clinician_name_map = {None: None}
+        for clinician in clinician_query(current_user()):
+            clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
 
     user = current_user()
     query = patients_query(
@@ -69,6 +74,8 @@ def render_patients_list(
                 patient.id, research_study_id, cached_as_of_key)
             patient.assessment_status = _(a_s)
             patient.current_qb = visit
+            if research_study_id:
+                patient.clinician = clinician_name_map[patient.clinician_id]
             patients_list.append(patient)
     else:
         patients_list = query
