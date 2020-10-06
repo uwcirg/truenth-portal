@@ -13,7 +13,8 @@ export default {
     settings: {},
     userInfo: {},
     LifeRayBaseURL: "",
-    domains: [],
+    //TODO add the rest of eligible topics
+    domains: ["mood_changes", "insomnia", "hot_flashes"],
     //chosen domain
     activeDomain: "",
     domainContent: "",

@@ -52,6 +52,7 @@ export default {
                 //get welcome page
                 //TODO filter content based on user's domains?
                 //each domain link on the intro/welcome page should have a representative attribute or css class
+                this.setSelectedDomain();
                 //that denote which domain it represents
                 this.getDomainContent();
                // self.setInitView();
@@ -196,6 +197,24 @@ export default {
                 contentElement.innerHTML = contentHTML;
             let mobileContentElement = contentElement.cloneNode(true);
             navContentContainerElement.appendChild(contentElement);
+
+            let adjustNavPos = () => {
+                window.requestAnimationFrame(function() {
+                    let topPosition = 48;
+                    // if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
+                    //     topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
+                    // }
+                    document.querySelector(".navigation").style.top = topPosition+"px";
+                });
+            };
+
+            let navLinkElements = document.querySelectorAll(".navigation a");
+            navLinkElements.forEach(link => {
+                link.addEventListener("click", () => {
+                    adjustNavPos();
+                });
+            });
+
             if (mobileNavElement) {
                 let mobileNavContentContainerElement = document.querySelector(".mobile-navigation .content");
                 if (!mobileNavContentContainerElement) {
@@ -210,13 +229,14 @@ export default {
                 });
             }
             window.addEventListener("scroll", function(e) {
-                window.requestAnimationFrame(function() {
-                    let topPosition = 48;
-                    if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
-                        topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
-                    }
-                    document.querySelector(".navigation").style.top = topPosition+"px";
-                });
+                adjustNavPos();
+                // window.requestAnimationFrame(function() {
+                //     let topPosition = 48;
+                //     if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
+                //         topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
+                //     }
+                //     document.querySelector(".navigation").style.top = topPosition+"px";
+                // });
             });
             let mobileLinkButton = document.querySelector(".mobile-quick-links button");
             if (mobileLinkButton) {
@@ -227,22 +247,20 @@ export default {
                     }, 150);
                 });
             }
-            let self = this;
-            // window.onload = function() {
-            //     console.log("GET TO LOAD??")
-            //     setTimeout(function() {
-            //         self.setNavLeftPos()
-            //     }, 50);
-            // };
-            //window.onload = self.setNavLeftPos;
-            // setTimeout(function() {
-            //     this.setNavLeftPos();
-            // }.bind(this),150);
+            window.addEventListener("hashchange", () => {
+                let routerTopic = this.getRouterTopic();
+                console.log("router Topic when hash? ", routerTopic)
+                if (routerTopic === this.activeDomain) return false;
+                if (routerTopic) {
+                    window.location.reload();
+                    return false;
+                }
+                return false;
+            });
             window.addEventListener("resize", function() {
                 let nav = document.querySelector(".mobile-navigation");
                 if (nav) nav.classList.remove("open");
                 document.querySelector("body").classList.remove("fixed");
-                //self.setNavLeftPos();
             });
             let videoNavImage = document.querySelectorAll(".navigation-video-image");
             videoNavImage.forEach(el => {
@@ -260,7 +278,6 @@ export default {
                 el.addEventListener('click', event => {
                     //let collapsibleItems = document.querySelectorAll(".collapsible");
                     let parentEl = event.target.parentElement;
-                    console.log("parent? ", parentEl)
                     let collapsibleItems = parentEl.querySelectorAll(".collapsible");
                     collapsibleItems.forEach(item => {
                         if (item === event.target) return true;
@@ -332,15 +349,40 @@ export default {
                 })
             });
         },
+        getRouterTopic() {
+            console.log(this.domains)
+            console.log("router topic??? ", this.$route.params.topic)
+            if (this.$route &&
+                this.$route.params && 
+                this.$route.params.topic &&
+                this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1) {
+                return this.$route.params.topic;
+            }
+            let arrHashText = String(location.hash).split("#");
+            if (arrHashText && arrHashText[1]) {
+                let matchText = arrHashText[1].replace("/", "");
+                if (this.domains.indexOf(matchText.toLowerCase()) !== -1) {
+                    return matchText;
+                }
+                return "";
+            } 
+            return "";
+        },
+        setSelectedDomain() {
+            let routerTopic = this.getRouterTopic();
+            console.log("Router topic? ", routerTopic)
+            if (routerTopic) {
+                this.activeDomain = routerTopic;
+                return;
+            }
+            this.activeDomain = getUrlParameter("topic") || "mood_changes";
+        },
         getSelectedDomain() {
             //return this.activeDomain;
             //return "substudy";
             //return "hot_flashes"
             //example URL that works: https://amy-dev.cirg.washington.edu/substudy-tailored-content#/insomnia
-            if (this.$route && this.$route.params && this.$route.params.topic) {
-                return this.$route.params.topic;
-            }
-            return getUrlParameter("topic") || "mood_changes";
+            return this.activeDomain;
          },
          getSearchURL() {
              //TODO use current domain name as tag
