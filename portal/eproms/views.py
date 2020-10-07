@@ -180,6 +180,10 @@ def home():
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
 
+    if not user.has_role(ROLE.PATIENT.value):
+        abort(404, "no /home view for user with roles: {}".format(
+            str([r.name for r in user.roles])))
+
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
 
