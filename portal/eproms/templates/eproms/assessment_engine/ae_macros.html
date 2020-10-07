@@ -25,6 +25,9 @@
         <a class="btn-lg btn-tnth-primary" href="{{button_url}}">{{button_label}}</a>
     </div>
 {%- endmacro -%}
+{%- macro render_greeting(full_name="") -%}
+    {{_("Hi, %(full_name)s.", full_name=full_name if full_name else "")}}
+{%- endmacro -%}
 {%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="") -%}
     {%- if assessment_status.overall_status == OverallStatus.completed -%}
         {% call render_card_content(title_text=_("Completed Questionnaires")) %}
