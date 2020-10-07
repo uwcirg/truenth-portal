@@ -1,5 +1,4 @@
 <!-- portal footer -->
-<!-- we need this right? -->
 <template>
     <footer :id="sectionId" ref="footer" v-bind:class="{active : loaded}">
         <div class="content" v-html="content"></div>

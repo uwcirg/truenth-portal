@@ -201,14 +201,15 @@ export default {
             let adjustNavPos = () => {
                 window.requestAnimationFrame(function() {
                     let topPosition = 48;
-                    // if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
-                    //     topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
-                    // }
                     document.querySelector(".navigation").style.top = topPosition+"px";
                 });
             };
+            let closeMobileNav = () => {
+                document.querySelector(".mobile-navigation").classList.remove("open");
+                document.querySelector("body").classList.remove("fixed");
+            }
 
-            let navLinkElements = document.querySelectorAll(".navigation a");
+            let navLinkElements = navElement.querySelectorAll("a");
             navLinkElements.forEach(link => {
                 link.addEventListener("click", () => {
                     adjustNavPos();
@@ -216,27 +217,31 @@ export default {
             });
 
             if (mobileNavElement) {
-                let mobileNavContentContainerElement = document.querySelector(".mobile-navigation .content");
+                let mobileNavContentContainerElement = mobileNavElement.querySelector(".content");
                 if (!mobileNavContentContainerElement) {
                     let div = document.createElement("div");
                     div.classList.add("content");
                     mobileNavElement.prepend(div);
                 }
                 mobileNavContentContainerElement.appendChild(mobileContentElement);
-                mobileNavElement.addEventListener("click",function(e) {
-                    document.querySelector(".mobile-navigation").classList.remove("open");
-                    document.querySelector("body").classList.remove("fixed");
+                let mobileNavLinks = mobileNavElement.querySelectorAll("a");
+                mobileNavLinks.forEach(item => {
+                    item.addEventListener("click", function(e) {
+                        e.stopPropagation();
+                        closeMobileNav();
+                    })
                 });
+                let mobileCloseButtonElement = mobileNavElement.querySelector(".btn-close");
+                if (mobileCloseButtonElement) {
+                    mobileCloseButtonElement.addEventListener("click",function(e) {
+                        e.stopPropagation();
+                        closeMobileNav();
+                    });
+                }
             }
             window.addEventListener("scroll", function(e) {
                 adjustNavPos();
-                // window.requestAnimationFrame(function() {
-                //     let topPosition = 48;
-                //     if (isInViewport(document.querySelector("#tnthNavWrapper"))) {
-                //         topPosition = document.querySelector("#tnthNavWrapper").offsetHeight + topPosition;
-                //     }
-                //     document.querySelector(".navigation").style.top = topPosition+"px";
-                // });
+    
             });
             let mobileLinkButton = document.querySelector(".mobile-quick-links button");
             if (mobileLinkButton) {
@@ -259,13 +264,12 @@ export default {
                 return false;
             });
             window.addEventListener("resize", function() {
-                let nav = document.querySelector(".mobile-navigation");
-                if (nav) nav.classList.remove("open");
-                document.querySelector("body").classList.remove("fixed");
+                closeMobileNav();
             });
             let videoNavImage = document.querySelectorAll(".navigation-video-image");
             videoNavImage.forEach(el => {
                 el.addEventListener("click", function(e) {
+                    closeMobileNav();
                     let videoElement = document.querySelector(".video");
                     if (videoElement) {
                         videoElement.scrollIntoView();
@@ -304,23 +308,12 @@ export default {
                     });
                 }
             });
-            // $(".tiles-container .tile").each(function() {
-            //     let anchorLink = $(this).find("a");
-            //     if (anchorLink.length && $(anchorLink).attr("href")) {
-            //         $(this).on("click", function(e) {
-            //             e.stopPropagation();
-            //             window.open($(anchorLink).attr("href"), "_blank");
-            //             return false;
-            //         });
-            //     }
-            // });
         },
         setVideo() {
             let videoElement = document.querySelector(".video");
             if (!videoElement) {
                 return;
             }
-            let iframeElement = document.createElement("iframe");
             let iframeSrc = videoElement.getAttribute("data-iframe-src");
             let videoNavElements = document.querySelectorAll(".navigation-video-image");
             if (!iframeSrc) {
@@ -333,6 +326,7 @@ export default {
                 });
                 return;
             }
+            let iframeElement = document.createElement("iframe");
             iframeElement.setAttribute("allowfullscreen", true);
             iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
             videoElement.appendChild(iframeElement);
@@ -348,7 +342,6 @@ export default {
                         ve.setAttribute("src", veSrc + "?autoPlay=true");
                     }
                 });
-                console.log("GET HERE ? ", el)
                 el.classList.remove("hide");
             });
         },
@@ -403,37 +396,22 @@ export default {
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
         onDomainContentDidLoad() {
-            this.setNav();
-            this.setCollapsible();
-            this.setVideo();
-            this.setTileLinkEvent();
+            console.log("WTF?")
             setTimeout(function() {
                 this.setInitView();
                 this.setCurrentView("domain");
             }.bind(this), 150);
+            this.setNav();
+            this.setCollapsible();
+            this.setVideo();
+            this.setTileLinkEvent();
         },
         getDomainContent() {
-            console.log("router param ", (this.$route? this.$route.params.topic: "WTF"))
             if (this.domainContent) {
                 //already populated
                 this.setInitView();
                 return this.domainContent;
             }
-            //let self = this;
-            // $.ajax({
-            //     url : this.getSearchURL(),
-            //     crossDomain : true,
-            //     cache : false,   //if needed..
-            //     type : 'GET',    //Default..
-            //     retryCount : 0,
-            //     retryLimit : 3,
-            //     xhrFields : {
-            //         withCredentials : true //if needed..
-            //     }}).done(function(data) {
-            //         console.log("data? ", data)
-            //     }).fail(function(e) {
-            //         console.log("failed ")
-            //     });
             this.$http(this.getSearchURL()).then(
                 response => {
                 //LR URL returns this
@@ -447,26 +425,7 @@ export default {
                     .then(() => {
                         // DOM updated
                         this.onDomainContentDidLoad();
-                        // self.setNav();
-                        // self.setCollapsible();
-                        // self.setVideo();
-                        // self.setTileLinkEvent();
-                        // setTimeout(function() {
-                        //     this.setInitView();
-                        //     this.setCurrentView("domain");
-                        // }.bind(self), 150);
                     });
-                    // setTimeout(function() {
-                    //     this.setNav();
-                    //     this.setCollapsible();
-                    //     this.setVideo();
-                    //     this.setTileLinkEvent();
-
-                    //     setTimeout(function() {
-                    //         this.setInitView();
-                    //         this.setCurrentView("domain");
-                    //     }.bind(this), 50);
-                    // }.bind(this), 200);
                     
                 } else {
                     this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
