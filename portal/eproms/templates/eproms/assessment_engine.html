@@ -3,7 +3,7 @@
         {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
             <!-- patient has pending work in base study -->
             {% include "eproms/assessment_engine/ae_due.html" with context %}
-        {% elif unstarted_indefinite_questionnaires or unfinished_indefinite_questionnaires and assessment_status.overall_status != OverallStatus.withdrawn %}
+        {% elif (unstarted_indefinite_instruments or unfinished_indefinite_instruments) and assessment_status.overall_status != OverallStatus.withdrawn %}
             <!-- patient completed base study, but has outstanding indefinite work-->
             {% include "eproms/assessment_engine/ae_indefinite_due.html" with context %}
         {% elif assessment_status.overall_status == OverallStatus.completed %}
