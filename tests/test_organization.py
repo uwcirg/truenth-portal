@@ -243,8 +243,7 @@ def test_organization_get_by_identifier(test_user_login, client):
 
 
 def test_org_missing_identifier(
-        login, client, initialized_patient):
-    login()
+        client, initialized_patient_logged_in):
     # should get 404 w/o finding a match
     response = client.get(
         '/api/organization/{value}?system={system}'.format(
@@ -253,10 +252,9 @@ def test_org_missing_identifier(
 
 
 def test_organization_list(
-        login, client, shallow_org_tree, initialized_patient):
+        client, initialized_patient_logged_in):
     count = Organization.query.count()
 
-    login()
     # use api to obtain FHIR bundle
     response = client.get('/api/organization')
     assert response.status_code == 200
