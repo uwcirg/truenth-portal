@@ -30,9 +30,9 @@ class TestPortal(TestCase):
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
-        self.login()
         self.add_required_clinical_data()
-        self.bless_with_basics(make_patient=False)
+        self.bless_with_basics(setdate=datetime.utcnow())
+        self.login()
         response = self.client.get('/home')
         assert response.status_code == 200
 
@@ -55,9 +55,9 @@ class TestPortal(TestCase):
             db.session.add(ui)
             db.session.commit()
 
-        self.login()
         self.add_required_clinical_data()
-        self.bless_with_basics(make_patient=False)
+        self.bless_with_basics(setdate=datetime.utcnow())
+        self.login()
         user = db.session.merge(self.test_user)
 
         response = self.client.get('/home')
