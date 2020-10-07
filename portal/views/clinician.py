@@ -17,15 +17,18 @@ clinician_api = Blueprint('clinician_api', __name__)
 
 def clinician_query(acting_user):
     """Builds a live query for all clinicians the acting user can view"""
-    limit_to_orgs = org_restriction_by_role(acting_user, None)
     query = User.query.join(UserRoles).filter(
         UserRoles.user_id == User.id).join(Role).filter(
         UserRoles.role_id == Role.id).filter(
-        Role.name == ROLE.CLINICIAN.value).join(UserOrganization).filter(
-        UserOrganization.user_id == User.id).filter(
-        UserOrganization.organization_id.in_(
-            tuple(limit_to_orgs))).with_entities(
-            User.id, User.first_name, User.last_name)
+        Role.name == ROLE.CLINICIAN.value).with_entities(
+        User.id, User.first_name, User.last_name)
+
+    limit_to_orgs = org_restriction_by_role(acting_user, None)
+    if limit_to_orgs:
+        query = query.join(UserOrganization).filter(
+            UserOrganization.user_id == User.id).filter(
+            UserOrganization.organization_id.in_(tuple(limit_to_orgs)))
+
     return query
 
 
@@ -61,9 +64,8 @@ def clinician_search():
       - ServiceToken: []
 
     """
-    query = clinician_query(current_user())
     clinicians = []
-    for item in query:
+    for item in clinician_query(current_user()):
         clinicians.append(Practitioner(
             first_name=item.first_name,
             last_name=item.last_name,
