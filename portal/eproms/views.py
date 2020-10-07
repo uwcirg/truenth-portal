@@ -122,8 +122,9 @@ def assessment_engine_view(user):
         assessment_status.overall_status == OverallStatus.overdue) \
         or (assessment_status.due_date is not None
             and assessment_status.due_date < now)
-    enrolled_in_indefinite = assessment_status.enrolled_in_classification("indefinite")
-    
+    enrolled_in_indefinite = assessment_status.enrolled_in_classification(
+        "indefinite")
+
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
