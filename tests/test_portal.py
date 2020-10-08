@@ -16,6 +16,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import User
+from portal.system_uri import ICHOM
 from tests import OAUTH_INFO_PROVIDER_LOGIN, TEST_USER_ID, TestCase
 
 
@@ -32,6 +33,7 @@ class TestPortal(TestCase):
 
         self.add_required_clinical_data()
         self.bless_with_basics(setdate=datetime.utcnow())
+        self.add_procedure(code='1', display='Watchful waiting', system=ICHOM)
         self.login()
         response = self.client.get('/home')
         assert response.status_code == 200
@@ -57,6 +59,7 @@ class TestPortal(TestCase):
 
         self.add_required_clinical_data()
         self.bless_with_basics(setdate=datetime.utcnow())
+        self.add_procedure(code='1', display='Watchful waiting', system=ICHOM)
         self.login()
         user = db.session.merge(self.test_user)
 
