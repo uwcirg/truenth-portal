@@ -15,7 +15,7 @@ down_revision = '6395e14d5ee5'
 
 
 def upgrade():
-    """Assessment Engine has its own view, no longer pushing HTMl into db
+    """Assessment Engine has its own view, no longer pushing HTML into db
 
     Remove obsolete user_intervention rows.
     """

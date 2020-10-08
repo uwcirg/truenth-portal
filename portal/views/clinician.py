@@ -27,7 +27,7 @@ def clinician_query(acting_user):
     if limit_to_orgs:
         query = query.join(UserOrganization).filter(
             UserOrganization.user_id == User.id).filter(
-            UserOrganization.organization_id.in_(tuple(limit_to_orgs)))
+            UserOrganization.organization_id.in_(limit_to_orgs))
 
     return query
 

@@ -102,7 +102,6 @@ def assessment_engine_view(user):
         user=user,
         research_study_id=research_study_id,
         as_of_date=now)
-    current_app.logger.debug("{}".format(assessment_status))
     unstarted_indefinite_instruments = (
         assessment_status.instruments_needing_full_assessment(
             classification='indefinite'))
