@@ -15,7 +15,8 @@
             <div class="portal-item">
                 {%- if intervention.name == "assessment_engine" %}
                     {%- if display.card_html -%}
-                        {{ display.card_html | safe }}
+                        {%  set ae_html = assessment_engine_view(user) %}
+                        {{ ae_html | safe }}
                         <input type="hidden" class="link-label" value="{{display.link_label}}" />
                         <input type="hidden" class="link-url" value="{{display.link_url}}" />
                     {%- else -%}

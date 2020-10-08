@@ -2858,14 +2858,18 @@ body.portal .copyright-container  {
   }
 }
 .portal-header-logout-container {
+  position: relative !important;
   width: 100%;
   max-width: 100%;
-  margin: 2em auto;
+  margin: auto;
+  margin-bottom: 2em;
   text-align: center;
   & a {
-  max-width: 100%;
-  margin: 1em auto;
-  text-transform: uppercase;
+    padding: 16px;
+    min-width: 250px;
+    max-width: 100%;
+    margin: 1em auto;
+    text-transform: uppercase;
   }
 }
 .portal-flex-container {
@@ -2954,6 +2958,9 @@ body.portal .copyright-container  {
   margin-right: auto;
   max-width: 100%;
   text-align: center;
+  a {
+    line-height: 1.5;
+  }
 }
 
 .portal-flex-container {

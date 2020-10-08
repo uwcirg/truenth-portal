@@ -1,0 +1,35 @@
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, completed_card -%}
+{% extends "eproms/assessment_engine/ae_base.html" %}
+<!-- baseline due -->
+{% block head %}
+    {% set greeting = render_greeting(full_name=full_name) %}
+    {%- if assessment_is_due %}
+        {% call render_header(title_text=greeting) %}
+            {{_("Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s.",
+                assigning_authority=_(assessment_status.assigning_authority),
+                expired_date=expired_date
+            )}}
+        {% endcall %}
+    {%- else -%}
+        {% call render_header(title_text=greeting) %}
+            {{_("Please complete your %(assigning_authority)s questionnaire by %(due_date)s.",
+                assigning_authority=_(assessment_status.assigning_authority),
+                due_date=due_date
+            )}}
+        {% endcall %}
+    {%- endif -%}
+{% endblock %}
+{% block body %}
+    {% set button_label =  _('Continue questionnaire') if assessment_status.overall_status == OverallStatus.in_progress else _('Go to questionnaire') %}
+    {%- call render_card_content(
+        title_text=_("Open Questionnaire"),
+        card_class="portal-description-incomplete") -%}
+        <p>{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</p>
+        {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+    {%- endcall -%}
+    {{completed_card(
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        comp_date=comp_date)
+    }}
+{% endblock %}

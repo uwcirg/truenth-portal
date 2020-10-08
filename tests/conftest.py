@@ -261,7 +261,7 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
-def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
+def initialized_patient(app, add_user, initialize_static, shallow_org_tree):
     """returns test patient with data necessary to avoid initial_queries"""
     TEST_USERNAME = 'test@example.com'
     FIRST_NAME = '✓'
@@ -341,6 +341,20 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
     yield test_user
 
     OrgTree.invalidate_cache()
+
+
+@pytest.fixture
+def initialized_patient_logged_in(client, initialized_patient):
+    """Fixture to extend initialized patient to one logged in"""
+    initialized_patient = db.session.merge(initialized_patient)
+    oauth_info = {'user_id': initialized_patient.id}
+
+    client.get(
+        'test/oauth',
+        query_string=oauth_info,
+        follow_redirects=True
+    )
+    return initialized_patient
 
 
 @pytest.fixture
