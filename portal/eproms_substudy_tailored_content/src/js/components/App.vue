@@ -13,9 +13,11 @@
     </div>
 </template>
 <script>
+    import Vue from 'vue';
     import "custom-event-polyfill";
     import bootstrap from "bootstrap";
     import $ from 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
+    //import $ from 'expose-loader';
     import "bootstrap/dist/css/bootstrap.min.css";
     import "../../style/app.less";
     import Error from "./Error.vue";
@@ -39,7 +41,7 @@
         },
         mixins: [BaseMethods],
         errorCaptured(Error, Component, info) {
-            console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
+           // console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
             return false;
         },
         errorHandler(err, vm) {
@@ -48,8 +50,8 @@
             if (errorElement) {
                 errorElement.innerHTML = "Error occurred initializing Vue instance.";
             }
-            console.warn("Vue instance threw an error: ", vm, this);
-            console.error("Error thrown: ", err);
+          //  console.warn("Vue instance threw an error: ", vm, this);
+          //  console.error("Error thrown: ", err);
         },
         data() {
             return {

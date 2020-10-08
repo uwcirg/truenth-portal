@@ -253,6 +253,16 @@ export default {
                     }, 150);
                 });
             }
+            window.addEventListener("keypress", (e) => {
+                if (e.keyCode === 13) {
+                    let routerTopic = this.getRouterTopic();
+                    if (routerTopic) {
+                        window.location.reload();
+                        return false;
+                    }
+                }
+                return false;
+            });
             window.addEventListener("hashchange", () => {
                 let routerTopic = this.getRouterTopic();
                 console.log("router Topic when hash? ", routerTopic)
@@ -347,12 +357,12 @@ export default {
         },
         getRouterTopic() {
 
-            if (checkIE()) { // detect it's IE11
+         //   if (checkIE()) { // detect it's IE11
                 var currentPath = window.location.hash.slice(1)
                 if (this.$route.path !== currentPath) {
                     this.$router.push(currentPath)
                 }
-            }
+         //   }
             console.log(this.domains)
             console.log("router topic??? ", this.$route.params.topic)
 

@@ -10,11 +10,11 @@
                url("./fonts/fontawesome-webfont.svg") format("svg");
 }
 @baseFontSize: 18px;
-@subtitleFontSize: 19px;
-@titleFontSize: 21px;
+@subtitleFontSize: 20px;
+@titleFontSize: 22px;
 @mobileFontSize: 16px;
 @smallFontSize: 14px;
-@bodyBackgroundColor: #FFF;
+@bodyBackgroundColor: #FFF; 
 @bodyColor: #444;
 @headingBackgroundColor: #4C5249;
 @heroHeaderBackgroundColor: #4b5148b3;
@@ -50,8 +50,9 @@
 @sectionBorderColor: rgba(0, 0, 0, 0.2);
 @sectionRightPadding: 296px;
 @sectionRightPaddingWide: 140px;
-@headingWidth: 52.5%;
-@bodyContentWidth: 47.5%;
+@headingWidth: 50%;
+@bodyContentWidth: 55%;
+@twoColumnItemWidth: 48%;
 
 html, body {
     height: 100%;
@@ -211,7 +212,7 @@ select::-ms-expand {
 .error-message {
   color: #FFF;
   //TODO remove this
- // display: none;
+  display: none;
   background: @errorColor;
 
   &.content {
@@ -465,6 +466,12 @@ a {
 .body-text {
   margin-top: 16px;
 }
+.subtitle-text {
+  font-size: @subtitleFontSize;
+  &.emphasis {
+    font-weight: bold;
+  }
+}
 
 .module-section {
   h3 {
@@ -502,6 +509,19 @@ a {
   animation-duration: 800ms;
   animation-timing-function: @defaultAnimationSpeed;
   animation-fill-mode: forwards;
+  position: relative;
+  z-index: 5;
+  &:after {
+    display: block;
+    position: absolute;
+    content: "";
+    z-index: -1;
+    top: 0;
+    bottom: calc(40% - 32px);
+    left: 0;
+    right: 0;
+    background: @darkFeatureItemBackgroundColor
+  }
   //color: #FFF;
   h1, h2 {
     font-weight: 600;
@@ -611,7 +631,7 @@ a {
 @media (min-width: 992px) {
   .two-column-feature {
     .item {
-      width: @bodyContentWidth;
+      width: @twoColumnItemWidth;
     }
   }
 }
@@ -1025,6 +1045,7 @@ footer {
     flex-direction: column;
     align-items: flex-start;
     position: fixed;
+    z-index: 100;
     right: 16px;
     top: 208px;
     background: @navBackgroundColor;
