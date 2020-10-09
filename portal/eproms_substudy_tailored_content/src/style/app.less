@@ -16,8 +16,6 @@
 @smallFontSize: 14px;
 @bodyBackgroundColor: #FFF; 
 @bodyColor: #444;
-@headingBackgroundColor: #4C5249;
-@heroHeaderBackgroundColor: #4b5148b3;
 @linkColor: #48A1E9;
 @linkHoverColor: darken(@linkColor, 10%);
 @placeholderColor: #777;
@@ -25,14 +23,12 @@
 @buttonBackgroundColor: #7C959E;
 @buttonHoverBackgroundColor: darken(@buttonBackgroundColor, 10%);
 @errorColor: #C9252C;
-@infoColor: #f3ead1;
 @inputBorderColor: #777;
 @successColor: #82dc29;
 @mutedColor: #777;
 @muterColor:  #e0e0e0;
 @navLinkColor: #48A1E9;
 @navTitleColor: #333;
-//@heroSectionBackgroundColor: #3F4A55;
 @heroSectionBackgroundColor: #F5F6F6;
 @successBackgroundColor: #9eb781;
 @mainSectionBackgroundColor: #FFF;
@@ -41,7 +37,6 @@
 @featureItemBackgroundColor: #FFF;
 @featureTileColor: #48A1E9;
 @calloutColor: #48A1E9;
-//@darkFeatureItemBackgroundColor: #626A5D;
 @darkFeatureItemBackgroundColor: #F1EFEA;
 @defaultFontFamily: Arial, sans-serif;
 @bodyFontFamily: @defaultFontFamily;
@@ -80,7 +75,6 @@ body {
 @media (min-width: 992px) {
     body {
         font-size: @baseFontSize;
-        //overflow-y: hidden;
     }
 }
 h1, h2, h3, h4, h5 {
@@ -91,7 +85,7 @@ h2, h3, h4, h5 {
   text-transform: capitalize;
 }
 h4, h5 {
-  line-height: 1.35 !important;
+  line-height: 1.5 !important;
 }
 
 small, .small {
@@ -266,6 +260,7 @@ main.active,
 section.active {
     opacity: 1;
     .hero-title:after {
+      display: block;
       visibility: visible;
     }
 }
@@ -289,11 +284,6 @@ section.main {
       animation-timing-function: @defaultAnimationSpeed;
       animation-fill-mode: forwards;
       .body-content {
-          // animation-name: blurReady;
-          // animation-duration: 800ms;
-          // animation-timing-function: @defaultAnimationSpeed;
-          // animation-fill-mode: forwards;
-         // animation-delay: 50ms;
           opacity: 1;
       }
     }
@@ -466,6 +456,9 @@ a {
 .body-text {
   margin-top: 16px;
 }
+.title-text {
+  font-size: @titleFontSize;
+}
 .subtitle-text {
   font-size: @subtitleFontSize;
   &.emphasis {
@@ -496,8 +489,6 @@ a {
 }
 
 .hero-section {
-  //background-color: @heroSectionBackgroundColor;
-  //background-image: url("../assets/background.jpg");
   background-size: cover;
   background-attachment: scroll;
   background-position: bottom center;
@@ -522,21 +513,18 @@ a {
     right: 0;
     background: @darkFeatureItemBackgroundColor
   }
-  //color: #FFF;
   h1, h2 {
     font-weight: 600;
   }
   .hero-title {
-    //margin-top: calc(500px / 4);
-    //background-color: @heroHeaderBackgroundColor;
     padding: 24px 0 0;
     width: 100%;
     max-width: 100%;
     //text-align: center;
     &:after {
-      display: block;
+      display: none;
       visibility: hidden;
-      //content: "\2193";
+     // content: "\2193";
       content: "\f107";
       -webkit-font-smoothing: antialiased;
       font-size: 2.5rem;
@@ -550,8 +538,8 @@ a {
       -moz-animation: bounce 2s 15;
       -webkit-animation: bounce 2s 15;
       animation: bounce 2s 15;
-      animation-delay: 1.55s;
-      transition: visibility 350ms ease 250ms;
+      -webkit-font-smoothing: antialiased;
+      transition: visibility 1s ease 250ms;
     }
   }
   .hero-image {
@@ -635,13 +623,6 @@ a {
     }
   }
 }
-// @media (min-width: 1400px) {
-//   .two-column-feature {
-//     .item {
-//       width: 47.5%;
-//     }
-//   }
-// }
 
 .two-column-image-feature {
   display: flex;
@@ -713,9 +694,13 @@ a {
     padding-right: 16px;
     margin-bottom: 32px;
     width: 100%;
+    text-transform: normal;
   }
   .tile-title {
     font-size: @baseFontSize !important;
+  }
+  h3:first-of-type {
+    margin-bottom: 32px;
   }
 }
 @media (min-width: 768px) {
@@ -724,6 +709,9 @@ a {
     .title {
       font-size: @titleFontSize;
       width: 80%;
+    }
+    .title-text {
+      width: 90%;
     }
   }
 }
@@ -752,9 +740,6 @@ a {
   .collapsible-container {
     .collapsible-container-title {
       width: @headingWidth;
-      // text-align: left;
-      // padding-left: 0;
-      // padding-right: 0;
     }
   }
   .two-column-feature {
@@ -869,6 +854,10 @@ a {
 
 .resource-section {
   background-color: @resourceSectionBackgroundColor;
+  &  h3:first-of-type {
+    margin-top: 16px;
+    max-width: 250px;
+  }
   .tiles-container {
     margin-top: 24px;
     justify-content: flex-start;
@@ -883,7 +872,7 @@ a {
     margin-right: 8px;
     background-color: @featureItemBackgroundColor;
     .title {
-      margin-bottom: 24px;
+      margin-bottom: 8px;
     }
     a {
       color: @calloutColor;
@@ -897,6 +886,7 @@ a {
     }
     .content {
       min-height: 88px;
+      margin-bottom: 16px;
     }
     .callout-text {
       color: @calloutColor;
@@ -1094,7 +1084,6 @@ footer {
   min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  //background: #ffffffe6;
   background: #FFF;
   padding: 24px 32px;
   .content {
@@ -1141,16 +1130,10 @@ footer {
 @media (min-width: 500px) {
   .mobile-navigation {
     padding: 24px 48px;
-    // .content {
-    //   padding-right: 32px;
-    //   padding-left: 32px;
-    // }
   }
 }
 
 .navigation-video-image {
-  //background-color: @muterColor;
-  //width: 60%;
   width: 100%;
   height: 0;
   position: relative;
@@ -1159,7 +1142,6 @@ footer {
   background-image: url("../assets/video.png");
   background-repeat: no-repeat;
   background-size: contain;
-  //padding-bottom: 32%;
   padding-bottom: 56%;
   animation-name: blurReady;
   animation-duration: 850ms;
@@ -1206,6 +1188,15 @@ footer {
   }
   60% {
     transform: translateY(12px) scale(1.1);
+  }
+}
+
+@keyframes gradualVis {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
