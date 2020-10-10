@@ -260,8 +260,9 @@ main.active,
 section.active {
     opacity: 1;
     .hero-title:after {
-      display: block;
+      opacity: 1;
       visibility: visible;
+      color: @bodyColor
     }
 }
 
@@ -520,15 +521,18 @@ a {
     padding: 24px 0 0;
     width: 100%;
     max-width: 100%;
+
     //text-align: center;
     &:after {
-      display: none;
+      display: block;
+      opacity: 0;
       visibility: hidden;
-     // content: "\2193";
+      color: transparent;
+  //    content: "\2193";
       content: "\f107";
       -webkit-font-smoothing: antialiased;
       font-size: 2.5rem;
-  //    font-family: symbols;
+    //  font-family: symbols;
       font-family: FontAwesome;
       font-style: normal;
       font-weight: 300;
@@ -539,7 +543,8 @@ a {
       -webkit-animation: bounce 2s 15;
       animation: bounce 2s 15;
       -webkit-font-smoothing: antialiased;
-      transition: visibility 1s ease 250ms;
+      animation-delay: 1.75s;
+      transition: visibility 1s ease 550ms, opacity 1s ease 550ms;
     }
   }
   .hero-image {
@@ -1202,12 +1207,12 @@ footer {
 
 @keyframes blurReady {
   0% {
-    filter: blur(3px);
-    -webkit-filter: blur(3px);
-    -moz-filter: blur(3px);
-    -o-filter: blur(3px);
-    -ms-filter: blur(3px);
-    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+    filter: blur(10px);
+    -webkit-filter: blur(10px);
+    -moz-filter: blur(10px);
+    -o-filter: blur(10px);
+    -ms-filter: blur(10px);
+    filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='10');
   }
   100% {
     filter: blur(0);
