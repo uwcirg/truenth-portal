@@ -312,6 +312,7 @@ export default {
                 let anchorLink = el.querySelector("a");
                 if (anchorLink && anchorLink.getAttribute("href")) {
                     el.addEventListener("click", function(e) {
+                        e.preventDefault();
                         e.stopPropagation();
                         window.open(anchorLink.getAttribute("href"), "_blank");
                         return false;
