@@ -161,8 +161,7 @@ module.exports = function(_env, argv) {
       splitChunks: {
         chunks: "all",
         minSize: 0,
-        maxInitialRequests: 10,
-        maxAsyncRequests: 10,
+        maxInitialRequests: Infinity,
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/,

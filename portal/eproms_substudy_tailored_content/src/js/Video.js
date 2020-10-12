@@ -5,14 +5,22 @@ export default {
             if (!videoElement) {
                 return;
             }
-            let iframeElement = document.createElement("iframe");
-            iframeElement.setAttribute("allowfullscreen", true);
-            iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
-            videoElement.appendChild(iframeElement);
-            videoElement.classList.add("active");
+            // let iframeElement = document.createElement("iframe");
+            // iframeElement.setAttribute("allowfullscreen", true);
+            // iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
+            // videoElement.appendChild(iframeElement);
+            // videoElement.classList.add("active");
             let videoNavElements = document.querySelectorAll(".navigation-video-image");
             videoNavElements.forEach(el => {
                 el.addEventListener("click", () => {
+                    if (!el.getAttribute("data-video-initialized")) {
+                        let iframeElement = document.createElement("iframe");
+                        iframeElement.setAttribute("allowfullscreen", true);
+                        iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
+                        videoElement.appendChild(iframeElement);
+                        videoElement.classList.add("active");
+                        el.setAttribute("data-video-initialized", true);
+                    }
                     let ve = document.querySelector(".video iframe");
                     if (ve) {
                         let veSrc = ve.getAttribute("src");
