@@ -830,7 +830,7 @@ a {
     //flex: 1;
   }
   .tile-title {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     width: 100%;
   }
   .content {
@@ -878,13 +878,14 @@ a {
     margin-right: 8px;
     background-color: @featureItemBackgroundColor;
     .title {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     a {
       color: @calloutColor;
       display: inline-block;
       text-decoration: none;
       font-weight: 600;
+      letter-spacing: 0.02rem;
       &:after {
         display: inline-block;
         content: "\2192";
@@ -1069,6 +1070,7 @@ footer {
   left: calc(50% - 80px);
   right: calc(50% - 80px);
   width: 160px;
+  z-index: 10;
   button {
     background: @calloutColor;
     color: #FFF;
@@ -1147,8 +1149,8 @@ footer {
   height: 0;
   position: relative;
   margin: 32px auto 32px;
-  cursor:pointer;
-  background-image: url("../assets/video.png");
+  cursor: pointer;
+  background-image: url("../assets/images/video.png");
   background-repeat: no-repeat;
   background-size: contain;
   padding-bottom: 56%;

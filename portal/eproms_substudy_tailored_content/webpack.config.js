@@ -45,22 +45,23 @@ module.exports = function(_env, argv) {
           test: require.resolve('jquery'),
           loader: 'expose-loader',
           options: {
-            //exposes: ['$', 'jQuery']
             exposes: ['$', 'jQuery!jquery']
-            //exposes: "jquery"
-            // exposes: {
-            //   globalName: "$",
-            //   override: true
-            // }
           },
         },
         {
-          test: /\.(woff2|eot|svg|ttf|woff|otf)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          use: 'url-loader?limit=10000',
+          test: /\.(woff2|eot|ttf|woff|otf)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          //use: 'url-loader?limit=10000',
+          loader: "file-loader",
+          options: {
+            name: "[name].[ext]"
+          }
         },
         {
-          test: /\.(ttf|eot|svg|png|jpe?g|gif)(\?[\s\S]+)?$/,
-          use: 'file-loader',
+          test: /\.(ttf|svg|png|jpe?g|gif)(\?[\s\S]+)?$/,
+          loader: 'file-loader',
+          options: {
+            name: "[name].[ext]"
+          }
         },
         {
           test: /\.(js)$/,

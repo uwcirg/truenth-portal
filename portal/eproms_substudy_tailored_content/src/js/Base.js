@@ -1,4 +1,6 @@
-import {checkIE, isInViewport, getUrlParameter, tryParseJSON} from "./Utility";
+import NavMethods from "./Nav";
+import VideoMethods from "./Video";
+import {checkIE, getUrlParameter, tryParseJSON} from "./Utility";
 export default {
     mounted: function() {
         Promise.all([
@@ -23,6 +25,7 @@ export default {
             this.initApp();
         });
     },
+    mixins: [NavMethods, VideoMethods],
     /*
      * methods available to the application
      */
@@ -149,144 +152,6 @@ export default {
                 }
             );
         },
-        setNav() {
-            //let navElement = document.querySelector(".navigation .content");
-            let navElement = document.querySelector(".navigation");
-            //let mobileNavElement = document.querySelector(".mobile-navigation .content");
-            let mobileNavElement = document.querySelector(".mobile-navigation");
-            let mobileQuickLinkElement = document.querySelector(".mobile-quick-links");
-            //console.log("nav? ", navElement)
-            if (!navElement) {
-                if (mobileNavElement) {
-                    mobileNavElement.classList.add("hide");
-                }
-                if (mobileQuickLinkElement) {
-                    mobileQuickLinkElement.classList.add("hide");
-                }
-                return;
-            }
-            let anchorElements = document.querySelectorAll(".anchor-link");
-            //console.log("anchor links? ", anchorElements)
-            if (!anchorElements.length) {
-                // let navParentElement = document.querySelector(".navigation");
-                // let mobileNavElement = document.querySelector(".mobile-navigation");
-                // let mobileQuickLinkElement = document.querySelector(".mobile-quick-links");
-                if (navElement) navElement.classList.add("hide");
-                if (mobileNavElement) mobileNavElement.classList.add("hide");
-                if (mobileQuickLinkElement) mobileQuickLinkElement.classList.add("hide");
-                return;
-            }
-            let navContentContainerElement = document.querySelector(".navigation .content");
-            if (!navContentContainerElement) {
-                let div = document.createElement("div");
-                div.classList.add("content");
-                navElement.prepend(div);
-            }
-            let contentHTML = "";
-            anchorElements.forEach(el => {
-                if (!el.getAttribute("id")) {
-                    return true;
-                }
-                //console.log("Next element? " , el.nextElementSibling.innerText)
-                contentHTML += `<a href="#${el.getAttribute("id")}">${
-                    el.nextElementSibling &&
-                    el.nextElementSibling.innerText? 
-                    el.nextElementSibling.innerText : el.getAttribute("id").replace(/_/g, ' ')}</a>`;
-            });
-            let contentElement = document.createElement("div");
-                contentElement.innerHTML = contentHTML;
-            let mobileContentElement = contentElement.cloneNode(true);
-            navContentContainerElement.appendChild(contentElement);
-
-            let adjustNavPos = () => {
-                window.requestAnimationFrame(function() {
-                    let topPosition = 48;
-                    document.querySelector(".navigation").style.top = topPosition+"px";
-                });
-            };
-            let closeMobileNav = () => {
-                document.querySelector(".mobile-navigation").classList.remove("open");
-                document.querySelector("body").classList.remove("fixed");
-            }
-
-            let navLinkElements = navElement.querySelectorAll("a");
-            navLinkElements.forEach(link => {
-                link.addEventListener("click", () => {
-                    adjustNavPos();
-                });
-            });
-
-            if (mobileNavElement) {
-                let mobileNavContentContainerElement = mobileNavElement.querySelector(".content");
-                if (!mobileNavContentContainerElement) {
-                    let div = document.createElement("div");
-                    div.classList.add("content");
-                    mobileNavElement.prepend(div);
-                }
-                mobileNavContentContainerElement.appendChild(mobileContentElement);
-                let mobileNavLinks = mobileNavElement.querySelectorAll("a");
-                mobileNavLinks.forEach(item => {
-                    item.addEventListener("click", function(e) {
-                        e.stopPropagation();
-                        closeMobileNav();
-                    })
-                });
-                let mobileCloseButtonElement = mobileNavElement.querySelector(".btn-close");
-                if (mobileCloseButtonElement) {
-                    mobileCloseButtonElement.addEventListener("click",function(e) {
-                        e.stopPropagation();
-                        closeMobileNav();
-                    });
-                }
-            }
-            window.addEventListener("scroll", function(e) {
-                adjustNavPos();
-    
-            });
-            let mobileLinkButton = document.querySelector(".mobile-quick-links button");
-            if (mobileLinkButton) {
-                mobileLinkButton.addEventListener("click",function(e) {
-                    e.stopImmediatePropagation();
-                    document.querySelector(".mobile-navigation").classList.add("open");
-                    setTimeout(function() {
-                        document.querySelector("body").classList.add("fixed");
-                    }, 150);
-                });
-            }
-            window.addEventListener("keypress", (e) => {
-                if (e.keyCode === 13) {
-                    let routerTopic = this.getRouterTopic();
-                    if (routerTopic) {
-                        window.location.reload();
-                        return false;
-                    }
-                }
-                return false;
-            });
-            window.addEventListener("hashchange", () => {
-                let routerTopic = this.getRouterTopic();
-                console.log("router Topic when hash? ", routerTopic)
-                if (routerTopic === this.activeDomain) return false;
-                if (routerTopic) {
-                    window.location.reload();
-                    return false;
-                }
-                return false;
-            });
-            window.addEventListener("resize", function() {
-                closeMobileNav();
-            });
-            let videoNavImage = document.querySelectorAll(".navigation-video-image");
-            videoNavImage.forEach(el => {
-                el.addEventListener("click", function(e) {
-                    closeMobileNav();
-                    let videoElement = document.querySelector(".video");
-                    if (videoElement) {
-                        videoElement.scrollIntoView();
-                    }
-                });
-            });
-        },
         setCollapsible() {
             let collapsibleElements = document.querySelectorAll(".collapsible");
             collapsibleElements.forEach(el => {
@@ -320,40 +185,26 @@ export default {
                 }
             });
         },
-        setVideo() {
-            let videoElement = document.querySelector(".video");
-            if (!videoElement) {
-                return;
-            }
-            let iframeSrc = videoElement.getAttribute("data-iframe-src");
-            let videoNavElements = document.querySelectorAll(".navigation-video-image");
-            if (!iframeSrc) {
-                let videoSection = document.querySelector(".video-section");
-                if (videoSection) {
-                    videoSection.classList.add("hide");
-                }
-                videoNavElements.forEach(item => {
-                    item.classList.add("hide");
-                });
-                return;
-            }
-            let iframeElement = document.createElement("iframe");
-            iframeElement.setAttribute("allowfullscreen", true);
-            iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
-            videoElement.appendChild(iframeElement);
-            videoElement.classList.add("active");
-            videoNavElements.forEach(el => {
-                el.addEventListener("click", () => {
-                    let ve = document.querySelector(".video iframe");
-                    if (ve) {
-                        let veSrc = ve.getAttribute("src");
-                        if (veSrc.indexOf("?") !== -1) {
-                            veSrc = veSrc.substring(0, veSrc.indexOf("?"));
-                        }
-                        ve.setAttribute("src", veSrc + "?autoPlay=true");
+        initRouterEvents() {
+            window.addEventListener("keypress", (e) => {
+                if (e.keyCode === 13) {
+                    let routerTopic = this.getRouterTopic();
+                    if (routerTopic) {
+                        window.location.reload();
+                        return false;
                     }
-                });
-                el.classList.remove("hide");
+                }
+                return false;
+            });
+            window.addEventListener("hashchange", () => {
+                let routerTopic = this.getRouterTopic();
+                console.log("router Topic when hash? ", routerTopic)
+                if (routerTopic === this.activeDomain) return false;
+                if (routerTopic) {
+                    window.location.reload();
+                    return false;
+                }
+                return false;
             });
         },
         getRouterTopic() {
@@ -407,14 +258,14 @@ export default {
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
         onDomainContentDidLoad() {
-            console.log("WTF?")
             setTimeout(function() {
                 this.setInitView();
                 this.setCurrentView("domain");
             }.bind(this), 150);
-            this.setNav();
+            this.initNav();
+            this.initRouterEvents();
             this.setCollapsible();
-            this.setVideo();
+            this.initVideo();
             this.setTileLinkEvent();
         },
         getDomainContent() {
