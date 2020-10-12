@@ -1,27 +1,43 @@
+import {isInViewport} from "./Utility";
 export default {
     methods: {
-        initVideo() {
-            let videoElement = document.querySelector(".video");
+        getVideoElement() {
+            return document.querySelector(".video");
+        },
+        setVideoIframe() {
+            let videoElement = this.getVideoElement();
             if (!videoElement) {
                 return;
             }
-            // let iframeElement = document.createElement("iframe");
-            // iframeElement.setAttribute("allowfullscreen", true);
-            // iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
-            // videoElement.appendChild(iframeElement);
-            // videoElement.classList.add("active");
+            if (videoElement.classList.contains("active")) {
+                return;
+            }
+            let iframeElement = document.createElement("iframe");
+            iframeElement.setAttribute("allowfullscreen", true);
+            iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
+            videoElement.appendChild(iframeElement);
+            videoElement.classList.add("active");
+        },
+        initVideo() {
+            let videoElement = this.getVideoElement();
+            if (!videoElement) {
+                return;
+            }
             let videoNavElements = document.querySelectorAll(".navigation-video-image");
+            window.addEventListener("scroll", e => {
+                e.stopPropagation();
+                window.requestAnimationFrame(() => {
+                    if (!isInViewport(videoElement)) {
+                        return false;
+                    }
+                    this.setVideoIframe();
+                });
+                
+            });
             videoNavElements.forEach(el => {
                 el.addEventListener("click", () => {
-                    if (!el.getAttribute("data-video-initialized")) {
-                        let iframeElement = document.createElement("iframe");
-                        iframeElement.setAttribute("allowfullscreen", true);
-                        iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
-                        videoElement.appendChild(iframeElement);
-                        videoElement.classList.add("active");
-                        el.setAttribute("data-video-initialized", true);
-                    }
-                    let ve = document.querySelector(".video iframe");
+                    this.setVideoIframe();
+                    let ve = videoElement.querySelector("iframe");
                     if (ve) {
                         let veSrc = ve.getAttribute("src");
                         if (veSrc.indexOf("?") !== -1) {

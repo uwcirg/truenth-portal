@@ -417,6 +417,9 @@ a {
       display: none;
     }
   }
+  &.video {
+    position: relative;
+  }
 }
 @media (min-width: 768px) {
   .module-section {
@@ -1174,10 +1177,28 @@ footer {
 .video {
   width: 100%;
   position: relative;
+  min-height: 250px;
   margin-top: 24px;
   margin-bottom: 24px;
+  &:before {
+    display: block;
+    content: "";
+    border: 8px solid @muterColor;
+    border-top: 8px solid @bodyColor; /* Blue */
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spinner 2s linear infinite;
+    position: absolute;
+    top: calc(50% - 40px);
+    left: calc(50% - 40px);
+    z-index: 5;
+  }
   &.active {
     padding-bottom: calc(56% - 32px);
+    &:before {
+      display: none;
+    }
   }
   iframe {
     border: 0;
