@@ -6965,6 +6965,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.1",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "general_pain",
+                "display": "General pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, how OFTEN did you have pain?",
           "option": [
             {
@@ -7002,6 +7011,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.2",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "general_pain",
+                "display": "General pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your PAIN at its WORST?",
           "option": [
             {
@@ -7039,6 +7057,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.3",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "general_pain",
+                "display": "General pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did PAIN INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7076,6 +7103,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.4",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "joint_pain",
+                "display": "Joint pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, how OFTEN did you have ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS)?",
           "option": [
             {
@@ -7113,6 +7149,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.5",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "joint_pain",
+                "display": "Joint pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) at their WORST?",
           "option": [
             {
@@ -7150,6 +7195,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.6",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "joint_pain",
+                "display": "Joint pain"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7187,6 +7241,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.7",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "insomnia",
+                "display": "Insomnia"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) at its worst?",
           "option": [
             {
@@ -7224,6 +7287,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.8",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "insomnia",
+                "display": "Insomnia"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7261,6 +7333,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.9",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "fatigue",
+                "display": "Fatigue"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your FATIGUE, TIREDNESS, OR LACK OF ENERGY at its WORST?",
           "option": [
             {
@@ -7298,6 +7379,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.10",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "fatigue",
+                "display": "Fatigue"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did FATIGUE, TIREDNESS, OR LACK OF ENERGY INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7335,6 +7425,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.11",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "anxious",
+                "display": "Anxious"
+              }
+            ]
+          },
           "text": "In the last 7 days, how OFTEN did you feel ANXIETY?",
           "option": [
             {
@@ -7372,6 +7471,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.12",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "anxious",
+                "display": "Anxious"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your ANXIETY at its WORST?",
           "option": [
             {
@@ -7409,6 +7517,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.13",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "anxious",
+                "display": "Anxious"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did ANXIETY INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7446,6 +7563,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.14",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "discouraged",
+                "display": "Discouraged"
+              }
+            ]
+          },
           "text": "In the last 7 days, how OFTEN did you FEEL THAT NOTHING COULD CHEER YOU UP?",
           "option": [
             {
@@ -7483,6 +7609,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.15",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "discouraged",
+                "display": "Discouraged"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your FEELINGS THAT NOTHING COULD CHEER YOU UP at THEIR WORST?",
           "option": [
             {
@@ -7520,6 +7655,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.16",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "discouraged",
+                "display": "Discouraged"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did THE FEELING THAT NOTHING COULD CHEER YOU UP INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7557,6 +7701,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.17",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "sad",
+                "display": "Sad"
+              }
+            ]
+          },
           "text": "In the last 7 days, how OFTEN did you have SAD OR UNHAPPY FEELINGS?",
           "option": [
             {
@@ -7594,6 +7747,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.18",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "sad",
+                "display": "Sad"
+              }
+            ]
+          },
           "text": "In the last 7 days, what was the SEVERITY of your SAD OR UNHAPPY FEELINGS at their WORST?",
           "option": [
             {
@@ -7631,6 +7793,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.19",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "sad",
+                "display": "Sad"
+              }
+            ]
+          },
           "text": "In the last 7 days, how much did SAD OR UNHAPPY FEELINGS INTERFERE with your usual or daily activities?",
           "option": [
             {
@@ -7668,6 +7839,15 @@
         {
           "type": "choice",
           "linkId": "ironman_ss.20",
+          "code":  {
+            "coding": [
+              {
+                "system": "http://us.truenth.org/observation",
+                "code": "social_isolation",
+                "display": "Social isolation"
+              }
+            ]
+          },
           "text": "During the past week: Has your physical condition or medical treatment interfered with your social activities?",
           "option": [
             {
