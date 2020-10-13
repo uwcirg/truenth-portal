@@ -25,6 +25,19 @@ export default {
             this.initApp();
         });
     },
+    watch: {
+        $route(to, from) {
+            /*
+             * watch for manual hash change
+             */
+            if (to && to.params && to.params.topic) {
+                if (this.domains.indexOf(to.params.topic) !== -1) {
+                    location.reload();
+                    return false;
+                }
+            }
+        }
+    },
     mixins: [NavMethods, VideoMethods],
     /*
      * methods available to the application
@@ -196,37 +209,27 @@ export default {
             });
         },
         initRouterEvents() {
-            window.addEventListener("keypress", (e) => {
-                if (e.keyCode === 13) {
+            if (checkIE()) {
+                 window.addEventListener("hashchange", () => {
                     let routerTopic = this.getRouterTopic();
+                    console.log("router Topic when hash? ", routerTopic)
+                    if (routerTopic === this.activeDomain) return false;
                     if (routerTopic) {
                         window.location.reload();
                         return false;
                     }
-                }
-                return false;
-            });
-            window.addEventListener("hashchange", () => {
-                let routerTopic = this.getRouterTopic();
-                console.log("router Topic when hash? ", routerTopic)
-                if (routerTopic === this.activeDomain) return false;
-                if (routerTopic) {
-                    window.location.reload();
                     return false;
-                }
-                return false;
-            });
+                });
+            }
         },
         getRouterTopic() {
 
-         //   if (checkIE()) { // detect it's IE11
+           if (checkIE()) { // detect it's IE11
                 var currentPath = window.location.hash.slice(1)
                 if (this.$route.path !== currentPath) {
                     this.$router.push(currentPath)
                 }
-         //   }
-            console.log(this.domains)
-            console.log("router topic??? ", this.$route.params.topic)
+            }
 
             if (this.$route &&
                 this.$route.params && 
