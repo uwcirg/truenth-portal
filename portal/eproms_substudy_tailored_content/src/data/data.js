@@ -2,7 +2,7 @@
  * properties used by application to persist state
  */
 export default {
-    userId: 0,
+    userId: false,
     locale: "en-us",
     errorMessage: "",
     currentView: "intro",

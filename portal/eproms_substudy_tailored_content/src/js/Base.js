@@ -42,6 +42,11 @@ export default {
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
             this.initialized = true;
+            if (!this.getUserID()) {
+                this.setSelectedDomain();
+                this.getDomainContent();
+                return;
+            }
             Promise.all([
                  //TODO init user domains, call api based on user id
                 this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
@@ -68,6 +73,7 @@ export default {
             //let self = this;
             Vue.nextTick(() => {
                     setTimeout(function() {
+                        this.goToTop();
                         this.setCurrentView("domain");
                         this.loading = false;
                     }.bind(this), 350);
@@ -143,6 +149,10 @@ export default {
         },
         isMatchView(viewId) {
             return this.currentView === viewId;
+        },
+        goToTop() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         },
         goToView(viewId) {
             Vue.nextTick(

@@ -6,6 +6,7 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const vendorPath = './src/vendors';
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = function(_env, argv) {
   const isProduction = argv && argv.mode === "production";
@@ -75,7 +76,12 @@ module.exports = function(_env, argv) {
         },
         {
           test: /\.css$/,
-          use: ['style-loader', 'css-loader']
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader
+            },
+            'css-loader',
+          ],
         },
         {
           test: /\.less$/,
@@ -122,6 +128,12 @@ module.exports = function(_env, argv) {
           Vue: ['vue/dist/vue.esm.js', 'default'],
         }
       ),
+      new MiniCssExtractPlugin({
+        // Options similar to the same options in webpackOptions.output
+        // both options are optional
+        filename: '[name].css',
+        chunkFilename: '[name].[id].css',
+      }),
       new webpack.DefinePlugin({
         "process.env.NODE_ENV": JSON.stringify(
           isProduction ? "production" : "development"
@@ -161,7 +173,7 @@ module.exports = function(_env, argv) {
       splitChunks: {
         chunks: "all",
         minSize: 0,
-        maxInitialRequests: Infinity,
+        maxInitialRequests: 10,
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/,
