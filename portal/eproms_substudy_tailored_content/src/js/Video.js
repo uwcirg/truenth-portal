@@ -23,7 +23,6 @@ export default {
             if (!videoElement) {
                 return;
             }
-            let videoNavElements = document.querySelectorAll(".navigation-video-image");
             window.addEventListener("scroll", e => {
                 e.stopPropagation();
                 window.requestAnimationFrame(() => {
@@ -34,6 +33,7 @@ export default {
                 });
                 
             });
+            let videoNavElements = document.querySelectorAll(".navigation-video-image");
             videoNavElements.forEach(el => {
                 el.addEventListener("click", () => {
                     this.setVideoIframe();

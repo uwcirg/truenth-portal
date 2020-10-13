@@ -17,17 +17,16 @@
     import "custom-event-polyfill";
     import bootstrap from "bootstrap";
     import $ from 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
-    //import $ from 'expose-loader';
     import "bootstrap/dist/css/bootstrap.min.css";
-    import "../../style/app.less";
+    import "../style/app.less";
     import Error from "./Error.vue";
     import DomainSection from "./DomainSection.vue";
     import HeaderSection from "./Header.vue";
     import FooterSection from "./Footer.vue";
     //import IntroSection from "./IntroSection.vue";
-    import AppData from "../../data/data.js";
-    import BaseMethods from "../Base.js";
-    import {sendRequest} from "../Utility.js";
+    import AppData from "../data/data.js";
+    import BaseMethods from "../js/Base.js";
+    import {sendRequest} from "../js/Utility.js";
 
     Vue.prototype.$http = sendRequest;
 
@@ -41,7 +40,7 @@
         },
         mixins: [BaseMethods],
         errorCaptured(Error, Component, info) {
-           // console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
+            console.error("Error: ", Error, " Component: ", Component, " Message: ", info);
             return false;
         },
         errorHandler(err, vm) {
@@ -50,8 +49,8 @@
             if (errorElement) {
                 errorElement.innerHTML = "Error occurred initializing Vue instance.";
             }
-          //  console.warn("Vue instance threw an error: ", vm, this);
-          //  console.error("Error thrown: ", err);
+            console.warn("Vue instance threw an error: ", vm, this);
+            console.error("Error thrown: ", err);
         },
         data() {
             return {

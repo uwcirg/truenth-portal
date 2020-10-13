@@ -5,7 +5,8 @@
     </header>
 </template>
 <script>
-    import {getWrapperJS} from "../Utility.js";
+    import Vue from "vue";
+    import {getWrapperJS} from "../js/Utility.js";
     export default {
         mounted() {
             Vue.nextTick(() => {

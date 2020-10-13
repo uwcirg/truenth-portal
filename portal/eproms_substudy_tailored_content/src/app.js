@@ -2,7 +2,7 @@
  * application main component
  */
 import Vue from 'vue';
-import App from './js/components/App.vue';
+import App from './components/App.vue';
 import VueRouter from 'vue-router';
 
 Vue.use(VueRouter);
