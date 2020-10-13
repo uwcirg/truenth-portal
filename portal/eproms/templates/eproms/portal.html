@@ -14,14 +14,8 @@
         {%- if display.access -%}
             <div class="portal-item">
                 {%- if intervention.name == "assessment_engine" %}
-                    {%- if display.card_html -%}
-                        {%  set ae_html = assessment_engine_view(user) %}
-                        {{ ae_html | safe }}
-                        <input type="hidden" class="link-label" value="{{display.link_label}}" />
-                        <input type="hidden" class="link-url" value="{{display.link_url}}" />
-                    {%- else -%}
-                        {{render_card_content(intervention, display, class='portal-description-incomplete portal-no-description-container')}}
-                    {%- endif %}
+                    {%  set ae_html = assessment_engine_view(user) %}
+                    {{ ae_html | safe }}
                 {%- else -%}
                     {% call render_card_content(intervention, display) %}
                         <div class="portal-description-body">
