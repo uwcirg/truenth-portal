@@ -68,7 +68,7 @@
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-visible="false" data-class="consentdate-field text-center" data-filter-control="input" data-visible="true">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field"  data-filter-control="select" data-visible="false">{{ _("Site(s)") }}</th>
                   <!-- TODO fill in these two columns with data -->
-                  <th data-field="providers" data-sortable="true" data-class="provider-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
+                  <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
                   <th data-field="interventionActions" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Trigger Response") }}</th>
               </tr>
           </thead>
@@ -94,7 +94,7 @@
                       {%-endif-%}
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
-                      <td><!--treating clinicians--></td>
+                      <td>{{patient.clinician if patient.clinician else ""}}</td>
                       <td> <!--response status--></td>
                   </tr>
                {% endfor %}

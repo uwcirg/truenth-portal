@@ -2319,9 +2319,6 @@ export default (function() {
                 }
                 return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
             },
-            hasSubStudyConsent: function() {
-                return this.consent.currentItems.filter( item => parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID).length;
-            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
                 if (this.isSubStudyConsent(item)) {

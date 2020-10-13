@@ -1,0 +1,54 @@
+{%- macro render_header(title_text="") -%}
+    <div class="portal-header-container">
+        <h2 class="portal-header">{{title_text}}</h2>
+        <h4 class="portal-intro-text">{{caller()}}</h4>
+    </div>
+{%- endmacro -%}
+{%- macro render_card_content(title_text="", card_class="") -%}
+    <div class="portal-description {{card_class}}">
+        <h4 class="portal-description-title">
+            {{title_text}}
+        </h4>
+        <div class="portal-description-body">
+            <!-- render the card body html from the calling party-->
+            {{caller()}}
+        </div>
+    </div>
+{%- endmacro -%}
+{%- macro render_logout() -%}
+    <div class="button-container portal-header-logout-container">
+        <a class="btn-lg btn-tnth-primary" href="/logout">{{ _("Log out") }}</a>
+    </div>
+{%- endmacro -%}
+{%- macro render_call_to_button(button_label="", button_url="") -%}
+    <div class="button-container">
+        <a class="btn-lg btn-tnth-primary" href="{{button_url}}">{{button_label}}</a>
+    </div>
+{%- endmacro -%}
+{%- macro render_greeting(full_name="") -%}
+    {{_("Hi, %(full_name)s.", full_name=full_name if full_name else "")}}
+{%- endmacro -%}
+{%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="") -%}
+    {%- if assessment_status.overall_status == OverallStatus.completed -%}
+        {% call render_card_content(title_text=_("Completed Questionnaires")) %}
+            <p>
+                <a class="portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="proAssessmentsLoc")}}'>
+                    {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
+                </a>
+            </p>
+        {% endcall %}
+    {%- else -%}
+        {% call render_card_content(title_text=_("Completed Questionnaires"), card_class="disabled") %}
+            <p>
+                {{_("When you are done, completed questionnaires will be shown here.")}}
+            </p>
+        {% endcall %}
+    {%- endif -%}
+{%- endmacro -%}
+{%- macro thankyou_card(full_name="", registry="") -%}
+    {% call render_header(title_text=_("Thank you, %(full_name)s.", full_name=full_name if full_name else '')) %}
+        <p>{{ _("You've completed the %(registry)s questionnaire.", registry=_(registry)) }}</p>
+        <p>{{ _("You will be notified when the next questionnaire is ready to complete.") }}</p>
+    {% endcall %}
+    {{render_logout()}}
+{%- endmacro -%}

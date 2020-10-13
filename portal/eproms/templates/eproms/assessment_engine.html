@@ -1,0 +1,25 @@
+<div class="portal-body">
+    <div class="portal-item">
+        {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
+            <!-- patient has pending work in base study -->
+            {% include "eproms/assessment_engine/ae_due.html" with context %}
+        {% elif (unstarted_indefinite_instruments or unfinished_indefinite_instruments) and assessment_status.overall_status != OverallStatus.withdrawn %}
+            <!-- patient completed base study, but has outstanding indefinite work-->
+            {% include "eproms/assessment_engine/ae_indefinite_due.html" with context %}
+        {% elif assessment_status.overall_status == OverallStatus.completed %}
+            <!-- patient completed both base and indefinite or withdrew -->
+            {% include "eproms/assessment_engine/ae_complete.html" with context %}
+        {% elif assessment_status.overall_status == OverallStatus.withdrawn %}
+            <!-- patient withdrawn, show questionnaire unavailable anymore? -->
+            {% include "eproms/assessment_engine/ae_not_available.html" with context %}
+        {% else %}
+            <!--If the user was enrolled in indefinite work and lands
+                here, they should see the thank you text. -->
+            {% if enrolled_in_indefinite %}
+                {% include "eproms/assessment_engine/ae_thankyou.html" with context %}
+            {% else %}
+                {% include "eproms/assessment_engine/ae_not_available.html" with context %}
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

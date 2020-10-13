@@ -1,0 +1,18 @@
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, completed_card -%}
+{% extends "eproms/assessment_engine/ae_base.html" %}
+<!-- User completed baseline, but has outstanding indefinite work -->
+{% block head %}
+    {% call render_header(title_text=render_greeting(full_name=full_name)) %}
+        {{_("Please complete your %(assigning_authority)s questionnaire at your convenience.",
+                assigning_authority=_(assessment_status.assigning_authority))}}
+    {% endcall %}
+{% endblock %}
+{% block body %}
+    {%- set button_label = _('Continue questionnaire') if unfinished_indefinite_instruments else _('Go to questionnaire') -%}
+    {%- call render_card_content(
+        title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
+        <p>{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</p>
+        {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+    {%- endcall -%}
+    {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+{% endblock %}

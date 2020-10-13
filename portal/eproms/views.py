@@ -12,6 +12,7 @@ from flask import (
 from flask_user import roles_required
 
 from ..database import db
+from ..date_tools import localize_datetime
 from ..extensions import oauth, recaptcha
 from ..models.app_text import (
     AboutATMA,
@@ -72,6 +73,74 @@ def landing():
         init_login_modal=init_login_modal)
 
 
+def assessment_engine_view(user):
+    """View like function for this very special intervention
+
+    Most interventions maintain a small block of HTML in the interventions
+    or (when customized per user) in the user_interventions table.
+
+    The assessment engine is special, as much of the state used to determine
+    logic switches within the displayed HTML only lives within the portal
+    and not with the intervention.  Furthermore, the displayed HTML exceeds
+    the "card" model, is significantly more complex (i.e. modal use) and
+    therefore gets this function to render the "main well" of the page used
+    to display intervention cards.
+
+    NB - not a real flask view method, as the returned HTML needs to be
+    embedded within another page, not made into a response object.
+
+    """
+    from datetime import datetime
+    from ..models.overall_status import OverallStatus
+    from ..models.qb_status import QB_Status  # avoid cycle
+    now = datetime.utcnow()
+
+    # TODO handle research study id.  Patient must be done with study 0
+    #  before seeing any study 1 work.
+    research_study_id = 0
+    assessment_status = QB_Status(
+        user=user,
+        research_study_id=research_study_id,
+        as_of_date=now)
+    unstarted_indefinite_instruments = (
+        assessment_status.instruments_needing_full_assessment(
+            classification='indefinite'))
+    unfinished_indefinite_instruments = (
+        assessment_status.instruments_in_progress(
+            classification='indefinite'))
+
+    # variables needed for the templates
+    due_date = localize_datetime(
+        assessment_status.due_date, user) \
+        if assessment_status.due_date else None
+    expired_date = localize_datetime(assessment_status.expired_date, user) \
+        if assessment_status.expired_date else None
+    comp_date = localize_datetime(assessment_status.completed_date, user) \
+        if assessment_status.completed_date else None
+    assessment_is_due = (
+        assessment_status.overall_status == OverallStatus.overdue) \
+        or (assessment_status.due_date is not None
+            and assessment_status.due_date < now)
+    enrolled_in_indefinite = assessment_status.enrolled_in_classification(
+        "indefinite")
+
+    return render_template(
+        "eproms/assessment_engine.html",
+        user=user,
+        assessment_status=assessment_status,
+        enrolled_in_indefinite=enrolled_in_indefinite,
+        unstarted_indefinite_instruments=unstarted_indefinite_instruments,
+        unfinished_indefinite_instruments=unfinished_indefinite_instruments,
+        OverallStatus=OverallStatus,
+        full_name=user.display_name,
+        registry=assessment_status.assigning_authority,
+        due_date=due_date,
+        expired_date=expired_date,
+        assessment_is_due=assessment_is_due,
+        comp_date=comp_date
+    )
+
+
 @eproms.route('/home')
 def home():
     """home page view function
@@ -111,13 +180,20 @@ def home():
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
 
+    if not user.has_role(ROLE.PATIENT.value):
+        abort(404, "no /home view for user with roles: {}".format(
+            str([r.name for r in user.roles])))
+
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
 
     consent_agreements = {}
     return render_template(
-        'eproms/portal.html', user=user,
-        interventions=interventions, consent_agreements=consent_agreements)
+        'eproms/portal.html',
+        user=user,
+        assessment_engine_view=assessment_engine_view,
+        interventions=interventions,
+        consent_agreements=consent_agreements)
 
 
 @eproms.route('/privacy')
