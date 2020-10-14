@@ -21,5 +21,18 @@
                 {% include "eproms/assessment_engine/ae_not_available.html" with context %}
             {% endif %}
         {% endif %}
+        <!-- substudy tiles, NOTE: need to make sure that subject is part of the substudy AND has eligible main study questionnaires -->
+        {% if enrolled_in_substudy and (
+            assessment_status.overall_status in (
+                OverallStatus.due,OverallStatus.overdue,
+                OverallStatus.in_progress,
+                OverallStatus.completed)
+            or
+            unstarted_indefinite_instruments
+            or 
+            unfinished_indefinite_instruments
+        ) %}
+            {% include "eproms/assessment_engine/ae_empro.html" with context %}
+        {% endif %}
     </div>
 </div>

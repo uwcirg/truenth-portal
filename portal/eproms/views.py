@@ -93,11 +93,13 @@ def assessment_engine_view(user):
     from datetime import datetime
     from ..models.overall_status import OverallStatus
     from ..models.qb_status import QB_Status  # avoid cycle
+    from ..models.research_study import ResearchStudy
     now = datetime.utcnow()
 
     # TODO handle research study id.  Patient must be done with study 0
     #  before seeing any study 1 work.
     research_study_id = 0
+    substudy_research_study_id = 1
     assessment_status = QB_Status(
         user=user,
         research_study_id=research_study_id,
@@ -123,6 +125,18 @@ def assessment_engine_view(user):
             and assessment_status.due_date < now)
     enrolled_in_indefinite = assessment_status.enrolled_in_classification(
         "indefinite")
+    substudy_assessment_status = QB_Status(
+        user=user,
+        research_study_id=substudy_research_study_id,
+        as_of_date=now)
+    enrolled_in_substudy = substudy_research_study_id \
+        in ResearchStudy.assigned_to(user)
+    substudy_due_date = localize_datetime(
+        substudy_assessment_status.due_date, user) \
+        if substudy_assessment_status.due_date else None
+    substudy_comp_date = localize_datetime(
+        substudy_assessment_status.completed_date, user) \
+        if substudy_assessment_status.completed_date else None
 
     return render_template(
         "eproms/assessment_engine.html",
@@ -137,7 +151,11 @@ def assessment_engine_view(user):
         due_date=due_date,
         expired_date=expired_date,
         assessment_is_due=assessment_is_due,
-        comp_date=comp_date
+        comp_date=comp_date,
+        enrolled_in_substudy=enrolled_in_substudy,
+        substudy_assessment_status=substudy_assessment_status,
+        substudy_comp_date=substudy_comp_date
+
     )
 
 
