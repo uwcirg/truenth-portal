@@ -18,8 +18,8 @@ export default {
                 this.setErrorMessage(`Error parsing data ${e}`);
             }
             this.initApp();
-            console.log("settings? ", this.settings);
-            console.log("user? ", this.userInfo)
+            //console.log("settings? ", this.settings);
+            //console.log("user? ", this.userInfo)
         }).catch(error => {
             this.setErrorMessage(`Error in promises ${error}`);
             this.initApp();
@@ -69,7 +69,7 @@ export default {
                 } catch(e) {
                     this.setErrorMessage(`Error parsing data ${e}`);
                 }
-                console.log("user locale? ", this.getLocale())
+                //console.log("user locale? ", this.getLocale())
                 //get welcome page
                 //TODO filter content based on user's domains?
                 //each domain link on the intro/welcome page should have a representative attribute or css class
@@ -144,9 +144,9 @@ export default {
         getLRBaseURL() {
             return this.LifeRayBaseURL;
         },
-        setLRBaseURL(data) {
-            if (data) {
-                this.LifeRayBaseURL = data;
+        setLRBaseURL(url) {
+            if (url) {
+                this.LifeRayBaseURL = url;
             }
         },
         getCurrentView() {
@@ -157,7 +157,6 @@ export default {
             this.currentView = viewId;
         },
         isCurrentView(viewId) {
-            //return !this.hasError() && !this.isLoading() && this.isMatchView(viewId);
             return !this.isLoading() && this.isMatchView(viewId);
         },
         isMatchView(viewId) {
@@ -179,7 +178,6 @@ export default {
             let collapsibleElements = document.querySelectorAll(".collapsible");
             collapsibleElements.forEach(el => {
                 el.addEventListener('click', event => {
-                    //let collapsibleItems = document.querySelectorAll(".collapsible");
                     let parentEl = event.target.parentElement;
                     let collapsibleItems = parentEl.querySelectorAll(".collapsible");
                     collapsibleItems.forEach(item => {
@@ -212,8 +210,6 @@ export default {
             if (checkIE()) {
                  window.addEventListener("hashchange", () => {
                     let routerTopic = this.getRouterTopic();
-                    console.log("router Topic when hash? ", routerTopic)
-                    if (routerTopic === this.activeDomain) return false;
                     if (routerTopic) {
                         window.location.reload();
                         return false;
@@ -249,18 +245,22 @@ export default {
         },
         setSelectedDomain() {
             let routerTopic = this.getRouterTopic();
-            console.log("Router topic? ", routerTopic)
+            let queryTopic = getUrlParameter("topic") || getUrlParameter("domain");
+            if (queryTopic) {
+                this.activeDomain = queryTopic;
+                return;
+            }
             if (routerTopic) {
                 this.activeDomain = routerTopic;
                 return;
             }
-            this.activeDomain = getUrlParameter("topic") || "mood_changes";
+            //TODO this should be the default landing topic/tag
+            this.activeDomain = "mood_changes";
         },
         getSelectedDomain() {
-            //return this.activeDomain;
-            //return "substudy";
-            //return "hot_flashes"
-            //example URL that works: https://amy-dev.cirg.washington.edu/substudy-tailored-content#/insomnia
+            //example URL that works: 
+            //https://amy-dev.cirg.washington.edu/substudy-tailored-content#/insomnia
+            //https://amy-dev.cirg.washington.edu/substudy-tailored-content?topic=hot_flashes
             return this.activeDomain;
          },
          getSearchURL() {
@@ -287,13 +287,7 @@ export default {
                 this.setInitView();
                 return this.domainContent;
             }
-            this.$http(this.getSearchURL()).then(
-                response => {
-                //LR URL returns this
-                //console.log("response? ", JSON.parse(response));
-                // let content = JSON.parse(response);
-                // this.setDomainContent(content["results"][0]["content"]);
-                //console.log("response? ", response);
+            this.$http(this.getSearchURL()).then(response => {
                 if (response) {
                     this.setDomainContent(response);
                     Vue.nextTick()
@@ -315,7 +309,6 @@ export default {
                 } else {
                     this.getContentAttempt = 0;
                 }
-                console.log(e)
                 this.setErrorMessage(`Error occurred retrieving content: ${e.statusText}`);
                 this.loading = false;
                // this.setInitView();

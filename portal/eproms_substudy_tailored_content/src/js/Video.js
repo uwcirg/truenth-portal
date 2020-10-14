@@ -1,6 +1,11 @@
 import {isInViewport} from "./Utility";
 export default {
     methods: {
+        getIframeAttribute() {
+            let videoElement = this.getVideoElement();
+            if (videoElement) return videoElement.getAttribute("data-iframe-src");
+            return "";
+        },
         getVideoElement() {
             return document.querySelector(".video");
         },
@@ -9,18 +14,33 @@ export default {
             if (!videoElement) {
                 return;
             }
+            let videoSrc = this.getIframeAttribute();
+            if (!videoSrc) {
+                return;
+            }
             if (videoElement.classList.contains("active")) {
                 return;
             }
             let iframeElement = document.createElement("iframe");
             iframeElement.setAttribute("allowfullscreen", true);
-            iframeElement.setAttribute("src", videoElement.getAttribute("data-iframe-src"));
+            iframeElement.setAttribute("src", videoSrc);
             videoElement.appendChild(iframeElement);
             videoElement.classList.add("active");
+        },
+        hideVideo() {
+            let videoSection = document.querySelector(".video-section");
+            if (videoSection) {
+                videoSection.style.display = "none";
+            }
         },
         initVideo() {
             let videoElement = this.getVideoElement();
             if (!videoElement) {
+                this.hideVideo();
+                return;
+            }
+            if (!this.getIframeAttribute()) {
+                this.hideVideo();
                 return;
             }
             window.addEventListener("scroll", e => {

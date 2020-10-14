@@ -117,10 +117,15 @@ export default {
             return document.querySelectorAll(".navigation-video-image");
         },
         setVideoNavVis() {
+
             let videoElement = document.querySelector(".video");
-            if (!videoElement || !videoElement.getAttribute("data-iframe-src")) {
+            console.log("WTF?? ", videoElement.getAttribute("data-iframe-src"))
+            if (!videoElement || (!videoElement.getAttribute("data-iframe-src"))) {
                 let videoNavImages = this.getVideoNavElements();
-                videoNavImages.forEach(el => el.classList.add("hide"));
+                console.log('nav? ', videoNavImages)
+                videoNavImages.forEach(el => {
+                    el.style.display = "none";
+                });
             }
         },
         initVideoNavEvent() {
