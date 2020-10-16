@@ -119,10 +119,8 @@ export default {
         setVideoNavVis() {
 
             let videoElement = document.querySelector(".video");
-            console.log("WTF?? ", videoElement.getAttribute("data-iframe-src"))
             if (!videoElement || (!videoElement.getAttribute("data-iframe-src"))) {
                 let videoNavImages = this.getVideoNavElements();
-                console.log('nav? ', videoNavImages)
                 videoNavImages.forEach(el => {
                     el.style.display = "none";
                 });

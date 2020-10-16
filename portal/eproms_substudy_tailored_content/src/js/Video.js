@@ -43,6 +43,11 @@ export default {
                 this.hideVideo();
                 return;
             }
+
+            if (videoElement.getAttribute("data-preload")) {
+                this.setVideoIframe();
+            }
+
             window.addEventListener("scroll", e => {
                 e.stopPropagation();
                 window.requestAnimationFrame(() => {

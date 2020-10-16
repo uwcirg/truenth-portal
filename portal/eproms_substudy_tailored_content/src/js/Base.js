@@ -30,7 +30,11 @@ export default {
             /*
              * watch for manual hash change
              */
-            if (to && to.params && to.params.topic) {
+            if (to && to.params) {
+                if (!to.params.topic) {
+                    location.reload();
+                    return false;
+                }
                 if (this.domains.indexOf(to.params.topic) !== -1) {
                     location.reload();
                     return false;
@@ -50,7 +54,6 @@ export default {
             return this.initialized;
         },
         initApp() {
-           // let self = this;
             this.setSettings(this.settings);
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
@@ -83,7 +86,7 @@ export default {
             });
         },
         setInitView() {
-            //let self = this;
+            //TODO if selected domain is default domain, need to filter content based on topics for subject
             Vue.nextTick(() => {
                     setTimeout(function() {
                         this.goToTop();
@@ -200,7 +203,8 @@ export default {
                     el.addEventListener("click", function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        window.open(anchorLink.getAttribute("href"), "_blank");
+                        window.open(anchorLink.getAttribute("href"), anchorLink.getAttribute("data-location")? 
+                        ("_"+anchorLink.getAttribute("data-location").replace("_", "")): "_blank");
                         return false;
                     });
                 }
@@ -255,7 +259,7 @@ export default {
                 return;
             }
             //TODO this should be the default landing topic/tag
-            this.activeDomain = "mood_changes";
+            this.activeDomain = "test_default_domain";
         },
         getSelectedDomain() {
             //example URL that works: 
@@ -316,7 +320,6 @@ export default {
         },
         setDomainContent: function(data) {
             let content = tryParseJSON(data);
-            console.log(content)
             if (content) {
                 this.domainContent = content["results"][0]["content"];
                 return;
