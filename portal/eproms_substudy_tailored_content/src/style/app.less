@@ -429,15 +429,23 @@ a {
   }
   &.intro {
     padding-top: 48px;
-    padding-bottom: 48px;
+    padding-bottom: 56px;
     margin-bottom: 24px;
     .hero-title {
       margin-bottom: 24px;
-      width: 55%;
+      width: 100%;
+    }
+  }
+}
+@media (min-width: 768px) {
+  .module-section.intro {
+    .hero-title {
+      width: 60%;
     }
   }
 }
 .hard-trigger {
+  margin-top: 40px;
   & h3:first-of-type {
     width: 100%;
     margin-bottom: 32px;
@@ -461,7 +469,7 @@ a {
   }
   .hard-trigger {
     & h3:first-of-type {
-      width: 70%;
+      width: 75%;
     }
   }
 }
@@ -912,6 +920,7 @@ a {
   
   .tiles-container {
     margin-top: 24px;
+    margin-bottom: 24px;
     justify-content: flex-start;
   }
   .tile {
