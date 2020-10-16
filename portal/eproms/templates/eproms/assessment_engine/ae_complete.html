@@ -1,13 +1,41 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_card_content, render_call_to_button, completed_card, thankyou_card -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content, render_call_to_button, completed_card, thankyou_card, empro_due, empro_completed -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed both baseline and indefinite -->
 {% block head %}
-    {{thankyou_card(full_name=full_name, registry=_(assessment_status.assigning_authority))}}
+    <!-- if main study is completed but still work in sub-study display header accordingly -->
+    {%- if substudy_assessment_is_due-%}
+        {% call render_header(title_text=greeting) %}
+            {{_("Please complete your EMPRO questionnaire as soon as possible. It will expire on %(substudy_expired_date)s.",
+                substudy_expired_date=substudy_expired_date
+            )}}
+        {% endcall %}
+    {%- else -%}
+        {{thankyou_card(full_name=full_name, registry=_(assessment_status.assigning_authority))}}
+    {%- endif -%}
 {% endblock %}
 {% block body %}
-    {%- call render_card_content(title_text=_("Open Questionnaire"), card_class="portal-completed-container") -%}
-        <p>{{_("No questionnaire is due.")}}</p>
+    <!-- main study questionnaire is completed, but sub-study questionnaire could still be due -->
+    <!-- substudy due card -->
+    {{empro_due(
+        substudy_assessment_is_due=substudy_assessment_is_due,
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        substudy_assessment_status=substudy_assessment_status,
+        substudy_expired_date=substudy_expired_date,
+        enrolled_in_substudy=enrolled_in_substudy
+    )}}
+    {%- call render_card_content(
+            title_text=_("%(assigning_authority)s Questionnaire", assigning_authority=assessment_status.assigning_authority), card_class="portal-completed-container") -%}
+        <div class="text-content">{{_("No questionnaire is due.")}}</div>
         {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
     {%- endcall -%}
     {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    <!-- substudy completed card -->
+    {{empro_completed(
+        user=user,
+        OverallStatus=OverallStatus,
+        substudy_assessment_status=substudy_assessment_status,
+        substudy_comp_date=substudy_comp_date,
+        enrolled_in_substudy=enrolled_in_substudy
+    )}}
 {% endblock %}

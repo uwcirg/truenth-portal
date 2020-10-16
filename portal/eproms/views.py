@@ -131,12 +131,17 @@ def assessment_engine_view(user):
         as_of_date=now)
     enrolled_in_substudy = substudy_research_study_id \
         in ResearchStudy.assigned_to(user)
-    substudy_due_date = localize_datetime(
-        substudy_assessment_status.due_date, user) \
+    substudy_expired_date = localize_datetime(
+        substudy_assessment_status.expired_date, user) \
         if substudy_assessment_status.due_date else None
     substudy_comp_date = localize_datetime(
         substudy_assessment_status.completed_date, user) \
         if substudy_assessment_status.completed_date else None
+    substudy_assessment_is_due = enrolled_in_substudy \
+        and substudy_assessment_status.overall_status in (
+        OverallStatus.due,
+        OverallStatus.overdue,
+        OverallStatus.in_progress)
 
     return render_template(
         "eproms/assessment_engine.html",
@@ -154,6 +159,8 @@ def assessment_engine_view(user):
         comp_date=comp_date,
         enrolled_in_substudy=enrolled_in_substudy,
         substudy_assessment_status=substudy_assessment_status,
+        substudy_assessment_is_due=substudy_assessment_is_due,
+        substudy_expired_date=substudy_expired_date,
         substudy_comp_date=substudy_comp_date
 
     )

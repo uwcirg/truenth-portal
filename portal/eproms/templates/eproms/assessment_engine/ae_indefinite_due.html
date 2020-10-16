@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, completed_card -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, completed_card, empro_due -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed baseline, but has outstanding indefinite work -->
 {% block head %}
@@ -10,9 +10,20 @@
 {% block body %}
     {%- set button_label = _('Continue questionnaire') if unfinished_indefinite_instruments else _('Go to questionnaire') -%}
     {%- call render_card_content(
-        title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
-        <p>{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</p>
+        title_text=_("%(assigning_authority)s Questionnaire",
+                assigning_authority=_(assessment_status.assigning_authority)),
+        card_class="portal-description-incomplete") -%}
+        <div class="text-content">{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</div>
         {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
     {%- endcall -%}
+    <!-- substudy due card -->
+    {{empro_due(
+        substudy_assessment_is_due=substudy_assessment_is_due,
+        assessment_status=assessment_status,
+        OverallStatus=OverallStatus,
+        substudy_assessment_status=substudy_assessment_status,
+        substudy_expired_date=substudy_expired_date,
+        enrolled_in_substudy=enrolled_in_substudy
+    )}}
     {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
 {% endblock %}
