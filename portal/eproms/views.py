@@ -139,9 +139,9 @@ def assessment_engine_view(user):
         if substudy_assessment_status.completed_date else None
     substudy_assessment_is_due = enrolled_in_substudy \
         and substudy_assessment_status.overall_status in (
-        OverallStatus.due,
-        OverallStatus.overdue,
-        OverallStatus.in_progress)
+            OverallStatus.due,
+            OverallStatus.overdue,
+            OverallStatus.in_progress)
 
     return render_template(
         "eproms/assessment_engine.html",
