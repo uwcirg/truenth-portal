@@ -5,7 +5,7 @@
     <!-- if main study is completed but still work in sub-study display header accordingly -->
     {%- if substudy_assessment_is_due-%}
         {% call render_header(title_text=greeting) %}
-            {{_("Please complete your EMPRO questionnaire as soon as possible. It will expire on %(substudy_expired_date)s.",
+            {{_("Please complete your questionnaire as soon as possible. It will expire on %(substudy_expired_date)s.",
                 substudy_expired_date=substudy_expired_date
             )}}
         {% endcall %}
