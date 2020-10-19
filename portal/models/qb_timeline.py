@@ -534,6 +534,11 @@ def ordered_qbs(user, classification=None):
                 period_instruments = set(
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & cur_only:
+                    # Posted results tie user to the old RP; clear skipped
+                    # state as it's unavailable when results from the "next"
+                    # exist.
+                    rp_flyweight.skipped_nxt_start = None
+
                     # Don't transition yet, as definitive work on the old
                     # (current) RP has already been posted, UNLESS ...
                     if period_instruments & next_only:
