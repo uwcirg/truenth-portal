@@ -228,7 +228,10 @@ def overdue_dates(user, as_of):
         return na
 
     a_s = QB_Status(user, as_of_date=as_of)
-    assert a_s.overall_status == status
+    if a_s.overall_status != status:
+        current_app.logger.error(
+            "%s != %s for %s as of %s".format(
+            a_s.overall_status, status, user.id, as_of))
     if a_s.overdue_date is None:
         return na
 
