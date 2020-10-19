@@ -71,3 +71,12 @@ class QBD(object):
         results['iteration'] = self.iteration
         results['visit'] = visit_name(self)
         return results
+
+    def __repr__(self):
+        """Useful shortcut in debugging"""
+        results = self.as_json()
+        return "QBD(visit={visit}, start={rel_start}, qb={qb_name})".format(
+            visit=results['visit'],
+            rel_start=results['relative_start'],
+            qb_name=self._questionnaire_bank.name if self._questionnaire_bank else "",
+        )
