@@ -36,6 +36,7 @@ export default {
             if (mobileQuickLinkElement) {
                 mobileQuickLinkElement.classList.add("hide");
             }
+            document.querySelector("main").classList.add("no-nav");
         },
         setNavContent() {
             let navElement = this.getNavElement();

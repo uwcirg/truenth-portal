@@ -14,7 +14,7 @@ export default {
     userInfo: {},
     LifeRayBaseURL: "",
     //TODO add the rest of eligible topics
-    domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain"],
+    domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
     //chosen domain
     activeDomain: "",
     domainContent: "",

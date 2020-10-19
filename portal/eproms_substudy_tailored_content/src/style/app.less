@@ -411,7 +411,7 @@ a {
 }
 
 .module-section {
-  padding: 32px 24px 32px;
+  padding: 32px 32px;
   &.intro,
   &.dark {
     background-color: @darkFeatureItemBackgroundColor
@@ -453,35 +453,51 @@ a {
 }
 @media (min-width: 768px) {
   .module-section {
-    padding-right: calc(@sectionRightPadding - 64px);
+   // padding-right: calc(@sectionRightPadding - 64px);
     padding-left: 40px;
     &.full,
     &.image {
     //&.video-section {
       padding-right: 32px !important;
     }
-    &.video-section {
-      padding-right: @sectionRightPadding;
-    }
+    // &.video-section {
+    //   padding-right: @sectionRightPadding;
+    // }
     h3, h5.title {
       text-align: left;
     }
   }
   .hard-trigger {
     & h3:first-of-type {
-      width: 75%;
+      width: 97.5%;
+    }
+  }
+  main:not(.no-nav) {
+    .module-section {
+      padding-right: calc(@sectionRightPadding - 64px);
     }
   }
 }
 @media (min-width: 1200px) {
   .module-section {
-    padding-right: @sectionRightPadding;
+   // padding-right: @sectionRightPadding;
     padding-left: 40px;
+    .hard-trigger {
+      & h3:first-of-type {
+        width: 70%;
+      }
+    }
+  }
+  main:not(.no-nav) {
+    .module-section {
+      padding-right:@sectionRightPadding;
+    }
+
   }
 }
 @media (min-width: 1400px) {
   .module-section {
-    padding-right: @sectionRightPaddingWide;
+  //  padding-right: @sectionRightPaddingWide;
     padding-left: 32px;
     &.feature {
       margin-left: 32px;
@@ -490,6 +506,12 @@ a {
     &.video-section {
       padding-right: 88px;
     }
+  }
+  main:not(.no-nav) {
+    .module-section {
+      padding-right: @sectionRightPaddingWide;
+    }
+
   }
 }
 
@@ -588,6 +610,8 @@ a {
   }
   .hero-image {
     width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
     img {
       width: 100%;
     }
@@ -841,6 +865,7 @@ a {
     & + .collapsible-content {
       display: block;
       padding-left: 16px;
+      padding-right: 48px;
     }
   }
 }
@@ -985,10 +1010,11 @@ a {
   .resource-section,
   .resource {
     .tile {
-      width: 32%;
+      width: calc(30% - 16px);
     }
   }
 }
+
 @media (min-width: 1400px) {
   .resource-section {
    // margin-right: @sectionRightPaddingWide;
@@ -1000,6 +1026,12 @@ a {
     padding-bottom: 48px;
     margin-right: 32px;
     margin-left: 32px;
+  }
+  .resource-section,
+  .resource {
+    .tile {
+      width: calc(30% - 24px);
+    }
   }
 }
 footer {
