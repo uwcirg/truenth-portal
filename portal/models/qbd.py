@@ -75,8 +75,10 @@ class QBD(object):
     def __repr__(self):
         """Useful shortcut in debugging"""
         results = self.as_json()
+        qb_name = (
+            self._questionnaire_bank.name if self._questionnaire_bank else "")
         return "QBD(visit={visit}, start={rel_start}, qb={qb_name})".format(
             visit=results['visit'],
             rel_start=results['relative_start'],
-            qb_name=self._questionnaire_bank.name if self._questionnaire_bank else "",
+            qb_name=qb_name,
         )

@@ -231,7 +231,7 @@ def overdue_dates(user, as_of):
     if a_s.overall_status != status:
         current_app.logger.error(
             "%s != %s for %s as of %s".format(
-            a_s.overall_status, status, user.id, as_of))
+                a_s.overall_status, status, user.id, as_of))
     if a_s.overdue_date is None:
         return na
 
