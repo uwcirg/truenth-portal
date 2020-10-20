@@ -15,14 +15,17 @@
         <div class="text-content">{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</div>
         {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
     {%- endcall -%}
-    <!-- substudy due card -->
-    {{empro_due(
-        substudy_assessment_is_due=substudy_assessment_is_due,
-        assessment_status=assessment_status,
-        OverallStatus=OverallStatus,
-        substudy_assessment_status=substudy_assessment_status,
-        substudy_expired_date=substudy_expired_date,
-        enrolled_in_substudy=enrolled_in_substudy
-    )}}
-    {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    {%- if enrolled_in_substudy -%}
+        <!-- substudy due card -->
+        {{empro_due(
+            substudy_assessment_is_due=substudy_assessment_is_due,
+            assessment_status=assessment_status,
+            OverallStatus=OverallStatus,
+            substudy_assessment_status=substudy_assessment_status,
+            substudy_expired_date=substudy_expired_date,
+            enrolled_in_substudy=enrolled_in_substudy
+        )}}
+    {%- else -%}
+        {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    {%- endif -%}
 {% endblock %}

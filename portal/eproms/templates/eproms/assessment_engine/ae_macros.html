@@ -107,12 +107,12 @@
                 <a data-toggle="modal" data-target="#emproModal">{{_("Learn about your specific issues based on your last questionnaire submitted on %(substudy_comp_date)s", substudy_comp_date=substudy_comp_date)}}</a>
             </div>
         {%- endcall -%}
-        <!--
+        <!-- TODO link to longitudinal report page -->
         {%- call render_card_content(
             title_text=_("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
             card_class="portal-description-complete") -%}
             <p>{{_("View your longitudinal charts and discuss with your care provider")}}</p>
-        {%- endcall -%} -->
+        {%- endcall -%}
         {{empro_thankyou_modal(user)}}
     {%- endif -%}
 {%- endmacro -%}
