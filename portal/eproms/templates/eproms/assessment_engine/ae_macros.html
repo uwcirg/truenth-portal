@@ -28,9 +28,20 @@
 {%- macro render_greeting(full_name="") -%}
     {{_("Hi, %(full_name)s.", full_name=full_name if full_name else "")}}
 {%- endmacro -%}
-{%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="") -%}
+{%- macro due_card(
+    assessment_status={},
+    title_text=_("Open Questionnaire"),
+    button_label=_("Go to questionnaire")) -%}
+    {%- call render_card_content(
+        title_text=_("Open Questionnaire"),
+        card_class="portal-description-incomplete") -%}
+        <div class="text-content">{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</div>
+        {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+    {%- endcall -%}
+{%- endmacro -%}
+{%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="", title_text=_("Completed Questionnaires")) -%}
     {%- if assessment_status.overall_status == OverallStatus.completed -%}
-        {% call render_card_content(title_text=_("Completed Questionnaires")) %}
+        {% call render_card_content(title_text=title_text) %}
             <div class="text-content">
                 <a class="portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="proAssessmentsLoc")}}'>
                     {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
@@ -38,7 +49,7 @@
             </div>
         {% endcall %}
     {%- else -%}
-        {% call render_card_content(title_text=_("Completed Questionnaires"), card_class="disabled") %}
+        {% call render_card_content(title_text=title_text, card_class="disabled") %}
             <div class="text-content">{{_("When you are done, completed questionnaires will be shown here.")}}</div>
         {% endcall %}
     {%- endif -%}
