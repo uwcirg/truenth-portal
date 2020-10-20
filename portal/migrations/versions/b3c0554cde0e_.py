@@ -8,6 +8,7 @@ Create Date: 2020-09-02 22:07:40.249193
 from alembic import op
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 
 from portal.models.audit import Audit
 from portal.models.qb_timeline import QBT
@@ -23,13 +24,15 @@ down_revision = '1977c23a53c8'
 
 def faux_account(session):
     """Generates a fake user account to hold references to unwanted QNRs"""
+    conn = op.get_bind()
+
     email = '__no_email__fake@example.com'
-    user = session.query(User).filter(User._email == email).first()
-    if not user:
-        session.add(User(email=email))
-        session.commit()
-        user = session.query(User).filter(User.email == email).one()
-    return user
+
+    results = conn.execute(text("""SELECT id FROM users WHERE email=:email"""), email=email).fetchall()
+    if not results:
+        conn.execute(text("INSERT INTO users (email) VALUES (:email)"), email=email)
+        results = conn.execute(text("""SELECT id FROM users WHERE email=:email"""), email=email).fetchall()
+    return results[0]
 
 
 def upgrade():
