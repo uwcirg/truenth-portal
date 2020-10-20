@@ -32,7 +32,7 @@ def faux_account(session):
     if not results:
         conn.execute(text("INSERT INTO users (email) VALUES (:email)"), email=email)
         results = conn.execute(text("""SELECT id FROM users WHERE email=:email"""), email=email).fetchall()
-    return results[0]
+    return results[0][0]
 
 
 def upgrade():
@@ -41,10 +41,10 @@ def upgrade():
     session = Session(bind=bind)
 
     # Rather than blow away the unwanted QNRs, assign them to a fake subject
-    fu = faux_account(session)
+    fu_id = faux_account(session)
 
     query = session.query(QuestionnaireResponse).filter(
-        QuestionnaireResponse.subject_id != fu.id).filter(or_(
+        QuestionnaireResponse.subject_id != fu_id).filter(or_(
             QuestionnaireResponse.document[
                 "questionnaire"]["reference"].astext.endswith("irondemog"),
             QuestionnaireResponse.document[
@@ -66,15 +66,15 @@ def upgrade():
             elif first_completed:
                 msg = (
                     f"reassigning QuestionnaireResponse: {qnr.id} "
-                    f"from subject {qnr.subject_id} to fake {fu.id}")
+                    f"from subject {qnr.subject_id} to fake {fu_id}")
                 aud = Audit(
-                    user_id=fu.id,
+                    user_id=fu_id,
                     subject_id=qnr.subject_id,
                     context='assessment',
                     comment=msg)
                 print(msg)
                 session.add(aud)
-                qnr.subject_id = fu.id
+                qnr.subject_id = fu_id
 
         return need_relationship_assignments
 
