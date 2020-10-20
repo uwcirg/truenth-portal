@@ -720,6 +720,29 @@
     },
     {
       "resourceType": "QuestionnaireBank",
+      "classification": "baseline",
+      "name": "ironman_ss_baseline",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 0}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [],
+      "research_protocol": {
+        "display": "EMPRO v1",
+        "reference": "api/research_protocol/EMPRO v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_ss",
+            "reference": "api/questionnaire/ironman_ss?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
       "classification": "recurring",
       "name": "ironman_ss_recurring_monthly_pattern",
       "start": "{\"days\": 0}",
@@ -729,7 +752,7 @@
       "recurs": [
         {
           "cycle_length": "{\"months\": 1}",
-          "start": "{\"days\": 0}",
+          "start": "{\"months\": 1}",
           "termination": "{\"months\": 12}"
         }
       ],
