@@ -66,12 +66,19 @@ export default {
             Promise.all([
                  //TODO init user domains, call api based on user id
                 this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
+                this.$http("//geoip.cirg.washington.edu/json/")
             ]).then(responses => {
                 try {
                     this.setLocale(JSON.parse(responses[0]));
                 } catch(e) {
-                    this.setErrorMessage(`Error parsing data ${e}`);
+                    this.setErrorMessage(`Error parsing locale data ${e}`);
                 }
+                try {
+                    this.setCountryCode(JSON.parse(responses[1]));
+                } catch(e) {
+                    this.setErrorMessage(`Error parsing country code data ${e}`);
+                }
+
                 //console.log("user locale? ", this.getLocale())
                 //get welcome page
                 //TODO filter content based on user's domains?
@@ -127,6 +134,22 @@ export default {
                 }
             });
             console.log("Locale ", this.locale);
+        },
+        getCountryCode() {
+           return this.countryCode;
+         //return "GB";
+         //return "CA";
+        },
+        setCountryCode(data) {
+            if (!data || !data.country_code) return false;
+            this.countryCode = data.country_code;
+        },
+        isEligibleCountryCode(countryCode) {
+            if (!countryCode) return false;
+            return this.eligibleCountryCodes.filter(item => {
+                return item.code === countryCode.toUpperCase()
+                
+            }).length;
         },
         getSettings() {
             return this.settings;
@@ -267,10 +290,11 @@ export default {
             //https://amy-dev.cirg.washington.edu/substudy-tailored-content?topic=hot_flashes
             return this.activeDomain;
          },
-         getSearchURL() {
+         getSearchURL(searchTag) {
+             searchTag = searchTag || this.getSelectedDomain();
              //TODO use current domain name as tag
              //pass in locale info
-             return `/api/asset/tag/${this.getSelectedDomain()}?locale_code=${this.getLocale()}`;
+             return `/api/asset/tag/${searchTag}?locale_code=${this.getLocale()}`;
              //CORS issue with querying LR directly, TODO: uncomment this when resolves
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
@@ -279,11 +303,14 @@ export default {
                 this.setInitView();
                 this.setCurrentView("domain");
             }.bind(this), 150);
+            this.setResourcesByCountry();
             this.initNav();
             this.initRouterEvents();
             this.setCollapsible();
             this.initVideo();
             this.setTileLinkEvent();
+            this.initDebugModeEvent();
+        
         },
         getDomainContent() {
             if (this.domainContent) {
@@ -326,8 +353,49 @@ export default {
             }
             this.domainContent = data;
         },
+        setResourcesByCountry(countryCode) {
+            let resourceSection = document.querySelector(".resource-section");
+            if (!resourceSection) {
+                return;
+            }
+            countryCode = countryCode ||this.getCountryCode();
+            if (!this.isEligibleCountryCode(countryCode)) {
+                return;
+            }
+            if (!this.debugMode && (countryCode === this.defaultCountryCode || !countryCode)) return;
+            if (this.debugMode && countryCode === this.defaultCountryCode) {
+                location.reload();
+                return;
+            }
+            this.$http(this.getSearchURL(`resources_${this.getSelectedDomain()}_${countryCode}`)).then(response => {
+                if (response) {
+                    resourceSection.querySelector(".content").innerHTML = response;
+                    
+                } else {
+                    this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
+                    this.setInitView(true);
+                }
+            }).catch(e => {
+                console.log(`error fetching resources for country code ${countryCode} `, e)
+            });
+           
+        },
         goHome: function() {
             this.goToView("domain");
+        },
+        initDebugModeEvent: function() {
+            /*
+             * activating debugging tool by pressing Ctrl + Shift + d
+             */
+            document.addEventListener("keydown", event => {
+                if (event.ctrlKey && 
+                    event.shiftKey &&
+                    event.key.toLowerCase() === "d")
+                this.debugMode = true;
+            });
+        },
+        isDebugMode: function() {
+            return this.debugMode;
         }
     }
 };

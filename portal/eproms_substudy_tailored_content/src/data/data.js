@@ -4,8 +4,10 @@
 export default {
     userId: false,
     locale: "en-us",
+    defaultCountryCode: "US",
+    countryCode: "US",
     errorMessage: "",
-    currentView: "intro",
+    currentView: "domain",
     portalWrapperURL: "/api/portal-wrapper-html/",
     portalFooterURL: "/api/portal-footer-html/",
     settingsURL: "/api/settings",
@@ -15,6 +17,19 @@ export default {
     LifeRayBaseURL: "",
     //TODO add the rest of eligible topics
     domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
+    eligibleCountryCodes: [{
+        name: "United Kingdom",
+        code: "GB"
+    },
+    {
+        name: "Canada",
+        code: "CA"
+    },
+    {
+        name: "United States",
+        code: "US"
+    }
+    ],
     //chosen domain
     activeDomain: "",
     domainContent: "",

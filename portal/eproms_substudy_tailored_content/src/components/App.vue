@@ -9,6 +9,7 @@
             <!-- TODO will there be a resource section? if so have a separate template section -->
             <error></error>
         </main>
+        <debug-section></debug-section>
         <footer-section></footer-section>
     </div>
 </template>
@@ -23,6 +24,7 @@
     import DomainSection from "./DomainSection.vue";
     import HeaderSection from "./Header.vue";
     import FooterSection from "./Footer.vue";
+    import DebugSection from "./DebugSection.vue";
     //import IntroSection from "./IntroSection.vue";
     import AppData from "../data/data.js";
     import BaseMethods from "../js/Base.js";
@@ -36,6 +38,7 @@
             DomainSection,
             HeaderSection,
             FooterSection,
+            DebugSection
             //IntroSection
         },
         mixins: [BaseMethods],
@@ -56,6 +59,7 @@
             return {
                 loading: true,
                 initialized: false,
+                debugMode: false,
                 ...AppData};
         }
     }
