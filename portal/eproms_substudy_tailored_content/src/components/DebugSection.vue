@@ -4,10 +4,8 @@
             <h5>Development Tool</h5>
             <label>Change Country Code</label>
             <select id="countryCodeSelector">
-                <option value="">Select</option>
-                <option value="GB">United Kingdom</option>
-                <option value="CA">Canada</option>
-                <option value="US">United States</option>
+                <option value="">-- Select --</option>
+                <option v-for="item in getAppObj().getEligibleCountryCodes()" :key="item.code" :value="item.code" v-text="item.name"></option>
             </select>
         </div>
     </aside>

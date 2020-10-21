@@ -144,6 +144,9 @@ export default {
             if (!data || !data.country_code) return false;
             this.countryCode = data.country_code;
         },
+        getEligibleCountryCodes() {
+            return this.eligibleCountryCodes;
+        },
         isEligibleCountryCode(countryCode) {
             if (!countryCode) return false;
             return this.eligibleCountryCodes.filter(item => {
