@@ -162,7 +162,6 @@ def assessment_engine_view(user):
         substudy_assessment_is_due=substudy_assessment_is_due,
         substudy_expired_date=substudy_expired_date,
         substudy_comp_date=substudy_comp_date
-
     )
 
 
