@@ -64,6 +64,8 @@ class ResearchStudy(db.Model):
             if latest_consent(user, rs_id) and rs_id not in results:
                 results.append(rs_id)
         results.sort()
+        if len(results):
+            assert None not in results
         return results
 
 
