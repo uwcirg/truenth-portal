@@ -320,6 +320,7 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
+        //TODO set this to real API
         this.sendRequest("/static/files/substudy_test_triggers.json", "GET", userId, params, function(data) {
             if (data) {
                 if (!data.error) {

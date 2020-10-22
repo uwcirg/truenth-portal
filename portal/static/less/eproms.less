@@ -3049,6 +3049,9 @@ body.portal .copyright-container  {
     padding: 8px;
     margin: 0 auto;
   }
+  .modal-body {
+    padding: 16px 32px 0;
+  }
   .modal-content {
     border-radius: 10px;
     position: relative;
@@ -3078,9 +3081,14 @@ body.portal .copyright-container  {
   }
   .items-section {
     display: flex;
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    align-items: flex-start;
     margin-bottom: 24px;
     .item {
       padding: 24px 8px;
@@ -3120,7 +3128,8 @@ body.portal .copyright-container  {
         flex-wrap: nowrap;
         flex: 1;
         border-bottom: 0;
-        &:first-of-type {
+        &:first-of-type,
+        &.default:first-child{
           padding-left: 0;
         }
         &:not(:last-of-type) {

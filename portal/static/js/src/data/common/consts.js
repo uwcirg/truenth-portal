@@ -9,7 +9,7 @@ Insomnia = insomnia
 Fatigue = fatigue 
 Anxious, discouraged, sad, social isolation = mood changes 
 */
-//'general_pain', 'joint_pain', 'insomnia', 'fatigue', 'anxious', 'discouraged', 'sad', 'social_isolation'
+//possible domains: 'general_pain', 'joint_pain', 'insomnia', 'fatigue', 'anxious', 'discouraged', 'sad', 'social_isolation'
 export var EMPRO_DOMAIN_MAPPINGS = {
     "joint_pain" : "pain",
     "general_pain": "pain",

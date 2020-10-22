@@ -154,7 +154,6 @@
                         <br/>
                         {% if user and user.organizations %}
                             <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team directly at")}}</p>
-                            <br/>
                             <p><b>{{user.organizations[0].name}}</b></p>
                         {% endif %}
                     </div>
@@ -168,7 +167,7 @@
                         </div>
                     </div>
                     <!-- always show -->
-                    <div class="item">
+                    <div class="item default">
                         <p class="hard-trigger-item">{{_("Our goal is to guide you through managing each challenge with key information and support. To view a full summary of your responses, use the link below.")}}</p>
                         <p class="soft-trigger-item no-trigger-item">{{_("View a full summary of your responses.")}}</p>
                         <!-- TODO point to longitudinal report-->
@@ -180,7 +179,7 @@
                         <p>{{_("We’ve gathered more information and resources you may find helpful.")}}</p>
                         <div class="buttons-container">
                             <!-- TODO self management pointing to self management landing page -->
-                            <button class="btn btn-empro-primary">{{_("Explore Our Resources")}}</button>
+                            <a class="btn btn-empro-primary" href="/substudy_tailored_content">{{_("Explore Our Resources")}}</a>
                         </div>
                     </div>
                     <div class="item soft-trigger-item no-trigger-item">
@@ -188,7 +187,6 @@
                         <br/>
                         {% if user and user.organizations %}
                             <p>{{_("If you have any questions or need assistance, please contact your team directly at")}}</p>
-                            <br/>
                             <p><b>{{user.organizations[0].name}}</b></p>
                         {% endif %}
                     </div>
@@ -197,5 +195,9 @@
         </div>
         </div>
     </div>
+    {{empro_script()}}
+{%- endmacro -%}
+{%- macro empro_script() -%}
+    <script src="{{ url_for('static', filename='js/dist/empro.bundle.js') }}" defer></script>
 {%- endmacro -%}
 
