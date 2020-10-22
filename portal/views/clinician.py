@@ -54,6 +54,15 @@ def clinician_search():
     operationId: clinician_search
     tags:
       - Clinician
+    parameters:
+      - name: org_filter
+        in: query
+        description:
+            Limit the results beyond the current_user's view by including
+            organization identifiers
+            `/api/clinician?organization_id=146999`
+        required: true
+        type: string
     produces:
       - application/json
     responses:
