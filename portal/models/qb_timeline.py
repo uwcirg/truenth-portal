@@ -678,7 +678,8 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     QBT.research_study_id == research_study_id).delete()
 
             # if any rows are found, assume this user/study is current
-            if QBT.query.filter(QBT.user_id == user_id).count():
+            if QBT.query.filter(QBT.user_id == user_id).filter(
+                    QBT.research_study_id == research_study_id).count():
                 trace(
                     "found QBT rows, returning cached for {}:{}".format(
                         user_id, research_study_id))
