@@ -23,7 +23,6 @@ class QB_Status(object):
         self.user = user
         self.as_of_date = as_of_date
         self.research_study_id = research_study_id
-        assert self.research_study_id is not None
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
         self._overall_status = None
