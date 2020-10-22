@@ -314,6 +314,25 @@ export default { /*global $ */
             }
         });
     },
+    getSubStudyTriggers: function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({error: i18next.t("User id is required.")});
+            return false;
+        }
+        this.sendRequest("/static/files/substudy_test_triggers.json", "GET", userId, params, function(data) {
+            if (data) {
+                if (!data.error) {
+
+                    callback(data);
+                    return true;
+                } else {
+                    callback({"error": true});
+                    return false;
+                }
+            }
+        });
+    },
     "getCliniciansList": function(callback) {
         callback = callback || function() {};
         this.sendRequest("/api/clinician", "GET", "", false, function(data) {

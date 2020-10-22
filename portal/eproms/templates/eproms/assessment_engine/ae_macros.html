@@ -145,9 +145,9 @@
                     <div class="item hard-trigger-item">
                         <!-- TODO dynamic populate domain topics from call to API !?! -->
                         <p>{{_("You reported having some particular challenges with: ")}}</p>
-                        <ul>
+                        <ul id="hardTriggerDisplayList">
                             <!-- TODO this is the subject's domain topic(s)-->
-                            <li>{{_("insomnia")}}</li>
+                            <!--<li>{{_("insomnia")}}</li>-->
                         </ul>
                         <br/>
                         <p><b>{{_("To help address these, we’ve informed your care team and they’ll be in contact with you soon.")}}</b></p>
@@ -162,11 +162,9 @@
                     <!-- TODO show this section only if there is soft trigger -->
                     <div class="item hard-trigger-item">
                         <p>{{_("Based on your questionnaire responses, we’ve also gathered information and resources you may find helpful.")}}</p>
-                        <div class="buttons-container">
+                        <div id="hardTriggerButtonsContainer" class="buttons-container">
                             <!--TODO this should be dynamically populated based on the domain topics available to the user-->
-                            <button class="btn btn-empro-primary">{{_("insomnia")}}</button>
-                            <button class="btn btn-empro-primary">{{_("fatigue")}}</button>
-                            <button class="btn btn-empro-primary">{{_("hot flashes")}}</button>
+                            <!--<button class="btn btn-empro-primary">{{_("insomnia")}}</button>-->
                         </div>
                     </div>
                     <!-- always show -->

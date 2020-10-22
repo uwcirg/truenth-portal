@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_thankyou_modal -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- baseline due -->
 {% block head %}
@@ -35,6 +35,7 @@
             substudy_expired_date=substudy_expired_date,
             enrolled_in_substudy=enrolled_in_substudy
         )}}
+        {{empro_thankyou_modal(user)}}
     {%- else -%}
         {{completed_card(
             assessment_status=assessment_status,
