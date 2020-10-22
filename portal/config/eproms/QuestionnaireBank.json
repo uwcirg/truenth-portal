@@ -753,7 +753,7 @@
         {
           "cycle_length": "{\"months\": 1}",
           "start": "{\"months\": 1}",
-          "termination": "{\"months\": 12}"
+          "termination": "{\"months\": 11}"
         }
       ],
       "research_protocol": {
