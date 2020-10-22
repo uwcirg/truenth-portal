@@ -96,6 +96,10 @@ class QuestionnaireBank(db.Model):
     @property
     def research_study_id(self):
         """A questionnaire bank w/ a research protocol has a research study"""
+        # intervention linked qbs hardcoded to use study id 0
+        if self.intervention_id is not None:
+            return 0
+
         if self.research_protocol_id is None:
             return
 
