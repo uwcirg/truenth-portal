@@ -1,5 +1,5 @@
 """Clinician API view functions"""
-from flask import Blueprint, jsonify, url_for
+from flask import Blueprint, jsonify, request, url_for
 from flask_user import roles_required
 
 from ..extensions import oauth
@@ -15,7 +15,7 @@ from .crossdomain import crossdomain
 clinician_api = Blueprint('clinician_api', __name__)
 
 
-def clinician_query(acting_user):
+def clinician_query(acting_user, org_filter=None):
     """Builds a live query for all clinicians the acting user can view"""
     query = User.query.join(UserRoles).filter(
         UserRoles.user_id == User.id).join(Role).filter(
@@ -23,7 +23,7 @@ def clinician_query(acting_user):
         Role.name == ROLE.CLINICIAN.value).with_entities(
         User.id, User.first_name, User.last_name)
 
-    limit_to_orgs = org_restriction_by_role(acting_user, None)
+    limit_to_orgs = org_restriction_by_role(acting_user, org_filter)
     if limit_to_orgs:
         query = query.join(UserOrganization).filter(
             UserOrganization.user_id == User.id).filter(
@@ -46,6 +46,10 @@ def clinician_search():
     Results limited to clinicians with a common organization, or a child
     of the current user's organization(s).
 
+    Can further limit results to those at or below a filter organization,
+    such as a patient's org, by including query parameter
+     ``/api/clinician?organization_id=###``
+
     ---
     operationId: clinician_search
     tags:
@@ -65,7 +69,8 @@ def clinician_search():
 
     """
     clinicians = []
-    for item in clinician_query(current_user()):
+    org_filter = request.args.getlist('organization_id', int)
+    for item in clinician_query(current_user(), org_filter):
         clinicians.append(Practitioner(
             first_name=item.first_name,
             last_name=item.last_name,
