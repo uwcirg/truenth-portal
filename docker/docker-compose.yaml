@@ -29,6 +29,7 @@ services:
       - celeryworker
       - celeryworkerslow
       - celerybeat
+      - sdc
     volumes:
       - source: user-documents
         target: ${FILE_UPLOAD_DIR:-/var/lib/portal/uploads}
@@ -70,6 +71,9 @@ services:
     depends_on:
       - celeryworker
       - celeryworkerslow
+
+  sdc:
+    image: ghcr.io/uwcirg/sdc-services:latest
 
   redis:
     image: redis
