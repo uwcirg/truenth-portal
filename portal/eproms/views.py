@@ -360,7 +360,7 @@ def resources():
         for asset in results:
             if 'demo' in asset['tags']:
                 demo_content.append(asset_by_uuid(asset['uuid']))
-            # topic tag for the work instruction
+            # filter for topic tag for the work instruction
             asset['topics'] = [tag for tag in asset['tags'] if tag not in (
                 asset_title, 'individual work instruction')]
 
