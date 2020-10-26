@@ -337,12 +337,24 @@ class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
     def __init__(
-            self, user, research_study_id, qb_id=None, qb_iteration=None):
-        """Optionally include qb_id and qb_iteration to limit"""
+            self, user, research_study_id, qb_id=None, qb_iteration=None,
+            ignore_iteration=False):
+        """Optionally include qb_id and qb_iteration to limit
+
+        :param user: subject in question
+        :param research_study_id: study being processed
+        :param qb_id: include to filter results to only qb_id
+        :param qb_iteration: used only when qb_id is set and ignore_iteration
+         is NOT set
+        :param ignore_iteration: used in combination with qb_id to filter
+         results on the given questionnaire bank, but ignore the iteration.
+
+        """
         self.user = user
         self.research_study_id = research_study_id
         self.qb_id = qb_id
         self.qb_iteration = qb_iteration
+        self.ignore_iteration = ignore_iteration
         self._qnrs = None
 
     @property
@@ -364,9 +376,10 @@ class QNR_results(object):
             QuestionnaireResponse.authored)
         if self.qb_id:
             query = query.filter(
-                QuestionnaireResponse.questionnaire_bank_id == self.qb_id
-            ).filter(
-                QuestionnaireResponse.qb_iteration == self.qb_iteration)
+                QuestionnaireResponse.questionnaire_bank_id == self.qb_id)
+            if not self.ignore_iteration:
+                query = query.filter(
+                    QuestionnaireResponse.qb_iteration == self.qb_iteration)
         self._qnrs = []
         for qnr in query:
             self._qnrs.append(QNR(
@@ -906,3 +919,33 @@ def generate_qnr_csv(qnr_bundle):
                         row_data['option_text'] = strip_tags(
                             answer['valueCoding'].get('text', None))
                 yield {k: v for k, v in row_data.items() if v is not None}
+
+
+def first_last_like_qnr(qnr):
+    """Specialized lookup function to return similar QNRs
+
+    :param qnr: reference QNR - look for first and most recent QNRs similar
+      to the one provided.  That is owned by the same subject and QB.
+
+    :return: tuple(first, last) of like QNRs, if found.  One or both may be
+      None if not found.
+
+    """
+    user = User.query.get(qnr.subject_id)
+    rs_id = qnr.questionnaire_bank.research_study_id
+    postedQNRs = QNR_results(
+        user,
+        research_study_id=rs_id,
+        qb_id=qnr.questionnaire_bank_id)
+
+    initial, last = None, None
+    for q in postedQNRs.qnrs:
+        if q.status != 'completed':
+            continue
+        if q == qnr:
+            break
+        if not initial:
+            initial = q
+            continue
+        last = q
+    return initial, last
