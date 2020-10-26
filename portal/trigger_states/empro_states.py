@@ -14,7 +14,6 @@ EMPRO_STUDY_ID = 1
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
 
 
-
 class EMPRO_state(StateMachine):
     """States a user repeatedly transitions through as an EMPRO participant
 
