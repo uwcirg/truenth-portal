@@ -114,4 +114,3 @@ class DomainManifold(object):
         #  and use DomainTriggers(domain).eval() to populate
         triggers['domain'] = [{d: faux_trigger()} for d in EMPRO_DOMAINS]
         return triggers
-
