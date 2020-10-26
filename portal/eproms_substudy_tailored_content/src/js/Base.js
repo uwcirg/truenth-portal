@@ -285,7 +285,7 @@ export default {
                 return;
             }
             //TODO this should be the default landing topic/tag
-            this.activeDomain = "test_default_domain";
+            this.activeDomain = "default_domain";
         },
         getSelectedDomain() {
             //example URL that works: 
