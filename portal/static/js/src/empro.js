@@ -1,4 +1,4 @@
-import {EMPRO_DOMAIN_MAPPINGS} from "./data/common/consts.js";
+import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
 import tnthAjax from "./modules/TnthAjax.js";
 
 var emproObj = function() {
