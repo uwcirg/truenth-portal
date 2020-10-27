@@ -20,9 +20,9 @@ emproObj.prototype.initTriggerDomains = function() {
     tnthAjax.getCurrentUser((data) => {
         if (!data || !data.id) return;
         this.userId = data.id;
-        console.log("user id? ", this.userId)
+        //console.log("user id? ", this.userId)
         tnthAjax.getSubStudyTriggers(this.userId, false, function(data) {
-            console.log("data? ", data)
+            //console.log("data? ", data)
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
@@ -48,9 +48,9 @@ emproObj.prototype.initTriggerDomains = function() {
                 //present thank you modal
                 $("#emproModal").modal("show");
             }
-            console.log("self.domains? ", self.domains);
-            console.log("has hard triggers ", self.hasHardTrigger);
-            console.log("has soft triggers ", self.hasSoftTrigger);
+       //     console.log("self.domains? ", self.domains);
+       //     console.log("has hard triggers ", self.hasHardTrigger);
+       //     console.log("has soft triggers ", self.hasSoftTrigger);
         });
     });
 }
