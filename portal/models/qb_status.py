@@ -38,10 +38,12 @@ class QB_Status(object):
 
         # Every QB should have "due" - filter by to get one per QB
         users_qbs = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.due).order_by(QBT.at.asc())
 
         # Obtain withdrawal date if applicable
         withdrawn = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.withdrawn).first()
         self._withdrawal_date = withdrawn.at if withdrawn else None
 

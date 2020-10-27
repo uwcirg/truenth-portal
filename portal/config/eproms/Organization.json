@@ -306,8 +306,9 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2020-09-20T14:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -524,8 +525,9 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2018-05-22T00:00:00Z"},
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v2", "retired_as_of": "2018-05-22T00:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-18T14:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -693,8 +695,9 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2018-05-29T04:00:00Z"},
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v2", "retired_as_of": "2018-05-29T04:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-19T04:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -769,8 +772,9 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2019-03-03T00:00:00Z"},
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v2", "retired_as_of": "2019-03-03T00:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T04:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }

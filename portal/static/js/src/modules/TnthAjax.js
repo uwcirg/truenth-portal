@@ -332,9 +332,11 @@ export default { /*global $ */
             }
         });
     },
-    "getCliniciansList": function(callback) {
+    "getCliniciansList": function(orgIds, callback) {
         callback = callback || function() {};
-        this.sendRequest("/api/clinician", "GET", "", false, function(data) {
+        orgIds = orgIds || [];
+        let orgIdsParam = orgIds.map(orgId => `organization_id=${orgId}`).join("&");
+        this.sendRequest("/api/clinician"+(orgIds.length?`?${orgIdsParam}`:""), "GET", "", false, function(data) {
             if (data.error) {
                 var errorMessage = i18next.t("Server error occurred retrieving clinicians.");
                 $(".get-clinicians-error").html(errorMessage);

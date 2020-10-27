@@ -568,6 +568,11 @@ def ordered_qbs(user, research_study_id, classification=None):
                 period_instruments = set(
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & cur_only:
+                    # Posted results tie user to the old RP; clear skipped
+                    # state as it's unavailable when results from the "next"
+                    # exist.
+                    rp_flyweight.skipped_nxt_start = None
+
                     # Don't transition yet, as definitive work on the old
                     # (current) RP has already been posted, UNLESS ...
                     if period_instruments & next_only:
@@ -678,7 +683,8 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     QBT.research_study_id == research_study_id).delete()
 
             # if any rows are found, assume this user/study is current
-            if QBT.query.filter(QBT.user_id == user_id).count():
+            if QBT.query.filter(QBT.user_id == user_id).filter(
+                    QBT.research_study_id == research_study_id).count():
                 trace(
                     "found QBT rows, returning cached for {}:{}".format(
                         user_id, research_study_id))
