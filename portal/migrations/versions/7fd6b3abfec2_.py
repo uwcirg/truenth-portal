@@ -18,7 +18,8 @@ down_revision = '1675585e7031'
 def upgrade():
     if current_app.config.get('GIL'):
         return
-    op.create_table('trigger_states',
+    op.create_table(
+        'trigger_states',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column(
