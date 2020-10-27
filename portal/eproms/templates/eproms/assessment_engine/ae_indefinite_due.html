@@ -9,6 +9,7 @@
 {% endblock %}
 {% block body %}
     {%- set button_label = _("Continue questionnaire") if unfinished_indefinite_instruments else _("Go to questionnaire") -%}
+    <!-- tile title change for substudy -->
     {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
                         if enrolled_in_substudy else _("Open Questionnaire") %}
     <!-- main study due card -->

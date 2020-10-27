@@ -14,6 +14,7 @@
     {%- endif -%}
 {% endblock %}
 {% block body %}
+    <!-- tile title change for substudy -->
     {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
                         if enrolled_in_substudy else _("Open Questionnaire") %}
     {%- call render_card_content(
