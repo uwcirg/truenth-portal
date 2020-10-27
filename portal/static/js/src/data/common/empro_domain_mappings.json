@@ -1,0 +1,10 @@
+{
+    "joint_pain" : "pain",
+    "general_pain": "pain",
+    "insomnia": "insomnia",
+    "anxious": "mood_changes",
+    "discouraged": "mood_changes",
+    "sad": "mood_changes",
+    "social_isolation": "mood_changes",
+    "fatigue": "fatigue"
+}
