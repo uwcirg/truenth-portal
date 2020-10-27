@@ -1121,7 +1121,7 @@ export default (function() {
             },
             initTreatingClinicianSection: function() {
                 let self = this;
-                this.modules.tnthAjax.getCliniciansList(function(data) {
+                this.modules.tnthAjax.getCliniciansList(this.subjectOrgs, function(data) {
                     if (!data || !data.entry || !data.entry.length) {
                         let errorMessage = i18next.t("No treating clinician available for this site");
                         $("#treatingClinicianContainer .select-list-error").text(errorMessage);
