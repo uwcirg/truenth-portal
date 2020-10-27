@@ -48,7 +48,7 @@
 @sectionRightPaddingWide: 140px;
 @headingWidth: 50%;
 @bodyContentWidth: 55%;
-@twoColumnItemWidth: 48%;
+@twoColumnItemWidth: 47.5%;
 
 html, body {
     height: 100%;
@@ -88,7 +88,7 @@ h1, h2 {
   line-height: 1.2 !important;
 }
 h2, h3, h4, h5 {
-  text-transform: capitalize;
+//  text-transform: capitalize;
 }
 h4, h5 {
   line-height: 1.5 !important;
@@ -225,6 +225,10 @@ select::-ms-expand {
 
 .hide {
     display: none !important;
+}
+
+.show {
+  display: block !important;
 }
 
 .visshow {
@@ -429,7 +433,7 @@ a {
   }
   &.intro {
     padding-top: 48px;
-    padding-bottom: 48px;
+    padding-bottom: 36px;
     margin-bottom: 24px;
     .hero-title {
       margin-bottom: 24px;
@@ -444,11 +448,18 @@ a {
     }
   }
 }
+@media (min-width: 1200px) {
+  .module-section.intro {
+    .hero-title {
+      width: 50%;
+    }
+  }
+}
 .hard-trigger {
-
   margin-top: 40px;
-  & h3:first-of-type {
+  .title {
     width: 100%;
+    text-transform: none;
     margin-bottom: 32px;
   }
 }
@@ -469,8 +480,8 @@ a {
     }
   }
   .hard-trigger {
-    & h3:first-of-type {
-      width: 97.5%;
+    .title {
+      width: 70%;
     }
   }
   main:not(.no-nav) {
@@ -688,6 +699,10 @@ a {
   .two-column-feature {
     .item {
       width: @twoColumnItemWidth;
+      padding: 24px 56px 24px 0;
+      &.narrow {
+        width: 30%;
+      }
     }
   }
 }
@@ -967,6 +982,7 @@ a {
       text-decoration: none;
       font-weight: 600;
       letter-spacing: 0.02rem;
+      white-space: normal;
       // &:after {
       //   display: inline-block;
       //   content: "\2192";
@@ -980,6 +996,7 @@ a {
     .callout-text {
       color: @calloutColor;
       font-size: 14px;
+      width: 100%;
     }
     &:hover {
       background-color: @featureTileColor;
@@ -1351,6 +1368,10 @@ footer {
     width: 30%;
     //margin: auto;
   }
+}
+
+#hardTriggerTopicsContainer {
+  display: none;
 }
 
 @keyframes bounce {

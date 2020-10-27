@@ -6,6 +6,8 @@ export default {
         Promise.all([
             this.$http(this.settingsURL).catch(error => { return error }),
             this.$http(this.meURL).catch(error => { return error }),
+            this.$http("//geoip.cirg.washington.edu/json/")
+     //       this.$http(`/static/js/src/data/common/empro_domain_mappings.json`),
         ]).then(responses => {
             try {
                 this.setSettings(JSON.parse(responses[0]));
@@ -17,6 +19,17 @@ export default {
             } catch(e) {
                 this.setErrorMessage(`Error parsing data ${e}`);
             }
+            try {
+                this.setCountryCode(JSON.parse(responses[2]));
+            } catch(e) {
+                this.setErrorMessage(`Error parsing country code data ${e}`);
+            }
+            //TODO add domain mapping
+            // try {
+            //     this.domainMappings = JSON.parse(responses[2]);
+            // } catch(e) {
+            //     this.setErrorMessage(`Error parsing data ${e}`);
+            // }
             this.initApp();
             //console.log("settings? ", this.settings);
             //console.log("user? ", this.userInfo)
@@ -58,42 +71,36 @@ export default {
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
             this.initialized = true;
-            if (!this.getUserID()) {
-                this.setSelectedDomain();
-                this.getDomainContent();
-                return;
-            }
+            // if (!this.getUserID()) {
+            //     this.setSelectedDomain();
+            //     this.getDomainContent();
+            //     return;
+            // }
             Promise.all([
-                 //TODO init user domains, call api based on user id
                 this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                this.$http("//geoip.cirg.washington.edu/json/")
+                  //TODO init user domains, call REAL api based on user id
+                //this.$http("/static/files/substudy_test_triggers.json")
             ]).then(responses => {
                 try {
                     this.setLocale(JSON.parse(responses[0]));
                 } catch(e) {
                     this.setErrorMessage(`Error parsing locale data ${e}`);
                 }
-                try {
-                    this.setCountryCode(JSON.parse(responses[1]));
-                } catch(e) {
-                    this.setErrorMessage(`Error parsing country code data ${e}`);
-                }
-
-                //console.log("user locale? ", this.getLocale())
-                //get welcome page
-                //TODO filter content based on user's domains?
-                //each domain link on the intro/welcome page should have a representative attribute or css class
+                //TODO get user domains based on trigger API
+                // try {
+                //     this.setUserDomains(JSON.parse(responses[1]));
+                // } catch(e) {
+                //     this.setErrorMessage(`Error parsing country code data ${e}`);
+                // }
                 this.setSelectedDomain();
-                //that denote which domain it represents
+                //populate domain content
                 this.getDomainContent();
-               // self.setInitView();
             }).catch(error => {
                 this.setErrorMessage(`Error in promises ${error}`);
                 this.setInitView();
             });
         },
         setInitView() {
-            //TODO if selected domain is default domain, need to filter content based on topics for subject
             Vue.nextTick(() => {
                     setTimeout(function() {
                         this.goToTop();
@@ -169,6 +176,25 @@ export default {
             if (data) {
                 this.userInfo = data;
             }
+        },
+        getUserDomains() {
+            return this.userDomains;
+        },
+        setUserDomains(data) {
+            if (!data || !data.triggers || !data.triggers.domain) {
+                return false;
+            }
+            let hardTriggerDomains = (data.triggers.domain).filter(item => {
+                let entry = Object.entries(item);
+                return entry[0] && entry[0][1] && entry[0][1].indexOf("hard") !== -1;
+            });
+            this.userDomains = (hardTriggerDomains).map(item => {
+                return this.domainMappings[Object.keys(item)[0]];
+            });
+            this.userDomains = this.userDomains.filter((d, index) => {
+                return this.userDomains.indexOf(d) === index;
+            });
+            console.log("user domain? ", this.userDomains);
         },
         getLRBaseURL() {
             return this.LifeRayBaseURL;
@@ -285,12 +311,11 @@ export default {
                 return;
             }
             //TODO this should be the default landing topic/tag
-            this.activeDomain = "default_domain";
+            this.activeDomain = this.defaultDomain;
         },
         getSelectedDomain() {
             //example URL that works: 
             //https://amy-dev.cirg.washington.edu/substudy-tailored-content#/insomnia
-            //https://amy-dev.cirg.washington.edu/substudy-tailored-content?topic=hot_flashes
             return this.activeDomain;
          },
          getSearchURL(searchTag) {
@@ -355,6 +380,33 @@ export default {
                 return;
             }
             this.domainContent = data;
+            //filter content of default landing page based on user trigger-based domains
+            if (this.getSelectedDomain() === this.defaultDomain) {
+                Vue.nextTick()
+                    .then(() => {
+                        // DOM updated
+                        this.processDefaultDomainContent();
+                    });
+                
+            }
+        },
+        processDefaultDomainContent() {
+            if (!this.getUserDomains().length) return;
+            let hardTriggerTiles = document.querySelectorAll("#hardTriggerTopicsContainer .tile");
+            hardTriggerTiles.forEach(item => {
+                if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) === -1) {
+                    item.classList.add("hide");
+                }
+            });
+
+            document.querySelector("#hardTriggerTopicsContainer").classList.add("show");
+            
+            let otherTopicTiles = document.querySelectorAll("#otherTopicsContainer .tile");
+            otherTopicTiles.forEach(item => {
+                if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) !== -1) {
+                    item.classList.add("hide");
+                }
+            });
         },
         setResourcesByCountry(countryCode) {
             let resourceSection = document.querySelector(".resource-section");

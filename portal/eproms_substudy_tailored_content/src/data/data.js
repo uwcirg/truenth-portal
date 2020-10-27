@@ -15,8 +15,10 @@ export default {
     settings: {},
     userInfo: {},
     LifeRayBaseURL: "",
-    //TODO add the rest of eligible topics
+    domainMappings: {},
+    defaultDomain: "default_domain",
     domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
+    userDomains: [],
     eligibleCountryCodes: [{
         name: "United Kingdom",
         code: "GB"
