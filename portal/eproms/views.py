@@ -352,14 +352,17 @@ def resources():
     org = user.first_top_organization()
     if not org:
         abort(400, 'user must belong to an organization')
-    resources_data = get_any_tag_data(
-        '{} work instruction'.format(org.name.lower()))
+    asset_title = '{} work instruction'.format(org.name.lower())
+    resources_data = get_any_tag_data(asset_title)
     results = resources_data['results']
     if (len(results) > 0):
         demo_content = []
         for asset in results:
             if 'demo' in asset['tags']:
                 demo_content.append(asset_by_uuid(asset['uuid']))
+            # filter for topic tag for the work instruction
+            asset['topics'] = [tag for tag in asset['tags'] if tag not in (
+                asset_title, 'individual work instruction')]
 
         return render_template('eproms/resources.html',
                                results=results, demo_content=demo_content)
