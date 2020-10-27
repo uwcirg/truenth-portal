@@ -2,15 +2,12 @@
     <div class="portal-item">
         {% if assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress) %}
             <!-- patient has pending work in base study -->
-            <!-- also check for any pending sub-study work if applicable -->
             {% include "eproms/assessment_engine/ae_due.html" with context %}
         {% elif (unstarted_indefinite_instruments or unfinished_indefinite_instruments) and assessment_status.overall_status != OverallStatus.withdrawn %}
             <!-- patient completed base study, but has outstanding indefinite work-->
-            <!-- also check for any pending sub-study work if applicable -->
             {% include "eproms/assessment_engine/ae_indefinite_due.html" with context %}
         {% elif assessment_status.overall_status == OverallStatus.completed %}
             <!-- patient completed both base and indefinite or withdrew -->
-            <!-- also check for any pending sub-study work if applicable -->
             {% include "eproms/assessment_engine/ae_complete.html" with context %}
         {% elif assessment_status.overall_status == OverallStatus.withdrawn %}
             <!-- patient withdrawn, show questionnaire unavailable anymore? -->
