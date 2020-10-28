@@ -10,3 +10,4 @@ const app  = new Vue({ /*global Vue $ */
     render: h => h(App),
     router,
 }).$mount("#app");
+

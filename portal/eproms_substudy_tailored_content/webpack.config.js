@@ -111,7 +111,6 @@ module.exports = function(_env, argv) {
     },
     plugins: [
       new VueLoaderPlugin(),
-      //new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         title: "Substudy Tailored Content",
         template: path.join(__dirname, '/src/app.html'),

@@ -7,3 +7,4 @@ describe("Mounted App", () => {
     expect(wrapper.element).toMatchSnapshot();
   })
 });
+
