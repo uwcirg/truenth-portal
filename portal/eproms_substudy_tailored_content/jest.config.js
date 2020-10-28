@@ -1,3 +1,6 @@
+/*
+ * Jest configuration
+ */
 module.exports = {
     preset: '@vue/cli-plugin-unit-jest',
     testPathIgnorePatterns: ['\\\\node_modules\\\\'],

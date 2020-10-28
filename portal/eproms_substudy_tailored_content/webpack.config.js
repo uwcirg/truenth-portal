@@ -11,6 +11,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = function(_env, argv) {
   const isProduction = argv && argv.mode === "production";
   const isDevelopment = !isProduction;
+  const currentEnv = argv.mode;
   /*
    * output to static file for ease of development
    */
@@ -134,9 +135,7 @@ module.exports = function(_env, argv) {
         chunkFilename: '[name].[id].[contenthash].css',
       }),
       new webpack.DefinePlugin({
-        "process.env.NODE_ENV": JSON.stringify(
-          isProduction ? "production" : "development"
-        )
+        "process.env.NODE_ENV": JSON.stringify(currentEnv)
       }),
       new FileManagerPlugin({
         onStart: {

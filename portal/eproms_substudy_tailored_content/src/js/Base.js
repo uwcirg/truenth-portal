@@ -10,8 +10,8 @@ export default {
         Promise.allSettled([
             this.$http(this.settingsURL).catch(error => { return error }),
             this.$http(this.meURL).catch(error => { return error }),
-            this.$http("//geoip.cirg.washington.edu/json/"),
-            this.$http(`/static/js/src/data/common/empro_domain_mappings.json`),
+            this.$http(this.geoIPURL),
+            this.$http(this.domainMappingsURL),
         ]).then(responses => {
             try {
                 //set config settings
@@ -452,12 +452,14 @@ export default {
             /*
              * activating debugging tool by pressing Ctrl + Shift + d
              */
-            document.addEventListener("keydown", event => {
-                if (event.ctrlKey && 
-                    event.shiftKey &&
-                    event.key.toLowerCase() === "d")
-                this.debugMode = true;
-            });
+            if (document) {
+                document.addEventListener("keydown", event => {
+                    if (event.ctrlKey && 
+                        event.shiftKey &&
+                        event.key.toLowerCase() === "d")
+                    this.debugMode = true;
+                });
+            }
         },
         isDebugMode: function() {
             return this.debugMode;

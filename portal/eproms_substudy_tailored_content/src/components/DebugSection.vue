@@ -13,7 +13,9 @@
 <script>
     export default { 
         mounted() {
-            document.querySelector("#countryCodeSelector").addEventListener("change", (e) => {
+            let countryCodeSelector =  document.querySelector("#countryCodeSelector");
+            if (!countryCodeSelector) return;
+            countryCodeSelector.addEventListener("change", (e) => {
                 if (!e.target.value) return;
                 this.getAppObj().setResourcesByCountry(e.target.value);
             });
