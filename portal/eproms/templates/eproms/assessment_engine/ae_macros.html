@@ -68,7 +68,7 @@
                     assessment_status={},
                     OverallStatus={},
                     substudy_assessment_status={},
-                    substudy_expired_date="",
+                    substudy_due_date="",
                     enrolled_in_substudy=false) -%}
     <!-- subject is in the sub-study and the sub-study questionnaire is due-->
     {%- if  enrolled_in_substudy and substudy_assessment_is_due-%}
@@ -78,21 +78,18 @@
             title_text=_("%(substudy_title)s Questionnaire", substudy_title=substudy_title),
             card_class="portal-description-incomplete" if assessment_status.overall_status == OverallStatus.completed else "disabled") -%}
             {%- if assessment_status.overall_status != OverallStatus.completed -%}
-                {%- if substudy_expired_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire will expire on %(substudy_expired_date)s. Please complete your %(registry)s Questionnaire before being able to complete the sub-study questionnaire.", 
+                {%- if substudy_due_date -%}
+                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due for %(substudy_due_date)s. Please complete your %(registry)s Questionnaire before being able to complete the sub-study questionnaire.", 
                         substudy_title=substudy_title,
-                        substudy_expired_date=substudy_expired_date,
+                        substudy_due_date=substudy_due_date,
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- else -%}
                     <div class="text-content">{{_("Complete your %(substudy_title)s questionnaire here. Please complete your %(registry)s Questionnaire before being able to complete the sub-study questionnaire.", 
                         substudy_title=substudy_title,
-                        substudy_expired_date=substudy_expired_date,
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- endif -%}
             {%- else -%}
-                <div class="text-content">{{_("Please complete your questionnaire here. Your responses will create a big impact for future generations of men with Prostate Cancer.")}}</div>, 
-                substudy_title=substudy_title,
-                substudy_expired_date=substudy_expired_date)}}</div>
+                <div class="text-content">{{_("Please complete your questionnaire here. Your responses will create a big impact for future generations of men with Prostate Cancer.")}}</div>
             {%- endif -%}
             {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
         {%- endcall -%}

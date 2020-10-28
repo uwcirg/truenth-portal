@@ -131,8 +131,8 @@ def assessment_engine_view(user):
         as_of_date=now)
     enrolled_in_substudy = substudy_research_study_id \
         in ResearchStudy.assigned_to(user)
-    substudy_expired_date = localize_datetime(
-        substudy_assessment_status.expired_date, user) \
+    substudy_due_date = localize_datetime(
+        substudy_assessment_status.due_date, user) \
         if substudy_assessment_status.due_date else None
     substudy_comp_date = localize_datetime(
         substudy_assessment_status.completed_date, user) \
@@ -160,7 +160,7 @@ def assessment_engine_view(user):
         enrolled_in_substudy=enrolled_in_substudy,
         substudy_assessment_status=substudy_assessment_status,
         substudy_assessment_is_due=substudy_assessment_is_due,
-        substudy_expired_date=substudy_expired_date,
+        substudy_due_date=substudy_due_date,
         substudy_comp_date=substudy_comp_date
     )
 
