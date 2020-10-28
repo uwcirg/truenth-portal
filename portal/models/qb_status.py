@@ -219,7 +219,7 @@ class QB_Status(object):
             user_qnrs = QNR_results(
                 self.user,
                 research_study_id=self.research_study_id,
-                qb_id=self._current.qb_id,
+                qb_ids=[self._current.qb_id],
                 qb_iteration=self._current.iteration)
             self._required = user_qnrs.required_qs(self._current.qb_id)
             self._partial = user_qnrs.partial_qs(
