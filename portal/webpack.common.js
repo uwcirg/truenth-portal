@@ -10,6 +10,7 @@ module.exports = {
         "CookieMonster": JsSrcPath+"/CookieMonster.js",
         "coredata": JsSrcPath+"/coredata.js",
         "initialQueries": JsSrcPath+"/initialQueries.js",
+        "empro": JsSrcPath+"/empro.js",
         "gil": JsSrcPath+"/gil.js",
         "gilIndex": JsSrcPath+"/gilIndex.js",
         "landing": JsSrcPath+"/landing.js",
