@@ -24,9 +24,9 @@
                 <ul class="work-instruction-list">
                     {% for asset in results %}
                         {% if 'individual work instruction' in asset['tags'] %}
-                            <li class="work-instruction-item">
-                                <a href="{{url_for('.work_instruction', tag=asset['tags'][1])}}" class="first-letter">{{asset['title']}}</a>
-                            </li>
+                                    <li class="work-instruction-item">
+                                        <a href="{{url_for('.work_instruction', tag=asset['topics'][0])}}" class="first-letter">{{asset['title']}}</a>
+                                    </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
