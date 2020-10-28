@@ -111,7 +111,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=last_viable.qb_id,
+                qb_ids=[last_viable.qb_id],
                 qb_iteration=last_viable.iteration).entry_method()
             if entry_method:
                 current_app.logger.warn(
@@ -131,7 +131,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=qbd.qb_id,
+                qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 historic['entry_method'] = entry_method
@@ -149,7 +149,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=qbd.qb_id,
+                qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 indef['entry_method'] = entry_method
