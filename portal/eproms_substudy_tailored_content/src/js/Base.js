@@ -1,35 +1,38 @@
 import NavMethods from "./Nav";
 import VideoMethods from "./Video";
-import {checkIE, getUrlParameter, tryParseJSON} from "./Utility";
+import {checkIE, getUrlParameter, tryParseJSON, PromiseAllSettledPolyfill} from "./Utility";
+
 export default {
-    mounted: function() {
-        Promise.all([
+    created() {
+        PromiseAllSettledPolyfill();
+    },
+    mounted() {
+        Promise.allSettled([
             this.$http(this.settingsURL).catch(error => { return error }),
             this.$http(this.meURL).catch(error => { return error }),
-            this.$http("//geoip.cirg.washington.edu/json/")
-     //       this.$http(`/static/js/src/data/common/empro_domain_mappings.json`),
+            this.$http("//geoip.cirg.washington.edu/json/"),
+            this.$http(`/static/js/src/data/common/empro_domain_mappings.json`),
         ]).then(responses => {
             try {
-                this.setSettings(JSON.parse(responses[0]));
+                this.setSettings(JSON.parse(responses[0].value));
             } catch(e) {
                 this.setErrorMessage(`Error parsing data ${e}`);
             }
             try {
-                this.userInfo = JSON.parse(responses[1]);
+                this.userInfo = JSON.parse(responses[1].value);
             } catch(e) {
                 this.setErrorMessage(`Error parsing data ${e}`);
             }
             try {
-                this.setCountryCode(JSON.parse(responses[2]));
+                this.setCountryCode(JSON.parse(responses[2].value));
             } catch(e) {
                 this.setErrorMessage(`Error parsing country code data ${e}`);
             }
-            //TODO add domain mapping
-            // try {
-            //     this.domainMappings = JSON.parse(responses[2]);
-            // } catch(e) {
-            //     this.setErrorMessage(`Error parsing data ${e}`);
-            // }
+            try {
+                this.domainMappings = JSON.parse(responses[3].value);
+            } catch(e) {
+                this.setErrorMessage(`Error parsing data ${e}`);
+            }
             this.initApp();
             //console.log("settings? ", this.settings);
             //console.log("user? ", this.userInfo)
@@ -71,27 +74,25 @@ export default {
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
             this.initialized = true;
-            // if (!this.getUserID()) {
-            //     this.setSelectedDomain();
-            //     this.getDomainContent();
-            //     return;
-            // }
-            Promise.all([
-                this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                  //TODO init user domains, call REAL api based on user id
-                //this.$http("/static/files/substudy_test_triggers.json")
-            ]).then(responses => {
+            Promise.allSettled(
+                this.getUserID()?
+                [
+                    this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
+                    this.$http(`/api/user/${this.getUserID()}/triggers`)
+                ] :
+                [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
+            ).then(responses => {
                 try {
-                    this.setLocale(JSON.parse(responses[0]));
+                    this.setLocale(JSON.parse(responses[0].value));
                 } catch(e) {
                     this.setErrorMessage(`Error parsing locale data ${e}`);
                 }
                 //TODO get user domains based on trigger API
-                // try {
-                //     this.setUserDomains(JSON.parse(responses[1]));
-                // } catch(e) {
-                //     this.setErrorMessage(`Error parsing country code data ${e}`);
-                // }
+                try {
+                    this.setUserDomains(JSON.parse(responses[1].value));
+                } catch(e) {
+                    this.setErrorMessage(`Error parsing country code data ${e}`);
+                }
                 this.setSelectedDomain();
                 //populate domain content
                 this.getDomainContent();
@@ -129,7 +130,6 @@ export default {
             return this.locale.replace('_', '-');
         },
         setLocale(data) {
-            //let self = this;
             if (!data || !data.communication) {
                 return false;
             }
@@ -140,7 +140,7 @@ export default {
                     this.locale = item.language.coding[0].code;
                 }
             });
-            console.log("Locale ", this.locale);
+            //console.log("Locale ", this.locale);
         },
         getCountryCode() {
            return this.countryCode;
@@ -194,7 +194,7 @@ export default {
             this.userDomains = this.userDomains.filter((d, index) => {
                 return this.userDomains.indexOf(d) === index;
             });
-            console.log("user domain? ", this.userDomains);
+            //console.log("user domain? ", this.userDomains);
         },
         getLRBaseURL() {
             return this.LifeRayBaseURL;
@@ -370,7 +370,6 @@ export default {
                 }
                 this.setErrorMessage(`Error occurred retrieving content: ${e.statusText}`);
                 this.loading = false;
-               // this.setInitView();
             });
         },
         setDomainContent: function(data) {

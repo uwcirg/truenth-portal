@@ -96,3 +96,18 @@ export function checkIE() {
   return "-ms-scroll-limit" in document.documentElement.style &&
          "-ms-ime-align" in document.documentElement.style;
 }
+
+export function PromiseAllSettledPolyfill() {
+  if(!Promise.allSettled) {
+    Promise.allSettled = function(promises) {
+      return Promise.all(promises.map(p => Promise.resolve(p).then(value => ({
+        status: 'fulfilled',
+        value
+      }), reason => ({
+        status: 'rejected',
+        reason
+      }))));
+    };
+  }
+}
+
