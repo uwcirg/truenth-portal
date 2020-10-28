@@ -20,7 +20,9 @@ from flask import (
     render_template,
     render_template_string,
     request,
+    safe_join,
     session,
+    send_from_directory,
     url_for,
 )
 from flask_babel import gettext as _
@@ -209,6 +211,15 @@ class ShortcutAliasForm(FlaskForm):
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
+
+@portal.route('/substudy-tailored-content')
+@oauth.require_oauth()
+def substudy_tailored_content():
+    return send_from_directory(
+        safe_join(current_app.static_folder, 'templates'),
+        'substudy_tailored_content.html',
+        cache_timeout=-1
+    )
 
 @portal.route('/go', methods=['GET', 'POST'])
 def specific_clinic_entry():

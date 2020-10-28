@@ -52,4 +52,3 @@ portal/static/templates
 portal/static/bundle
 portal/eproms_substudy_tailored_content/node_modules
 portal/eproms_substudy_tailored_content/dist
-portal/eproms_substudy_tailored_content/src/__tests__/__snapshots__
