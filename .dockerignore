@@ -1,0 +1,54 @@
+*.egg-info
+*.egg
+*.eggs
+*.env
+*.sqlite
+*.pyc
+*~
+*.swp
+application.cfg
+site.cfg
+celerybeat.pid
+celerybeat-schedule
+env
+lib
+local
+include
+man
+pip-selfcheck.json
+log
+portal/test_uploads
+docker/portal.env
+docker/docker-compose.dev.*.yaml
+
+geckodriver.log
+coverage.xml
+
+.coverage
+.idea
+.project
+.pydevproject
+.pytest_cache
+.settings
+.tox
+
+# compiled (binary) translation files
+*.mo
+
+# generated CSS files
+portal/static/css/*.css
+
+# nodeJS virtual environment and files
+node_env/
+portal/node_modules/
+portal/package-lock.json
+
+# auto-generated JS eslint config when linting JS files (via command eslint) at development
+portal/static/js/.eslintrc.js
+portal/eproms/static/js/.eslintrc.js
+
+# auto-generated folders housing files from the frontend build, i.e. substudy tailored content
+portal/static/templates
+portal/static/bundle
+portal/eproms_substudy_tailored_content/node_modules
+portal/eproms_substudy_tailored_content/dist
