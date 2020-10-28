@@ -5,8 +5,8 @@
     <!-- if main study is completed but still work in sub-study display header accordingly -->
     {%- if substudy_assessment_is_due-%}
         {% call render_header(title_text=greeting) %}
-            {{_("Please complete your questionnaire as soon as possible. It will expire on %(substudy_expired_date)s.",
-                substudy_expired_date=substudy_expired_date
+            {{_("Please complete your questionnaire as soon as possible. It is due on %(substudy_due_date)s.",
+                substudy_due_date=substudy_due_date
             )}}
         {% endcall %}
     {%- else -%}
@@ -30,7 +30,7 @@
         assessment_status=assessment_status,
         OverallStatus=OverallStatus,
         substudy_assessment_status=substudy_assessment_status,
-        substudy_expired_date=substudy_expired_date,
+        substudy_due_date=substudy_due_date,
         enrolled_in_substudy=enrolled_in_substudy
     )}}
 
