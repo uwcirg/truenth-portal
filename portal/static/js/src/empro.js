@@ -8,6 +8,7 @@ var emproObj = function() {
     this.userId = 0;
 };
 emproObj.prototype.populateDomainDisplay = function() {
+    if (!$("#hardTriggerDisplayList").length) return;
     this.domains.forEach(domain => {
         $("#hardTriggerDisplayList").append(`<li>${domain}</li>`);
         $("#hardTriggerButtonsContainer").append(
@@ -61,3 +62,4 @@ $(document).ready(function() {
         show: false
     });
 });
+
