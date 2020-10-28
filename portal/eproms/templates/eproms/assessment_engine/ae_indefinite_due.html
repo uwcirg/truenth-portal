@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, completed_card -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed baseline, but has outstanding indefinite work -->
 {% block head %}
@@ -8,11 +8,23 @@
     {% endcall %}
 {% endblock %}
 {% block body %}
-    {%- set button_label = _('Continue questionnaire') if unfinished_indefinite_instruments else _('Go to questionnaire') -%}
-    {%- call render_card_content(
-        title_text=_("Open Questionnaire"), card_class="portal-description-incomplete") -%}
-        <p>{{_("Please complete your %(assigning_authority)s questionnaire here.", assigning_authority=_(assessment_status.assigning_authority))}}</p>
-        {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
-    {%- endcall -%}
-    {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    {%- set button_label = _("Continue questionnaire") if unfinished_indefinite_instruments else _("Go to questionnaire") -%}
+    <!-- tile title change for subjects enrolled in substudy -->
+    {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
+                        if enrolled_in_substudy else _("Open Questionnaire") %}
+    <!-- main study due card -->
+    {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=title_text)}}
+    {%- if enrolled_in_substudy -%}
+        <!-- substudy due card -->
+        {{empro_due(
+            substudy_assessment_is_due=substudy_assessment_is_due,
+            assessment_status=assessment_status,
+            OverallStatus=OverallStatus,
+            substudy_assessment_status=substudy_assessment_status,
+            substudy_due_date=substudy_due_date,
+            enrolled_in_substudy=enrolled_in_substudy
+        )}}
+    {%- else -%}
+        {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date)}}
+    {%- endif -%}
 {% endblock %}

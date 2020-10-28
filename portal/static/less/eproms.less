@@ -102,6 +102,8 @@
 @reportContentBorderColor: #ececec;
 @profileItemBgColor: #e8e8e8;
 @toolbarBorderColor: #f5f4f4;
+@emproBtnPrimaryColor: #60676E;
+
 
 
 /**
@@ -2790,6 +2792,9 @@ body.portal {
   background: #5F676E;
   overflow-x: hidden;
   overflow-y: auto;
+  &.modal-open {
+    overflow-y: hidden;
+  }
 }
 body.portal .container {
   max-width: 1100px;
@@ -2842,7 +2847,7 @@ body.portal .copyright-container  {
   line-height: 1;
 }
 .portal-header-container * {
-  line-height: 27px;
+  line-height: 1.5;
   letter-spacing: 1px;
   font-weight: 400;
 }
@@ -2850,11 +2855,18 @@ body.portal .copyright-container  {
 .portal-intro-text {
   font-size: @baseFontSize;
   letter-spacing: 1px;
+  p {
+    margin: 0 0 8px;
+  }
 }
 @media (min-width: 699px) {
   .portal-header,
   .portal-intro-text {
     font-size: @subSmallHeadSize*0.96;
+  }
+  .portal-intro-text {
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 .portal-header-logout-container {
@@ -2879,12 +2891,13 @@ body.portal .copyright-container  {
   position: relative;
   padding-bottom: 1em;
 }
+
 .portal-description {
   background: #3d4750;
   color: #FFF;
-  padding: 0.5em 1.5em 4em;
+  padding: 0.5em 2em 2.5em;
   position: relative;
-  width: 430px;
+  width: 440px;
   max-width: 100%;
   margin: 1em auto;
   min-height: 250px;
@@ -2912,13 +2925,35 @@ body.portal .copyright-container  {
     }
   }
 }
+.portal-description-wrapper {
+  margin-top: 32px;
+  width:440px;
+  .title {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #FFF;
+    font-size: @lgHeadlineSize;
+  }
+  .portal-description {
+    width: 100%;
+  }
+}
 @media (min-width: 992px) {
   .portal-description {
     margin: 1em;
+    width: 42.5%;
     &.full-width {
       width: 96%;
       min-height: 200px;
     }
+  }
+  .portal-description-wrapper {
+    width: 42.5%;
+  }
+}
+@media (min-width: 1200px) {
+  .portal-description {
+    width: 40%;
   }
 }
 .portal-no-description-container {
@@ -2942,10 +2977,16 @@ body.portal .copyright-container  {
 }
 
 .portal-description-body {
-  margin-top: 1em;
   text-align: center;
   font-size: @baseFontSize;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  .text-content {
+    flex: 1;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {
@@ -2962,10 +3003,20 @@ body.portal .copyright-container  {
     line-height: 1.5;
   }
 }
+.portal-description .button-container {
+  position: relative;
+  margin-bottom: 0;
+  margin-top: 24px;
+}
 
 .portal-flex-container {
   .portal-description {
     padding-top: 1.5em;
+    display: flex;
+    flex-direction: column;
+    .portal-description-body {
+      flex: 1;
+    }
   }
 }
 
@@ -2974,7 +3025,10 @@ body.portal .copyright-container  {
   letter-spacing: 1px;
   text-align: center;
   font-size: @baseFontSize;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
+
 @media (min-width: 699px) {
   .portal-description-title {
     font-size: @subSmallHeadSize;
@@ -2987,6 +3041,121 @@ body.portal .copyright-container  {
 .portal-full-width-container {
   font-size: @subheadSize;
   padding: 2em;
+}
+
+#emproModal {
+  .modal-dialog {
+    width: 100%;
+    padding: 8px;
+    margin: 0 auto;
+  }
+  .modal-body {
+    padding: 16px 32px 0;
+  }
+  .modal-content {
+    border-radius: 10px;
+    position: relative;
+    .close {
+      position: absolute;
+      right: 24px;
+      top: 16px;
+      font-size: 24px;
+      display: block;
+      font-weight: 400;
+      color: @mutedColor;
+      z-index: 10;
+    }
+    p {
+      margin: 0 0 12px;
+    }
+  }
+  .title {
+    margin-bottom: 16px;
+    width: 100%;
+    line-height: 1.5;
+    padding-right: 32px;
+  }
+  .header-section {
+    padding-bottom: 16px;
+    border-bottom: 1px solid @HRColor;
+  }
+  .items-section {
+    display: flex;
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-bottom: 24px;
+    .item {
+      padding: 24px 8px;
+      width: 100%;
+      border-bottom: 1px solid @HRColor;
+      &:last-of-type {
+        border-bottom: 0;
+      }
+      &.hard-trigger-item {
+        display: none;
+      }
+    }
+    .buttons-container {
+      margin-top: 24px;
+    }
+    a, button {
+      background-color: @emproBtnPrimaryColor;
+      color: #FFF;
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      white-space: normal;
+      margin: 8px auto;
+    }
+  }
+}
+@media (min-width: 768px) {
+  #emproModal {
+    .title {
+      width: 480px;
+    }
+    .items-section {
+      .item {
+        padding: 24px 24px;
+        width: 33.33333333%;
+        min-height: 424px;
+        flex-wrap: nowrap;
+        flex: 1;
+        border-bottom: 0;
+        &:first-of-type,
+        &.default:first-child{
+          padding-left: 0;
+        }
+        &:not(:last-of-type) {
+          border-right: 1px solid @HRColor;
+        }
+      }
+      button {
+        max-width: 100%;
+      }
+    }
+  }
+}
+@media (min-width: 1200px) {
+  #emproModal {
+    .modal-dialog {
+      width: 75%;
+      margin: auto;
+    }
+  }
+}
+@media (min-width: 1400px) {
+  #emproModal {
+    .modal-dialog {
+      width: 70%;
+    }
+  }
 }
 .loading-message-indicator {
   z-index: 10;
@@ -4050,7 +4219,7 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   letter-spacing: 1px;
 }
 .modal-body {
-  font-size: @baseMobileFontSize;
+  font-size: @baseFontSize;
   padding: 2em 2.5em;
 }
 .modal-title {
