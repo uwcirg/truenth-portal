@@ -7,7 +7,7 @@ from portal.models.questionnaire_response import QuestionnaireResponse
 
 
 @fixture
-def initialized_with_substudy_qnr(test_user, initialized_with_substudy_qb):
+def initialized_with_ss_qnr(test_user, initialized_with_ss_qb):
     test_user_id = db.session.merge(test_user).id
     instrument_id = 'empro'
     doc_id = '123'
@@ -36,7 +36,7 @@ def initialized_with_substudy_qnr(test_user, initialized_with_substudy_qb):
         encounter=encounter,
         subject_id=test_user_id,
         status='completed',
-        questionnaire_bank=initialized_with_substudy_qb)
+        questionnaire_bank=initialized_with_ss_qb)
     with SessionScope(db):
         db.session.add(encounter)
         db.session.add(qnr)
