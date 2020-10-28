@@ -24,10 +24,10 @@ def test_initial_state_view(client, initialized_patient_logged_in):
     assert results.json['state'] == 'unstarted'
 
 
-def test_bogus_transition(initialized_with_substudy_qnr):
+def test_bogus_transition(initialized_with_ss_qnr):
     """Attempt to jump to due without starting; expect exception"""
     with pytest.raises(TransitionNotAllowed):
-        evaluate_triggers(initialized_with_substudy_qnr)
+        evaluate_triggers(initialized_with_ss_qnr)
 
 
 def test_initiate_trigger(test_user):
@@ -41,13 +41,14 @@ def test_initiate_trigger(test_user):
     assert before == results.id
 
 
-def test_base_eval(test_user, initialized_with_substudy_qnr):
+def test_base_eval(
+        test_user, initialized_with_ss_recur_qb, initialized_with_ss_qnr):
     from portal.database import db
 
     test_user_id = db.session.merge(test_user).id
     initiate_trigger(test_user_id)
 
-    evaluate_triggers(initialized_with_substudy_qnr)
+    evaluate_triggers(initialized_with_ss_qnr)
     results = users_trigger_state(test_user_id)
 
     assert len(results.triggers['domain']) == 8

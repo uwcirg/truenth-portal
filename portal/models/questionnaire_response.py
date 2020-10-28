@@ -24,7 +24,12 @@ from .fhir import bundle_results
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire import Questionnaire
-from .questionnaire_bank import QuestionnaireBank, trigger_date, visit_name
+from .questionnaire_bank import (
+    QuestionnaireBank,
+    QuestionnaireBankQuestionnaire,
+    trigger_date,
+    visit_name,
+)
 from .research_study import research_study_id_from_questionnaire
 from .reference import Reference
 from .user import User, current_user, patients_query
@@ -337,13 +342,13 @@ class QNR_results(object):
     """API for QuestionnaireResponses for a user"""
 
     def __init__(
-            self, user, research_study_id, qb_id=None, qb_iteration=None,
+            self, user, research_study_id, qb_ids=None, qb_iteration=None,
             ignore_iteration=False):
         """Optionally include qb_id and qb_iteration to limit
 
         :param user: subject in question
         :param research_study_id: study being processed
-        :param qb_id: include to filter results to only qb_id
+        :param qb_ids: include as list to filter results to only qb_id(s)
         :param qb_iteration: used only when qb_id is set and ignore_iteration
          is NOT set
         :param ignore_iteration: used in combination with qb_id to filter
@@ -352,7 +357,7 @@ class QNR_results(object):
         """
         self.user = user
         self.research_study_id = research_study_id
-        self.qb_id = qb_id
+        self.qb_ids = qb_ids
         self.qb_iteration = qb_iteration
         self.ignore_iteration = ignore_iteration
         self._qnrs = None
@@ -374,9 +379,9 @@ class QNR_results(object):
             QuestionnaireResponse.authored,
             QuestionnaireResponse.encounter_id).order_by(
             QuestionnaireResponse.authored)
-        if self.qb_id:
+        if self.qb_ids:
             query = query.filter(
-                QuestionnaireResponse.questionnaire_bank_id == self.qb_id)
+                QuestionnaireResponse.questionnaire_bank_id.in_(self.qb_ids))
             if not self.ignore_iteration:
                 query = query.filter(
                     QuestionnaireResponse.qb_iteration == self.qb_iteration)
@@ -401,7 +406,7 @@ class QNR_results(object):
         """
         from .qb_timeline import calc_and_adjust_expired, calc_and_adjust_start
 
-        if self.qb_id:
+        if self.qb_ids:
             raise ValueError(
                 "Can't associate results when restricted to single QB")
 
@@ -924,8 +929,15 @@ def generate_qnr_csv(qnr_bundle):
 def first_last_like_qnr(qnr):
     """Specialized lookup function to return similar QNRs
 
+    As clients need QNRs spanning baseline and recurring, can't simply locate
+    on qb_id alone.  Look up "similar" based on the QNR's QB, the QB's
+    questionnaire, and other QBs with the same questionnaire.  The resulting
+    set of questionnaire banks and the qnr.subject_id are used to look for
+    "similar" results.
+
     :param qnr: reference QNR - look for first and most recent QNRs similar
-      to the one provided.  That is owned by the same subject and QB.
+      to the one provided.  That is owned by the same subject and QBs
+      containing the same questionnaire.
 
     :return: tuple(first, last) of like QNRs, if found.  One or both may be
       None if not found.
@@ -933,16 +945,31 @@ def first_last_like_qnr(qnr):
     """
     user = User.query.get(qnr.subject_id)
     rs_id = qnr.questionnaire_bank.research_study_id
-    postedQNRs = QNR_results(
-        user,
-        research_study_id=rs_id,
-        qb_id=qnr.questionnaire_bank_id)
+    qbq = qnr.questionnaire_bank.questionnaires
+    if not qbq or len(qbq) > 1:
+        raise ValueError(
+            "supporting exactly one questionnaire in QNR->QB within"
+            " `first_last_like_qnr()`")
+    q_id = qbq[0].questionnaire_id
+
+    query = QuestionnaireBank.query.join(
+        QuestionnaireBankQuestionnaire).filter(
+        QuestionnaireBank.id ==
+        QuestionnaireBankQuestionnaire.questionnaire_bank_id).filter(
+        QuestionnaireBankQuestionnaire.questionnaire_id == q_id).with_entities(
+        QuestionnaireBank.id)
+    qb_ids = [qb.id for qb in query]
+    if not qb_ids:
+        raise ValueError("no matching qbs found!")
+
+    postedQNRs = QNR_results(user, research_study_id=rs_id, qb_ids=qb_ids)
 
     initial, last = None, None
     for q in postedQNRs.qnrs:
         if q.status != 'completed':
             continue
-        if q == qnr:
+        if q.qnr_id == qnr.id:
+            # ordered list, made it to current
             break
         if not initial:
             initial = q
