@@ -208,18 +208,39 @@ select::-ms-expand {
 
 #errorMessage {
   margin-top: 32px;
+  align-self: stretch;
 }
 .error-message {
   color: #FFF;
-  //TODO remove this
-  display: none;
   background: @errorColor;
 
   &.content {
-    padding: 32px;
-    &, & > * {
-      font-size: @titleFontSize;
+    position: relative;
+    &:before {
+      content: "\f0f9";
+      font-family: FontAwesome;
+      font-style: normal;
+      display: block;
+      position: absolute;
+      left: 32px;
+
     }
+    padding: 16px 32px 16px 72px;
+    &, & > * {
+      font-size: @subtitleFontSize;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  #errorMessage {
+    margin-left: 40px;
+    margin-right: 32px;
+  }
+}
+@media (min-width: 1200px) {
+  #errorMessage {
+    margin-right: 88px;
   }
 }
 

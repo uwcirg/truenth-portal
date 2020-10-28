@@ -14,24 +14,32 @@ export default {
             this.$http(`/static/js/src/data/common/empro_domain_mappings.json`),
         ]).then(responses => {
             try {
+                //set config settings
                 this.setSettings(JSON.parse(responses[0].value));
             } catch(e) {
+                //log error to console
                 this.setErrorMessage(`Error parsing data ${e}`);
             }
             try {
+                //set user email and id
                 this.userInfo = JSON.parse(responses[1].value);
             } catch(e) {
-                this.setErrorMessage(`Error parsing data ${e}`);
+                //log error to console
+                this.setErrorMessage(`Error parsing user data ${e}`);
             }
             try {
+                //set country code
                 this.setCountryCode(JSON.parse(responses[2].value));
             } catch(e) {
+                //log error to console
                 this.setErrorMessage(`Error parsing country code data ${e}`);
             }
             try {
+                //set domain mappings
                 this.domainMappings = JSON.parse(responses[3].value);
             } catch(e) {
-                this.setErrorMessage(`Error parsing data ${e}`);
+                //log error to console
+                this.setErrorMessage(`Error parsing domain mapping data ${e}`);
             }
             this.initApp();
             //console.log("settings? ", this.settings);
@@ -85,13 +93,15 @@ export default {
                 try {
                     this.setLocale(JSON.parse(responses[0].value));
                 } catch(e) {
+                    //log error to console
                     this.setErrorMessage(`Error parsing locale data ${e}`);
                 }
                 //TODO get user domains based on trigger API
                 try {
                     this.setUserDomains(JSON.parse(responses[1].value));
                 } catch(e) {
-                    this.setErrorMessage(`Error parsing country code data ${e}`);
+                    //log error to console
+                    this.setErrorMessage(`Error parsing trigger data ${e}`);
                 }
                 this.setSelectedDomain();
                 //populate domain content
@@ -118,7 +128,9 @@ export default {
             this.setErrorMessage("");
         },
         setErrorMessage(message) {
-            this.errorMessage += (this.errorMessage?"<br/>": "") + message;
+            this.errorMessage += (this.errorMessage?"\n": "") + message;
+            //error will be log to console
+            console.error(this.errorMessage);
         },
         getUserID() {
             return this.userId;
@@ -329,7 +341,6 @@ export default {
         onDomainContentDidLoad() {
             setTimeout(function() {
                 this.setInitView();
-                this.setCurrentView("domain");
             }.bind(this), 150);
             this.setResourcesByCountry();
             this.initNav();
@@ -360,7 +371,6 @@ export default {
                     this.setInitView(true);
                 }
             }).catch(e => {
-                console.log("failed? ", e)
                 this.getContentAttempt++;
                 if (this.getContentAttempt <= 2) {
                     this.getDomainContent();
@@ -426,11 +436,12 @@ export default {
                     resourceSection.querySelector(".content").innerHTML = response;
                     
                 } else {
+                    //log error to console
                     this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
                     this.setInitView(true);
                 }
             }).catch(e => {
-                console.log(`error fetching resources for country code ${countryCode} `, e)
+                this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
             });
            
         },
