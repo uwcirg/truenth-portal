@@ -240,7 +240,12 @@ select::-ms-expand {
 }
 @media (min-width: 1200px) {
   #errorMessage {
-    margin-right: 88px;
+    margin-right: @sectionRightPadding;
+  }
+  .no-nav {
+    #errorMessage {
+      margin-right: 32px;
+    }
   }
 }
 

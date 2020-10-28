@@ -456,8 +456,12 @@ export default {
                 document.addEventListener("keydown", event => {
                     if (event.ctrlKey && 
                         event.shiftKey &&
-                        event.key.toLowerCase() === "d")
-                    this.debugMode = true;
+                        event.key.toLowerCase() === "d") {
+                        this.debugMode = true;
+                        console.log("current data ", this.$data);
+                        return false;
+                    }
+                    
                 });
             }
         },
