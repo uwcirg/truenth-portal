@@ -30,6 +30,6 @@
         {%- endif -%}
     {%- else -%}
         <!-- main study completed tile -->
-        {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date, title=_("Completed Questionnaires"))}}
+        {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date, title_text=_("Completed Questionnaires"))}}
     {%- endif -%}
 {% endblock %}

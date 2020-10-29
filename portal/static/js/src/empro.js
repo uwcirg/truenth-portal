@@ -30,7 +30,7 @@ emproObj.prototype.initTriggerItemsVis = function() {
     if (this.hasHardTrigger) {
         $("#emproModal .hard-trigger").addClass("active");
         $("#emproModal .no-trigger").hide();
-         //present thank you modal
+         //present thank you modal if hard trigger present
         $("#emproModal").modal("show");
         return;
     }
@@ -64,7 +64,13 @@ emproObj.prototype.initTriggerDomains = function() {
                 let entry = Object.entries(item);
                 return entry[0] && entry[0][1] && entry[0][1].indexOf("soft") !== -1;
             }).length;
+            /*
+             * display user domain topic(s)
+             */
             self.populateDomainDisplay();
+            /*
+             * show/hide sections based on triggers
+             */
             self.initTriggerItemsVis();
            //console.log("self.domains? ", self.domains);
            //console.log("has hard triggers ", self.hasHardTrigger);
@@ -77,5 +83,4 @@ $(document).ready(function() {
     let EmproObj = new emproObj();
     EmproObj.initTriggerDomains();
     EmproObj.initThankyouModal();
-   
 });
