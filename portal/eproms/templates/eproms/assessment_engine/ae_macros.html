@@ -127,7 +127,7 @@
 {%- endmacro -%}
 {%- macro empro_thankyou_card(full_name="") -%}
     {% call render_header(title_text=_("Hi, %(full_name)s.", full_name=full_name if full_name else '')) %}
-        <p>{{_("None of your questionnaires are due.  You can view your completed questionnaires below:")}}</p>
+        <p>{{_("None of your questionnaires are due. You can view your completed questionnaires below:")}}</p>
     {% endcall %}
 {%- endmacro -%}
 {%- macro empro_modal_default_supportTeam_block(organization="") -%}
@@ -148,14 +148,14 @@
         <p><b>{{_("To help address these, we've informed your care team and they'll be in contact with you soon.")}}</b></p>
         <br/>
         {% if user and user.organizations %}
-            <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team at %(organization) directly.  They're happy to help.", organization=organization)}}</p>
+            <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team at %(organization) directly. They're happy to help.", organization=organization)}}</p>
         {% endif %}
     </div>
 {%- endmacro -%}
 {%- macro empro_modal_default_report_block() -%}
     <div class="item">
         <h4>{{_("Your Report")}}</h4>
-        <p>{{_("Here’s where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
+        <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
             <!-- TODO point to longitudinal report -->
             <a class="btn btn-empro-primary">{{_("My Report")}}</a>
