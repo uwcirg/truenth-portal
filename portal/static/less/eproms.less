@@ -2817,7 +2817,7 @@ body.portal .copyright-container  {
 }
 .portal-header-container {
   color: #FFF;
-  width: 85%;
+  width: 90%;
   margin: 1em auto 2em auto;
   font-size: @subheadSize;
   max-width: 100%;
@@ -2907,7 +2907,22 @@ body.portal .copyright-container  {
     text-overflow: ellipsis;
   }
   &.disabled {
-    opacity: @disabledOpacity;
+    position: relative;
+    a:hover {
+      text-decoration: none;
+    }
+    &:after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: block;
+      content: "";
+      background:@muterColor;
+      opacity: 0.1;
+      z-index: 1;
+    }
   }
   & .title {
     font-size: @subSmallHeadSize;
@@ -2951,11 +2966,7 @@ body.portal .copyright-container  {
     width: 42.5%;
   }
 }
-@media (min-width: 1200px) {
-  .portal-description {
-    width: 40%;
-  }
-}
+
 .portal-no-description-container {
   position: relative;
   font-size: @subheadSize;
@@ -3043,6 +3054,27 @@ body.portal .copyright-container  {
   padding: 2em;
 }
 
+.portal-skyscraper-container {
+  margin-top: 40px;
+  .section-title {
+    color: #FFF;
+    margin-bottom: 16px;
+    font-size: @lgFontSize;
+  }
+  .top {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bottom {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
 #emproModal {
   .modal-dialog {
     width: 100%;
@@ -3057,12 +3089,13 @@ body.portal .copyright-container  {
     position: relative;
     .close {
       position: absolute;
-      right: 24px;
-      top: 16px;
+      right: 16px;
+      top: 8px;
       font-size: 24px;
       display: block;
       font-weight: 400;
       color: @mutedColor;
+      opacity: 1;
       z-index: 10;
     }
     p {
@@ -3072,7 +3105,7 @@ body.portal .copyright-container  {
   .title {
     margin-bottom: 16px;
     width: 100%;
-    line-height: 1.5;
+    line-height: 1.4;
     padding-right: 32px;
   }
   .header-section {
@@ -3090,15 +3123,22 @@ body.portal .copyright-container  {
     flex-wrap: wrap;
     justify-content: space-evenly;
     margin-bottom: 24px;
+    &.hard-trigger,
+    &.soft-trigger {
+      display: none;
+    }
+    &.active {
+      display: flex;
+    }
     .item {
-      padding: 24px 8px;
+      padding: 16px 8px 24px;
       width: 100%;
       border-bottom: 1px solid @HRColor;
       &:last-of-type {
         border-bottom: 0;
       }
-      &.hard-trigger-item {
-        display: none;
+      li:not(:last-of-type) {
+        margin-bottom: 8px;
       }
     }
     .buttons-container {
@@ -3109,7 +3149,7 @@ body.portal .copyright-container  {
       color: #FFF;
       display: block;
       width: 100%;
-      max-width: 320px;
+      max-width: 100%;
       white-space: normal;
       margin: 8px auto;
     }
@@ -3117,19 +3157,15 @@ body.portal .copyright-container  {
 }
 @media (min-width: 768px) {
   #emproModal {
-    .title {
-      width: 480px;
-    }
     .items-section {
       .item {
-        padding: 24px 24px;
+        padding: 16px 24px 24px;
         width: 33.33333333%;
         min-height: 424px;
         flex-wrap: nowrap;
         flex: 1;
         border-bottom: 0;
-        &:first-of-type,
-        &.default:first-child{
+        &:first-of-type {
           padding-left: 0;
         }
         &:not(:last-of-type) {
@@ -3145,7 +3181,7 @@ body.portal .copyright-container  {
 @media (min-width: 1200px) {
   #emproModal {
     .modal-dialog {
-      width: 75%;
+      width: 70%;
       margin: auto;
     }
   }
@@ -3153,7 +3189,7 @@ body.portal .copyright-container  {
 @media (min-width: 1400px) {
   #emproModal {
     .modal-dialog {
-      width: 70%;
+      width: 67.5%;
     }
   }
 }

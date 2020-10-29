@@ -29,20 +29,30 @@
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=title_text)}}
     <!-- substudy due card -->
     {%- if enrolled_in_substudy -%}
-        {{empro_due(
-            substudy_assessment_is_due=substudy_assessment_is_due,
-            assessment_status=assessment_status,
-            OverallStatus=OverallStatus,
-            substudy_assessment_status=substudy_assessment_status,
-            substudy_due_date=substudy_due_date,
-            enrolled_in_substudy=enrolled_in_substudy
-        )}}
+        {%- if substudy_assessment_is_due -%}
+            {{empro_due(
+                substudy_assessment_is_due=substudy_assessment_is_due,
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                substudy_assessment_status=substudy_assessment_status,
+                substudy_due_date=substudy_due_date,
+                enrolled_in_substudy=enrolled_in_substudy
+            )}}
+        {%- else -%}
+            {{completed_card(
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                comp_date=comp_date,
+                title_text=title_text)
+            }}
+        {%- endif -%}
     {%- else -%}
+        <!-- main study completed tile -->
         {{completed_card(
             assessment_status=assessment_status,
             OverallStatus=OverallStatus,
             comp_date=comp_date,
-            title_text=title_text)
+            title_text=_("Completed Questionnaires"))
         }}
     {%- endif -%}
 {% endblock %}
