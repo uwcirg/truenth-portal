@@ -66,9 +66,9 @@ emproObj.prototype.initTriggerDomains = function() {
             }).length;
             self.populateDomainDisplay();
             self.initTriggerItemsVis();
-           console.log("self.domains? ", self.domains);
-           console.log("has hard triggers ", self.hasHardTrigger);
-           console.log("has soft triggers ", self.hasSoftTrigger);
+           //console.log("self.domains? ", self.domains);
+           //console.log("has hard triggers ", self.hasHardTrigger);
+           //console.log("has soft triggers ", self.hasSoftTrigger);
         });
     });
 }
@@ -79,4 +79,3 @@ $(document).ready(function() {
     EmproObj.initThankyouModal();
    
 });
-
