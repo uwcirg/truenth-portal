@@ -33,9 +33,6 @@ WORKDIR "$HOME/portal"
 # Copy repo into image
 COPY . .
 
-# Copy substudy app files built in substudy_app stage
-COPY --from=substudy_app /tmp/substudy_app/dist/bundle /portal/portal/static/bundle
-COPY --from=substudy_app /tmp/substudy_app/dist/templates /portal/portal/static/templates
 
 # Install build dependencies
 RUN \
@@ -74,6 +71,10 @@ RUN \
     apt-get update --quiet > /dev/null && \
     apt-get install --quiet --quiet portal && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
+
+# Copy substudy app files built in substudy_app stage
+COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.7/site-packages/portal/static/bundle/
+COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.7/site-packages/portal/static/templates/
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
