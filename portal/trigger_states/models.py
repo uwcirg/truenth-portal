@@ -24,6 +24,8 @@ class TriggerState(db.Model):
     state = db.Column('state', trigger_state_enum, nullable=False, index=True)
     timestamp = db.Column(
         db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    questionnaire_response_id = db.Column(
+        db.ForeignKey('questionnaire_responses.id'), index=True)
     triggers = db.Column(JSONB)
 
     def as_json(self):
