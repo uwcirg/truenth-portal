@@ -2,12 +2,14 @@
 import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
+from portal.database import db
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
     evaluate_triggers,
     initiate_trigger,
     users_trigger_state,
 )
+from portal.trigger_states.models import TriggerState
 
 
 def test_initial_state(test_user):
@@ -43,8 +45,6 @@ def test_initiate_trigger(test_user):
 
 def test_base_eval(
         test_user, initialized_with_ss_recur_qb, initialized_with_ss_qnr):
-    from portal.database import db
-
     test_user_id = db.session.merge(test_user).id
     initiate_trigger(test_user_id)
 
@@ -52,6 +52,12 @@ def test_base_eval(
     results = users_trigger_state(test_user_id)
 
     assert len(results.triggers['domain']) == 8
+
+    ts = TriggerState.query.filter(
+        TriggerState.user_id == test_user_id).filter(
+        TriggerState.state == 'processed').one()
+    assert ts.questionnaire_response_id == initialized_with_ss_qnr.id
+
 
 
 def test_cur_hard_trigger():

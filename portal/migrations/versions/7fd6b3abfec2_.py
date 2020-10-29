@@ -31,13 +31,21 @@ def upgrade():
                 name='trigger_state_type'),
             nullable=False),
         sa.Column('timestamp', sa.DateTime(), nullable=False),
+        sa.Column('questionnaire_response_id', sa.Integer(), nullable=True),
         sa.Column(
             'triggers',
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=True),
+        sa.ForeignKeyConstraint(
+            ['questionnaire_response_id'], ['questionnaire_responses.id'], ),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
         sa.PrimaryKeyConstraint('id')
         )
+    op.create_index(
+        op.f('ix_trigger_states_questionnaire_response_id'),
+        'trigger_states',
+        ['questionnaire_response_id'],
+        unique=False)
     op.create_index(
         op.f('ix_trigger_states_state'),
         'trigger_states',
@@ -65,5 +73,8 @@ def downgrade():
         op.f('ix_trigger_states_timestamp'), table_name='trigger_states')
     op.drop_index(
         op.f('ix_trigger_states_state'), table_name='trigger_states')
+    op.drop_index(
+        op.f('ix_trigger_states_questionnaire_response_id'),
+        table_name='trigger_states')
     op.drop_table('trigger_states')
     # ### end Alembic commands ###
