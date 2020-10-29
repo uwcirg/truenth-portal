@@ -26,6 +26,8 @@ class QB_Status(object):
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
         self._overall_status = None
+        self._enrolled_in_common = False
+        self._current = None
         self._sync_timeline()
         self._indef_init()
 
@@ -46,6 +48,10 @@ class QB_Status(object):
             QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.withdrawn).first()
         self._withdrawal_date = withdrawn.at if withdrawn else None
+        if self.withdrawn_by(self.as_of_date):
+            self._overall_status = OverallStatus.withdrawn
+            trace("found user withdrawn; no valid qbs")
+            return
 
         # convert query to list of tuples for easier manipulation
         self.__ordered_qbs = [qbt.qbd() for qbt in users_qbs]
@@ -57,8 +63,6 @@ class QB_Status(object):
             else:
                 self._overall_status = OverallStatus.expired
                 trace("no qb timeline data for {}".format(self.user))
-            self._enrolled_in_common = False
-            self._current = None
             return
         self._enrolled_in_common = True
 
@@ -74,17 +78,12 @@ class QB_Status(object):
         # w/o a cur, probably hasn't started, set expired and leave
         if not cur_qbd and (
                 self.__ordered_qbs[0].relative_start > self.as_of_date):
-            if self.withdrawn_by(self.as_of_date):
-                trace("user withdrawn prior to first qb start")
-                self._overall_status = OverallStatus.withdrawn
-            else:
-                trace(
-                    "no current QBD (too early); first qb doesn't start till"
-                    " {} vs as_of {}".format(
-                        self.__ordered_qbs[0].relative_start, self.as_of_date))
-                self._overall_status = OverallStatus.expired
-                self.next_qbd = self.__ordered_qbs[0]
-            self._current = None
+            trace(
+                "no current QBD (too early); first qb doesn't start till"
+                " {} vs as_of {}".format(
+                    self.__ordered_qbs[0].relative_start, self.as_of_date))
+            self._overall_status = OverallStatus.expired
+            self.next_qbd = self.__ordered_qbs[0]
             return
 
         if cur_index > 0:
