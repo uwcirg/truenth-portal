@@ -21,17 +21,15 @@
     <!-- tile title change for subjects enrolled in substudy -->
     {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
                         if enrolled_in_substudy else _("Open Questionnaire") %}
-    {%- call render_card_content(
-        title_text=title_text,
-        card_class="portal-completed-container") -%}
-        <div class="text-content">{{_("No questionnaire is due.")}}</div>
-        {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
-    {%- endcall -%}
-
     {% set completed_title_text = _("%(assigning_authority)s Questionnaire", 
                                 assigning_authority=_(assessment_status.assigning_authority)) if enrolled_in_substudy else  _("Completed Questionnaires") %}
 
     {%- if enrolled_in_substudy -%}
+        {%- call render_card_content(
+            title_text=title_text,
+            card_class="portal-completed-container") -%}
+            <div class="text-content">{{_("No questionnaire is due.")}}</div>
+        {%- endcall -%}
         <!-- main study questionnaire is completed, but sub-study questionnaire could still be due -->
         <!-- substudy due card -->
         {{empro_due(
@@ -43,9 +41,9 @@
             enrolled_in_substudy=enrolled_in_substudy
         )}}
         <div class="portal-skyscraper-container">
-            <!-- main study completed card -->
             <div class="top">
                 <h2 class="section-title">{{_("Completed Questionnaires")}}</h2>
+                <!-- main study completed card -->
                 {{completed_card(
                     assessment_status=assessment_status,
                     OverallStatus=OverallStatus,
@@ -66,6 +64,12 @@
         </div>
     {%- else -%}
         <!-- main study ONLY -->
+        {%- call render_card_content(
+            title_text=title_text,
+            card_class="portal-completed-container") -%}
+            <div class="text-content">{{_("No questionnaire is due.")}}</div>
+            {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
+        {%- endcall -%}
         <!-- main study completed card -->
         {{completed_card(
             assessment_status=assessment_status,
