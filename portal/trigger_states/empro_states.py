@@ -140,6 +140,7 @@ def evaluate_triggers(qnr):
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
         ts.triggers = dm.eval_triggers()
+        ts.questionnaire_response_id = qnr.id
 
         # transition to done and persist state
         sm.finish()
