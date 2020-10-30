@@ -2,7 +2,7 @@ import tnthAjax from "./modules/TnthAjax.js";
 import tnthDates from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
 import CurrentUser from "./mixins/CurrentUser.js";
-import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
+import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
 
 (function () { /*global Vue DELAY_LOADING i18next $ */
     var DELAY_LOADING = true; //a workaround for hiding of loading indicator upon completion of loading of portal wrapper - loading indicator needs to continue displaying until patients list has finished loading
@@ -46,7 +46,9 @@ import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
                     self.setRowItemEvent();
                     self.handleAffiliatedUIVis();
                     self.addFilterPlaceHolders();
-                    self.setContainerVis();
+                    setTimeout(function() {
+                        self.setContainerVis();
+                    }, 350);
                 } else {
                     self.handleCurrentUser();
                 }
@@ -166,7 +168,8 @@ import {EPROMS_SUBSTUDY_ID} from "./data/common/consts.js";
             },
             getExportReportUrl: function(dataType) {
                 dataType = dataType||"json";
-                return `/api/report/questionnaire_status?format=${dataType}`;
+                let researchStudyID = $("#patientList").hasClass("substudy")?EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
+                return `/api/report/questionnaire_status?research_study_id=${researchStudyID}&format=${dataType}`;
             },
             clearExportReportTimeoutID: function() {
                 if (!this.arrExportReportTimeoutID.length) {
