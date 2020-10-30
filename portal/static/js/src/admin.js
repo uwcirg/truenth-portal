@@ -168,7 +168,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
             },
             getExportReportUrl: function(dataType) {
                 dataType = dataType||"json";
-                let researchStudyID = $("#patientList").hasClass("substudy")?EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
+                let researchStudyID = $("#patientList").hasClass("substudy") ? EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
                 return `/api/report/questionnaire_status?research_study_id=${researchStudyID}&format=${dataType}`;
             },
             clearExportReportTimeoutID: function() {
