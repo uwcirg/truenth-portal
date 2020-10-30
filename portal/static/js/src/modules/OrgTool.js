@@ -123,20 +123,26 @@ export default (function() { /*global i18next $ */
         if (!researchProtocols.length) return [];
         return researchProtocols[0].research_protocols;
     }
-    OrgTool.prototype.isSubStudyOrg = function(orgId) {
+    OrgTool.prototype.isSubStudyOrg = function(orgId, params) {
         if (!orgId) return false;
+        params = params || {};
         var orgsList = this.getOrgsList();
         if (!orgsList.hasOwnProperty(orgId)) return false;
         if (!this.getResearchProtocolsByOrgId(orgId).length) {
-            /*
-             * include flag for inherited attributes to find added inherited attributes that include research study
-             * information
-             */
-            tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: true}, function(data) {
-                if (data && data.extension) {
-                    orgsList[orgId].extension = [...data.extension];
-                }
-            });
+            if (sessionStorage.getItem(`extension_${orgId}`)) {
+                orgsList[orgId].extension = [...JSON.parse(sessionStorage.getItem(`extension_${orgId}`))];
+            } else {
+                /*
+                * include flag for inherited attributes to find added inherited attributes that include research study
+                * information
+                */
+                tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: params.async ? false : true}, function(data) {
+                    if (data && data.extension) {
+                        orgsList[orgId].extension = [...data.extension];
+                        sessionStorage.setItem(`extension_${orgId}`, JSON.stringify(data.extension));
+                    }
+                });
+            }
         }
         let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
 

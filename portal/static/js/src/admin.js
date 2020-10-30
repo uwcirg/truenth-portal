@@ -156,6 +156,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     self.onCurrentUserInit();
                 }, true);
             },
+            isSubStudyPatientView: function() {
+                return $("#patientList").hasClass("substudy");
+            },
             allowSubStudyView: function() {
                 return this.userResearchStudyIds.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
             },
@@ -168,7 +171,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
             },
             getExportReportUrl: function(dataType) {
                 dataType = dataType||"json";
-                let researchStudyID = $("#patientList").hasClass("substudy") ? EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
+                let researchStudyID = this.isSubStudyPatientView() ? EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
                 return `/api/report/questionnaire_status?research_study_id=${researchStudyID}&format=${dataType}`;
             },
             clearExportReportTimeoutID: function() {
@@ -201,8 +204,11 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
             },
             initToggleListEvent: function() {
                 if (!$("#patientListToggle").length) return;
-                $("#patientListToggle .radio").on("click", function(e) {
-                    e.stopPropagation();
+                $("#patientListToggle a").on("click", e => {
+                    e.preventDefault();
+                });
+                $("#patientListToggle .radio, #patientListToggle .label").on("click", function(e) {
+                    e.stopImmediatePropagation();
                     $("#patientListToggle").addClass("loading");
                     setTimeout(function() {
                         window.location = $(this).closest("a").attr("href");
@@ -327,6 +333,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 this.setSubStudyUIElements();
                 this.initRoleBasedEvent();
                 this.fadeLoader();
+                setTimeout(function() {
+                    this.setOrgsFilterWarning();
+                }.bind(this), 650);
             },
             setOrgsMenuHeight: function (padding) {
                 padding = padding || 85;
@@ -697,11 +706,10 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 var orgFields = $("#userOrgs input[name='organization']");
                 var fi = this.currentTablePreference ? this.currentTablePreference.filters : {};
                 var fa = this.siteFilterApplied() ? fi.orgs_filter_control : [];
+                let ot = this.getOrgTool();
+                let isSubStudyPatientView = this.isSubStudyPatientView();
                 orgFields.each(function () {
                     $(this).prop("checked", false);
-                    if (!fa) {
-                        return true;
-                    }
                     var oself = $(this),
                         val = oself.val();
                     fa = fa.map(function (item) {
@@ -712,6 +720,30 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 if (this.getHereBelowOrgs().length === 1) {
                     orgFields.prop("checked", true);
                 }
+            },
+            initSubStudyOrgsVis: function () {
+                var orgFields = $("#userOrgs input[name='organization']");
+                let ot = this.getOrgTool();
+                let isSubStudyPatientView = this.isSubStudyPatientView();
+                orgFields.each(function () {
+                    var val = $(this).val();
+                    if (val && isSubStudyPatientView && !ot.isSubStudyOrg(val, {async: true})) {
+                        $(this).attr("disabled", true);
+                        $(this).parent("label").addClass("disabled")
+                    }
+                });
+            },
+            setOrgsFilterWarning: function() {
+                if (!this.siteFilterApplied()) {
+                    return;
+                }
+                /*
+                 * display organization filtered popover warning text
+                 */
+                $("#adminTableToolbar .orgs-filter-warning").popover("show");
+                setTimeout(function() {
+                    $("#adminTableToolbar .orgs-filter-warning").popover("hide");
+                }, 5000);
             },
             initOrgsEvent: function () {
                 var ofields = $("#userOrgs input[name='organization']");
@@ -730,6 +762,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
 
                 $("#orglist-dropdown").on("click touchstart", function () {
                     $(this).find(".glyphicon-menu-up, .glyphicon-menu-down").toggleClass("tnth-hide"); //toggle menu up/down button
+                    self.initSubStudyOrgsVis();
                     setTimeout(function () {
                         self.setOrgsMenuHeight(95);
                         self.clearFilterButtons();
