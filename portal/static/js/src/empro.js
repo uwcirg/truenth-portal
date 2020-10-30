@@ -8,22 +8,45 @@ var emproObj = function() {
     this.userId = 0;
 };
 emproObj.prototype.populateDomainDisplay = function() {
-    if (!$("#hardTriggerDisplayList").length) return;
     this.domains.forEach(domain => {
-        $("#hardTriggerDisplayList").append(`<li>${domain}</li>`);
-        $("#hardTriggerButtonsContainer").append(
-            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}">${domain.replace(/_/g, " ")}</a>`
+        $("#emproModal .triggersDisplayList").append(`<li>${domain}</li>`);
+        $("#emproModal .triggersButtonsContainer").append(
+            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}" target="_blank">${domain.replace(/_/g, " ")}</a>`
         );
     });
+};
+emproObj.prototype.initThankyouModal = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
+    $("#emproModal").modal({
+        show: false
+    });
+};
+emproObj.prototype.initTriggerItemsVis = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
+    if (this.hasHardTrigger) {
+        $("#emproModal .hard-trigger").addClass("active");
+        $("#emproModal .no-trigger").hide();
+         //present thank you modal if hard trigger present
+        $("#emproModal").modal("show");
+        return;
+    }
+    if (this.hasSoftTrigger) {
+        $("#emproModal .soft-trigger").addClass("active");
+        $("#emproModal .no-trigger").hide();
+        return;
+    }
+   
 };
 emproObj.prototype.initTriggerDomains = function() {
     var self = this;
     tnthAjax.getCurrentUser((data) => {
         if (!data || !data.id) return;
         this.userId = data.id;
-        //console.log("user id? ", this.userId)
         tnthAjax.getSubStudyTriggers(this.userId, false, function(data) {
-            //console.log("data? ", data)
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
@@ -41,25 +64,23 @@ emproObj.prototype.initTriggerDomains = function() {
                 let entry = Object.entries(item);
                 return entry[0] && entry[0][1] && entry[0][1].indexOf("soft") !== -1;
             }).length;
+            /*
+             * display user domain topic(s)
+             */
             self.populateDomainDisplay();
-            if (self.hasHardTrigger) {
-                $("#emproModal .hard-trigger-item").show();
-                $("#emproModal .soft-trigger-item").hide();
-                $("#emproModal .no-trigger-item").hide();
-                //present thank you modal
-                $("#emproModal").modal("show");
-            }
-       //     console.log("self.domains? ", self.domains);
-       //     console.log("has hard triggers ", self.hasHardTrigger);
-       //     console.log("has soft triggers ", self.hasSoftTrigger);
+            /*
+             * show/hide sections based on triggers
+             */
+            self.initTriggerItemsVis();
+           //console.log("self.domains? ", self.domains);
+           //console.log("has hard triggers ", self.hasHardTrigger);
+           //console.log("has soft triggers ", self.hasSoftTrigger);
         });
     });
 }
 
 $(document).ready(function() {
-    (new emproObj()).initTriggerDomains();
-    $("#emproModal").modal({
-        show: false
-    });
+    let EmproObj = new emproObj();
+    EmproObj.initTriggerDomains();
+    EmproObj.initThankyouModal();
 });
-

@@ -39,9 +39,9 @@
         {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
     {%- endcall -%}
 {%- endmacro -%}
-{%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="", title_text=_("Completed Questionnaires")) -%}
+{%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="", title_text=_("Completed Questionnaires"), card_class="") -%}
     {%- if assessment_status.overall_status == OverallStatus.completed -%}
-        {% call render_card_content(title_text=title_text) %}
+        {% call render_card_content(title_text=title_text, card_class=card_class) %}
             <div class="text-content">
                 <a class="portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="proAssessmentsLoc")}}'>
                     {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
@@ -101,15 +101,16 @@
     OverallStatus={},
     substudy_assessment_status={},
     substudy_comp_date="",
-    enrolled_in_substudy=false)
+    enrolled_in_substudy=false,
+    card_class="")
 -%}
     <!-- subject is in the sub-study and the sub-study questionnaire has been completed -->
     {%- if enrolled_in_substudy and 
         substudy_assessment_status.overall_status == OverallStatus.completed -%}
         {%- set substudy_title = "EMPRO" -%}
         {%- call render_card_content(
-            title_text=_("%(substudy_title)s: Get help with your specific issues", substudy_title=substudy_title),
-            card_class="portal-description-complete") -%}
+            title_text = _("%(substudy_title)s: Get help with your specific issues", substudy_title=substudy_title),
+            card_class = card_class if card_class else "portal-description-complete") -%}
             <div class="text-content">
                 <!-- this is an anchor link to open thank you modal -->
                 <a data-toggle="modal" data-target="#emproModal">{{_("Learn about your specific issues based on your last questionnaire submitted on %(substudy_comp_date)s", substudy_comp_date=substudy_comp_date)}}</a>
@@ -117,79 +118,103 @@
         {%- endcall -%}
         <!-- TODO link to longitudinal report page -->
         {%- call render_card_content(
-            title_text=_("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
-            card_class="portal-description-complete") -%}
+            title_text = _("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
+            card_class = card_class if card_class else "portal-description-complete") -%}
             <p>{{_("View your longitudinal charts and discuss with your care provider")}}</p>
         {%- endcall -%}
         {{empro_thankyou_modal(user)}}
     {%- endif -%}
+{%- endmacro -%}
+{%- macro empro_thankyou_card(full_name="") -%}
+    {% call render_header(title_text=_("Hi, %(full_name)s.", full_name=full_name if full_name else '')) %}
+        <p>{{_("None of your questionnaires are due. You can view your completed questionnaires below:")}}</p>
+    {% endcall %}
+{%- endmacro -%}
+{%- macro empro_modal_default_supportTeam_block(organization="") -%}
+    <div class="item">
+        <h4>{{_("Your Support Team")}}</h4>
+        <p>{{_("If you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help.", organization=organization)}}</p>
+      
+    </div>
+{%- endmacro -%}
+{%- macro empro_modal_hardTrigger_supportTeam_block(organization="") -%}
+    <div class="item">
+        <h4>{{_("Your Support Team")}}</h4>
+        <p>{{_("You reported having some particular challenges with: ")}}</p>
+        <ul class="triggersDisplayList">
+           <!-- dynamically populated based on user trigger domain(s) -->
+        </ul>
+        <br/>
+        <p><b>{{_("To help address these, we've informed your care team and they'll be in contact with you soon.")}}</b></p>
+        <br/>
+        {% if user and user.organizations %}
+            <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team at %(organization) directly. They're happy to help.", organization=organization)}}</p>
+        {% endif %}
+    </div>
+{%- endmacro -%}
+{%- macro empro_modal_default_report_block() -%}
+    <div class="item">
+        <h4>{{_("Your Report")}}</h4>
+        <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
+        <div class="buttons-container">
+            <!-- TODO point to longitudinal report -->
+            <a class="btn btn-empro-primary">{{_("My Report")}}</a>
+        </div>
+    </div>
+{%- endmacro -%}
+{%- macro empro_modal_triggered_healthTip_block() -%}
+    <div class="item">
+        <h4>{{_("Your Health Tips")}}</h4>
+        <p>{{_("Based on your questionnaire responses, we've gathered tips and resources on managing the topic(s) below:")}}</p>
+        <div class="triggersButtonsContainer buttons-container">
+            <!--dynamically populated based on user trigger domain(s) -->
+        </div>
+    </div>
+{%- endmacro -%}
+{%- macro empro_modal_default_healthTip_block() -%}
+    <div class="item">
+        <h4>{{_("Your Health Tips")}}</h4>
+        <p>{{_("Explore ways to manage common prostate cancer challenges. Here you'll find plenty of helpful information and resources.")}}</p>
+        <div class="buttons-container">
+            <a class="btn btn-empro-primary" href="{{url_for('portal.substudy_tailored_content')}}" target="_blank">{{_("Explore Our Resources")}}</a>
+        </div>
+    </div>
 {%- endmacro -%}
 <!--sub-study macro -->
 {%- macro empro_thankyou_modal(user) -%}
     <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
     <div class="modal fade" tabindex="-1" role="dialog" id="emproModal">
         <div class="modal-dialog">
-        <div class="modal-content">
-            <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}"><span aria-hidden="true">&times;</span></button>
-            <div class="modal-body">
-                <div class="header-section">
-                    <h2 class="title">{{_("Thank you for completing the IRONMAN EMPRO questionnaire.")}}</h2>
-                    <p class="subtitle-text">{{_("We appreciate you sharing your experience and truly value your time.")}}</p>
-                </div>
-                <div class="items-section">
-                    <!-- TODO show this section only if there is hard trigger -->
-                    <!-- hard trigger items are hidden by default -->
-                    <div class="item hard-trigger-item">
-                        <!-- TODO dynamic populate domain topics from call to API !?! -->
-                        <p>{{_("You reported having some particular challenges with: ")}}</p>
-                        <ul id="hardTriggerDisplayList">
-                            <!-- TODO this is the subject's domain topic(s)-->
-                            <!--<li>{{_("insomnia")}}</li>-->
-                        </ul>
-                        <br/>
-                        <p><b>{{_("To help address these, we've informed your care team and they'll be in contact with you soon.")}}</b></p>
-                        <br/>
-                        {% if user and user.organizations %}
-                            <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team directly at")}}</p>
-                            <p><b>{{user.organizations[0].name}}</b></p>
-                        {% endif %}
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-body">
+                    <div class="header-section">
+                        <h2 class="title">
+                            {{_("Thank you for being part of the IRONMAN EMPRO study.")}}
+                            <br/>
+                            {{_("We truly value your time and participation.")}}
+                        </h2>
+                        <p>{{_("Find your latest tips and tools below.")}}</p>
                     </div>
-                    <!-- TODO show this section only if there is hard trigger -->
-                    <!-- TODO show this section only if there is soft trigger -->
-                    <div class="item hard-trigger-item">
-                        <p>{{_("Based on your questionnaire responses, we've also gathered information and resources you may find helpful.")}}</p>
-                        <div id="hardTriggerButtonsContainer" class="buttons-container">
-                            <!--TODO this should be dynamically populated based on the domain topics available to the user-->
-                            <!--<button class="btn btn-empro-primary">{{_("insomnia")}}</button>-->
-                        </div>
+                    <div class="items-section no-trigger">
+                        {{empro_modal_default_report_block()}}
+                        {{empro_modal_default_healthTip_block()}}
+                        {{empro_modal_default_supportTeam_block(organization=user.organizations[0].name if user else "")}}
                     </div>
-                    <!-- always show -->
-                    <div class="item default">
-                        <p class="hard-trigger-item">{{_("Our goal is to guide you through managing each challenge with key information and support. To view a full summary of your responses, use the link below.")}}</p>
-                        <p class="soft-trigger-item no-trigger-item">{{_("View a full summary of your responses.")}}</p>
-                        <!-- TODO point to longitudinal report-->
-                        <div class="buttons-container">
-                            <button class="btn btn-empro-primary">{{_("View Report")}}</button>
-                        </div>
+                    <div class="items-section hard-trigger">
+                        {{empro_modal_hardTrigger_supportTeam_block(organization=user.organizations[0].name if user else "")}}
+                        {{empro_modal_triggered_healthTip_block()}}
+                        {{empro_modal_default_report_block()}}
                     </div>
-                    <div class="item soft-trigger-item no-trigger-item">
-                        <p>{{_("We've gathered more information and resources you may find helpful.")}}</p>
-                        <div class="buttons-container">
-                            <!-- TODO self management pointing to self management landing page -->
-                            <a class="btn btn-empro-primary" href="/substudy_tailored_content">{{_("Explore Our Resources")}}</a>
-                        </div>
-                    </div>
-                    <div class="item soft-trigger-item no-trigger-item">
-                        <p>{{_("If you have any questions or need assistance, please contact your team directly.")}}</p>
-                        <br/>
-                        {% if user and user.organizations %}
-                            <p>{{_("If you have any questions or need assistance, please contact your team directly at")}}</p>
-                            <p><b>{{user.organizations[0].name}}</b></p>
-                        {% endif %}
+                    <div class="items-section soft-trigger">
+                        {{empro_modal_triggered_healthTip_block()}}
+                        {{empro_modal_default_report_block()}}
+                        {{empro_modal_default_supportTeam_block(organization=user.organizations[0].name if user else "")}}
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </div>
     {{empro_script()}}

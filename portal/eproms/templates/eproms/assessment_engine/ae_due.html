@@ -22,27 +22,37 @@
 {% block body %}
     {% set button_label =  _('Continue questionnaire') if assessment_status.overall_status == OverallStatus.in_progress else _('Go to questionnaire')
     %}
-    <!-- tile title change for subjects enrolled in substudy -->
+    <!-- tile title change for sub-study questionnaire is due.  NOTE: sub-study tile is not available when main study questionnaire is not completed yet -->
     {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
-                        if enrolled_in_substudy else _("Open Questionnaire") %}
+                        if substudy_assessment_is_due and substudy_assessment_is_due else _("Open Questionnaire") %}
     <!-- main study due card -->
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=title_text)}}
     <!-- substudy due card -->
     {%- if enrolled_in_substudy -%}
-        {{empro_due(
-            substudy_assessment_is_due=substudy_assessment_is_due,
-            assessment_status=assessment_status,
-            OverallStatus=OverallStatus,
-            substudy_assessment_status=substudy_assessment_status,
-            substudy_due_date=substudy_due_date,
-            enrolled_in_substudy=enrolled_in_substudy
-        )}}
+        {%- if substudy_assessment_is_due -%}
+            {{empro_due(
+                substudy_assessment_is_due=substudy_assessment_is_due,
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                substudy_assessment_status=substudy_assessment_status,
+                substudy_due_date=substudy_due_date,
+                enrolled_in_substudy=enrolled_in_substudy
+            )}}
+        {%- else -%}
+            {{completed_card(
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                comp_date=comp_date,
+                title_text=title_text)
+            }}
+        {%- endif -%}
     {%- else -%}
+        <!-- main study completed tile -->
         {{completed_card(
             assessment_status=assessment_status,
             OverallStatus=OverallStatus,
             comp_date=comp_date,
-            title_text=title_text)
+            title_text=_("Completed Questionnaires"))
         }}
     {%- endif -%}
 {% endblock %}
