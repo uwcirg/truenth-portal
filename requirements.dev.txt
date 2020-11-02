@@ -22,7 +22,7 @@ pytest-flask==0.15.0
 selenium==3.141.0
 snowballstemmer==2.0.0    # via sphinx
 sphinx-rtd-theme==0.4.3
-sphinx==2.3.1
+sphinx==3.3.0
 sphinxcontrib-websupport==1.1.2  # via sphinx
 tox==3.14.6
 typing==3.7.4.1             # via sphinx
