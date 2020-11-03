@@ -21,6 +21,7 @@ class Observation(db.Model):
     performers = db.relationship(
         'Performer', lazy='dynamic', cascade="save-update",
         secondary="observation_performers", backref=db.backref('observations'))
+    derived_from = db.Column(db.Text)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -42,6 +43,8 @@ class Observation(db.Model):
         fhir.update(self.value_quantity.as_fhir())
         if self.performers:
             fhir['performer'] = [p.as_fhir() for p in self.performers]
+        if self.derived_from:
+            fhir['derivedFrom'] = self.derived_from
         return fhir
 
     def update_from_fhir(self, data):
@@ -65,6 +68,8 @@ class Observation(db.Model):
                 code=v.get('code') or current_v.code).add_if_not_found(True)
             setattr(self, 'value_quantity_id', vq.id)
             setattr(self, 'value_quantity', vq)
+        if 'derivedFrom' in data:
+            self.derived_from = data['derivedFrom']
         return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):

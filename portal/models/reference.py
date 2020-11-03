@@ -75,6 +75,15 @@ class Reference(object):
         return instance
 
     @classmethod
+    def questionnaire_response(cls, qnr_identifier):
+        """Create a reference from given questionnaire response identifier"""
+        instance = cls()
+        instance.questionnaire_response = (
+            f"{qnr_identifier['system']}/QuestionnaireResponse/"
+            f"{qnr_identifier['value']}")
+        return instance
+
+    @classmethod
     def research_protocol(cls, research_protocol_name):
         """Create a reference object from a known research protocol"""
         instance = cls()
@@ -95,7 +104,7 @@ class Reference(object):
 
     @classmethod
     def parse(cls, reference_dict):
-        """Parse an organization from a FHIR Reference resource
+        """Parse a Reference Object from a FHIR Reference resource
 
         Typical format: "{'Reference': 'Organization/12'}"
         or "{'reference': 'api/patient/6'}"
@@ -117,6 +126,7 @@ class Reference(object):
         from .organization import Organization, OrganizationIdentifier
         from .practitioner import Practitioner, PractitionerIdentifier
         from .questionnaire import Questionnaire, QuestionnaireIdentifier
+        from .questionnaire_response import QuestionnaireResponse
         from .questionnaire_bank import QuestionnaireBank
         from .research_protocol import ResearchProtocol
         from .user import User
@@ -146,6 +156,11 @@ class Reference(object):
                         Identifier.id == QuestionnaireIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
+            elif obj == QuestionnaireResponse:
+                # NB the order of system, value is swaped with all other regex
+                # patterns - swap back in identifier instance
+                ident = Identifier(system=value, _value=system)
+                query = obj.by_identifier(identifier=ident)
             else:
                 raise ValueError(
                     '`{}` does not support external identifier '
@@ -177,6 +192,8 @@ class Reference(object):
              Questionnaire, 'identifier'),
             (re.compile(r'[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
              QuestionnaireBank, 'name'),
+            (re.compile(r'(\S+)/QuestionnaireResponse/(\S+)'),
+             QuestionnaireResponse, 'identifier'),
             (re.compile(r'[Ii]ntervention/(\w+)'), Intervention, 'name'),
             (re.compile(r'[Pp]atient/(\d+)'), User, 'id'),
             (re.compile(r'[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
@@ -251,6 +268,9 @@ class Reference(object):
             ref = "api/questionnaire_bank/{}".format(
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
+        if hasattr(self, 'questionnaire_response'):
+            ref = self.questionnaire_response
+            display = self.questionnaire_response
         if hasattr(self, 'research_protocol_name'):
             ref = "api/research_protocol/{}".format(
                 self.research_protocol_name)
