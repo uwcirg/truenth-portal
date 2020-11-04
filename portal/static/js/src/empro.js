@@ -1,4 +1,5 @@
 import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
+import {SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "./data/common/consts.js";
 import tnthAjax from "./modules/TnthAjax.js";
 
 var emproObj = function() {
@@ -22,6 +23,9 @@ emproObj.prototype.initThankyouModal = function() {
     $("#emproModal").modal({
         show: false
     });
+};
+emproObj.prototype.initReportLink = function() {
+    $(".longitudinal-report-link").attr("href", `/patients/longitudinal-report/${this.userId}/${SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
 };
 emproObj.prototype.initTriggerItemsVis = function() {
     if (!$("#emproModal").length) {
@@ -72,6 +76,11 @@ emproObj.prototype.initTriggerDomains = function() {
              * show/hide sections based on triggers
              */
             self.initTriggerItemsVis();
+
+            /*
+             * construct user report URL
+             */
+            self.initReportLink();
            //console.log("self.domains? ", self.domains);
            //console.log("has hard triggers ", self.hasHardTrigger);
            //console.log("has soft triggers ", self.hasSoftTrigger);

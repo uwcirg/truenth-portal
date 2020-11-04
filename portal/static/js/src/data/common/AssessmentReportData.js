@@ -5,6 +5,7 @@ export default {
     errorMessage: "",
     data: [],
     tableHeaders: [i18next.t("Question"), i18next.t("Response")],
+    questionTitleHeader: i18next.t("Questions"),
     caption: {},
     serverError: i18next.t("Server Error occurred retrieving report data"),
     noDataError: i18next.t("No data returned from server"),

@@ -15,6 +15,7 @@ module.exports = {
         "gilIndex": JsSrcPath+"/gilIndex.js",
         "landing": JsSrcPath+"/landing.js",
         "main": JsSrcPath+"/main.js",
+        "longitudinalReport": JsSrcPath+"/longitudinalReport.js",
         "orgTreeView": JsSrcPath+"/orgTreeView.js",
         "profile": JsSrcPath+"/profile.js",
         "psaTracker": JsSrcPath+"/psaTracker.js",

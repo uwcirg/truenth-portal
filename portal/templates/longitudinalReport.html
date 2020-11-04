@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% from "flask_user/_macros.html" import footer %}
+{% block head %}
+    {{super()}}
+    <!-- Add the slick-theme.css if you want default styling -->
+{% endblock %}
+{% block main %}
+    <div class="container">
+        <section class="header">
+            <div class="header__div--title">
+                {% set top_organization = user.first_top_organization().name %}
+                {% if enrolled_in_substudy %}
+                    <h2>{{_("%(organization)s EMPRO Assessment Report Detail", organization=top_organization)}}</h2>
+                {% else %}
+                    <h2>{{_("%(organization)s Assessment Report Detail", organization=top_organization)}}</h2>
+                {% endif %}
+                <h4>{{_("Patient #%(id)d - %(first_name)s %(last_name)s", id=user.id, first_name=user.first_name, last_name=user.last_name)}}</h4>
+            </div>
+            <div class="header__div--navigation">
+                    {% if current_user.id == user.id %}
+                        <a href="{{url_for('portal.profile')}}" data-toggle="tooltip" data-placement="top" title="{{_('Back to Profile')}}" class="btn"><span class="glyphicon glyphicon-user icon" aria-hidden="true"></span></a>
+                    {% else %}
+                        {% if current_user.has_role(ROLE.STAFF.value) %}
+                            <a href="{{url_for('patients.patient_profile', patient_id=user.id)}}" data-toggle="tooltip" data-placement="top" title="{{_('Back to Patient Profile')}}" class="btn"><span class="glyphicon glyphicon-user icon" aria-hidden="true"></span></a>
+                        {% else %}
+                            <a href="{{url_for('portal.profile', user_id=user.id)}}" data-toggle="tooltip" data-placement="top" title="{{_('Back to User Profile')}}" class="btn"><span class="glyphicon glyphicon-user icon" aria-hidden="true"></span></a>
+                        {% endif %}
+                    {% endif %}
+                    <a href="/" data-toggle="tooltip" data-placement="top" title="{{_('Back to Truenth Home')}}" class="btn"><span class="glyphicon glyphicon-home icon" aria-hidden="true"></span></a>
+            </div>
+        </section>
+        <section id="longitudinalReportContainer"></section>
+    </div>
+{% endblock %}
+{% block footer %}
+    {{footer(user=current_user)}}
+{% endblock %}
+{% block additional_scripts %}
+    <script src="{{ url_for('static', filename='js/dist/longitudinalReport.bundle.js') }}" defer></script>
+{% endblock %}

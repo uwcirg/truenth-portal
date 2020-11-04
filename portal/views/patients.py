@@ -19,6 +19,7 @@ from ..models.intervention import Intervention
 from ..models.organization import Organization
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
+from ..models.research_study import ResearchStudy
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
 
@@ -162,6 +163,20 @@ def session_report(subject_id, instrument_id, authored_date):
         "sessionReport.html", user=user,
         current_user=current_user(), instrument_id=instrument_id,
         authored_date=authored_date)
+
+
+@patients.route(
+    '/longitudinal-report/<int:subject_id>/<instrument_id>')
+@oauth.require_oauth()
+def longitudinal_report(subject_id, instrument_id):
+    user = get_user(subject_id, 'view')
+    substudy_research_study_id = 1
+    enrolled_in_substudy = substudy_research_study_id \
+        in ResearchStudy.assigned_to(user)
+    return render_template(
+        "longitudinalReport.html", user=user,
+        enrolled_in_substudy=enrolled_in_substudy,
+        instrument_id=instrument_id, current_user=current_user())
 
 
 @patients.route('/patient_profile/<int:patient_id>')

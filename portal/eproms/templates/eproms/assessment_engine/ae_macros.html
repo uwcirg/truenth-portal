@@ -120,7 +120,7 @@
         {%- call render_card_content(
             title_text = _("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
             card_class = card_class if card_class else "portal-description-complete") -%}
-            <p>{{_("View your longitudinal charts and discuss with your care provider")}}</p>
+            <p><a class="longitudinal-report-link">{{_("View your longitudinal charts and discuss with your care provider")}}</a></p>
         {%- endcall -%}
         {{empro_thankyou_modal(user)}}
     {%- endif -%}
@@ -158,7 +158,7 @@
         <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
             <!-- TODO point to longitudinal report -->
-            <a class="btn btn-empro-primary">{{_("My Report")}}</a>
+            <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("My Report")}}</a>
         </div>
     </div>
 {%- endmacro -%}
