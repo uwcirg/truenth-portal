@@ -874,13 +874,13 @@ def assessment_update(patient_id):
         response['message'] = str(e)
         return jsonify(response), 400
     existing_qnr = QuestionnaireResponse.by_identifier(identifier)
-    if not existing_qnr:
+    if existing_qnr.count() == 0:
         current_app.logger.warning(
             "attempted update on QuestionnaireResponse with unknown "
             "identifier {}".format(identifier))
         response['message'] = "existing QuestionnaireResponse not found"
         return jsonify(response), 404
-    if len(existing_qnr) > 1:
+    if existing_qnr.count() > 1:
         msg = ("can't update; multiple QuestionnaireResponses found with "
                "identifier {}".format(identifier))
         current_app.logger.warning(msg)
@@ -888,7 +888,7 @@ def assessment_update(patient_id):
         return jsonify(msg), 409
 
     response.update({'message': 'previous questionnaire response found'})
-    existing_qnr = existing_qnr[0]
+    existing_qnr = existing_qnr.first()
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
@@ -1538,7 +1538,7 @@ def assessment_add(patient_id):
             return jsonify(response), 400
 
         existing_qnr = QuestionnaireResponse.by_identifier(identifier)
-        if len(existing_qnr):
+        if existing_qnr.count():
             msg = ("QuestionnaireResponse with matching {} already exists; "
                    "must be unique over (system, value)".format(identifier))
             current_app.logger.warning(msg)

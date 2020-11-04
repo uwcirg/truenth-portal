@@ -1,0 +1,38 @@
+{
+  "resourceType": "Observation",
+  "issued": "2020-10-22T02:18:22Z",
+  "code": {
+    "coding": [
+      {
+        "code": "ironman_ss",
+        "display": "Treatment symptoms and side effects",
+        "system": "http://us.truenth.org/questionnaire"
+      },
+      {
+        "code": "joint_pain",
+        "display": "Joint pain",
+        "system": "http://us.truenth.org/observation"
+      }
+    ]
+  },
+  "derivedFrom": [
+    {
+      "reference": "https://stg-ae.us.truenth.org/eproms-demo/QuestionnaireResponse/538.0"
+    }
+  ],
+  "valueCoding": {
+    "code": "ironman_ss.4.4",
+    "system": "https://eproms-dev.128.208.230.75.nip.io/api/codings/assessment",
+    "display": "Frequently",
+    "extension": [
+      {
+        "url": "http://us.truenth.org/observation/severity_extension",
+        "valueCoding": {
+          "system": "http://us.truenth.org/observation/severity",
+          "code": "penultimate",
+          "display": "penultimate"
+        }
+      }
+    ]
+  }
+}
