@@ -133,7 +133,6 @@
             } else {
                 $(".report .nav-arrow.start").removeClass("disabled");
             }
-            console.log("in set cell vis? start index? ",  this.navStartIndex, " end index ", this.navEndIndex)
             /*
              * set columns vis
              */
