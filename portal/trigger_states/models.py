@@ -7,7 +7,12 @@ from ..date_tools import FHIR_datetime
 
 
 trigger_state_enum = ENUM(
-    'unstarted', 'due', 'inprocess', 'processed', name='trigger_state_type',
+    'unstarted',
+    'due',
+    'inprocess',
+    'processed',
+    'triggered',
+    name='trigger_state_type',
     create_type=False)
 
 
@@ -56,3 +61,20 @@ class TriggerState(db.Model):
             self.timestamp = None
         db.session.add(self)
         db.session.commit()
+
+    def hard_trigger_list(self):
+        """Convenience function to return list of hard triggers
+
+        Save clients from internal structure of self.triggers - returns
+        a simple list of hard trigger domains if any exist for instance.
+
+        """
+        if not self.triggers:
+            return
+
+        results = []
+        for item in self.triggers['domain']:
+            domain, trigger_list = item.popitem()
+            if 'hard' in trigger_list:
+                results.append(domain)
+        return results
