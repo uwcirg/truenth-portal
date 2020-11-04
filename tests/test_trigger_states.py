@@ -59,7 +59,6 @@ def test_base_eval(
     assert ts.questionnaire_response_id == initialized_with_ss_qnr.id
 
 
-
 def test_cur_hard_trigger():
     # Single result with a severe should generate a hard (and soft) trigger
     dt = DomainTriggers('anxious')
