@@ -74,6 +74,7 @@
             this.setMaxToShow();
             this.setNavIndexes();
             this.setNavCellVis();
+            this.setPrintStyle();
             setTimeout(function() {
                 this.loading = false;
             }.bind(this), 150);
@@ -284,6 +285,39 @@
                 this.errorMessage = self.loadError;
                 this.loading = false;
             });
+        },
+        setPrintStyle() {
+            var styleNode = document.createElement("style");
+            styleNode.type = "text/css";
+            let styles = `
+                @media print {
+                    section.header {
+                        margin-top: 0;
+                    }
+                    .header__div--navigation {
+                        display: none;
+                    }
+                    #homeFooter {
+                        display: none !important;
+                    }
+                    #tnthNavWrapper {
+                        display: none;
+                        visibility: hidden !important;
+                    }
+                    #mainNav {
+                        height: 0;
+                    }
+                    #tnthNavMain {
+                        display: none !important;
+                    }
+                    .nav-arrow {
+                        display: none !important;
+                    }
+                }
+            `;
+            if (styleNode.styleSheet) styleNode.styleSheet.cssText = styles;
+            else styleNode.appendChild(document.createTextNode(styles));
+            document.getElementsByTagName("head")[0].appendChild(styleNode);
         },
         isTouchDevice() {
             return "ontouchstart" in window || window.DocumentTouch && document instanceof window.DocumentTouch;
