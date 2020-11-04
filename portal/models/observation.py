@@ -2,6 +2,8 @@ from datetime import datetime
 
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
+from .coding import Coding
+from .codeable_concept import CodeableConcept
 from .performer import Performer
 from .value_quantity import ValueQuantity
 
@@ -13,15 +15,16 @@ class Observation(db.Model):
     status = db.Column(db.String(80))
     codeable_concept_id = db.Column(
         db.ForeignKey('codeable_concepts.id'), nullable=False)
-    value_quantity_id = db.Column(
-        db.ForeignKey('value_quantities.id'), nullable=False)
+    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'))
+    value_coding_id = db.Column(db.ForeignKey('codings.id'))
     codeable_concept = db.relationship(
         'CodeableConcept', cascade="save-update")
     value_quantity = db.relationship('ValueQuantity')
+    value_coding = db.relationship('Coding')
     performers = db.relationship(
         'Performer', lazy='dynamic', cascade="save-update",
         secondary="observation_performers", backref=db.backref('observations'))
-    derived_from = db.Column(db.Text)
+    derived_from = db.Column(db.Text, index=True)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -40,7 +43,10 @@ class Observation(db.Model):
             fhir['status'] = self.status
         fhir['id'] = self.id
         fhir['code'] = self.codeable_concept.as_fhir()
-        fhir.update(self.value_quantity.as_fhir())
+        if self.value_quantity_id:
+            fhir.update(self.value_quantity.as_fhir())
+        if self.value_coding_id:
+            fhir.update(self.value_coding.as_fhir())
         if self.performers:
             fhir['performer'] = [p.as_fhir() for p in self.performers]
         if self.derived_from:
@@ -52,6 +58,9 @@ class Observation(db.Model):
             issued = FHIR_datetime.parse(data['issued']) if data[
                 'issued'] else None
             setattr(self, 'issued', issued)
+        if 'code' in data:
+            self.codeable_concept = CodeableConcept.from_fhir(
+                data['code'])
         if 'status' in data:
             setattr(self, 'status', data['status'])
         if 'performer' in data:
@@ -68,6 +77,10 @@ class Observation(db.Model):
                 code=v.get('code') or current_v.code).add_if_not_found(True)
             setattr(self, 'value_quantity_id', vq.id)
             setattr(self, 'value_quantity', vq)
+        if 'valueCoding' in data:
+            self.value_coding = Coding.from_fhir(
+                data['valueCoding']).add_if_not_found(True)
+            self.value_coding_id = self.value_coding.id
         if 'derivedFrom' in data:
             self.derived_from = data['derivedFrom']
         return self.as_fhir()

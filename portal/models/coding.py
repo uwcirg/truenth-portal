@@ -10,6 +10,8 @@ class Coding(db.Model):
     system = db.Column(db.String(255), nullable=False)
     code = db.Column(db.String(80), nullable=False)
     display = db.Column(db.Text, nullable=False)
+    extension_id = db.Column(db.ForeignKey('codings.id'))
+    extension = db.relationship('Coding', remote_side=[id])
     __table_args__ = (
         UniqueConstraint('system', 'code', name='_system_code'),)
 
@@ -21,6 +23,14 @@ class Coding(db.Model):
         for i in ("system", "code", "display"):
             if i in data:
                 self.__setattr__(i, str(data[i]))
+        if 'extension' in data and len(data['extension']):
+            # Only allow a single extension at this time
+            if len(data['extension']) > 1:
+                raise ValueError(
+                    "codings model holds a single, optional extension")
+            self.extension = Coding.from_fhir(
+                data['extension'][0]['valueCoding']).add_if_not_found(True)
+            self.extension_id = self.extension.id
         return self.add_if_not_found(True)
 
     @classmethod
