@@ -78,7 +78,7 @@ class Reference(object):
     def questionnaire_response(cls, qnr_identifier):
         """Create a reference from given questionnaire response identifier"""
         instance = cls()
-        instance.questionnaire_response = (
+        instance.questionnaire_response_reference = (
             f"{qnr_identifier['system']}/QuestionnaireResponse/"
             f"{qnr_identifier['value']}")
         return instance
@@ -249,35 +249,37 @@ class Reference(object):
         if hasattr(self, 'clinician_id'):
             ref = "api/clinician/{}".format(self.clinician_id)
             display = User.query.get(self.clinician_id).display_name
-        if hasattr(self, 'patient_id'):
+        elif hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name
-        if hasattr(self, 'practitioner_id'):
+        elif hasattr(self, 'practitioner_id'):
             p = Practitioner.query.get(self.practitioner_id)
             i = [i for i in p.identifiers if i.system == US_NPI][0]
             ref = "api/practitioner/{}?system={}".format(i.value, i.system)
             display = p.display_name
-        if hasattr(self, 'organization_id'):
+        elif hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
             display = Organization.query.get(self.organization_id).name
-        if hasattr(self, 'questionnaire_name'):
+        elif hasattr(self, 'questionnaire_name'):
             ref = "api/questionnaire/{}?system={}".format(
                 self.questionnaire_name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)
             display = self.questionnaire_name
-        if hasattr(self, 'questionnaire_bank_name'):
+        elif hasattr(self, 'questionnaire_bank_name'):
             ref = "api/questionnaire_bank/{}".format(
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
-        if hasattr(self, 'questionnaire_response'):
-            ref = self.questionnaire_response
-            display = self.questionnaire_response
-        if hasattr(self, 'research_protocol_name'):
+        elif hasattr(self, 'questionnaire_response_reference'):
+            ref = self.questionnaire_response_reference
+            display = self.questionnaire_response_reference
+        elif hasattr(self, 'research_protocol_name'):
             ref = "api/research_protocol/{}".format(
                 self.research_protocol_name)
             display = self.research_protocol_name
-        if hasattr(self, 'intervention_name'):
+        elif hasattr(self, 'intervention_name'):
             ref = "api/intervention/{}".format(
                 self.intervention_name)
             display = self.intervention_name
+        else:
+            raise ValueError("lacking internal attribute")
 
         return {"reference": ref, "display": display}
