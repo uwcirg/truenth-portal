@@ -356,3 +356,10 @@ def celery_beat_health_check(**kwargs):
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
         value=str(datetime.utcnow()),
     )
+
+@celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
+def process_triggers_task():
+    """Task form - wraps call to testable function `fire_trigger_events` """
+    # Include within function as not all applications include the blueprint
+    from portal.trigger_states.empro_states import fire_trigger_events
+    fire_trigger_events()
