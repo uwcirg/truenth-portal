@@ -85,3 +85,18 @@ def test_worsening_baseline():
     dt.current_answers = {15: 3, 12: 3, 21: 3}
     assert 'soft' in dt.triggers
     assert 'hard' not in dt.triggers
+
+
+def test_ts_hard_triggers():
+    mock_triggers = {
+            'domain': [
+                {'general_pain': ['soft']},
+                {'joint_pain': ['hard', 'soft']},
+                {'insomnia': ['soft']},
+                {'fatigue': ['hard', 'soft']},
+                {'anxious': ['soft']}
+            ]
+    }
+
+    ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
+    assert set(['joint_pain', 'fatigue']) == set(ts.hard_trigger_list())

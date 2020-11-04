@@ -3,11 +3,14 @@
 See also:
     [IRONMAN EMPRO Study Experience](https://promowiki.movember.com/display/ISS/Product+Development+-+IRONMAN+EMPRO+Study)
 """
+import copy
 from flask import current_app
 from statemachine import StateMachine, State
 from statemachine.exceptions import TransitionNotAllowed
+
 from .empro_domains import DomainManifold
 from .models import TriggerState
+from ..database import db
 from ..timeout_lock import LockTimeout, TimeoutLock
 
 EMPRO_STUDY_ID = 1
@@ -28,7 +31,11 @@ class EMPRO_state(StateMachine):
 
     Transitions:
       - initially_available: called when a user qualifies for the study
-      - process: called to evaluate user's responses and store trigger state
+      - begin_process: called on QNR submission, initiating processing
+      - processed_triggers: processing of results completed; trigger state
+       available
+      - fired_events: trigger state has been evaluated, events (such as
+       generating email for clinicians and patients) have fired.
       - next_available: called once the next EMPRO cycle becomes available
 
     """
@@ -38,12 +45,14 @@ class EMPRO_state(StateMachine):
     due = State('due')
     inprocess = State('inprocess')
     processed = State('processed')
+    triggered = State('triggered')
 
     # Transitions
     initial_available = unstarted.to(due)
     begin_process = due.to(inprocess)
-    finish = inprocess.to(processed)
-    next_available = processed.to(due)
+    processed_triggers = inprocess.to(processed)
+    fired_events = processed.to(triggered)
+    next_available = triggered.to(due)
 
 
 def enter_user_trigger_critical_section(user_id):
@@ -83,7 +92,8 @@ def users_trigger_state(user_id):
       - unstarted: no info avail for user
       - due: users triggers unavailable; assessment due
       - inprocess: triggers are not ready; continue to poll for results
-      - processes: triggers available in TriggerState.triggers attribute
+      - processed: triggers available in TriggerState.triggers attribute
+      - triggered: triggers available in TriggerState.triggers attribute
 
     """
     # if semaphore is locked for user, return "inprocess"
@@ -142,8 +152,8 @@ def evaluate_triggers(qnr):
         ts.triggers = dm.eval_triggers()
         ts.questionnaire_response_id = qnr.id
 
-        # transition to done and persist state
-        sm.finish()
+        # transition and persist state
+        sm.processed_triggers()
         ts.insert(from_copy=True)
 
     except (TransitionNotAllowed, LockTimeout) as e:
@@ -155,3 +165,52 @@ def evaluate_triggers(qnr):
         critical_section = TimeoutLock(key=EMPRO_LOCK_KEY.format(
             user_id=qnr.subject_id))
         critical_section.__exit__(None, None, None)
+
+
+def fire_trigger_events():
+    """Typically called as a celery task, fire any pending events
+
+    After questionnaire responses and resulting observations are evaluated,
+    a celery job call lands here to seek out and executed any appropriate
+    events from the user's trigger state.  Said rows will be in the
+    'processed' state.
+
+    Actions are recorded in trigger_states.triggers and the row's state
+    is transitioned to 'triggered'.
+
+    """
+    # as a job, make sure only running one concurrent instance
+    NEVER_WAIT = 0
+    with TimeoutLock(key='fire_trigger_events', timeout=NEVER_WAIT):
+        # seek out any pending work
+        for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
+            # necessary to make deep copy in order to update DB JSON
+            triggers = copy.deepcopy(ts.triggers)
+            triggers['actions'] = []
+            # Emails generated for both patient and clinician/staff based
+            # on hard triggers.  Patient gets 'thank you' email regardless.
+            hard_trigger_list = ts.hard_trigger_list()
+
+            # without hard triggers, user gets thank you email
+            if not hard_trigger_list:
+                # TODO generate and send patient thank you email
+                triggers['actions'].append(
+                    {"email": "patient thank you email id"})
+
+            else:
+                # TODO generate and send patient trigger info email
+                triggers['actions'].append(
+                    {"email": "patient trigger info email id"})
+
+                # TODO generate and send clinician and staff email
+                #  with link to user's profile - that will present
+                #  QB for clinician to fill out.
+                triggers['actions'].append(
+                    {"email": "clinician email id"})
+
+            # Change state, as this row has been processed.
+            ts['triggers'] = triggers
+            sm = EMPRO_state(ts)
+            sm.fired_events()
+
+        db.session.commit()
