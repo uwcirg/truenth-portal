@@ -221,6 +221,9 @@
                     };
                     this.data[index].data.push(answerObj);
                     let currentDomain = "";
+                    /*
+                     * get response for each question
+                     */
                     this.questions.forEach(questionItem => {
                         if (questionItem.code &&
                             questionItem.code.length && 
@@ -287,6 +290,9 @@
             });
         },
         setPrintStyle() {
+            /*
+             * print styles, TODO: add more specifics when specs are available
+             */
             var styleNode = document.createElement("style");
             styleNode.type = "text/css";
             let styles = `
