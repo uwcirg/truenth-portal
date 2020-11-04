@@ -1,7 +1,7 @@
 """TriggerStates table - for EPROMs only blueprint `trigger_states`
 
 Revision ID: 7fd6b3abfec2
-Revises: 1675585e7031
+Revises: b513ad8e85b7
 Create Date: 2020-10-15 02:55:21.369483
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '7fd6b3abfec2'
-down_revision = '1675585e7031'
+down_revision = 'b513ad8e85b7'
 
 
 def upgrade():
@@ -28,6 +28,7 @@ def upgrade():
                 'unstarted',
                 'due',
                 'processed',
+                'triggered',
                 name='trigger_state_type'),
             nullable=False),
         sa.Column('timestamp', sa.DateTime(), nullable=False),
@@ -77,4 +78,5 @@ def downgrade():
         op.f('ix_trigger_states_questionnaire_response_id'),
         table_name='trigger_states')
     op.drop_table('trigger_states')
+    op.execute('DROP TYPE trigger_state_type')
     # ### end Alembic commands ###
