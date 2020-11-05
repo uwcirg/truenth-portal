@@ -166,7 +166,7 @@ def session_report(subject_id, instrument_id, authored_date):
 
 
 @patients.route(
-    '/longitudinal-report/<int:subject_id>/<instrument_id>')
+    '/<int:subject_id>/longitudinal-report/<instrument_id>')
 @oauth.require_oauth()
 def longitudinal_report(subject_id, instrument_id):
     user = get_user(subject_id, 'view')

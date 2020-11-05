@@ -25,6 +25,9 @@ emproObj.prototype.initThankyouModal = function() {
     });
 };
 emproObj.prototype.initReportLink = function() {
+    /*
+     * link to longitudinal report
+     */
     $(".longitudinal-report-link").attr("href", `/patients/${this.userId}/longitudinal-report/${SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
 };
 emproObj.prototype.initTriggerItemsVis = function() {
@@ -50,6 +53,10 @@ emproObj.prototype.initTriggerDomains = function() {
     tnthAjax.getCurrentUser((data) => {
         if (!data || !data.id) return;
         this.userId = data.id;
+        /*
+        * construct user report URL
+        */
+        this.initReportLink();
         tnthAjax.getSubStudyTriggers(this.userId, false, function(data) {
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
@@ -88,8 +95,4 @@ $(document).ready(function() {
     let EmproObj = new emproObj();
     EmproObj.initTriggerDomains();
     EmproObj.initThankyouModal();
-    /*
-    * construct user report URL
-    */
-    EmproObj.initReportLink();
 });
