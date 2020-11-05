@@ -25,7 +25,7 @@ emproObj.prototype.initThankyouModal = function() {
     });
 };
 emproObj.prototype.initReportLink = function() {
-    $(".longitudinal-report-link").attr("href", `/patients/longitudinal-report/${this.userId}/${SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
+    $(".longitudinal-report-link").attr("href", `/patients/${this.userId}/longitudinal-report/${SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
 };
 emproObj.prototype.initTriggerItemsVis = function() {
     if (!$("#emproModal").length) {
@@ -77,10 +77,6 @@ emproObj.prototype.initTriggerDomains = function() {
              */
             self.initTriggerItemsVis();
 
-            /*
-             * construct user report URL
-             */
-            self.initReportLink();
            //console.log("self.domains? ", self.domains);
            //console.log("has hard triggers ", self.hasHardTrigger);
            //console.log("has soft triggers ", self.hasSoftTrigger);
@@ -92,4 +88,8 @@ $(document).ready(function() {
     let EmproObj = new emproObj();
     EmproObj.initTriggerDomains();
     EmproObj.initThankyouModal();
+    /*
+    * construct user report URL
+    */
+    EmproObj.initReportLink();
 });

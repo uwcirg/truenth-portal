@@ -3,8 +3,8 @@
         <div class="loader" v-show="loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
         <div class="content" v-show="!loading">
-            <span class="nav-arrow start" @click="setGoBackward()">&lt;</span>
-            <span class="nav-arrow end" @click="setGoForward()">&gt;</span>
+            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)">&lt;</span>
+            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
                 <THEAD>
                     <TH class="title" v-text="questionTitleHeader"></TH>
@@ -65,7 +65,7 @@
     },
     methods: {
         setUserId () {
-            this.userId = location.pathname.split("/")[3];
+            this.userId = location.pathname.split("/")[2];
         },
         setInstrumentId () {
             this.instrumentId = location.pathname.split("/")[4];
@@ -253,7 +253,6 @@
             });
         },
         getData () {
-            var self = this;
             $.when(
                 $.ajax(`/api/questionnaire/${this.instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`),
                //  $.ajax(`/static/files/testAssessment.json`)
@@ -284,8 +283,8 @@
                         }.bind(this), 150);
                     }
                 );
-            }).fail(function() {
-                this.errorMessage = self.loadError;
+            }).fail(e => {
+                this.errorMessage = this.loadError;
                 this.loading = false;
             });
         },
