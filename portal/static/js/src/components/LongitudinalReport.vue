@@ -271,7 +271,7 @@
                 }
                 this.questionnaireData = questionnaireData[0];
                 this.assessmentData = (assessmentData[0].entry).sort(function(a, b) {
-                                        return new Date(a.authored) - new Date(b.authored);
+                                        return new Date(b.authored) - new Date(a.authored);
                                     });
                 this.setDomains();
                 this.setQuestions();
