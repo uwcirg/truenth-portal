@@ -246,6 +246,7 @@ class Reference(object):
         from .practitioner import Practitioner
         from .user import User
 
+        display = None
         if hasattr(self, 'clinician_id'):
             ref = "api/clinician/{}".format(self.clinician_id)
             display = User.query.get(self.clinician_id).display_name
@@ -270,7 +271,6 @@ class Reference(object):
             display = self.questionnaire_bank_name
         elif hasattr(self, 'questionnaire_response_reference'):
             ref = self.questionnaire_response_reference
-            display = self.questionnaire_response_reference
         elif hasattr(self, 'research_protocol_name'):
             ref = "api/research_protocol/{}".format(
                 self.research_protocol_name)
@@ -282,4 +282,7 @@ class Reference(object):
         else:
             raise ValueError("lacking internal attribute")
 
-        return {"reference": ref, "display": display}
+        result = {'reference': ref}
+        if display:
+            result['display'] = display
+        return result

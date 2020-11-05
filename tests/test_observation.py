@@ -1,6 +1,6 @@
 import json
 import os
-from pytest import fixture
+from pytest import fixture, mark
 
 from portal.models.observation import Observation
 
@@ -18,6 +18,7 @@ def obs_w_extension(request):
     return json_from_file(request=request, filename=filename)
 
 
+@mark.skip("waiting on PR with QNR test fixtures needed for Observation.derivedFrom reference")
 def test_coding_extension(obs_w_extension):
     obs = Observation()
     obs.update_from_fhir(obs_w_extension)
