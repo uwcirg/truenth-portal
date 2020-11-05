@@ -18,6 +18,8 @@ export default {
     userInfo: {},
     LifeRayBaseURL: "",
     domainMappings: {},
+    //resources page
+    resourcesDomain: "resource_library",
     defaultDomain: "default_domain",
     domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
     userDomains: [],

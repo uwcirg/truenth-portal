@@ -59,7 +59,8 @@ export default {
                     location.reload();
                     return false;
                 }
-                if (this.domains.indexOf(to.params.topic) !== -1) {
+                /* resource */
+                if (this.domains.indexOf(to.params.topic) !== -1 || to.params.topic === this.resourcesDomain) {
                     location.reload();
                     return false;
                 }
@@ -301,7 +302,9 @@ export default {
             if (this.$route &&
                 this.$route.params && 
                 this.$route.params.topic &&
-                this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1) {
+                (this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1 ||
+                this.$route.params.topic === this.resourcesDomain
+                )) {
                 return this.$route.params.topic;
             }
             let arrHashText = String(location.hash).split("#");
@@ -325,7 +328,6 @@ export default {
                 this.activeDomain = routerTopic;
                 return;
             }
-            //TODO this should be the default landing topic/tag
             this.activeDomain = this.defaultDomain;
         },
         getSelectedDomain() {
@@ -421,6 +423,11 @@ export default {
             });
         },
         setResourcesByCountry(countryCode) {
+
+            if (this.domains.indexOf(this.getSelectedDomain()) === -1) {
+                return false;
+            }
+
             let resourceSection = document.querySelector(".resource-section");
             if (!resourceSection) {
                 return;
@@ -429,12 +436,12 @@ export default {
             if (!this.isEligibleCountryCode(countryCode)) {
                 return;
             }
-            if (!this.debugMode && (countryCode === this.defaultCountryCode || !countryCode)) return;
-            if (this.debugMode && countryCode === this.defaultCountryCode) {
-                location.reload();
-                return;
-            }
-            this.$http(this.getSearchURL(`resources_${this.getSelectedDomain()}_${countryCode}`)).then(response => {
+            // if (!this.debugMode && (countryCode === this.defaultCountryCode || !countryCode)) return;
+            // if (this.debugMode && countryCode === this.defaultCountryCode) {
+            //     location.reload();
+            //     return;
+            // }
+            this.$http(this.getSearchURL(`resources_${this.getSelectedDomain()}_${countryCode.toLowerCase()}`)).then(response => {
                 if (response) {
                     resourceSection.querySelector(".content").innerHTML = response;
                     
