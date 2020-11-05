@@ -86,7 +86,8 @@ export default {
                 this.getUserID()?
                 [
                     this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                    this.$http(`/api/user/${this.getUserID()}/triggers`)
+                    this.$http(`/static/files/substudy_test_triggers_new.json`)
+                   // this.$http(`/api/user/${this.getUserID()}/triggers`)
                 ] :
                 [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
             ).then(responses => {
@@ -196,13 +197,16 @@ export default {
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
-            let hardTriggerDomains = (data.triggers.domain).filter(item => {
-                let entry = Object.entries(item);
-                return entry[0] && entry[0][1] && entry[0][1].indexOf("hard") !== -1;
-            });
-            this.userDomains = (hardTriggerDomains).map(item => {
-                return this.domainMappings[Object.keys(item)[0]];
-            });
+            let self = this;
+            for (let key in data.triggers.domain) {
+                for (let q in data.triggers.domain[key]) {
+                    if (data.triggers.domain[key][q] === "hard") {
+                        if (self.domainMappings[key]) {
+                            self.userDomains.push(self.domainMappings[key]);
+                        }
+                    }
+                }
+            }
             this.userDomains = this.userDomains.filter((d, index) => {
                 return this.userDomains.indexOf(d) === index;
             });
