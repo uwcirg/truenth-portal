@@ -63,7 +63,7 @@ class TriggerState(db.Model):
         db.session.commit()
 
     def hard_trigger_list(self):
-        """Convenience function to return list of hard triggers
+        """Convenience function to return list of hard trigger domains
 
         Save clients from internal structure of self.triggers - returns
         a simple list of hard trigger domains if any exist for instance.
@@ -73,8 +73,7 @@ class TriggerState(db.Model):
             return
 
         results = []
-        for item in self.triggers['domain']:
-            domain, trigger_list = item.popitem()
-            if 'hard' in trigger_list:
+        for domain, link_triggers in self.triggers['domain'].items():
+            if 'hard' in link_triggers.values():
                 results.append(domain)
         return results

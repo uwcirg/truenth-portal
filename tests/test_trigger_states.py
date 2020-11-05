@@ -62,41 +62,47 @@ def test_base_eval(
 def test_cur_hard_trigger():
     # Single result with a severe should generate a hard (and soft) trigger
     dt = DomainTriggers('anxious')
-    dt.current_answers = {15: 4, 12: 3, 21: 1}
-    assert 'hard' in dt.triggers
-    # hard trigger should implicitly add soft as well
-    assert 'soft' in dt.triggers
+    dt.current_answers = {
+        'ironman_ss.12': (3, None),
+        'ironman_ss.11': (2, None),
+        'ironman_ss.13': (4, 'penultimate')}
+    assert len(dt.triggers) == 1
+    assert 'ironman_ss.13' in dt.triggers
 
 
 def test_worsening_soft_trigger():
     # One point worsening from any q in domain should generate 'soft'
     dt = DomainTriggers('anxious')
-    dt.previous_answers = {21: 2, 15: 2}
-    dt.current_answers = {15: 3, 12: 3, 21: 1}
-    assert 'soft' in dt.triggers
-    assert 'hard' not in dt.triggers
+    dt.previous_answers = {'ss.21': (2, None), 'ss.15': (2, None)}
+    dt.current_answers = {
+        'ss.15': (3, None), 'ss.12': (3, None), 'ss.21': (1, None)}
+    assert len(dt.triggers) == 1
+    assert dt.triggers['ss.15'] == 'soft'
 
 
 def test_worsening_baseline():
-    # Using mock'd results, confirm a hard trigger fires
+    # confirm a hard trigger with 2 level worsening
     dt = DomainTriggers('anxious')
-    dt.initial_answers = {21: 2, 15: 3}
-    dt.previous_answers = {12: 3, 15: 3}
-    dt.current_answers = {15: 3, 12: 3, 21: 3}
-    assert 'soft' in dt.triggers
-    assert 'hard' not in dt.triggers
+    dt.initial_answers = {15: (3, None), 21: (1, None)}
+    dt.previous_answers = {12: (1, None), 15: (3, None)}
+    dt.current_answers = {12: (3, None), 15: (3, None), 21: (3, None)}
+    assert len(dt.triggers) == 2
+    assert dt.triggers[12] == dt.triggers[21] == 'hard'
 
 
 def test_ts_hard_triggers():
     mock_triggers = {
-            'domain': [
-                {'general_pain': ['soft']},
-                {'joint_pain': ['hard', 'soft']},
-                {'insomnia': ['soft']},
-                {'fatigue': ['hard', 'soft']},
-                {'anxious': ['soft']}
-            ]
+            'domain': {
+                'general_pain': {
+                    'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
+                'joint_pain': {
+                    'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
+                'insomnia': {},
+                'fatigue': {'ironman_ss.9': 'hard'},
+                'anxious': {'ironman_ss.12': 'soft'},
+        }
     }
 
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
-    assert set(['joint_pain', 'fatigue']) == set(ts.hard_trigger_list())
+    assert set(['general_pain', 'joint_pain', 'fatigue']) == set(
+        ts.hard_trigger_list())

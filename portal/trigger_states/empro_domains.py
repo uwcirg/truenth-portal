@@ -37,7 +37,7 @@ class DomainTriggers(object):
 
     def __init__(self, domain):
         self.domain = domain
-        self._triggers = set()
+        self._triggers = dict()
 
         # Dictionaries (possibly empty) keyed by question ID, containing
         # answer value
@@ -48,20 +48,25 @@ class DomainTriggers(object):
     @property
     def triggers(self):
         self.eval()
-        return list(self._triggers)
+        return self._triggers
 
     def check_for_worsening(self, previous, current):
         """Helper to look for worsening conditions"""
         keyset = set(list(previous.keys()) + list(current.keys()))
-        for k in keyset:
-            if k not in previous or k not in current:
+        for link_id in keyset:
+            if link_id not in previous or link_id not in current:
                 # Without an answer in both, can't compare
                 continue
 
-            if previous[k] < current[k]:
-                self._triggers.add('soft')
-                if previous[k] + 1 < current[k]:
-                    self._triggers.add('hard')
+            # format: (score, severity)
+            prev_value, _ = previous[link_id]
+            curr_value, _ = current[link_id]
+            if prev_value < curr_value:
+                # don't overwrite w/ soft if hard value already exists
+                if link_id not in self._triggers:
+                    self._triggers[link_id] = 'soft'
+                if prev_value + 1 < curr_value:
+                    self._triggers[link_id] = 'hard'
 
     def eval(self):
         """Use instance data to evaluate trigger state for domain"""
@@ -69,11 +74,11 @@ class DomainTriggers(object):
         self._triggers.clear()
 
         # check if current data includes hard trigger
-        for value in self.current_answers.values():
-            if value >= 4:
-                self._triggers.add('hard')
-                # Hard trigger implicitly includes soft
-                self._triggers.add('soft')
+        for link_id, v_tup in self.current_answers.items():
+            # format: (score, severity)
+            _, severity = v_tup
+            if severity and severity in ('penultimate', 'ultimate'):
+                self._triggers[link_id] = 'hard'
 
         # if we have a previous or initial, see if anything worsened
         if self.previous_answers:
@@ -105,10 +110,6 @@ class DomainManifold(object):
 
     def eval_triggers(self):
         triggers = dict()
-        triggers['source_data'] = {
-            'initial': 'QuestionnaireResponse/123',
-            'last': 'QuestionnaireResponse/123',
-            'current': 'QuestionnaireResponse/123'}
 
         # TODO walk actual observations by domain at a time, use
         #  and use DomainTriggers(domain).eval() to populate
