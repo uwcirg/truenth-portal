@@ -1934,6 +1934,34 @@
         },
         {
           "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14649,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-49"
+        }
+      ],
+      "language": "en_US",
+      "name": "Princess Margaret Cancer Center",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
 			{"name": "IRONMAN v3", "retired_as_of": "2020-08-07T04:00:00Z"},
 			{"name": "IRONMAN v5"}
           ],
