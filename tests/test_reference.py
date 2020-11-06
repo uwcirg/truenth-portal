@@ -63,8 +63,10 @@ class TestReference(TestCase):
             "system": "https://ae-eproms-test.cirg.washington.edu",
             "value": "588.0"}
         qnr_ref = Reference.questionnaire_response(qnr_id)
-        assert qnr_ref.as_fhir()['reference'] == (
-            f"{qnr_id['system']}/QuestionnaireResponse/{qnr_id['value']}")
+        assert qnr_ref.as_fhir() == {
+            'reference':
+                f"{qnr_id['system']}/QuestionnaireResponse/{qnr_id['value']}"
+        }
 
     def test_qnr_parse(self):
         from tests.test_assessment_status import (
