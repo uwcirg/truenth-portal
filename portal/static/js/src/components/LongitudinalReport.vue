@@ -176,6 +176,13 @@
                 return this.setDisplayDate(item.authored);
             });
         },
+        getQuestionOptions(linkId) {
+            if (!linkId) return [];
+            let question = this.questions.filter(item => {
+                return item.linkId === linkId;
+            });
+            return question.length ? question[0].option : [];
+        },
         setDisplayData() {
             /*
              * prepping data for display
@@ -212,12 +219,18 @@
                     q = !this.hasValue(q) ? "--" : q;
                     a = !this.hasValue(a) ? "--" : a;
                     let answerValue = arrValueCoding.length? parseInt(arrValueCoding[0].split(".")[2]) : 0;
+                    let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
                         a: a,
                         linkId: entry.linkId,
                         value: answerValue,
-                        cssClass: answerValue >= 4 ? "darkest" : (answerValue >= 3 ? "darker": (answerValue <= 1 ? "no-value": ""))
+                        cssClass: 
+                        //last
+                        answerValue >= optionsLength.length ? "darkest" : 
+                        //penultimate
+                        (answerValue >= optionsLength.length - 1 ? "darker": 
+                        (answerValue <= 1 ? "no-value": ""))
                     };
                     this.data[index].data.push(answerObj);
                     let currentDomain = "";
