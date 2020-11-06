@@ -4,16 +4,20 @@ import tnthAjax from "./modules/TnthAjax.js";
 
 var emproObj = function() {
     this.domains = [];
+    this.hardTriggerDomains = [];
+    this.softTriggerDomains = [];
     this.hasHardTrigger = false;
     this.hasSoftTrigger = false;
     this.userId = 0;
 };
 emproObj.prototype.populateDomainDisplay = function() {
     this.domains.forEach(domain => {
-        $("#emproModal .triggersDisplayList").append(`<li>${domain}</li>`);
         $("#emproModal .triggersButtonsContainer").append(
             `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}" target="_blank">${domain.replace(/_/g, " ")}</a>`
         );
+    });
+    this.hardTriggerDomains.forEach(domain => {
+        $("#emproModal .hardTriggersDisplayList").append(`<li>${domain}</li>`);
     });
 };
 emproObj.prototype.initThankyouModal = function() {
@@ -61,20 +65,39 @@ emproObj.prototype.initTriggerDomains = function() {
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
-            self.domains = (data.triggers.domain).map(item => {
-                return EMPRO_DOMAIN_MAPPINGS[Object.keys(item)[0]];
-            });
-            self.domains = self.domains.filter((d, index) => {
-                return self.domains.indexOf(d) === index;
-            });
-            self.hasHardTrigger = (data.triggers.domain).filter(item => {
-                let entry = Object.entries(item);
-                return entry[0] && entry[0][1] && entry[0][1].indexOf("hard") !== -1;
-            }).length;
-            self.hasSoftTrigger = (data.triggers.domain).filter(item => {
-                let entry = Object.entries(item);
-                return entry[0] && entry[0][1] && entry[0][1].indexOf("soft") !== -1;
-            }).length;
+            for (let key in data.triggers.domain) {
+                if (!Object.keys(data.triggers.domain[key]).length) {
+                    continue;
+                }
+                let mappedDomain = EMPRO_DOMAIN_MAPPINGS[key];
+                /*
+                 * get all user domains that have related triggers
+                 */
+                if (self.domains.indexOf(mappedDomain) === -1) {
+                    self.domains.push(mappedDomain);
+                }
+                for (let q in data.triggers.domain[key]) {
+                    if (data.triggers.domain[key][q] === "hard") {
+                        self.hasHardTrigger = true;
+                        /*
+                         * get all domain topics that have hard trigger
+                         */
+                        if (self.hardTriggerDomains.indexOf(mappedDomain) === -1) {
+                            self.hardTriggerDomains.push(mappedDomain);
+                        }
+                    }
+                    if (data.triggers.domain[key][q] === "soft") {
+                        self.hasSoftTrigger = true;
+                         /*
+                         * get all domain topics that have soft trigger
+                         */
+                        if (self.softTriggerDomains.indexOf(mappedDomain) === -1) {
+                            self.softTriggerDomains.push(mappedDomain);
+                        }
+                    }
+                }
+            }
+
             /*
              * display user domain topic(s)
              */

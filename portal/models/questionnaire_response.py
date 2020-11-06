@@ -218,7 +218,7 @@ class QuestionnaireResponse(db.Model):
                 == json.dumps(identifier.system)).filter(
                 QuestionnaireResponse.document['identifier']['value']
                 == json.dumps(identifier.value))
-        return found.order_by(QuestionnaireResponse.id.desc()).all()
+        return found.order_by(QuestionnaireResponse.id.desc())
 
     @staticmethod
     def validate_authored(authored):
