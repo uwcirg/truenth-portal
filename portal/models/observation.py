@@ -54,10 +54,10 @@ class Observation(db.Model):
             fhir['performer'] = [p.as_fhir() for p in self.performers]
         if self.derived_from:
             # Only QNRs supported - if defined, it is a QNR.id.
-            # In FHIR format, present as reference
+            # In FHIR format, present as single item list reference
             qnr = QuestionnaireResponse.query.get(self.derived_from)
             ref = Reference.questionnaire_response(qnr.document_identifier)
-            fhir['derivedFrom'] = ref.as_fhir()
+            fhir['derivedFrom'] = [ref.as_fhir()]
         return fhir
 
     def update_from_fhir(self, data):
