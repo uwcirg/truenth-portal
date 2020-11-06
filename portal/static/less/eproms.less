@@ -100,6 +100,7 @@
 @HRColor: #eeeeee;
 @landingInputBorderColor: #AFB8C2;
 @reportContentBorderColor: #ececec;
+@reportHeadRowBackgroundColor: #efefe8;
 @profileItemBgColor: #e8e8e8;
 @toolbarBorderColor: #f5f4f4;
 @emproBtnPrimaryColor: #60676E;
@@ -2223,6 +2224,10 @@ div.footer-wrapper.right-panel {
       }
     }
 
+    label.disabled {
+      opacity: @disabledOpacity;
+    }
+
     #orglist-footer-container {
       padding: 0.5em 1em;
       width: 300px;
@@ -3073,6 +3078,189 @@ body.portal .copyright-container  {
     justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
+  }
+}
+
+section.header {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid @muterColor;
+  .header__div--title {
+    margin-right: 16px;
+  }
+  .icon {
+    padding: 12px;
+    color: @mutedColor;
+    background: @muterColor;
+  }
+  .btn {
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+}
+@media (min-width: 768px) {
+  section.header {
+    margin-top: 72px;
+  }
+}
+@media (min-width: 992px) {
+  section.header {
+    margin-top: 16px;
+  }
+}
+
+.report {
+  position: relative;
+  min-height: 25vh;
+  .loader {
+    position: absolute;
+    z-index: 5;
+    top: 32px;
+    left: 32px;
+  }
+  .error-message {
+    margin-top: 16px;
+  }
+  .nav-arrow {
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
+    font-size: 14px;
+    top: 12px;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background: #FFF;
+    border-radius: 100%;
+    padding-left: 10px;
+    padding-top: 4px;
+    color: @mutedColor;
+    border: 1px solid @mutedColor;
+    &.start {
+      margin-right: 8px;
+      left: 40%;
+    }
+    &.end {
+      padding-left: 12px;
+      right: 16px;
+    }
+    &.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+  .report-table {
+    margin-top: 24px;
+    TR:hover {
+      background-color: lighten(@muterColor, 5%);
+    }
+  }
+  .container {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  TH {
+    background: @reportHeadRowBackgroundColor;
+    font-weight: 600;
+    color: @mutedColor;
+    padding: 16px 16px 16px 24px;
+    letter-spacing: 0.1rem;
+  }
+  TH.title {
+    text-transform: uppercase;
+    width: 50%;
+    padding: 16px;
+    &:not(:first-of-type) {
+      padding-left: 32px;
+    }
+  }
+  .answer {
+    border-radius: 20px;
+    background: @muterColor;
+    display: inline-block;
+    padding: 8px 12px;
+    min-width: 132px;
+    text-align: center;
+    &.darker {
+      background: lighten(@mutedColor, 10%);
+      color: #FFF;
+    }
+    &.darkest {
+      background: darken(@mutedColor, 10%);
+      color: #FFF;
+    }
+    &.no-value {
+      background: transparent;
+    }
+  }
+  .domainText {
+    font-weight: 600;
+    text-transform: capitalize;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .item,
+  td.item {
+    padding: 16px 12px 16px 16px;
+    &.question {
+      padding-left: 12px;
+      padding-right: 32px;
+    }
+    line-height: 1.5;
+    vertical-align: middle;
+  }
+  td.domain ~ td.item {
+    padding-top: 32px;
+  }
+  .cell.active {
+    display: table-cell !important;
+  }
+  .cell.inactive {
+    display: none;
+  }
+  td.cell {
+    position: relative;
+    overflow: hidden;
+    &:before {
+      transform: translateX(1);
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      background: #FFF;
+      opacity: 0.9;
+    }
+    &.active:before {
+      -webkit-animation: popOut 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -moz-animation: popOut 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -ms-animation: popOut 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      -o-animation: popOut 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation: popOut 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      animation-fill-mode: forwards;
+    }
+    &.inactive:before {
+      transform: translateX(1);
+    }
+  }
+  tr:not(:last-of-type) {
+    border-bottom: 1px solid @muterColor;
+  }
+}
+@media (min-width: 768px) {
+  .report {
+    TH.title {
+      width: 35%;
+    }
+    .nav-arrow {
+      &.start {
+        left: 30%;
+      }
+    }
   }
 }
 
@@ -4102,6 +4290,71 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     -ms-transform: rotate(360deg);
     -o-transform: rotate(360deg);
     transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes popOut {
+  0% {
+    -webkit-transform: translateX(1);
+    -moz-transform: translateX(1);
+    -ms-transform: translateX(1);
+    -o-transform: translateX(1);
+    transform: translateX(1);
+  }
+  100% {
+    -webkit-transform: translateX(-500%);
+    -moz-transform: translateX(-500%);
+    -ms-transform: translateX(-500%);
+    -o-transform: translateX(-500%);
+    transform: translateX(-500%);
+  }
+}
+@-moz-keyframes popOut {
+  0% {
+    -webkit-transform: translateX(1);
+    -moz-transform: translateX(1);
+    -ms-transform: translateX(1);
+    -o-transform: translateX(1);
+    transform: translateX(1);
+  }
+  100% {
+    -webkit-transform: translateX(-500%);
+    -moz-transform: translateX(-500%);
+    -ms-transform: translateX(-500%);
+    -o-transform: translateX(-500%);
+    transform: translateX(-500%);
+  }
+}
+@-o-keyframes popOut {
+  0% {
+    -webkit-transform: translateX(1);
+    -moz-transform: translateX(1);
+    -ms-transform: translateX(1);
+    -o-transform: translateX(1);
+    transform: translateX(1);
+  }
+  100% {
+    -webkit-transform: translateX(-500%);
+    -moz-transform: translateX(-500%);
+    -ms-transform: translateX(-500%);
+    -o-transform: translateX(-500%);
+    transform: translateX(-500%);
+  }
+}
+@keyframes popOut {
+  0% {
+    -webkit-transform: translateX(1);
+    -moz-transform: translateX(1);
+    -ms-transform: translateX(1);
+    -o-transform: translateX(1);
+    transform: translateX(1);
+  }
+  100% {
+    -webkit-transform: translateX(-500%);
+    -moz-transform: translateX(-500%);
+    -ms-transform: translateX(-500%);
+    -o-transform: translateX(-500%);
+    transform: translateX(-500%);
   }
 }
 .custom-container {
