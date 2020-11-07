@@ -6125,6 +6125,12 @@
       "display": "Spanish (Spain)",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "it_IT",
+      "display": "Italian",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
     }
   ],
   "id": "SitePersistence v0.2",
