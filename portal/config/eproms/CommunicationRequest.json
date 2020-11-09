@@ -3908,7 +3908,7 @@
       "notify_post_qb_start": "{\"weeks\": 1}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -3925,7 +3925,7 @@
       "notify_post_qb_start": "{\"weeks\": 2}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
@@ -3942,7 +3942,7 @@
       "notify_post_qb_start": "{\"weeks\": 3}",
       "qb_iteration": 0,
       "questionnaire_bank": {
-        "reference": "api/questionnaire_bank/IRONMAN_v5_recurring_3mo_pattern"
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
