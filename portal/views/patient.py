@@ -216,7 +216,17 @@ def post_patient_deceased(patient_id):
             {'deceasedDateTime', 'deceasedBoolean'}):
         abort(400, "Requires deceasedDateTime or deceasedBoolean in JSON")
 
-    patient.update_deceased(request.json)
+    try:
+        patient.update_deceased(request.json)
+    except ValueError as ve:
+        if "Dates prior to year 1900 not supported" in str(ve):
+            abort(
+                400,
+                "deceasedDateTime unrealistically historic (pre-1900),"
+                f" please review: {request.json['deceasedDateTime']}")
+        else:
+            raise ve
+
     db.session.commit()
     auditable_event("updated demographics on user {0} from input {1}".format(
         patient.id, json.dumps(request.json)), user_id=current_user().id,

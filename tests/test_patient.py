@@ -282,3 +282,14 @@ class TestPatient(TestCase):
         assert response.status_code == 200
         patient = User.query.get(TEST_USER_ID)
         assert not patient.deceased
+
+    def test_deceased_pre_epoch(self):
+        self.promote_user(role_name=ROLE.PATIENT.value)
+        self.login()
+        pre_epoch = '1899-01-15 00:09:30'
+        data = {'deceasedDateTime': pre_epoch}
+        response = self.client.post(
+            '/api/patient/{}/deceased'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
+        assert response.status_code == 400

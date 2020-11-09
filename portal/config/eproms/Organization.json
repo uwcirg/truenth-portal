@@ -467,8 +467,9 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v2", "retired_as_of": "2018-03-28T04:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T13:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1774,7 +1775,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T05:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1919,6 +1921,34 @@
       ],
       "language": "en_US",
       "name": "Cross Cancer Institute (Alberta Health Services)",
+      "partOf": {
+        "reference": "api/organization/23000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14649,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-49"
+        }
+      ],
+      "language": "en_US",
+      "name": "Princess Margaret Cancer Center",
       "partOf": {
         "reference": "api/organization/23000"
       },
@@ -2234,6 +2264,106 @@
       ],
       "language": "de_CH",
       "name": "Universitätsspital Zürich",
+      "partOf": {
+        "reference": "api/organization/25000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "fr_CA",
+                "display": "Canadian French",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146150,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-150"
+        }
+      ],
+      "language": "de_CH",
+      "name": "Universitätsspital Basel",
+      "partOf": {
+        "reference": "api/organization/25000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "it_IT",
+                "display": "Italian",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "de_CH",
+                "display": "Swiss German",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_US",
+                "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Zurich",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146151,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-151"
+        }
+      ],
+      "language": "it_IT",
+      "name": "Ente Ospedaliero Cantonale (EOC)",
       "partOf": {
         "reference": "api/organization/25000"
       },
@@ -2659,7 +2789,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-09-29T14:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3015,7 +3146,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3071,7 +3203,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3099,7 +3232,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3127,7 +3261,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3155,7 +3290,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3183,7 +3319,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3211,7 +3348,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3239,7 +3377,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3267,7 +3406,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3295,7 +3435,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3323,7 +3464,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2020-10-21T23:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
