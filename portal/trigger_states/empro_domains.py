@@ -1,4 +1,7 @@
 """Module to handle complexity of domain scoring and triggers"""
+from collections import defaultdict
+
+from ..models.observation import Observation
 from ..models.questionnaire_response import first_last_like_qnr
 
 # TODO extract from EMPRO Questionnaire - hardcoded for time being
@@ -103,10 +106,32 @@ class DomainManifold(object):
         self.first_qnr, self.last_qnr = first_last_like_qnr(qnr)
 
         for timepoint in 'cur', 'first', 'last':
-            qnrs = getattr(self, f"{timepoint}_qnr")
-            if qnrs:
-                # TODO Obtain observations directly from QNR or Query
-                setattr(self, f"{timepoint}_obs", [])
+            process_qnr = getattr(self, f"{timepoint}_qnr")
+            if process_qnr:
+                obs = Observation.query.filter(
+                    Observation.derived_from == str(process_qnr.id)
+                )
+                # Extract useful bits for trigger calc from observations
+                # format as dictionary, keyed by `domain`.  Each domain
+                # will contain a dictionary keyed by `link_id`, with a value
+                # tuple (score, severity)
+                results = dict()
+                for ob in obs:
+                    # acquire the domain
+                    for code in ob.codeable_concept.codings:
+                        if code.system == 'http://us.truenth.org/observation':
+                            domain = code.code
+                    if not domain:
+                        raise ValueError(f"'domain' not found in observation {ob.id}")
+                    link_id, score = ob.value_coding.code.rsplit('.', 1)
+                    # severity is only present on penultimate, ultimate
+                    severity = None
+                    if ob.value_coding.extension_id:
+                        severity = ob.value_coding.extension.code
+                    if domain not in results:
+                        results[domain] = defaultdict(dict)
+                    results[domain][link_id] = (int(score), severity)
+                setattr(self, f"{timepoint}_obs", results)
 
     def eval_triggers(self):
         triggers = dict()

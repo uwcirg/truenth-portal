@@ -225,6 +225,11 @@ class QuestionnaireResponse(db.Model):
                 == json.dumps(identifier.value))
         return found.order_by(QuestionnaireResponse.id.desc())
 
+    @property
+    def document_identifier(self):
+        """Return FHIR identifier(s) found within the document"""
+        return self.document['identifier']
+
     @staticmethod
     def validate_authored(authored):
         """Validate the authored value is current or in the past
