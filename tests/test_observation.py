@@ -1,8 +1,11 @@
+from flask_webtest import SessionScope
 import json
 import os
-from pytest import fixture, mark
+from pytest import fixture
 
+from portal.database import db
 from portal.models.observation import Observation
+from portal.trigger_states.empro_domains import DomainManifold
 
 
 def json_from_file(request, filename):
@@ -18,8 +21,7 @@ def obs_w_extension(request):
     return json_from_file(request=request, filename=filename)
 
 
-@mark.skip("waiting on PR with QNR test fixtures needed for Observation.derivedFrom reference")
-def test_coding_extension(obs_w_extension):
+def test_coding_extension(initialized_with_ss_qnr, obs_w_extension):
     obs = Observation()
     obs.update_from_fhir(obs_w_extension)
 
@@ -35,3 +37,29 @@ def test_coding_extension(obs_w_extension):
     # valueCoding holds the answer, and it's extension, a trigger value
     assert obs.value_coding.code == 'ironman_ss.4.4'
     assert obs.value_coding.extension.code == 'penultimate'
+
+
+def test_query_obs_from_qnr(initialized_with_ss_qnr, obs_w_extension):
+    obs = Observation()
+    obs.update_from_fhir(obs_w_extension)
+
+    with SessionScope(db):
+        db.session.add(obs)
+        db.session.commit()
+
+    qnr = db.session.merge(initialized_with_ss_qnr)
+    obs = Observation.query.filter(Observation.derived_from == str(qnr.id))
+    assert obs.one()
+
+
+def test_obtain_observations(obs_w_extension, initialized_with_ss_qnr):
+    obs = Observation()
+    obs.update_from_fhir(obs_w_extension)
+
+    with SessionScope(db):
+        db.session.add(obs)
+        db.session.commit()
+
+    qnr = db.session.merge(initialized_with_ss_qnr)
+    dm = DomainManifold(qnr)
+    assert dm.cur_obs['joint_pain']['ironman_ss.4'] == (4, 'penultimate')
