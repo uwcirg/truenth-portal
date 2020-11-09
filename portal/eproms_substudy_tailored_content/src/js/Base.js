@@ -87,8 +87,8 @@ export default {
                 this.getUserID()?
                 [
                     this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                  //  this.$http(`/api/user/${this.getUserID()}/triggers`)
-                  this.$http(`/static/files/substudy_test_triggers_new.json`)
+                    this.$http(`/api/user/${this.getUserID()}/triggers`)
+                  //this.$http(`/static/files/substudy_test_triggers_new.json`)
                 ] :
                 [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
             ).then(responses => {
@@ -444,8 +444,7 @@ export default {
                         
                     } else {
                         //log error to console
-                        this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
-                        //this.setInitView(true);
+                        this.setErrorMessage(`Error occurred retrieving ${countryCode} resource content: no content returned.`);
                     }
                 }).catch(e => {
                     this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
@@ -467,7 +466,6 @@ export default {
                 }
                 this.$http(this.getSearchURL(`video_${videoSection.getAttribute("data-topic")}`)).then(response => {
                     if (response) {
-                     //   console.log("response?  ", response)
                         videoSection.innerHTML = response;
                         Vue.nextTick()
                         .then(() => {
@@ -477,8 +475,7 @@ export default {
                         
                     } else {
                         //log error to console
-                        this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
-                        //this.setInitView(true);
+                        this.setErrorMessage(`Error occurred retrieving video content: no content returned.`);
                     }
                 }).catch(e => {
                     this.setErrorMessage(`error fetching video for ${videoSection.getAttribute("data-topic")} `, e)
