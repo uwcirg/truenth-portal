@@ -32,6 +32,15 @@ def test_bogus_transition(initialized_with_ss_qnr):
         evaluate_triggers(initialized_with_ss_qnr)
 
 
+def test_qnr_identifier(initialized_with_ss_qnr):
+    from portal.models.reference import Reference
+    ref = Reference.questionnaire_response(
+        initialized_with_ss_qnr.document_identifier)
+    assert ref.as_fhir()['reference'] == (
+        'https://stg-ae.us.truenth.org/eproms-demo/QuestionnaireResponse/538.0'
+    )
+
+
 def test_initiate_trigger(test_user):
     results = initiate_trigger(test_user.id)
     assert results.state == 'due'
