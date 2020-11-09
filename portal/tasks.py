@@ -357,6 +357,7 @@ def celery_beat_health_check(**kwargs):
         value=str(datetime.utcnow()),
     )
 
+
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
 def process_triggers_task():
     """Task form - wraps call to testable function `fire_trigger_events` """

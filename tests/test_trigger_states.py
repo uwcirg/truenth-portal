@@ -101,14 +101,14 @@ def test_worsening_baseline():
 
 def test_ts_hard_triggers():
     mock_triggers = {
-            'domain': {
-                'general_pain': {
-                    'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
-                'joint_pain': {
-                    'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
-                'insomnia': {},
-                'fatigue': {'ironman_ss.9': 'hard'},
-                'anxious': {'ironman_ss.12': 'soft'},
+        'domain': {
+            'general_pain': {
+                'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
+            'joint_pain': {
+                'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
+            'insomnia': {},
+            'fatigue': {'ironman_ss.9': 'hard'},
+            'anxious': {'ironman_ss.12': 'soft'},
         }
     }
 

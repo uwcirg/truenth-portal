@@ -122,7 +122,8 @@ class DomainManifold(object):
                         if code.system == 'http://us.truenth.org/observation':
                             domain = code.code
                     if not domain:
-                        raise ValueError(f"'domain' not found in observation {ob.id}")
+                        raise ValueError(
+                            f"'domain' not found in observation {ob.id}")
                     link_id, score = ob.value_coding.code.rsplit('.', 1)
                     # severity is only present on penultimate, ultimate
                     severity = None
