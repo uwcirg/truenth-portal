@@ -434,18 +434,17 @@ export default {
                     return true;
                 }
                 this.$http(this.getSearchURL(`resources_${topic}_${countryCode.toLowerCase()}`)).then(response => {
-                    if (response) {
-                       if (!resourceSection.querySelector(".content")) {
-                            let div = document.createElement("div");
-                            div.classList.add("content");
-                            resourceSection.append(div);
-                       }
-                        resourceSection.querySelector(".content").innerHTML = response;
-                        
-                    } else {
-                        //log error to console
-                        this.setErrorMessage(`Error occurred retrieving ${countryCode} resource content: no content returned.`);
+                    if (!response) {
+                         //log error to console
+                         this.setErrorMessage(`Error occurred retrieving ${countryCode} resource content: no content returned.`);
+                         return;
                     }
+                    if (!resourceSection.querySelector(".content")) {
+                        let div = document.createElement("div");
+                        div.classList.add("content");
+                        resourceSection.append(div);
+                    }
+                    resourceSection.querySelector(".content").innerHTML = response;
                 }).catch(e => {
                     this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
                 });
@@ -461,24 +460,24 @@ export default {
                     this.initVideo();
                     return true;
                 }
-                if (!videoSection.getAttribute("data-topic")) {
+                let videoTopic = videoSection.getAttribute("data-topic");
+                if (!videoTopic) {
                     return true;
                 }
-                this.$http(this.getSearchURL(`video_${videoSection.getAttribute("data-topic")}`)).then(response => {
-                    if (response) {
-                        videoSection.innerHTML = response;
-                        Vue.nextTick()
-                        .then(() => {
-                            // DOM updated
-                            this.initVideo();
-                        });
-                        
-                    } else {
-                        //log error to console
-                        this.setErrorMessage(`Error occurred retrieving video content: no content returned.`);
+                this.$http(this.getSearchURL(`video_${videoTopic}`)).then(response => {
+                    if (!response) {
+                         //log error to console
+                         this.setErrorMessage(`Error occurred retrieving ${videoTopic} video content: no content returned.`);
+                         return;
                     }
+                    videoSection.innerHTML = response;
+                    Vue.nextTick()
+                    .then(() => {
+                        // DOM updated
+                        this.initVideo();
+                    });
                 }).catch(e => {
-                    this.setErrorMessage(`error fetching video for ${videoSection.getAttribute("data-topic")} `, e)
+                    this.setErrorMessage(`error fetching video for ${videoTopic} `, e);
                 });
             });
             this.initVideoEvents();
