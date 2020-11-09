@@ -1,20 +1,20 @@
 import {isInViewport} from "./Utility";
 export default {
     methods: {
-        getIframeAttribute() {
-            let videoElement = this.getVideoElement();
+        getIframeAttribute(videoElement) {
+            videoElement = videoElement || this.getVideoElement();
             if (videoElement) return videoElement.getAttribute("data-iframe-src");
             return "";
         },
         getVideoElement() {
             return document.querySelector(".video");
         },
-        setVideoIframe() {
-            let videoElement = this.getVideoElement();
+        setVideoIframe(videoElement) {
+            videoElement = videoElement || this.getVideoElement();
             if (!videoElement) {
                 return;
             }
-            let videoSrc = this.getIframeAttribute();
+            let videoSrc = this.getIframeAttribute(videoElement);
             if (!videoSrc) {
                 return;
             }
@@ -27,41 +27,33 @@ export default {
             videoElement.appendChild(iframeElement);
             videoElement.classList.add("active");
         },
-        hideVideo() {
+        hideVideo(videoElement) {
+            videoElement = videoElement || this.getVideoElement();
             let videoSection = document.querySelector(".video-section");
             if (videoSection) {
                 videoSection.style.display = "none";
             }
+            if (videoElement) {
+                videoElement.style.display = "none";
+            }
         },
-        initVideo() {
-            let videoElement = this.getVideoElement();
-            if (!videoElement) {
-                this.hideVideo();
-                return;
-            }
-            if (!this.getIframeAttribute()) {
-                this.hideVideo();
-                return;
-            }
-
-            if (videoElement.getAttribute("data-preload")) {
-                this.setVideoIframe();
-            }
-
+        initVideoEvents() {
             window.addEventListener("scroll", e => {
                 e.stopPropagation();
                 window.requestAnimationFrame(() => {
-                    if (!isInViewport(videoElement)) {
-                        return false;
-                    }
-                    this.setVideoIframe();
+                    let videoElements = document.querySelectorAll(".video");
+                    videoElements.forEach(el => {
+                        if (!isInViewport(el.parentNode || el)) {
+                            return false;
+                        }
+                        this.setVideoIframe(el);
+                    });
                 });
-                
             });
             let videoNavElements = document.querySelectorAll(".navigation-video-image");
             videoNavElements.forEach(el => {
                 el.addEventListener("click", () => {
-                    this.setVideoIframe();
+                    this.setVideoIframe(videoElement);
                     let ve = videoElement.querySelector("iframe");
                     if (ve) {
                         let veSrc = ve.getAttribute("src");
@@ -73,6 +65,21 @@ export default {
                 });
                 el.classList.remove("hide");
             });
+        },
+        initVideo(videoElement) {
+            videoElement = videoElement || this.getVideoElement();
+            if (!videoElement) {
+                this.hideVideo(videoElement);
+                return;
+            }
+            if (!this.getIframeAttribute(videoElement)) {
+                this.hideVideo(videoElement);
+                return;
+            }
+
+            if (videoElement.getAttribute("data-preload")) {
+                this.setVideoIframe(videoElement);
+            }
         }
     }
 }

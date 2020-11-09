@@ -62,10 +62,10 @@ body {
     background: @bodyBackgroundColor;
     box-sizing: border-box;
     font-family: @bodyFontFamily;
-    overflow-y: auto;
+    overflow: auto;
     color: @bodyColor;
     &.fixed {
-      overflow-y: hidden;
+      overflow: hidden;
       #tnthNavWrapper {
         z-index: -1;
         visibility: hidden !important;
@@ -469,6 +469,11 @@ a {
       width: 100%;
     }
   }
+}
+.section-title {
+  padding-left: 40px;
+  padding-right: 32px;
+  position: relative;
 }
 @media (min-width: 768px) {
   .module-section.intro {
@@ -928,7 +933,7 @@ a {
   justify-content: flex-start;
   align-items: flex-start;
   .tile {
-    padding: 20px;
+    padding: 24px;
     margin-right: 8px;
     cursor: pointer;
     background-color: #FFF;
@@ -1107,6 +1112,38 @@ a {
   //   }
   // }
 }
+#resources_main {
+  .video-title {
+    font-size: 1.25rem;
+  }
+  .resource-section {
+    padding-top: 0;
+    background: #FFF !important;
+    .tile {
+      background: @darkFeatureItemBackgroundColor;
+      &:hover {
+        background: @featureTileColor;
+      }
+      &.default {
+        display: none;
+      }
+    }
+  }
+  .video-section + .resource-section {
+    margin-top: -40px;
+   // margin-bottom: -16px;
+  }
+  .section-title + .video-section {
+    padding-top: 16px;
+  }
+}
+@media (min-width: 1400px) {
+  #resources_main {
+    .resource-section {
+      padding-left: 0;
+    }
+  }
+}
 footer {
   padding-top: 32px;
   padding-bottom: 24px;
@@ -1133,7 +1170,7 @@ footer {
   color: #FFF;
   border: 0;
   &:hover {
-    background: @buttonHoverBackgroundColor;
+    background: @buttonColor;
   }
 }
 
