@@ -17,20 +17,6 @@ class AnswerIdValue(object):
         self.value = value
 
 
-# TODO... for now, generate some bogus triggers
-def faux_trigger():
-    # randomly return one of the possible trigger states
-    from random import randint
-
-    v = randint(0, 2)
-    if v == 2:
-        return 'hard', 'soft'
-    elif v == 1:
-        return ('soft',)
-    else:
-        return ()
-
-
 class DomainTriggers(object):
     """Handles only the trigger calc, from question ID and value internals
 
@@ -38,15 +24,16 @@ class DomainTriggers(object):
     values.  Given such, calculate the trigger state for any given domain.
     """
 
-    def __init__(self, domain):
+    def __init__(
+            self, domain, current_answers, previous_answers, initial_answers):
         self.domain = domain
         self._triggers = dict()
 
-        # Dictionaries (possibly empty) keyed by question ID, containing
-        # answer value
-        self.current_answers = dict()
-        self.previous_answers = dict()
-        self.initial_answers = dict()
+        # Dictionaries (possibly empty) keyed by question link_id, containing
+        # tuple (answer value, severity)
+        self.current_answers = current_answers or dict()
+        self.previous_answers = previous_answers or dict()
+        self.initial_answers = initial_answers or dict()
 
     @property
     def triggers(self):
@@ -97,15 +84,15 @@ class DomainManifold(object):
     """Bring together available responses and domains for trigger eval"""
 
     def __init__(self, qnr):
-        self.first_qnr, self.last_qnr, self.cur_qnr = None, None, None
-        self.first_obs, self.last_obs, self.cur_obs = None, None, None
+        self.initial_qnr, self.prev_qnr, self.cur_qnr = None, None, None
+        self.initial_obs, self.prev_obs, self.cur_obs = None, None, None
         self.obtain_observations(qnr)
 
     def obtain_observations(self, qnr):
         self.cur_qnr = qnr
-        self.first_qnr, self.last_qnr = first_last_like_qnr(qnr)
+        self.initial_qnr, self.prev_qnr = first_last_like_qnr(qnr)
 
-        for timepoint in 'cur', 'first', 'last':
+        for timepoint in 'cur', 'initial', 'prev':
             process_qnr = getattr(self, f"{timepoint}_qnr")
             if process_qnr:
                 obs = Observation.query.filter(
@@ -136,8 +123,16 @@ class DomainManifold(object):
 
     def eval_triggers(self):
         triggers = dict()
+        triggers['domain'] = dict()
 
-        # TODO walk actual observations by domain at a time, use
-        #  and use DomainTriggers(domain).eval() to populate
-        triggers['domain'] = [{d: faux_trigger()} for d in EMPRO_DOMAINS]
+        for domain in EMPRO_DOMAINS:
+            if domain in self.cur_obs:
+                dt = DomainTriggers(
+                    domain=domain,
+                    current_answers=self.cur_obs[domain],
+                    previous_answers=self.prev_obs.get(domain),
+                    initial_answers=self.initial_obs.get(domain)
+                )
+                triggers['domain'][domain] = dt.triggers
+
         return triggers
