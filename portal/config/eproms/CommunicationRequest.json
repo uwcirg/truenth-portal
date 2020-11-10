@@ -3847,7 +3847,106 @@
       },
       "resourceType": "CommunicationRequest",
       "status": "active"
-    }	
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Baseline | Reminder 1 week before due (1)"
+        }
+      ],
+      "lr_uuid": "e5c0f9a0-db6a-2c86-af46-d593f4dfd3b1",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_baseline"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Baseline | Due Reminder (2)"
+        }
+      ],
+      "lr_uuid": "44ff8f5d-9c5f-eaab-e559-e2512febeb05",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_baseline"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Baseline | 1 week overdue reminder (3)"
+        }
+      ],
+      "lr_uuid": "96a65d05-e0af-272c-1b28-dde93c0a6c5b",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_baseline"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Recurring | Reminder 1 week before due (1)"
+        }
+      ],
+      "lr_uuid": "e5c0f9a0-db6a-2c86-af46-d593f4dfd3b1",
+      "notify_post_qb_start": "{\"weeks\": 1}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Recurring | due"
+        }
+      ],
+      "lr_uuid": "44ff8f5d-9c5f-eaab-e559-e2512febeb05",
+      "notify_post_qb_start": "{\"weeks\": 2}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/communicationrequest/name",
+          "use": "usual",
+          "value": "EMPRO v1 Recurring | 1 week overdue reminder (3)"
+        }
+      ],
+      "lr_uuid": "96a65d05-e0af-272c-1b28-dde93c0a6c5b",
+      "notify_post_qb_start": "{\"weeks\": 3}",
+      "qb_iteration": 0,
+      "questionnaire_bank": {
+        "reference": "api/questionnaire_bank/ironman_ss_recurring_monthly_pattern"
+      },
+      "resourceType": "CommunicationRequest",
+      "status": "active"
+    }
   ],
   "id": "SitePersistence v0.2",
   "meta": {
