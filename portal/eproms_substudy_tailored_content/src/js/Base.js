@@ -59,7 +59,8 @@ export default {
                     location.reload();
                     return false;
                 }
-                if (this.domains.indexOf(to.params.topic) !== -1) {
+                if (this.domains.indexOf(to.params.topic) !== -1 ||
+                    this.mainPageIdentifiers.indexOf(to.params.topic) !== -1) {
                     location.reload();
                     return false;
                 }
@@ -87,6 +88,7 @@ export default {
                 [
                     this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
                     this.$http(`/api/user/${this.getUserID()}/triggers`)
+                  //this.$http(`/static/files/substudy_test_triggers_new.json`)
                 ] :
                 [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
             ).then(responses => {
@@ -114,7 +116,6 @@ export default {
         setInitView() {
             Vue.nextTick(() => {
                     setTimeout(function() {
-                        this.goToTop();
                         this.setCurrentView("domain");
                         this.loading = false;
                     }.bind(this), 350);
@@ -199,7 +200,7 @@ export default {
             let self = this;
             for (let key in data.triggers.domain) {
                 for (let q in data.triggers.domain[key]) {
-                    if (data.triggers.domain[key][q] === "hard") {
+                    if (["hard", "soft"].indexOf(data.triggers.domain[key][q]) !== -1) {
                         if (self.domainMappings[key]) {
                             self.userDomains.push(self.domainMappings[key]);
                         }
@@ -231,10 +232,6 @@ export default {
         },
         isMatchView(viewId) {
             return this.currentView === viewId;
-        },
-        goToTop() {
-            document.body.scrollTop = 0; // For Safari
-            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         },
         goToView(viewId) {
             Vue.nextTick(
@@ -301,7 +298,9 @@ export default {
             if (this.$route &&
                 this.$route.params && 
                 this.$route.params.topic &&
-                this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1) {
+                (this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1 ||
+                 this.mainPageIdentifiers.indexOf(this.$route.params.topic.toLowerCase()) !== -1
+                )) {
                 return this.$route.params.topic;
             }
             let arrHashText = String(location.hash).split("#");
@@ -325,7 +324,6 @@ export default {
                 this.activeDomain = routerTopic;
                 return;
             }
-            //TODO this should be the default landing topic/tag
             this.activeDomain = this.defaultDomain;
         },
         getSelectedDomain() {
@@ -345,12 +343,12 @@ export default {
             setTimeout(function() {
                 this.setInitView();
             }.bind(this), 150);
-            this.setResourcesByCountry();
             this.initNav();
             this.initRouterEvents();
             this.setCollapsible();
-            this.initVideo();
             this.setTileLinkEvent();
+            this.setVideoByDomainTopic();
+            this.setResourcesByCountry();
             this.initDebugModeEvent();
         
         },
@@ -421,32 +419,68 @@ export default {
             });
         },
         setResourcesByCountry(countryCode) {
-            let resourceSection = document.querySelector(".resource-section");
-            if (!resourceSection) {
+
+            let resourceSections = document.querySelectorAll(`.resource-section`);
+            if (!resourceSections.length) {
                 return;
             }
             countryCode = countryCode ||this.getCountryCode();
             if (!this.isEligibleCountryCode(countryCode)) {
                 return;
             }
-            if (!this.debugMode && (countryCode === this.defaultCountryCode || !countryCode)) return;
-            if (this.debugMode && countryCode === this.defaultCountryCode) {
-                location.reload();
+            resourceSections.forEach(resourceSection => {
+                let topic = resourceSection.getAttribute("data-topic");
+                if (!topic) {
+                    return true;
+                }
+                this.$http(this.getSearchURL(`resources_${topic}_${countryCode.toLowerCase()}`)).then(response => {
+                    if (!response) {
+                         //log error to console
+                         this.setErrorMessage(`Error occurred retrieving ${countryCode} resource content: no content returned.`);
+                         return;
+                    }
+                    if (!resourceSection.querySelector(".content")) {
+                        let div = document.createElement("div");
+                        div.classList.add("content");
+                        resourceSection.append(div);
+                    }
+                    resourceSection.querySelector(".content").innerHTML = response;
+                }).catch(e => {
+                    this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
+                });
+            });
+        },
+        setVideoByDomainTopic() {
+            let videoSections = document.querySelectorAll(`.video-section`);
+            if (!videoSections.length) {
                 return;
             }
-            this.$http(this.getSearchURL(`resources_${this.getSelectedDomain()}_${countryCode}`)).then(response => {
-                if (response) {
-                    resourceSection.querySelector(".content").innerHTML = response;
-                    
-                } else {
-                    //log error to console
-                    this.setErrorMessage(`Error occurred retrieving content: no content returned.`);
-                    this.setInitView(true);
+            videoSections.forEach(videoSection => {
+                if (videoSection.querySelector(".video")) {
+                    this.initVideo();
+                    return true;
                 }
-            }).catch(e => {
-                this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
+                let videoTopic = videoSection.getAttribute("data-topic");
+                if (!videoTopic) {
+                    return true;
+                }
+                this.$http(this.getSearchURL(`video_${videoTopic}`)).then(response => {
+                    if (!response) {
+                         //log error to console
+                         this.setErrorMessage(`Error occurred retrieving ${videoTopic} video content: no content returned.`);
+                         return;
+                    }
+                    videoSection.innerHTML = response;
+                    Vue.nextTick()
+                    .then(() => {
+                        // DOM updated
+                        this.initVideo();
+                    });
+                }).catch(e => {
+                    this.setErrorMessage(`error fetching video for ${videoTopic} `, e);
+                });
             });
-           
+            this.initVideoEvents();
         },
         goHome: function() {
             this.goToView("domain");

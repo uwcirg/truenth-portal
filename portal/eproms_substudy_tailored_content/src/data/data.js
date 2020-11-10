@@ -19,6 +19,7 @@ export default {
     LifeRayBaseURL: "",
     domainMappings: {},
     defaultDomain: "default_domain",
+    mainPageIdentifiers: ["resource_library", "default_domain"],
     domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
     userDomains: [],
     eligibleCountryCodes: [{
