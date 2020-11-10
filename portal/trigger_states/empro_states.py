@@ -68,18 +68,16 @@ def enter_user_trigger_critical_section(user_id):
       a transition to the ``inprocess`` state.
 
     """
+    ts = users_trigger_state(user_id)
+    sm = EMPRO_state(ts)
+    sm.begin_process()
+    # Record the historical transformation via insert.
+    ts.insert(from_copy=True)
+
+    # Now 'inprocess', obtain the lock to be freed at the conclusion
+    # of `evaluate_triggers()`
     critical_section = TimeoutLock(key=EMPRO_LOCK_KEY.format(user_id=user_id))
     critical_section.__enter__()
-
-    try:
-        ts = users_trigger_state(user_id)
-        sm = EMPRO_state(ts)
-        sm.begin_process()
-        # Record the historical transformation via insert.
-        ts.insert(from_copy=True)
-    except TransitionNotAllowed as tna:
-        critical_section.__exit__(None, None, None)
-        raise tna
 
 
 def users_trigger_state(user_id):
@@ -145,7 +143,13 @@ def evaluate_triggers(qnr):
         # first, confirm state transition is allowed - raises if not
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
-        sm.begin_process()
+
+        # typical flow, processing was triggered before SDC handoff
+        # if launched from testing or some catch-up task, initiate now
+        if ts.state != "inprocess":
+            enter_user_trigger_critical_section(user_id=qnr.subject_id)
+            # confirm local vars picked up state change
+            assert ts.state == 'inprocess'
 
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
@@ -155,6 +159,8 @@ def evaluate_triggers(qnr):
         # transition and persist state
         sm.processed_triggers()
         ts.insert(from_copy=True)
+
+        return ts
 
     except (TransitionNotAllowed, LockTimeout) as e:
         current_app.logger.exception(e)
@@ -209,7 +215,7 @@ def fire_trigger_events():
                     {"email": "clinician email id"})
 
             # Change state, as this row has been processed.
-            ts['triggers'] = triggers
+            ts.triggers = triggers
             sm = EMPRO_state(ts)
             sm.fired_events()
 

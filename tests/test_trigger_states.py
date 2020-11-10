@@ -5,7 +5,9 @@ from statemachine.exceptions import TransitionNotAllowed
 from portal.database import db
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
+    enter_user_trigger_critical_section,
     evaluate_triggers,
+    fire_trigger_events,
     initiate_trigger,
     users_trigger_state,
 )
@@ -60,7 +62,7 @@ def test_base_eval(
     evaluate_triggers(initialized_with_ss_qnr)
     results = users_trigger_state(test_user_id)
 
-    assert len(results.triggers['domain']) == 8
+    assert 'domain' in results.triggers
 
     ts = TriggerState.query.filter(
         TriggerState.user_id == test_user_id).filter(
@@ -70,31 +72,41 @@ def test_base_eval(
 
 def test_cur_hard_trigger():
     # Single result with a severe should generate a hard (and soft) trigger
-    dt = DomainTriggers('anxious')
-    dt.current_answers = {
-        'ironman_ss.12': (3, None),
-        'ironman_ss.11': (2, None),
-        'ironman_ss.13': (4, 'penultimate')}
+    dt = DomainTriggers(
+        domain='anxious',
+        current_answers={
+            'ironman_ss.12': (3, None),
+            'ironman_ss.11': (2, None),
+            'ironman_ss.13': (4, 'penultimate')},
+        previous_answers=None,
+        initial_answers=None)
     assert len(dt.triggers) == 1
     assert 'ironman_ss.13' in dt.triggers
 
 
 def test_worsening_soft_trigger():
     # One point worsening from any q in domain should generate 'soft'
-    dt = DomainTriggers('anxious')
-    dt.previous_answers = {'ss.21': (2, None), 'ss.15': (2, None)}
-    dt.current_answers = {
-        'ss.15': (3, None), 'ss.12': (3, None), 'ss.21': (1, None)}
+    dt = DomainTriggers(
+        domain='anxious',
+        previous_answers={'ss.21': (2, None), 'ss.15': (2, None)},
+        current_answers={
+            'ss.15': (3, None), 'ss.12': (3, None), 'ss.21': (1, None)},
+        initial_answers=None)
     assert len(dt.triggers) == 1
     assert dt.triggers['ss.15'] == 'soft'
 
 
 def test_worsening_baseline():
     # confirm a hard trigger with 2 level worsening
-    dt = DomainTriggers('anxious')
-    dt.initial_answers = {15: (3, None), 21: (1, None)}
-    dt.previous_answers = {12: (1, None), 15: (3, None)}
-    dt.current_answers = {12: (3, None), 15: (3, None), 21: (3, None)}
+    initial_answers = {15: (3, None), 21: (1, None)}
+    previous_answers = {12: (1, None), 15: (3, None)}
+    current_answers = {12: (3, None), 15: (3, None), 21: (3, None)}
+    dt = DomainTriggers(
+        domain='anxious',
+        initial_answers=initial_answers,
+        previous_answers=previous_answers,
+        current_answers=current_answers)
+
     assert len(dt.triggers) == 2
     assert dt.triggers[12] == dt.triggers[21] == 'hard'
 
@@ -115,3 +127,20 @@ def test_ts_hard_triggers():
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
     assert set(['general_pain', 'joint_pain', 'fatigue']) == set(
         ts.hard_trigger_list())
+
+
+def test_fire_trigger_events(
+        test_user, initialized_with_ss_recur_qb, initialized_with_ss_qnr):
+    test_user_id = db.session.merge(test_user).id
+
+    # mock user transitioning to processed
+    initiate_trigger(test_user_id)
+    enter_user_trigger_critical_section(test_user_id)
+    evaluate_triggers(initialized_with_ss_qnr)
+
+    fire_trigger_events()
+
+    # user's trigger should now include actions and be triggered
+    ts = users_trigger_state(test_user_id)
+    assert ts.state == 'triggered'
+    assert 'actions' in ts.triggers
