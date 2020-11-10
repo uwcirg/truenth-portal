@@ -24,7 +24,7 @@
 @headlineSize:    1.60em;
 @subheadSize:     1.30em;
 @subSmallHeadSize: 1.1em;
-@lgFontSize:      1.5em;
+@lgFontSize:      1.475em;
 @lgHeadlineSize:  1.35em;
 @lgsubheadSize:   1.25em;
 @splashFontSize:  1.05em;
@@ -2823,10 +2823,20 @@ body.portal .copyright-container  {
 .portal-header-container {
   color: #FFF;
   width: 87.5%;
-  margin: 1em auto 2em auto;
+  margin: 1em auto 32px auto;
   font-size: @subheadSize;
   max-width: 100%;
   text-align: center;
+}
+@media (min-width: 768px) {
+  .portal-header-container {
+    margin: 3.5em auto 32px auto;
+  }
+}
+@media (min-width: 992px) {
+  .portal-header-container {
+    margin: 32px auto 32px auto;
+  }
 }
 .button-callout {
   position: relative;
@@ -2858,7 +2868,7 @@ body.portal .copyright-container  {
 }
 .portal-header,
 .portal-intro-text {
-  font-size: @baseFontSize;
+  font-size: @subSmallHeadSize*0.96;
   letter-spacing: 1px;
   p {
     margin: 0 0 8px;
@@ -2908,6 +2918,7 @@ body.portal .copyright-container  {
   margin: 1em auto;
   min-height: 250px;
   overflow: hidden;
+  line-height: 1.5;
   p {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3023,7 +3034,7 @@ body.portal .copyright-container  {
 .portal-description .button-container {
   position: relative;
   margin-bottom: 0;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 .portal-flex-container {
@@ -3061,11 +3072,13 @@ body.portal .copyright-container  {
 }
 
 .portal-skyscraper-container {
-  margin-top: 40px;
+  margin-top: 16px;
   .section-title {
     color: #FFF;
     margin-bottom: 16px;
-    font-size: @lgFontSize;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 1px;
   }
   .top {
     display: flex;
@@ -3080,7 +3093,13 @@ body.portal .copyright-container  {
     flex-wrap: wrap;
   }
 }
-
+@media (min-width: 699px) {
+  .portal-skyscraper-container {
+    .section-title {
+      font-size: 1.4em;
+    }
+  }
+}
 section.header {
   margin-top: 16px;
   display: flex;

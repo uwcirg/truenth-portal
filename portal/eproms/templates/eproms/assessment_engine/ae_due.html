@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_completed -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- baseline due -->
 {% block head %}
@@ -22,11 +22,15 @@
 {% block body %}
     {% set button_label =  _('Continue questionnaire') if assessment_status.overall_status == OverallStatus.in_progress else _('Go to questionnaire')
     %}
-    <!-- tile title change for sub-study questionnaire is due.  NOTE: sub-study tile is not available when main study questionnaire is not completed yet -->
-    {% set title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
-                        if substudy_assessment_is_due else _("Open Questionnaire") %}
+    <!-- tile title change for sub-study questionnaire is due.  NOTE: sub-study DUE tile is not available when main study questionnaire is not completed yet -->
+    {% set due_title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
+                            if enrolled_in_substudy else _("Open Questionnaire") %}
+    <!-- tile title for completed card, NOTE:  need to differentiate between main and sub-study -->
+    {% set completed_title_text = _("%(assigning_authority)s Questionnaire", 
+                            assigning_authority=_(assessment_status.assigning_authority))
+                            if enrolled_in_substudy else _("Completed Questionnaire") %}
     <!-- main study due card -->
-    {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=title_text)}}
+    {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     <!-- substudy due card -->
     {%- if enrolled_in_substudy -%}
         {%- if substudy_assessment_is_due -%}
@@ -43,16 +47,24 @@
                 assessment_status=assessment_status,
                 OverallStatus=OverallStatus,
                 comp_date=comp_date,
-                title_text=_("Completed Questionnaires"))
+                title_text=completed_title_text)
             }}
         {%- endif -%}
+         <!-- it is possible that user has completed empro at this point, so need to show -->
+        {{empro_completed(
+            user=user,
+            OverallStatus=OverallStatus,
+            substudy_assessment_status=substudy_assessment_status,
+            substudy_comp_date=substudy_comp_date,
+            enrolled_in_substudy=enrolled_in_substudy
+        )}}
     {%- else -%}
         <!-- main study completed tile -->
         {{completed_card(
             assessment_status=assessment_status,
             OverallStatus=OverallStatus,
             comp_date=comp_date,
-            title_text=_("Completed Questionnaires"))
+            title_text=completed_title_text)
         }}
     {%- endif -%}
 {% endblock %}
