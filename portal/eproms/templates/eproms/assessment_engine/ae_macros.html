@@ -116,7 +116,6 @@
                 <a data-toggle="modal" data-target="#emproModal">{{_("Learn about your specific issues based on your last questionnaire submitted on %(substudy_comp_date)s", substudy_comp_date=substudy_comp_date)}}</a>
             </div>
         {%- endcall -%}
-        <!-- TODO link to longitudinal report page -->
         {%- call render_card_content(
             title_text = _("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
             card_class = card_class if card_class else "portal-description-complete") -%}
@@ -157,7 +156,6 @@
         <h4>{{_("Your Report")}}</h4>
         <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
-            <!-- TODO point to longitudinal report -->
             <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("My Report")}}</a>
         </div>
     </div>
@@ -176,7 +174,7 @@
         <h4>{{_("Your Health Tips")}}</h4>
         <p>{{_("Explore ways to manage common prostate cancer challenges. Here you'll find plenty of helpful information and resources.")}}</p>
         <div class="buttons-container">
-            <a class="btn btn-empro-primary" href="{{url_for('portal.substudy_tailored_content')}}" target="_blank">{{_("Explore Our Resources")}}</a>
+            <a class="btn btn-empro-primary" href="{{url_for('portal.substudy_tailored_content')}}">{{_("Explore Our Resources")}}</a>
         </div>
     </div>
 {%- endmacro -%}
