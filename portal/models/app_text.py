@@ -280,12 +280,16 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
         """Generate AppText name key for User Reminder Email Content
+
         Some organizations supply customized content - which is indexed
         by adding the org name to the end of the app_text pattern
         `patient reminder email`
+
         :param org: Typically top level org name - used to look for
         customized content.
+
         :returns: string for AppText.name field
+        
         """
         default = "patient reminder email"
         # See if content is available with the given org as the suffix
