@@ -1078,7 +1078,8 @@ export default (function() {
                     e.stopPropagation();
                     $("#erroremail").html("");
                 });
-                $("#profileForm").on("postEventUpdate", "#email", function(e) {
+            
+                $("#profileForm").on("change, postEventUpdate", "#email", function(e) {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }

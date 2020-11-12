@@ -94,12 +94,14 @@ export default { /*global $ */
         this.reportError(userId ? userId : "Not available", url, errorMessage, true);
     },
     "reportError": function(userId, page_url, message, sync) {
+        let MAX_MESSAGE_LENGTH = 1900;
         //params need to contain the following: subject_id: User on which action is being attempted message: Details of the error event page_url: The page requested resulting in the error
         var params = {};
         page_url = page_url || window.location.href;
         params.subject_id = userId || 0;
         params.page_url = page_url;
         params.message = "Error generated in JS - " + (message ? message.replace(/["']/g, "") : "no detail available"); //don't think we want to translate message sent back to the server here
+        params.message = params.message.substring(0, MAX_MESSAGE_LENGTH)
         console.log("Errors occurred....."); /*eslint no-console: off */
         console.log(params); /*global console*/
         $.ajax({
@@ -320,7 +322,9 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, function(data) {
+        //substudy_test_triggers_new
+        this.sendRequest(`/static/files/substudy_test_triggers_new.json`, "GET", userId, params, function(data) {
+        //this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, function(data) {
             if (data) {
                 if (!data.error) {
                     callback(data);
