@@ -52,7 +52,6 @@ from ..models.app_text import (
     UndefinedAppText,
     UserInviteEmail_ATMA,
     UserReminderEmail_ATMA,
-    UserWelcomeEmail_ATMA,
     VersionedResource,
     app_text,
     get_terms,
@@ -708,19 +707,25 @@ def profile(user_id):
                            consent_agreements=consent_agreements)
 
 
-@portal.route('/patient-invite-email/<int:user_id>')
+@portal.route(
+    '/patient-invite-email/<int:user_id>', defaults={'research_study_id': 0})
+@portal.route('/patient-invite-email/<int:user_id>/<int:research_study_id>')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
-def patient_invite_email(user_id):
+def patient_invite_email(user_id, research_study_id):
     """Patient Invite Email Content"""
     user = get_user(user_id, 'edit')
 
     try:
         top_org = user.first_top_organization()
         if top_org:
-            name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+            name_key = UserInviteEmail_ATMA.name_key(
+                org=top_org.name,
+                research_study_id=research_study_id)
         else:
-            name_key = UserInviteEmail_ATMA.name_key()
+            name_key = UserInviteEmail_ATMA.name_key(
+                research_study_id=research_study_id
+            )
         args = load_template_args(user=user)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
@@ -741,6 +746,7 @@ def patient_reminder_email(user_id):
     :param research_study_id: set for targeted reminder emails, defaults to 0
 
     """
+    from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
     research_study_id = int(request.args.get('research_study_id', 0))
     try:
@@ -751,60 +757,27 @@ def patient_reminder_email(user_id):
             name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserReminderEmail_ATMA.name_key()
-        item = mailResource_by_name_key(name_key, user, research_study_id)
-    except UndefinedAppText:
-        """return no content and 204 no content status"""
-        return '', 204
 
-    return jsonify(subject=item.subject, body=item.body)
-
-
-@portal.route('/patient-welcome-email/<int:user_id>')
-@roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
-@oauth.require_oauth()
-def patient_welcome_email(user_id):
-    """Patient Welcome Email Content for a Research Study
-
-    Query string
-    :param research_study_id: set for targeted welcome email, defaults to 0
-
-    """
-    from ..models.research_study import ResearchStudy
-    user = get_user(user_id, 'edit')
-    research_study_id = int(request.args.get('research_study_id', 0))
-    research_study_title = ResearchStudy.query.get(
-        research_study_id).as_fhir()['title']
-    try:
-        if research_study_title:
-            name_key = UserWelcomeEmail_ATMA.name_key(
-                research_study=research_study_title)
+        # If the user has a pending questionnaire bank, include for due date
+        qstats = QB_Status(
+            user,
+            research_study_id=research_study_id,
+            as_of_date=datetime.utcnow())
+        qbd = qstats.current_qbd()
+        if qbd:
+            qb_id, qb_iteration = qbd.qb_id, qbd.iteration
         else:
-            name_key = UserWelcomeEmail_ATMA.name_key()
-        item = mailResource_by_name_key(name_key, user, research_study_id)
+            qb_id, qb_iteration = None, None
+
+        args = load_template_args(
+            user=user, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
+        item = MailResource(
+            app_text(name_key), locale_code=user.locale_code, variables=args)
     except UndefinedAppText:
         """return no content and 204 no content status"""
         return '', 204
 
     return jsonify(subject=item.subject, body=item.body)
-
-
-def mailResource_by_name_key(name_key, user, research_study_id=0):
-    from ..models.qb_status import QB_Status
-    # If the user has a pending questionnaire bank, include for due date
-    qstats = QB_Status(
-        user,
-        research_study_id=research_study_id,
-        as_of_date=datetime.utcnow())
-    qbd = qstats.current_qbd()
-    if qbd:
-        qb_id, qb_iteration = qbd.qb_id, qbd.iteration
-    else:
-        qb_id, qb_iteration = None, None
-
-    args = load_template_args(
-        user=user, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
-    return MailResource(
-        app_text(name_key), locale_code=user.locale_code, variables=args)
 
 
 @portal.route('/share-your-story')
