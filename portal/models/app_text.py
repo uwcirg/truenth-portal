@@ -280,16 +280,12 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
         """Generate AppText name key for User Reminder Email Content
-
         Some organizations supply customized content - which is indexed
         by adding the org name to the end of the app_text pattern
         `patient reminder email`
-
         :param org: Typically top level org name - used to look for
         customized content.
-
         :returns: string for AppText.name field
-
         """
         default = "patient reminder email"
         # See if content is available with the given org as the suffix
@@ -299,6 +295,38 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
             if query.count() == 1:
                 return specialized
         return default
+
+
+class UserWelcomeEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for User Welcome Email Content for a research study"""
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for Welcome Email Content
+
+        Some organizations supply customized content - which is indexed
+        by adding the research study name to the end of the app_text pattern
+        `patient welcome email`
+
+        :param research_study: name of the research study - used to look for
+        customized content.
+
+        :returns: string for AppText.name field
+
+        """
+       
+        default = "patient welcome email"
+        research_study = kwargs.get('research_study')
+
+        # See if content is available with the given research study title as the suffix
+        if research_study:
+            specialized = " ".join((default, research_study))
+            print("specialized name {}".format(specialized))
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
+    
+        return default
+
 
 
 class SiteSummaryEmail_ATMA(AppTextModelAdapter):

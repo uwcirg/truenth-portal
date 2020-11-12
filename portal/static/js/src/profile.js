@@ -219,6 +219,17 @@ export default (function() {
                 get: function() {
                     return this.manualEntry.message;
                 }
+            },
+            computedIsSubStudyPatient: function() {
+                //will re-compute when the dependent prop, this.subjectReseachStudies, updates
+                return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
+            },
+            computedUserEmail: function() {
+                //will re-compute when email updates
+                return this.demo.data.email;
+            },
+            computedTreatingClinician: function() {
+                return this.demo.data.clinician && Object.keys(this.demo.data.clinician).length;
             }
         },
         methods: {
@@ -303,7 +314,7 @@ export default (function() {
                 });
             },
             userHasNoEmail: function() {
-                return !this.demo.data.email;
+                return !this.computedUserEmail;
             },
             isUserEmailReady: function() {
                 return this.userEmailReady;
@@ -573,7 +584,7 @@ export default (function() {
                 }).length;
             },
             isSubStudyPatient: function() {
-                return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
+                return this.computedIsSubStudyPatient;
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
@@ -1119,6 +1130,9 @@ export default (function() {
                     self.updateIdentifierData(this);
                 });
             },
+            hasTreatingClinician: function() {
+                return this.computedTreatingClinician;
+            },
             initTreatingClinicianSection: function() {
                 let self = this;
                 this.modules.tnthAjax.getCliniciansList(this.subjectOrgs, function(data) {
@@ -1299,6 +1313,10 @@ export default (function() {
                 $("#profileEmailLogTable a.item-link").on("click", function() {
                     self.getEmailContent($(this).attr("data-user-id"), $(this).attr("data-item-id"));
                 });
+            },
+            allowSubStudyWelcomeEmail: function() {
+                //TODO check to see if sub-study questionnaire is DUE?
+                return this.isSubStudyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
             },
             initPatientEmailFormSection: function() {
                 var self = this;
@@ -2527,6 +2545,7 @@ export default (function() {
                     setTimeout(function() { // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
                         self.modules.tnthAjax.getConsent(userId || self.subjectId, {sync: true}, function(data) {
                             self.getConsentList(data);
+                            self.setSubjectResearchStudies();
                         });
                     }, 1500);
                 });

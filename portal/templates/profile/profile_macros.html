@@ -321,6 +321,8 @@
                     <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("TrueNTH Invite")}}</option>
                 {%endif %}
                 <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
+                <!-- reactive option, will only show when user is in sub-study and email is available -->
+                <option value="welcome" data-url="{{url_for('portal.patient_welcome_email', user_id=person.id, research_study_id=1)}}" v-show="allowSubStudyWelcomeEmail()">{{_("TrueNTH Sub-Study Welcome")}}</option>
             {% endcall %}
             <!--
                 set P3P invite/reminder tile visibility based on whether user's org matches config variable, ACCEPT_TERMS_ON_NEXT_ORG - this is the case of MUSIC patient
