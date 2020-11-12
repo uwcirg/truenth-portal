@@ -329,7 +329,7 @@ class UserWelcomeEmail_ATMA(AppTextModelAdapter):
             query = AppText.query.filter_by(name=specialized)
             if query.count() == 1:
                 return specialized
-                
+        
         return default
 
 
