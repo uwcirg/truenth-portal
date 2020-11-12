@@ -772,7 +772,8 @@ def patient_welcome_email(user_id):
     from ..models.research_study import ResearchStudy
     user = get_user(user_id, 'edit')
     research_study_id = int(request.args.get('research_study_id', 0))
-    research_study_title = ResearchStudy.query.get(research_study_id).as_fhir()['title']
+    research_study_title = ResearchStudy.query.get(
+        research_study_id).as_fhir()['title']
     try:
         if research_study_title:
             name_key = UserWelcomeEmail_ATMA.name_key(
@@ -789,7 +790,7 @@ def patient_welcome_email(user_id):
 
 def mailResource_by_name_key(name_key, user, research_study_id=0):
     from ..models.qb_status import QB_Status
-     # If the user has a pending questionnaire bank, include for due date
+    # If the user has a pending questionnaire bank, include for due date
     qstats = QB_Status(
         user,
         research_study_id=research_study_id,

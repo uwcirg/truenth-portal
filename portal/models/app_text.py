@@ -289,7 +289,7 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
         customized content.
 
         :returns: string for AppText.name field
-        
+
         """
         default = "patient reminder email"
         # See if content is available with the given org as the suffix
@@ -302,7 +302,7 @@ class UserReminderEmail_ATMA(AppTextModelAdapter):
 
 
 class UserWelcomeEmail_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for User Welcome Email Content for a research study"""
+    """AppTextModelAdapter for User Welcome Email Content"""
     @staticmethod
     def name_key(**kwargs):
         """Generate AppText name key for Welcome Email Content
@@ -317,18 +317,19 @@ class UserWelcomeEmail_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
-       
+
         default = "patient welcome email"
         research_study = kwargs.get('research_study')
 
-        # See if content is available with the given research study title as the suffix
+        # See if content is available with the given research study title
+        # as the suffix
         if research_study:
             specialized = " ".join((default, research_study))
             print("specialized name {}".format(specialized))
             query = AppText.query.filter_by(name=specialized)
             if query.count() == 1:
                 return specialized
-    
+                
         return default
 
 
