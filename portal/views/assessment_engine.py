@@ -1575,6 +1575,10 @@ def assessment_add(patient_id):
     db.session.commit()
     questionnaire_response.assign_qb_relationship(
         acting_user_id=current_user().id)
+
+    from ..tasks import extract_observations_task
+    extract_observations_task.apply_async(questionnaire_response_id=questionnaire_response.id)
+
     auditable_event("added {}".format(questionnaire_response),
                     user_id=current_user().id, subject_id=patient_id,
                     context='assessment')
