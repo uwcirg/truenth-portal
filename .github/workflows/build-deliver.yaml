@@ -1,0 +1,28 @@
+# docker continuous delivery
+# deliver docker images to configured repo with tags to match branches and git tags
+---
+name: Build & Deliver
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout git commit
+        uses: actions/checkout@master
+
+      - name: Publish to GitHub Container Registry
+        # TODO: pin to hash
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: ${{ github.repository }}
+          registry: ghcr.io
+
+          # configured at repo settings/secrets
+          # GitHub Username
+          username: ${{ secrets.DOCKER_USERNAME }}
+          
+          # GitHub personal access token
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+          # update major tags when updating minor tags (eg 1.2.3 also updates 1.2 and 1)
+          tag_semver: true
