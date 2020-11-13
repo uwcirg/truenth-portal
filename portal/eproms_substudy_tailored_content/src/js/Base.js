@@ -190,10 +190,14 @@ export default {
                 this.userInfo = data;
             }
         },
+        getDefaultDomains() {
+            return Object.keys(this.domainMappings);
+        },
         getUserDomains() {
             return this.userDomains;
         },
         setUserDomains(data) {
+            this.userDomains = [];
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
@@ -203,6 +207,9 @@ export default {
                     if (["hard", "soft"].indexOf(data.triggers.domain[key][q]) !== -1) {
                         if (self.domainMappings[key]) {
                             self.userDomains.push(self.domainMappings[key]);
+                        }
+                        if (self.getDefaultDomains().indexOf(key) !== -1) {
+                            self.userDomains.push(key);
                         }
                     }
                 }
@@ -401,9 +408,17 @@ export default {
             }
         },
         processDefaultDomainContent() {
-            if (!this.getUserDomains().length) return;
+            let triggerElements = document.querySelectorAll(".trigger");
+            if (!this.getUserDomains().length) {
+                triggerElements.forEach(el => {
+                    el.classList.remove("show");
+                    el.classList.add("hide");
+                })
+                return;
+            }
             let hardTriggerTiles = document.querySelectorAll("#hardTriggerTopicsContainer .tile");
             hardTriggerTiles.forEach(item => {
+                item.classList.remove("hide");
                 if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) === -1) {
                     item.classList.add("hide");
                 }
@@ -413,10 +428,14 @@ export default {
             
             let otherTopicTiles = document.querySelectorAll("#otherTopicsContainer .tile");
             otherTopicTiles.forEach(item => {
+                item.classList.remove("hide");
                 if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) !== -1) {
                     item.classList.add("hide");
                 }
             });
+            triggerElements.forEach(el => {
+                el.classList.add("show");
+            })
         },
         setResourcesByCountry(countryCode) {
 
@@ -482,10 +501,10 @@ export default {
             });
             this.initVideoEvents();
         },
-        goHome: function() {
+        goHome() {
             this.goToView("domain");
         },
-        initDebugModeEvent: function() {
+        initDebugModeEvent() {
             /*
              * activating debugging tool by pressing Ctrl + Shift + d
              */
@@ -502,8 +521,30 @@ export default {
                 });
             }
         },
-        isDebugMode: function() {
+        submitTestTriggers() {
+            let testChkElements = document.querySelectorAll("#debugContainer .trigger-checkbox");
+            let testData = {
+                triggers: {
+                    domain: {}
+                }
+            };
+            testChkElements.forEach(el => {
+                if (el.checked) {
+                    testData.triggers.domain[el.value] = {"ironman_ss": "hard"}
+                }
+            });
+            //log test data to console for debugging
+            console.log("test data? ", testData);
+            this.setUserDomains(testData);
+            this.processDefaultDomainContent();
+            //log updated date to console for debugging
+            console.log("updated data ", this.$data);
+        },
+        isDebugMode () {
             return this.debugMode;
+        },
+        unsetDebugMode() {
+            this.debugMode = false;
         }
     }
 };

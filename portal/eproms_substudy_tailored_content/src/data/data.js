@@ -20,7 +20,10 @@ export default {
     domainMappings: {},
     defaultDomain: "default_domain",
     mainPageIdentifiers: ["resource_library", "default_domain"],
-    domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue"],
+    /*
+     * tailored domain topics, some for video only, e.g. masculinity & empowerment
+     */
+    domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue", "masculinity", "empowerment"],
     userDomains: [],
     eligibleCountryCodes: [{
         name: "United Kingdom",
