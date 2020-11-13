@@ -10,6 +10,9 @@ jobs:
       - name: Checkout git commit
         uses: actions/checkout@master
 
+      - name: Set version environment variable
+        run: echo "PORTAL_VERSION="$(python setup.py --version)"" >> $GITHUB_ENV
+
       - name: Publish to GitHub Container Registry
         # TODO: pin to hash
         uses: elgohr/Publish-Docker-Github-Action@master
