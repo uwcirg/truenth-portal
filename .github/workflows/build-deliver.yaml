@@ -10,7 +10,7 @@ jobs:
       - name: Checkout git commit
         uses: actions/checkout@master
         with:
-          fetch-depth: 1000
+          fetch-depth: 0
 
       - name: Set version environment variable
         run: echo "PORTAL_VERSION="$(python setup.py --version)"" >> $GITHUB_ENV
