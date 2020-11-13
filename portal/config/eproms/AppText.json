@@ -161,6 +161,26 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9bd6f29d-965d-7752-f4f4-d0d26c14b89f",
+      "name": "patient empro thank you email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76ae0f03-3018-52f3-34a1-f477bd5f8a1b",
+      "name": "patient empro both triggers email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=7c527734-a1b9-1e2b-b52a-854ea0fd585e",
+      "name": "patient empro hard triggers email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=dcd1f80b-6d6d-a649-75c6-5e042c8442fd",
+      "name": "patient empro soft triggers email",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>",
       "name": "profileSendEmail invite email_body",
       "resourceType": "AppText"
