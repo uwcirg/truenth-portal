@@ -533,9 +533,11 @@ export default {
                     testData.triggers.domain[el.value] = {"ironman_ss": "hard"}
                 }
             });
+            //log test data to console for debugging
             console.log("test data? ", testData);
             this.setUserDomains(testData);
             this.processDefaultDomainContent();
+            //log updated date to console for debugging
             console.log("updated data ", this.$data);
         },
         isDebugMode () {
