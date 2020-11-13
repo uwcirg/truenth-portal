@@ -261,16 +261,10 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
-def initialized_patient(app, add_user, initialize_static, shallow_org_tree):
+def initialized_patient(app, test_user, initialize_static, shallow_org_tree):
     """returns test patient with data necessary to avoid initial_queries"""
-    TEST_USERNAME = 'test@example.com'
-    FIRST_NAME = '✓'
-    LAST_NAME = 'Last'
-    IMAGE_URL = 'http://examle.com/photo.jpg'
     now = datetime.utcnow()
-    test_user = add_user(
-        username=TEST_USERNAME, first_name=FIRST_NAME,
-        last_name=LAST_NAME, image_url=IMAGE_URL)
+    test_user = db.session.merge(test_user)
     test_user.birthdate = now
     test_user_id = test_user.id
     role_id = db.session.query(Role.id).filter(
