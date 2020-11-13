@@ -1316,7 +1316,11 @@ export default (function() {
                 });
             },
             allowSubStudyWelcomeEmail: function() {
-                //TODO check to see if sub-study questionnaire is DUE?
+                /*
+                 *  to allow option for sub-study welcome email in the dropdown
+                 *  the subject needs to have consented to the sub-study, have a valid email and an
+                 *  assigned treating clinician
+                 */
                 return this.isSubStudyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
             },
             initPatientEmailFormSection: function() {
