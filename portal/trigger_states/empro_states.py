@@ -5,6 +5,7 @@ See also:
 """
 import copy
 from flask import current_app
+from smtplib import SMTPRecipientsRefused
 from statemachine import StateMachine, State
 from statemachine.exceptions import TransitionNotAllowed
 
@@ -185,6 +186,9 @@ def fire_trigger_events():
     is transitioned to 'triggered'.
 
     """
+    from ..models.user import User
+    from .empro_messages import patient_email, staff_emails
+
     # as a job, make sure only running one concurrent instance
     NEVER_WAIT = 0
     with TimeoutLock(key='fire_trigger_events', timeout=NEVER_WAIT):
@@ -195,24 +199,31 @@ def fire_trigger_events():
             triggers['actions'] = []
             # Emails generated for both patient and clinician/staff based
             # on hard triggers.  Patient gets 'thank you' email regardless.
-            hard_trigger_list = ts.hard_trigger_list()
+            hard_triggers = ts.hard_trigger_list()
+            soft_triggers = ts.soft_trigger_list()
+            pending_emails = []
+            patient = User.query.get(ts.user_id)
 
-            # without hard triggers, user gets thank you email
-            if not hard_trigger_list:
-                # TODO generate and send patient thank you email
-                triggers['actions'].append(
-                    {"email": "patient thank you email id"})
+            # Patient always gets mail
+            pending_emails.append(
+                patient_email(patient, soft_triggers, hard_triggers))
 
-            else:
-                # TODO generate and send patient trigger info email
-                triggers['actions'].append(
-                    {"email": "patient trigger info email id"})
+            if hard_triggers:
+                # In the event of hard_triggers, clinicians/staff get mail
+                pending_emails.append(staff_emails(patient, hard_triggers))
 
-                # TODO generate and send clinician and staff email
-                #  with link to user's profile - that will present
-                #  QB for clinician to fill out.
-                triggers['actions'].append(
-                    {"email": "clinician email id"})
+            for em in pending_emails:
+                try:
+                    em.send_message()
+                    triggers['actions'].append(
+                        {"email": (em.id, em.subject)})
+                except SMTPRecipientsRefused as exc:
+                    msg = ("Error sending trigger email to {}: "
+                           "{}".format(em.recipients, exc))
+                    current_app.errors(msg)
+                    triggers['errors'].append(
+                        {"email": msg}
+                    )
 
             # Change state, as this row has been processed.
             ts.triggers = triggers
