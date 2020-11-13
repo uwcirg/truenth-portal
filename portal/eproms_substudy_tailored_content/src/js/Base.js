@@ -87,8 +87,8 @@ export default {
                 this.getUserID()?
                 [
                     this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                    this.$http(`/api/user/${this.getUserID()}/triggers`)
-                  //this.$http(`/static/files/substudy_test_triggers_new.json`)
+                  //  this.$http(`/api/user/${this.getUserID()}/triggers`)
+                  this.$http(`/static/files/substudy_test_triggers_new.json`)
                 ] :
                 [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
             ).then(responses => {
@@ -401,7 +401,13 @@ export default {
             }
         },
         processDefaultDomainContent() {
-            if (!this.getUserDomains().length) return;
+            let triggerElements = document.querySelectorAll(".trigger");
+            if (!this.getUserDomains().length) {
+                triggerElements.forEach(el => {
+                    el.classList.add("hide");
+                })
+                return;
+            }
             let hardTriggerTiles = document.querySelectorAll("#hardTriggerTopicsContainer .tile");
             hardTriggerTiles.forEach(item => {
                 if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) === -1) {
@@ -417,6 +423,9 @@ export default {
                     item.classList.add("hide");
                 }
             });
+            triggerElements.forEach(el => {
+                el.classList.add("show");
+            })
         },
         setResourcesByCountry(countryCode) {
 

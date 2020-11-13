@@ -471,9 +471,14 @@ a {
   }
 }
 .section-title {
-  padding-left: 40px;
+  padding-left: 32px;
   padding-right: 32px;
   position: relative;
+}
+@media (min-width: 1400px) {
+  .section-title {
+    padding-left: 32px;
+  }
 }
 @media (min-width: 768px) {
   .module-section.intro {
@@ -496,6 +501,9 @@ a {
     text-transform: none;
     margin-bottom: 32px;
   }
+}
+#otherTopicsContainer {
+  padding-bottom: 0;
 }
 @media (min-width: 768px) {
   .module-section {
@@ -1129,13 +1137,13 @@ a {
       }
     }
   }
-  .video-section + .resource-section {
-    margin-top: -40px;
-  }
+  .video-section + .resource-section,
   .section-title + .video-section {
     padding-top: 16px;
   }
 }
+
+
 @media (min-width: 1400px) {
   #resources_main {
     .resource-section {
