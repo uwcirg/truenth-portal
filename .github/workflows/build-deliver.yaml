@@ -16,6 +16,8 @@ jobs:
         with:
           name: ${{ github.repository }}
           registry: ghcr.io
+          dockerfile: docker/Dockerfile
+          context: ./
 
           # configured at repo settings/secrets
           # GitHub Username
