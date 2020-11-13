@@ -111,7 +111,7 @@ def test_worsening_baseline():
     assert dt.triggers[12] == dt.triggers[21] == 'hard'
 
 
-def test_ts_hard_triggers():
+def test_ts_trigger_lists():
     mock_triggers = {
         'domain': {
             'general_pain': {
@@ -127,11 +127,15 @@ def test_ts_hard_triggers():
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
     assert set(['general_pain', 'joint_pain', 'fatigue']) == set(
         ts.hard_trigger_list())
+    assert set(['general_pain', 'joint_pain', 'anxious']) == set(
+        ts.soft_trigger_list())
 
 
 def test_fire_trigger_events(
-        test_user, initialized_with_ss_recur_qb, initialized_with_ss_qnr):
-    test_user_id = db.session.merge(test_user).id
+        initialized_patient,
+        initialized_with_ss_recur_qb,
+        initialized_with_ss_qnr):
+    test_user_id = db.session.merge(initialized_patient).id
 
     # mock user transitioning to processed
     initiate_trigger(test_user_id)
