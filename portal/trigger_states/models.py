@@ -77,3 +77,19 @@ class TriggerState(db.Model):
             if 'hard' in link_triggers.values():
                 results.append(domain)
         return results
+
+    def soft_trigger_list(self):
+        """Convenience function to return list of soft trigger domains
+
+        Save clients from internal structure of self.triggers - returns
+        a simple list of soft trigger domains if any exist for instance.
+
+        """
+        if not self.triggers:
+            return
+
+        results = []
+        for domain, link_triggers in self.triggers['domain'].items():
+            if 'soft' in link_triggers.values():
+                results.append(domain)
+        return results
