@@ -3356,20 +3356,21 @@ section.header {
       background-color: @emproBtnPrimaryColor;
       color: #FFF;
       display: block;
-      width: 100%;
+      width: 300px;
       max-width: 100%;
       white-space: normal;
       margin: 8px auto;
     }
   }
 }
+
 @media (min-width: 768px) {
   #emproModal {
     .items-section {
       .item {
         padding: 16px 24px 24px;
         width: 33.33333333%;
-        min-height: 424px;
+        min-height: 360px;
         flex-wrap: nowrap;
         flex: 1;
         border-bottom: 0;
@@ -3380,24 +3381,18 @@ section.header {
           border-right: 1px solid @HRColor;
         }
       }
-      button {
+      a, button {
+        width: 100%;
         max-width: 100%;
       }
     }
   }
 }
-@media (min-width: 1200px) {
+@media (min-width: 992px) {
   #emproModal {
     .modal-dialog {
-      width: 70%;
+      width: 960px;
       margin: auto;
-    }
-  }
-}
-@media (min-width: 1400px) {
-  #emproModal {
-    .modal-dialog {
-      width: 67.5%;
     }
   }
 }
