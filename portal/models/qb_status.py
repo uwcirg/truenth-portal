@@ -523,7 +523,7 @@ def patient_research_study_status(patient):
                 rs_status['ready'] = False
                 rs_status['errors'].append('Pending work in base study')
 
-            if patient.clinican_id is None:
+            if patient.clinician_id is None:
                 # Enforce biz rule - must have clinician on file.
                 rs_status['ready'] = False
                 rs_status['errors'].append("No clinician")

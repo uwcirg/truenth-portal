@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content, render_call_to_button, completed_card, thankyou_card, empro_thankyou_card, empro_due, empro_completed -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content, render_call_to_button, completed_card, thankyou_card, empro_thankyou_card, empro_due, completed_cards -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed both baseline and indefinite -->
 {% block head %}
@@ -40,28 +40,16 @@
             substudy_due_date=substudy_due_date,
             enrolled_in_substudy=enrolled_in_substudy
         )}}
-        <div class="portal-skyscraper-container">
-            <div class="top">
-                <h2 class="section-title">{{_("Completed Questionnaires")}}</h2>
-                <!-- main study completed card -->
-                {{completed_card(
-                    assessment_status=assessment_status,
-                    OverallStatus=OverallStatus,
-                    comp_date=comp_date,
-                    title_text=completed_title_text)}}
-            </div>
-            <div class="bottom">
-                <!-- substudy completed card -->
-                {{empro_completed(
-                    user=user,
-                    OverallStatus=OverallStatus,
-                    substudy_assessment_status=substudy_assessment_status,
-                    substudy_comp_date=substudy_comp_date,
-                    enrolled_in_substudy=enrolled_in_substudy,
-                    card_class="disabled" if substudy_assessment_is_due else ""
-                )}}
-            </div>
-        </div>
+        <!-- both main and substudy completed cards-->
+        {{completed_cards(
+            user=user,
+            assessment_status=assessment_status,
+            OverallStatus=OverallStatus,
+            comp_date=comp_date,
+            substudy_assessment_status=substudy_assessment_status,
+            enrolled_in_substudy=enrolled_in_substudy
+            substudy_assessment_is_due=substudy_assessment_is_due
+        )}}
     {%- else -%}
         <!-- main study ONLY -->
         {%- call render_card_content(
