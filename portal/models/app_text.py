@@ -254,17 +254,30 @@ class UserInviteEmail_ATMA(AppTextModelAdapter):
     def name_key(**kwargs):
         """Generate AppText name key for User Invite Email Content
 
-        Some organizations supply customized content - which is indexed
-        by adding the org name to the end of the app_text pattern
+        Some organizations and research studies supply customized content,
+        which is indexed by adding the org or study name to the end of the
+        app_text pattern.
         `patient invite email`
 
         :param org: Typically top level org name - used to look for
-        customized content.
+         customized content.
+        :param research_study_id: Optionally included for studies with
+         tailored content.  If provided, the study is consulted FIRST.
 
         :returns: string for AppText.name field
 
         """
+        from .research_study import ResearchStudy
         default = "patient invite email"
+        # First try the study (if provided)
+        if kwargs.get('research_study_id'):
+            study_title = ResearchStudy.query.get(
+                kwargs.get('research_study_id')).title
+            specialized = " ".join((default, study_title))
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
+
         # See if content is available with the given org as the suffix
         if kwargs.get('org'):
             specialized = " ".join((default, kwargs.get('org')))
