@@ -40,14 +40,14 @@
             substudy_due_date=substudy_due_date,
             enrolled_in_substudy=enrolled_in_substudy
         )}}
-        <!-- both main and substudy completed cards-->
+        <!-- both main and sub-study completed -->
         {{completed_cards(
             user=user,
             assessment_status=assessment_status,
             OverallStatus=OverallStatus,
             comp_date=comp_date,
             substudy_assessment_status=substudy_assessment_status,
-            enrolled_in_substudy=enrolled_in_substudy
+            enrolled_in_substudy=enrolled_in_substudy,
             substudy_assessment_is_due=substudy_assessment_is_due
         )}}
     {%- else -%}
