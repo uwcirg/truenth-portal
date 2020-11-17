@@ -29,6 +29,12 @@ class EMPRO_state(StateMachine):
       - inprocess: system in process of evaluating users triggers
       - processed: user's completed EMPRO questionnaire(s) have been
        processed.  a list of hard and soft triggers are available.
+      - triggered: action taken on user's trigger state, such as email
+       sent to subject and staff as appropriate.  if no further action is
+       necessary, transition immediately to ``resolved``.  a list of
+       hard and soft triggers are available.
+      - resolved: no further action needed.  a list of hard and soft
+       triggers are available.
 
     Transitions:
       - initially_available: called when a user qualifies for the study
@@ -37,6 +43,7 @@ class EMPRO_state(StateMachine):
        available
       - fired_events: trigger state has been evaluated, events (such as
        generating email for clinicians and patients) have fired.
+      - resolve: actions complete, nothing pending for trigger state
       - next_available: called once the next EMPRO cycle becomes available
 
     """
@@ -47,13 +54,15 @@ class EMPRO_state(StateMachine):
     inprocess = State('inprocess')
     processed = State('processed')
     triggered = State('triggered')
+    resolved = State('resolved')
 
     # Transitions
     initial_available = unstarted.to(due)
     begin_process = due.to(inprocess)
     processed_triggers = inprocess.to(processed)
     fired_events = processed.to(triggered)
-    next_available = triggered.to(due)
+    resolve = triggered.to(resolved)
+    next_available = resolved.to(due)
 
 
 def enter_user_trigger_critical_section(user_id):
@@ -196,7 +205,9 @@ def fire_trigger_events():
         for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
-            triggers['actions'] = []
+            triggers['actions'] = dict()
+            triggers['actions']['email'] = list()
+
             # Emails generated for both patient and clinician/staff based
             # on hard triggers.  Patient gets 'thank you' email regardless.
             hard_triggers = ts.hard_trigger_list()
@@ -215,19 +226,23 @@ def fire_trigger_events():
             for em in pending_emails:
                 try:
                     em.send_message()
-                    triggers['actions'].append(
-                        {"email": (em.id, em.subject)})
+                    triggers['actions']['email'].append(
+                        {"sent": (em.id, em.subject)})
                 except SMTPRecipientsRefused as exc:
                     msg = ("Error sending trigger email to {}: "
                            "{}".format(em.recipients, exc))
-                    current_app.errors(msg)
-                    triggers['errors'].append(
-                        {"email": msg}
+                    current_app.logger.errors(msg)
+                    triggers['actions']['email'].append(
+                        {"error": msg}
                     )
 
             # Change state, as this row has been processed.
             ts.triggers = triggers
             sm = EMPRO_state(ts)
             sm.fired_events()
+
+            # Without hard triggers, no further action is necessary
+            if not hard_triggers:
+                sm.resolve()
 
         db.session.commit()

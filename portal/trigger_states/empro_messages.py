@@ -25,12 +25,10 @@ def patient_email(patient, soft_triggers, hard_triggers):
     args = load_template_args(
         user=patient, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
 
-    if soft_triggers and hard_triggers:
+    if hard_triggers:
         name = 'patient empro both triggers email'
     elif soft_triggers:
         name = 'patient empro soft triggers email'
-    elif hard_triggers:
-        name = 'patient empro hard triggers email'
     else:
         name = 'patient empro thank you email'
     mr = MailResource(
@@ -54,9 +52,9 @@ def staff_emails(patient, hard_triggers):
     # - link to patient profile
     # - list of `hard_triggers`
     args = {
-        'study_id': patient.external_study_id(),
+        'study_id': patient.external_study_id,
         'patient_link': url_for(
-            'patient.patient_profile', patient_id=patient.id, _external=True),
+            'patients.patient_profile', patient_id=patient.id, _external=True),
         'hard_triggers': hard_triggers
     }
     mr = MailResource(
@@ -69,4 +67,3 @@ def staff_emails(patient, hard_triggers):
         subject=mr.subject,
         body=mr.body)
     return em
-
