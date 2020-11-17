@@ -191,7 +191,7 @@ def patient_profile(patient_id):
 
     from ..models.qb_status import QB_Status, patient_research_study_status
     from ..models.research_study import EMPRO_RS_ID, ResearchStudy
-    
+
     user = current_user()
     patient = get_user(patient_id, 'edit')
     consent_agreements = Organization.consent_agreements(
