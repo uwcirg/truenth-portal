@@ -12,6 +12,7 @@ trigger_state_enum = ENUM(
     'inprocess',
     'processed',
     'triggered',
+    'resolved',
     name='trigger_state_type',
     create_type=False)
 
@@ -83,13 +84,14 @@ class TriggerState(db.Model):
 
         Save clients from internal structure of self.triggers - returns
         a simple list of soft trigger domains if any exist for instance.
+        NB, all hard triggers imply a matching soft trigger.
 
         """
         if not self.triggers:
             return
 
-        results = []
+        results = set(self.hard_trigger_list())
         for domain, link_triggers in self.triggers['domain'].items():
             if 'soft' in link_triggers.values():
-                results.append(domain)
-        return results
+                results.add(domain)
+        return list(results)

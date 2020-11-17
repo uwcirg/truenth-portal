@@ -111,40 +111,25 @@ def test_worsening_baseline():
     assert dt.triggers[12] == dt.triggers[21] == 'hard'
 
 
-def test_ts_trigger_lists():
-    mock_triggers = {
-        'domain': {
-            'general_pain': {
-                'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
-            'joint_pain': {
-                'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
-            'insomnia': {},
-            'fatigue': {'ironman_ss.9': 'hard'},
-            'anxious': {'ironman_ss.12': 'soft'},
-        }
-    }
-
+def test_ts_trigger_lists(mock_triggers):
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
     assert set(['general_pain', 'joint_pain', 'fatigue']) == set(
         ts.hard_trigger_list())
-    assert set(['general_pain', 'joint_pain', 'anxious']) == set(
+    assert set(['general_pain', 'joint_pain', 'anxious', 'fatigue']) == set(
         ts.soft_trigger_list())
 
 
-def test_fire_trigger_events(
-        initialized_patient,
-        initialized_with_ss_recur_qb,
-        initialized_with_ss_qnr):
-    test_user_id = db.session.merge(initialized_patient).id
-
-    # mock user transitioning to processed
-    initiate_trigger(test_user_id)
-    enter_user_trigger_critical_section(test_user_id)
-    evaluate_triggers(initialized_with_ss_qnr)
+def test_fire_trigger_events(initialized_patient, processed_ts):
+    # pretend patient is it's own clinician for staff email
+    user = db.session.merge(initialized_patient)
+    user.clinician_id = user.id
 
     fire_trigger_events()
 
-    # user's trigger should now include actions and be triggered
-    ts = users_trigger_state(test_user_id)
+    # user's trigger should now include actions and with hard
+    # triggers, should still be triggered with an action for staff
+    # and patient
+    ts = users_trigger_state(user.id)
     assert ts.state == 'triggered'
-    assert 'actions' in ts.triggers
+    assert len(ts.triggers['actions']['email']) > 1
+
