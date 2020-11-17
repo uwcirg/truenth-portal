@@ -189,7 +189,7 @@ def longitudinal_report(subject_id, instrument_id):
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
 
-    from ..models.qb_status import QB_Status, patient_research_study_status
+    from ..models.qb_status import patient_research_study_status
     from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 
     user = current_user()
