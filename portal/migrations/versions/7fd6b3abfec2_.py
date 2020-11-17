@@ -29,6 +29,7 @@ def upgrade():
                 'due',
                 'processed',
                 'triggered',
+                'resolved',
                 name='trigger_state_type'),
             nullable=False),
         sa.Column('timestamp', sa.DateTime(), nullable=False),
