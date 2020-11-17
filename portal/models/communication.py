@@ -231,7 +231,10 @@ def load_template_args(
     # into the args instance
     args = DynamicDictLookup()
     lc = user.locale_code if user else None
-    for fname, function in locals().items():
+    # Avoid `dictionary changed size during iteration` error by
+    # copying locals
+    locs = locals().copy()
+    for fname, function in locs.items():
         if fname.startswith('_lookup_'):
             # chop the prefix and assign to the function
             args[fname[len('_lookup_'):]] = locale_closure(
