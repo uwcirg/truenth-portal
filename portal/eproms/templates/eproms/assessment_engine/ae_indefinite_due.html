@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_completed -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_completed, completed_cards -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed baseline, but has outstanding indefinite work -->
 {% block head %}
@@ -19,13 +19,23 @@
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
         {%- if substudy_assessment_is_due -%}
-            <!-- substudy due card -->
+            <!-- substudy due card, NOTE if global study work is still due, this tile will be disabled -->
             {{empro_due(
                 substudy_assessment_is_due=substudy_assessment_is_due,
                 assessment_status=assessment_status,
                 OverallStatus=OverallStatus,
                 substudy_assessment_status=substudy_assessment_status,
                 substudy_due_date=substudy_due_date,
+                enrolled_in_substudy=enrolled_in_substudy,
+                substudy_assessment_is_ready=substudy_assessment_is_ready
+            )}}
+            <!-- main study and/or substudy completed cards-->
+             {{completed_cards(
+                user=user,
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                comp_date=comp_date,
+                substudy_assessment_status=substudy_assessment_status,
                 enrolled_in_substudy=enrolled_in_substudy
             )}}
         {%- else -%}
@@ -34,15 +44,15 @@
                 OverallStatus=OverallStatus,
                 comp_date=comp_date,
                 title_text=completed_title_text)}}
+             <!-- it is possible that user has completed empro at this point, so need to show -->
+            {{empro_completed(
+                user=user,
+                OverallStatus=OverallStatus,
+                substudy_assessment_status=substudy_assessment_status,
+                substudy_comp_date=substudy_comp_date,
+                enrolled_in_substudy=enrolled_in_substudy
+            )}}
         {%- endif -%}
-        <!-- it is possible that user has completed empro at this point, so need to show -->
-        {{empro_completed(
-            user=user,
-            OverallStatus=OverallStatus,
-            substudy_assessment_status=substudy_assessment_status,
-            substudy_comp_date=substudy_comp_date,
-            enrolled_in_substudy=enrolled_in_substudy
-        )}}
     {%- else -%}
         <!-- main study completed tile -->
         {{completed_card(assessment_status=assessment_status, OverallStatus=OverallStatus, comp_date=comp_date, title_text=completed_title_text)}}
