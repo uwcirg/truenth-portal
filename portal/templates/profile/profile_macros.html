@@ -313,7 +313,7 @@
         {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
-{% macro profileSendEmail(person) -%}
+{% macro profileSendEmail(person, substudy_assessment_is_ready=false) -%}
     {%- if person -%}
         <div class="email-form-container">
             {% call profileEmailForm(person) %}
@@ -321,8 +321,10 @@
                     <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("TrueNTH Invite")}}</option>
                 {%endif %}
                 <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
-                <!-- reactive option, will only show when user is in sub-study and email is available -->
-                <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("TrueNTH Sub-Study Welcome")}}</option>
+                {% if substudy_assessment_is_ready %}
+                    <!-- reactive option, will only show when user is in sub-study and email is available -->
+                    <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("TrueNTH Sub-Study Welcome")}}</option>
+                {% endif %}
             {% endcall %}
             <!--
                 set P3P invite/reminder tile visibility based on whether user's org matches config variable, ACCEPT_TERMS_ON_NEXT_ORG - this is the case of MUSIC patient
@@ -1057,7 +1059,7 @@
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
 {%- endmacro %}
-{% macro profileCustomDetail(person) -%}
+{% macro profileCustomDetail(person, substudy_assessment_is_ready=false) -%}
      <div class="row" data-profile-section-id="custompatientdetail">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
@@ -1067,7 +1069,7 @@
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
-                    <div>{{profileSendEmail(person)}}</div>
+                    <div>{{profileSendEmail(person, substudy_assessment_is_ready)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
