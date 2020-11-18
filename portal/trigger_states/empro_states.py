@@ -232,15 +232,15 @@ def fire_trigger_events():
             patient = User.query.get(ts.user_id)
 
             # Patient always gets mail
-            pending_emails.append(
+            pending_emails.append((
                 patient_email(patient, soft_triggers, hard_triggers),
-                "patient thank you")
+                "patient thank you"))
 
             if hard_triggers:
                 # In the event of hard_triggers, clinicians/staff get mail
-                pending_emails.append(
+                pending_emails.append((
                     staff_emails(patient, hard_triggers),
-                    "initial staff alert")
+                    "initial staff alert"))
 
             for em, context in pending_emails:
                 send_n_report(em, context, triggers['actions']['email'])
