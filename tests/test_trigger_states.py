@@ -3,6 +3,7 @@ import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
 from portal.database import db
+from portal.models.role import ROLE
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
     enter_user_trigger_critical_section,
@@ -119,32 +120,36 @@ def test_ts_trigger_lists(mock_triggers):
         ts.soft_trigger_list())
 
 
-def test_fire_trigger_events(initialized_patient, processed_ts):
+def test_fire_trigger_events(initialized_patient, processed_ts, promote_user):
     # pretend patient is it's own clinician for staff email
     user = db.session.merge(initialized_patient)
+    user_id = user.id
     user.clinician_id = user.id
+    promote_user(user=user, role_name=ROLE.CLINICIAN.value)
 
     fire_trigger_events()
 
     # user's trigger should now include actions and with hard
     # triggers, should still be triggered with an action for staff
     # and patient
-    ts = users_trigger_state(user.id)
+    ts = users_trigger_state(user_id)
     assert ts.state == 'triggered'
     assert len(ts.triggers['actions']['email']) > 1
 
 
-def test_fire_reminders(initialized_patient, triggered_ts):
+def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
     # pretend patient is it's own clinician for staff email
     user = db.session.merge(initialized_patient)
+    user_id = user.id
     user.clinician_id = user.id
+    promote_user(user=user, role_name=ROLE.CLINICIAN.value)
 
     fire_trigger_events()
 
     # user's trigger should now include actions and with hard
     # triggers, should still be triggered with an action for staff
     # and patient
-    ts = users_trigger_state(user.id)
+    ts = users_trigger_state(user_id)
     assert ts.state == 'triggered'
     assert len(ts.triggers['actions']['email']) > 1
     assert 'reminder' in ts.triggers['actions']['email'][-1]['context']
