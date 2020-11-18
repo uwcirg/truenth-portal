@@ -787,7 +787,36 @@
         {
           "questionnaire": {
             "display": "ironman_post_intervention",
-            "reference": "api/questionnaire/ironman_ss?system=http://us.truenth.org/questionnaire"
+            "reference": "api/questionnaire/ironman_post_intervention?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "recurring",
+      "name": "empro_post_intervention_recurring_monthly_pattern",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 0}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [
+        {
+          "cycle_length": "{\"months\": 1}",
+          "start": "{\"months\": 1}",
+          "termination": "{\"months\": 11}"
+        }
+      ],
+      "research_protocol": {
+        "display": "EMPRO STAFF v1",
+        "reference": "api/research_protocol/EMPRO STAFF v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_post_intervention",
+            "reference": "api/questionnaire/ironman_post_intervention?system=http://us.truenth.org/questionnaire"
           },
           "rank": 0
         }
