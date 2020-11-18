@@ -4,7 +4,9 @@ from flask import current_app, url_for
 
 from portal.models.app_text import MailResource, app_text
 from portal.models.communication import EmailMessage, load_template_args
-from portal.models.user import User
+from portal.models.organization import UserOrganization
+from portal.models.role import ROLE, Role
+from portal.models.user import User, UserRoles
 from portal.models.qb_status import QB_Status
 
 
@@ -43,8 +45,31 @@ def patient_email(patient, soft_triggers, hard_triggers):
 
 def staff_emails(patient, hard_triggers):
     """Return list of emails, one for each eligible staff/clinician"""
-    clinician = User.query.get(patient.clinician_id)
-    # TODO lookup 'site coordinator' and copy
+
+    # Only supporting patients with a single organization
+    if len(patient.organizations) != 1:
+        raise ValueError(
+            f"Require single org on patient {patient.id} ")
+    org_id = patient.organizations[0].id
+
+    # Email every clinician and staff (not staff-admin) directly
+    # associated with the patient's organization
+
+    staff_list = User.query.join(UserRoles).filter(
+        User.id == UserRoles.user_id).join(Role).filter(
+        UserRoles.role_id == Role.id).filter(
+        Role.name.in_((ROLE.STAFF.value, ROLE.CLINICIAN.value))).join(
+        UserOrganization).filter(
+        User.id == UserOrganization.user_id).filter(
+        UserOrganization.organization_id == org_id)
+
+    # make sure assigned clinician made the list
+    found = [user.id for user in staff_list if user.id == patient.clinician_id]
+    if not found:
+        raise ValueError(
+            f"Patient's ({patient.id}) assigned clinician not in distribution"
+            f" list. Check clinician's ({patient.clinician_id}) organization")
+
     # TODO plug in real app_text name for yet pending 'staff trigger email'
 
     # According to spec, args need at least:
@@ -57,13 +82,15 @@ def staff_emails(patient, hard_triggers):
             'patients.patient_profile', patient_id=patient.id, _external=True),
         'hard_triggers': hard_triggers
     }
-    mr = MailResource(
-        app_text("staff trigger email"),
-        locale_code=patient.locale_code,
-        variables=args)
-    em = EmailMessage(
-        recipients=clinician.email,
-        sender=current_app.config['MAIL_DEFAULT_SENDER'],
-        subject=mr.subject,
-        body=mr.body)
-    return em
+    emails = []
+    for staff in staff_list:
+        mr = MailResource(
+            app_text("staff trigger email"),
+            locale_code=staff.locale_code,
+            variables=args)
+        emails.append(EmailMessage(
+            recipients=staff.email,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            subject=mr.subject,
+            body=mr.body))
+    return emails
