@@ -81,17 +81,16 @@
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
             {%- if not substudy_assessment_is_ready -%}
                 {%- if substudy_due_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due for %(substudy_due_date)s. Please complete your %(registry)s Questionnaire before being able to complete the sub-study questionnaire.", 
+                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.", 
                         substudy_title=substudy_title,
                         substudy_due_date=substudy_due_date,
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- else -%}
-                    <div class="text-content">{{_("Complete your %(substudy_title)s questionnaire here. Please complete your %(registry)s Questionnaire before being able to complete the sub-study questionnaire.", 
-                        substudy_title=substudy_title,
+                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.", 
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- endif -%}
             {%- else -%}
-                <div class="text-content">{{_("Please complete your questionnaire here. Your responses will create a big impact for future generations of men with Prostate Cancer.")}}</div>
+                <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
             {%- endif -%}
             {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
         {%- endcall -%}
@@ -114,26 +113,25 @@
         <div class="portal-skyscraper-container">
             <div class="top">
                 <h2 class="section-title">{{_("Completed Questionnaires")}}</h2>
-                <!-- main study completed card -->
-                {% if mainstudy_overall_completed_status %}
-                    {{completed_card(
-                        assessment_status=assessment_status,
-                        OverallStatus=OverallStatus,
-                        comp_date=comp_date,
-                        title_text=completed_title_text)}}
-                {% endif %}
             </div>
             <div class="bottom">
-                <!-- substudy completed card -->
-                {% if substudy_overall_completed_status %}
-                    {{empro_completed(
-                        user=user,
-                        OverallStatus=OverallStatus,
-                        substudy_assessment_status=substudy_assessment_status,
-                        substudy_comp_date=substudy_comp_date,
-                        enrolled_in_substudy=enrolled_in_substudy
-                    )}}
+                <!-- main study completed card -->
+                {% if mainstudy_overall_completed_status %}
+                  {{completed_card(
+                      assessment_status=assessment_status,
+                      OverallStatus=OverallStatus,
+                      comp_date=comp_date,
+                      title_text=completed_title_text)}}
                 {% endif %}
+                <!-- substudy completed card -->
+                {{empro_completed(
+                    user=user,
+                    OverallStatus=OverallStatus,
+                    substudy_assessment_status=substudy_assessment_status,
+                    substudy_comp_date=substudy_comp_date,
+                    enrolled_in_substudy=enrolled_in_substudy,
+                    card_class="disabled" if not substudy_overall_completed_status else ""
+                )}}
             </div>
         </div>
     {% endif %}
@@ -148,21 +146,23 @@
     card_class="")
 -%}
     <!-- subject is in the sub-study and the sub-study questionnaire has been completed -->
-    {%- if enrolled_in_substudy and 
-        substudy_assessment_status.overall_status == OverallStatus.completed -%}
+    {%- if enrolled_in_substudy -%}
         {%- set substudy_title = "EMPRO" -%}
         {%- call render_card_content(
-            title_text = _("%(substudy_title)s: Get help with your specific issues", substudy_title=substudy_title),
+            title_text = _("%(substudy_title)s Study", substudy_title=substudy_title),
             card_class = card_class if card_class else "portal-description-complete") -%}
             <div class="text-content">
-                <!-- this is an anchor link to open thank you modal -->
-                <a data-toggle="modal" data-target="#emproModal">{{_("Learn about your specific issues based on your last questionnaire submitted on %(substudy_comp_date)s", substudy_comp_date=substudy_comp_date)}}</a>
+                <p>{{_("View a summary of your questionnaire responses, as well as key health tips and resources.")}}</p>
+                {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
+                    <div class="buttons-container">
+                        <br/>
+                        <!-- this is an anchor link to open thank you modal -->
+                        <a class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#emproModal">{{_("View report and resources", substudy_comp_date=substudy_comp_date)}}</a>
+                    </div>
+                {% else %}
+                    <p>{{_("No EMPRO questionnaire has been completed yet.")}}</p>
+                {% endif %}
             </div>
-        {%- endcall -%}
-        {%- call render_card_content(
-            title_text = _("%(substudy_title)s: View how you are doing over time", substudy_title=substudy_title),
-            card_class = card_class if card_class else "portal-description-complete") -%}
-            <p><a class="longitudinal-report-link">{{_("View your longitudinal charts and discuss with your care provider")}}</a></p>
         {%- endcall -%}
         {{empro_thankyou_modal(user)}}
     {%- endif -%}
