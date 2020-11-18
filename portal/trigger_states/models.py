@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
@@ -78,6 +78,22 @@ class TriggerState(db.Model):
             if 'hard' in link_triggers.values():
                 results.append(domain)
         return results
+
+    def reminder_due(self):
+        """Determine if reminder is due from internal state"""
+        first_sent = FHIR_datetime.parse(
+            self.triggers['actions']['email'][0]['timestamp'])
+        last_sent = FHIR_datetime.parse(
+            self.triggers['actions']['email'][-1]['timestamp'])
+        now = datetime.utcnow()
+
+        # To be sent daily after the initial 48 hours
+        needed_delta = timedelta(days=1)
+        if first_sent + timedelta(hours=1) > last_sent:
+            # only initial has been sent.  need 48 hours to have passed
+            needed_delta = timedelta(days=2)
+
+        return now > last_sent + needed_delta
 
     def soft_trigger_list(self):
         """Convenience function to return list of soft trigger domains
