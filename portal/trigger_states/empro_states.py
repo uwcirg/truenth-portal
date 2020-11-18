@@ -238,9 +238,8 @@ def fire_trigger_events():
 
             if hard_triggers:
                 # In the event of hard_triggers, clinicians/staff get mail
-                pending_emails.append((
-                    staff_emails(patient, hard_triggers),
-                    "initial staff alert"))
+                for msg in staff_emails(patient, hard_triggers):
+                    pending_emails.append((msg, "initial staff alert"))
 
             for em, context in pending_emails:
                 send_n_report(em, context, triggers['actions']['email'])
@@ -258,10 +257,9 @@ def fire_trigger_events():
 
         # Now seek out any pending actions, such as reminders to staff
         for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
-            pending_emails = []
             if ts.reminder_due():
                 patient = User.query.get(ts.user_id)
-                pending_emails.append(staff_emails(patient, ts.hard_trigger_list()))
+                pending_emails = staff_emails(patient, ts.hard_trigger_list())
 
                 # necessary to make deep copy in order to update DB JSON
                 triggers = copy.deepcopy(ts.triggers)
