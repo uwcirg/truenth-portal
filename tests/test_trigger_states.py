@@ -133,3 +133,18 @@ def test_fire_trigger_events(initialized_patient, processed_ts):
     assert ts.state == 'triggered'
     assert len(ts.triggers['actions']['email']) > 1
 
+
+def test_fire_reminders(initialized_patient, triggered_ts):
+    # pretend patient is it's own clinician for staff email
+    user = db.session.merge(initialized_patient)
+    user.clinician_id = user.id
+
+    fire_trigger_events()
+
+    # user's trigger should now include actions and with hard
+    # triggers, should still be triggered with an action for staff
+    # and patient
+    ts = users_trigger_state(user.id)
+    assert ts.state == 'triggered'
+    assert len(ts.triggers['actions']['email']) > 1
+    assert 'reminder' in ts.triggers['actions']['email'][-1]['context']

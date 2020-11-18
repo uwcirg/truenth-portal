@@ -197,11 +197,27 @@ def fire_trigger_events():
     """
     from ..models.user import User
     from .empro_messages import patient_email, staff_emails
+    from ..date_tools import FHIR_datetime
+
+    def send_n_report(em, context, record):
+        """Send email, append success/fail w/ context to record"""
+        result = {'context': context, 'timestamp': FHIR_datetime.now()}
+        try:
+            em.send_message()
+            result['email_message_id'] = em.id
+            record.append(result)
+        except SMTPRecipientsRefused as e:
+            msg = ("Error sending trigger email to {}: "
+                   "{}".format(em.recipients, e))
+            current_app.logger.errors(msg)
+            result['error'] = msg
+            record.append(result)
 
     # as a job, make sure only running one concurrent instance
     NEVER_WAIT = 0
     with TimeoutLock(key='fire_trigger_events', timeout=NEVER_WAIT):
-        # seek out any pending work
+        # seek out any pending "processed" work, i.e. triggers recently
+        # evaluated
         for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
@@ -217,24 +233,17 @@ def fire_trigger_events():
 
             # Patient always gets mail
             pending_emails.append(
-                patient_email(patient, soft_triggers, hard_triggers))
+                patient_email(patient, soft_triggers, hard_triggers),
+                "patient thank you")
 
             if hard_triggers:
                 # In the event of hard_triggers, clinicians/staff get mail
-                pending_emails.append(staff_emails(patient, hard_triggers))
+                pending_emails.append(
+                    staff_emails(patient, hard_triggers),
+                    "initial staff alert")
 
-            for em in pending_emails:
-                try:
-                    em.send_message()
-                    triggers['actions']['email'].append(
-                        {"sent": (em.id, em.subject)})
-                except SMTPRecipientsRefused as exc:
-                    msg = ("Error sending trigger email to {}: "
-                           "{}".format(em.recipients, exc))
-                    current_app.logger.errors(msg)
-                    triggers['actions']['email'].append(
-                        {"error": msg}
-                    )
+            for em, context in pending_emails:
+                send_n_report(em, context, triggers['actions']['email'])
 
             # Change state, as this row has been processed.
             ts.triggers = triggers
@@ -244,5 +253,24 @@ def fire_trigger_events():
             # Without hard triggers, no further action is necessary
             if not hard_triggers:
                 sm.resolve()
+
+        db.session.commit()
+
+        # Now seek out any pending actions, such as reminders to staff
+        for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
+            pending_emails = []
+            if ts.reminder_due():
+                patient = User.query.get(ts.user_id)
+                pending_emails.append(staff_emails(patient, ts.hard_trigger_list()))
+
+                # necessary to make deep copy in order to update DB JSON
+                triggers = copy.deepcopy(ts.triggers)
+                for em in pending_emails:
+                    send_n_report(
+                        em, context="reminder staff alert",
+                        record=triggers['actions']['email'])
+
+                # push updated record back into trigger_states
+                ts.triggers = triggers
 
         db.session.commit()
