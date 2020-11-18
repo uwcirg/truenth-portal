@@ -160,7 +160,7 @@
                         <a class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#emproModal">{{_("View report and resources", substudy_comp_date=substudy_comp_date)}}</a>
                     </div>
                 {% else %}
-                    <p>{{_("No EMPRO questionnaire has been completed yet.")}}</p>
+                    <p>{{_("No %(substudy_title)s questionnaire has been completed yet.", substudy_title=substudy_title)}}</p>
                 {% endif %}
             </div>
         {%- endcall -%}
