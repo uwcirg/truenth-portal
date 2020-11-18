@@ -7843,6 +7843,23 @@
           "valueBoolean": true
         }
       ]
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "ironman_post_intervention"
+        }
+      ],
+      "status": "draft",
+      "resourceType": "Questionnaire",
+      "item": [],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
+          "valueBoolean": true
+        }
+      ]
     }
   ],
   "id": "SitePersistence v0.2",

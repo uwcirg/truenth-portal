@@ -769,6 +769,29 @@
           "rank": 0
         }
       ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "baseline",
+      "name": "empro_post_intervention_baseline",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 0}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [],
+      "research_protocol": {
+        "display": "EMPRO STAFF v1",
+        "reference": "api/research_protocol/EMPRO STAFF v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_post_intervention",
+            "reference": "api/questionnaire/ironman_ss?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
     }
   ],
   "id": "SitePersistence v0.2",
