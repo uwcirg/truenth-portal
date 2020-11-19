@@ -1203,7 +1203,7 @@ select:not([multiple]) {
     }
   }
   .detail-title {
-    margin-bottom: 0.25em;
+    margin-bottom: 16px;
   }
  .detail-title {
     color: #ebefeb;
@@ -2836,6 +2836,7 @@ body.portal .copyright-container  {
 @media (min-width: 992px) {
   .portal-header-container {
     margin: 32px auto 32px auto;
+    max-width: 70%;
   }
 }
 .button-callout {
@@ -2882,6 +2883,7 @@ body.portal .copyright-container  {
   .portal-intro-text {
     padding-left: 32px;
     padding-right: 32px;
+    line-height: 1.55;
   }
 }
 .portal-header-logout-container {
@@ -2936,8 +2938,8 @@ body.portal .copyright-container  {
       bottom: 0;
       display: block;
       content: "";
-      background:@muterColor;
-      opacity: 0.1;
+      background: #3d4750;
+      opacity: 0.3;
       z-index: 1;
     }
   }
@@ -2949,6 +2951,10 @@ body.portal .copyright-container  {
   }
   & a {
     color: #FFF;
+    &.btn-lg {
+      padding: 12px 16px;
+      font-size: 0.95em;
+    }
   }
   .button-container {
     a {
@@ -3012,8 +3018,6 @@ body.portal .copyright-container  {
   flex-direction: column;
   .text-content {
     flex: 1;
-    padding-left: 16px;
-    padding-right: 16px;
   }
 }
 .portal-flex-container .button-container,
@@ -3072,7 +3076,7 @@ body.portal .copyright-container  {
 }
 
 .portal-skyscraper-container {
-  margin-top: 16px;
+  margin-top: 20px;
   .section-title {
     color: #FFF;
     margin-bottom: 16px;
@@ -3109,6 +3113,8 @@ section.header {
   border-bottom: 1px solid @muterColor;
   .header__div--title {
     margin-right: 16px;
+    width: 60%;
+    max-width: 100%;
   }
   .icon {
     padding: 12px;
@@ -3200,7 +3206,7 @@ section.header {
     border-radius: 20px;
     background: @muterColor;
     display: inline-block;
-    padding: 8px 12px;
+    padding: 8px 16px;
     min-width: 132px;
     text-align: center;
     &.darker {
@@ -3356,20 +3362,21 @@ section.header {
       background-color: @emproBtnPrimaryColor;
       color: #FFF;
       display: block;
-      width: 100%;
+      width: 300px;
       max-width: 100%;
       white-space: normal;
       margin: 8px auto;
     }
   }
 }
+
 @media (min-width: 768px) {
   #emproModal {
     .items-section {
       .item {
         padding: 16px 24px 24px;
         width: 33.33333333%;
-        min-height: 424px;
+        min-height: 360px;
         flex-wrap: nowrap;
         flex: 1;
         border-bottom: 0;
@@ -3380,24 +3387,18 @@ section.header {
           border-right: 1px solid @HRColor;
         }
       }
-      button {
+      a, button {
+        width: 100%;
         max-width: 100%;
       }
     }
   }
 }
-@media (min-width: 1200px) {
+@media (min-width: 992px) {
   #emproModal {
     .modal-dialog {
-      width: 70%;
+      width: 960px;
       margin: auto;
-    }
-  }
-}
-@media (min-width: 1400px) {
-  #emproModal {
-    .modal-dialog {
-      width: 67.5%;
     }
   }
 }
@@ -3702,7 +3703,7 @@ section.header {
   top: 0;
   left: 0;
   background: @profileItemBgColor;
-  min-height: 4em;
+  min-height: 80px;
   width: 100%;
 }
 #profileEmailMessage {

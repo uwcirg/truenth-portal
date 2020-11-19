@@ -239,6 +239,9 @@ class BaseConfig(object):
         '/static/img/TrueNTH_Banner_Logo_Mobile.svg'
     }
 
+    DEBUG_DUMP_HEADERS = os.environ.get('DEBUG_DUMP_HEADERS', 'false').lower() == 'true'
+    DEBUG_DUMP_REQUEST = os.environ.get('DEBUG_DUMP_REQUEST', 'false').lower() == 'true'
+
     MAINTENANCE_MESSAGE = os.environ.get('MAINTENANCE_MESSAGE')
     MAINTENANCE_WINDOW = os.environ['MAINTENANCE_WINDOW'].split(',') \
         if os.environ.get('MAINTENANCE_WINDOW') else None

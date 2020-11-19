@@ -707,19 +707,25 @@ def profile(user_id):
                            consent_agreements=consent_agreements)
 
 
-@portal.route('/patient-invite-email/<int:user_id>')
+@portal.route(
+    '/patient-invite-email/<int:user_id>', defaults={'research_study_id': 0})
+@portal.route('/patient-invite-email/<int:user_id>/<int:research_study_id>')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
-def patient_invite_email(user_id):
+def patient_invite_email(user_id, research_study_id):
     """Patient Invite Email Content"""
     user = get_user(user_id, 'edit')
 
     try:
         top_org = user.first_top_organization()
         if top_org:
-            name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+            name_key = UserInviteEmail_ATMA.name_key(
+                org=top_org.name,
+                research_study_id=research_study_id)
         else:
-            name_key = UserInviteEmail_ATMA.name_key()
+            name_key = UserInviteEmail_ATMA.name_key(
+                research_study_id=research_study_id
+            )
         args = load_template_args(user=user)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)

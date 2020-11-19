@@ -4,6 +4,9 @@ from .questionnaire_bank import QuestionnaireBank, qbs_by_intervention
 from .research_protocol import ResearchProtocol
 from .user_consent import latest_consent
 
+BASE_RS_ID = 0
+EMPRO_RS_ID = 1
+
 status_types = (
     "active", "administratively-completed", "approved", "closed-to-accrual",
     "closed-to-accrual-and-intervention", "completed", "disapproved",

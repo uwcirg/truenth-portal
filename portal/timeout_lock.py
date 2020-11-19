@@ -47,7 +47,7 @@ class TimeoutLock(object):
 
             # Found an expired lock and nobody beat us to replacing it
             if (current_value and float(current_value) < time.time() and
-                    self.redis.getset(self.key, expires) == current_value):
+                    self.redis.getset(self.key, expires)):
                 return
 
             timeout -= 1
@@ -59,6 +59,11 @@ class TimeoutLock(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.redis.delete(self.key)
+
+    def is_locked(self):
+        """Status check - NOT intended to be combined as an atomic check"""
+        current_value = self.redis.get(self.key)
+        return current_value and float(current_value) >= time.time()
 
 
 def guarded_task_launch(task, **kwargs):

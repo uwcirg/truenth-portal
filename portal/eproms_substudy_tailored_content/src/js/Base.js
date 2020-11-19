@@ -83,12 +83,12 @@ export default {
             this.setLRBaseURL(this.settings?this.settings["LR_ORIGIN"]:"");
             this.setUserID(this.userInfo?this.userInfo["id"]:0);
             this.initialized = true;
+            //set user related data
             Promise.allSettled(
                 this.getUserID()?
                 [
                     this.$http(`/api/demographics/${this.getUserID()}`).catch(error => { return error }),
-                    this.$http(`/api/user/${this.getUserID()}/triggers`)
-                  //this.$http(`/static/files/substudy_test_triggers_new.json`)
+                    this.$http(`/api/user/${this.getUserID()}/roles`)
                 ] :
                 [new Promise((resolve, reject) => setTimeout(() => reject(new Error("No user Id found.")), 0))]
             ).then(responses => {
@@ -98,16 +98,19 @@ export default {
                     //log error to console
                     this.setErrorMessage(`Error parsing locale data ${e}`);
                 }
-                //TODO get user domains based on trigger API
-                try {
-                    this.setUserDomains(JSON.parse(responses[1].value));
-                } catch(e) {
-                    //log error to console
-                    this.setErrorMessage(`Error parsing trigger data ${e}`);
+                let roleData = JSON.parse(responses[1].value);
+                if (roleData.roles) {
+                    try {
+                        this.setUserRoles(roleData.roles.map(item => item.name));
+                    } catch(e) {
+                        //log error to console
+                        this.setErrorMessage(`Error parsing role data ${e}`);
+                    }
                 }
                 this.setSelectedDomain();
                 //populate domain content
                 this.getDomainContent();
+                this.initTriggerDomains();
             }).catch(error => {
                 this.setErrorMessage(`Error in promises ${error}`);
                 this.setInitView();
@@ -126,7 +129,7 @@ export default {
             return this.errorMessage !== "";
         },
         resetError() {
-            this.setErrorMessage("");
+            this.errorMessage = "";
         },
         setErrorMessage(message) {
             this.errorMessage += (this.errorMessage?"\n": "") + message;
@@ -190,10 +193,40 @@ export default {
                 this.userInfo = data;
             }
         },
+        setUserRoles(data) {
+            this.userRoles = data;
+        },
+        isPatient() {
+            return this.userRoles.indexOf(this.patientRole) !== -1;
+        },
+        getDefaultDomains() {
+            return Object.keys(this.domainMappings);
+        },
+        initTriggerDomains() {
+            if (!this.isTriggersNeeded()) {
+                return;
+            }
+            //get trigger domains IF a patient
+            Promise.allSettled([
+                this.$http(`/api/user/${this.getUserID()}/triggers`)
+            ]).then(response => {
+                try {
+                    this.setUserDomains(JSON.parse(response[0].value));
+                    this.processDefaultDomainContent();
+                } catch(e) {
+                    //log error to console
+                    this.setErrorMessage(`Error parsing trigger data ${e}`);
+                }
+            }).catch(error => {
+                callback();
+                this.setErrorMessage(`Error retrieving trigger data: ${error}`);
+            });
+        },
         getUserDomains() {
             return this.userDomains;
         },
         setUserDomains(data) {
+            this.userDomains = [];
             if (!data || !data.triggers || !data.triggers.domain) {
                 return false;
             }
@@ -203,6 +236,9 @@ export default {
                     if (["hard", "soft"].indexOf(data.triggers.domain[key][q]) !== -1) {
                         if (self.domainMappings[key]) {
                             self.userDomains.push(self.domainMappings[key]);
+                        }
+                        if (self.getDefaultDomains().indexOf(key) !== -1) {
+                            self.userDomains.push(key);
                         }
                     }
                 }
@@ -350,7 +386,6 @@ export default {
             this.setVideoByDomainTopic();
             this.setResourcesByCountry();
             this.initDebugModeEvent();
-        
         },
         getDomainContent() {
             if (this.domainContent) {
@@ -383,39 +418,49 @@ export default {
                 this.loading = false;
             });
         },
-        setDomainContent: function(data) {
+        setDomainContent(data) {
             let content = tryParseJSON(data);
             if (content) {
                 this.domainContent = content["results"][0]["content"];
                 return;
             }
             this.domainContent = data;
-            //filter content of default landing page based on user trigger-based domains
-            if (this.getSelectedDomain() === this.defaultDomain) {
-                Vue.nextTick()
-                    .then(() => {
-                        // DOM updated
-                        this.processDefaultDomainContent();
-                    });
-                
-            }
+        },
+        isTriggersNeeded() {
+            return this.isPatient() && this.getSelectedDomain() === this.defaultDomain;
         },
         processDefaultDomainContent() {
-            if (!this.getUserDomains().length) return;
-            let hardTriggerTiles = document.querySelectorAll("#hardTriggerTopicsContainer .tile");
-            hardTriggerTiles.forEach(item => {
-                if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) === -1) {
-                    item.classList.add("hide");
+            //filter content of default landing page based on user trigger-based domains
+            Vue.nextTick().then(() => {
+                // DOM updated
+                let triggerElements = document.querySelectorAll(".trigger");
+                if (!this.getUserDomains().length) {
+                    triggerElements.forEach(el => {
+                        el.classList.remove("show");
+                        el.classList.add("hide");
+                    })
+                    return;
                 }
-            });
+                let hardTriggerTiles = document.querySelectorAll("#hardTriggerTopicsContainer .tile");
+                hardTriggerTiles.forEach(item => {
+                    item.classList.remove("hide");
+                    if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) === -1) {
+                        item.classList.add("hide");
+                    }
+                });
 
-            document.querySelector("#hardTriggerTopicsContainer").classList.add("show");
-            
-            let otherTopicTiles = document.querySelectorAll("#otherTopicsContainer .tile");
-            otherTopicTiles.forEach(item => {
-                if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) !== -1) {
-                    item.classList.add("hide");
-                }
+                document.querySelector("#hardTriggerTopicsContainer").classList.add("show");
+                
+                let otherTopicTiles = document.querySelectorAll("#otherTopicsContainer .tile");
+                otherTopicTiles.forEach(item => {
+                    item.classList.remove("hide");
+                    if (this.getUserDomains().indexOf(item.getAttribute("data-topic")) !== -1) {
+                        item.classList.add("hide");
+                    }
+                });
+                triggerElements.forEach(el => {
+                    el.classList.add("show");
+                });
             });
         },
         setResourcesByCountry(countryCode) {
@@ -482,10 +527,10 @@ export default {
             });
             this.initVideoEvents();
         },
-        goHome: function() {
+        goHome() {
             this.goToView("domain");
         },
-        initDebugModeEvent: function() {
+        initDebugModeEvent() {
             /*
              * activating debugging tool by pressing Ctrl + Shift + d
              */
@@ -502,8 +547,30 @@ export default {
                 });
             }
         },
-        isDebugMode: function() {
+        submitTestTriggers() {
+            let testChkElements = document.querySelectorAll("#debugContainer .trigger-checkbox");
+            let testData = {
+                triggers: {
+                    domain: {}
+                }
+            };
+            testChkElements.forEach(el => {
+                if (el.checked) {
+                    testData.triggers.domain[el.value] = {"ironman_ss": "hard"}
+                }
+            });
+            //log test data to console for debugging
+            console.log("test data? ", testData);
+            this.setUserDomains(testData);
+            this.processDefaultDomainContent();
+            //log updated date to console for debugging
+            console.log("updated data ", this.$data);
+        },
+        isDebugMode () {
             return this.debugMode;
+        },
+        unsetDebugMode() {
+            this.debugMode = false;
         }
     }
 };

@@ -12,6 +12,7 @@ from .questionnaire_response import (
     qnr_document_id,
 )
 
+
 class NoCurrentQB(Exception):
     """Exception to raise when no current QB is available yet required"""
     pass
@@ -218,7 +219,7 @@ class QB_Status(object):
             user_qnrs = QNR_results(
                 self.user,
                 research_study_id=self.research_study_id,
-                qb_id=self._current.qb_id,
+                qb_ids=[self._current.qb_id],
                 qb_iteration=self._current.iteration)
             self._required = user_qnrs.required_qs(self._current.qb_id)
             self._partial = user_qnrs.partial_qs(
@@ -466,3 +467,65 @@ class QB_Status(object):
             current_app.logger.error(
                 f"Caught TN-2747 in action!  User {self.user.id} completed"
                 f" {requested_indef} already!")
+
+
+def patient_research_study_status(patient):
+    """Returns details regarding patient readiness for available studies
+
+    Wraps complexity of checking multiple QB_Status and ResearchStudy
+    availability.  Includes several business rule checks as well
+    as enforcing user has completed outstanding work from other studies
+    if applicable.  NB - a user may be "ready" for a study, but another
+    study may have outstanding work.
+
+    :returns: ordered list of applicable research studies.  Each contains a
+     dictionary with keys:
+     - research_study_id: integer value of research study
+     - ready: set True or False based on complex rules.  True means pending
+         work user can immediately do
+     - errors: list of strings detailing anything preventing user from being
+         "ready"
+
+    """
+    from datetime import datetime
+    from .research_study import EMPRO_RS_ID, ResearchStudy
+    as_of_date = datetime.utcnow()
+
+    results = []
+    # Returns studies in required order - first found with pending work
+    # preempts subsequent
+    for rs in ResearchStudy.assigned_to(patient):
+        rs_status = {
+            'research_study_id': rs,
+            'ready': False,
+            'errors': [],
+        }
+        results.append(rs_status)
+        assessment_status = QB_Status(
+            patient, research_study_id=rs, as_of_date=as_of_date)
+        if assessment_status.overall_status == 'Withdrawn':
+            rs_status['errors'].append('Withdrawn')
+            continue
+
+        needing_full = assessment_status.instruments_needing_full_assessment(
+            classification='all')
+        resume_ids = assessment_status.instruments_in_progress(
+            classification='all')
+
+        if needing_full or resume_ids:
+            # work to be done in this study, break out of loop
+            rs_status['ready'] = True
+
+        # Apply business rules specific to EMPRO
+        if rs == EMPRO_RS_ID:
+            if results[0]['ready']:
+                # Clear ready status when base has pending work
+                rs_status['ready'] = False
+                rs_status['errors'].append('Pending work in base study')
+
+            if patient.clinician_id is None:
+                # Enforce biz rule - must have clinician on file.
+                rs_status['ready'] = False
+                rs_status['errors'].append("No clinician")
+
+    return results

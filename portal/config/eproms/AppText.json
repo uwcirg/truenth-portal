@@ -151,8 +151,33 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=01fbb874-b7cb-21b5-625c-8221e10cec6b",
+      "name": "patient invite email IRONMAN EMPRO Study",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea",
       "name": "patient reminder email TrueNTH Global Registry",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9bd6f29d-965d-7752-f4f4-d0d26c14b89f",
+      "name": "patient empro thank you email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76ae0f03-3018-52f3-34a1-f477bd5f8a1b",
+      "name": "patient empro both triggers email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=7c527734-a1b9-1e2b-b52a-854ea0fd585e",
+      "name": "patient empro hard triggers email",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=dcd1f80b-6d6d-a649-75c6-5e042c8442fd",
+      "name": "patient empro soft triggers email",
       "resourceType": "AppText"
     },
     {
