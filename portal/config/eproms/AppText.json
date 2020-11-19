@@ -171,11 +171,6 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=7c527734-a1b9-1e2b-b52a-854ea0fd585e",
-      "name": "patient empro hard triggers email",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=dcd1f80b-6d6d-a649-75c6-5e042c8442fd",
       "name": "patient empro soft triggers email",
       "resourceType": "AppText"
