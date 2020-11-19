@@ -895,6 +895,13 @@ def assessment_update(patient_id):
     db.session.commit()
     existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
 
+    # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
+    qn_name = existing_qnr.document.get("questionnaire").get("reference", '').split('/')[-1]
+    if  qn_name == 'ironman_ss':
+        from ..tasks import extract_observations_task
+        extract_observations_task.apply_async(
+            kwargs={'questionnaire_response_id': existing_qnr.id}
+        )
     auditable_event(
         "updated {}".format(existing_qnr),
         user_id=current_user().id,
@@ -1575,6 +1582,16 @@ def assessment_add(patient_id):
     db.session.commit()
     questionnaire_response.assign_qb_relationship(
         acting_user_id=current_user().id)
+
+
+    # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
+    qn_name = questionnaire_response.document.get("questionnaire").get("reference", '').split('/')[-1]
+    if  qn_name == 'ironman_ss':
+        from ..tasks import extract_observations_task
+        extract_observations_task.apply_async(
+            kwargs={'questionnaire_response_id': questionnaire_response.id}
+        )
+
     auditable_event("added {}".format(questionnaire_response),
                     user_id=current_user().id, subject_id=patient_id,
                     context='assessment')

@@ -56,7 +56,7 @@ class Observation(db.Model):
             # Only QNRs supported - if defined, it is a QNR.id.
             # In FHIR format, present as single item list reference
             qnr = QuestionnaireResponse.query.get(self.derived_from)
-            ref = Reference.questionnaire_response(qnr.document_identifier)
+            ref = Reference.questionnaire_response(qnr.document['identifier'])
             fhir['derivedFrom'] = [ref.as_fhir()]
         return fhir
 
