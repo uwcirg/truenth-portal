@@ -209,7 +209,6 @@ export default {
             //get trigger domains IF a patient
             Promise.allSettled([
                 this.$http(`/api/user/${this.getUserID()}/triggers`)
-               //this.$http(`/static/files/substudy_test_triggers_new.json`)
             ]).then(response => {
                 try {
                     this.setUserDomains(JSON.parse(response[0].value));
