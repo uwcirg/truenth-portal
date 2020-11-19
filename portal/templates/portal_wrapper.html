@@ -59,7 +59,7 @@
                 {% endif %}
             </div>
             <div id="tnthTopLinks">
-                <div class="tnth-btn-group">
+                <div class="tnth-btn-group nav-menu">
                     {% if user %}
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
@@ -88,6 +88,10 @@
                             {% endif %}
                             {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
+                            {% endif %}
+                            {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value) %}
+                                <!-- hidden by default, will be dynamically presented via frontend -->
+                                <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>
                         </ul>
@@ -120,7 +124,7 @@
             </div>
             {% if enable_links %}
             <div id="tnthNavbarXs">
-                <ul class="tnth-navbar-xs" style="list-style-type:none">
+                <ul class="tnth-navbar-xs nav-menu" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                     {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
@@ -141,6 +145,10 @@
                     {% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                         <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
+                    {% endif %}
+                    {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value) %}
+                         <!-- hidden by default, will be dynamically presented via frontend -->
+                        <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
                     {% endif %}
                     {% if user %}<li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>
