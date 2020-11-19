@@ -773,7 +773,7 @@
     {
       "resourceType": "QuestionnaireBank",
       "classification": "baseline",
-      "name": "empro_post_intervention_baseline",
+      "name": "ironman_ss_post_tx_baseline",
       "start": "{\"days\": 0}",
       "due": "{\"days\": 0}",
       "overdue": "{\"days\": 15}",
@@ -786,8 +786,8 @@
       "questionnaires": [
         {
           "questionnaire": {
-            "display": "ironman_post_intervention",
-            "reference": "api/questionnaire/ironman_post_intervention?system=http://us.truenth.org/questionnaire"
+            "display": "ironman_ss_post_tx",
+            "reference": "api/questionnaire/ironman_ss_post_tx?system=http://us.truenth.org/questionnaire"
           },
           "rank": 0
         }
@@ -796,7 +796,7 @@
     {
       "resourceType": "QuestionnaireBank",
       "classification": "recurring",
-      "name": "empro_post_intervention_recurring_monthly_pattern",
+      "name": "ironman_ss_post_tx_recurring_monthly_pattern",
       "start": "{\"days\": 0}",
       "due": "{\"days\": 0}",
       "overdue": "{\"days\": 15}",
@@ -815,8 +815,8 @@
       "questionnaires": [
         {
           "questionnaire": {
-            "display": "ironman_post_intervention",
-            "reference": "api/questionnaire/ironman_post_intervention?system=http://us.truenth.org/questionnaire"
+            "display": "ironman_ss_post_tx",
+            "reference": "api/questionnaire/ironman_ss_post_tx?system=http://us.truenth.org/questionnaire"
           },
           "rank": 0
         }
