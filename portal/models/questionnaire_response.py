@@ -341,6 +341,18 @@ class QuestionnaireResponse(db.Model):
 
         return results
 
+    def as_sdc_fhir(self):
+        """
+        Return QuestionnaireResponse FHIR in structure expected by SDC $extract service
+        """
+        qnr = self.document_answered
+
+        qn_ref = self.document.get("questionnaire").get("reference")
+        qn_name = qn_ref.split("/")[-1] if qn_ref else None
+        qn = Questionnaire.find_by_name(name=qn_name)
+
+        qnr['contained'] = [qn.as_fhir()]
+        return qnr
 
 QNR = namedtuple('QNR', [
     'qnr_id', 'qb_id', 'iteration', 'status', 'instrument', 'authored',

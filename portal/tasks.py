@@ -15,7 +15,7 @@ from traceback import format_exc
 from celery.utils.log import get_task_logger
 from flask import current_app
 import redis
-from requests import Request, Session
+from requests import Request, Session, post
 from requests.exceptions import RequestException
 from sqlalchemy import and_
 
@@ -24,6 +24,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.observation import Observation
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
@@ -356,6 +357,36 @@ def celery_beat_health_check(**kwargs):
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
         value=str(datetime.utcnow()),
     )
+
+
+@celery.task(name="tasks.extract_observations_task", queue=LOW_PRIORITY)
+def extract_observations_task(questionnaire_response_id):
+    """Task wrapper for extract_observations"""
+    extract_observations(questionnaire_response_id)
+
+
+def extract_observations(questionnaire_response_id):
+    """Format and submit QuestionnaireResponse to SDC service; store returned Observations"""
+    from .models.questionnaire_response import QuestionnaireResponse
+    #from .trigger_states.empro_states import enter_user_trigger_critical_section
+    qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
+
+    # TODO enable after merging
+    #enter_user_trigger_critical_section(user_id=qnr.subject_id)
+
+    qnr_json = qnr.as_sdc_fhir()
+
+    SDC_BASE_URL = current_app.config['SDC_BASE_URL']
+    response = post(f"{SDC_BASE_URL}/$extract", json=qnr_json)
+    response.raise_for_status()
+
+    obs_bundle = response.json()
+
+    for obs in obs_bundle['entry']:
+        observation = Observation()
+        observation.update_from_fhir(obs)
+        db.session.add(observation)
+    db.session.commit()
 
 
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
