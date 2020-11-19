@@ -24,6 +24,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.observation import Observation
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
@@ -382,6 +383,7 @@ def extract_observations(questionnaire_response_id):
     obs_bundle = response.json()
 
     for obs in obs_bundle['entry']:
-        observation = Observation.update_from_fhir(obs)
+        observation = Observation()
+        observation.update_from_fhir(obs)
         db.session.add(observation)
     db.session.commit()
