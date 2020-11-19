@@ -77,7 +77,8 @@ export default {
                 return;
             }
 
-            if (videoElement.getAttribute("data-preload")) {
+            if (videoElement.getAttribute("data-preload") || (
+                videoElement.parentNode && videoElement.parentNode.getAttribute("data-preload"))) {
                 this.setVideoIframe(videoElement);
             }
         }
