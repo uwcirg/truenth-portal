@@ -89,7 +89,7 @@
                             {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                             {% endif %}
-                            {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value) %}
+                            {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                                 <!-- hidden by default, will be dynamically presented via frontend -->
                                 <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
                             {% endif %}
@@ -146,7 +146,7 @@
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                         <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                     {% endif %}
-                    {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value) %}
+                    {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                          <!-- hidden by default, will be dynamically presented via frontend -->
                         <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
                     {% endif %}
