@@ -895,6 +895,10 @@ def assessment_update(patient_id):
     db.session.commit()
     existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
 
+    from ..tasks import extract_observations_task
+    extract_observations_task.apply_async(
+        kwargs={'questionnaire_response_id': existing_qnr.id}
+    )
     auditable_event(
         "updated {}".format(existing_qnr),
         user_id=current_user().id,
