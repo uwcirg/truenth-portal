@@ -135,4 +135,8 @@ class DomainManifold(object):
                 )
                 triggers['domain'][domain] = dt.triggers
 
+        triggers['source'] = {
+            'qnr_id': self.cur_qnr.id,
+            'qb_id': self.cur_qnr.questionnaire_bank_id,
+            'qb_iteration': self.cur_qnr.qb_iteration}
         return triggers
