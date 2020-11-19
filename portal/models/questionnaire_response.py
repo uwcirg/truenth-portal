@@ -331,7 +331,6 @@ class QuestionnaireResponse(db.Model):
         """
         Return QuestionnaireResponse FHIR in structure expected by SDC $extract service
         """
-        #POST QuestionnaireResponse (and contained Questionnaire) to given SDC $extract service
         qnr = self.document_answered
 
         qn_ref = self.document.get("questionnaire").get("reference")
