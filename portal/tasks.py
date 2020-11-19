@@ -368,11 +368,11 @@ def extract_observations_task(questionnaire_response_id):
 def extract_observations(questionnaire_response_id):
     """Format and submit QuestionnaireResponse to SDC service; store returned Observations"""
     from .models.questionnaire_response import QuestionnaireResponse
-    #from .trigger_states.empro_states import enter_user_trigger_critical_section
+    from .trigger_states.empro_states import enter_user_trigger_critical_section
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
 
     # TODO enable after merging
-    #enter_user_trigger_critical_section(user_id=qnr.subject_id)
+    enter_user_trigger_critical_section(user_id=qnr.subject_id)
 
     qnr_json = qnr.as_sdc_fhir()
 
@@ -387,14 +387,6 @@ def extract_observations(questionnaire_response_id):
         observation.update_from_fhir(obs)
         db.session.add(observation)
     db.session.commit()
-
-
-@celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
-def process_triggers_task():
-    """Task form - wraps call to testable function `fire_trigger_events` """
-    # Include within function as not all applications include the blueprint
-    from portal.trigger_states.empro_states import fire_trigger_events
-    fire_trigger_events()
 
 
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
