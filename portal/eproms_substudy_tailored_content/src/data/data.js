@@ -16,6 +16,7 @@ export default {
     meURL: "/api/me",
     settings: {},
     userInfo: {},
+    userRoles: [],
     LifeRayBaseURL: "",
     domainMappings: {},
     defaultDomain: "default_domain",
@@ -38,6 +39,7 @@ export default {
         code: "US"
     }
     ],
+    patientRole: "patient",
     //chosen domain
     activeDomain: "",
     domainContent: "",
