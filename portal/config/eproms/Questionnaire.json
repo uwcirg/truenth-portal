@@ -6995,13 +6995,31 @@
             {
               "valueCoding": {
                 "display": "Frequently",
-                "code": "ironman_ss.1.4"
+                "code": "ironman_ss.1.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Almost constantly",
-                "code": "ironman_ss.1.5"
+                "code": "ironman_ss.1.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7039,13 +7057,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.2.4"
+                "code": "ironman_ss.2.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.2.5"
+                "code": "ironman_ss.2.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7083,13 +7119,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.3.4"
+                "code": "ironman_ss.3.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.3.5"
+                "code": "ironman_ss.3.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7127,13 +7181,31 @@
             {
               "valueCoding": {
                 "display": "Frequently",
-                "code": "ironman_ss.4.4"
+                "code": "ironman_ss.4.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Almost constantly",
-                "code": "ironman_ss.4.5"
+                "code": "ironman_ss.4.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7171,13 +7243,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.5.4"
+                "code": "ironman_ss.5.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.5.5"
+                "code": "ironman_ss.5.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7215,13 +7305,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.6.4"
+                "code": "ironman_ss.6.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.6.5"
+                "code": "ironman_ss.6.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7259,13 +7367,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.7.4"
+                "code": "ironman_ss.7.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.7.5"
+                "code": "ironman_ss.7.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7303,13 +7429,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.8.4"
+                "code": "ironman_ss.8.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.8.5"
+                "code": "ironman_ss.8.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7347,13 +7491,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.9.4"
+                "code": "ironman_ss.9.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.9.5"
+                "code": "ironman_ss.9.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7391,13 +7553,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.10.4"
+                "code": "ironman_ss.10.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.10.5"
+                "code": "ironman_ss.10.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7435,13 +7615,31 @@
             {
               "valueCoding": {
                 "display": "Frequently",
-                "code": "ironman_ss.11.4"
+                "code": "ironman_ss.11.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Almost constantly",
-                "code": "ironman_ss.11.5"
+                "code": "ironman_ss.11.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7479,13 +7677,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.12.4"
+                "code": "ironman_ss.12.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.12.5"
+                "code": "ironman_ss.12.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7523,13 +7739,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.13.4"
+                "code": "ironman_ss.13.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.13.5"
+                "code": "ironman_ss.13.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7567,13 +7801,31 @@
             {
               "valueCoding": {
                 "display": "Frequently",
-                "code": "ironman_ss.14.4"
+                "code": "ironman_ss.14.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Almost constantly",
-                "code": "ironman_ss.14.5"
+                "code": "ironman_ss.14.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7611,13 +7863,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.15.4"
+                "code": "ironman_ss.15.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.15.5"
+                "code": "ironman_ss.15.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7655,13 +7925,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.16.4"
+                "code": "ironman_ss.16.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.16.5"
+                "code": "ironman_ss.16.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7699,13 +7987,31 @@
             {
               "valueCoding": {
                 "display": "Frequently",
-                "code": "ironman_ss.17.4"
+                "code": "ironman_ss.17.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Almost constantly",
-                "code": "ironman_ss.17.5"
+                "code": "ironman_ss.17.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7743,13 +8049,31 @@
             {
               "valueCoding": {
                 "display": "Severe",
-                "code": "ironman_ss.18.4"
+                "code": "ironman_ss.18.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very severe",
-                "code": "ironman_ss.18.5"
+                "code": "ironman_ss.18.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7787,13 +8111,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.19.4"
+                "code": "ironman_ss.19.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.19.5"
+                "code": "ironman_ss.19.5",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -7825,13 +8167,31 @@
             {
               "valueCoding": {
                 "display": "Quite a bit",
-                "code": "ironman_ss.20.3"
+                "code": "ironman_ss.20.3",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "penultimate"
+                    }
+                  }
+                ]
               }
             },
             {
               "valueCoding": {
                 "display": "Very much",
-                "code": "ironman_ss.20.4"
+                "code": "ironman_ss.20.4",
+                "extension": [
+                  {
+                    "url": "http://us.truenth.org/observation/severity_extension",
+                    "valueCoding": {
+                      "system": "http://us.truenth.org/observation/severity",
+                      "code": "ultimate"
+                    }
+                  }
+                ]
               }
             }
           ]
