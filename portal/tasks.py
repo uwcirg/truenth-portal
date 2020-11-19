@@ -368,10 +368,12 @@ def extract_observations_task(questionnaire_response_id):
 def extract_observations(questionnaire_response_id):
     """Format and submit QuestionnaireResponse to SDC service; store returned Observations"""
     from .models.questionnaire_response import QuestionnaireResponse
-    from .trigger_states.empro_states import enter_user_trigger_critical_section
+    from .trigger_states.empro_states import (
+        enter_user_trigger_critical_section,
+        evaluate_triggers,
+    )
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
 
-    # TODO enable after merging
     enter_user_trigger_critical_section(user_id=qnr.subject_id)
 
     qnr_json = qnr.as_sdc_fhir()
@@ -387,6 +389,10 @@ def extract_observations(questionnaire_response_id):
         observation.update_from_fhir(obs)
         db.session.add(observation)
     db.session.commit()
+
+    # As scoring is complete, pass baton to evaluation process
+    # which also frees the locked critical section on completion
+    evaluate_triggers(qnr)
 
 
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
