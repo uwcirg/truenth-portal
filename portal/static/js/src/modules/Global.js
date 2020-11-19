@@ -94,11 +94,9 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         $.ajax({
             type: "GET",
             url: `/api/user/${userId}/research_study`
-        }).done(function(data) {
+        }).done(data => {
            callback(data);
-        }).fail(function() {
-            callback();
-        });
+        }).fail(callback);
     },
     /*
      * dynamically show/hide sub-study specific UI elements
