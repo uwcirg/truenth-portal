@@ -12,6 +12,8 @@ from statemachine.exceptions import TransitionNotAllowed
 from .empro_domains import DomainManifold
 from .models import TriggerState
 from ..database import db
+from ..models.qbd import QBD
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..timeout_lock import LockTimeout, TimeoutLock
 
 EMPRO_STUDY_ID = 1
@@ -272,3 +274,91 @@ def fire_trigger_events():
                 ts.triggers = triggers
 
         db.session.commit()
+
+
+def empro_staff_qbd_accessor(qnr):
+    """Specialized closure for QNR association
+
+    When QNRs are posted (or other events such as a user's consent date
+    changes), the QNR needs to be associated with the appropriate
+    QuestionnarieBank (and iteration).
+
+    This function returns a closure to function like the lookup
+    for other questionnaire banks.
+
+    """
+    # with qnr captured, return a function capable of looking up
+    # the appropriate QB/Iteration when called.
+
+    def qbd_accessor(as_of_date, classification):
+        """Implement qbd_accessor API for EMPRO Staff QB
+
+        Look up appropriate QB/Iteration for subject from given as_of_date.
+        Using the trigger_states for user, determine best match.
+
+        Stores the QNR_id on the respective trigger_state, if a good match
+        is found.
+
+        :returns: qbd (questionnaire bank details) representing QB and iteration
+         for QNR association.
+
+        """
+        result = QBD(None, None)
+        no_match_message = (
+            "EMPRO Staff qnr association lookup failed for subject "
+            f"{qnr.subject_id} @ {as_of_date}")
+
+        # find best match from subject's trigger_states.  should always be
+        # in `triggered` state, unless re-eval is in process due to consent
+        # change, or the like.
+        query = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
+            TriggerState.state.in_('triggered', 'resolved')).order_by(
+            TriggerState.timestamp)
+        if not query.count():
+            current_app.logger.errors(no_match_message)
+            return result
+
+        potential, match = None, None
+        for ts in query:
+            if ts.timestamp < as_of_date:
+                potential = ts
+            if ts.timestamp > as_of_date:
+                # POST Tx QB doesn't make sense beyond date of subject's
+                # trigger eval.  If potential is set, call it a match
+                if potential:
+                    match = potential
+                break
+
+        if not match:
+            current_app.logger.errors(no_match_message)
+            return result
+
+        # Store the match and advance the state if necessary
+        triggers = copy.deepcopy(match.triggers)
+        triggers['actions']['qnr_id'] = qnr.id
+        match.triggers = triggers
+        if match.state != 'resolved':
+            sm = EMPRO_state(match)
+            sm.resolve()
+        db.session.commit()
+
+        # Look up post tx match WRT source qb
+        if not triggers['source']['qb_id']:
+            raise ValueError("association not possible w/o source QB")
+
+        src_qb = QuestionnaireBank.query.get(triggers['source']['qb_id']).one()
+        if 'baseline' in src_qb.name:
+            post_tx_qb = QuestionnaireBank.query.filter(
+                QuestionnaireBank.name == 'ironman_ss_post_tx_baseline'
+            ).one()
+        else:
+            post_tx_qb = QuestionnaireBank.query.filter(
+                QuestionnaireBank.name ==
+                'ironman_ss_post_tx_recurring_monthly_pattern'
+            ).one()
+
+        result.relative_start = match.timestamp
+        result.qb_id = post_tx_qb.id
+        result.iteration = triggers['source']['qb_iteration']
+        return result
