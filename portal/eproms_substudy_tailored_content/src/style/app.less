@@ -208,8 +208,26 @@ select::-ms-expand {
 
 #errorMessage {
   display: none;
-  margin-top: 32px;
-  align-self: stretch;
+  &.active {
+    display: block;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    align-self: stretch;
+    position: relative;
+  }
+  .close {
+    position: absolute;
+    right: 8px;
+    top: 16px;
+    color: #FFF;
+    z-index: 15;
+    font-weight: 300;
+    font-size: 16px;
+    opacity: 0.8;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+  }
 }
 .error-message {
   color: #FFF;
@@ -306,10 +324,7 @@ section.active {
 
 section.main {
     flex-grow: 1;
-    min-width: 100%;
-    max-width: 100%;
     margin: 0;
-    min-height: 90%;
     display: none;
     transition: opacity 750ms ease, transform 350ms @defaultAnimationSpeed, height 350ms @defaultAnimationSpeed;
    // position: relative;
@@ -319,6 +334,9 @@ section.main {
     }
     &.active {
       display: block;
+      min-width: 100%;
+      max-width: 100%;
+      min-height: 90%;
       animation-name: popIn;
       animation-duration: 350ms;
       animation-timing-function: @defaultAnimationSpeed;
@@ -444,7 +462,7 @@ a {
 }
 
 .module-section {
-  padding: 32px 32px;
+  padding: 24px 32px;
   &.intro,
   &.dark {
     background-color: @darkFeatureItemBackgroundColor
@@ -463,7 +481,7 @@ a {
   &.intro {
     padding-top: 48px;
     padding-bottom: 36px;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
     .hero-title {
       margin-bottom: 24px;
       width: 100%;
@@ -475,11 +493,7 @@ a {
   padding-right: 32px;
   position: relative;
 }
-@media (min-width: 1400px) {
-  .section-title {
-    padding-left: 32px;
-  }
-}
+
 @media (min-width: 768px) {
   .module-section.intro {
     .hero-title {
@@ -1103,9 +1117,6 @@ a {
 
 @media (min-width: 1400px) {
   .resource-section {
-   // margin-right: @sectionRightPaddingWide;
-  //  margin-left: 32px;
-   // padding-right: @sectionRightPaddingWide;
     padding-right: 24px;
     padding-left: 48px;
     padding-top: 48px;
@@ -1113,14 +1124,11 @@ a {
     margin-right: 32px;
     margin-left: 32px;
   }
-  // .resource-section,
-  // .resource {
-  //   .tile {
-  //     width: calc(30% - 24px);
-  //   }
-  // }
 }
 #resources_main {
+  .empro-internal {
+    display: none;
+  }
   .video-title {
     font-size: 1.25rem;
   }
@@ -1137,9 +1145,23 @@ a {
       }
     }
   }
-  .video-section + .resource-section,
   .section-title + .video-section {
     padding-top: 16px;
+    margin-top: -8px;
+    margin-bottom: 24px;
+  }
+  .video-section + .resource-section {
+    margin-top: -32px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .video-section + .resource-section + .section-title {
+    margin-top: 56px;
+  }
+  .video-section + .side-note {
+    margin-top: -64px;
+    font-size: 14px;
+    margin-bottom: 48px;
   }
 }
 
@@ -1510,4 +1532,25 @@ footer {
     -ms-filter: blur(0);
     filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='0');
   }
+}
+
+@media print {
+  .navigation,
+  .mobile-quick-links,
+  .mobile-navigation,
+  .hero-title:after,
+  .video-section,
+  .resource-section,
+  #homeFooter {
+    display: none;
+    visibility: hidden !important;
+  }
+  
+  .collapsible + .collapsible-content {
+    display: block;
+  }
+  .collapsible:after {
+    display: none;
+  }
+  
 }
