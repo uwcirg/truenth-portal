@@ -27,6 +27,7 @@ def upgrade():
             postgresql.ENUM(
                 'unstarted',
                 'due',
+                'inprocess',
                 'processed',
                 'triggered',
                 'resolved',
