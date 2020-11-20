@@ -983,7 +983,11 @@ def first_last_like_qnr(qnr):
     if not qb_ids:
         raise ValueError("no matching qbs found!")
 
-    postedQNRs = QNR_results(user, research_study_id=rs_id, qb_ids=qb_ids)
+    postedQNRs = QNR_results(
+        user,
+        research_study_id=rs_id,
+        qb_ids=qb_ids,
+        ignore_iteration=True)
 
     initial, last = None, None
     for q in postedQNRs.qnrs:
