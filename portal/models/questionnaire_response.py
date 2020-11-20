@@ -968,9 +968,13 @@ def first_last_like_qnr(qnr):
     rs_id = qnr.questionnaire_bank.research_study_id
     qbq = qnr.questionnaire_bank.questionnaires
     if not qbq or len(qbq) > 1:
-        raise ValueError(
+        # TODO raise once beyond initial testing, for now, return nones
+        current_app.logger.warning(
+            "No questionnaires associated w/ QNR - assume test data")
+        return None, None
+        """raise ValueError(
             "supporting exactly one questionnaire in QNR->QB within"
-            " `first_last_like_qnr()`")
+            " `first_last_like_qnr()`")"""
     q_id = qbq[0].questionnaire_id
 
     query = QuestionnaireBank.query.join(
