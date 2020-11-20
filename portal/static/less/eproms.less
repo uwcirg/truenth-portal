@@ -3316,6 +3316,22 @@ section.header {
       margin: 0 0 12px;
     }
   }
+  .modal-footer {
+    background: @bodyBgColor;
+    color: @baseColor;
+    text-align: left;
+    padding: 16px 32px 24px;
+    border-top: 0;
+    border-radius: 10px;
+    &.hard-trigger,
+    &.soft-trigger {
+      display: none;
+    }
+    &.hard-trigger.active,
+    &.soft-trigger.active {
+      display: block;
+    }
+  }
   .title {
     margin-bottom: 16px;
     width: 100%;

@@ -13,7 +13,9 @@ var emproObj = function() {
 emproObj.prototype.populateDomainDisplay = function() {
     this.domains.forEach(domain => {
         $("#emproModal .triggersButtonsContainer").append(
-            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}">${domain.replace(/_/g, " ")}</a>`
+            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}">
+            ${i18next.t("{domain} Tips").replace("{domain}", domain.replace(/_/g, " "))}
+            </a>`
         );
     });
     this.hardTriggerDomains.forEach(domain => {
