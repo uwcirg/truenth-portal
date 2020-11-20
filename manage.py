@@ -128,7 +128,8 @@ def sync():
     stamp_db()
     flush_cache()
     upgrade_db()
-    seed()
+    # TODO remove global override of keep_unmentioned when codings site-persistence allows codings from Observations
+    seed(keep_unmentioned=True)
 
 
 @click.option(
