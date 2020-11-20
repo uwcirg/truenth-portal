@@ -110,7 +110,7 @@ export default {
                 this.setSelectedDomain();
                 //populate domain content
                 this.getDomainContent();
-                this.initTriggerDomains();
+
             }).catch(error => {
                 this.setErrorMessage(`Error in promises ${error}`);
                 this.setInitView();
@@ -376,6 +376,9 @@ export default {
             //  return  `${this.getLRBaseURL()}/c/portal/truenth/asset/query?content=true&anyTags=${this.getSelectedDomain()}&languageId=${this.getLocale()}`;
          },
         onDomainContentDidLoad() {
+            Vue.nextTick(() => {
+                this.initTriggerDomains();
+            });
             setTimeout(function() {
                 this.setInitView();
             }.bind(this), 150);
@@ -426,8 +429,11 @@ export default {
             }
             this.domainContent = data;
         },
+        isAtDefaultDomain() {
+            return this.getSelectedDomain() === this.defaultDomain;
+        },
         isTriggersNeeded() {
-            return this.isPatient() && this.getSelectedDomain() === this.defaultDomain;
+            return this.isPatient() && this.isAtDefaultDomain();
         },
         processDefaultDomainContent() {
             //filter content of default landing page based on user trigger-based domains
