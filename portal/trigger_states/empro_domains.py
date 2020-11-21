@@ -85,7 +85,7 @@ class DomainManifold(object):
 
     def __init__(self, qnr):
         self.initial_qnr, self.prev_qnr, self.cur_qnr = None, None, None
-        self.initial_obs, self.prev_obs, self.cur_obs = None, None, None
+        self.initial_obs, self.prev_obs, self.cur_obs = {}, {}, {}
         self.obtain_observations(qnr)
 
     def obtain_observations(self, qnr):
