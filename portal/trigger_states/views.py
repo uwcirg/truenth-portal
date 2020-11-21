@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from .empro_states import users_trigger_state
 from ..views.crossdomain import crossdomain
 from ..extensions import oauth
@@ -24,4 +24,16 @@ def user_triggers(user_id):
     get_user(user_id, 'view')
 
     ts = users_trigger_state(user_id)
+
+    # Debugging parameter - reprocess as if given QNR was just submitted
+    if request.args.get('reprocess_qnr_id'):
+        from .empro_states import evaluate_triggers
+        from ..models.questionnaire_response import QuestionnaireResponse
+        qnr = QuestionnaireResponse.query.get(
+            request.args.get('reprocess_qnr_id'))
+        if qnr.subject_id != user_id:
+            raise ValueError("QNR subject doesn't match requested user")
+        evaluate_triggers(qnr, override_state=True)
+        ts = users_trigger_state(user_id)
+
     return jsonify(ts.as_json())
