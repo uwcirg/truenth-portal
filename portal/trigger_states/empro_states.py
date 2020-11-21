@@ -143,7 +143,7 @@ def initiate_trigger(user_id):
     return ts
 
 
-def evaluate_triggers(qnr):
+def evaluate_triggers(qnr, override_state=False):
     """Process state for given QuestionnaireResponse
 
     Complicated set of business rules used to determine trigger state.
@@ -162,6 +162,10 @@ def evaluate_triggers(qnr):
         # first, confirm state transition is allowed - raises if not
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
+
+        if ts.state == 'processed' and override_state:
+            # go around state machine, setting directly when requested
+            ts.state = 'inprocess'
 
         # typical flow, processing was triggered before SDC handoff
         # if launched from testing or some catch-up task, initiate now
