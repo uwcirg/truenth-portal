@@ -1,0 +1,1143 @@
+{
+    "entry":[
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T23:01:11Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      {
+                         "valueString":""
+                      }
+                   ],
+                   "linkId":"irondemog_v3.1"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.2"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.3"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.4"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.5"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.6"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.7"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.8"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.9"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.10"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.11"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.12"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.13"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.14"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.15"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.16"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.17"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.18"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.19"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.20"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.21"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.22"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.23"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.24"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.25"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.26"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.27"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.28"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.29"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.30"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.31"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.32"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.33"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.34"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.35"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.36"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.37"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.38"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.39"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.40"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.41"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.42"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.43"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.44"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.45"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.46"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.47"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.48"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.49"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.50"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.51"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.52"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.53"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.54"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.55"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.56"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.57"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.58"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.59"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.60"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.61"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.62"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.63"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.64"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.65"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"irondemog_v3.66"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"Demographic & Epidemiological Factors",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/irondemog_v3"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       },
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T23:00:46Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"prems.1"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"prems.2"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"prems.3"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"prems.4"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"prems.5.2",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"prems.5"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"prems.6.2",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"prems.6"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"Patient Reported Experience Measures (PREMS)",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/prems"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       },
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T23:00:09Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.1"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.2"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.3"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.4"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.5"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.6"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.7"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.8"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.9"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.10"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.11"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.12"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.13"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.14"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.15"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.16"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.17"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.18"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.19"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.20"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"epic26.21"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No problem"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"epic26.22.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"epic26.22"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No problem"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"epic26.23.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"epic26.23"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No problem"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"epic26.24.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"epic26.24"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No problem"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"epic26.25.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"epic26.25"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"No problem"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"epic26.26.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"epic26.26"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"EPIC 26 Short Form",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/epic26"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       },
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T22:59:34Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      {
+                         "valueString":"Not at all"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"factfpsi.1.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"factfpsi.1"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"Not at all"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"factfpsi.2.1",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"factfpsi.2"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"FACT-FPSI 17 - Q36 & 37",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/factfpsi"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       },
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T22:59:12Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.1"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.2"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.3"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.4"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.5"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.6"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.7"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.8"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.9"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.10"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.11"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.12"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.13"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"ironmisc_v5.14"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"3"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"ironmisc_v5.15.3",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"ironmisc_v5.15"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"4"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"ironmisc_v5.16.4",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"ironmisc_v5.16"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"How you feel, your memory, sleep quality, and pain",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/ironmisc_v5"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       },
+       {
+          "author":{
+             "display":"user info",
+             "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+          },
+          "authored":"2020-11-20T22:58:34Z",
+          "group":{
+             "question":[
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.1"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.2"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.3"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.4"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.5"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.6"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.7"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.8"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.9"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.10"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.11"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.12"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.13"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.14"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.15"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.16"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.17"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.18"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.19"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.20"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.21"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.22"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.23"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.24"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.25"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.26"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.27"
+                },
+                {
+                   "answer":[
+                      
+                   ],
+                   "linkId":"eortc.28"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"3"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"eortc.29.3",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"eortc.29"
+                },
+                {
+                   "answer":[
+                      {
+                         "valueString":"4"
+                      },
+                      {
+                         "valueCoding":{
+                            "code":"eortc.30.4",
+                            "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                         }
+                      }
+                   ],
+                   "linkId":"eortc.30"
+                }
+             ]
+          },
+          "questionnaire":{
+             "display":"Quality of Life Questionnaire (EORTC QLQ-30)",
+             "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/eortc"
+          },
+          "resourceType":"QuestionnaireResponse",
+          "source":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          },
+          "status":"completed",
+          "subject":{
+             "display":"patient demographics",
+             "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+          }
+       }
+    ],
+    "link":[
+       {
+          "href":"https://eproms-test.cirg.washington.edu/api/patient/3142/assessment",
+          "rel":"self"
+       }
+    ],
+    "resourceType":"Bundle"
+ }

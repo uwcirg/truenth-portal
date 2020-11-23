@@ -32,7 +32,7 @@
 </div>
 {% endblock %}
 {% block footer %}{{footer(False, True, user)}}{% endblock %}
-{% block additional_scripts %}<script src="{{ url_for('.static', filename='js/portal.js') }}"></script>{% endblock %}
+{% block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/portal.bundle.js') }}"></script>{% endblock %}
 {% macro render_card_content(intervention, display, class='') -%}
     <div class="portal-description {{class}}">
         {%- if intervention.description -%}<h2 class="tnth-subhead title">{{ intervention.description }}</h2>{% endif %}

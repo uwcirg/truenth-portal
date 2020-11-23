@@ -1,0 +1,92 @@
+
+import tnthDates from "./modules/TnthDate";
+import TestJson from "./data/common/MainStudyQuestionnaireTestData.json";
+
+$(document).on("ready", function() {
+    $(".button-container").each(function() {
+        $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    });
+    $(".btn-tnth-primary").on("click", function(event) {
+        if ($(this).hasClass("disabled")) {
+            return false;
+        }
+        var link = $(this).attr("href");
+        if (link) {
+            event.preventDefault();
+            $(this).hide();
+            $(this).prev(".loading-message-indicator").show();
+            setTimeout(function() {
+                window.location=link;
+            }, 300);
+        }
+    });
+    $("body").addClass("portal");
+
+    /*
+     * enable debugging: key combo: Crtl + Shift + "d"
+     */
+    document.addEventListener("keydown", event => {
+        if (event.ctrlKey && 
+            event.shiftKey &&
+            event.key.toLowerCase() === "d") {
+                console.log("WTF")
+            $("#developmentToolsContainer").removeClass("hide");
+            console.log(TestJson);
+            return false;
+        }
+        
+    });
+    /*
+     * test button, on clicking of whick will submit test data for the subject
+     */
+    $("#btnTestData").on("click", () => {
+        $.ajax({
+            type: "GET",
+            url: "/api/me"
+        }).done(function(data) {
+            if (!data.id) return;
+            let entry = TestJson.entry;
+            let reference = `${location.origin}/api/demographics/${data.id}`;
+            let semaphors = entry.length;
+            let requestsCompleted = () => {
+                if (semaphors == 0) {
+                    console.log("DONE!");
+                    $("#btnTestData").removeClass("disabled").attr("disabled", false);
+                    $("#developmentToolsContainer .loader").addClass("hide");
+                    location.reload();
+                }
+            }
+            entry.forEach((item, index) => {
+                let postData = item;
+                /*
+                * set authored date to current date/time
+                */
+                postData.authored = tnthDates.getTodayDateObj().gmtDate;
+                /*
+                 *  make sure referencing the current subject account
+                 */
+                postData.author.reference = reference;
+                postData.source.reference = reference;
+                postData.subject.reference = reference;
+                console.log(postData);
+                $("#btnTestData").addClass("disabled").attr("disabled", true);
+                $("#developmentToolsContainer .loader").removeClass("hide");
+                $.ajax({
+                    type: "POST",
+                    url: `/api/patient/${data.id}/assessment`,
+                    data: JSON.stringify(postData),
+                    contentType: "application/json",
+                    dataType: "json"
+                }).done(() => {
+                    semaphors--;
+                    requestsCompleted();
+                }).fail((e) => {
+                    console.log("test data post failed ", e);
+                    semaphors--;
+                    requestsCompleted();
+                });
+            });
+        });
+    });
+
+});
