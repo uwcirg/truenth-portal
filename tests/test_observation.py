@@ -21,6 +21,12 @@ def obs_w_extension(request):
     return json_from_file(request=request, filename=filename)
 
 
+@fixture
+def obs_bundle_sans_extension(request):
+    filename = 'obs-bundle-sans-extension.json'
+    return json_from_file(request=request, filename=filename)
+
+
 def test_coding_extension(initialized_with_ss_qnr, obs_w_extension):
     obs = Observation()
     obs.update_from_fhir(obs_w_extension)
@@ -63,3 +69,20 @@ def test_obtain_observations(obs_w_extension, initialized_with_ss_qnr):
     qnr = db.session.merge(initialized_with_ss_qnr)
     dm = DomainManifold(qnr)
     assert dm.cur_obs['joint_pain']['ironman_ss.4'] == (4, 'penultimate')
+
+
+def test_parse_bundle(obs_bundle_sans_extension, initialized_with_ss_qnr):
+    Observation.parse_obs_bundle(obs_bundle_sans_extension)
+    expect = {
+        'anxious',
+        'discouraged',
+        'fatigue',
+        'general_pain',
+        'insomnia',
+        'joint_pain',
+        'sad',
+        'social_isolation'}
+    found_domains = set()
+    for ob in Observation.query.all():
+        found_domains.add(ob.codeable_concept.codings[0].code)
+    assert found_domains == expect
