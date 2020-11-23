@@ -125,6 +125,13 @@ class Observation(db.Model):
             self = db.session.merge(match)
         return self
 
+    @classmethod
+    def parse_obs_bundle(cls, obs_bundle):
+        for obs in obs_bundle['entry']:
+            observation = cls()
+            observation.update_from_fhir(obs)
+            db.session.add(observation)
+
 
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'

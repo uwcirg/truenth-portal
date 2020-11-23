@@ -382,12 +382,7 @@ def extract_observations(questionnaire_response_id):
     response = post(f"{SDC_BASE_URL}/$extract", json=qnr_json)
     response.raise_for_status()
 
-    obs_bundle = response.json()
-
-    for obs in obs_bundle['entry']:
-        observation = Observation()
-        observation.update_from_fhir(obs)
-        db.session.add(observation)
+    Observation.parse_obs_bundle(response.json())
     db.session.commit()
 
     # As scoring is complete, pass baton to evaluation process
