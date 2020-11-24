@@ -179,7 +179,7 @@ export default { /*global i18next datepicker $*/
         $("#consentDateModal").on("hidden.bs.modal", function() {
             $(this).removeClass("active");
         });
-        $("#consentDateModal .consent-date").datepicker({"format": "d M yyyy","forceParse": false,"endDate": new Date(),"autoclose": true});
+        $("#consentDateModal .consent-date").datepicker({"format": "d M yyyy","forceParse": false, "autoclose": true});
         $("#consentDateModal .consent-hour, #consentDateModal .consent-minute, #consentDateModal .consent-second").each(function() {
             Utility.convertToNumericField($(this));
         });
