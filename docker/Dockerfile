@@ -38,6 +38,8 @@ RUN \
 
 FROM debian:buster as production
 
+LABEL org.opencontainers.image.source https://github.com/uwcirg/truenth-portal
+
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
     DEBIAN_FRONTEND=noninteractive \
