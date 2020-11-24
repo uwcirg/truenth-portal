@@ -58,7 +58,14 @@ $(document).on("ready", function() {
                     }
                     $("#developmentToolsContainer .error").html("error occurred processing data, see console for detail.")
                 }
-            }
+            };
+            let beforeRequests = () => {
+                $("#btnTestData").addClass("disabled").attr("disabled", true);
+                $("#developmentToolsContainer .loader").removeClass("hide");
+                $("#developmentToolsContainer .error").html("");
+            };
+           
+            beforeRequests();
             entry.forEach((item, index) => {
                 let postData = item;
                 /*
@@ -71,8 +78,6 @@ $(document).on("ready", function() {
                 postData.author.reference = reference;
                 postData.source.reference = reference;
                 postData.subject.reference = reference;
-                $("#btnTestData").addClass("disabled").attr("disabled", true);
-                $("#developmentToolsContainer .loader").removeClass("hide");
                 $.ajax({
                     type: "POST",
                     url: `/api/patient/${data.id}/assessment`,
