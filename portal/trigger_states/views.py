@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from .empro_states import users_trigger_state
 from ..views.crossdomain import crossdomain
 from ..extensions import oauth
@@ -48,10 +48,15 @@ def user_triggers(user_id):
 
             # reset state to allow processing
             ts = users_trigger_state(qnr.subject_id)
+            current_app.logger.debug(
+                f"triggers view: force transition from {ts.state} to 'due")
             ts.state = 'due'
 
             extract_observations(qnr.id)
 
+        current_app.logger.debug(
+            f"triggers view: evaluate_triggers() for {user_id} on request"
+        )
         evaluate_triggers(qnr, override_state=True)
         ts = users_trigger_state(user_id)
 
