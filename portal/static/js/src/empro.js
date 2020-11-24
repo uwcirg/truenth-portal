@@ -19,7 +19,7 @@ emproObj.prototype.populateDomainDisplay = function() {
         );
     });
     this.hardTriggerDomains.forEach(domain => {
-        $("#emproModal .hardTriggersDisplayList").append(`<li>${domain}</li>`);
+        $("#emproModal .hardTriggersDisplayList").append(`<li>${domain.replace(/_/g, " ")}</li>`);
     });
 };
 emproObj.prototype.initThankyouModal = function() {
