@@ -2818,6 +2818,7 @@ body.portal .copyright-container  {
   justify-content: center;
 }
 .portal-item {
+  width: 100%;
   max-width: 100%;
 }
 .portal-header-container {
@@ -2904,6 +2905,8 @@ body.portal .copyright-container  {
 .portal-flex-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
   flex-wrap: wrap;
   position: relative;
   padding-bottom: 1em;
@@ -2914,8 +2917,7 @@ body.portal .copyright-container  {
   color: #FFF;
   padding: 0.5em 1.75em 2.5em;
   position: relative;
-  width: 440px;
-  min-width: 420px;
+  width: 420px;
   max-width: 100%;
   margin: 1em auto;
   min-height: 250px;
@@ -2979,7 +2981,7 @@ body.portal .copyright-container  {
 @media (min-width: 992px) {
   .portal-description {
     margin: 1em;
-    width: 40%;
+    //width: 40%;
     &.full-width {
       width: 96%;
       min-height: 200px;
@@ -3093,7 +3095,7 @@ body.portal .copyright-container  {
   .bottom {
     display: flex;
     justify-content: center;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
   }
 }
@@ -3101,6 +3103,14 @@ body.portal .copyright-container  {
   .portal-skyscraper-container {
     .section-title {
       font-size: 1.4em;
+    }
+  }
+}
+@media (min-width: 992px) {
+
+  .portal-skyscraper-container {
+    .bottom {
+      flex-direction: row;
     }
   }
 }
