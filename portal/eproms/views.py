@@ -129,8 +129,8 @@ def assessment_engine_view(user):
     enrolled_in_substudy = EMPRO_RS_ID \
         in ResearchStudy.assigned_to(user)
     substudy_due_date = localize_datetime(
-        substudy_assessment_status.due_date, user) \
-        if substudy_assessment_status.due_date else None
+        substudy_assessment_status.overdue_date, user) \
+        if substudy_assessment_status.overdue_date else None
     substudy_comp_date = localize_datetime(
         substudy_assessment_status.completed_date, user) \
         if substudy_assessment_status.completed_date else None
