@@ -29,9 +29,7 @@ $(document).on("ready", function() {
         if (event.ctrlKey && 
             event.shiftKey &&
             event.key.toLowerCase() === "d") {
-                console.log("WTF")
             $("#developmentToolsContainer").removeClass("hide");
-            console.log(TestJson);
             return false;
         }
         
@@ -52,7 +50,6 @@ $(document).on("ready", function() {
             let errorMessage = "";
             let requestsCompleted = () => {
                 if (semaphors == 0) {
-                    console.log("DONE!");
                     $("#btnTestData").removeClass("disabled").attr("disabled", false);
                     $("#developmentToolsContainer .loader").addClass("hide");
                     if (!errorMessage) {
@@ -74,7 +71,6 @@ $(document).on("ready", function() {
                 postData.author.reference = reference;
                 postData.source.reference = reference;
                 postData.subject.reference = reference;
-                console.log(postData);
                 $("#btnTestData").addClass("disabled").attr("disabled", true);
                 $("#developmentToolsContainer .loader").removeClass("hide");
                 $.ajax({
