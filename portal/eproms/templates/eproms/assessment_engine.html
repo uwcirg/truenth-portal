@@ -20,11 +20,14 @@
     {% endif %}
 {% endif %}
 
+<!-- debugging feature -->
 {% if config["SYSTEM_TYPE"].lower() != "production" and
       assessment_status.overall_status in (OverallStatus.due, OverallStatus.overdue) %}
         <div id="developmentToolsContainer" class="hide">
+            <!-- made available only when assessment is available -->
             <!-- allow submission of main study questionnaires data -->
             <button id="btnTestData" class="btn-lg btn-tnth-primary">Submit Test Data</button>
             <div class="loader hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+            <div class="error error-message"></div>
         </div>
 {% endif %}

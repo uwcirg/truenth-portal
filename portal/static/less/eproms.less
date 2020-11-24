@@ -5716,7 +5716,15 @@ div.or {
 }
 
 #developmentToolsContainer {
-  .loader {
+  margin-left: 32px;
+  margin-right: 32px;
+  &:focus,
+  &:hover,
+  &:active {
+    outline: none;
+  }
+  .loader,
+  .error {
     margin-top: 16px;
   }
 }

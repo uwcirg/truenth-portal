@@ -36,8 +36,9 @@ $(document).on("ready", function() {
         }
         
     });
-    /*
+    /* 
      * test button, on clicking of whick will submit test data for the subject
+     * button is activated via key combo Crtl + Shift + "d"
      */
     $("#btnTestData").on("click", () => {
         $.ajax({
@@ -48,22 +49,27 @@ $(document).on("ready", function() {
             let entry = TestJson.entry;
             let reference = `${location.origin}/api/demographics/${data.id}`;
             let semaphors = entry.length;
+            let errorMessage = "";
             let requestsCompleted = () => {
                 if (semaphors == 0) {
                     console.log("DONE!");
                     $("#btnTestData").removeClass("disabled").attr("disabled", false);
                     $("#developmentToolsContainer .loader").addClass("hide");
-                    location.reload();
+                    if (!errorMessage) {
+                        location.reload();
+                        return;
+                    }
+                    $("#developmentToolsContainer .error").html("error occurred processing data, see console for detail.")
                 }
             }
             entry.forEach((item, index) => {
                 let postData = item;
                 /*
-                * set authored date to current date/time
+                * set authored date to current date/time GMT
                 */
                 postData.authored = tnthDates.getTodayDateObj().gmtDate;
                 /*
-                 *  make sure referencing the current subject account
+                 *  make sure any reference should reference the current subject account
                  */
                 postData.author.reference = reference;
                 postData.source.reference = reference;
@@ -79,9 +85,10 @@ $(document).on("ready", function() {
                     dataType: "json"
                 }).done(() => {
                     semaphors--;
-                    requestsCompleted();
+                    requestsCompleted(true);
                 }).fail((e) => {
                     console.log("test data post failed ", e);
+                    errorMessage = e;
                     semaphors--;
                     requestsCompleted();
                 });
