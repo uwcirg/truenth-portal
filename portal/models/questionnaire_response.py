@@ -209,6 +209,13 @@ class QuestionnaireResponse(db.Model):
 
         db.session.commit()
 
+    def purge_related_observations(self):
+        """Look up and purge all QNR related observations"""
+        from portal.models.observation import Observation
+        Observation.query.filter(
+            Observation.derived_from == str(self.id)).delete()
+        db.session.commit()
+
     @staticmethod
     def by_identifier(identifier):
         """Query for QuestionnaireResponse(s) with given identifier"""
