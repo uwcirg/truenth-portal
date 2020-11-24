@@ -35,8 +35,8 @@ $(document).on("ready", function() {
         
     });
     /* 
-     * test button, on clicking of whick will submit test data for the subject
-     * button is activated via key combo Crtl + Shift + "d"
+     * Click event for the test button - will submit fake data for the main study questionnaires for the subject
+     * NOTE: button is activated via key combo Crtl + Shift + "d"
      */
     $("#btnTestData").on("click", () => {
         $.ajax({
