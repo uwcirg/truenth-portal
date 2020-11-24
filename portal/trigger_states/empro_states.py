@@ -91,6 +91,9 @@ def enter_user_trigger_critical_section(user_id):
     sm = EMPRO_state(ts)
     sm.begin_process()
     # Record the historical transformation via insert.
+    current_app.logger.debug(
+        "record state change to 'inprocess' from "
+        f"enter_user_trigger_critical_section({user_id})")
     ts.insert(from_copy=True)
 
     # Now 'inprocess', obtain the lock to be freed at the conclusion
@@ -139,6 +142,9 @@ def initiate_trigger(user_id):
 
     # Record the historical transformation via insert if new
     if ts.id is None:
+        current_app.logger.debug(
+            "record state change to 'due' from "
+            f"initiate_trigger({user_id})")
         ts.insert()
     return ts
 
@@ -165,11 +171,17 @@ def evaluate_triggers(qnr, override_state=False):
 
         if ts.state == 'processed' and override_state:
             # go around state machine, setting directly when requested
+            current_app.logger.debug(
+                f"override trigger_state transition from {ts.state} "
+                f"to 'inprocess'")
             ts.state = 'inprocess'
 
         # typical flow, processing was triggered before SDC handoff
         # if launched from testing or some catch-up task, initiate now
         if ts.state != "inprocess":
+            current_app.logger.debug(
+                "evaluate_triggers(): trigger_state transition from "
+                f"{ts.state} to 'inprocess'")
             enter_user_trigger_critical_section(user_id=qnr.subject_id)
             # confirm local vars picked up state change
             assert ts.state == 'inprocess'
@@ -181,6 +193,9 @@ def evaluate_triggers(qnr, override_state=False):
 
         # transition and persist state
         sm.processed_triggers()
+        current_app.logger.debug(
+            "record state change to 'processed' from "
+            f"evaluate_triggers() for {qnr.subject_id}")
         ts.insert(from_copy=True)
 
         return ts
