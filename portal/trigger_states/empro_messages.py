@@ -28,11 +28,11 @@ def patient_email(patient, soft_triggers, hard_triggers):
         user=patient, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
 
     if hard_triggers:
-        name = 'patient empro both triggers email'
+        name = 'empro patient both triggers email'
     elif soft_triggers:
-        name = 'patient empro soft triggers email'
+        name = 'empro patient soft triggers email'
     else:
-        name = 'patient empro thank you email'
+        name = 'empro patient thank you email'
     mr = MailResource(
         app_text(name), locale_code=patient.locale_code, variables=args)
     em = EmailMessage(
@@ -43,7 +43,7 @@ def patient_email(patient, soft_triggers, hard_triggers):
     return em
 
 
-def staff_emails(patient, hard_triggers):
+def staff_emails(patient, hard_triggers, initial_notification):
     """Return list of emails, one for each eligible staff/clinician"""
 
     # Only supporting patients with a single organization
@@ -70,7 +70,9 @@ def staff_emails(patient, hard_triggers):
             f"Patient's ({patient.id}) assigned clinician not in distribution"
             f" list. Check clinician's ({patient.clinician_id}) organization")
 
-    # TODO plug in real app_text name for yet pending 'staff trigger email'
+    app_text_name = 'empro clinician trigger reminder'
+    if initial_notification:
+        app_text_name = 'empro clinician trigger notification'
 
     # According to spec, args need at least:
     # - study ID
@@ -85,7 +87,7 @@ def staff_emails(patient, hard_triggers):
     emails = []
     for staff in staff_list:
         mr = MailResource(
-            app_text("staff trigger email"),
+            app_text(app_text_name),
             locale_code=staff.locale_code,
             variables=args)
         emails.append(EmailMessage(
