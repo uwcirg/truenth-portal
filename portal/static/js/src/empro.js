@@ -66,7 +66,7 @@ emproObj.prototype.initTriggerDomains = function() {
         this.initReportLink();
         tnthAjax.assessmentReport(this.userId, SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
             if (!data || !data.entry || !data.entry.length) {
-               this.initThankyouModal();
+               this.initThankyouModal(false);
                return;
             }
             let [today, authoredDate, status] = [
