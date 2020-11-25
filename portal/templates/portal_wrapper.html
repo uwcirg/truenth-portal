@@ -90,7 +90,7 @@
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                             {% endif %}
                             {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
-                                <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
+                                <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPRO Resources") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>
                         </ul>
@@ -146,7 +146,7 @@
                         <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
                     {% endif %}
                     {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
-                        <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPROS Resources") }}</a></li>
+                        <li class="eproms-substudy"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPRO Resources") }}</a></li>
                     {% endif %}
                     {% if user %}<li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>
