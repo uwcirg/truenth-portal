@@ -318,20 +318,33 @@ export default { /*global $ */
     },
     getSubStudyTriggers: function(userId, params, callback) {
         callback = callback || function() {};
+        params = params || {};
+        params.retryAttempt = params.retryAttempt || 0;
+        params.maxTryAttempts = params.maxTryAttempts || 5;
+
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                    return true;
-                } else {
-                    callback({"error": true});
-                    return false;
-                }
+
+        this.sendRequest(`/static/files/substudy_test_triggers_new.json`, "GET", userId, params, (data) => {
+        //this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, function(data) {
+            if (!data || data.error || !data.state) {
+                callback({"error": true});
+                return false;
             }
+            if (params.retryAttempt < params.maxTryAttempts &&
+                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
+                ["processed", "triggered", "resolved"].indexOf(String(data.state).toLowerCase()) === -1) {
+                params.retryAttempt++;
+                setTimeout(function() {
+                    this.getSubStudyTriggers(userId, params, callback);
+                }.bind(this), 1000*params.retryAttempt);
+                return false;
+            }
+            params.retryAttempt = 0;
+            callback(data);
+            return true;
         });
     },
     "getCliniciansList": function(orgIds, callback) {

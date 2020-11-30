@@ -53,10 +53,9 @@ emproObj.prototype.initTriggerItemsVis = function() {
         $("#emproModal .no-trigger").hide();
         return;
     }
-   
+    //fix
 };
-emproObj.prototype.initTriggerDomains = function() {
-    var self = this;
+emproObj.prototype.init = function() {
     tnthAjax.getCurrentUser((data) => {
         if (!data || !data.id) return;
         this.userId = data.id;
@@ -69,10 +68,16 @@ emproObj.prototype.initTriggerDomains = function() {
                this.initThankyouModal(false);
                return;
             }
+            /*
+             * make sure data item with the latest authored date is first
+             */
+            let assessmentData = (data.entry).sort(function(a, b) {
+                return new Date(b.authored) - new Date(a.authored);
+            });
             let [today, authoredDate, status] = [
                 tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
-                tnthDate.getDateWithTimeZone(new Date(data.entry[0]["authored"]), "yyyy-mm-dd"),
-                data.entry[0].status];
+                tnthDate.getDateWithTimeZone(new Date(assessmentData[0]["authored"]), "yyyy-mm-dd"),
+                assessmentData[0].status];
             let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}`;
             let assessmentCompleted = String(status).toLowerCase() === "completed";
             /*
@@ -93,63 +98,81 @@ emproObj.prototype.initTriggerDomains = function() {
              * don't continue on to invoke trigger API if sub-study assessment is not completed
              */
             if (!assessmentCompleted) {
+                this.initThankyouModal(false);
                 return;
             }
-            tnthAjax.getSubStudyTriggers(this.userId, false, function(data) {
-                if (!data || !data.triggers || !data.triggers.domain) {
-                    return false;
-                }
-                for (let key in data.triggers.domain) {
-                    if (!Object.keys(data.triggers.domain[key]).length) {
-                        continue;
-                    }
-                    let mappedDomain = EMPRO_DOMAIN_MAPPINGS[key];
-                    /*
-                     * get all user domains that have related triggers
-                     */
-                    if (self.domains.indexOf(mappedDomain) === -1) {
-                        self.domains.push(mappedDomain);
-                    }
-                    for (let q in data.triggers.domain[key]) {
-                        if (data.triggers.domain[key][q] === "hard") {
-                            self.hasHardTrigger = true;
-                            /*
-                             * get all domain topics that have hard trigger
-                             */
-                            if (self.hardTriggerDomains.indexOf(mappedDomain) === -1) {
-                                self.hardTriggerDomains.push(mappedDomain);
-                            }
-                        }
-                        if (data.triggers.domain[key][q] === "soft") {
-                            self.hasSoftTrigger = true;
-                             /*
-                             * get all domain topics that have soft trigger
-                             */
-                            if (self.softTriggerDomains.indexOf(mappedDomain) === -1) {
-                                self.softTriggerDomains.push(mappedDomain);
-                            }
-                        }
-                    }
-                }
-    
-                /*
-                 * display user domain topic(s)
-                 */
-                self.populateDomainDisplay();
-                /*
-                 * show/hide sections based on triggers
-                 */
-                self.initTriggerItemsVis();
-    
-               //console.log("self.domains? ", self.domains);
-               //console.log("has hard triggers ", self.hasHardTrigger);
-               //console.log("has soft triggers ", self.hasSoftTrigger);
-            });
+            this.initTriggerDomains();
         });
     });
+};
+emproObj.prototype.setLoadingVis = function(done) {
+    if (done) {
+        $("#emproModal .items-section").removeClass("loading");
+        return;
+    }
+    $("#emproModal .items-section").addClass("loading");
 }
+emproObj.prototype.initTriggerDomains = function() {
+    var self = this;
+    this.setLoadingVis();
+    tnthAjax.getSubStudyTriggers(this.userId, false, (data) => {
+        if (!data || !data.triggers || !data.triggers.domain) {
+            this.initThankyouModal(false);
+            this.setLoadingVis(true);
+            return false;
+        }
 
+        for (let key in data.triggers.domain) {
+            if (!Object.keys(data.triggers.domain[key]).length) {
+                continue;
+            }
+            let mappedDomain = EMPRO_DOMAIN_MAPPINGS[key];
+            /*
+             * get all user domains that have related triggers
+             */
+            if (self.domains.indexOf(mappedDomain) === -1) {
+                self.domains.push(mappedDomain);
+            }
+            for (let q in data.triggers.domain[key]) {
+                if (data.triggers.domain[key][q] === "hard") {
+                    self.hasHardTrigger = true;
+                    /*
+                     * get all domain topics that have hard trigger
+                     */
+                    if (self.hardTriggerDomains.indexOf(mappedDomain) === -1) {
+                        self.hardTriggerDomains.push(mappedDomain);
+                    }
+                }
+                if (data.triggers.domain[key][q] === "soft") {
+                    self.hasSoftTrigger = true;
+                     /*
+                     * get all domain topics that have soft trigger
+                     */
+                    if (self.softTriggerDomains.indexOf(mappedDomain) === -1) {
+                        self.softTriggerDomains.push(mappedDomain);
+                    }
+                }
+            }
+        }
+
+        /*
+         * display user domain topic(s)
+         */
+        this.populateDomainDisplay();
+        /*
+         * show/hide sections based on triggers
+         */
+        this.initTriggerItemsVis();
+
+        //finish loading
+        this.setLoadingVis(true);
+
+       //console.log("self.domains? ", self.domains);
+       //console.log("has hard triggers ", self.hasHardTrigger);
+       //console.log("has soft triggers ", self.hasSoftTrigger);
+    });
+};
 $(document).ready(function() {
     let EmproObj = new emproObj();
-    EmproObj.initTriggerDomains();
+    EmproObj.init();
 });

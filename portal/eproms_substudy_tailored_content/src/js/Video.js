@@ -53,6 +53,7 @@ export default {
             let videoNavElements = document.querySelectorAll(".navigation-video-image");
             videoNavElements.forEach(el => {
                 el.addEventListener("click", () => {
+                    let videoElement = this.getVideoElement();
                     this.setVideoIframe(videoElement);
                     let ve = videoElement.querySelector("iframe");
                     if (ve) {

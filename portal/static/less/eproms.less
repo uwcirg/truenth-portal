@@ -2918,7 +2918,7 @@ body.portal .copyright-container  {
   position: relative;
   width: 420px;
   max-width: 100%;
-  margin: 1em auto;
+  margin: 1em;
   min-height: 250px;
   overflow: hidden;
   line-height: 1.5;
@@ -3018,8 +3018,13 @@ body.portal .copyright-container  {
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
-  .text-content {
-    flex: 1;
+  flex-grow: 1;
+  justify-content: space-between;
+  // .text-content {
+  //   flex: 1;
+  // }
+  .button-container {
+    align-self: flex-end;
   }
 }
 .portal-flex-container .button-container,
@@ -3048,9 +3053,6 @@ body.portal .copyright-container  {
     padding-top: 1.5em;
     display: flex;
     flex-direction: column;
-    .portal-description-body {
-      flex: 1;
-    }
   }
 }
 
@@ -3353,6 +3355,7 @@ section.header {
     border-bottom: 1px solid @HRColor;
   }
   .items-section {
+    position: relative;
     display: flex;
     -webkit-box-align: stretch;
     -webkit-align-items: stretch;
@@ -3369,6 +3372,38 @@ section.header {
     }
     &.active {
       display: flex;
+    }
+    &.loading {
+      &:before {
+        content: ' ';
+        display: block;
+        font-size: 8px;
+        width: 8px;
+        height: 8px;
+        -webkit-animation: spinner 1500ms infinite linear;
+        -moz-animation: spinner 1500ms infinite linear;
+        -ms-animation: spinner 1500ms infinite linear;
+        -o-animation: spinner 1500ms infinite linear;
+        animation: spinner 1500ms infinite linear;
+        -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+        box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+        position: absolute;
+        left: calc(100% / 2 - 8px);
+        top: calc(100% / 2 - 8px);
+        z-index: 999;
+        border-radius: 4px;
+      }
+      &:after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: #FFF;
+        opacity: 0.6;
+      }
     }
     .item {
       padding: 16px 8px 24px;
