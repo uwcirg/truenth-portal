@@ -164,7 +164,9 @@
                 {% endif %}
             </div>
         {%- endcall -%}
-        {{empro_thankyou_modal(user)}}
+        {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
+            {{empro_thankyou_modal(user)}}
+        {% endif %}
     {%- endif -%}
 {%- endmacro -%}
 {%- macro empro_thankyou_card(full_name="") -%}

@@ -25,6 +25,7 @@ export default {
      * tailored domain topics, some for video only, e.g. masculinity & empowerment
      */
     domains: ["mood_changes", "insomnia", "hot_flashes", "sex_and_intimacy", "pain", "fatigue", "masculinity", "empowerment"],
+    processedTriggerStates: ["processed", "triggered", "resolved"],
     userDomains: [],
     eligibleCountryCodes: [{
         name: "United Kingdom",

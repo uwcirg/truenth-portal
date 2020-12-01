@@ -3,7 +3,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID} from "../data/common/consts.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
 export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
@@ -318,20 +318,31 @@ export default { /*global $ */
     },
     getSubStudyTriggers: function(userId, params, callback) {
         callback = callback || function() {};
+        params = params || {};
+        params.retryAttempt = params.retryAttempt || 0;
+        params.maxTryAttempts = params.maxTryAttempts || 5;
+
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                    return true;
-                } else {
-                    callback({"error": true});
-                    return false;
-                }
+        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
+            if (!data || data.error || !data.state) {
+                callback({"error": true});
+                return false;
             }
+            if (params.retryAttempt < params.maxTryAttempts &&
+                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
+                EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
+                params.retryAttempt++;
+                setTimeout(function() {
+                    this.getSubStudyTriggers(userId, params, callback);
+                }.bind(this), 1000*params.retryAttempt);
+                return false;
+            }
+            params.retryAttempt = 0;
+            callback(data);
+            return true;
         });
     },
     "getCliniciansList": function(orgIds, callback) {

@@ -202,24 +202,50 @@ export default {
         getDefaultDomains() {
             return Object.keys(this.domainMappings);
         },
-        initTriggerDomains() {
+        initTriggerDomains(params) {
             if (!this.isTriggersNeeded()) {
+                setTimeout(function() {
+                    this.setInitView();
+                }.bind(this), 150);
                 return;
             }
+            params = params || {};
+            params.retryAttempt = params.retryAttempt || 0;
+            params.maxTryAttempts = params.maxTryAttempts || 5;
             //get trigger domains IF a patient
             Promise.allSettled([
                 this.$http(`/api/user/${this.getUserID()}/triggers`)
             ]).then(response => {
+                let processedData = "";
                 try {
-                    this.setUserDomains(JSON.parse(response[0].value));
-                    this.processDefaultDomainContent();
+                    processedData = JSON.parse(response[0].value);
                 } catch(e) {
                     //log error to console
                     this.setErrorMessage(`Error parsing trigger data ${e}`);
                 }
+
+                if (processedData &&
+                    params.retryAttempt < params.maxTryAttempts &&
+                    //if the trigger data has not been processed, try again until maximum number of attempts has been reached
+                    this.processedTriggerStates.indexOf(String(processedData.state).toLowerCase()) === -1) {
+                    params.retryAttempt++;
+                    setTimeout(function() {
+                        this.initTriggerDomains(params);
+                    }.bind(this), 1000*params.retryAttempt);
+                    return false;
+                }
+                params.retryAttempt = 0;
+                try {
+                    this.setUserDomains(processedData);
+                    this.processDefaultDomainContent();
+                } catch(e) {
+                    //log error to console
+                    this.setErrorMessage(`Error setting user domain(s) ${e}`);
+                }
+                this.setInitView();
             }).catch(error => {
-                callback();
                 this.setErrorMessage(`Error retrieving trigger data: ${error}`);
+                this.setInitView();
             });
         },
         getUserDomains() {
@@ -379,9 +405,6 @@ export default {
             Vue.nextTick(() => {
                 this.initTriggerDomains();
             });
-            setTimeout(function() {
-                this.setInitView();
-            }.bind(this), 150);
             this.initNav();
             this.initRouterEvents();
             this.setCollapsible();
