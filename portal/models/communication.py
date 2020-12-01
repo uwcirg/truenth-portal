@@ -98,7 +98,7 @@ def load_template_args(
             return text.replace('<a href', '<a class="btn" href')
 
     def _lookup_home_button():
-        return make_button(_lookup_home_link(), inlinde=True)
+        return make_button(_lookup_home_link(), inline=True)
 
     def _lookup_home_link():
         label = _('View My Report and Resources')
