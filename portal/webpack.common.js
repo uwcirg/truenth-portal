@@ -17,6 +17,7 @@ module.exports = {
         "main": JsSrcPath+"/main.js",
         "longitudinalReport": JsSrcPath+"/longitudinalReport.js",
         "orgTreeView": JsSrcPath+"/orgTreeView.js",
+        "portal": JsSrcPath+"/portal.js",
         "profile": JsSrcPath+"/profile.js",
         "psaTracker": JsSrcPath+"/psaTracker.js",
         "research": JsSrcPath+"/research.js",
