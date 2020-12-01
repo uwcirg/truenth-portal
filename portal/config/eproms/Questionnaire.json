@@ -7843,6 +7843,70 @@
           "valueBoolean": true
         }
       ]
+    },
+    {
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/questionnaire",
+          "value": "ironman_ss_post_tx"
+        }
+      ],
+      "status": "draft",
+      "resourceType": "Questionnaire",
+      "item": [
+        {
+          "type": "open-choice",
+          "linkId": "ironman_ss_post_tx.1",
+          "text": "Action(s) Taken",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Called and spoke with patient",
+                "code": "ironman_ss_post_tx.1.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Sent a message through secure messaging system, awaiting response",
+                "code": "ironman_ss_post_tx.1.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Contacted patient and scheduled follow up visit to review concerns",
+                "code": "ironman_ss_post_tx.1.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Attempted to contact patient, but unable to reach patient within 48 hours of trigger notification",
+                "code": "ironman_ss_post_tx.1.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Other (please specify)",
+                "code": "ironman_ss_post_tx.1.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "linkId": "ironman_ss_post_tx.2",
+          "text": "Date action taken"
+        },
+        {
+          "type": "choice",
+          "linkId": "ironman_ss_post_tx.3",
+          "text": "Action taken by"
+        },
+        {
+          "type": "boolean",
+          "linkId": "ironman_ss_post_tx.4",
+          "text": "I confirm I have received this notification and taken action."
+        }
+      ]
     }
   ],
   "id": "SitePersistence v0.2",

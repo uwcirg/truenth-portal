@@ -7,6 +7,12 @@
       "resourceType": "ResearchProtocol"
     },
     {
+      "created_at": "2020-11-18T07:00:00",
+      "name": "EMPRO STAFF v1",
+      "research_study_id": 1,
+      "resourceType": "ResearchProtocol"
+    },
+    {
       "created_at": "2019-12-16T14:00:00",
       "name": "IRONMAN v5",
       "research_study_id": 0,
