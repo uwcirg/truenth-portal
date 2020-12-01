@@ -51,7 +51,7 @@
                 substudy_assessment_status=substudy_assessment_status,
                 substudy_comp_date=substudy_comp_date,
                 enrolled_in_substudy=enrolled_in_substudy,
-                card_class="disabled"
+                card_class="disabled" if not substudy_assessment_status.overall_status == OverallStatus.completed else ""
             )}}
         {%- endif -%}
     {%- else -%}
