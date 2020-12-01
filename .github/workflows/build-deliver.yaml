@@ -27,7 +27,7 @@ jobs:
           # configured at repo settings/secrets
           # GitHub Username
           username: ${{ secrets.DOCKER_USERNAME }}
-          
+
           # GitHub personal access token
           password: ${{ secrets.DOCKER_PASSWORD }}
 
