@@ -64,16 +64,16 @@ def load_template_args(
     from .qb_status import NoCurrentQB
     from .qb_timeline import QBT  # avoid cycle
 
-    def ae_link():
+    def access_link(next_step):
         token = url_token(user.id)
         auditable_event(
-            "generated URL token {} for ae_link".format(
-                token), user_id=user.id, subject_id=user.id,
+            "generated URL token {} for access_link, next: {}".format(
+                token, next_step), user_id=user.id, subject_id=user.id,
             context='authentication')
 
         return url_for(
             'portal.access_via_token', token=token,
-            next_step='present_needed', _external=True)
+            next_step=next_step, _external=True)
 
     def make_button(text, inline=False):
         if inline:
@@ -97,6 +97,15 @@ def load_template_args(
         else:
             return text.replace('<a href', '<a class="btn" href')
 
+    def _lookup_home_button():
+        return make_button(_lookup_home_link(), inlinde=True)
+
+    def _lookup_home_link():
+        label = _('View My Report and Resources')
+        return (
+            '<a href="{home_link}">{label}</a>'.format(
+                home_link=access_link(next_step='home'), label=label))
+
     def _lookup_assessment_button():
         return make_button(_lookup_assessment_link(), inline=True)
 
@@ -104,7 +113,7 @@ def load_template_args(
         label = _('Complete Questionnaire')
         return (
             '<a href="{ae_link}">{label}</a>'.format(
-                ae_link=ae_link(), label=label))
+                ae_link=access_link(next_step='present_needed'), label=label))
 
     def _lookup_clinic_name():
         if user.organizations:
