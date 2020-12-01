@@ -1,0 +1,1282 @@
+{
+   "entry":[
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T23:01:11Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     {
+                        "valueString":""
+                     }
+                  ],
+                  "linkId":"irondemog_v3.1",
+                  "text":"What is your current age?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.2",
+                  "text":"What is your current height?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.3",
+                  "text":""
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.4",
+                  "text":"What is your current weight?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.5",
+                  "text":""
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.6",
+                  "text":"What was your weight at age 40?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.7",
+                  "text":""
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.8",
+                  "text":"Do you currently smoke cigarettes?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.9",
+                  "text":"How many cigarettes per day?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.10",
+                  "text":"Did you ever smoke?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.11",
+                  "text":"How many years ago did you quit?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.12",
+                  "text":"On average, how many cigarettes did you smoke per day?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.13",
+                  "text":"Are you currently using other tobacco products (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.14",
+                  "text":"What is your current marital status?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.15",
+                  "text":"What is your current living arrangement (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.16",
+                  "text":"What is your highest level of education?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.17",
+                  "text":"What is your current level of employment?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.18",
+                  "text":"What is your usual walking pace?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.19",
+                  "text":"In an average week, on how many days do you usually exercise (include brisk walking or more strenuous exercise)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.20",
+                  "text":"During the past month, how many hours per week did you spend sitting at home watching TV/movies?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.21",
+                  "text":"Do you currently take aspirin or other NSAIDs (e.g., ibuprofen, naproxen)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.22",
+                  "text":"How many do you take per week?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.23",
+                  "text":"Do you currently take multivitamins?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.24",
+                  "text":"How many multivitamins do you take per week?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.25",
+                  "text":"Do you currently take the following supplements (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.26",
+                  "text":"What is your ethnic group? Check all that apply."
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.27",
+                  "text":"Are you Hispanic or Latino?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.28",
+                  "text":"Are you a member of the national military?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.29",
+                  "text":"Have any of the following relatives been diagnosed with colon or rectal cancer (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.30",
+                  "text":"What was your parent's age at first diagnosis of colon or rectal cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.31",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.32",
+                  "text":"What was your sibling's age at first diagnosis of colon or rectal cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.33",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.34",
+                  "text":"What was your other sibling's age at first diagnosis of colon or rectal cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.35",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.36",
+                  "text":"Have any of the following relatives been diagnosed with prostate cancer (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.37",
+                  "text":"What was your father's age at first diagnosis of prostate cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.38",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.39",
+                  "text":"What was your brother's age at first diagnosis of prostate cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.40",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.41",
+                  "text":"What was your other brother's age at first diagnosis of prostate cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.42",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.43",
+                  "text":"Have any of the following relatives been diagnosed with breast cancer (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.44",
+                  "text":"What was your sister's age at first diagnosis of breast cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.45",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.46",
+                  "text":"What was your mother's age at first diagnosis of breast cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.47",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.48",
+                  "text":"Have any of the following relatives been diagnosed with ovarian cancer (check all that apply)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.49",
+                  "text":"What was your sister's age at first diagnosis of ovarian cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.50",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.51",
+                  "text":"What was your mother's age at first diagnosis of ovarian cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.52",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.53",
+                  "text":"Have any of the following relatives been diagnosed with pancreatic cancer? Check all that apply, and include any deceased relatives."
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.54",
+                  "text":"What was your parent's age at first diagnosis of pancreatic cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.55",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.56",
+                  "text":"What was your sibling's age at first diagnosis of pancreatic cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.57",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.58",
+                  "text":"What was your other sibling's age at first diagnosis of pancreatic cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.59",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.60",
+                  "text":"Have any of the following relatives been diagnosed with melanoma (skin cancer)? Check all that apply, and include any deceased relatives."
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.61",
+                  "text":"What was your parent's age at first diagnosis of melanoma (skin cancer)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.62",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.63",
+                  "text":"What was your sibling's age at first diagnosis of melanoma (skin cancer)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.64",
+                  "text":"Did this relative die from their cancer?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.65",
+                  "text":"What was your other sibling's age at first diagnosis of melanoma (skin cancer)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"irondemog_v3.66",
+                  "text":"Did this relative die from their cancer?"
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"Demographic & Epidemiological Factors",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/irondemog_v3"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      },
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T23:00:46Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"prems.1",
+                  "text":"Have you been offered a written assessment and care plan?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"prems.2",
+                  "text":"Were you given the name of non-physician personnel who would support you through your treatment?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"prems.3",
+                  "text":"Were you involved as much as you wanted to be in decisions about your care and treatment?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"prems.4",
+                  "text":"Do you think your views were taken into account when the team of doctors and nurses caring for you were discussing which treatment you should have?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"prems.5.2",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"prems.5",
+                  "text":"Were the possible side effects of treatment(s) explained in a way you could understand?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"prems.6.2",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"prems.6",
+                  "text":"Before you started your treatment, were you given written information about the side effects of treatment?"
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"Patient Reported Experience Measures (PREMS)",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/prems"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      },
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T23:00:09Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.1",
+                  "text":"Over the past 4 weeks, how often have you leaked urine?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.2",
+                  "text":"Which of the following best describes your urinary control during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.3",
+                  "text":"How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.4",
+                  "text":"Dripping or leaking urine"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.5",
+                  "text":"Pain or burning on urination"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.6",
+                  "text":"Bleeding with urination"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.7",
+                  "text":"Weak urine stream or incomplete emptying"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.8",
+                  "text":"Need to urinate frequently during the day"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.9",
+                  "text":"Overall, how big a problem has your urinary function been for you during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.10",
+                  "text":"Urgency to have a bowel movement"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.11",
+                  "text":"Increased frequency of bowel movements"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.12",
+                  "text":"Losing control of your stools"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.13",
+                  "text":"Bloody stools"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.14",
+                  "text":"Abdominal / Pelvic / Rectal Pain"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.15",
+                  "text":"Overall, how big a problem have your bowel habits been for you during the past 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.16",
+                  "text":"Your ability to have an erection?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.17",
+                  "text":"Your ability to reach orgasm (climax)?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.18",
+                  "text":"How would you describe the usual QUALITY of your erections during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.19",
+                  "text":"How would you describe the FREQUENCY of your erections during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.20",
+                  "text":"Overall, how would you rate your ability to function sexually during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"epic26.21",
+                  "text":"Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No problem"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"epic26.22.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"epic26.22",
+                  "text":"Hot flashes"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No problem"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"epic26.23.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"epic26.23",
+                  "text":"Breast tenderness / enlargement"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No problem"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"epic26.24.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"epic26.24",
+                  "text":"Feeling depressed"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No problem"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"epic26.25.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"epic26.25",
+                  "text":"Lack of energy"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"No problem"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"epic26.26.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"epic26.26",
+                  "text":"Change in body weight"
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"EPIC 26 Short Form",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/epic26"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      },
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T22:59:34Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     {
+                        "valueString":"Not at all"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"factfpsi.1.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"factfpsi.1",
+                  "text":"I have bone pain"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"Not at all"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"factfpsi.2.1",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"factfpsi.2",
+                  "text":"I worry that my condition will get worse"
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"FACT-FPSI 17 - Q36 & 37",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/factfpsi"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      },
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T22:59:12Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.1",
+                  "text":"A change in body weight has been a problem for you?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.2",
+                  "text":"That difficulties were piling up so high that you could not overcome them?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.3",
+                  "text":"Confident about your ability to handle your personal problems?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.4",
+                  "text":"That you were unable to control the important things in your life?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.5",
+                  "text":"Have you recently experienced any change in your ability to remember things?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.6",
+                  "text":"Do you have more trouble than usual remembering recent events?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.7",
+                  "text":"Do you have more trouble than usual remembering a short list of items, such as a shopping list?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.8",
+                  "text":"Do you have trouble remembering things from one second to the next?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.9",
+                  "text":"Do you have any difficulty in understanding or following spoken instructions?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.10",
+                  "text":"Do you have more trouble than usual following a group conversation or a plot in a TV program due to your memory?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.11",
+                  "text":"Do you have more trouble than usual finding your way around familiar streets?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.12",
+                  "text":"How often do you have difficulty falling asleep?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.13",
+                  "text":"How often do you have trouble with waking up during the night?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"ironmisc_v5.14",
+                  "text":"How often do you feel really rested when you wake up in the morning?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"3"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"ironmisc_v5.15.3",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"ironmisc_v5.15",
+                  "text":"Please rate your pain by selecting the one number that best describes your pain at its worst in the last 24 hours."
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"4"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"ironmisc_v5.16.4",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"ironmisc_v5.16",
+                  "text":"Please rate your pain by selecting the one number that best describes your pain on average."
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"How you feel, your memory, sleep quality, and pain",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/ironmisc_v5"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      },
+      {
+         "author":{
+            "display":"user info",
+            "reference":"https://eproms-test.cirg.washington.edu/api/me/12"
+         },
+         "authored":"2020-11-20T22:58:34Z",
+         "group":{
+            "question":[
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.1",
+                  "text":"Do you have any trouble doing strenuous activities, like carrying a heavy shopping bag or a suitcase?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.2",
+                  "text":"Do you have any trouble taking a long walk?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.3",
+                  "text":"Do you have any trouble taking a short walk outside of the house?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.4",
+                  "text":"Do you need to stay in bed or a chair during the day?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.5",
+                  "text":"Do you need help with eating, dressing, washing yourself or using the toilet?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.6",
+                  "text":"Were you limited in doing either your work or other daily activities?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.7",
+                  "text":"Were you limited in pursuing your hobbies or other leisure time activities?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.8",
+                  "text":"Were you short of breath?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.9",
+                  "text":"Have you had pain?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.10",
+                  "text":"Did you need to rest?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.11",
+                  "text":"Have you had trouble sleeping?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.12",
+                  "text":"Have you felt weak?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.13",
+                  "text":"Have you lacked appetite?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.14",
+                  "text":"Have you felt nauseated?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.15",
+                  "text":"Have you vomited?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.16",
+                  "text":"Have you been constipated?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.17",
+                  "text":"Have you had diarrhea?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.18",
+                  "text":"Were you tired?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.19",
+                  "text":"Did pain interfere with your daily activities?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.20",
+                  "text":"Have you had difficulty in concentrating on things, like reading a newspaper or watching television?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.21",
+                  "text":"Did you feel tense?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.22",
+                  "text":"Did you worry?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.23",
+                  "text":"Did you feel irritable?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.24",
+                  "text":"Did you feel depressed?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.25",
+                  "text":"Have you had difficulty remembering things?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.26",
+                  "text":"Has your physical condition or medical treatment interfered with your family life?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.27",
+                  "text":"Has your physical condition or medical treatment interfered with your social activities?"
+               },
+               {
+                  "answer":[
+                     
+                  ],
+                  "linkId":"eortc.28",
+                  "text":"Has your physical condition or medical treatment caused you financial difficulties?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"3"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"eortc.29.3",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"eortc.29",
+                  "text":"How would you rate your overall health during the past week?"
+               },
+               {
+                  "answer":[
+                     {
+                        "valueString":"4"
+                     },
+                     {
+                        "valueCoding":{
+                           "code":"eortc.30.4",
+                           "system":"https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                        }
+                     }
+                  ],
+                  "linkId":"eortc.30",
+                  "text":"How would you rate your overall quality of life during the past week?"
+               }
+            ]
+         },
+         "questionnaire":{
+            "display":"Quality of Life Questionnaire (EORTC QLQ-30)",
+            "reference":"https://eproms-test.cirg.washington.edu/api/questionnaires/eortc"
+         },
+         "resourceType":"QuestionnaireResponse",
+         "source":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         },
+         "status":"completed",
+         "subject":{
+            "display":"patient demographics",
+            "reference":"https://eproms-test.cirg.washington.edu/api/demographics/3142"
+         }
+      }
+   ]
+}
