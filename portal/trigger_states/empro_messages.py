@@ -79,10 +79,10 @@ def staff_emails(patient, hard_triggers, initial_notification):
     # - link to patient profile
     # - list of `hard_triggers`
     args = {
-        'study_id': patient.external_study_id,
-        'patient_link': url_for(
+        'patient_id': patient.id,
+        'post_intervention_assessment_link': url_for(
             'patients.patient_profile', patient_id=patient.id, _external=True),
-        'hard_triggers': hard_triggers
+        'triggered_domains': hard_triggers
     }
     emails = []
     for staff in staff_list:
