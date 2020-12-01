@@ -1,5 +1,7 @@
 import Utility from "./Utility.js";
 import Validator from "./Validator.js";
+import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
+
 export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
@@ -78,6 +80,47 @@ export default { /*global $ i18next */ /*initializing functions performed only o
 
         return cachedCurrentUserId;
     },
+    /*
+     * return research study object containing research studies participated by user
+     * @param userId Id of the user
+     * @param callback post ajax callback function that will receive data
+     */
+    getUserResearchStudies: function(userId, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback();
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: `/api/user/${userId}/research_study`
+        }).done(data => {
+           callback(data);
+        }).fail(callback);
+    },
+    /*
+     * dynamically show/hide sub-study specific UI elements
+     * @param elementSelector A DOMString containing one or more selectors to match, e.g. #tnthWrapper .blah
+     */
+    setSubstudyElementsVis: function(elementSelector) {
+        if (!elementSelector) {
+            return;
+        }
+        this.getCurrentUser((userId) => {
+            if (!userId) return;
+            this.getUserResearchStudies(userId, data => {
+                if (!data || !data.research_study || !data.research_study.length) {
+                    return;
+                }
+                let substudyRS = (data.research_study).filter(item => item.id === EPROMS_SUBSTUDY_ID);
+                if (substudyRS.length) {
+                    $(elementSelector).show();
+                    return;
+                }
+                $(elementSelector).hide();
+            });
+        });
+    },
     "prePopulateEmail": function() {
         var requestEmail =  Utility.getUrlParameter("email"), emailField = document.querySelector("#email");
         if (requestEmail && emailField) { /*global Utility getUrlParameter */
@@ -133,6 +176,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
+                /*
+                 * show sub-study specific links
+                 */
+                self.setSubstudyElementsVis("#tnthNavWrapper .eproms-substudy")
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
