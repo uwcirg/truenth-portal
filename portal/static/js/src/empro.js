@@ -14,7 +14,7 @@ var emproObj = function() {
 emproObj.prototype.populateDomainDisplay = function() {
     this.domains.forEach(domain => {
         $("#emproModal .triggersButtonsContainer").append(
-            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}">
+            `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}" target="_blank">
             ${i18next.t("{domain} Tips").replace("{domain}", domain.replace(/_/g, " "))}
             </a>`
         );
@@ -53,7 +53,6 @@ emproObj.prototype.initTriggerItemsVis = function() {
         $("#emproModal .no-trigger").hide();
         return;
     }
-    //fix
 };
 emproObj.prototype.init = function() {
     tnthAjax.getCurrentUser((data) => {
@@ -116,7 +115,7 @@ emproObj.prototype.initTriggerDomains = function() {
     var self = this;
     this.setLoadingVis();
     tnthAjax.getSubStudyTriggers(this.userId, false, (data) => {
-        if (!data || !data.triggers || !data.triggers.domain) {
+        if (!data || data.error || !data.triggers || !data.triggers.domain) {
             this.initThankyouModal(false);
             this.setLoadingVis(true);
             return false;

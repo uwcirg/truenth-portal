@@ -365,7 +365,7 @@ a {
   border-radius: 0;
   color: @buttonColor;
   border: 2px solid @buttonColor;
-  padding: 8px 16px;
+  padding: 12px 16px;
   border-radius: 8px;
   background: #FFF;
   &:focus {
@@ -1144,6 +1144,7 @@ a {
   .video-title {
     font-size: 1.25rem;
   }
+ 
   .resource-section {
     padding-top: 0;
     background: #FFF !important;
@@ -1207,6 +1208,13 @@ footer {
     max-width: 1200px;
     padding-left: 40px;
     padding-right: @sectionRightPaddingWide;
+  }
+}
+@media (max-width: 514px) {
+  #resources_main {
+    .video-section {
+      padding: 24px 24px;
+    }
   }
 }
 #stay-logged-in {

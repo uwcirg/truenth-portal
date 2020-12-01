@@ -214,8 +214,7 @@ export default {
             params.maxTryAttempts = params.maxTryAttempts || 5;
             //get trigger domains IF a patient
             Promise.allSettled([
-                //this.$http(`/api/user/${this.getUserID()}/triggers`)
-                this.$http(`/static/files/substudy_test_triggers_new.json`)
+                this.$http(`/api/user/${this.getUserID()}/triggers`)
             ]).then(response => {
                 let processedData = "";
                 try {
@@ -230,7 +229,6 @@ export default {
                     //if the trigger data has not been processed, try again until maximum number of attempts has been reached
                     this.processedTriggerStates.indexOf(String(processedData.state).toLowerCase()) === -1) {
                     params.retryAttempt++;
-                    console.log("attempt? ", params.retryAttempt)
                     setTimeout(function() {
                         this.initTriggerDomains(params);
                     }.bind(this), 1000*params.retryAttempt);
