@@ -29,7 +29,7 @@ def user_triggers(user_id):
 
     """
     # confirm view access
-    get_user(user_id, 'view')
+    get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
 
     ts = users_trigger_state(user_id)
 
