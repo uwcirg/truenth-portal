@@ -32,21 +32,25 @@ from .model_persistence import ModelPersistence
 #   CommunicationRequest depends on QuestionnaireBanks
 
 ModelDetails = namedtuple(
-    'ModelDetails', ['cls', 'sequence_name', 'lookup_field'])
+    'ModelDetails',
+    ['cls', 'sequence_name', 'lookup_field', 'keep_unmentioned'])
 models = (
-    ModelDetails(ResearchStudy, 'research_studies_id_seq', 'id'),
-    ModelDetails(ResearchProtocol, 'research_protocols_id_seq', 'name'),
-    ModelDetails(Coding, 'codings_id_seq', ('system', 'code')),
-    ModelDetails(Organization, 'organizations_id_seq', 'id'),
-    ModelDetails(Questionnaire, 'questionnaires_id_seq', 'identifier'),
-    ModelDetails(QuestionnaireBank, 'questionnaire_banks_id_seq', 'name'),
-    ModelDetails(Intervention, 'interventions_id_seq', 'name'),
-    ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id'),
-    ModelDetails(CommunicationRequest, 'communication_requests_id_seq',
-                 'identifier'),
-    ModelDetails(AppText, 'apptext_id_seq', 'name'),
-    ModelDetails(Notification, 'notifications_id_seq', 'name'),
-    ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name'))
+    ModelDetails(ResearchStudy, 'research_studies_id_seq', 'id', False),
+    ModelDetails(
+        ResearchProtocol, 'research_protocols_id_seq', 'name', False),
+    ModelDetails(Coding, 'codings_id_seq', ('system', 'code'), True),
+    ModelDetails(Organization, 'organizations_id_seq', 'id', False),
+    ModelDetails(Questionnaire, 'questionnaires_id_seq', 'identifier', False),
+    ModelDetails(
+        QuestionnaireBank, 'questionnaire_banks_id_seq', 'name', False),
+    ModelDetails(Intervention, 'interventions_id_seq', 'name', False),
+    ModelDetails(AccessStrategy, 'access_strategies_id_seq', 'id', False),
+    ModelDetails(
+        CommunicationRequest, 'communication_requests_id_seq', 'identifier',
+        False),
+    ModelDetails(AppText, 'apptext_id_seq', 'name', False),
+    ModelDetails(Notification, 'notifications_id_seq', 'name', False),
+    ModelDetails(ScheduledJob, 'scheduled_jobs_id_seq', 'name', False))
 
 
 class SitePersistence(object):
@@ -107,7 +111,9 @@ class SitePersistence(object):
             an organization or intervention in the current database
             but not in the persistence file, will be left in place.
             if False, any unmentioned data will be purged as part of
-            the import process.
+            the import process.  NB - the ModelDetails tuple also
+            defines keep_unmentioned, for types needing to always keep
+            unmentioned, such as codings.
         :param staging_exclusion: set only if persisting exclusions to retain
           on staging when pulling over production data
 
@@ -119,7 +125,8 @@ class SitePersistence(object):
                     model.cls, lookup_field=model.lookup_field,
                     sequence_name=model.sequence_name,
                     target_dir=self.dir)
-                model_persistence.import_(keep_unmentioned=keep_unmentioned)
+                model_persistence.import_(keep_unmentioned=(
+                        keep_unmentioned or model.keep_unmentioned))
 
             # Config isn't a model - separate function
             import_config(target_dir=self.dir)
