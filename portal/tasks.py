@@ -371,6 +371,7 @@ def extract_observations(questionnaire_response_id):
     from .trigger_states.empro_states import (
         enter_user_trigger_critical_section,
         evaluate_triggers,
+        fire_trigger_events,
     )
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
 
@@ -388,6 +389,9 @@ def extract_observations(questionnaire_response_id):
     # As scoring is complete, pass baton to evaluation process
     # which also frees the locked critical section on completion
     evaluate_triggers(qnr)
+
+    # Finally, fire any outstanding actions
+    fire_trigger_events()
 
 
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)

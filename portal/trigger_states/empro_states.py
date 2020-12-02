@@ -215,12 +215,13 @@ def fire_trigger_events():
     """Typically called as a celery task, fire any pending events
 
     After questionnaire responses and resulting observations are evaluated,
-    a celery job call lands here to seek out and executed any appropriate
+    a celery job call lands here to seek out and execute any appropriate
     events from the user's trigger state.  Said rows will be in the
     'processed' state.
 
     Actions are recorded in trigger_states.triggers and the row's state
-    is transitioned to 'triggered'.
+    is transitioned to 'triggered' or should no further action be necessary,
+    'resolved'.
 
     """
     from ..models.user import User
