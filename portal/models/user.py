@@ -1773,6 +1773,24 @@ class User(db.Model, UserMixin):
             return '<div>' + '</div><div>'.join(
                 [ui.staff_html for ui in uis]) + '</div>'
 
+    @classmethod
+    def find_by_email(cls, email):
+        """Lookup routine hiding details such as INVITE_PREFIX"""
+        if '@' not in email:
+            return None
+        exact = User.query.filter(
+            func.lower(User._email) == email.lower()).first()
+        if exact:
+            return exact
+
+        # Try with INVITE_PREFIX
+        invited = User.query.filter(
+            func.lower(User._email) == f"{INVITE_PREFIX}{email}".lower(
+            )).first()
+        if invited:
+            return invited
+        return None
+
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""
         # remove case issues as it confuses the match
