@@ -670,6 +670,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
     """
     def attempt_update(user_id, research_study_id, invalidate_existing):
         """Updates user's QBT or raises if lock is unattainable"""
+        from .qb_status import patient_research_study_status
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
@@ -698,6 +699,17 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     "{} with roles {} doesn't have timeline, only "
                     "patients".format(
                         user, str([r.name for r in user.roles])))
+
+            # Check eligibility - some studies aren't available till
+            # business rules have been met
+            study_eligibility = [
+                study for study in patient_research_study_status(
+                    user, ignore_QB_status=True) if
+                study['research_study_id'] == research_study_id]
+
+            if not study_eligibility or not study_eligibility[0]['eligible']:
+                trace(f"user determined ineligible for {research_study_id}")
+                return
 
             # Create time line for user, from initial trigger date
             qb_generator = ordered_qbs(user, research_study_id)
