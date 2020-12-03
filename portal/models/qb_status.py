@@ -509,7 +509,7 @@ def patient_research_study_status(patient, ignore_QB_status):
         results.append(rs_status)
         if rs == EMPRO_RS_ID and patient.clinician_id is None:
             # Enforce biz rule - must have clinician on file.
-            rs_status['ready'] = False
+            rs_status['eligible'] = False
             rs_status['errors'].append("No clinician")
 
         if ignore_QB_status:
