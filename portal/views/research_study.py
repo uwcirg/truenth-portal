@@ -18,7 +18,10 @@ research_study_api = Blueprint('research_study_api', __name__)
 @crossdomain()
 @oauth.require_oauth()
 def rs_for_user(user_id):
-    """Returns simple JSON for research study user is associated with
+    """Returns simple JSON for research study user is eligible for
+
+    NB a user may be "eligible" but not yet "ready" for a given study. Use
+    ``qb_status.patient_research_study_status()`` to check.
 
     ---
     tags:

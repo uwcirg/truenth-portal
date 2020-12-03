@@ -17,9 +17,10 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization
+from ..models.qb_status import patient_research_study_status
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
-from ..models.research_study import ResearchStudy
+from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user, patients_query
 
@@ -170,9 +171,7 @@ def session_report(subject_id, instrument_id, authored_date):
 @oauth.require_oauth()
 def longitudinal_report(subject_id, instrument_id):
     user = get_user(subject_id, 'view')
-    substudy_research_study_id = 1
-    enrolled_in_substudy = substudy_research_study_id \
-        in ResearchStudy.assigned_to(user)
+    enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
     return render_template(
         "longitudinalReport.html", user=user,
         enrolled_in_substudy=enrolled_in_substudy,
@@ -188,10 +187,6 @@ def longitudinal_report(subject_id, instrument_id):
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
-
-    from ..models.qb_status import patient_research_study_status
-    from ..models.research_study import EMPRO_RS_ID, ResearchStudy
-
     user = current_user()
     patient = get_user(patient_id, 'edit')
     consent_agreements = Organization.consent_agreements(
@@ -206,11 +201,12 @@ def patient_profile(patient_id):
                 display.link_label is not None):
             user_interventions.append({"name": intervention.name})
 
-    enrolled_in_substudy = EMPRO_RS_ID \
-        in ResearchStudy.assigned_to(patient)
-    research_study_status = patient_research_study_status(patient)
-    substudy_assessment_is_ready = enrolled_in_substudy \
-        and research_study_status[EMPRO_RS_ID]['ready']
+    substudy_status = [
+        study for study in patient_research_study_status(
+            patient, ignore_QB_status=False) if
+        study['research_study_id'] == EMPRO_RS_ID]
+    substudy_assessment_is_ready = (
+        substudy_status and substudy_status['ready'])
 
     return render_template(
         'profile/patient_profile.html', user=patient,
