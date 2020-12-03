@@ -81,13 +81,6 @@ def enter_user_trigger_critical_section(user_id):
 
     """
     ts = users_trigger_state(user_id)
-
-    # TODO remove this transition - outstanding integration work, should happen
-    #  when user first becomes eligible  - remove @pytest.mark.skip from
-    #  test_bogus_transition when done.
-    if ts.state == 'unstarted':
-        ts = initiate_trigger(user_id)
-
     sm = EMPRO_state(ts)
     sm.begin_process()
     # Record the historical transformation via insert.

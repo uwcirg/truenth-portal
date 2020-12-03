@@ -29,7 +29,6 @@ def test_initial_state_view(client, initialized_patient_logged_in):
     assert results.json['state'] == 'unstarted'
 
 
-@pytest.mark.skip(reason="TODO in enter_user_trigger_critical_section")
 def test_bogus_transition(initialized_with_ss_qnr):
     """Attempt to jump to due without starting; expect exception"""
     with pytest.raises(TransitionNotAllowed):
