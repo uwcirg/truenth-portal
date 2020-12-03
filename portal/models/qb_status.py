@@ -469,7 +469,7 @@ class QB_Status(object):
                 f" {requested_indef} already!")
 
 
-def patient_research_study_status(patient):
+def patient_research_study_status(patient, ignore_QB_status):
     """Returns details regarding patient readiness for available studies
 
     Wraps complexity of checking multiple QB_Status and ResearchStudy
@@ -478,11 +478,16 @@ def patient_research_study_status(patient):
     if applicable.  NB - a user may be "ready" for a study, but another
     study may have outstanding work.
 
+    :param patient: subject to check
+    :param ignore_QB_status: set to prevent recursive call, if used during
+      process of evaluating QB_status.  Will restrict results to eligible
     :returns: ordered list of applicable research studies.  Each contains a
      dictionary with keys:
      - research_study_id: integer value of research study
+     - eligible: set True if assigned to research study and pre-requisites
+         have been met, such as assigned clinician if applicable.
      - ready: set True or False based on complex rules.  True means pending
-         work user can immediately do
+         work user can immediately do.  NOT determined w/ ``ignore_QB_status``
      - errors: list of strings detailing anything preventing user from being
          "ready"
 
@@ -497,10 +502,20 @@ def patient_research_study_status(patient):
     for rs in ResearchStudy.assigned_to(patient):
         rs_status = {
             'research_study_id': rs,
+            'eligible': True,
             'ready': False,
             'errors': [],
         }
         results.append(rs_status)
+        if rs == EMPRO_RS_ID and patient.clinician_id is None:
+            # Enforce biz rule - must have clinician on file.
+            rs_status['ready'] = False
+            rs_status['errors'].append("No clinician")
+
+        if ignore_QB_status:
+            # Bootstrap issues, can't yet check QB_Status.
+            continue
+
         assessment_status = QB_Status(
             patient, research_study_id=rs, as_of_date=as_of_date)
         if assessment_status.overall_status == 'Withdrawn':
@@ -513,7 +528,7 @@ def patient_research_study_status(patient):
             classification='all')
 
         if needing_full or resume_ids:
-            # work to be done in this study, break out of loop
+            # work to be done in this study
             rs_status['ready'] = True
 
         # Apply business rules specific to EMPRO
@@ -522,10 +537,10 @@ def patient_research_study_status(patient):
                 # Clear ready status when base has pending work
                 rs_status['ready'] = False
                 rs_status['errors'].append('Pending work in base study')
-
-            if patient.clinician_id is None:
-                # Enforce biz rule - must have clinician on file.
-                rs_status['ready'] = False
-                rs_status['errors'].append("No clinician")
+            elif rs_status['ready']:
+                # As user may have just entered ready status on EMPRO
+                # move trigger_states.state to due
+                from ..trigger_states.empro_states import initiate_trigger
+                initiate_trigger(patient.id)
 
     return results
