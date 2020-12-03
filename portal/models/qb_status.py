@@ -469,7 +469,7 @@ class QB_Status(object):
                 f" {requested_indef} already!")
 
 
-def patient_research_study_status(patient, ignore_QB_status):
+def patient_research_study_status(patient, ignore_QB_status=False):
     """Returns details regarding patient readiness for available studies
 
     Wraps complexity of checking multiple QB_Status and ResearchStudy
