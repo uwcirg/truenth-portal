@@ -69,26 +69,6 @@ class ResearchStudy(db.Model):
         results.sort()
         return results
 
-    @staticmethod
-    def assigned_to(user):
-        """Returns set of all ResearchStudy IDs assigned to given user"""
-        base_study = 0
-        results = []
-        iqbs = qbs_by_intervention(user, classification=None)
-        if iqbs:
-            results.append(base_study)  # Use dummy till system need arises
-
-        for rp, _ in ResearchProtocol.assigned_to(
-                user, research_study_id='all'):
-            rs_id = rp.research_study_id
-            if rs_id is None:
-                continue
-
-            if latest_consent(user, rs_id) and rs_id not in results:
-                results.append(rs_id)
-        results.sort()
-        return results
-
 
 def research_study_id_from_questionnaire(questionnaire_name):
     """Reverse lookup research_study_id from a questionnaire_name"""
