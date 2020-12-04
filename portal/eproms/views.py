@@ -96,7 +96,7 @@ def assessment_engine_view(user):
     from ..models.research_study import BASE_RS_ID, EMPRO_RS_ID, ResearchStudy
     now = datetime.utcnow()
 
-    research_study_status = patient_research_study_status(user, False)
+    research_study_status = patient_research_study_status(user)
     assessment_status = QB_Status(
         user=user,
         research_study_id=BASE_RS_ID,
