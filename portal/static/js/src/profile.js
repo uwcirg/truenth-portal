@@ -1256,22 +1256,17 @@ export default (function() {
             hasPrevSubStudyPostTx: function() {
                 return this.computedSubStudyPostTxResponses.length;
             },
-            setPrevPostTxResponses: function() {
-                //TODO FIX THIS 
-                tnthAjax.assessmentReport(this.subjectId, EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, (data) => {
-                    if (!data || !data.entry || !data.entry.length) {
+            setPrevPostTxResponses: function(qnrId) {
+                if (!qnrId) {
+                    return;
+                }
+                this.modules.tnthAjax.getAssessmentByQNRId(this.subjectId, qnrId, false, (data) => {
+
+                    if (!data.group || !data.group.question) {
                         return;
-                     }
-                     /*
-                      * make sure data item with the latest authored date is first
-                      */
-                     let assessmentData = (data.entry).sort(function(a, b) {
-                         return new Date(b.authored) - new Date(a.authored);
-                     });
-                     if (!assessmentData[0].group || ! assessmentData[0].group.question) {
-                         return;
-                     }
-                     this.postTxQuestionnaire.answers = assessmentData[0].group.question;
+                    }
+                   
+                    this.postTxQuestionnaire.answers = data.group.question;
                      (this.postTxQuestionnaire.answers).forEach(item => {
                         let valueCoding = item.answer.filter(answer => {
                             return answer.valueCoding;
@@ -1300,12 +1295,18 @@ export default (function() {
                         }
                         if (valueString.length) {
                             valueString.forEach(subItem => {
-                                $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="string"],
-                                #postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="date"]`)
-                                .val(subItem.valueString)
-                                .attr("answered", true);
+                                $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="string"], #postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="date"]`).each(function() {
+                                    if ($(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][value="${subItem.valueString}"][dataType != "string"]`).length) {
+                                        return true;
+                                    }
+                                    $(this).val(subItem.valueString)
+                                    $(this).attr("answered", true);
+                                });
+                                
                             });
                         }
+                        
+                        $("#postTxResolutionContainer").text(i18next.t("Action last taken on {authoredDate}").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
                      });
                 });
             },
@@ -1358,6 +1359,7 @@ export default (function() {
             },
             initPostTxQuestionnaireSection: function() {
                 if (!this.subjectId) return;
+                let self = this;
                 this.setSubStudyTriggers(() => {
                     this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
                         setTimeout(function() {
@@ -1369,18 +1371,21 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
-                       if (EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(this.subStudyTriggers.state) !== -1) {
-                            //TODO check if there is any previous post tx responses
-                            this.setPrevPostTxResponses();
-                        }
-                        if (this.isSubStudyTriggersResolved()) return;
-                        let self = this;
                         Vue.nextTick(function() {
+                            console.log("trigger data? ", self.subStudyTriggers.data)
+                            if (EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(self.subStudyTriggers.state) !== -1 &&
+                                self.subStudyTriggers.data.resolution &&
+                                self.subStudyTriggers.data.resolution.qnr_id
+                            ){
+                                self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
+                            }
+                            if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
                                 {"format": "d M yyyy","forceParse": false, "autoclose": true}
                             ).on("changeDate", self.onResponseChangeFieldEvent);
                         });
+
                     });
                 });
             },
@@ -1486,9 +1491,9 @@ export default (function() {
                         $("#postTxQuestionnaireContainer .error-message").html(i18next.t("Error occurred submitting data, try again"));
                         return;
                     }
-                    // setTimeout(() => {
-                    //     location.reload();
-                    // }, 0);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 0);
                 });
                 return false;
             },

@@ -3311,8 +3311,8 @@ section.header {
     bottom: 0;
     right: 0;
     left: 0;
-    background: #FFF;
-    opacity: 0.6;
+    background: lighten(@profileItemBgColor, 5%);
+    opacity: 0.2;
     z-index: 50;
     .icon {
       position: absolute;
@@ -3336,7 +3336,7 @@ section.header {
     .list {
       display: flex;
       flex-direction: column;
-      height: 56px;
+      //height: 56px;
       flex-wrap: wrap;
       //width: 420px;
       max-width: 100%;
@@ -3354,6 +3354,24 @@ section.header {
     font-style: italic;
     font-size: @mobileSize;
     color: lighten(@mutedColor, 5%);
+  }
+  #questionsSection {
+    position: relative;
+    &.disabled:before {
+      content: "";
+      display: block;
+      position: absolute;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      top: 0;
+      background: @profileItemBgColor;
+      opacity: 0.2;
+      z-index: 5;
+    }
+  }
+  #postTxResolutionContainer {
+    font-weight: 500;
   }
   .question {
     margin-bottom: 24px;

@@ -1034,7 +1034,7 @@ export default { /*global $ */
         if (!userId) { callback({"error": true}); return false;}
         if (!qnrId) { callback({"error": true}); return false;}
         params = params || {};
-        this.sendRequest(`/api/patient/${userId}/${qnrId}`, "GET", userId, params, function(data) {
+        this.sendRequest(`/api/patient/${userId}/questionnaire_response/${qnrId}`, "GET", userId, params, function(data) {
             callback(data);
         });
     },
