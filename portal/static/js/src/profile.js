@@ -1372,7 +1372,9 @@ export default (function() {
                         }
                         this.postTxQuestionnaire.questions = data.item;
                         Vue.nextTick(function() {
-                            console.log("trigger data? ", self.subStudyTriggers.data)
+                            /*
+                             *  if the triggers are considered proccessed. check to see if they have been resolved
+                             */
                             if (EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(self.subStudyTriggers.state) !== -1 &&
                                 self.subStudyTriggers.data.resolution &&
                                 self.subStudyTriggers.data.resolution.qnr_id
@@ -1382,7 +1384,7 @@ export default (function() {
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
-                                {"format": "d M yyyy","forceParse": false, "autoclose": true}
+                                {"format": "d M yyyy","forceParse": false, "autoclose": true, endDate: new Date()}
                             ).on("changeDate", self.onResponseChangeFieldEvent);
                         });
 
@@ -1395,7 +1397,8 @@ export default (function() {
                     entry: []
                 };
                 let answerSet = [], self = this;
-                $("#postTxQuestionnaireContainer .question").each(function() {
+                let containerElementIdentifier = "#postTxQuestionnaireContainer";
+                $(`${containerElementIdentifier} .question`).each(function() {
                     let answers = [];
                     $(this).find("[dataType]").each(function() {
                         if ($(this).attr("dataType") === "date") {
@@ -1459,6 +1462,7 @@ export default (function() {
                         "text": $(this).attr("text")
                     });
                 });
+                let patientReference = `${location.origin}/api/demographics/${this.subjectId}`;
                 postData.entry.push({
                     "author":{
                         "display":"user info",
@@ -1475,20 +1479,20 @@ export default (function() {
                      },
                      "source": {
                         "display": "patient demographics",
-                        "reference": `${location.origin}/api/demographics/${this.subjectId}`
+                        "reference": patientReference
                     },
                      "subject":{
                         "display":"patient demographics",
-                        "reference":`${location.origin}/api/demographics/${this.subjectId}`
+                        "reference": patientReference
                      },
                      "status": "completed"
                 });
-                $("#postTxQuestionnaireContainer .error-message").html("");
-                $("#postTxQuestionnaireContainer .btn-submit").addClass("disabled").attr("disabled", true);
+                $(`${containerElementIdentifier} .error-message`).html("");
+                $(`${containerElementIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
                 this.modules.tnthAjax.postAssessment(this.subjectId, postData.entry[0], {targetField:$("#postTxSubmitContainer")}, (data) => {
-                    $("#postTxQuestionnaireContainer .btn-submit").removeClass("disabled").removeAttr("disabled");
+                    $(`${containerElementIdentifier} .btn-submit`).removeClass("disabled").removeAttr("disabled");
                     if (data && data.error) {
-                        $("#postTxQuestionnaireContainer .error-message").html(i18next.t("Error occurred submitting data, try again"));
+                        $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
                         return;
                     }
                     setTimeout(() => {
