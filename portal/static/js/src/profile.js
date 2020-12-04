@@ -1239,12 +1239,13 @@ export default (function() {
                             }
                         }
                     }
+                    let completedDate = data.triggers.source && data.triggers.source.authored ? data.triggers.source.authored : data.timestamp;
                     [
                         this.subStudyTriggers.domains,
                         this.subStudyTriggers.date,
                         this.subStudyTriggers.state,
                         this.subStudyTriggers.raw
-                    ] = [domains, this.modules.tnthDates.formatDateString(data.source.authored), data.state, data];
+                    ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data];
                     callback();
                 });
             },
@@ -1307,7 +1308,7 @@ export default (function() {
             },
             shouldShowSubstudyPostTx: function() {
                 //TODO need to also show post tx section IF there is previous response for this subject and the subject does not have triggers in the current patient questionnaire responses
-                return this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx();
+                return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx());
             },
             isSubStudyTriggersResolved: function() {
                 return this.subStudyTriggers.state === "resolved";

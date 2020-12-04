@@ -55,7 +55,7 @@
           {{profile_macro.longitudinalReport(user)}}
       </div>
     </div>
-    <div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
+    <div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowSubstudyPostTx()"> 
       <div class="col-md-12 col-xs-12">
           {{profile_macro.postInterventionQuestionnaire(user)}}
       </div>
