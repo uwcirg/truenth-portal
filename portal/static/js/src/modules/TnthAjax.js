@@ -1029,6 +1029,15 @@ export default { /*global $ */
             }
         });
     },
+    "getAssessmentByQNRId": function(userId, qnrId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false;}
+        if (!qnrId) { callback({"error": true}); return false;}
+        params = params || {};
+        this.sendRequest(`/api/patient/${userId}/${qnrId}`, "GET", userId, params, function(data) {
+            callback(data);
+        });
+    },
     "postAssessment": function(userId, data, params, callback) {
         callback = callback || function() {};
         if (!userId) { callback({"error": true}); return false; }

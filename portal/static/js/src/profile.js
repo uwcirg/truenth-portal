@@ -186,7 +186,8 @@ export default (function() {
             subStudyTriggers: {
                 domains: [],
                 date: "",
-                state: ""
+                state: "",
+                data: {}
             },
             disableFields: [],
             topLevelOrgs: [],
@@ -1244,8 +1245,8 @@ export default (function() {
                         this.subStudyTriggers.domains,
                         this.subStudyTriggers.date,
                         this.subStudyTriggers.state,
-                        this.subStudyTriggers.raw
-                    ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data];
+                        this.subStudyTriggers.data
+                    ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data.triggers];
                     callback();
                 });
             },
@@ -1282,26 +1283,28 @@ export default (function() {
                             return answer.valueBoolean;
                         });
                         if (valueCoding.length) {
-                            valueCoding.forEach(item => {
-                                let fields = $(`#postTxQuestionnaireContainer [code="${item.valueCoding.code}"]`);
+                            valueCoding.forEach(subItem => {
+                                let fields = $(`#postTxQuestionnaireContainer [code="${subItem.valueCoding.code}"]`);
                                 fields.each(function() {
                                     if ($(this).attr("dataType") === "open-choice") $(this).prop("checked", true);
                                     if ($(this).attr("dataType") === "choice") $(this).prop("selected", true);
-                                    if ($(this).attr("dataType") === "string" && valueString[valueString.length-1]) $(this).val(valueString[valueString.length-1].valueString);
                                     $(this).attr("answered", true);
                                 });
                             });
                         }
-                        else if (valueBoolean.length) {
+                        if (valueBoolean.length) {
                             $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
                             .prop("checked", valueBoolean[0].valueBoolean)
                             .attr("answered", true);
                             
                         }
-                        else if (valueString.length) {
-                            $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
-                            .val(valueString[0].valueString)
-                            .attr("answered", true);
+                        if (valueString.length) {
+                            valueString.forEach(subItem => {
+                                $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="string"],
+                                #postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="date"]`)
+                                .val(subItem.valueString)
+                                .attr("answered", true);
+                            });
                         }
                      });
                 });
@@ -1366,11 +1369,10 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
-                       // if ((!this.hasSubStudyTriggers() || this.isSubStudyTriggersResolved()) &&
-                       //     EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(this.subStudyTriggers.state) !== -1) {
+                       if (EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(this.subStudyTriggers.state) !== -1) {
                             //TODO check if there is any previous post tx responses
                             this.setPrevPostTxResponses();
-                       // }
+                        }
                         if (this.isSubStudyTriggersResolved()) return;
                         let self = this;
                         Vue.nextTick(function() {
@@ -1419,7 +1421,8 @@ export default (function() {
                                     "valueCoding": {
                                         "code": $(this).attr("code"),
                                         "system": `${location.origin}/api/codings/assessment`
-                                    }
+                                    },
+                                    "valueString": $(this).val()
                                 });
                                 let valueString = $(`#postTxQuestionnaireContainer .other-text[code="${$(this).attr("code")}"]`).val();
                                 if (valueString) {
