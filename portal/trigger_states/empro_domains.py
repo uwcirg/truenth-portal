@@ -1,6 +1,7 @@
 """Module to handle complexity of domain scoring and triggers"""
 from collections import defaultdict
 
+from ..date_tools import FHIR_datetime
 from ..models.observation import Observation
 from ..models.questionnaire_response import first_last_like_qnr
 
@@ -136,6 +137,7 @@ class DomainManifold(object):
                 triggers['domain'][domain] = dt.triggers
 
         triggers['source'] = {
+            'authored': FHIR_datetime.as_fhir(self.cur_qnr.authored),
             'qnr_id': self.cur_qnr.id,
             'qb_id': self.cur_qnr.questionnaire_bank_id,
             'qb_iteration': self.cur_qnr.qb_iteration}
