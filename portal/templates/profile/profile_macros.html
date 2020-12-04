@@ -841,6 +841,100 @@
     <div class="put-roles-error error-message"></div>
     <div class="delete-roles-error error-message"></div>
 {%- endmacro %}
+{%- macro longitudinalReport(person) -%}
+    {% call profileSection(editable=false, id="longitudinalReportSection") %}
+        <div id="longitudinalReportContainer" class="eproms-substudy" data-profile-section-id="longitudinalReport">
+            <!-- populate dynamically based on whether there is longitudinal report available for the subject -->
+        </div>
+    {% endcall %}
+{%- endmacro -%}
+{%- macro postInterventionQuestionnaire(person) -%}
+    {% call profileSection(editable=false) %}
+    {% call titleSection(id="postInterventionQuestionnaireLoc") -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
+        <!-- don't show this if no hard triggers ?? -->
+        <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire" v-show="shouldShowSubstudyPostTx()">
+            <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
+            <h5 class="muted">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
+            <div id="triggersSection">
+                <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
+                <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
+                    <ul class="list">
+                        <li v-for="item in subStudyTriggers.domains" v-text="item" class="text"></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
+            <div id="questionsSection" class="content">
+                <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
+                    <!-- question text -->
+                    <span class="title" :class="item.type" v-text="item.text"></span>
+                    <!-- date type answer-->
+                    <input type="text" class="data-datepicker form-control answer" readonly placeholder="d M yyyy"
+                            :class="{disabled: isSubStudyTriggersResolved()}"
+                            :dataType="item.type"
+                            :disabled="isSubStudyTriggersResolved()"
+                            :linkId="item.linkId"
+                            @change="onResponseChangeFieldEvent"
+                            v-if="item.type == 'date'"
+                    >
+                    <!-- boolean type answer-->
+                    <input type="checkbox"
+                        class="bool answer" 
+                        :dataType = "item.type"
+                        :disabled = "isSubStudyTriggersResolved()"
+                        :linkId="item.linkId"
+                        @change="onResponseChangeFieldEvent"
+                        v-if="item.type == 'boolean'">
+                    <!-- open-choice (checkboxes) type answer -->
+                    <div class="choices answer" v-if="item.type == 'open-choice'">
+                        <div class="choice" v-for="option in item.option">
+                            <input 
+                                type="checkbox"
+                                :code="option.valueCoding.code"
+                                :class="{other: /other/gi.test(option.valueCoding.display)}"
+                                :dataType="item.type"
+                                :disabled="isSubStudyTriggersResolved()"
+                                :linkId="item.linkId"
+                                :value="option.valueCoding.display"
+                                @change="onResponseChangeFieldEvent"
+                            >
+                            <span class="text" v-text="option.valueCoding.display"></span>
+                            <textarea
+                                class="form-control addl-text other-text"
+                                dataType="string"
+                                :code="option.valueCoding.code"
+                                :disabled="isSubStudyTriggersResolved()"
+                                :linkId="item.linkId"
+                                @change="onResponseChangeFieldEvent"
+                                v-if="/other/gi.test(option.valueCoding.display)"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <!-- choice (select) type answer -->
+                    <select class="form-control answer" v-if="item.type == 'choice'" 
+                        :linkId="item.linkId"
+                        :disabled="isSubStudyTriggersResolved()"
+                        :dataType="item.type"
+                        @change="onResponseChangeFieldEvent"
+                    >
+                        <option value="">{{_("Select")}}</option>
+                        <option v-for="option in item.option"
+                            :code="option.valueCoding.code"
+                            :dataType="item.type"
+                            :linkId="item.linkId"
+                            :value="option.valueCoding.display"
+                            v-text="option.valueCoding.display"></option>
+                    </select>
+                </div>
+                <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
+                    <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
+                </div>
+                {{saveLoaderDiv("postTxSubmitContainer")}}
+            </div>
+            <div class="post-intervention-questionnaire-error error-message"></div>
+        </div>
+    {% endcall %}
+{%- endmacro -%}
 {% macro profileTreatingClinician(person) %}
     {% call profileSection(data_sections="locale, timezone") %}
         {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
@@ -869,8 +963,8 @@
             <THEAD><th>{{_("Questionnaire Name")}}</th><th>{{_("Visit")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></THEAD>
             {% raw %}
                 <tr v-for="item in assessment.assessmentListItems" v-bind:title="item.title" v-bind:class="item.class">
-                    <td><a v-bind:href="item.link">{{item.display}}</a></td>
-                    <td><a v-bind:href="item.link">{{item.visit}}</a></td>
+                    <td><a v-bind:href="item.link" v-html="item.display"></a></td>
+                    <td><a v-bind:href="item.link" v-html="item.visit"></a></td>
                     <td><a v-bind:href="item.link">{{item.status}}</a></td>
                     <td><a v-bind:href="item.link">{{item.date}}</a></td>
                 </tr>

@@ -1,0 +1,339 @@
+{
+  "entry": [
+    {
+      "author": {
+        "display": "patient demographics", 
+        "reference": "https://eproms-test.cirg.washington.edu/api/demographics/3119"
+      }, 
+      "authored": "2020-11-30T17:12:40Z", 
+      "group": {
+        "question": [
+          {
+            "answer": [
+              {
+                "valueString": "Frequently"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.1.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.1", 
+            "text": "In the last 7 days, how OFTEN did you have pain?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.2.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.2", 
+            "text": "In the last 7 days, what was the SEVERITY of your PAIN at its WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Quite a bit"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.3.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.3", 
+            "text": "In the last 7 days, how much did PAIN INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Frequently"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.4.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.4", 
+            "text": "In the last 7 days, how OFTEN did you have ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS)?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.5.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.5", 
+            "text": "In the last 7 days, what was the SEVERITY of your ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) at their WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Quite a bit"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.6.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.6", 
+            "text": "In the last 7 days, how much did ACHING JOINTS (SUCH AS ELBOWS, KNEES, SHOULDERS) INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Very severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.7.5", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.7", 
+            "text": "In the last 7 days, what was the SEVERITY of your INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) at its worst?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Somewhat"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.8.3", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.8", 
+            "text": "In the last 7 days, how much did INSOMNIA (INCLUDING DIFFICULTY FALLING ASLEEP, STAYING ASLEEP, OR WAKING UP EARLY) INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Mild"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.9.2", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.9", 
+            "text": "In the last 7 days, what was the SEVERITY of your FATIGUE, TIREDNESS, OR LACK OF ENERGY at its WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Quite a bit"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.10.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.10", 
+            "text": "In the last 7 days, how much did FATIGUE, TIREDNESS, OR LACK OF ENERGY INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Frequently"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.11.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.11", 
+            "text": "In the last 7 days, how OFTEN did you feel ANXIETY?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Very severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.12.5", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.12", 
+            "text": "In the last 7 days, what was the SEVERITY of your ANXIETY at its WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "A little bit"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.13.2", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.13", 
+            "text": "In the last 7 days, how much did ANXIETY INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Frequently"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.14.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.14", 
+            "text": "In the last 7 days, how OFTEN did you FEEL THAT NOTHING COULD CHEER YOU UP?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Very severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.15.5", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.15", 
+            "text": "In the last 7 days, what was the SEVERITY of your FEELINGS THAT NOTHING COULD CHEER YOU UP at THEIR WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "A little bit"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.16.2", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.16", 
+            "text": "In the last 7 days, how much did THE FEELING THAT NOTHING COULD CHEER YOU UP INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Frequently"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.17.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.17", 
+            "text": "In the last 7 days, how OFTEN did you have SAD OR UNHAPPY FEELINGS?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Very severe"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.18.5", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.18", 
+            "text": "In the last 7 days, what was the SEVERITY of your SAD OR UNHAPPY FEELINGS at their WORST?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Somewhat"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.19.3", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.19", 
+            "text": "In the last 7 days, how much did SAD OR UNHAPPY FEELINGS INTERFERE with your usual or daily activities?"
+          }, 
+          {
+            "answer": [
+              {
+                "valueString": "Very much"
+              }, 
+              {
+                "valueCoding": {
+                  "code": "ironman_ss.20.4", 
+                  "system": "https://eproms-test.cirg.washington.edu/api/codings/assessment"
+                }
+              }
+            ], 
+            "linkId": "ironman_ss.20", 
+            "text": "During the past week: Has your physical condition or medical treatment interfered with your social activities?"
+          }
+        ]
+      }, 
+      "questionnaire": {
+        "display": "Treatment symptoms and side effects", 
+        "reference": "https://eproms-test.cirg.washington.edu/api/questionnaires/ironman_ss"
+      }, 
+      "resourceType": "QuestionnaireResponse", 
+      "source": {
+        "display": "patient demographics", 
+        "reference": "https://eproms-test.cirg.washington.edu/api/demographics/3119"
+      }, 
+      "status": "completed", 
+      "subject": {
+        "display": "patient demographics", 
+        "reference": "https://eproms-test.cirg.washington.edu/api/demographics/3119"
+      }
+    }
+  ], 
+  "link": [
+    {
+      "href": "https://amy-dev.cirg.washington.edu/api/patient/3119/assessment/ironman_ss", 
+      "rel": "self"
+    }
+  ], 
+  "resourceType": "Bundle", 
+  "total": 1, 
+  "type": "searchset", 
+  "updated": "2020-11-30T18:36:23.615271Z"
+}

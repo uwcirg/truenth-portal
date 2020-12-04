@@ -326,7 +326,8 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
+        this.sendRequest(`/static/files/substudy_test_triggers_new.json`, "GET", userId, params, (data) => {
+        //this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
             if (!data || data.error || !data.state) {
                 callback({"error": true});
                 return false;
@@ -864,6 +865,20 @@ export default { /*global $ */
             }
         });
     },
+    "getInstrument": function(instrumentId, params, callback) { //return instruments list by organization(s)
+        callback = callback || function() {};
+        if (!instrumentId) {
+            callback({error: true});
+            return
+        }
+        this.sendRequest(`/api/questionnaire/${instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`, "GET", null, params, function(data) {
+            if (!data || data.error) {
+                callback({"error": true});
+                return;
+            }
+            callback(data);
+        });
+    },
     "getInstrumentsList": function(sync, callback) { //return instruments list by organization(s)
         callback = callback || function() {};
         this.sendRequest("api/questionnaire", "GET", null, {
@@ -1012,6 +1027,16 @@ export default { /*global $ */
             } else {
                 callback({"error": i18next.t("no data returned")});
             }
+        });
+    },
+    "postAssessment": function(userId, data, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false; }
+        if (!data) { callback({"error": true}); return false;}
+        params = params || {};
+        params.data = JSON.stringify(data);
+        this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            callback({data: data});
         });
     },
     "assessmentList": function(userId, params, callback) {

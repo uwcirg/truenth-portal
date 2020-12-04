@@ -7,7 +7,14 @@ import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
 import {sortArrayByField} from "./modules/Utility.js";
-import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_TITLE} from "./data/common/consts.js";
+import {
+    EPROMS_SUBSTUDY_ID,
+    EPROMS_SUBSTUDY_TITLE,
+    EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+    EPROMS_SUBSTUDY_SHORT_TITLE,
+    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+    EMPRO_TRIGGER_PROCCESSED_STATES
+} from "./data/common/consts.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -171,6 +178,16 @@ export default (function() {
             patientEmailForm: {
                 loading: false
             },
+            postTxQuestionnaire: {
+                questions: [],
+                answers: [],
+                loading: true
+            },
+            subStudyTriggers: {
+                domains: [],
+                date: "",
+                state: ""
+            },
             disableFields: [],
             topLevelOrgs: [],
             fillViews: {},
@@ -230,6 +247,12 @@ export default (function() {
             },
             computedTreatingClinician: function() {
                 return this.demo.data.clinician && Object.keys(this.demo.data.clinician).length;
+            },
+            computedSubStudyTriggers: function() {
+                return this.subStudyTriggers.domains;
+            },
+            computedSubStudyPostTxResponses: function() {
+                return this.postTxQuestionnaire.answers;
             }
         },
         methods: {
@@ -864,6 +887,12 @@ export default (function() {
                 case "treatingclinician":
                     this.initTreatingClinicianSection();
                     break;
+                case "longitudinalreport":
+                        this.initLongitudinalReportSection();
+                        break;
+                case "posttxquestionnaire":
+                        this.initPostTxQuestionnaireSection();
+                        break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1175,6 +1204,289 @@ export default (function() {
                         self.postDemoData($("#treatingClinicianContainer"), postData);
                     });
                 });
+            },
+            initLongitudinalReportSection: function() {
+                if (!this.subjectId) return;
+                let CONTAINER_ID = "longitudinalReportContainer";
+                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+                    data => {
+                        if (!data || !data.entry || !data.entry.length) {
+                            $(`#longitudinalReportSection`).hide();
+                            return;
+                        }
+                        $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
+                });
+            },
+            setSubStudyTriggers: function(callback) {
+                callback = callback || function() {};
+                this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, false, (data) => {
+                    if (!data.triggers || !data.triggers.domain) {
+                        callback();
+                        return;
+                    }
+                    let domains = new Array();
+                    for (let topic in data.triggers.domain) {
+                        if (!Object.keys(data.triggers.domain[topic]).length) {
+                            continue;
+                        }
+                        for (let q in data.triggers.domain[topic]) {
+                            /*
+                             * HARD triggers ONLY 
+                             */
+                            if (data.triggers.domain[topic][q] === "hard"
+                                && domains.indexOf(topic) === -1) {
+                                domains.push(topic);
+                            }
+                        }
+                    }
+                    [
+                        this.subStudyTriggers.domains,
+                        this.subStudyTriggers.date,
+                        this.subStudyTriggers.state,
+                        this.subStudyTriggers.raw
+                    ] = [domains, this.modules.tnthDates.formatDateString(data.source.authored), data.state, data];
+                    callback();
+                });
+            },
+            hasSubStudyTriggers: function() {
+                return this.computedSubStudyTriggers.length;
+            },
+            hasPrevSubStudyPostTx: function() {
+                return this.computedSubStudyPostTxResponses.length;
+            },
+            setPrevPostTxResponses: function() {
+                //TODO FIX THIS 
+                tnthAjax.assessmentReport(this.subjectId, EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, (data) => {
+                    if (!data || !data.entry || !data.entry.length) {
+                        return;
+                     }
+                     /*
+                      * make sure data item with the latest authored date is first
+                      */
+                     let assessmentData = (data.entry).sort(function(a, b) {
+                         return new Date(b.authored) - new Date(a.authored);
+                     });
+                     if (!assessmentData[0].group || ! assessmentData[0].group.question) {
+                         return;
+                     }
+                     this.postTxQuestionnaire.answers = assessmentData[0].group.question;
+                     (this.postTxQuestionnaire.answers).forEach(item => {
+                        let valueCoding = item.answer.filter(answer => {
+                            return answer.valueCoding;
+                        });
+                        let valueString = item.answer.filter(answer => {
+                            return answer.valueString;
+                        });
+                        let valueBoolean = item.answer.filter(answer => {
+                            return answer.valueBoolean;
+                        });
+                        if (valueCoding.length) {
+                            valueCoding.forEach(item => {
+                                let fields = $(`#postTxQuestionnaireContainer [code="${item.valueCoding.code}"]`);
+                                fields.each(function() {
+                                    if ($(this).attr("dataType") === "open-choice") $(this).prop("checked", true);
+                                    if ($(this).attr("dataType") === "choice") $(this).prop("selected", true);
+                                    if ($(this).attr("dataType") === "string" && valueString[valueString.length-1]) $(this).val(valueString[valueString.length-1].valueString);
+                                    $(this).attr("answered", true);
+                                });
+                            });
+                        }
+                        else if (valueBoolean.length) {
+                            $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
+                            .prop("checked", valueBoolean[0].valueBoolean)
+                            .attr("answered", true);
+                            
+                        }
+                        else if (valueString.length) {
+                            $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
+                            .val(valueString[0].valueString)
+                            .attr("answered", true);
+                        }
+                     });
+                });
+            },
+            shouldShowSubstudyPostTx: function() {
+                //TODO need to also show post tx section IF there is previous response for this subject and the subject does not have triggers in the current patient questionnaire responses
+                return this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx();
+            },
+            isSubStudyTriggersResolved: function() {
+                return this.subStudyTriggers.state === "resolved";
+            },
+            onResponseChangeFieldEvent: function(event) {
+                let targetElement = $(event.target);
+                let containerIdentifier = "#postTxQuestionnaireContainer";
+                if (
+                    targetElement.attr("type") === "checkbox" && targetElement.is(":checked") ||
+                    (targetElement.attr("type") === "text" && targetElement.val()) ||
+                    (event.target.tagName.toLowerCase() === "select" && targetElement.find("option:selected").val()) ||
+                    (event.target.tagName.toLowerCase() === "textarea" && targetElement.val())
+                ) {
+                    targetElement.attr("answered", true);
+                } else {
+                    targetElement.removeAttr("answered");
+                }
+                //text for other field
+                if (targetElement.hasClass("addl-text")) {
+                    let code = targetElement.attr("code");
+                    $(`${containerIdentifier} input[type="checkbox"][code="${code}"]`)
+                    .prop("checked", targetElement.val()?true:false)
+                }
+                //other field
+                if (targetElement.hasClass("other")) {
+                    let code = targetElement.attr("code");
+                    if (!targetElement.is(":checked")) {
+                        $(`${containerIdentifier} textarea[code="${code}"]`).val("").removeAttr("answered");
+                    }
+                }
+                let answeredNum = 0;
+                $(`${containerIdentifier} .question`).each(function() {
+                    if ($(this).find("[answered]").length) {
+                        answeredNum++;
+                    }
+                });
+                if (
+                    $(`${containerIdentifier} .question`).length === answeredNum
+                ) {
+                    $(`${containerIdentifier} .btn-submit`).removeClass("disabled").removeAttr("disabled");
+                    return;
+                }
+                $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
+            },
+            initPostTxQuestionnaireSection: function() {
+                if (!this.subjectId) return;
+                this.setSubStudyTriggers(() => {
+                    this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
+                        setTimeout(function() {
+                            this.postTxQuestionnaire.loading = false;
+                        }.bind(this), 50);
+                        let containerIdentifier = "#postTxQuestionnaireContainer";
+                        if (!data.item) {
+                            $(`${containerIdentifier}`).hide();
+                            return;
+                        }
+                        this.postTxQuestionnaire.questions = data.item;
+                       // if ((!this.hasSubStudyTriggers() || this.isSubStudyTriggersResolved()) &&
+                       //     EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(this.subStudyTriggers.state) !== -1) {
+                            //TODO check if there is any previous post tx responses
+                            this.setPrevPostTxResponses();
+                       // }
+                        if (this.isSubStudyTriggersResolved()) return;
+                        let self = this;
+                        Vue.nextTick(function() {
+                            //initialize datepicker
+                            $(`${containerIdentifier} .data-datepicker`).datepicker(
+                                {"format": "d M yyyy","forceParse": false, "autoclose": true}
+                            ).on("changeDate", self.onResponseChangeFieldEvent);
+                        });
+                    });
+                });
+            },
+            submitPostTxQuestionnaire: function(e) {
+                e.preventDefault();
+                let postData = {
+                    entry: []
+                };
+                let answerSet = [], self = this;
+                $("#postTxQuestionnaireContainer .question").each(function() {
+                    let answers = [];
+                    $(this).find("[dataType]").each(function() {
+                        if ($(this).attr("dataType") === "date") {
+                            answers.push({
+                                "valueString": self.modules.tnthDates.formatDateString(new Date($(this).val()), "iso-short")
+                            });
+                        }
+                        if ($(this).attr("dataType") === "choice") {
+                            let selectedOption = $(this).find("option:selected");
+                            if (selectedOption.length) {
+                                answers.push({
+                                    "valueString": selectedOption.val()
+                                });
+                                answers.push({
+                                    "valueCoding": {
+                                        "code": selectedOption.attr("code"),
+                                        "system": `${location.origin}/api/codings/assessment`
+                                    }
+                                });
+                            }
+                        }
+                        if ($(this).attr("dataType") === "open-choice" && $(this).is(":checked")) {
+                            if ($(this).hasClass("other-text")) {
+                                return true;
+                            }
+                            if ($(this).hasClass("other")) {
+                                answers.push({
+                                    "valueCoding": {
+                                        "code": $(this).attr("code"),
+                                        "system": `${location.origin}/api/codings/assessment`
+                                    }
+                                });
+                                let valueString = $(`#postTxQuestionnaireContainer .other-text[code="${$(this).attr("code")}"]`).val();
+                                if (valueString) {
+                                    answers.push({
+                                        "valueString": valueString
+                                    });
+                                }
+                                return true;
+                            }
+                            answers.push({
+                                "valueString": $(this).val()
+                            });
+                            answers.push({
+                                "valueCoding": {
+                                    "code": $(this).attr("code"),
+                                    "system": `${location.origin}/api/codings/assessment`
+                                }
+                            });
+                        }
+                        if ($(this).attr("dataType") === "boolean") {
+                            answers.push({
+                                "valueBoolean": $(this).is(":checked") ? true: false
+                            });
+                        }
+                    });
+                    answerSet.push({
+                        "answer": answers,
+                        "linkId": $(this).attr("linkId"),
+                        "text": $(this).attr("text")
+                    });
+                });
+                postData.entry.push({
+                    "author":{
+                        "display":"user info",
+                        "reference":`${location.origin}/api/me/${this.currentUserId}`
+                     },
+                     "authored":this.modules.tnthDates.getTodayDateObj().gmtDate,
+                     "group": {
+                        "question": answerSet
+                     },
+                     "resourceType":"QuestionnaireResponse",
+                     "questionnaire":{
+                        "display":"EMPRO Post Intervention Questionnaire",
+                        "reference":`${location.origin}/api/questionnaires/${EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER}`
+                     },
+                     "source": {
+                        "display": "patient demographics",
+                        "reference": `${location.origin}/api/demographics/${this.subjectId}`
+                    },
+                     "subject":{
+                        "display":"patient demographics",
+                        "reference":`${location.origin}/api/demographics/${this.subjectId}`
+                     },
+                     "status": "completed"
+                });
+                $("#postTxQuestionnaireContainer .error-message").html("");
+                $("#postTxQuestionnaireContainer .btn-submit").addClass("disabled").attr("disabled", true);
+                this.modules.tnthAjax.postAssessment(this.subjectId, postData.entry[0], {targetField:$("#postTxSubmitContainer")}, (data) => {
+                    $("#postTxQuestionnaireContainer .btn-submit").removeClass("disabled").removeAttr("disabled");
+                    if (data && data.error) {
+                        $("#postTxQuestionnaireContainer .error-message").html(i18next.t("Error occurred submitting data, try again"));
+                        return;
+                    }
+                    // setTimeout(() => {
+                    //     location.reload();
+                    // }, 0);
+                });
+                return false;
             },
             getAccessUrl: function() {
                 var url = "";
