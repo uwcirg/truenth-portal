@@ -326,7 +326,6 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-       // this.sendRequest(`/static/files/substudy_test_triggers_new.json`, "GET", userId, params, (data) => {
         this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
             if (!data || data.error || !data.state) {
                 callback({"error": true});
