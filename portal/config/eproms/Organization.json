@@ -2019,6 +2019,34 @@
     {
       "extension": [
         {
+          "timezone": "America/Chicago",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146152,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-152"
+        }
+      ],
+      "language": "en_US",
+      "name": "Memphis VA Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
