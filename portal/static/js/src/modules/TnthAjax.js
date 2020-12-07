@@ -864,6 +864,20 @@ export default { /*global $ */
             }
         });
     },
+    "getInstrument": function(instrumentId, params, callback) { //return instruments list by organization(s)
+        callback = callback || function() {};
+        if (!instrumentId) {
+            callback({error: true});
+            return
+        }
+        this.sendRequest(`/api/questionnaire/${instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`, "GET", null, params, function(data) {
+            if (!data || data.error) {
+                callback({"error": true});
+                return;
+            }
+            callback(data);
+        });
+    },
     "getInstrumentsList": function(sync, callback) { //return instruments list by organization(s)
         callback = callback || function() {};
         this.sendRequest("api/questionnaire", "GET", null, {
@@ -1012,6 +1026,25 @@ export default { /*global $ */
             } else {
                 callback({"error": i18next.t("no data returned")});
             }
+        });
+    },
+    "getAssessmentByQNRId": function(userId, qnrId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false;}
+        if (!qnrId) { callback({"error": true}); return false;}
+        params = params || {};
+        this.sendRequest(`/api/patient/${userId}/questionnaire_response/${qnrId}`, "GET", userId, params, function(data) {
+            callback(data);
+        });
+    },
+    "postAssessment": function(userId, data, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false; }
+        if (!data) { callback({"error": true}); return false;}
+        params = params || {};
+        params.data = JSON.stringify(data);
+        this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            callback({data: data});
         });
     },
     "assessmentList": function(userId, params, callback) {

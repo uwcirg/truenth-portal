@@ -8299,7 +8299,33 @@
         {
           "type": "choice",
           "linkId": "ironman_ss_post_tx.3",
-          "text": "Action taken by"
+          "text": "Action taken by",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Clinic Research Nurse",
+                "code": "ironman_ss_post_tx.3.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Research Staff",
+                "code": "ironman_ss_post_tx.3.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Physician",
+                "code": "ironman_ss_post_tx.3.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Other",
+                "code": "ironman_ss_post_tx.3.4"
+              }
+            }
+          ]
         },
         {
           "type": "boolean",
