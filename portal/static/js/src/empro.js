@@ -32,10 +32,17 @@ emproObj.prototype.initThankyouModal = function(autoShow) {
     });
 };
 emproObj.prototype.initReportLink = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
+    let reportURL = `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`;
+    if ($("#emproModal").attr("data-url-authenticated")) {
+        reportURL = `/user/sign-in?next=${reportURL}`;
+    }
     /*
      * link to longitudinal report
      */
-    $(".longitudinal-report-link").attr("href", `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
+    $(".longitudinal-report-link").attr("href", reportURL);
 };
 emproObj.prototype.initTriggerItemsVis = function() {
     if (!$("#emproModal").length) {
@@ -112,6 +119,9 @@ emproObj.prototype.setLoadingVis = function(done) {
     $("#emproModal .items-section").addClass("loading");
 }
 emproObj.prototype.initTriggerDomains = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
     var self = this;
     this.setLoadingVis();
     tnthAjax.getSubStudyTriggers(this.userId, false, (data) => {

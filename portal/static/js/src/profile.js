@@ -1987,10 +1987,6 @@ export default (function() {
             },
             initPatientReportSection: function() {
                 var self = this;
-                if (this.settings && this.settings["SHOW_PROFILE_MACROS"] && this.settings["SHOW_PROFILE_MACROS"].indexOf("intervention_reports") === -1) {
-                    $("#patientReportsContainer").hide();
-                    return;
-                }
                 this.modules.tnthAjax.patientReport(self.subjectId, {useWorker: true}, function(data) {
                     if (!data.error) {
                         if (data.user_documents && data.user_documents.length > 0) {
@@ -2041,6 +2037,9 @@ export default (function() {
                     }
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
+                        if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
+                            return true;
+                        }
                         var arrRefs = String(reference).split("/");
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         if (!instrumentId) {
@@ -2069,10 +2068,14 @@ export default (function() {
                          *  status as indicated in extension field should take precedence over regular status field
                          */
                         var visitStatus = extensionStatus ? extensionStatus: entry.status;
+                        let displayName = entry.questionnaire.display;
+                        if ((new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
+                            displayName = i18next.t("EMPRO Questionnaire");
+                        }
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
-                            display: i18next.t(entry.questionnaire.display),
+                            display: displayName,
                             //title case the status to allow it to be translated correctly
                             status: getStatusString(visitStatus),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),

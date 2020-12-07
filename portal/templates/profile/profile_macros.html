@@ -639,11 +639,18 @@
     {%- endif -%}
 {%- endmacro %}
 {% macro patientReports(person) -%}
-    <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
-    <div id="prTableToolBar"><span id="tableCount"></span></div>
-    <a href="#profilePatientReportTable"></a>
-    <table id="profilePatientReportTable" data-profile-section-id="patientreport"></table>
-    <div id="patientReportErrorMessage" class="text-muted"></div>
+    <div class="row" id="patientReportsContainer">
+        <div class="col-md-12 col-xs-12">
+        {% call profileSection(editable=False) -%}
+            {% call titleSection(id="patientReportsLoc") -%}{{ _("Patient Reports") }}{%-endcall %}
+            <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
+            <div id="prTableToolBar"><span id="tableCount"></span></div>
+            <a href="#profilePatientReportTable"></a>
+            <table id="profilePatientReportTable" data-profile-section-id="patientreport"></table>
+            <div id="patientReportErrorMessage" class="text-muted"></div>
+        {%- endcall %}
+        </div>
+    </div>
 {%- endmacro %}
 
 {% macro profileConsent(person, current_user) -%}
