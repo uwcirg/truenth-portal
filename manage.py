@@ -2,7 +2,6 @@
 
 FLASK_APP=manage.py flask --help
 
-(bogus comment line added to trigger build)
 """
 import copy
 from datetime import datetime
