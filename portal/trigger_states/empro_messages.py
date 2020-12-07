@@ -1,6 +1,7 @@
 """Module to encapsulate EMPRO messaging details"""
 from datetime import datetime
 from flask import current_app, url_for
+from flask_babel import gettext as _
 
 from portal.models.app_text import MailResource, app_text
 from portal.models.communication import EmailMessage, load_template_args
@@ -78,10 +79,16 @@ def staff_emails(patient, hard_triggers, initial_notification):
     # - study ID
     # - link to patient profile
     # - list of `hard_triggers`
+    link = (
+        '<a href="{href}">{label}</a>'.format(href=url_for(
+            'patients.patient_profile',
+            patient_id=patient.id,
+            _anchor='postInterventionQuestionnaireLoc',
+            _external=True),
+            label=_('View Participant Details')))
     args = {
         'patient_id': patient.id,
-        'post_intervention_assessment_link': url_for(
-            'patients.patient_profile', patient_id=patient.id, _external=True),
+        'post_intervention_assessment_link': link,
         'triggered_domains': hard_triggers
     }
     emails = []
