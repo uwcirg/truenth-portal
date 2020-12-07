@@ -62,7 +62,7 @@ emproObj.prototype.init = function() {
         * construct user report URL
         */
         this.initReportLink();
-        tnthAjax.assessmentReport(this.userId, SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
+        tnthAjax.assessmentReport(this.userId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
             if (!data || !data.entry || !data.entry.length) {
                this.initThankyouModal(false);
                return;

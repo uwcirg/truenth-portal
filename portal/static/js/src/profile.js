@@ -1375,7 +1375,7 @@ export default (function() {
                             /*
                              *  if the triggers are considered proccessed. check to see if they have been resolved
                              */
-                            if (EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(self.subStudyTriggers.state) !== -1 &&
+                            if (
                                 self.subStudyTriggers.data.resolution &&
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
@@ -1478,8 +1478,8 @@ export default (function() {
                         "reference":`${location.origin}/api/questionnaires/${EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER}`
                      },
                      "source": {
-                        "display": "patient demographics",
-                        "reference": patientReference
+                        "display": "user demographics",
+                        "reference": `${location.origin}/api/demographics/${this.currentUserId}`
                     },
                      "subject":{
                         "display":"patient demographics",
