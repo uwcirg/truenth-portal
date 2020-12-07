@@ -73,6 +73,7 @@
 @legendColor:    #595F57;
 @modalBackgroundColor: #606a73;
 @sectionTitleColor: #526960;
+@titleTextColor: #5C5E60;
 @sectionBorderColor: #E0E6E3;
 @rowBackgroundColor: #8a8e90;
 @navBarBgColor: #607D8B;
@@ -3301,6 +3302,141 @@ section.header {
   }
 }
 
+#postTxQuestionnaireContainer {
+  position: relative;
+  min-height: 250px;
+  .loader {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: lighten(@profileItemBgColor, 5%);
+    opacity: 0.2;
+    z-index: 50;
+    .icon {
+      position: absolute;
+      z-index: 51;
+      left: calc(50% - 2em);
+      top: 25%
+    }
+  }
+  #triggersSection {
+    margin-bottom: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    .item {
+      margin-bottom: 16px;
+      .text {
+        font-weight: 500;
+      }
+    }
+    .list {
+      -webkit-columns: 2;
+      -moz-columns: 2;
+      columns: 2;
+      max-width: 100%;
+      padding: 0;
+      margin-top: 8px;
+      margin-right: 16px;
+      align-items: flex-start;
+      list-style-type: square;
+      list-style-position: inside;
+      .text {
+        margin-bottom: 4px;
+      }
+    }
+  }
+  #reportNoteSection {
+    margin-bottom: 32px;
+    font-style: italic;
+    font-size: @mobileSize;
+    color: lighten(@mutedColor, 5%);
+  }
+  #questionsSection {
+    position: relative;
+    &.disabled:before {
+      content: "";
+      display: block;
+      position: absolute;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      top: 0;
+      background: @profileItemBgColor;
+      opacity: 0.3;
+      z-index: 5;
+    }
+  }
+  #postTxResolutionContainer {
+    font-weight: 500;
+  }
+  .question {
+    margin-bottom: 24px;
+    .title {
+      display: inline-block;
+      margin-right: 8px;
+      min-width: 132px;
+      color: @titleTextColor;
+      font-weight: 500;
+      &.boolean {
+        color: @baseColor;
+      }
+    }
+  }
+  .choices {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    .choice {
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      .text {
+        margin-left: 8px;
+      }
+    }
+  }
+  select,
+  .data-datepicker {
+    display: inline-block;
+    width: 250px;
+  }
+  .data-datepicker {
+    background: #FFF;
+    &.disabled {
+      background: @muterColor;
+    }
+  }
+  .bool {
+    float:left;
+    margin-right: 8px;
+  }
+  .addl-text {
+    width: 80%;
+    max-width: 100%;
+    margin-left: 16px;
+    margin-top: 12px;
+    height: 72px;
+  }
+  .error-message {
+    margin-top: 16px;
+  }
+  #postTxSubmitContainer {
+    margin-bottom: 16px;
+  }
+}
+@media (min-width: 699px) {
+  #postTxQuestionnaireContainer {
+    #triggersSection {
+      .list {
+        width: 50%;
+      }
+    }
+  }
+}
+
 #emproModal {
   .modal-dialog {
     width: 100%;
@@ -3435,7 +3571,7 @@ section.header {
   #emproModal {
     .items-section {
       .item {
-        padding: 16px 24px 24px;
+        padding: 16px 24px 0;
         width: 33.33333333%;
         min-height: 360px;
         flex-wrap: nowrap;

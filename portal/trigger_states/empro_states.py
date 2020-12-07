@@ -12,6 +12,7 @@ from statemachine.exceptions import TransitionNotAllowed
 from .empro_domains import DomainManifold
 from .models import TriggerState
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..timeout_lock import LockTimeout, TimeoutLock
@@ -334,30 +335,31 @@ def empro_staff_qbd_accessor(qnr):
         # change, or the like.
         query = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state.in_('triggered', 'resolved')).order_by(
+            TriggerState.state.in_(('triggered', 'resolved'))).order_by(
             TriggerState.timestamp)
         if not query.count():
             current_app.logger.errors(no_match_message)
             return result
 
-        potential, match = None, None
+        match = None
         for ts in query:
             if ts.timestamp < as_of_date:
-                potential = ts
+                match = ts
             if ts.timestamp > as_of_date:
-                # POST Tx QB doesn't make sense beyond date of subject's
-                # trigger eval.  If potential is set, call it a match
-                if potential:
-                    match = potential
+                # A patient's submission beyond the date of the POST Tx QB
+                # doesn't make sense - break out.
                 break
 
         if not match:
-            current_app.logger.errors(no_match_message)
+            current_app.logger.error(no_match_message)
             return result
 
         # Store the match and advance the state if necessary
         triggers = copy.deepcopy(match.triggers)
-        triggers['actions']['qnr_id'] = qnr.id
+        triggers['resolution'] = {
+            'qnr_id': qnr.id,
+            'qb_iteration': None,
+            'authored': FHIR_datetime.as_fhir(qnr.authored)}
         match.triggers = triggers
         if match.state != 'resolved':
             sm = EMPRO_state(match)
@@ -368,7 +370,7 @@ def empro_staff_qbd_accessor(qnr):
         if not triggers['source']['qb_id']:
             raise ValueError("association not possible w/o source QB")
 
-        src_qb = QuestionnaireBank.query.get(triggers['source']['qb_id']).one()
+        src_qb = QuestionnaireBank.query.get(triggers['source']['qb_id'])
         if 'baseline' in src_qb.name:
             post_tx_qb = QuestionnaireBank.query.filter(
                 QuestionnaireBank.name == 'ironman_ss_post_tx_baseline'
@@ -383,3 +385,4 @@ def empro_staff_qbd_accessor(qnr):
         result.qb_id = post_tx_qb.id
         result.iteration = triggers['source']['qb_iteration']
         return result
+    return qbd_accessor

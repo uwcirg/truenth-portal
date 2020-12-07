@@ -105,10 +105,10 @@ class QuestionnaireResponse(db.Model):
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
 
-        if qn_name == 'ironman_ss_post_rx':
+        if qn_name == 'ironman_ss_post_tx':
             # special case for the EMPRO Staff QB
-            from trigger_states.empro_states import empro_qbd_accessor
-            qbd_accessor = empro_qbd_accessor(self)
+            from ..trigger_states.empro_states import empro_staff_qbd_accessor
+            qbd_accessor = empro_staff_qbd_accessor(self)
         elif qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
             if self.questionnaire_bank is not None:

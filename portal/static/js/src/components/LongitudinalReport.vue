@@ -276,6 +276,7 @@
                 if ((!questionnaireData || !questionnaireData[0]) ||
                     (!assessmentData || !assessmentData[0])) {
                     this.errorMessage = this.serverError;
+                    this.loading = false;
                     return;
                 }
                 if (!assessmentData[0].entry || !assessmentData[0].entry.length) {

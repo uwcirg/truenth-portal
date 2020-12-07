@@ -1,5 +1,5 @@
 import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
-import {SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "./data/common/consts.js";
+import {EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "./data/common/consts.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import tnthDate from "./modules/TnthDate.js";
 
@@ -32,10 +32,17 @@ emproObj.prototype.initThankyouModal = function(autoShow) {
     });
 };
 emproObj.prototype.initReportLink = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
+    let reportURL = `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`;
+    if ($("#emproModal").attr("data-url-authenticated")) {
+        reportURL = `/user/sign-in?next=${reportURL}`;
+    }
     /*
      * link to longitudinal report
      */
-    $(".longitudinal-report-link").attr("href", `/patients/${this.userId}/longitudinal-report/${SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`);
+    $(".longitudinal-report-link").attr("href", reportURL);
 };
 emproObj.prototype.initTriggerItemsVis = function() {
     if (!$("#emproModal").length) {
@@ -62,7 +69,7 @@ emproObj.prototype.init = function() {
         * construct user report URL
         */
         this.initReportLink();
-        tnthAjax.assessmentReport(this.userId, SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
+        tnthAjax.assessmentReport(this.userId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
             if (!data || !data.entry || !data.entry.length) {
                this.initThankyouModal(false);
                return;
@@ -112,6 +119,9 @@ emproObj.prototype.setLoadingVis = function(done) {
     $("#emproModal .items-section").addClass("loading");
 }
 emproObj.prototype.initTriggerDomains = function() {
+    if (!$("#emproModal").length) {
+        return;
+    }
     var self = this;
     this.setLoadingVis();
     tnthAjax.getSubStudyTriggers(this.userId, false, (data) => {
