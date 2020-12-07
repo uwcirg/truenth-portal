@@ -12,8 +12,7 @@ import {
     EPROMS_SUBSTUDY_TITLE,
     EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
     EPROMS_SUBSTUDY_SHORT_TITLE,
-    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
-    EMPRO_TRIGGER_PROCCESSED_STATES
+    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER
 } from "./data/common/consts.js";
 
 /*
@@ -1306,7 +1305,7 @@ export default (function() {
                             });
                         }
                         
-                        $("#postTxResolutionContainer").text(i18next.t("Action last taken on {authoredDate}").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
+                        $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate}").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
                      });
                 });
             },
@@ -1988,6 +1987,10 @@ export default (function() {
             },
             initPatientReportSection: function() {
                 var self = this;
+                if (this.settings && this.settings["SHOW_PROFILE_MACROS"] && this.settings["SHOW_PROFILE_MACROS"].indexOf("intervention_reports") === -1) {
+                    $("#patientReportsContainer").hide();
+                    return;
+                }
                 this.modules.tnthAjax.patientReport(self.subjectId, {useWorker: true}, function(data) {
                     if (!data.error) {
                         if (data.user_documents && data.user_documents.length > 0) {
