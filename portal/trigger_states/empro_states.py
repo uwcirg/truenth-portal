@@ -377,6 +377,15 @@ def empro_staff_qbd_accessor(qnr):
         # Store the match and advance the state if necessary
         triggers = copy.deepcopy(match.triggers)
         triggers['action_state'] = 'completed'
+
+        # Business rule to prevent multiple submissions (TN-2848)
+        if ('resolution' in triggers and
+                triggers['resolution']['qnr_id'] != qnr.id):
+            current_app.logger.error(
+                f"Second POST-TX response {qnr.id} not allowed on "
+                f"user {qnr.subject_id}")
+            return result
+
         triggers['resolution'] = {
             'qnr_id': qnr.id,
             'qb_iteration': None,
