@@ -83,7 +83,17 @@ def staff_emails(patient, hard_triggers, initial_notification):
     if patient.organizations:
         clinic = _(patient.organizations[0].name)
     link = (
-        '<a href="{href}">{label}</a>'.format(href=url_for(
+        '<a href={href} '
+        'style="font-size: 0.9em; '
+        'font-family: Helvetica, Arial, sans-serif; '
+        'display: inline-block; color: #FFF; '
+        'background-color: #7C959E; border-color: #7C959E; '
+        'border-radius: 0; '
+        'letter-spacing: 2px; cursor: pointer; '
+        'text-transform: uppercase; text-align: center; '
+        'line-height: 1.42857143; '
+        'font-weight: 400; padding: 0.6em; text-decoration: none;">'
+        '{label}</a>'.format(href=url_for(
             'patients.patient_profile',
             patient_id=patient.id,
             _anchor='postInterventionQuestionnaireLoc',
