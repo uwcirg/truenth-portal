@@ -124,21 +124,33 @@ def users_trigger_state(user_id):
 
 
 def initiate_trigger(user_id):
-    """Call when EMPRO becomes available for user"""
+    """Call when EMPRO becomes available for user or next is due"""
     ts = users_trigger_state(user_id)
     if ts.state == 'due':
         # Allow idempotent call - skip out if in correct state
         return ts
 
-    # ... or attempt transition
+    # Check and update the status of pending work.
+    if ts.state == 'triggered':
+        # Just ran out of time, resolve as 'missed'
+        current_app.logger.debug(f"resolve 'missed' trigger for {user_id}")
+        triggers = copy.deepcopy(ts.triggers)
+        triggers['action_state'] = 'missed'
+        sm = EMPRO_state(ts)
+        sm.resolve()
+        db.session.commit()
+
+    if ts.state == 'resolved':
+        current_app.logger.debug(f"transition to next due for {user_id}")
+        # generate a new ts, to leave resolved record behind
+        ts = TriggerState(user_id=user_id, state='unstarted')
+
     sm = EMPRO_state(ts)
     sm.initial_available()
 
-    # Record the historical transformation via insert if new
+    # Record the historical transformation via insert
     if ts.id is None:
-        current_app.logger.debug(
-            "record state change to 'due' from "
-            f"initiate_trigger({user_id})")
+        current_app.logger.debug("record state change to 'due' for {user_id}")
         ts.insert()
     return ts
 
@@ -246,6 +258,7 @@ def fire_trigger_events():
         for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
+            triggers['action_state'] = 'not applicable'
             triggers['actions'] = dict()
             triggers['actions']['email'] = list()
 
@@ -262,6 +275,8 @@ def fire_trigger_events():
                 "patient thank you"))
 
             if hard_triggers:
+                triggers['action_state'] = 'due'
+
                 # In the event of hard_triggers, clinicians/staff get mail
                 for msg in staff_emails(patient, hard_triggers, True):
                     pending_emails.append((msg, "initial staff alert"))
@@ -289,6 +304,7 @@ def fire_trigger_events():
 
                 # necessary to make deep copy in order to update DB JSON
                 triggers = copy.deepcopy(ts.triggers)
+                triggers['action_state'] = 'overdue'
                 for em in pending_emails:
                     send_n_report(
                         em, context="reminder staff alert",
@@ -358,6 +374,7 @@ def empro_staff_qbd_accessor(qnr):
 
         # Store the match and advance the state if necessary
         triggers = copy.deepcopy(match.triggers)
+        triggers['action_state'] = 'completed'
         triggers['resolution'] = {
             'qnr_id': qnr.id,
             'qb_iteration': None,
