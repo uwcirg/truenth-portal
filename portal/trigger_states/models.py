@@ -32,10 +32,14 @@ class TriggerState(db.Model):
         db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     questionnaire_response_id = db.Column(
         db.ForeignKey('questionnaire_responses.id'), index=True)
+    visit_month = db.Column(db.Integer, nullable=False, index=True, default=0)
     triggers = db.Column(JSONB)
 
     def as_json(self):
-        results = {'state': self.state, 'user_id': self.user_id}
+        results = {
+            'state': self.state,
+            'user_id': self.user_id,
+            'visit_month': self.visit_month}
         if self.timestamp:
             results['timestamp'] = FHIR_datetime.as_fhir(self.timestamp)
         if self.triggers:
