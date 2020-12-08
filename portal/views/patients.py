@@ -72,12 +72,13 @@ def render_patients_list(
             if patient.deleted:
                 patients_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(
+            qb_status = qb_status_visit_name(
                 patient.id, research_study_id, cached_as_of_key)
-            patient.assessment_status = _(a_s)
-            patient.current_qb = visit
+            patient.assessment_status = _(qb_status['status'])
+            patient.current_qb = qb_status['visit_name']
             if research_study_id == EMPRO_RS_ID:
                 patient.clinician = clinician_name_map[patient.clinician_id]
+                patient.action_state = qb_status['action_state']
             patients_list.append(patient)
     else:
         patients_list = query
