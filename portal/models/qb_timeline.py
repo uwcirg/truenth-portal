@@ -925,18 +925,31 @@ class QB_StatusCacheKey(object):
 
 @cache.memoize(timeout=TWO_HOURS)
 def qb_status_visit_name(user_id, research_study_id, as_of_date):
-    """Return (status, visit name) for current QB for user as of given date
+    """Return details for current QB for user as of given date
 
     NB to take advantage of caching, clients should use
     ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
     a new lookup with each passing moment.
 
-    If no data is available for the user, returns (expired, None)
+    If no data is available for the user, returns
+     {'status': 'expired', 'visit_name': None}
+
+    :returns: dictionary with key/values for:
+      status: string like 'expired'
+      visit_name: for the period, i.e. '3 months'
+      action_state: 'not applicable', or status of follow up action
+
     """
-    from .research_study import ResearchStudy
+    from .research_study import EMPRO_RS_ID
 
     assert isinstance(research_study_id, int)
     assert isinstance(as_of_date, datetime)
+
+    results = {
+        'status': OverallStatus.expired,
+        'visit_name': None,
+        'action_state': 'not applicable'
+    }
 
     # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id, research_study_id=research_study_id)
@@ -949,8 +962,35 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
         QBT.at <= as_of_date).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt:
-        return qbt.status, visit_name(qbt.qbd())
-    return OverallStatus.expired, None
+        results['status'] = qbt.status
+        results['visit_name'] = visit_name(qbt.qbd())
+
+        if research_study_id == EMPRO_RS_ID:
+            # Not available to all products, thus the nested import
+            from ..trigger_states.models import TriggerState
+
+            # month count present only beyond baseline
+            if qbt.qbd().questionnaire_bank.classification == 'baseline':
+                visit_month = 0
+            else:
+                # pull digit from possibly translated string
+                digits = [
+                    int(s) for s in results['visit_name'].split()
+                    if s.isdigit()]
+                assert len(digits) == 1
+                visit_month = digits[0]
+
+            ts = TriggerState.query.filter(
+                TriggerState.user_id == user_id).filter(
+                TriggerState.visit_month == visit_month).order_by(
+                TriggerState.timestamp.desc()).first()
+            if ts and ts.triggers:
+                results['action_state'] = ts.triggers.get(
+                    'action_state', 'due')
+            else:
+                results['action_state'] = 'due'
+
+    return results
 
 
 def expires(user_id, qbd):

@@ -717,9 +717,9 @@ def aggregate_responses(
                 providers.append(org_ref)
             document["subject"]["careProvider"] = providers
 
-        _, timepoint = qb_status_visit_name(
+        qb_status = qb_status_visit_name(
             subject.id, research_study_id, questionnaire_response.authored)
-        document["timepoint"] = timepoint
+        document["timepoint"] = qb_status['visit_name']
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance
         # Remove when all interventions compliant

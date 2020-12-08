@@ -69,7 +69,7 @@
                   <th data-field="organization" data-sortable="true" data-class="organization-field"  data-filter-control="select" data-visible="true">{{ _("Site(s)") }}</th>
                   <!-- TODO fill in these two columns with data -->
                   <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
-                  <th data-field="interventionActions" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Response Status") }}</th>
+                  <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Response Status") }}</th>
               </tr>
           </thead>
           <tbody id="admin-table-body" class="data-link">
@@ -95,7 +95,7 @@
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       <td>{{patient.clinician if patient.clinician else ""}}</td>
-                      <td> <!--response status--></td>
+                      <td>{{patient.action_state}}</td>
                   </tr>
                {% endfor %}
           </tbody>

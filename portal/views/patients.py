@@ -48,7 +48,7 @@ def render_patients_list(
 
     if request.form.get('reset_cache'):
         QB_StatusCacheKey().update(datetime.utcnow())
-    if research_study_id:
+    if research_study_id == EMPRO_RS_ID:
         clinician_name_map = {None: None}
         for clinician in clinician_query(current_user()):
             clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
@@ -72,12 +72,13 @@ def render_patients_list(
             if patient.deleted:
                 patients_list.append(patient)
                 continue
-            a_s, visit = qb_status_visit_name(
+            qb_status = qb_status_visit_name(
                 patient.id, research_study_id, cached_as_of_key)
-            patient.assessment_status = _(a_s)
-            patient.current_qb = visit
-            if research_study_id:
+            patient.assessment_status = _(qb_status['status'])
+            patient.current_qb = qb_status['visit_name']
+            if research_study_id == EMPRO_RS_ID:
                 patient.clinician = clinician_name_map[patient.clinician_id]
+                patient.action_state = qb_status['action_state']
             patients_list.append(patient)
     else:
         patients_list = query
@@ -138,7 +139,7 @@ def patients_substudy():
     """
     return render_patients_list(
         request,
-        research_study_id=1,
+        research_study_id=EMPRO_RS_ID,
         table_name='substudyPatientList',
         template_name='admin/patients_substudy.html')
 
