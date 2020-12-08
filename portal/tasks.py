@@ -395,6 +395,7 @@ def extract_observations(questionnaire_response_id):
 
 
 @celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
+@scheduled_task
 def process_triggers_task():
     """Task form - wraps call to testable function `fire_trigger_events` """
     # Include within function as not all applications include the blueprint
