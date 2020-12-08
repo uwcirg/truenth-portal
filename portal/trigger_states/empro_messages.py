@@ -79,6 +79,9 @@ def staff_emails(patient, hard_triggers, initial_notification):
     # - study ID
     # - link to patient profile
     # - list of `hard_triggers`
+    clinic = ''
+    if patient.organizations:
+        clinic = _(patient.organizations[0].name)
     link = (
         '<a href="{href}">{label}</a>'.format(href=url_for(
             'patients.patient_profile',
@@ -87,6 +90,7 @@ def staff_emails(patient, hard_triggers, initial_notification):
             _external=True),
             label=_('View Participant Details')))
     args = {
+        'clinic_name': clinic,
         'patient_id': patient.id,
         'post_intervention_assessment_link': link,
         'triggered_domains': hard_triggers
