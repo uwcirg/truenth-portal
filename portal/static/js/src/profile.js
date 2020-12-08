@@ -1371,8 +1371,12 @@ export default (function() {
                 $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
             },
             initPostTxQuestionnaireSection: function() {
-                if (!this.subjectId) return;
+                if (!this.subjectId || !this.isSubStudyPatient()) {
+                    $("#postInterventionQuestionnaireSection").hide();
+                    return;
+                }
                 let self = this;
+
                 this.setSubStudyTriggers(() => {
                     this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
                         let containerIdentifier = "#postTxQuestionnaireContainer";
@@ -1398,6 +1402,8 @@ export default (function() {
                             if (!self.shouldShowSubstudyPostTx()) {
                                 //if post intervention questionnaire is not required, should hide the section
                                 $("#postInterventionQuestionnaireSection").hide();
+                            } else {
+                                $("#postInterventionQuestionnaireSection").show();
                             }
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
