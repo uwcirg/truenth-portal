@@ -188,6 +188,9 @@ export default (function() {
                 state: "",
                 data: {}
             },
+            subStudyAssessment: {
+                data: []
+            },
             disableFields: [],
             topLevelOrgs: [],
             fillViews: {},
@@ -251,9 +254,13 @@ export default (function() {
             computedSubStudyTriggers: function() {
                 return this.subStudyTriggers.domains;
             },
+            computedSubStudyAssessmentData: function() {
+                return this.subStudyAssessment.data;
+            },
             computedSubStudyPostTxResponses: function() {
                 return this.postTxQuestionnaire.answers;
-            }
+            },
+
         },
         methods: {
             registerDependencies: function() {
@@ -1205,6 +1212,12 @@ export default (function() {
                     });
                 });
             },
+            setSubStudyAssessmentData: function(data) {
+                this.subStudyAssessment.data = data;
+            },
+            hasSubStudyAsssessmentData: function() {
+                return this.computedSubStudyAssessmentData.length;
+            },
             initLongitudinalReportSection: function() {
                 if (!this.subjectId) return;
                 let CONTAINER_ID = "longitudinalReportContainer";
@@ -1214,6 +1227,7 @@ export default (function() {
                             $(`#longitudinalReportSection`).hide();
                             return;
                         }
+                        this.setSubStudyAssessmentData(data.entry);
                         $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
                 });
             },
@@ -1361,10 +1375,11 @@ export default (function() {
                 let self = this;
                 this.setSubStudyTriggers(() => {
                     this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
+                        let containerIdentifier = "#postTxQuestionnaireContainer";
                         setTimeout(function() {
                             this.postTxQuestionnaire.loading = false;
                         }.bind(this), 50);
-                        let containerIdentifier = "#postTxQuestionnaireContainer";
+                       
                         if (!data.item) {
                             $(`${containerIdentifier}`).hide();
                             return;
@@ -1379,6 +1394,10 @@ export default (function() {
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
                                 self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
+                            }
+                            if (!self.shouldShowSubstudyPostTx()) {
+                                //if post intervention questionnaire is not required, should hide the section
+                                $("#postInterventionQuestionnaireSection").hide();
                             }
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
