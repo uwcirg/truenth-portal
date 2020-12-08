@@ -340,9 +340,9 @@ class Communication(db.Model):
                     user=user, reason=reason))
 
         rs_id = self.communication_request.questionnaire_bank.research_study_id
-        qb_status, _ = qb_status_visit_name(
+        qb_status = qb_status_visit_name(
             self.user_id, rs_id, datetime.utcnow())
-        if qb_status == OverallStatus.withdrawn:
+        if qb_status['status'] == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
             self.status = 'suspended'
