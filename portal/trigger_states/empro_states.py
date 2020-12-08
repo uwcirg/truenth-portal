@@ -227,6 +227,8 @@ def fire_trigger_events():
         result = {'context': context, 'timestamp': FHIR_datetime.now()}
         try:
             em.send_message()
+            db.session.add(em)
+            db.session.commit()
             result['email_message_id'] = em.id
             record.append(result)
         except SMTPRecipientsRefused as e:
