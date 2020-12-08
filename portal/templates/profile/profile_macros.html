@@ -850,6 +850,7 @@
 {%- endmacro %}
 {%- macro longitudinalReport(person) -%}
     {% call profileSection(editable=false, id="longitudinalReportSection") %}
+        {% call titleSection(id="longitudinalReportsLoc") -%}{{ _("Longitudinal Report") }}{%-endcall %}
         <div id="longitudinalReportContainer" class="eproms-substudy" data-profile-section-id="longitudinalReport">
             <!-- populate dynamically based on whether there is longitudinal report available for the subject -->
         </div>
