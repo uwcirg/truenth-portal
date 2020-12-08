@@ -20,7 +20,7 @@ class NextStep(object):
         raise BadRequest("{} not a valid next step".format(step))
 
     @staticmethod
-    def home():
+    def home(user):
         return url_for('eproms.landing')
 
     @staticmethod
