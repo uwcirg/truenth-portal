@@ -141,9 +141,11 @@ def initiate_trigger(user_id):
         db.session.commit()
 
     if ts.state == 'resolved':
+        next_visit = int(ts.visit_month) + 1
         current_app.logger.debug(f"transition to next due for {user_id}")
         # generate a new ts, to leave resolved record behind
         ts = TriggerState(user_id=user_id, state='unstarted')
+        ts.visit_month = next_visit
 
     sm = EMPRO_state(ts)
     sm.initial_available()
