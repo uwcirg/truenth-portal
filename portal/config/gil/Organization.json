@@ -1758,6 +1758,32 @@
         "reference": "api/organization/40001"
       },
       "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 40016,
+      "identifier": [
+        {
+          "system": "http://us.truenth.org/identity-codes/practice-region",
+          "use": "secondary",
+          "value": "state:MI"
+        },
+        {
+          "system": "http://us.truenth.org/identity-codes/shortname",
+          "use": "secondary",
+          "value": "Western Michigan Urological Associates"
+        }
+      ],
+      "name": "Western Michigan Urological Associates",
+      "partOf": {
+        "reference": "api/organization/40001"
+      },
+      "resourceType": "Organization"
     }
   ],
   "id": "SitePersistence v0.2",

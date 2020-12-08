@@ -31,5 +31,5 @@ jobs:
           # GitHub personal access token
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-          # update major tags when updating minor tags (eg 1.2.3 also updates 1.2 and 1)
-          tag_semver: true
+          # push tags/release by their git name
+          tag_names: true
