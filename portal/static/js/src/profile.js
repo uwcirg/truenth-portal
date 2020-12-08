@@ -126,6 +126,7 @@ export default (function() {
             },
             stateDict: {AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")},
             roles: {data: []},
+            optionalCoreData: [],
             OrgsStateSelectorInitialized: false,
             consent: {
                 consentHeaderArray: [ //html for consent header cell in array
@@ -260,7 +261,9 @@ export default (function() {
             computedSubStudyPostTxResponses: function() {
                 return this.postTxQuestionnaire.answers;
             },
-
+            computedOptionalCoreData: function() {
+                return this.optionalCoreData;
+            }
         },
         methods: {
             registerDependencies: function() {
@@ -789,12 +792,22 @@ export default (function() {
                     setTimeout(function() {callback();}, initCount+20);
                 }
             },
+            setOptionalCoreData: function(data) {
+                this.optionalCoreData = data;
+            },
+            hasOptionalCoreData: function() {
+                return this.computedOptionalCoreData.length;
+            },
             handleOptionalCoreData: function() {
                 var targetSection = $("#profileDetailContainer"), self = this;
                 if (targetSection.length > 0) {
                     var loadingElement = targetSection.find(".profile-item-loader");
                     loadingElement.show();
                     this.modules.tnthAjax.getOptionalCoreData(self.subjectId, {useWorker: true, cache: true}, function(data) { //cache this request as change is rare if ever for optional data
+                        if (!data || !data.optional || !data.optional.length) {
+                            return;
+                        }
+                        self.setOptionalCoreData(data.optional);
                         if (data.optional) {
                             var sections = $("#profileForm .optional");
                             sections.each(function() {
@@ -1219,7 +1232,7 @@ export default (function() {
                 return this.computedSubStudyAssessmentData.length;
             },
             initLongitudinalReportSection: function() {
-                if (!this.subjectId) return;
+                if (!this.subjectId || !this.isSubStudyPatient()) return;
                 let CONTAINER_ID = "longitudinalReportContainer";
                 this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
                     data => {
@@ -1233,34 +1246,43 @@ export default (function() {
             },
             setSubStudyTriggers: function(callback) {
                 callback = callback || function() {};
-                this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, false, (data) => {
-                    if (!data.triggers || !data.triggers.domain) {
-                        callback();
-                        return;
-                    }
-                    let domains = new Array();
-                    for (let topic in data.triggers.domain) {
-                        if (!Object.keys(data.triggers.domain[topic]).length) {
-                            continue;
+                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+                    data => {
+                        if (!data || !data.entry || !data.entry.length) {
+                            //if no assessment data, no need to set triggers
+                            callback();
+                            return;
                         }
-                        for (let q in data.triggers.domain[topic]) {
-                            /*
-                             * HARD triggers ONLY 
-                             */
-                            if (data.triggers.domain[topic][q] === "hard"
-                                && domains.indexOf(topic) === -1) {
-                                domains.push(topic);
+                        this.setSubStudyAssessmentData(data.entry);
+                        this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, false, (data) => {
+                            if (!data.triggers || !data.triggers.domain) {
+                                callback();
+                                return;
                             }
-                        }
-                    }
-                    let completedDate = data.triggers.source && data.triggers.source.authored ? data.triggers.source.authored : data.timestamp;
-                    [
-                        this.subStudyTriggers.domains,
-                        this.subStudyTriggers.date,
-                        this.subStudyTriggers.state,
-                        this.subStudyTriggers.data
-                    ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data.triggers];
-                    callback();
+                            let domains = new Array();
+                            for (let topic in data.triggers.domain) {
+                                if (!Object.keys(data.triggers.domain[topic]).length) {
+                                    continue;
+                                }
+                                for (let q in data.triggers.domain[topic]) {
+                                    /*
+                                     * HARD triggers ONLY 
+                                     */
+                                    if (data.triggers.domain[topic][q] === "hard"
+                                        && domains.indexOf(topic) === -1) {
+                                        domains.push(topic);
+                                    }
+                                }
+                            }
+                            let completedDate = data.triggers.source && data.triggers.source.authored ? data.triggers.source.authored : data.timestamp;
+                            [
+                                this.subStudyTriggers.domains,
+                                this.subStudyTriggers.date,
+                                this.subStudyTriggers.state,
+                                this.subStudyTriggers.data
+                            ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data.triggers];
+                            callback();
+                    });
                 });
             },
             hasSubStudyTriggers: function() {
@@ -1372,12 +1394,15 @@ export default (function() {
             },
             initPostTxQuestionnaireSection: function() {
                 if (!this.subjectId || !this.isSubStudyPatient()) {
-                    $("#postInterventionQuestionnaireSection").hide();
-                    return;
+                    return false;
                 }
                 let self = this;
 
                 this.setSubStudyTriggers(() => {
+                    if (!this.hasSubStudyAsssessmentData()) {
+                        this.postTxQuestionnaire.loading = false;
+                        return;
+                    }
                     this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
                         let containerIdentifier = "#postTxQuestionnaireContainer";
                         setTimeout(function() {
@@ -1398,12 +1423,6 @@ export default (function() {
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
                                 self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
-                            }
-                            if (!self.shouldShowSubstudyPostTx()) {
-                                //if post intervention questionnaire is not required, should hide the section
-                                $("#postInterventionQuestionnaireSection").hide();
-                            } else {
-                                $("#postInterventionQuestionnaireSection").show();
                             }
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker

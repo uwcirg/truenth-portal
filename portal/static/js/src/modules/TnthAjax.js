@@ -1071,9 +1071,16 @@ export default { /*global $ */
             callback({error: i18next.t("User id and instrument Id are required.")});
             return false;
         }
+        let storageReportKey = `assessmentReport_${instrumentId}_${userId}`;
+        if (sessionStorage.getItem(storageReportKey)) {
+            var data = JSON.parse(sessionStorage.getItem(storageReportKey));
+            callback(data);
+            return true;
+        }
         this.sendRequest("/api/patient/" + userId + "/assessment/" + instrumentId, "GET", userId, null, function(data) {
             if (data) {
                 if (!data.error) {
+                    sessionStorage.setItem(storageReportKey, JSON.stringify(data));
                     callback(data);
                 } else {
                     callback({"error": i18next.t("Error occurred retrieving assessment report.")});

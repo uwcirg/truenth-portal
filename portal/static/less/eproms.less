@@ -2984,7 +2984,7 @@ body.portal .copyright-container  {
     margin: 1em;
     //width: 40%;
     &.full-width {
-      width: 96%;
+      width: 75%;
       min-height: 200px;
     }
   }
@@ -3301,7 +3301,10 @@ section.header {
     }
   }
 }
-
+#postInterventionQuestionnaireLoc {
+  height: 2px;
+  overflow: hidden;
+}
 #postTxQuestionnaireContainer {
   position: relative;
   min-height: 250px;
@@ -3353,7 +3356,7 @@ section.header {
     margin-bottom: 32px;
     font-style: italic;
     font-size: @mobileSize;
-    color: lighten(@mutedColor, 5%);
+    color: darken(@mutedColor, 5%);
   }
   #questionsSection {
     position: relative;
@@ -3432,6 +3435,18 @@ section.header {
     #triggersSection {
       .list {
         width: 50%;
+      }
+    }
+  }
+}
+@media (min-width: 992px) {
+  #postTxQuestionnaireContainer {
+    #triggersSection {
+      .list {
+        width: 60%;
+        -webkit-columns: 3;
+        -moz-columns: 3;
+        columns: 3;
       }
     }
   }

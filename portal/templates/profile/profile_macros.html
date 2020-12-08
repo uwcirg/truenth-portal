@@ -69,7 +69,7 @@
     </div>
 {%- endmacro %}
 {% macro profileDemoDetail(person, current_user) -%}
-    <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail">
+    <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail" v-show="hasOptionalCoreData()">
         <div class="col-md-12 col-xs-12">
             {% call profileSection(data_sections="detail", class="patient-detail-container") -%}
                 {% call titleSection(id="patientDetailLoc") -%}
@@ -858,7 +858,7 @@
 {%- endmacro -%}
 {%- macro postInterventionQuestionnaire(person) -%}
     {% call profileSection(editable=false) %}
-    {% call titleSection(id="postInterventionQuestionnaireLoc") -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
+    {% call titleSection() -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
         <!-- don't show this if no hard triggers ?? -->
         <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
             <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
