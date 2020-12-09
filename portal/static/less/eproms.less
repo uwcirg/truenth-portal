@@ -2330,6 +2330,9 @@ div.footer-wrapper.right-panel {
       }
       .byline-text {
         display: block;
+        font-weight: 500;
+        color: darken(@mutedColor, 5%);
+        letter-spacing: 0.04rem;
       }
     }
   }
@@ -3162,12 +3165,36 @@ section.header {
   .error-message {
     margin-top: 16px;
   }
+  .report-legend {
+    visibility: hidden;
+    margin-top: 8px;
+    font-size: 12px;
+    &.active {
+      visibility: visible;
+    }
+    .title {
+      font-weight: 500;
+    }
+    .soft-trigger-legend,
+    .hard-trigger-legend {
+      display:inline-block;
+      margin-left: 8px;
+    }
+    .soft-trigger-legend:before {
+      content: "*";
+      display: inline-block;
+    }
+    .hard-trigger-legend:before {
+      content: "**";
+      display: inline-block;
+    }
+  }
   .nav-arrow {
     position: absolute;
     z-index: 5;
     cursor: pointer;
     font-size: 14px;
-    top: 12px;
+    top: 36px;
     display: inline-block;
     width: 32px;
     height: 32px;
@@ -3191,7 +3218,7 @@ section.header {
     }
   }
   .report-table {
-    margin-top: 24px;
+    margin-top: 8px;
     TR:hover {
       background-color: lighten(@muterColor, 5%);
     }

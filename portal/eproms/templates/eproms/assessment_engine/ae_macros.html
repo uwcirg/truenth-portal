@@ -226,7 +226,7 @@
 <!--sub-study macro -->
 {%- macro empro_thankyou_modal(user) -%}
     <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
-    <div class="modal fade" tabindex="-1" role="dialog" id="emproModal" {% if user and user.current_encounter.auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
+    <div class="modal fade" tabindex="-1" role="dialog" id="emproModal" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
         <div class="modal-dialog">
             <div class="modal-content">
                 <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">

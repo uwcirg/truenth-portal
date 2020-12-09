@@ -331,6 +331,12 @@ export default { /*global $ */
                 callback({"error": true});
                 return false;
             }
+            let triggerDataKey = `cachedTriggers_${userId}`;
+            if (sessionStorage.getItem(triggerDataKey)) {
+                callback(JSON.parse(sessionStorage.getItem(triggerDataKey)));
+                return;
+            }
+            
             if (params.retryAttempt < params.maxTryAttempts &&
                 //if the trigger data has not been processed, try again until maximum number of attempts has been reached
                 EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
@@ -341,6 +347,7 @@ export default { /*global $ */
                 return false;
             }
             params.retryAttempt = 0;
+            sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
             callback(data);
             return true;
         });
