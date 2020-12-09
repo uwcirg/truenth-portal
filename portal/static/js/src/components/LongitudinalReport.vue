@@ -330,7 +330,6 @@
             $.when(
                 $.ajax(`/api/questionnaire/${this.instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`),
                 $.ajax(`/api/patient/${this.userId}/assessment/${this.instrumentId}`),
-               // $.ajax(`/static/files/trigger_history.json`)
                 $.ajax(`/api/user/${this.userId}/trigger_history`)
             ).done((questionnaireData, assessmentData, triggerData) => {
                 this.errorMessage = "";
