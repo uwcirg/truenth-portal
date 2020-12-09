@@ -654,6 +654,19 @@ def invalidate_users_QBT(user_id, research_study_id):
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
+
+    # args have to match order and values - no wild carding avail
+    as_of = QB_StatusCacheKey().current()
+    if research_study_id != 'all':
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, research_study_id, as_of)
+    else:
+        # quicker to just clear both than look up what user belongs to
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, 0, as_of)
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, 1, as_of)
+
     db.session.commit()
 
 
