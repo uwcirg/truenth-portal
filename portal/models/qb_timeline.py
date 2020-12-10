@@ -509,7 +509,7 @@ def ordered_qbs(user, research_study_id, classification=None):
     old_td, withdrawal_date = consent_withdrawal_dates(
         user, research_study_id=research_study_id)
     if not td:
-        if old_td:
+        if old_td and withdrawal_date:
             trace("withdrawn user, use previous trigger {}".format(old_td))
             td = old_td
         else:

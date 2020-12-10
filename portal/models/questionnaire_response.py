@@ -451,7 +451,7 @@ class QNR_results(object):
             user=self.user, research_study_id=self.research_study_id)
         old_td, withdrawal_date = consent_withdrawal_dates(
             self.user, research_study_id=self.research_study_id)
-        if not td and old_td:
+        if not td and old_td and withdrawal_date:
             td = old_td
 
         def qbd_accessor(as_of_date, classification):
