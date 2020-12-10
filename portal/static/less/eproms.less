@@ -2124,6 +2124,7 @@ div.footer-wrapper.right-panel {
   button {
     background-image: linear-gradient(to bottom, #FFF, #ececec 90%);
     min-width: 220px;
+    border: 2px solid darken(@muterColor, 5%);
   }
   .orgs-filter-warning {
     display: inline-block;
@@ -2331,6 +2332,7 @@ div.footer-wrapper.right-panel {
       .button {
         margin-left: 4px;
         font-size: @mediumText * 0.89;
+        font-weight: 500;
       }
       .byline-text {
         display: block;
@@ -2368,7 +2370,7 @@ div.footer-wrapper.right-panel {
     margin-top: 8px;
     .patientlist-toggle-container {
       padding: 12px 16px;
-      border: 1px solid @inputBorderColor;
+      border: 2px solid darken(@muterColor, 5%);
       position: relative;
       &.loading{
         border: 1px solid @toolbarBorderColor;
@@ -3057,6 +3059,9 @@ body.portal .copyright-container  {
   position: relative;
   margin-bottom: 0;
   margin-top: 32px;
+  .loading-message-indicator {
+    min-height: 42px;
+  }
 }
 
 .portal-flex-container {
