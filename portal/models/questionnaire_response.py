@@ -153,9 +153,9 @@ class QuestionnaireResponse(db.Model):
 
         if not self.questionnaire_bank_id:
             current_app.logger.warning(
-                "Can't locate QB for patient {}'s questionnaire_response "
+                "Can't locate QB for patient {}'s questionnaire_response {} "
                 "with reference to given instrument {}".format(
-                    self.subject_id, qn_name))
+                    self.subject_id, self.id, qn_name))
             self.questionnaire_bank_id = 0  # none of the above
             self.qb_iteration = None
 
@@ -488,6 +488,9 @@ class QNR_results(object):
         if not acting_user:
             acting_user = User.query.filter_by(email='__system__').first()
         for qnr in self.qnrs:
+            if qnr.qnr_id == 2497:
+                import pdb;
+                pdb.set_trace()
             QuestionnaireResponse.query.get(
                 qnr.qnr_id).assign_qb_relationship(
                 acting_user_id=acting_user.id, qbd_accessor=qbd_accessor)
