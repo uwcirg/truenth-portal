@@ -9,7 +9,7 @@ from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
-from ..audit import auditable_event
+from ..audit import Audit, auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
@@ -593,8 +593,17 @@ def ordered_qbs(user, research_study_id, classification=None):
                         if q.instrument not in common:
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        qnr.qb_id = rp_flyweight.nxt_qbd.qb_id
+                        qnr.questionnaire_bank_id = rp_flyweight.nxt_qbd.qb_id
                         qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
+                        msg = (
+                            "RP transition: qb_id ({}) and qb_iteration ({}) on"
+                            " questionnaire_response {}".format(
+                                qnr.questionnaire_bank_id, qnr.qb_iteration,
+                                qnr.id))
+                        audit = Audit(
+                            subject_id=user.id, user_id=user.id,
+                            context='assessment', comment=msg)
+                        db.session.add(audit)
                     transition_now = True
 
                 if transition_now:
