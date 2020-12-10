@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import pytest
 
+from portal.cache import cache
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -296,6 +297,7 @@ class TestQuestionnaireBank(TestCase):
             start='{"months": 3}', cycle_length='{"months": 6}',
             termination='{"months": 24}')
         qb.recurs.append(recur)
+        cache.delete_memoized(trigger_date)
         assert trigger_date(
             self.test_user, research_study_id=0, qb=qb) == tx_date
 
@@ -333,6 +335,7 @@ class TestQuestionnaireBank(TestCase):
         self.add_procedure(code='7', display='Focal therapy',
                            system=ICHOM, setdate=tx_date)
         self.test_user = db.session.merge(self.test_user)
+        cache.delete_memoized(trigger_date)
         assert trigger_date(self.test_user, research_study_id=0) == tx_date
 
     def test_intervention_in_progress(self):
@@ -360,6 +363,7 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         obs = self.test_user.observations.first()
         assert obs.codeable_concept.codings[0].display == 'biopsy'
+        cache.delete_memoized(trigger_date)
         assert trigger_date(
             self.test_user, research_study_id=0, qb=qb) == obs.issued
 
