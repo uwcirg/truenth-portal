@@ -929,12 +929,14 @@
                             v-text="option.valueCoding.display"></option>
                     </select>
                 </div>
-                <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
-                    <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
+                <div class="footer-container">
+                    <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
+                        <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
+                    </div>
+                    {{saveLoaderDiv("postTxSubmitContainer")}}
+                    <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
                 </div>
-                {{saveLoaderDiv("postTxSubmitContainer")}}
             </div>
-            <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
             <div class="post-intervention-questionnaire-error error-message"></div>
         </div>
     {% endcall %}

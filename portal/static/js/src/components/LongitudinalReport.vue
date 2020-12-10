@@ -2,7 +2,7 @@
 	<div id="longitudinalReportContainer" class="report">
         <div class="loader" v-show="loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
-        <div class="content" v-show="!loading">
+        <div class="content" :class="{triggers:hasTriggers()}" v-show="!loading">
             <div v-show="hasTriggers()" class="text-muted text-right report-legend" :class="{active: hasTriggers()}">
                 <span class="title" v-text="triggerLegendTitle"></span>
                 <span class="hard-trigger-legend" v-text="hardTriggerLegend"></span>
@@ -205,21 +205,24 @@
                         continue;
                     }
                     for (let q in item.triggers.domain[domain]) {
+                        if (!item.triggers.source || !item.triggers.source.authored) {
+                            continue;
+                        }
                         /*
-                            * get questions that trigger hard trigger
-                            */
+                        * get questions that trigger hard trigger
+                        */
                         if (item.triggers.domain[domain][q] === "hard") {
                             self.triggerData.hardTriggers.push({
-                                "authored": item.triggers.source ? item.triggers.source.authored: "",
+                                "authored": item.triggers.source.authored,
                                 "questionLinkId": q
                             });
                         }
                         /*
-                            * get questions that trigger soft trigger
-                            */
+                        * get questions that trigger soft trigger
+                        */
                         if (item.triggers.domain[domain][q] === "soft") {
                             self.triggerData.softTriggers.push({
-                                "authored": item.triggers.source ? item.triggers.source.authored: "",
+                                "authored": item.triggers.source.authored,
                                 "questionLinkId": q
                             });
                         }

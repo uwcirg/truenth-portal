@@ -2320,12 +2320,16 @@ div.footer-wrapper.right-panel {
     display: inline-block;
     #cacheResetForm {
       margin: 0.5em 0;
-      padding: 0;
+      background: lighten(@muterColor, 3%);
+      padding-top: 4px;
+      padding-bottom: 4px;
+      padding-right: 4px;
       .description {
         font-size: @mediumText;
         margin-bottom: 1em;
       }
       .button {
+        margin-left: 4px;
         font-size: @mediumText * 0.89;
       }
       .byline-text {
@@ -2333,6 +2337,8 @@ div.footer-wrapper.right-panel {
         font-weight: 500;
         color: darken(@mutedColor, 5%);
         letter-spacing: 0.04rem;
+        margin-left: 4px;
+        font-size: 0.875em;
       }
     }
   }
@@ -2343,9 +2349,10 @@ div.footer-wrapper.right-panel {
       }
     }
     #cacheResetContainer {
+      margin-left: 8px;
       #cacheResetForm {
         margin: 0;
-        padding: 0.25em .25em .15em;
+        padding: 8px 8px 8px 4px;
         .byline-text {
           display: inline-block;
           position: relative;
@@ -3194,7 +3201,7 @@ section.header {
     z-index: 5;
     cursor: pointer;
     font-size: 14px;
-    top: 36px;
+    top: 10px;
     display: inline-block;
     width: 32px;
     height: 32px;
@@ -3215,6 +3222,11 @@ section.header {
     &.disabled {
       opacity: 0.4;
       cursor: not-allowed;
+    }
+  }
+  .triggers {
+    .nav-arrow {
+      top: 36px;
     }
   }
   .report-table {
@@ -3351,6 +3363,14 @@ section.header {
       top: 25%
     }
   }
+  .footer-container {
+    position: relative;
+    #postTxResolutionContainer {
+      position: absolute;
+      top: 0;
+      z-index: 10;
+    }
+  }
   #triggersSection {
     margin-bottom: 12px;
     margin-top: 16px;
@@ -3398,6 +3418,7 @@ section.header {
       background: @profileItemBgColor;
       opacity: 0.3;
       z-index: 5;
+      transition: opacity 350ms ease 50ms;
     }
   }
   #postTxResolutionContainer {

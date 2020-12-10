@@ -326,15 +326,19 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
+        let triggerDataKey = `cachedTriggers_${userId}`;
+        if (params.clearCache) {
+            sessionStorage.removeItem(triggerDataKey);
+        } else {
+            if (sessionStorage.getItem(triggerDataKey)) {
+                callback(JSON.parse(sessionStorage.getItem(triggerDataKey)));
+                return;
+            }
+        }
         this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
             if (!data || data.error || !data.state) {
                 callback({"error": true});
                 return false;
-            }
-            let triggerDataKey = `cachedTriggers_${userId}`;
-            if (sessionStorage.getItem(triggerDataKey)) {
-                callback(JSON.parse(sessionStorage.getItem(triggerDataKey)));
-                return;
             }
             
             if (params.retryAttempt < params.maxTryAttempts &&

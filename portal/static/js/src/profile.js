@@ -1244,8 +1244,9 @@ export default (function() {
                         $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
                 });
             },
-            setSubStudyTriggers: function(callback) {
+            setSubStudyTriggers: function(callback, params) {
                 callback = callback || function() {};
+                params = params || {};
                 this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
                     data => {
                         if (!data || !data.entry || !data.entry.length) {
@@ -1254,7 +1255,7 @@ export default (function() {
                             return;
                         }
                         this.setSubStudyAssessmentData(data.entry);
-                        this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, false, (data) => {
+                        this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, params, (data) => {
                             if (!data.triggers || !data.triggers.domain) {
                                 callback();
                                 return;
@@ -1392,7 +1393,7 @@ export default (function() {
                 }
                 $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
             },
-            initPostTxQuestionnaireSection: function() {
+            initPostTxQuestionnaireSection: function(params) {
                 if (!this.subjectId || !this.isSubStudyPatient()) {
                     return false;
                 }
@@ -1432,7 +1433,7 @@ export default (function() {
                         });
 
                     });
-                });
+                }, params);
             },
             submitPostTxQuestionnaire: function(e) {
                 e.preventDefault();
@@ -1538,9 +1539,9 @@ export default (function() {
                         $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
                         return;
                     }
-                    setTimeout(() => {
-                        location.reload();
-                    }, 0);
+                    setTimeout(function() {
+                        this.initPostTxQuestionnaireSection({clearCache: true});
+                    }.bind(this), 2000);
                 });
                 return false;
             },
