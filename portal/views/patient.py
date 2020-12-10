@@ -314,7 +314,7 @@ def patient_timeline(patient_id):
     from ..models.questionnaire_bank import visit_name
     from ..trace import dump_trace, establish_trace
 
-    get_user(patient_id, permission='view')
+    user = get_user(patient_id, permission='view')
     trace = request.args.get('trace', False)
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
@@ -333,6 +333,9 @@ def patient_timeline(patient_id):
                 research_study_id=research_study_id,
                 acting_user_id=current_user().id)
 
+        from ..cache import cache
+        from ..models.questionnaire_bank import trigger_date
+        cache.delete_memoized(trigger_date, user, research_study_id)
         update_users_QBT(
             patient_id,
             research_study_id=research_study_id,
