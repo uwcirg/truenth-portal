@@ -376,12 +376,14 @@ def patient_timeline(patient_id):
         QuestionnaireResponse.subject_id == patient_id).order_by(
         QuestionnaireResponse.authored)
     posted = [{
-        'at, qb, iteration, status, name': "{}, {}, {}, {}, {}".format(
-            qnr.authored,
-            qb_names.get(qnr.questionnaire_bank_id),
-            qnr.qb_iteration,
-            qnr.status,
-            qnr.document['questionnaire']['reference'].split('/')[-1])
+        'qnr_id, at, qb, iteration, status, name':
+            "{}, {}, {}, {}, {}, {}".format(
+                qnr.id,
+                qnr.authored,
+                qb_names.get(qnr.questionnaire_bank_id),
+                qnr.qb_iteration,
+                qnr.status,
+                qnr.document['questionnaire']['reference'].split('/')[-1])
         } for qnr in qnrs]
 
     qbstatus = QB_Status(
