@@ -96,7 +96,7 @@
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       <td>{{patient.clinician if patient.clinician else ""}}</td>
                       <td>
-                        {% if patient.action_state == "required" or patient.action_state == "due" or patient.action_state == "overdue" %}
+                        {% if patient.action_state in ("required", "due", "overdue") %}
                           <a href='{{url_for("patients.patient_profile", patient_id=patient.id, _anchor="postInterventionQuestionnaireLoc")}}'>{{patient.action_state}}</a>
                         {% else %}
                           {{patient.action_state}}
