@@ -153,9 +153,9 @@ class QuestionnaireResponse(db.Model):
 
         if not self.questionnaire_bank_id:
             current_app.logger.warning(
-                "Can't locate QB for patient {}'s questionnaire_response "
+                "Can't locate QB for patient {}'s questionnaire_response {} "
                 "with reference to given instrument {}".format(
-                    self.subject_id, qn_name))
+                    self.subject_id, self.id, qn_name))
             self.questionnaire_bank_id = 0  # none of the above
             self.qb_iteration = None
 
@@ -451,7 +451,7 @@ class QNR_results(object):
             user=self.user, research_study_id=self.research_study_id)
         old_td, withdrawal_date = consent_withdrawal_dates(
             self.user, research_study_id=self.research_study_id)
-        if not td and old_td:
+        if not td and old_td and withdrawal_date:
             td = old_td
 
         def qbd_accessor(as_of_date, classification):

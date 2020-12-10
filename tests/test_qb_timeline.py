@@ -3,6 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pytest
 
+from portal.cache import cache
 from portal.database import db
 from portal.date_tools import FHIR_datetime
 from portal.models.audit import Audit
@@ -17,7 +18,11 @@ from portal.models.qb_timeline import (
     second_null_safe_datetime,
     update_users_QBT,
 )
-from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    trigger_date,
+    visit_name,
+)
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.views.user import withdraw_consent
 from tests import TEST_USER_ID, TestCase, associative_backdate
@@ -250,6 +255,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # update QBT should not re-establish baseline connection given dates
         self.test_user = db.session.merge(self.test_user)
+        cache.delete_memoized(trigger_date)
         qbstatus = QB_Status(
             user=self.test_user,
             research_study_id=0,

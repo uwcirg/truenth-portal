@@ -14,6 +14,7 @@ from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
+    trigger_date
 )
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
@@ -91,6 +92,7 @@ class TestReporting(TestCase):
             db.session.commit()
         crv, self.test_user = map(db.session.merge, (crv, self.test_user))
 
+        cache.delete_memoized(trigger_date)
         invalidate_users_QBT(self.test_user.id, research_study_id='all')
         a_s = QB_Status(
             self.test_user, research_study_id=0, as_of_date=datetime.utcnow())

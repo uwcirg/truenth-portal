@@ -20,6 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
@@ -32,6 +33,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
@@ -732,6 +734,7 @@ def set_user_consents(user_id):
 
         # Moving consent dates potentially invalidates
         # (questionnaire_response: visit_name) associations.
+        cache.delete_memoized(trigger_date, user, consent.research_study_id)
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=user.id,
             research_study_id=consent.research_study_id,
@@ -983,6 +986,7 @@ def delete_user_consents(user_id):
     remove_uc.status = 'deleted'
     # The deleted consent may have altered the cached assessment
     # status, even the qb assignments - force re-eval by invalidating now
+    cache.delete_memoized(trigger_date, user, research_study_id)
     QuestionnaireResponse.purge_qb_relationship(
         subject_id=user_id,
         research_study_id=research_study_id,
