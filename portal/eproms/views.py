@@ -145,7 +145,7 @@ def assessment_engine_view(user):
         and research_study_status[EMPRO_RS_ID]['eligible']
     substudy_assessment_errors = enrolled_in_substudy \
         and research_study_status[EMPRO_RS_ID]['errors'] \
-    
+
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
