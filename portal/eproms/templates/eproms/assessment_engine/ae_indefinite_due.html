@@ -18,6 +18,7 @@
     <!-- main study due card -->
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
+        <!-- don't show sub-study due card since global study questionnaire isn't completed yet -->
         <!-- show main study completed card first -->
         {{completed_card(
             assessment_status=assessment_status,
