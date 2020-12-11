@@ -196,12 +196,17 @@
         {% endif %}
     </div>
 {%- endmacro -%}
-{%- macro empro_modal_default_report_block() -%}
+{%- macro empro_modal_default_report_block(user) -%}
     <div class="item">
         <h4>{{_("Your Report")}}</h4>
         <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
-            <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
+            {%- if user and user.current_encounter().auth_method == 'url_authenticated' -%}
+                <!-- for an url authenticated user, trying to access the report will be prompted to login in -->
+                <a class="btn btn-empro-primary btn-report portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
+            {%- else -%}
+                <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
+            {%- endif -%}
         </div>
     </div>
 {%- endmacro -%}
@@ -242,18 +247,18 @@
                         <p>{{_("Find your latest tips and tools below.")}}</p>
                     </div>
                     <div class="items-section no-trigger">
-                        {{empro_modal_default_report_block()}}
+                        {{empro_modal_default_report_block(user)}}
                         {{empro_modal_default_healthTip_block()}}
                         {{empro_modal_default_supportTeam_block(organization=user.organizations[0].name if user else "")}}
                     </div>
                     <div class="items-section hard-trigger">
                         {{empro_modal_hardTrigger_supportTeam_block(organization=user.organizations[0].name if user else "")}}
                         {{empro_modal_triggered_healthTip_block()}}
-                        {{empro_modal_default_report_block()}}
+                        {{empro_modal_default_report_block(user)}}
                     </div>
                     <div class="items-section soft-trigger">
                         {{empro_modal_triggered_healthTip_block()}}
-                        {{empro_modal_default_report_block()}}
+                        {{empro_modal_default_report_block(user)}}
                         {{empro_modal_default_supportTeam_block(organization=user.organizations[0].name if user else "")}}
                     </div>
                 </div>
