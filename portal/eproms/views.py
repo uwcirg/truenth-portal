@@ -141,8 +141,6 @@ def assessment_engine_view(user):
             OverallStatus.in_progress)
     substudy_assessment_is_ready = enrolled_in_substudy \
         and research_study_status[EMPRO_RS_ID]['ready']
-    substudy_assessment_is_eligible = enrolled_in_substudy \
-        and research_study_status[EMPRO_RS_ID]['eligible']
     substudy_assessment_errors = enrolled_in_substudy \
         and research_study_status[EMPRO_RS_ID]['errors'] \
 
