@@ -96,7 +96,7 @@
             {%- endif -%}
             {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
             <!-- display any error if for some reason the assessment is not ready -->
-            {%- if substudy_assessment_errors and  substudy_assessment_errors|length %}
+            {%- if substudy_assessment_errors and substudy_assessment_errors|length %}
                 <div class="error-message">
                     <span class='glyphicon glyphicon-alert warning icon' aria-hidden='true'></span>
                     {{substudy_assessment_errors | join(", ")}}</div>
