@@ -70,10 +70,12 @@
                     substudy_assessment_status={},
                     substudy_due_date="",
                     enrolled_in_substudy=false,
-                    substudy_assessment_is_ready=false) -%}
+                    substudy_assessment_is_ready=false,
+                    substudy_assessment_errors=substudy_assessment_errors
+    ) -%}
     <!-- subject is in the sub-study and the sub-study questionnaire is due-->
     <!-- NOTE the tile is disabled IF global study work is not complete -->
-    {%- if  enrolled_in_substudy and substudy_assessment_is_due-%}
+    {%- if  enrolled_in_substudy -%}
         {% set substudy_title = "EMPRO" %}
         {% set button_label =  _('complete questionnaire') %}
         {%- call render_card_content(
@@ -93,6 +95,12 @@
                 <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
             {%- endif -%}
             {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+            <!-- display any error if for some reason the assessment is not ready -->
+            {%- if substudy_assessment_errors and  substudy_assessment_errors|length %}
+                <div class="error-message">
+                    <span class='glyphicon glyphicon-alert warning icon' aria-hidden='true'></span>
+                    {{substudy_assessment_errors | join(", ")}}</div>
+            {%- endif -%}
         {%- endcall -%}
     {%- endif -%}
 {%- endmacro -%}

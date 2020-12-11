@@ -141,7 +141,11 @@ def assessment_engine_view(user):
             OverallStatus.in_progress)
     substudy_assessment_is_ready = enrolled_in_substudy \
         and research_study_status[EMPRO_RS_ID]['ready']
-
+    substudy_assessment_is_eligible = enrolled_in_substudy \
+        and research_study_status[EMPRO_RS_ID]['eligible']
+    substudy_assessment_errors = enrolled_in_substudy \
+        and research_study_status[EMPRO_RS_ID]['errors'] \
+    
     return render_template(
         "eproms/assessment_engine.html",
         user=user,
@@ -162,7 +166,8 @@ def assessment_engine_view(user):
         substudy_assessment_is_due=substudy_assessment_is_due,
         substudy_due_date=substudy_due_date,
         substudy_comp_date=substudy_comp_date,
-        substudy_assessment_is_ready=substudy_assessment_is_ready
+        substudy_assessment_is_ready=substudy_assessment_is_ready,
+        substudy_assessment_errors=substudy_assessment_errors
     )
 
 
