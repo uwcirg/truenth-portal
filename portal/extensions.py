@@ -28,6 +28,7 @@ from .csrf import csrf
 from .database import db
 from .models.login import login_user
 from .models.user import User, current_user
+from .session import SameSiteSession as Session
 
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
