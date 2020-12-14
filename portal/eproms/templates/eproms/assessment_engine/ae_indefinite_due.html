@@ -18,22 +18,24 @@
     <!-- main study due card -->
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
-        <!-- don't show sub-study due card since global study questionnaire isn't completed yet -->
-        <!-- show main study completed card first -->
-        {{completed_card(
+        <!-- substudy due card, NOTE if global study work is still due, this tile will be disabled -->
+        {{empro_due(
+            substudy_assessment_is_due=substudy_assessment_is_due,
+            assessment_status=assessment_status,
+            OverallStatus=OverallStatus,
+            substudy_assessment_status=substudy_assessment_status,
+            substudy_due_date=substudy_due_date,
+            enrolled_in_substudy=enrolled_in_substudy,
+            substudy_assessment_is_ready=substudy_assessment_is_ready
+        )}}
+         <!-- main study and/or substudy completed cards if either main study is completed or sub-study is completed -->
+        {{completed_cards(
+            user=user,
             assessment_status=assessment_status,
             OverallStatus=OverallStatus,
             comp_date=comp_date,
-            title_text=completed_title_text)
-        }}
-        <!-- it is possible that user has completed empro at this point, so need to show -->
-        {{empro_completed(
-            user=user,
-            OverallStatus=OverallStatus,
             substudy_assessment_status=substudy_assessment_status,
-            substudy_comp_date=substudy_comp_date,
-            enrolled_in_substudy=enrolled_in_substudy,
-            card_class="disabled" if substudy_assessment_status.overall_status != OverallStatus.completed else ""
+            enrolled_in_substudy=enrolled_in_substudy
         )}}
     {%- else -%}
         <!-- main study completed tile -->
