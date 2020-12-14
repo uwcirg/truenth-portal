@@ -3,6 +3,7 @@ import os
 from flask_session import Session, RedisSessionInterface
 from flask_session.sessions import total_seconds
 
+
 class BaseRedisSessionInterface(RedisSessionInterface):
     """Override RedisSessionInterface save_session() method to passthrough flask config"""
 
