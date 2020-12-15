@@ -28,7 +28,7 @@ flask-sqlalchemy==2.4.1
 flask-sqlalchemy-caching==1.0.4
 flask-swagger==0.2.14
 git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
-flask-wtf==0.14.2         # via flask-user
+flask-wtf==0.14.3         # via flask-user
 flask==1.0.3
 fuzzywuzzy==0.17.0
 healthcheck==1.3.3
