@@ -21,7 +21,7 @@ flask-dance[sqla]==1.4.0
 flask-login==0.4.1        # via flask-user
 flask-mail==0.9.1         # via flask-user
 flask-migrate==2.5.3
-flask-oauthlib==0.9.5
+flask-oauthlib==0.9.6
 flask-recaptcha==0.4.2
 flask-session==0.3.1
 flask-sqlalchemy==2.4.1
