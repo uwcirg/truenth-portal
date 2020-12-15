@@ -571,11 +571,13 @@ def ordered_qbs(user, classification=None):
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
                         assert qnr.authored >= rp_flyweight.nxt_start
-                        # when RP dates don't align, attempt an advance
                         if qnr.authored > rp_flyweight.nxt_exp:
+                            # when RP dates don't align, attempt an advance
                             rp_flyweight._advance_nxt()
                             if qnr.authored > rp_flyweight.nxt_exp:
+                                # still out of sync? - raise
                                 raise ValueError(f"transition error on qnr {qnr.id}")
+
                         qnr.questionnaire_bank_id = rp_flyweight.nxt_qbd.qb_id
                         qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
                     transition_now = True
