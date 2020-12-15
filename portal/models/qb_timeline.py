@@ -363,22 +363,20 @@ class RP_flyweight(object):
         """Returns true only if state suggests it *may* be transtion time"""
         return self.nxt_rpd and self.cur_rpd.retired < self.cur_exp
 
-    def next_qbd(self):
-        """Advance to next qbd on applicable RPs"""
-        self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
-        if self.cur_rpd:
-            self.cur_qbd = next(self.cur_rpd.qbds, None)
-        if self.cur_qbd:
-            self.cur_start = calc_and_adjust_start(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
-            self.cur_exp = calc_and_adjust_expired(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+    def _advance_nxt(self):
+        """Push only the next RP values ahead
 
+        As the RP may affect the dates of say a 9 mo visit, in rare
+        cases a posted QNR will require we push the dates ahead.  Use
+        with care!  Generally part of `next_qbd()` call.
+        """
         self.nxt_qbd, self.nxt_start = None, None
         if self.nxt_rpd:
             self.nxt_qbd = next(self.nxt_rpd.qbds, None)
         if self.nxt_qbd:
             self.nxt_start = calc_and_adjust_start(
+                user=self.user, qbd=self.nxt_qbd, initial_trigger=self.td)
+            self.nxt_exp = calc_and_adjust_expired(
                 user=self.user, qbd=self.nxt_qbd, initial_trigger=self.td)
             if self.cur_qbd is None:
                 trace("Finished cur RP with remaining QBs in next")
@@ -406,6 +404,19 @@ class RP_flyweight(object):
                             self.cur_rpd.rp.name, self.nxt_rpd.rp.name,
                             self.cur_start, self.nxt_start,
                             self.skipped_nxt_start))
+
+    def next_qbd(self):
+        """Advance to next qbd on applicable RPs"""
+        self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
+        if self.cur_rpd:
+            self.cur_qbd = next(self.cur_rpd.qbds, None)
+        if self.cur_qbd:
+            self.cur_start = calc_and_adjust_start(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+            self.cur_exp = calc_and_adjust_expired(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+
+        self._advance_nxt()
         if self.cur_qbd:
             trace("advanced to next QB: {}({}) [{} - {})".format(
                 self.cur_qbd.questionnaire_bank.name,
@@ -559,7 +570,13 @@ def ordered_qbs(user, classification=None):
                         if q.instrument not in common:
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        qnr.qb_id = rp_flyweight.nxt_qbd.qb_id
+                        assert qnr.authored >= rp_flyweight.nxt_start
+                        # when RP dates don't align, attempt an advance
+                        if qnr.authored > rp_flyweight.nxt_exp:
+                            rp_flyweight._advance_nxt()
+                            if qnr.authored > rp_flyweight.nxt_exp:
+                                raise ValueError(f"transition error on qnr {qnr.id}")
+                        qnr.questionnaire_bank_id = rp_flyweight.nxt_qbd.qb_id
                         qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
                     transition_now = True
 
