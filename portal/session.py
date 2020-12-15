@@ -57,7 +57,7 @@ class BaseRedisSessionInterface(RedisSessionInterface):
         )
 
 
-class SameSiteSession(Session):
+class RedisSameSiteSession(Session):
     """Extends flask-session to passthrough SESSION_COOKIE_SAMESITE flask config"""
     def _get_interface(self, app):
         config = app.config.copy()
@@ -66,15 +66,6 @@ class SameSiteSession(Session):
         config.setdefault('SESSION_USE_SIGNER', False)
         config.setdefault('SESSION_KEY_PREFIX', 'session:')
         config.setdefault('SESSION_REDIS', None)
-        config.setdefault('SESSION_MEMCACHED', None)
-        config.setdefault('SESSION_FILE_DIR', os.path.join(os.getcwd(), 'flask_session'))
-        config.setdefault('SESSION_FILE_THRESHOLD', 500)
-        config.setdefault('SESSION_FILE_MODE', 384)
-        config.setdefault('SESSION_MONGODB', None)
-        config.setdefault('SESSION_MONGODB_DB', 'flask_session')
-        config.setdefault('SESSION_MONGODB_COLLECT', 'sessions')
-        config.setdefault('SESSION_SQLALCHEMY', None)
-        config.setdefault('SESSION_SQLALCHEMY_TABLE', 'sessions')
         session_interface = BaseRedisSessionInterface(
             config['SESSION_REDIS'],
             config['SESSION_KEY_PREFIX'],
