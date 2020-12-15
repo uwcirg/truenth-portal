@@ -15,7 +15,7 @@ coverage==5.1
 decorator==4.4.0          # via validators
 dogpile.cache==0.9.0      # via flask-sqlalchemy-caching
 enum34==1.1.6
-flask-babel==0.12.2
+flask-babel==1.0.0
 flask-caching==1.8.0      # via flask-sqlalchemy-caching
 flask-dance[sqla]==1.4.0
 flask-login==0.4.1        # via flask-user
