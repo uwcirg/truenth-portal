@@ -3033,11 +3033,15 @@ body.portal .copyright-container  {
   flex-direction: column;
   flex-grow: 1;
   justify-content: space-between;
-  // .text-content {
-  //   flex: 1;
-  // }
   .button-container {
     align-self: flex-end;
+  }
+  .error-message {
+    color: lighten(@errorMessageColor, 40%);
+    margin: 24px 16px 0;
+    .icon {
+      margin-right: 8px;
+    }
   }
 }
 .portal-flex-container .button-container,
