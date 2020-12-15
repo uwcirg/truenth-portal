@@ -159,7 +159,7 @@ export default {
             //console.log("Locale ", this.locale);
         },
         getCountryCode() {
-           return this.countryCode;
+            return this.countryCode;
          //return "GB";
          //return "CA";
         },
@@ -500,7 +500,8 @@ export default {
             }
             countryCode = countryCode ||this.getCountryCode();
             if (!this.isEligibleCountryCode(countryCode)) {
-                return;
+                //get the resources for default country code
+                countryCode = this.defaultCountryCode;
             }
             resourceSections.forEach(resourceSection => {
                 let topic = resourceSection.getAttribute("data-topic");
