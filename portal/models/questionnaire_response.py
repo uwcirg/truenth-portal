@@ -77,6 +77,14 @@ class QuestionnaireResponse(db.Model):
         default=default_authored
     )
 
+    @property
+    def qb_id(self):
+        raise ValueError('questionnaire_bank_id referenced by wrong name `qb_id`')
+
+    @qb_id.setter
+    def qb_id(self, value):
+        raise ValueError('questionnaire_bank_id assignment to wrong name `qb_id`')
+
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
