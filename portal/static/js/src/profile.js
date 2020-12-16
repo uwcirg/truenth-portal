@@ -1871,7 +1871,7 @@ export default (function() {
                     e.stopPropagation();
                     $(this).toggleClass("active");
                 });
-                $("#communicationsContainer .tab-label").first().addClass("active");
+                $("#communicationsContainer .tab-label").last().addClass("active");
                 $("#emailBodyModal").modal({"show": false});
                 var subjectId = this.subjectId, self = this;
                 this.modules.tnthAjax.emailLog(subjectId, {useWorker: true}, function(data) {
@@ -1902,12 +1902,25 @@ export default (function() {
                     event.preventDefault();
                     event.stopImmediatePropagation(); //stop bubbling of events
                     var email = $("#email").val();
+                    $("#passwordResetErrorMessage").text("");
+                    let setVis = (loading) => {
+                        if (loading) {
+                            $("#resetPasswordGroup .loading-indicator").removeClass("tnth-hide");
+                            $("#btnPasswordResetEmail").addClass("disabled").attr("disabled", true);
+                            return;
+                        }
+                        $("#resetPasswordGroup .loading-indicator").addClass("tnth-hide");
+                        $("#btnPasswordResetEmail").removeClass("disabled").attr("disabled", false);
+                    };
+                    //loading
+                    setVis(true);
                     self.modules.tnthAjax.passwordReset(self.subjectId, function(data) {
                         if (!data.error) {
                             $("#passwordResetMessage").text(i18next.t("Password reset email sent to {email}").replace("{email}", email));
                         } else {
-                            $("#passwordResetMessage").text(i18next.t("Unable to send email."));
+                            $("#passwordResetErrorMessage").text(i18next.t("Unable to send email."));
                         }
+                        setVis(false);
                     });
                 });
             },
