@@ -963,6 +963,7 @@ select:not([multiple]) {
   label.tab-label.active {
     font-weight: 500
   }
+  //
   .tab-content {
     max-height: 0;
     overflow: auto;
@@ -972,12 +973,16 @@ select:not([multiple]) {
     -webkit-transition: max-height .35s;
     -o-transition: max-height .35s;
     transition: max-height .35s;
+    .registration-label {
+      margin-top: 12px;
+      margin-bottom: 0 !important;
+    }
   }
   /* :checked */
   label.tab-label.active ~ .tab-content {
     max-height: 27em;
     margin: 1em auto;
-    padding: 0.5em;
+    padding: 16px 16px;
     border: 1px solid #e4dfdf;
   }
   /* Icon */
@@ -1435,6 +1440,9 @@ div.footer-wrapper.right-panel {
 #termsText {
   padding: 0;
 }
+.terms-text {
+  padding: 8px 24px 8px;
+}
 #agreeLabel {
   margin-left: 2em;
 }
@@ -1455,6 +1463,11 @@ div.footer-wrapper.right-panel {
     margin-right: 8px;
   }
 }
+@media (min-width: 992px) {
+  .data-saving-indicator {
+    margin-left: 10%;
+  }
+}
 #topTerms {
   position: relative;
   .well {
@@ -1472,6 +1485,9 @@ div.footer-wrapper.right-panel {
   }
   .terms-checkbox-container {
     margin-top: 0.5em;
+    .terms-label {
+      font-size: 1em;
+    }
   }
   .terms-checkbox-container i:hover {
     cursor: pointer;
@@ -1500,6 +1516,7 @@ div.footer-wrapper.right-panel {
   max-width: 100%;
   margin-left: 2px;
   display: inline-block;
+  font-weight: 600;
 }
 .edit-view {
   .terms-tick-box-text {
@@ -1561,9 +1578,7 @@ div.footer-wrapper.right-panel {
   }
 
   .reg-buttons-msg-wrapper {
-    width: 500px;
     max-width: 100%;
-    margin: 0 auto;
   }
   .reg-complete-container {
     width: 350px;
@@ -1572,28 +1587,29 @@ div.footer-wrapper.right-panel {
     padding: 0.5em 0;
     text-align: center;
     display: none;
+    .update-button-container {
+      margin-top: 32px;
+      .loading-message-indicator {
+        min-height: 56px;
+      }
+    }
   }
   #buttonsContainer {
-    width: 350px;
     max-width: 100%;
-    margin: 1em auto;
+    margin: 24px auto;
     position: relative;
-    text-align: center;
   }
   #buttonsContainer.continue {
-    margin: 1em auto;
+    margin: 32px 0;
   }
   #next {
     opacity: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
     letter-spacing: 4px;
     text-transform: uppercase;
     padding: 1em;
-    width: 110px;
     max-width: 100%;
     margin-left: 0.2em;
+    transition: opacity 150ms ease;
   }
   #updateProfile {
     opacity: 0;
@@ -1616,7 +1632,6 @@ div.footer-wrapper.right-panel {
     font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
     width: 100%;
     min-height: 30vh;
-    margin-top: 20%;
     display: none;
   }
   .iq-container .tnth-headline:first-of-type {
@@ -1635,15 +1650,14 @@ div.footer-wrapper.right-panel {
   }
   .iq-container .content {
     position: relative;
-    -webkit-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
-    -moz-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
-    box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
   }
   .iq-container .content-body {
-    background: #FBFBFA;
-    background: rgba(203, 210, 217, 0.2);
-    padding: 8em 2.5em 5em 2.5em;
-    margin: 2em auto;
+    padding: 0;
+    margin: 16px auto;
+    .terms-checkbox-container {
+      padding: 16px;
+      border-top: 1px solid @muterColor;
+    }
   }
   .iq-container .subtitle {
     color: #595d4e;
@@ -1660,6 +1674,9 @@ div.footer-wrapper.right-panel {
   label,
   .pat-label {
     font-size: @subheadSize;
+  }
+  .terms-label {
+    font-size: 1em;
   }
   .prompt {
     color: @labelColor;
@@ -1711,6 +1728,9 @@ div.footer-wrapper.right-panel {
 }
 #progressWrapper {
   display: none;
+  &.initial-queries {
+    display: none !important;
+  }
   width: 100%;
   margin: 4% auto 9% auto;
   position: relative;
@@ -3036,13 +3056,6 @@ body.portal .copyright-container  {
   .button-container {
     align-self: flex-end;
   }
-  .error-message {
-    color: lighten(@errorMessageColor, 40%);
-    margin: 24px 16px 0;
-    .icon {
-      margin-right: 8px;
-    }
-  }
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {
@@ -3985,6 +3998,11 @@ section.header {
 }
 #resetPasswordContainer {
   flex-grow: 0.3;
+}
+#resetPasswordGroup {
+  .loading-indicator {
+    margin-top: 16px;
+  }
 }
 #passwordResetMessage {
   width: 300px;
@@ -5335,11 +5353,6 @@ div.timezone-warning.text-warning {
     padding: 0 1em;
   }
 }
-@media (min-width: 500px) {
-    .iq-container {
-      margin-top: 11%;
-    }
-}
 @media (min-width: 506px) {
   #consentListTable,
   #profileAuditLogTable,
@@ -5765,9 +5778,8 @@ div.timezone-warning.text-warning {
   }
 
   #aboutForm {
-    max-width: 65%;
+    max-width: 80%;
     .iq-container {
-      margin-top: 5%;
       .tnth-headline:first-of-type {
         font-size: @subheadSize;
       }
@@ -5875,6 +5887,9 @@ div.timezone-warning.text-warning {
       }
     }
   }
+}
+#progressWrapper.initial-queries {
+  display: none !important;
 }
 
 @media(min-width: 1301px) {

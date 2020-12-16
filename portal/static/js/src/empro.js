@@ -35,10 +35,18 @@ emproObj.prototype.initReportLink = function() {
     if (!$("#emproModal").length) {
         return;
     }
-    let reportURL = `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`;
-    if ($("#emproModal").attr("data-url-authenticated")) {
-        reportURL = `/user/sign-in?next=${reportURL}`;
+    //url authenticated link will invoke authentication continuation modal, so close the thank you modal first
+    let reportElement = $("#emproModal .btn-report.portal-weak-auth-disabled");
+    if (reportElement.length) {
+        reportElement.on("click", function(e) {
+            e.preventDefault();
+            $("#emproModal").modal("hide");
+            $(this).addClass("disabled");
+            return false;
+        });
+        return false;
     }
+    let reportURL = `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`;
     /*
      * link to longitudinal report
      */

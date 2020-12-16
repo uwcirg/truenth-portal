@@ -401,31 +401,31 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    {%- if not person.is_registered() -%}
-                        <div id="communicationsContainer" class="tabs-container">
-                            <div class="tab">
-                                <input id="tab-five" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
-                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label active">{{_("Send registration email to user")}}</label>
+                    <div id="communicationsContainer" class="tabs-container">
+                        <div class="tab">
+                            <input id="tab-five" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            {%- if person.is_registered() -%}
+                                <label id="lbStaffResetPassword" for="tab-five" class="tab-label">{{_("Send reset password email to staff")}}</label>
                                 <div class="tab-content">
+                                    <!-- reset password -->
+                                    {{resetPassword(person)}}
+                                </div>
+                            {%- else -%}
+                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label">{{_("Send registration email to user")}}</label>
+                                <div class="tab-content">
+                                    <!-- registration -->
                                     {{profileStaffRegistrationEmail(person)}}
                                 </div>
-                            </div>
-                            <div class="tab">
-                                <input id="tab-six" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                                <label id="lbEmailLog" for="tab-six" class="tab-label">{{_("Email audit log")}}</label>
-                                <div class="tab-content">
-                                    {{profileEmailLog(person)}}
-                                </div>
+                            {%- endif -%}
+                        </div>
+                        <div class="tab">
+                            <input id="tab-six" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            <label id="lbEmailLog" for="tab-six" class="tab-label">{{_("Email audit log")}}</label>
+                            <div class="tab-content">
+                                {{profileEmailLog(person)}}
                             </div>
                         </div>
-                    {%- else -%}
-                        <div class="flex">
-                            <div id="resetPasswordContainer" class="flex-item">
-                                <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
-                                {{resetPassword(person)}}
-                            </div>
-                        </div>
-                    {%- endif -%}
+                    </div>
                 </div>
             </div>
         </div>
@@ -475,9 +475,11 @@
 {%- endmacro %}
 
 {% macro resetPassword(person) %}
-    <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
+    <div id="resetPasswordGroup" class="form-group" data-profile-section-id="resetpassword">
         <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{_("Send email")}}</button>
+        <div class="loading-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
         <div id="passwordResetMessage" class="text-info"></div>
+        <div id="passwordResetErrorMessage" class="error-message"></div>
     </div>
 {%-endmacro %}
 
