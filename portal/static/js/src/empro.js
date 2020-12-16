@@ -35,17 +35,6 @@ emproObj.prototype.initReportLink = function() {
     if (!$("#emproModal").length) {
         return;
     }
-    //url authenticated link will invoke authentication continuation modal, so close the thank you modal first
-    let reportElement = $("#emproModal .btn-report.portal-weak-auth-disabled");
-    if (reportElement.length) {
-        reportElement.on("click", function(e) {
-            e.preventDefault();
-            $("#emproModal").modal("hide");
-            $(this).addClass("disabled");
-            return false;
-        });
-        return false;
-    }
     let reportURL = `/patients/${this.userId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}`;
     /*
      * link to longitudinal report
@@ -132,7 +121,7 @@ emproObj.prototype.initTriggerDomains = function() {
     }
     var self = this;
     this.setLoadingVis();
-    tnthAjax.getSubStudyTriggers(this.userId, false, (data) => {
+    tnthAjax.getSubStudyTriggers(this.userId, {maxTryAttempts: 3}, (data) => {
         if (!data || data.error || !data.triggers || !data.triggers.domain) {
             this.initThankyouModal(false);
             this.setLoadingVis(true);
