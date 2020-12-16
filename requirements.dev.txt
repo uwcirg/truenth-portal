@@ -31,4 +31,3 @@ waitress==1.4.3           # via webtest
 webob==1.8.5              # via webtest
 webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9
---editable .
