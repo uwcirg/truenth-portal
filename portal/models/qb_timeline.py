@@ -347,6 +347,7 @@ class RP_flyweight(object):
             user=self.user, trigger_date=self.td,
             classification=self.classification)
         self.cur_rpd, self.nxt_rpd = next(self.rp_walker, (None, None))
+        self.last_visit_completed = None
         self.skipped_nxt_start = None
 
     def adjust_start(self):
@@ -363,13 +364,18 @@ class RP_flyweight(object):
         """Returns true only if state suggests it *may* be transtion time"""
         return self.nxt_rpd and self.cur_rpd.retired < self.cur_exp
 
-    def _advance_nxt(self):
-        """Push only the next RP values ahead
 
-        As the RP may affect the dates of say a 9 mo visit, in rare
-        cases a posted QNR will require we push the dates ahead.  Use
-        with care!  Generally part of `next_qbd()` call.
-        """
+    def next_qbd(self):
+        """Advance to next qbd on applicable RPs"""
+        self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
+        if self.cur_rpd:
+            self.cur_qbd = next(self.cur_rpd.qbds, None)
+        if self.cur_qbd:
+            self.cur_start = calc_and_adjust_start(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+            self.cur_exp = calc_and_adjust_expired(
+                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
+
         self.nxt_qbd, self.nxt_start = None, None
         if self.nxt_rpd:
             self.nxt_qbd = next(self.nxt_rpd.qbds, None)
@@ -395,6 +401,9 @@ class RP_flyweight(object):
                     self.nxt_start = calc_and_adjust_start(
                         user=self.user, qbd=self.nxt_qbd,
                         initial_trigger=self.td)
+                    self.nxt_exp = calc_and_adjust_expired(
+                        user=self.user, qbd=self.nxt_qbd,
+                        initial_trigger=self.td)
                 if self.cur_start > self.nxt_start + relativedelta(months=1):
                     # Still no match means poorly defined RP QBs
                     raise ValueError(
@@ -404,19 +413,6 @@ class RP_flyweight(object):
                             self.cur_rpd.rp.name, self.nxt_rpd.rp.name,
                             self.cur_start, self.nxt_start,
                             self.skipped_nxt_start))
-
-    def next_qbd(self):
-        """Advance to next qbd on applicable RPs"""
-        self.cur_qbd, self.cur_start, self.cur_exp = None, None, None
-        if self.cur_rpd:
-            self.cur_qbd = next(self.cur_rpd.qbds, None)
-        if self.cur_qbd:
-            self.cur_start = calc_and_adjust_start(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
-            self.cur_exp = calc_and_adjust_expired(
-                user=self.user, qbd=self.cur_qbd, initial_trigger=self.td)
-
-        self._advance_nxt()
         if self.cur_qbd:
             trace("advanced to next QB: {}({}) [{} - {})".format(
                 self.cur_qbd.questionnaire_bank.name,
@@ -461,7 +457,11 @@ class RP_flyweight(object):
 
         # confirm the now current isn't already retired. rare situation that
         # happens when an org has retired multiple RPs before a user's trigger
-        if self.consider_transition():
+        if (
+                self.cur_rpd.retired and
+                self.cur_rpd.retired < self.td and
+                self.consider_transition()):
+            trace('fire double transition as RP retired before user trigger')
             self.transition()
 
 
@@ -539,6 +539,14 @@ def ordered_qbs(user, classification=None):
                 qnrs_for_period = user_qnrs.authored_during_period(
                     start=rp_flyweight.cur_start, end=rp_flyweight.cur_exp,
                     restrict_to_instruments=combined_instruments)
+
+                # quick check if current is done, as overlapping QBs pull
+                # in QNRs from upcoming QBs
+                unfinished = rp_flyweight.cur_qbd.questionnaire_instruments
+                for qnr in qnrs_for_period:
+                    if qnr.status == 'completed' and qnr.instrument in unfinished:
+                        unfinished.remove(qnr.instrument)
+
                 if len(qnrs_for_period) == 0:
                     transition_now = True
 
@@ -547,12 +555,13 @@ def ordered_qbs(user, classification=None):
                 if not transition_now and period_instruments & cur_only:
                     # Posted results tie user to the old RP; clear skipped
                     # state as it's unavailable when results from the "next"
-                    # exist.
-                    rp_flyweight.skipped_nxt_start = None
+                    # exist, unless it's all done.
+                    if unfinished:
+                        rp_flyweight.skipped_nxt_start = None
 
                     # Don't transition yet, as definitive work on the old
                     # (current) RP has already been posted, UNLESS ...
-                    if period_instruments & next_only:
+                    if period_instruments & next_only and unfinished:
                         current_app.logger.warning(
                             "Transition surprise, {} has deterministic QNRs "
                             "for multiple RPs '{}':'{}' during same visit; "
@@ -562,6 +571,7 @@ def ordered_qbs(user, classification=None):
                                 rp_flyweight.nxt_rpd.rp.name,
                                 str(period_instruments), str(cur_only),
                                 str(common), str(next_only)))
+                        trace("deterministic for both RPs! transition")
                         transition_now = True
                 else:
                     # Safe to transition, but first update all the common,
@@ -570,16 +580,16 @@ def ordered_qbs(user, classification=None):
                         if q.instrument not in common:
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        assert qnr.authored >= rp_flyweight.nxt_start
-                        if qnr.authored > rp_flyweight.nxt_exp:
-                            # when RP dates don't align, attempt an advance
-                            rp_flyweight._advance_nxt()
-                            if qnr.authored > rp_flyweight.nxt_exp:
-                                # still out of sync? - raise
-                                raise ValueError(f"transition error on qnr {qnr.id}")
-
-                        qnr.questionnaire_bank_id = rp_flyweight.nxt_qbd.qb_id
-                        qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
+                        if (
+                                qnr.authored < rp_flyweight.nxt_start or
+                                qnr.authored > rp_flyweight.nxt_exp):
+                            # when RP dates don't align, remove the qb association
+                            # as it'll get picked up during assignment
+                            qnr.questionnaire_bank_id = None
+                            qnr.qb_iteration = None
+                        else:
+                            qnr.questionnaire_bank_id == rp_flyweight.nxt_qbd.qb_id
+                            qnr.qb_iteration == rp_flyweight.nxt_qbd.iteration
                     transition_now = True
 
                 if transition_now:
@@ -679,6 +689,50 @@ def update_users_QBT(user_id, invalidate_existing=False):
                     "user_id": user.id, "qb_id": qbd.questionnaire_bank.id,
                     "qb_iteration": qbd.iteration, "qb_recur_id": qb_recur_id}
                 start = qbd.relative_start
+
+                if (
+                        pending_qbts and pending_qbts[-1].at > start and
+                        pending_qbts[-1].status != 'expired'):
+                    # This large & unfortunate HACK is necessary w/
+                    # overlapping QBs due to protocol change as there's
+                    # inadequate state available w/i the generator.
+
+                    # Unique edge case that only happens when user filled
+                    # out results from the previous QB that belongs to the
+                    # previous RP, AND the new RP inserted a skipped visit
+                    # AND now we find the skipped visit starts BEFORE the
+                    # results were committed to the previous QB.  In such a
+                    # case we need to ignore the skipped and move on.
+                    trace(
+                        "Found overlapping dates and results on former;"
+                        f" NOT adding {qbd}")
+
+                    # For questionnaires with common instrument names that
+                    # happen to fit in both QBs, need to now reassign the
+                    # QB associations as the second is getting tossed
+                    changed = user_qnrs.reassign_qb_association(
+                        existing={
+                            'qb_id': qbd.qb_id,
+                            'iteration': qbd.iteration},
+                        desired={
+                            'qb_id': pending_qbts[-1].qb_id,
+                            'iteration': pending_qbts[-1].qb_iteration})
+
+                    # IF the reassignment caused a change, AND the previous
+                    # visit was in a partially_completed state AND the change
+                    # now completes that visit, update the status.
+                    if (
+                            changed and
+                            pending_qbts[-1].status == 'partially_completed'):
+                        complete_date = user_qnrs.completed_date(
+                            pending_qbts[-1].qb_id,
+                            pending_qbts[-1].qb_iteration)
+                        if complete_date:
+                            pending_qbts[-1].at = complete_date
+                            pending_qbts[-1].status = 'completed'
+
+                    continue  # effectively removes the unwanted visit
+
                 # Always add start (due)
                 pending_qbts.append(QBT(at=start, status='due', **kwargs))
 
