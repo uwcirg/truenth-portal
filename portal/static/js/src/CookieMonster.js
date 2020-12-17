@@ -16,8 +16,8 @@ import Utility from "./modules/Utility.js";
         this.setCookie({"expires":d.toGMTString(), ...this.getSameSiteAttribute()});
     };
     CookieMonster.prototype.getSameSiteAttribute = function() {
-        //Do we need this set specifically to environment or ?
-        //if (String(this.settings["SYSTEM_TYPE"]).toLowerCase() === "development") return {};
+        //Do not set this for development environment
+        if (String(this.settings["SYSTEM_TYPE"]).toLowerCase() === "development") return false;
         return {
             "SameSite":  "None; Secure"
         }
@@ -188,7 +188,7 @@ import Utility from "./modules/Utility.js";
 
     };
     CookieMonster.prototype.getSettings = function (callback) {
-        Utility.newHttpRequest("/api/settings", false, callback);
+        Utility.newHttpRequest("/api/settings", {cache: true}, callback);
     }
     CookieMonster.prototype.init = function() {
         var self = this;
