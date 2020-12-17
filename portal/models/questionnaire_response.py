@@ -110,7 +110,9 @@ class QuestionnaireResponse(db.Model):
             from .qb_status import QB_Status  # avoid cycle
             qbstatus = QB_Status(self.subject, as_of_date=authored)
 
-            def qbstats_current_qbd(as_of_date, classification):
+            def qbstats_current_qbd(as_of_date, classification, instrument):
+                # TODO: consider instrument?  Introduced in patching
+                #  overlapping QBs from v3->v5
                 if as_of_date != authored:
                     raise RuntimeError(
                         "local QB_Status instantiated w/ wrong as_of_date")
@@ -126,7 +128,10 @@ class QuestionnaireResponse(db.Model):
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
-        qbd = qbd_accessor(as_of_date=authored, classification=None)
+        qbd = qbd_accessor(
+            as_of_date=authored,
+            classification=None,
+            instrument=qn_name)
         if qbd and qn and qn.id in (
                 q.questionnaire.id for q in
                 qbd.questionnaire_bank.questionnaires):
@@ -135,7 +140,9 @@ class QuestionnaireResponse(db.Model):
         # if a valid qb wasn't found, try the indefinite option
         else:
             qbd = qbd_accessor(
-                as_of_date=authored, classification='indefinite')
+                as_of_date=authored,
+                classification='indefinite',
+                instrument=qn_name)
             if qbd and qn and qn.id in (
                     q.questionnaire.id for q in
                     qbd.questionnaire_bank.questionnaires):
@@ -394,7 +401,7 @@ class QNR_results(object):
         if not td and old_td:
             td = old_td
 
-        def qbd_accessor(as_of_date, classification):
+        def qbd_accessor(as_of_date, classification, instrument):
             """Simplified qbd lookup consults only assigned qbs"""
             if classification == 'indefinite':
                 container = indef_qbs
@@ -424,7 +431,19 @@ class QNR_results(object):
                         match = qbd
                     else:
                         # second hit only happens with overlapping QBs and is
-                        # as far as we look.
+                        # as far as we look.  if the instrument only fits in
+                        # one, return it - otherwise, prefer the second.
+                        these_qs = [
+                            q.name for q in
+                            qbd.questionnaire_bank.questionnaires]
+                        match_qs = [
+                            q.name for q in
+                            match.questionnaire_bank.questionnaires]
+
+                        if instrument in these_qs:
+                            return qbd
+                        if instrument in match_qs:
+                            return match
                         return qbd
 
             return match
@@ -461,6 +480,22 @@ class QNR_results(object):
         """
         associated = [qnr for qnr in self.qnrs if qnr.qb_id is not None]
         return len(self.qnrs) != len(associated)
+
+    def reassign_qb_association(self, existing, desired):
+        """Update any contained QNRs from existing QB to desired"""
+        changed = False
+        for qnr in self.qnrs:
+            if (
+                    qnr.qb_id == existing['qb_id'] and
+                    qnr.iteration == existing['iteration']):
+                changed = True
+                actual_qnr = QuestionnaireResponse.query.get(qnr.qnr_id)
+                actual_qnr.questionnaire_bank_id = desired['qb_id']
+                actual_qnr.qb_iteration = desired['iteration']
+        if changed:
+            db.session.commit()
+            self._qnrs = None
+        return changed
 
     def authored_during_period(self, start, end, restrict_to_instruments=None):
         """Return the ordered list of QNRs with authored in [start, end)"""
