@@ -1598,6 +1598,12 @@ div.footer-wrapper.right-panel {
     max-width: 100%;
     margin: 24px auto;
     position: relative;
+    .loading-message-indicator {
+      width: 320px;
+      position: absolute;
+      top: 8px;
+      left: calc(50% - 40px);
+    }
   }
   #buttonsContainer.continue {
     margin: 32px 0;
@@ -1616,6 +1622,12 @@ div.footer-wrapper.right-panel {
     letter-spacing: 4px;
     text-transform: uppercase;
     padding: 1em;
+    width: 320px;
+    margin: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(50% - 160px);
   }
   #next:disabled {
     background: @disabledColor;
