@@ -103,6 +103,9 @@ class QuestionnaireResponse(db.Model):
 
         """
         authored = FHIR_datetime.parse(self.document['authored'])
+        if authored != self.authored:
+            current_app.logger.error(
+                "QNR %d has conflicting 'authored' values!", self.id)
         if qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
             qbstatus = QB_Status(self.subject, as_of_date=authored)
