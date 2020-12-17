@@ -542,7 +542,9 @@ def ordered_qbs(user, classification=None):
                 # in QNRs from upcoming QBs
                 unfinished = rp_flyweight.cur_qbd.questionnaire_instruments
                 for qnr in qnrs_for_period:
-                    if qnr.status == 'completed' and qnr.instrument in unfinished:
+                    if (
+                            qnr.status == 'completed' and
+                            qnr.instrument in unfinished):
                         unfinished.remove(qnr.instrument)
 
                 if len(qnrs_for_period) == 0:
@@ -572,22 +574,6 @@ def ordered_qbs(user, classification=None):
                         trace("deterministic for both RPs! transition")
                         transition_now = True
                 else:
-                    # Safe to transition, but first update all the common,
-                    # existing QNRs to reference the *next* RP
-                    for q in qnrs_for_period:
-                        if q.instrument not in common:
-                            continue
-                        qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        if (
-                                qnr.authored < rp_flyweight.nxt_start or
-                                qnr.authored > rp_flyweight.nxt_exp):
-                            # when RP dates don't align, remove the qb association
-                            # as it'll get picked up during assignment
-                            qnr.questionnaire_bank_id = None
-                            qnr.qb_iteration = None
-                        else:
-                            qnr.questionnaire_bank_id == rp_flyweight.nxt_qbd.qb_id
-                            qnr.qb_iteration == rp_flyweight.nxt_qbd.iteration
                     transition_now = True
 
                 if transition_now:
