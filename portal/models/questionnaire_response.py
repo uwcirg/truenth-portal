@@ -401,8 +401,17 @@ class QNR_results(object):
             else:
                 container = qbs
 
-            # Loop until date matching qb found, break if beyond
+            # Loop until date matching qb found.  Occasionally
+            # QBs overlap, such as during a protocol change.  Look
+            # ahead one beyond match, preferring second if two fit.
+            match, laps = None, 0
             for qbd in container:
+                if match:
+                    # once a match is found, only look ahead a
+                    # single QB for a second, overlapping match
+                    laps += 1
+                    if laps > 1:
+                        return match
                 qb_start = calc_and_adjust_start(
                     user=self.user, qbd=qbd, initial_trigger=td)
                 qb_expired = calc_and_adjust_expired(
@@ -410,9 +419,15 @@ class QNR_results(object):
                 if as_of_date < qb_start:
                     continue
                 if qb_start <= as_of_date < qb_expired:
-                    return qbd
-                if qb_expired > as_of_date:
-                    break
+                    if not match:
+                        # first match found.  retain as the likely fit
+                        match = qbd
+                    else:
+                        # second hit only happens with overlapping QBs and is
+                        # as far as we look.
+                        return qbd
+
+            return match
 
         # typically triggered from updating task job - use system
         # as acting user in audits, if no current user is available
