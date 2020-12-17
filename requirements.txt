@@ -43,7 +43,7 @@ oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, reques
 passlib==1.7.1            # via flask-user
 polib==1.1.0
 pycparser==2.20           # via cffi
-pycryptodome==3.9.0       # via flask-user
+pycryptodome==3.9.9       # via flask-user
 python-dateutil==2.8.0
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
