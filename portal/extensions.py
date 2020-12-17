@@ -21,7 +21,6 @@ from flask_babel import Babel
 from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
-from flask_session import Session
 from flask_user import SQLAlchemyAdapter, UserManager
 
 from .csrf import csrf
