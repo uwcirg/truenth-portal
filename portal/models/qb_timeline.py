@@ -347,7 +347,6 @@ class RP_flyweight(object):
             user=self.user, trigger_date=self.td,
             classification=self.classification)
         self.cur_rpd, self.nxt_rpd = next(self.rp_walker, (None, None))
-        self.last_visit_completed = None
         self.skipped_nxt_start = None
 
     def adjust_start(self):
@@ -363,7 +362,6 @@ class RP_flyweight(object):
     def consider_transition(self):
         """Returns true only if state suggests it *may* be transtion time"""
         return self.nxt_rpd and self.cur_rpd.retired < self.cur_exp
-
 
     def next_qbd(self):
         """Advance to next qbd on applicable RPs"""
