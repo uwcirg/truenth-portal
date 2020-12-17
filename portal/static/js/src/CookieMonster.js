@@ -1,8 +1,9 @@
-import {getUrlParameter} from "./modules/Utility.js";
+import Utility from "./modules/Utility.js";
 (function() {
     var CookieMonster = window.CookieMonster = function() {
         this.modalElementId = "modalCookieEnableWarning";
         this.testCookieName = "testCookieMonster";
+        this.settings = {};
         this.resizeTimer = 0;
     };
     CookieMonster.prototype.getSelectorsToDisable = function() {
@@ -11,13 +12,28 @@ import {getUrlParameter} from "./modules/Utility.js";
     CookieMonster.prototype.deleteTestCookie = function() {
         var d = new Date();
         d.setTime(d.getTime() - (1000*60*60*24)); //set the time to the past. 1000 milliseonds = 1 second
-        var expires = "expires=" + d.toGMTString(); //compose the expirartion date
-        window.document.cookie = this.testCookieName+"="+"; "+expires;//set the cookie with name and the expiration date
+        //set the cookie with name and the expiration date
+        this.setCookie({"expires":d.toGMTString(), ...this.getSameSiteAttribute()});
+    };
+    CookieMonster.prototype.getSameSiteAttribute = function() {
+        //Do not set this for development environment
+        if (String(this.settings["SYSTEM_TYPE"]).toLowerCase() === "development") return false;
+        return {
+            "SameSite":  "None; Secure"
+        }
+    };
+    CookieMonster.prototype.setCookie = function(params) {
+        params = params || {};
+        var cookieValue = this.testCookieName+"=foo";
+        for (var key in params) {
+            cookieValue += ";"+key+"="+params[key];
+        }
+        document.cookie = cookieValue + ";";
     };
     CookieMonster.prototype.isCookieEnabled = function() {
         var cookieEnabled = navigator.cookieEnabled;
         if (!cookieEnabled) {
-            document.cookie = this.testCookieName;
+            this.setCookie(this.getSameSiteAttribute());
             cookieEnabled = document.cookie.indexOf(this.testCookieName) !== -1;
         }
         //browsers variations here - safari allowed setting of cookies even when enabling cookie is turned off, but raise runtime security error
@@ -108,7 +124,7 @@ import {getUrlParameter} from "./modules/Utility.js";
         dialogElement.style.top = ((window.innerHeight - domRect.height) / 3) + "px";
     };
     CookieMonster.prototype.initModal = function() {
-        if (getUrlParameter("redirect")) { /*global getUrlParameter */
+        if (Utility.getUrlParameter("redirect")) { /*global getUrlParameter */
             return false; //do not init modal if this is coming from a redirect as to privacy page
         }
         var modalElement = document.getElementById(this.modalElementId);
@@ -171,8 +187,25 @@ import {getUrlParameter} from "./modules/Utility.js";
         this.onFailCheck();
 
     };
+    CookieMonster.prototype.getSettings = function (callback) {
+        Utility.newHttpRequest("/api/settings", {cache: true}, callback);
+    }
+    CookieMonster.prototype.init = function() {
+        var self = this;
+        this.getSettings(function(data) {
+            if (data) {
+                try {
+                    self.settings = JSON.parse(data);
+                } catch(e) {
+                    //log error to console
+                    console.log("Error parsing setting data ", e);
+                }
+            }
+            self.initCheckAndPostProcesses();
+        })
+    }
     window.onload = function() {
         var cookieEvil = new CookieMonster();
-        cookieEvil.initCheckAndPostProcesses();
+        cookieEvil.init();
     };
 })();
