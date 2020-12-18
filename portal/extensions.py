@@ -21,13 +21,13 @@ from flask_babel import Babel
 from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
-from flask_session import Session
 from flask_user import SQLAlchemyAdapter, UserManager
 
 from .csrf import csrf
 from .database import db
 from .models.login import login_user
 from .models.user import User, current_user
+from .session import RedisSameSiteSession as Session
 
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
