@@ -550,6 +550,11 @@ def ordered_qbs(user, classification=None):
                 if len(qnrs_for_period) == 0:
                     transition_now = True
 
+                # Indefinite requires special handling
+                if classification == 'indefinite' and not unfinished:
+                    yield rp_flyweight.cur_qbd
+                    return
+
                 period_instruments = set(
                     [q.instrument for q in qnrs_for_period])
                 if not transition_now and period_instruments & cur_only:

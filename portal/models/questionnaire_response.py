@@ -79,11 +79,13 @@ class QuestionnaireResponse(db.Model):
 
     @property
     def qb_id(self):
-        raise ValueError('questionnaire_bank_id referenced by wrong name `qb_id`')
+        raise ValueError(
+            'questionnaire_bank_id referenced by wrong name `qb_id`')
 
     @qb_id.setter
     def qb_id(self, value):
-        raise ValueError('questionnaire_bank_id assignment to wrong name `qb_id`')
+        raise ValueError(
+            'questionnaire_bank_id assignment to wrong name `qb_id`')
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -128,9 +130,11 @@ class QuestionnaireResponse(db.Model):
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
+        classification = (
+                qn_name.startswith('irondemog') and 'indefinite' or None)
         qbd = qbd_accessor(
             as_of_date=authored,
-            classification=None,
+            classification=classification,
             instrument=qn_name)
         if qbd and qn and qn.id in (
                 q.questionnaire.id for q in
