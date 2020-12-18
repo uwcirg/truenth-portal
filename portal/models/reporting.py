@@ -111,7 +111,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=last_viable.qb_id,
+                qb_ids=[last_viable.qb_id],
                 qb_iteration=last_viable.iteration).entry_method()
             if entry_method:
                 current_app.logger.warn(
@@ -131,7 +131,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=qbd.qb_id,
+                qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 historic['entry_method'] = entry_method
@@ -149,7 +149,7 @@ def adherence_report(
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
-                qb_id=qbd.qb_id,
+                qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 indef['entry_method'] = entry_method
@@ -239,21 +239,21 @@ def overdue_dates(user, research_study_id, as_of):
 
     """
     na = None, None, None
-    status, visit = qb_status_visit_name(user.id, research_study_id, as_of)
+    qb_status = qb_status_visit_name(user.id, research_study_id, as_of)
 
-    if status != OverallStatus.overdue:
+    if qb_status['status'] != OverallStatus.overdue:
         return na
 
     a_s = QB_Status(
         user, research_study_id=research_study_id, as_of_date=as_of)
-    if a_s.overall_status != status:
+    if a_s.overall_status != qb_status['status']:
         current_app.logger.error(
             "%s != %s for %s as of %s".format(
-                a_s.overall_status, status, user.id, as_of))
+                a_s.overall_status, qb_status['status'], user.id, as_of))
     if a_s.overdue_date is None:
         return na
 
-    return visit, a_s.due_date, a_s.expired_date
+    return qb_status['visit_name'], a_s.due_date, a_s.expired_date
 
 
 @cache.cached(timeout=60*60*12, key_prefix='overdue_stats_by_org')

@@ -7,7 +7,13 @@ import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
 import {sortArrayByField} from "./modules/Utility.js";
-import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_TITLE} from "./data/common/consts.js";
+import {
+    EPROMS_SUBSTUDY_ID,
+    EPROMS_SUBSTUDY_TITLE,
+    EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+    EPROMS_SUBSTUDY_SHORT_TITLE,
+    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER
+} from "./data/common/consts.js";
 
 /*
  * helper Object for initializing profile sections  TODO streamline this more
@@ -120,6 +126,7 @@ export default (function() {
             },
             stateDict: {AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")},
             roles: {data: []},
+            optionalCoreData: [],
             OrgsStateSelectorInitialized: false,
             consent: {
                 consentHeaderArray: [ //html for consent header cell in array
@@ -170,6 +177,20 @@ export default (function() {
             },
             patientEmailForm: {
                 loading: false
+            },
+            postTxQuestionnaire: {
+                questions: [],
+                answers: [],
+                loading: true
+            },
+            subStudyTriggers: {
+                domains: [],
+                date: "",
+                state: "",
+                data: {}
+            },
+            subStudyAssessment: {
+                data: []
             },
             disableFields: [],
             topLevelOrgs: [],
@@ -230,6 +251,18 @@ export default (function() {
             },
             computedTreatingClinician: function() {
                 return this.demo.data.clinician && Object.keys(this.demo.data.clinician).length;
+            },
+            computedSubStudyTriggers: function() {
+                return this.subStudyTriggers.domains;
+            },
+            computedSubStudyAssessmentData: function() {
+                return this.subStudyAssessment.data;
+            },
+            computedSubStudyPostTxResponses: function() {
+                return this.postTxQuestionnaire.answers;
+            },
+            computedOptionalCoreData: function() {
+                return this.optionalCoreData;
             }
         },
         methods: {
@@ -759,12 +792,22 @@ export default (function() {
                     setTimeout(function() {callback();}, initCount+20);
                 }
             },
+            setOptionalCoreData: function(data) {
+                this.optionalCoreData = data;
+            },
+            hasOptionalCoreData: function() {
+                return this.computedOptionalCoreData.length;
+            },
             handleOptionalCoreData: function() {
                 var targetSection = $("#profileDetailContainer"), self = this;
                 if (targetSection.length > 0) {
                     var loadingElement = targetSection.find(".profile-item-loader");
                     loadingElement.show();
                     this.modules.tnthAjax.getOptionalCoreData(self.subjectId, {useWorker: true, cache: true}, function(data) { //cache this request as change is rare if ever for optional data
+                        if (!data || !data.optional || !data.optional.length) {
+                            return;
+                        }
+                        self.setOptionalCoreData(data.optional);
                         if (data.optional) {
                             var sections = $("#profileForm .optional");
                             sections.each(function() {
@@ -864,6 +907,12 @@ export default (function() {
                 case "treatingclinician":
                     this.initTreatingClinicianSection();
                     break;
+                case "longitudinalreport":
+                        this.initLongitudinalReportSection();
+                        break;
+                case "posttxquestionnaire":
+                        this.initPostTxQuestionnaireSection();
+                        break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1175,6 +1224,326 @@ export default (function() {
                         self.postDemoData($("#treatingClinicianContainer"), postData);
                     });
                 });
+            },
+            setSubStudyAssessmentData: function(data) {
+                this.subStudyAssessment.data = data;
+            },
+            hasSubStudyAsssessmentData: function() {
+                return this.computedSubStudyAssessmentData.length;
+            },
+            initLongitudinalReportSection: function() {
+                if (!this.subjectId || !this.isSubStudyPatient()) return;
+                let CONTAINER_ID = "longitudinalReportContainer";
+                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+                    data => {
+                        if (!data || !data.entry || !data.entry.length) {
+                            $(`#longitudinalReportSection`).hide();
+                            return;
+                        }
+                        this.setSubStudyAssessmentData(data.entry);
+                        $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
+                });
+            },
+            setSubStudyTriggers: function(callback, params) {
+                callback = callback || function() {};
+                params = params || {};
+                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+                    data => {
+                        if (!data || !data.entry || !data.entry.length) {
+                            //if no assessment data, no need to set triggers
+                            callback();
+                            return;
+                        }
+                        this.setSubStudyAssessmentData(data.entry);
+                        this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, params, (data) => {
+                            if (!data.triggers || !data.triggers.domain) {
+                                callback();
+                                return;
+                            }
+                            let domains = new Array();
+                            for (let topic in data.triggers.domain) {
+                                if (!Object.keys(data.triggers.domain[topic]).length) {
+                                    continue;
+                                }
+                                for (let q in data.triggers.domain[topic]) {
+                                    /*
+                                     * HARD triggers ONLY 
+                                     */
+                                    if (data.triggers.domain[topic][q] === "hard"
+                                        && domains.indexOf(topic) === -1) {
+                                        domains.push(topic);
+                                    }
+                                }
+                            }
+                            let completedDate = data.triggers.source && data.triggers.source.authored ? data.triggers.source.authored : data.timestamp;
+                            [
+                                this.subStudyTriggers.domains,
+                                this.subStudyTriggers.date,
+                                this.subStudyTriggers.state,
+                                this.subStudyTriggers.data
+                            ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data.triggers];
+                            callback();
+                    });
+                });
+            },
+            hasSubStudyTriggers: function() {
+                return this.computedSubStudyTriggers.length;
+            },
+            hasPrevSubStudyPostTx: function() {
+                return this.computedSubStudyPostTxResponses.length;
+            },
+            setPrevPostTxResponses: function(qnrId) {
+                if (!qnrId) {
+                    return;
+                }
+                this.modules.tnthAjax.getAssessmentByQNRId(this.subjectId, qnrId, false, (data) => {
+
+                    if (!data.group || !data.group.question) {
+                        return;
+                    }
+                   
+                    this.postTxQuestionnaire.answers = data.group.question;
+                     (this.postTxQuestionnaire.answers).forEach(item => {
+                        let valueCoding = item.answer.filter(answer => {
+                            return answer.valueCoding;
+                        });
+                        let valueString = item.answer.filter(answer => {
+                            return answer.valueString;
+                        });
+                        let valueBoolean = item.answer.filter(answer => {
+                            return answer.valueBoolean;
+                        });
+                        if (valueCoding.length) {
+                            valueCoding.forEach(subItem => {
+                                let fields = $(`#postTxQuestionnaireContainer [code="${subItem.valueCoding.code}"]`);
+                                fields.each(function() {
+                                    if ($(this).attr("dataType") === "open-choice") $(this).prop("checked", true);
+                                    if ($(this).attr("dataType") === "choice") $(this).prop("selected", true);
+                                    $(this).attr("answered", true);
+                                });
+                            });
+                        }
+                        if (valueBoolean.length) {
+                            $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
+                            .prop("checked", valueBoolean[0].valueBoolean)
+                            .attr("answered", true);
+                            
+                        }
+                        if (valueString.length) {
+                            valueString.forEach(subItem => {
+                                $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="string"], #postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="date"]`).each(function() {
+                                    if ($(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][value="${subItem.valueString}"][dataType != "string"]`).length) {
+                                        return true;
+                                    }
+                                    $(this).val(subItem.valueString)
+                                    $(this).attr("answered", true);
+                                });
+                                
+                            });
+                        }
+                        
+                        $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate}").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
+                     });
+                });
+            },
+            shouldShowSubstudyPostTx: function() {
+                //TODO need to also show post tx section IF there is previous response for this subject and the subject does not have triggers in the current patient questionnaire responses
+                return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx());
+            },
+            isSubStudyTriggersResolved: function() {
+                return this.subStudyTriggers.state === "resolved";
+            },
+            onResponseChangeFieldEvent: function(event) {
+                let targetElement = $(event.target);
+                let containerIdentifier = "#postTxQuestionnaireContainer";
+                if (
+                    targetElement.attr("type") === "checkbox" && targetElement.is(":checked") ||
+                    (targetElement.attr("type") === "text" && targetElement.val()) ||
+                    (event.target.tagName.toLowerCase() === "select" && targetElement.find("option:selected").val()) ||
+                    (event.target.tagName.toLowerCase() === "textarea" && targetElement.val())
+                ) {
+                    targetElement.attr("answered", true);
+                } else {
+                    targetElement.removeAttr("answered");
+                }
+                //text for other field
+                if (targetElement.hasClass("addl-text")) {
+                    let code = targetElement.attr("code");
+                    $(`${containerIdentifier} input[type="checkbox"][code="${code}"]`)
+                    .prop("checked", targetElement.val()?true:false)
+                }
+                //other field
+                if (targetElement.hasClass("other")) {
+                    let code = targetElement.attr("code");
+                    if (!targetElement.is(":checked")) {
+                        $(`${containerIdentifier} textarea[code="${code}"]`).val("").removeAttr("answered");
+                    }
+                }
+                let answeredNum = 0;
+                $(`${containerIdentifier} .question`).each(function() {
+                    if ($(this).find("[answered]").length) {
+                        answeredNum++;
+                    }
+                });
+                if (
+                    $(`${containerIdentifier} .question`).length === answeredNum
+                ) {
+                    $(`${containerIdentifier} .btn-submit`).removeClass("disabled").removeAttr("disabled");
+                    return;
+                }
+                $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
+            },
+            initPostTxQuestionnaireSection: function(params) {
+                if (!this.subjectId || !this.isSubStudyPatient()) {
+                    return false;
+                }
+                let self = this;
+
+                this.setSubStudyTriggers(() => {
+                    if (!this.hasSubStudyAsssessmentData()) {
+                        this.postTxQuestionnaire.loading = false;
+                        return;
+                    }
+                    this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
+                        let containerIdentifier = "#postTxQuestionnaireContainer";
+                        setTimeout(function() {
+                            this.postTxQuestionnaire.loading = false;
+                        }.bind(this), 50);
+                       
+                        if (!data.item) {
+                            $(`${containerIdentifier}`).hide();
+                            return;
+                        }
+                        this.postTxQuestionnaire.questions = data.item;
+                        Vue.nextTick(function() {
+                            /*
+                             *  if the triggers are considered proccessed. check to see if they have been resolved
+                             */
+                            if (
+                                self.subStudyTriggers.data.resolution &&
+                                self.subStudyTriggers.data.resolution.qnr_id
+                            ){
+                                self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
+                            }
+                            if (self.isSubStudyTriggersResolved()) return;
+                            //initialize datepicker
+                            $(`${containerIdentifier} .data-datepicker`).datepicker(
+                                {"format": "d M yyyy","forceParse": false, "autoclose": true, endDate: new Date()}
+                            ).on("changeDate", self.onResponseChangeFieldEvent);
+                        });
+
+                    });
+                }, params);
+            },
+            submitPostTxQuestionnaire: function(e) {
+                e.preventDefault();
+                let postData = {
+                    entry: []
+                };
+                let answerSet = [], self = this;
+                let containerElementIdentifier = "#postTxQuestionnaireContainer";
+                $(`${containerElementIdentifier} .question`).each(function() {
+                    let answers = [];
+                    $(this).find("[dataType]").each(function() {
+                        if ($(this).attr("dataType") === "date") {
+                            answers.push({
+                                "valueString": self.modules.tnthDates.formatDateString(new Date($(this).val()), "iso-short")
+                            });
+                        }
+                        if ($(this).attr("dataType") === "choice") {
+                            let selectedOption = $(this).find("option:selected");
+                            if (selectedOption.length) {
+                                answers.push({
+                                    "valueString": selectedOption.val()
+                                });
+                                answers.push({
+                                    "valueCoding": {
+                                        "code": selectedOption.attr("code"),
+                                        "system": `${location.origin}/api/codings/assessment`
+                                    }
+                                });
+                            }
+                        }
+                        if ($(this).attr("dataType") === "open-choice" && $(this).is(":checked")) {
+                            if ($(this).hasClass("other-text")) {
+                                return true;
+                            }
+                            if ($(this).hasClass("other")) {
+                                answers.push({
+                                    "valueCoding": {
+                                        "code": $(this).attr("code"),
+                                        "system": `${location.origin}/api/codings/assessment`
+                                    },
+                                    "valueString": $(this).val()
+                                });
+                                let valueString = $(`#postTxQuestionnaireContainer .other-text[code="${$(this).attr("code")}"]`).val();
+                                if (valueString) {
+                                    answers.push({
+                                        "valueString": valueString
+                                    });
+                                }
+                                return true;
+                            }
+                            answers.push({
+                                "valueString": $(this).val()
+                            });
+                            answers.push({
+                                "valueCoding": {
+                                    "code": $(this).attr("code"),
+                                    "system": `${location.origin}/api/codings/assessment`
+                                }
+                            });
+                        }
+                        if ($(this).attr("dataType") === "boolean") {
+                            answers.push({
+                                "valueBoolean": $(this).is(":checked") ? true: false
+                            });
+                        }
+                    });
+                    answerSet.push({
+                        "answer": answers,
+                        "linkId": $(this).attr("linkId"),
+                        "text": $(this).attr("text")
+                    });
+                });
+                let patientReference = `${location.origin}/api/demographics/${this.subjectId}`;
+                postData.entry.push({
+                    "author":{
+                        "display":"user info",
+                        "reference":`${location.origin}/api/me/${this.currentUserId}`
+                     },
+                     "authored":this.modules.tnthDates.getTodayDateObj().gmtDate,
+                     "group": {
+                        "question": answerSet
+                     },
+                     "resourceType":"QuestionnaireResponse",
+                     "questionnaire":{
+                        "display":"EMPRO Post Intervention Questionnaire",
+                        "reference":`${location.origin}/api/questionnaires/${EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER}`
+                     },
+                     "source": {
+                        "display": "user demographics",
+                        "reference": `${location.origin}/api/demographics/${this.currentUserId}`
+                    },
+                     "subject":{
+                        "display":"patient demographics",
+                        "reference": patientReference
+                     },
+                     "status": "completed"
+                });
+                $(`${containerElementIdentifier} .error-message`).html("");
+                $(`${containerElementIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
+                this.modules.tnthAjax.postAssessment(this.subjectId, postData.entry[0], {targetField:$("#postTxSubmitContainer")}, (data) => {
+                    $(`${containerElementIdentifier} .btn-submit`).removeClass("disabled").removeAttr("disabled");
+                    if (data && data.error) {
+                        $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
+                        return;
+                    }
+                    setTimeout(function() {
+                        this.initPostTxQuestionnaireSection({clearCache: true});
+                    }.bind(this), 3000);
+                });
+                return false;
             },
             getAccessUrl: function() {
                 var url = "";
@@ -1502,7 +1871,7 @@ export default (function() {
                     e.stopPropagation();
                     $(this).toggleClass("active");
                 });
-                $("#communicationsContainer .tab-label").first().addClass("active");
+                $("#communicationsContainer .tab-label").last().addClass("active");
                 $("#emailBodyModal").modal({"show": false});
                 var subjectId = this.subjectId, self = this;
                 this.modules.tnthAjax.emailLog(subjectId, {useWorker: true}, function(data) {
@@ -1533,12 +1902,25 @@ export default (function() {
                     event.preventDefault();
                     event.stopImmediatePropagation(); //stop bubbling of events
                     var email = $("#email").val();
+                    $("#passwordResetErrorMessage").text("");
+                    let setVis = (loading) => {
+                        if (loading) {
+                            $("#resetPasswordGroup .loading-indicator").removeClass("tnth-hide");
+                            $("#btnPasswordResetEmail").addClass("disabled").attr("disabled", true);
+                            return;
+                        }
+                        $("#resetPasswordGroup .loading-indicator").addClass("tnth-hide");
+                        $("#btnPasswordResetEmail").removeClass("disabled").attr("disabled", false);
+                    };
+                    //loading
+                    setVis(true);
                     self.modules.tnthAjax.passwordReset(self.subjectId, function(data) {
                         if (!data.error) {
                             $("#passwordResetMessage").text(i18next.t("Password reset email sent to {email}").replace("{email}", email));
                         } else {
-                            $("#passwordResetMessage").text(i18next.t("Unable to send email."));
+                            $("#passwordResetErrorMessage").text(i18next.t("Unable to send email."));
                         }
+                        setVis(false);
                     });
                 });
             },
@@ -1713,6 +2095,9 @@ export default (function() {
                     }
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
+                        if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
+                            return true;
+                        }
                         var arrRefs = String(reference).split("/");
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         if (!instrumentId) {
@@ -1741,10 +2126,14 @@ export default (function() {
                          *  status as indicated in extension field should take precedence over regular status field
                          */
                         var visitStatus = extensionStatus ? extensionStatus: entry.status;
+                        let displayName = entry.questionnaire.display;
+                        if ((new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
+                            displayName = i18next.t("EMPRO Questionnaire");
+                        }
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
-                            display: i18next.t(entry.questionnaire.display),
+                            display: displayName,
                             //title case the status to allow it to be translated correctly
                             status: getStatusString(visitStatus),
                             class: (index % 2 !== 0 ? "class='odd'" : "class='even'"),

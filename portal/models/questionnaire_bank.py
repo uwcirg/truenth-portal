@@ -6,7 +6,7 @@ from flask_sqlalchemy_caching import FromCache
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
-from ..cache import TWO_HOURS, cache
+from ..cache import FIVE_MINS, TWO_HOURS, cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
@@ -303,6 +303,7 @@ class QuestionnaireBank(db.Model):
         return start + RelativeDelta(self.overdue)
 
 
+@cache.memoize(timeout=FIVE_MINS)
 def trigger_date(user, research_study_id, qb=None):
     """Return trigger date for user, research_study
 
@@ -325,6 +326,8 @@ def trigger_date(user, research_study_id, qb=None):
     :return: UTC datetime for the given user / QB, or None if N/A
 
     """
+    from .research_study import EMPRO_RS_ID
+    trace("calculate trigger date (not currently cached)")
 
     def biopsy_date(user):
         b_date = user.fetch_datetime_for_concept(CC.BIOPSY)
@@ -357,7 +360,48 @@ def trigger_date(user, research_study_id, qb=None):
             trace("no treatment or biopsy date, no trigger_date")
         return t
 
+    def completed_global_date(user, consent_date):
+        """EMPRO requires a global study completed w/i 4 weeks
+
+        :returns: the completed datetime of a global study QB either
+          prior to consent_date, but within 4 weeks or
+          after consent_date or
+          None
+
+        """
+        from .qb_timeline import QBT
+        four_weeks_back = consent_date - RelativeDelta(weeks=4)
+        completed = QBT.query.filter(QBT.user_id == user.id).filter(
+            QBT.status == 'completed').filter(
+            QBT.research_study_id == 0).filter(
+            QBT.at > four_weeks_back).order_by(QBT.at).with_entities(
+            QBT.at)
+
+        best = None
+        for timepoint in completed:
+            if not best:
+                best = timepoint.at
+                continue
+            if timepoint.at > consent_date:
+                # already have a match, don't accept a "better" option
+                # beyond the consent date.
+                break
+        return best
+
     trigger = None
+
+    if research_study_id == EMPRO_RS_ID:
+        c_date = consent_date(user, research_study_id)
+        if not c_date:
+            return None
+        completed_global = completed_global_date(user, c_date)
+        if not completed_global:
+            trace(
+                "no completed global study found, therefore not EMPRO ready")
+            return None
+        if completed_global < c_date:
+            return c_date
+        return completed_global
 
     # If given a QB, use its details to determine trigger
     if qb and qb.research_protocol_id:

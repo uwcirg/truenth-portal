@@ -9,7 +9,7 @@ from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
-from ..audit import auditable_event
+from ..audit import Audit, auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
@@ -509,7 +509,7 @@ def ordered_qbs(user, research_study_id, classification=None):
     old_td, withdrawal_date = consent_withdrawal_dates(
         user, research_study_id=research_study_id)
     if not td:
-        if old_td:
+        if old_td and withdrawal_date:
             trace("withdrawn user, use previous trigger {}".format(old_td))
             td = old_td
         else:
@@ -593,8 +593,17 @@ def ordered_qbs(user, research_study_id, classification=None):
                         if q.instrument not in common:
                             continue
                         qnr = QuestionnaireResponse.query.get(q.qnr_id)
-                        qnr.qb_id = rp_flyweight.nxt_qbd.qb_id
+                        qnr.questionnaire_bank_id = rp_flyweight.nxt_qbd.qb_id
                         qnr.qb_iteration = rp_flyweight.nxt_qbd.iteration
+                        msg = (
+                            "RP transition: qb_id ({}) and qb_iteration ({}) on"
+                            " questionnaire_response {}".format(
+                                qnr.questionnaire_bank_id, qnr.qb_iteration,
+                                qnr.id))
+                        audit = Audit(
+                            subject_id=user.id, user_id=user.id,
+                            context='assessment', comment=msg)
+                        db.session.add(audit)
                     transition_now = True
 
                 if transition_now:
@@ -654,6 +663,19 @@ def invalidate_users_QBT(user_id, research_study_id):
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
+
+    # args have to match order and values - no wild carding avail
+    as_of = QB_StatusCacheKey().current()
+    if research_study_id != 'all':
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, research_study_id, as_of)
+    else:
+        # quicker to just clear both than look up what user belongs to
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, 0, as_of)
+        cache.delete_memoized(
+            qb_status_visit_name, user_id, 1, as_of)
+
     db.session.commit()
 
 
@@ -670,6 +692,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
     """
     def attempt_update(user_id, research_study_id, invalidate_existing):
         """Updates user's QBT or raises if lock is unattainable"""
+        from .qb_status import patient_research_study_status
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
@@ -698,6 +721,17 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     "{} with roles {} doesn't have timeline, only "
                     "patients".format(
                         user, str([r.name for r in user.roles])))
+
+            # Check eligibility - some studies aren't available till
+            # business rules have been met
+            study_eligibility = [
+                study for study in patient_research_study_status(
+                    user, ignore_QB_status=True) if
+                study['research_study_id'] == research_study_id]
+
+            if not study_eligibility or not study_eligibility[0]['eligible']:
+                trace(f"user determined ineligible for {research_study_id}")
+                return
 
             # Create time line for user, from initial trigger date
             qb_generator = ordered_qbs(user, research_study_id)
@@ -913,18 +947,31 @@ class QB_StatusCacheKey(object):
 
 @cache.memoize(timeout=TWO_HOURS)
 def qb_status_visit_name(user_id, research_study_id, as_of_date):
-    """Return (status, visit name) for current QB for user as of given date
+    """Return details for current QB for user as of given date
 
     NB to take advantage of caching, clients should use
     ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
     a new lookup with each passing moment.
 
-    If no data is available for the user, returns (expired, None)
+    If no data is available for the user, returns
+     {'status': 'expired', 'visit_name': None}
+
+    :returns: dictionary with key/values for:
+      status: string like 'expired'
+      visit_name: for the period, i.e. '3 months'
+      action_state: 'not applicable', or status of follow up action
+
     """
-    from .research_study import ResearchStudy
+    from .research_study import EMPRO_RS_ID
 
     assert isinstance(research_study_id, int)
     assert isinstance(as_of_date, datetime)
+
+    results = {
+        'status': OverallStatus.expired,
+        'visit_name': None,
+        'action_state': 'not applicable'
+    }
 
     # should be cached, unless recently invalidated - confirm
     update_users_QBT(user_id, research_study_id=research_study_id)
@@ -937,8 +984,35 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
         QBT.at <= as_of_date).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt:
-        return qbt.status, visit_name(qbt.qbd())
-    return OverallStatus.expired, None
+        results['status'] = qbt.status
+        results['visit_name'] = visit_name(qbt.qbd())
+
+        if research_study_id == EMPRO_RS_ID:
+            # Not available to all products, thus the nested import
+            from ..trigger_states.models import TriggerState
+
+            # month count present only beyond baseline
+            if qbt.qbd().questionnaire_bank.classification == 'baseline':
+                visit_month = 0
+            else:
+                # pull digit from possibly translated string
+                digits = [
+                    int(s) for s in results['visit_name'].split()
+                    if s.isdigit()]
+                assert len(digits) == 1
+                visit_month = digits[0]
+
+            ts = TriggerState.query.filter(
+                TriggerState.user_id == user_id).filter(
+                TriggerState.visit_month == visit_month).order_by(
+                TriggerState.timestamp.desc()).first()
+            if ts and ts.triggers:
+                results['action_state'] = ts.triggers.get(
+                    'action_state', 'due')
+            else:
+                results['action_state'] = 'due'
+
+    return results
 
 
 def expires(user_id, qbd):

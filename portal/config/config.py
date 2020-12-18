@@ -180,6 +180,8 @@ class BaseConfig(object):
     LR_GROUP = os.environ.get('LR_GROUP', 20129)
     LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 34666)
 
+    SDC_BASE_URL = os.environ.get('SDC_BASE_URL', 'http://sdc:5000/v/r2/fhir')
+
     SYSTEM_TYPE = os.environ.get('SYSTEM_TYPE', 'development')
 
     # Only set cookies over "secure" channels (HTTPS) for non-dev deployments

@@ -28,7 +28,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
-from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
+from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
     NoFutureDates,
@@ -39,10 +39,8 @@ from ..models.research_study import (
     research_study_id_from_questionnaire,
 )
 from ..models.role import ROLE
-from ..models.user import User, current_user, get_user
+from ..models.user import current_user, get_user
 from ..timeout_lock import LockTimeout, guarded_task_launch
-from ..trace import dump_trace, establish_trace
-from ..type_tools import check_int
 from .crossdomain import crossdomain
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__)
@@ -651,6 +649,102 @@ def assessment(patient_id, instrument_id):
     return jsonify(bundle_results(elements=documents, links=[link]))
 
 
+@assessment_engine_api.route(
+    '/api/patient/<int:patient_id>/questionnaire_response/<int:qnr_id>'
+)
+@crossdomain()
+@oauth.require_oauth()
+def get_qnr_by_id(patient_id, qnr_id):
+    """Return the patient's requested questionaire_response
+
+    Retrieve a minimal FHIR doc in JSON format including the
+    'QuestionnaireResponse' resource type.
+    ---
+    operationId: getQuestionnaireResponseById
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - name: qnr_id
+        in: path
+        description:
+          ID (primary key) of the requested Questionnaire Response
+        required: true
+        type: string
+        enum:
+          - epic26
+          - eq5d
+      - name: patch_dstu2
+        in: query
+        description: whether or not to make bundles DTSU2 compliant
+        required: false
+        type: boolean
+        default: false
+    responses:
+      200:
+        description: successful operation
+        schema:
+          $ref: "#/definitions/QuestionnaireResponse"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+    security:
+      - ServiceToken: []
+
+    """
+    patient = get_user(
+        patient_id, 'view', allow_on_url_authenticated_encounters=True)
+    qnr = QuestionnaireResponse.query.get(qnr_id)
+    if not qnr:
+        abort(404)
+
+    if qnr.subject_id != patient.id:
+        abort(
+            400,
+            "Requested patient doesn't own requested questionnaire_response")
+
+    # NB, document_answered returns a (potentially) modified *copy* of
+    # the document, so changes aren't persisted or found in db session
+    # cached objects.  see TN-2417 for example side-effects
+    document = qnr.document_answered
+    for question in document['group']['question']:
+        for answer in question['answer']:
+            # Hack: Extensions should be a list, correct in-place if need be
+            # todo: migrate towards FHIR spec in persisted data
+            if (
+                'extension' in answer.get('valueCoding', {}) and
+                not isinstance(answer['valueCoding']['extension'], (tuple, list))
+            ):
+                answer['valueCoding']['extension'] = [answer['valueCoding']['extension']]
+
+    # Hack: add missing "resource" wrapper for DTSU2 compliance
+    # Remove when all interventions compliant
+    if request.args.get('patch_dstu2'):
+        document = {
+            'resource': document,
+            'fullUrl': request.url,
+        }
+
+    # No place within the FHIR spec to associate 'visit name' nor a
+    # 'status' as per business rules (i.e. 'in-progress' becomes
+    # 'partially completed' once the associated QB expires).
+    # Use FHIR `extension`s to pass these fields to clients.
+    extensions = qnr.extensions()
+    if extensions:
+        assert('extension' not in qnr.document)  # catch future collisions
+        document['extension'] = extensions
+
+    return jsonify(document)
+
+
 @assessment_engine_api.route('/api/patient/assessment')
 @crossdomain()
 @roles_required(
@@ -895,6 +989,13 @@ def assessment_update(patient_id):
     db.session.commit()
     existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
 
+    # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
+    qn_name = existing_qnr.document.get("questionnaire").get("reference", '').split('/')[-1]
+    if  qn_name == 'ironman_ss':
+        from ..tasks import extract_observations_task
+        extract_observations_task.apply_async(
+            kwargs={'questionnaire_response_id': existing_qnr.id}
+        )
     auditable_event(
         "updated {}".format(existing_qnr),
         user_id=current_user().id,
@@ -1575,6 +1676,16 @@ def assessment_add(patient_id):
     db.session.commit()
     questionnaire_response.assign_qb_relationship(
         acting_user_id=current_user().id)
+
+
+    # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
+    qn_name = questionnaire_response.document.get("questionnaire").get("reference", '').split('/')[-1]
+    if  qn_name == 'ironman_ss':
+        from ..tasks import extract_observations_task
+        extract_observations_task.apply_async(
+            kwargs={'questionnaire_response_id': questionnaire_response.id}
+        )
+
     auditable_event("added {}".format(questionnaire_response),
                     user_id=current_user().id, subject_id=patient_id,
                     context='assessment')

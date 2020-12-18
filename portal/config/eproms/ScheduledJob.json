@@ -218,6 +218,15 @@
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "update_tous_task"
+    },
+    {
+      "active": true,
+      "args": null,
+      "kwargs": null,
+      "name": "IRONMAN EMPRO Trigger Reminder Emails",
+      "resourceType": "ScheduledJob",
+      "schedule": "1 4 * * *",
+      "task": "process_triggers_task"
     }
   ],
   "id": "SitePersistence v0.2",

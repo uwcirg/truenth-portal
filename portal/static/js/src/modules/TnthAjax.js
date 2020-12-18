@@ -326,11 +326,21 @@ export default { /*global $ */
             callback({error: i18next.t("User id is required.")});
             return false;
         }
+        let triggerDataKey = `cachedTriggers_${userId}`;
+        if (params.clearCache) {
+            sessionStorage.removeItem(triggerDataKey);
+        } else {
+            if (sessionStorage.getItem(triggerDataKey)) {
+                callback(JSON.parse(sessionStorage.getItem(triggerDataKey)));
+                return;
+            }
+        }
         this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
             if (!data || data.error || !data.state) {
                 callback({"error": true});
                 return false;
             }
+            
             if (params.retryAttempt < params.maxTryAttempts &&
                 //if the trigger data has not been processed, try again until maximum number of attempts has been reached
                 EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
@@ -341,6 +351,7 @@ export default { /*global $ */
                 return false;
             }
             params.retryAttempt = 0;
+            sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
             callback(data);
             return true;
         });
@@ -864,6 +875,20 @@ export default { /*global $ */
             }
         });
     },
+    "getInstrument": function(instrumentId, params, callback) { //return instruments list by organization(s)
+        callback = callback || function() {};
+        if (!instrumentId) {
+            callback({error: true});
+            return
+        }
+        this.sendRequest(`/api/questionnaire/${instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`, "GET", null, params, function(data) {
+            if (!data || data.error) {
+                callback({"error": true});
+                return;
+            }
+            callback(data);
+        });
+    },
     "getInstrumentsList": function(sync, callback) { //return instruments list by organization(s)
         callback = callback || function() {};
         this.sendRequest("api/questionnaire", "GET", null, {
@@ -1014,6 +1039,25 @@ export default { /*global $ */
             }
         });
     },
+    "getAssessmentByQNRId": function(userId, qnrId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false;}
+        if (!qnrId) { callback({"error": true}); return false;}
+        params = params || {};
+        this.sendRequest(`/api/patient/${userId}/questionnaire_response/${qnrId}`, "GET", userId, params, function(data) {
+            callback(data);
+        });
+    },
+    "postAssessment": function(userId, data, params, callback) {
+        callback = callback || function() {};
+        if (!userId) { callback({"error": true}); return false; }
+        if (!data) { callback({"error": true}); return false;}
+        params = params || {};
+        params.data = JSON.stringify(data);
+        this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            callback({data: data});
+        });
+    },
     "assessmentList": function(userId, params, callback) {
         callback = callback || function() {};
         if (!userId) {
@@ -1038,9 +1082,16 @@ export default { /*global $ */
             callback({error: i18next.t("User id and instrument Id are required.")});
             return false;
         }
+        let storageReportKey = `assessmentReport_${instrumentId}_${userId}`;
+        if (sessionStorage.getItem(storageReportKey)) {
+            var data = JSON.parse(sessionStorage.getItem(storageReportKey));
+            callback(data);
+            return true;
+        }
         this.sendRequest("/api/patient/" + userId + "/assessment/" + instrumentId, "GET", userId, null, function(data) {
             if (data) {
                 if (!data.error) {
+                    sessionStorage.setItem(storageReportKey, JSON.stringify(data));
                     callback(data);
                 } else {
                     callback({"error": i18next.t("Error occurred retrieving assessment report.")});

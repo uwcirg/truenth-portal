@@ -20,6 +20,10 @@ class NextStep(object):
         raise BadRequest("{} not a valid next step".format(step))
 
     @staticmethod
+    def home(user):
+        return url_for('eproms.landing')
+
+    @staticmethod
     def present_needed(user):
         return url_for(
             'assessment_engine_api.present_needed', subject_id=user.id)

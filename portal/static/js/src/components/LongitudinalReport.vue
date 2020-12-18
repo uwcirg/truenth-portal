@@ -2,7 +2,12 @@
 	<div id="longitudinalReportContainer" class="report">
         <div class="loader" v-show="loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
-        <div class="content" v-show="!loading">
+        <div class="content" :class="{triggers:hasTriggers()}" v-show="!loading">
+            <div v-show="hasTriggers()" class="text-muted text-right report-legend" :class="{active: hasTriggers()}">
+                <span class="title" v-text="triggerLegendTitle"></span>
+                <span class="hard-trigger-legend" v-text="hardTriggerLegend"></span>
+                <span class="soft-trigger-legend" v-text="softTriggerLegend"></span>
+            </div>
             <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)">&lt;</span>
             <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
@@ -30,6 +35,7 @@
     import AssessmentReportData from "../data/common/AssessmentReportData.js";
     import tnthDates from "../modules/TnthDate.js";
     import SYSTEM_IDENTIFIER_ENUM from "../modules/SYSTEM_IDENTIFIER_ENUM";
+    import {EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
 	export default {
     data () {
         return {
@@ -41,6 +47,11 @@
             }],
             questionnaireData:[],
             assessmentData:[],
+            triggerData: {
+                data: [],
+                hardTriggers: [],
+                softTriggers: []
+            },
             questionnaireDates: [],
             questions: [{
                 code: "",
@@ -183,11 +194,51 @@
             });
             return question.length ? question[0].option : [];
         },
+        setTriggerData() {
+            let self = this;
+            this.triggerData.data.forEach(item => {
+                if (!item.triggers.domain) {
+                    return true;
+                }
+                for (let domain in item.triggers.domain) {
+                    if (!Object.keys(item.triggers.domain[domain]).length) {
+                        continue;
+                    }
+                    for (let q in item.triggers.domain[domain]) {
+                        if (!item.triggers.source || !item.triggers.source.authored) {
+                            continue;
+                        }
+                        /*
+                        * get questions that trigger hard trigger
+                        */
+                        if (item.triggers.domain[domain][q] === "hard") {
+                            self.triggerData.hardTriggers.push({
+                                "authored": item.triggers.source.authored,
+                                "questionLinkId": q
+                            });
+                        }
+                        /*
+                        * get questions that trigger soft trigger
+                        */
+                        if (item.triggers.domain[domain][q] === "soft") {
+                            self.triggerData.softTriggers.push({
+                                "authored": item.triggers.source.authored,
+                                "questionLinkId": q
+                            });
+                        }
+                    }
+                }
+            });
+        },
+        hasTriggers() {
+            return this.triggerData.hardTriggers.length || this.triggerData.softTriggers.length;
+        }, 
         setDisplayData() {
             /*
              * prepping data for display
              */
             this.assessmentData.forEach((item, index) => {
+                let authoredDate = item.authored;
                 this.data[index] = {
                     "date": this.setDisplayDate(item.authored),
                     "data": []};
@@ -209,6 +260,19 @@
                     arrValueCoding = arrValueCoding.map(function(item) {
                         return item.valueCoding.code;
                     });
+        
+                    let hardTriggers = $.grep(this.triggerData.hardTriggers, subitem => {
+                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
+                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
+                        return timeStampComparison && linkIdComparison
+                    });
+
+                    let softTriggers = $.grep(this.triggerData.softTriggers, subitem => {
+                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
+                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
+                        return timeStampComparison && linkIdComparison;
+                    });
+        
                     /*
                     * using valueCoding.code for answer and linkId for question if BOTH question and answer are empty strings
                     */
@@ -222,7 +286,7 @@
                     let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
-                        a: a,
+                        a: a + (hardTriggers.length?" **": (softTriggers.length?" *": "")),
                         linkId: entry.linkId,
                         value: answerValue,
                         cssClass: 
@@ -268,14 +332,15 @@
         getData () {
             $.when(
                 $.ajax(`/api/questionnaire/${this.instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`),
-               //  $.ajax(`/static/files/testAssessment.json`)
-                $.ajax(`/api/patient/${this.userId}/assessment/${this.instrumentId}`)
-            ).done((questionnaireData, assessmentData) => {
+                $.ajax(`/api/patient/${this.userId}/assessment/${this.instrumentId}`),
+                $.ajax(`/api/user/${this.userId}/trigger_history`)
+            ).done((questionnaireData, assessmentData, triggerData) => {
                 this.errorMessage = "";
-
+               
                 if ((!questionnaireData || !questionnaireData[0]) ||
                     (!assessmentData || !assessmentData[0])) {
                     this.errorMessage = this.serverError;
+                    this.loading = false;
                     return;
                 }
                 if (!assessmentData[0].entry || !assessmentData[0].entry.length) {
@@ -286,6 +351,12 @@
                 this.assessmentData = (assessmentData[0].entry).sort(function(a, b) {
                                         return new Date(b.authored) - new Date(a.authored);
                                     });
+                if (triggerData && triggerData[0]) {
+                    this.triggerData.data = triggerData[0].filter(item => {
+                        return EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(item.state) !== -1 && item.triggers;
+                    });
+                    this.setTriggerData();
+                }
                 this.setDomains();
                 this.setQuestions();
                 this.setQuestionnaireDates();

@@ -314,12 +314,15 @@ def patient_timeline(patient_id):
     from ..models.questionnaire_bank import visit_name
     from ..trace import dump_trace, establish_trace
 
-    get_user(patient_id, permission='view')
+    user = get_user(patient_id, permission='view')
     trace = request.args.get('trace', False)
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
-    research_study_id = int(request.args.get('research_study_id', 0))
+    try:
+        research_study_id = int(request.args.get('research_study_id', 0))
+    except ValueError:
+        abort(400, "integer value required for 'research_study_id'")
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
@@ -330,6 +333,9 @@ def patient_timeline(patient_id):
                 research_study_id=research_study_id,
                 acting_user_id=current_user().id)
 
+        from ..cache import cache
+        from ..models.questionnaire_bank import trigger_date
+        cache.delete_memoized(trigger_date, user, research_study_id)
         update_users_QBT(
             patient_id,
             research_study_id=research_study_id,
@@ -370,12 +376,14 @@ def patient_timeline(patient_id):
         QuestionnaireResponse.subject_id == patient_id).order_by(
         QuestionnaireResponse.authored)
     posted = [{
-        'at, qb, iteration, status, name': "{}, {}, {}, {}, {}".format(
-            qnr.authored,
-            qb_names.get(qnr.questionnaire_bank_id),
-            qnr.qb_iteration,
-            qnr.status,
-            qnr.document['questionnaire']['reference'].split('/')[-1])
+        'qnr_id, at, qb, iteration, status, name':
+            "{}, {}, {}, {}, {}, {}".format(
+                qnr.id,
+                qnr.authored,
+                qb_names.get(qnr.questionnaire_bank_id),
+                qnr.qb_iteration,
+                qnr.status,
+                qnr.document['questionnaire']['reference'].split('/')[-1])
         } for qnr in qnrs]
 
     qbstatus = QB_Status(

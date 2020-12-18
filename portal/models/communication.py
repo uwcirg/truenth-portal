@@ -64,16 +64,16 @@ def load_template_args(
     from .qb_status import NoCurrentQB
     from .qb_timeline import QBT  # avoid cycle
 
-    def ae_link():
+    def access_link(next_step):
         token = url_token(user.id)
         auditable_event(
-            "generated URL token {} for ae_link".format(
-                token), user_id=user.id, subject_id=user.id,
+            "generated URL token {} for access_link, next: {}".format(
+                token, next_step), user_id=user.id, subject_id=user.id,
             context='authentication')
 
         return url_for(
             'portal.access_via_token', token=token,
-            next_step='present_needed', _external=True)
+            next_step=next_step, _external=True)
 
     def make_button(text, inline=False):
         if inline:
@@ -97,6 +97,15 @@ def load_template_args(
         else:
             return text.replace('<a href', '<a class="btn" href')
 
+    def _lookup_home_button():
+        return make_button(_lookup_home_link(), inline=True)
+
+    def _lookup_home_link():
+        label = _('View My Report and Resources')
+        return (
+            '<a href="{home_link}">{label}</a>'.format(
+                home_link=access_link(next_step='home'), label=label))
+
     def _lookup_assessment_button():
         return make_button(_lookup_assessment_link(), inline=True)
 
@@ -104,7 +113,7 @@ def load_template_args(
         label = _('Complete Questionnaire')
         return (
             '<a href="{ae_link}">{label}</a>'.format(
-                ae_link=ae_link(), label=label))
+                ae_link=access_link(next_step='present_needed'), label=label))
 
     def _lookup_clinic_name():
         if user.organizations:
@@ -231,7 +240,10 @@ def load_template_args(
     # into the args instance
     args = DynamicDictLookup()
     lc = user.locale_code if user else None
-    for fname, function in locals().items():
+    # Avoid `dictionary changed size during iteration` error by
+    # copying locals
+    locs = locals().copy()
+    for fname, function in locs.items():
         if fname.startswith('_lookup_'):
             # chop the prefix and assign to the function
             args[fname[len('_lookup_'):]] = locale_closure(
@@ -328,9 +340,9 @@ class Communication(db.Model):
                     user=user, reason=reason))
 
         rs_id = self.communication_request.questionnaire_bank.research_study_id
-        qb_status, _ = qb_status_visit_name(
+        qb_status = qb_status_visit_name(
             self.user_id, rs_id, datetime.utcnow())
-        if qb_status == OverallStatus.withdrawn:
+        if qb_status['status'] == OverallStatus.withdrawn:
             current_app.logger.info(
                 "Skipping message send for withdrawn {}".format(user))
             self.status = 'suspended'

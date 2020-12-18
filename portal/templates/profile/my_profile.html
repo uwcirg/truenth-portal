@@ -15,14 +15,7 @@
                 {% endcall %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                {% call profile_macro.profileSection(editable=False) %}
-                    {% call profile_macro.titleSection(id="patientReportsLoc") -%}{{_("My Reports")}}{%- endcall%}
-                    {{profile_macro.patientReports(user)}}
-                {% endcall %}
-            </div>
-        </div>
+        {{profile_macro.patientReports(user) | show_macro('intervention_reports')}}
         {{profile_macro.profileClinicalQuestions(user, current_user) | show_macro('clinical_questions')}}
         {{profile_macro.profileProcedures(user, current_user) | show_macro('procedures')}}
         {%-if ROLE.PATIENT.value in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
