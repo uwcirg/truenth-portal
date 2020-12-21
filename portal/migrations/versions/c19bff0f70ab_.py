@@ -62,7 +62,7 @@ def affected_patients_list():
     """
     if not (
             current_app.config.get('SYSTEM_TYPE') == 'production' and
-            current_app.config.get('GIL') == None):
+            current_app.config.get('GIL') is None):
         return []
 
     patients = (
@@ -147,7 +147,8 @@ def upgrade():
         if modified_q:
             print("\tModified QNRs (old, new)")
             for mod in sorted(modified_q):
-                print(f"\t\t{mod} {modified_q[mod][1]} ==> {modified_q[mod][0]}")
+                print(f"\t\t{mod} {modified_q[mod][1]} ==>"
+                      f" {modified_q[mod][0]}")
         if added_t:
             print("\tAdditional timeline rows:")
             for item in sorted(added_t):
