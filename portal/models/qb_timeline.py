@@ -369,6 +369,19 @@ class RP_flyweight(object):
         self.cur_rpd, self.nxt_rpd = next(self.rp_walker, (None, None))
         self.skipped_nxt_start = None
 
+    def __repr__(self):
+        """strictly for enhanced debugging"""
+        r = []
+        r.append(
+            f"current: {self.cur_rpd.rp.name}"
+            f"(till: {self.cur_rpd.retired}) "
+            f"cur_qb: [{self.cur_start}<->{self.cur_exp})")
+        if self.nxt_qbd:
+            r.append(
+                f"next: {self.nxt_rpd.rp.name} "
+                f"next_qb: [{self.nxt_start}<->{self.nxt_exp})")
+        return '\n'.join(r)
+
     def adjust_start(self):
         """The QB start may need a minor adjustment, done once when ready"""
         self.cur_qbd.relative_start = self.cur_start
