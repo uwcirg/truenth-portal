@@ -123,21 +123,23 @@
         </div>
         <div class="bottom">
             <!-- main study completed card -->
+            <!-- in disabled state if main study questionnaire not completed yet -->
             {{completed_card(
                 assessment_status=assessment_status,
                 OverallStatus=OverallStatus,
                 comp_date=comp_date,
                 title_text=completed_title_text,
-                card_class="disabled" if not mainstudy_overall_completed_status else ""
+                card_class="" if mainstudy_overall_completed_status else "disabled"
             )}}
             <!-- substudy completed card -->
+            <!-- in disabled state if sub-study questionnaire not completed yet -->
             {{empro_completed(
                 user=user,
                 OverallStatus=OverallStatus,
                 substudy_assessment_status=substudy_assessment_status,
                 substudy_comp_date=substudy_comp_date,
                 enrolled_in_substudy=enrolled_in_substudy,
-                card_class="disabled" if not substudy_overall_completed_status else ""
+                card_class="" if substudy_overall_completed_status else "disabled"
             )}}
         </div>
     </div>
