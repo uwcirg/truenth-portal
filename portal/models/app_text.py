@@ -40,13 +40,14 @@ def time_request(url, params=None):
     return response
 
 
-def get_terms(locale_code, org=None, role=None):
+def get_terms(locale_code, org=None, role=None, research_study_id=None):
     """Shortcut to lookup correct terms given org and role"""
     if org:
         try:
             terms = VersionedResource(
                 app_text(WebsiteConsentTermsByOrg_ATMA.name_key(
-                    organization=org, role=role)),
+                    organization=org, role=role,
+                    research_study_id=research_study_id)),
                 locale_code=locale_code)
         except UndefinedAppText:
             terms = VersionedResource(
@@ -165,9 +166,20 @@ class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
+        from .research_study import ResearchStudy
+        default = "patient website consent URL"
+        # First try the study (if provided)
+        if kwargs.get('research_study_id'):
+            study_title = ResearchStudy.query.get(
+                kwargs.get('research_study_id')).title
+            specialized = " ".join((study_title, default))
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
         organization = kwargs.get('organization')
         if not organization:
             raise ValueError("required organization parameter not defined")
+
         role = kwargs.get('role')
         if role:
             return "{} {} website consent URL".format(

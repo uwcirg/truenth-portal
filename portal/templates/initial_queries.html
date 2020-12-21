@@ -2,11 +2,11 @@
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "initial_queries_macros.html" import tou, sectionContent, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
+{% from "initial_queries_macros.html" import tou, substudy_tou, sectionContent, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 {% from "profile/profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
 <input type="hidden" id="preselectClinic" value="{{session.get('associate_clinic_id', '')}}" />
-<div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
+<div id="progressWrapper" class="initial-queries"><ul id="progressbar" class="progressbar"></ul></div>
 {{tou(terms, user)}}
 <div id="aboutForm" class="tnth-hide">
   <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
@@ -14,6 +14,9 @@
     {% if user and user.email %}
       <input type="hidden" name="email" id="email" value="{{user.email}}" />
     {% endif %}
+    {% call sectionContent(sectionId="substudyTerms", display=_("Substudy Website Terms of Use"), config="empro_website_terms_of_use", class="wide") -%}
+      {{substudy_tou(substudy_terms, user)}}
+    {% endcall %}
     {% call sectionContent(sectionId="demographicsContainer", title=_("Tell us a little about yourself."), display=_("your information"), config="name,dob,role") -%}
       {{nameGroup()}}
       <br/>
@@ -38,11 +41,14 @@
         <div class="reg-complete-container">
             <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
             <p>{{ _("Click continue to start using TrueNTH") }}</p>
+            <div class="update-button-container">
+              <div class="loading-message-indicator updated-loading-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+              <button id="updateProfile" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+            </div>
         </div>
-        <div id="buttonsContainer" class="button-container">
+        <div id="buttonsContainer" class="reg-incomplete button-container">
           <div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
           <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
-          <button id="updateProfile" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
         </div>
     </div>
   </form>
