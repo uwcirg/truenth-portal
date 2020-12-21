@@ -671,6 +671,7 @@ export default (function() {
                     sessionStorage.clear();
                     self.handleLoginAs(e);
                 });
+                $("#loginAsButton, #btnLoginAs").removeClass("disabled").attr("disabled", false);
             },
             initEditButtons: function() {
                 var self = this;

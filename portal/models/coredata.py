@@ -21,6 +21,7 @@ from .procedure_codes import (
     known_treatment_not_started,
     known_treatment_started,
 )
+from .qb_status import patient_research_study_status
 from .research_study import (
     EMPRO_RS_ID,
     ResearchStudy
@@ -450,8 +451,14 @@ class Empro_Website_Terms_Of_UseData(TOU_core):
     def required(self, user, **kwargs):
         if not super(self.__class__, self).required(user, **kwargs):
             return False
-        return user.has_role(ROLE.PATIENT.value) and \
-            EMPRO_RS_ID in ResearchStudy.assigned_to(user)
+        enrolled_in_substudy = EMPRO_RS_ID \
+            in ResearchStudy.assigned_to(user)
+        research_study_status = patient_research_study_status(user)
+        substudy_assessment_is_ready = enrolled_in_substudy \
+            and research_study_status[EMPRO_RS_ID] \
+            and research_study_status[EMPRO_RS_ID]['ready']
+        return user.has_role(ROLE.PATIENT.value) \
+            and substudy_assessment_is_ready
 
 
 class Stored_Website_Consent_FormData(TOU_core):

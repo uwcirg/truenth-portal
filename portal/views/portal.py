@@ -73,6 +73,7 @@ from ..models.organization import (
 )
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
+from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
@@ -595,13 +596,11 @@ def initial_queries():
             role = r
     terms = get_terms(user.locale_code, org, role)
     substudy_terms = None
-    #TODO check if this is OK?
-    from ..models.research_study import EMPRO_RS_ID, ResearchStudy
     enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
     if enrolled_in_substudy:
         substudy_terms = get_terms(locale_code=user.locale_code, org=org,
             role=role, research_study_id=EMPRO_RS_ID)
-    print("empro asset {}".format(substudy_terms))
+
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)

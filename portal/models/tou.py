@@ -7,7 +7,7 @@ from .notification import Notification, UserNotification
 from .organization import Organization, OrgTree
 from .role import ROLE, Role
 from .user import User
-#TODO check if it is right to add the extra TOU type here? Migration needed then?
+#TODO added a new TOU type, Migration needed then?
 tou_types = ENUM('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
                  'EMPRO website terms of use',
