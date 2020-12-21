@@ -445,6 +445,7 @@ class Subject_Website_ConsentData(TOU_core):
             return False
         return user.has_role(ROLE.PATIENT.value)
 
+
 class Empro_Website_Terms_Of_UseData(TOU_core):
     tou_type = 'EMPRO website terms of use'
 
