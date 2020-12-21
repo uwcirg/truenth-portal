@@ -298,10 +298,15 @@ def post_patient_dob(patient_id):
 @patient_api.route('/api/patient/<int:patient_id>/timeline')
 @oauth.require_oauth()
 def patient_timeline(patient_id):
-    from ..date_tools import FHIR_datetime
+    from ..date_tools import FHIR_datetime, RelativeDelta
+    from ..models.organization import (
+        UserOrganization,
+        OrganizationResearchProtocol,
+    )
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
     from ..models.questionnaire_bank import visit_name
+    from ..models.research_protocol import ResearchProtocol
     from ..trace import dump_trace, establish_trace
 
     get_user(patient_id, permission='view')
@@ -345,6 +350,8 @@ def patient_timeline(patient_id):
             if qbt.status == OverallStatus.due:
                 data['questionnaires'] = ','.join(
                     [q.name for q in qbd.questionnaire_bank.questionnaires])
+                data['expires'] = FHIR_datetime.as_fhir(
+                    qbt.at + RelativeDelta(qbd.questionnaire_bank.expired))
             results.append(data)
 
     qb_names = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
@@ -352,14 +359,40 @@ def patient_timeline(patient_id):
     qnrs = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id == patient_id).order_by(
         QuestionnaireResponse.authored)
-    posted = [{
-        'at, qb, iteration, status, name': "{}, {}, {}, {}, {}".format(
+
+    def get_recur_id(qnr):
+        if len(qnr.questionnaire_bank.recurs):
+            return qnr.questionnaire_bank.recurs[0].id
+        return None
+
+    posted = [
+        "{}, {}, {} ({}, {}), {}, {}".format(
+            qnr.id,
             qnr.authored,
+            visit_name(QBD(
+                relative_start=None, qb_id=qnr.questionnaire_bank_id,
+                iteration=qnr.qb_iteration, recur_id=get_recur_id(qnr))),
             qb_names.get(qnr.questionnaire_bank_id),
             qnr.qb_iteration,
             qnr.status,
             qnr.document['questionnaire']['reference'].split('/')[-1])
-        } for qnr in qnrs]
+        for qnr in qnrs]
+
+    rp_query = ResearchProtocol.query.join(
+        OrganizationResearchProtocol,
+        OrganizationResearchProtocol.research_protocol_id ==
+        ResearchProtocol.id).join(
+        UserOrganization,
+        UserOrganization.organization_id ==
+        OrganizationResearchProtocol.organization_id).filter(
+        UserOrganization.user_id == patient_id).with_entities(
+        ResearchProtocol.name, OrganizationResearchProtocol.retired_as_of)
+    rps = []
+    for rp in rp_query:
+        msg = rp.name
+        if rp.retired_as_of:
+            msg = f"{msg}, retired: {rp.retired_as_of}"
+        rps.append(msg)
 
     qbstatus = QB_Status(
         user=User.query.get(patient_id), as_of_date=datetime.utcnow())
@@ -391,4 +424,4 @@ def patient_timeline(patient_id):
             posted=posted,
             timeline=results,
             trace=dump_trace("END time line lookup"))
-    return jsonify(status=status, posted=posted, timeline=results)
+    return jsonify(rps=rps, status=status, posted=posted, timeline=results)
