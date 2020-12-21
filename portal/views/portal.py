@@ -599,7 +599,7 @@ def initial_queries():
     enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
     if enrolled_in_substudy:
         substudy_terms = get_terms(locale_code=user.locale_code, org=org,
-                         role=role, research_study_id=EMPRO_RS_ID)
+                                   role=role, research_study_id=EMPRO_RS_ID)
 
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements(
