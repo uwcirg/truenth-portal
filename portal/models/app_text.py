@@ -167,15 +167,18 @@ class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
 
         """
         from .research_study import ResearchStudy
+
         default = "patient website consent URL"
-        # First try the study (if provided)
-        if kwargs.get('research_study_id'):
-            study_title = ResearchStudy.query.get(
-                kwargs.get('research_study_id')).title
-            specialized = " ".join((study_title, default))
-            query = AppText.query.filter_by(name=specialized)
-            if query.count() == 1:
-                return specialized
+
+        # try research study first
+        research_study_id = kwargs.get('research_study_id', 0)
+        research_study = ResearchStudy.query.get(research_study_id)
+        study_title = research_study.title if research_study else ""
+        specialized = " ".join((study_title, default))
+        query = AppText.query.filter_by(name=specialized)
+        if query.count() == 1:
+            return specialized
+
         organization = kwargs.get('organization')
         if not organization:
             raise ValueError("required organization parameter not defined")
