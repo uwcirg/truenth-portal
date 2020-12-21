@@ -1542,7 +1542,7 @@ export default (function() {
                     }
                     setTimeout(function() {
                         this.initPostTxQuestionnaireSection({clearCache: true});
-                    }.bind(this), 3000);
+                    }.bind(this), 2750);
                 });
                 return false;
             },
