@@ -332,7 +332,7 @@ def empro_staff_qbd_accessor(qnr):
     # with qnr captured, return a function capable of looking up
     # the appropriate QB/Iteration when called.
 
-    def qbd_accessor(as_of_date, classification):
+    def qbd_accessor(as_of_date, classification, instrument):
         """Implement qbd_accessor API for EMPRO Staff QB
 
         Look up appropriate QB/Iteration for subject from given as_of_date.
@@ -349,6 +349,14 @@ def empro_staff_qbd_accessor(qnr):
         no_match_message = (
             "EMPRO Staff qnr association lookup failed for subject "
             f"{qnr.subject_id} @ {as_of_date}")
+
+        if classification == 'indefinite':
+            # Doesn't apply - leave
+            return result
+        if instrument != 'ironman_ss_post_tx':
+            raise ValueError(
+                "specialized QBD accessor given wrong instrument "
+                f"{instrument}")
 
         # find best match from subject's trigger_states.  should always be
         # in `triggered` state, unless re-eval is in process due to consent
