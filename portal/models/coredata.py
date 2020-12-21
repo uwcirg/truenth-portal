@@ -452,12 +452,11 @@ class Empro_Website_Terms_Of_UseData(TOU_core):
     def required(self, user, **kwargs):
         if not super(self.__class__, self).required(user, **kwargs):
             return False
-        enrolled_in_substudy = EMPRO_RS_ID \
-            in ResearchStudy.assigned_to(user)
         research_study_status = patient_research_study_status(user)
-        substudy_assessment_is_ready = enrolled_in_substudy \
-            and research_study_status[EMPRO_RS_ID] \
-            and research_study_status[EMPRO_RS_ID]['ready']
+        substudy_status = research_study_status[EMPRO_RS_ID] \
+            if research_study_status else None
+        substudy_assessment_is_ready = substudy_status \
+            and substudy_status['ready']
         return user.has_role(ROLE.PATIENT.value) \
             and substudy_assessment_is_ready
 

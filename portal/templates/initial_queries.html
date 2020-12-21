@@ -14,7 +14,7 @@
     {% if user and user.email %}
       <input type="hidden" name="email" id="email" value="{{user.email}}" />
     {% endif %}
-    {% call sectionContent(sectionId="substudyTerms", display=_("Substudy Website Terms of Use"), config="empro_website_terms_of_use", class="wide") -%}
+    {% call sectionContent(sectionId="substudyTerms", display=_("Substudy Website Terms of Use"), config="empro_website_terms_of_use", showLoader=false) -%}
       {{substudy_tou(substudy_terms, user)}}
     {% endcall %}
     {% call sectionContent(sectionId="demographicsContainer", title=_("Tell us a little about yourself."), display=_("your information"), config="name,dob,role") -%}

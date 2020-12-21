@@ -8,7 +8,7 @@
 {% macro dataSavingIndicator() -%}
     <div class="data-saving-indicator text-muted tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
 {%- endmacro %}
-{% macro sectionContent(sectionId="", title="", display="", config="", class="") -%}
+{% macro sectionContent(sectionId="", title="", display="", config="", class="", showLoader=true) -%}
     <div id="{{sectionId}}" class="section-container iq-container {{class}}" data-parent-section="true" data-display="{{display}}" data-config="{{config}}">
       <div class="content">
           {% if title %}
@@ -19,7 +19,9 @@
           </div>
       </div>
       {{saveLoaderDiv(sectionId)}}
-      {{dataSavingIndicator()}}
+      {% if showLoader -%}
+        {{dataSavingIndicator()}}
+      {%- endif %}
     </div>
 {%- endmacro %}
 {% macro substudy_tou(terms, user) %}
@@ -29,7 +31,7 @@
     <div class="terms-checkbox-container">
       <label class="terms-label">
         <i class="fa fa-square-o fa-lg terms-tick-box edit-view"
-          data-org="{{user.first_top_organization().id}}"
+          data-org="{{user and user.first_top_organization().id}}"
           data-url="{{terms['url']}}"
           data-type="terms"
           data-tou-type="EMPRO website terms of use"
@@ -40,6 +42,7 @@
         >{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.")}}</span>
       </label>
     </div>
+    {{dataSavingIndicator()}}
   </div>
   <div class="error-message post-tou-error"></div>
 {% endmacro %}
