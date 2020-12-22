@@ -2079,6 +2079,50 @@ export default (function() {
                     }
                 });
             },
+            initTimeWarpUI: function() {
+                let self = this;
+                let containerId = "#timeWarpContainer";
+                let modalId = "#timeWarpModal";
+                let inputFieldId = "#timeWarpDays";
+                let clearMessages = () => {
+                    $(`${containerId} .info-message`).html("");
+                    $(`${containerId} .error-message`).html("");
+                };
+                $(containerId).removeClass("tnth-hide");
+                $(modalId).modal({
+                    show: false
+                });
+                $(modalId).on("shown.bs.modal", function() {
+                    $(inputFieldId).focus();
+                });
+                $(modalId).on("hidden.bs.modal", function() {
+                    clearMessages();
+                    $(inputFieldId).val("");
+                    setTimeout(() => {
+                        location.reload();
+                    }, 0);
+                })
+                $(`${containerId} .prompt`).on("click", function() {
+                    $(modalId).modal("show");
+                });
+                $(inputFieldId).removeAttr("disabled");
+                $(`${containerId} .submit`).on("click", function() {
+                    $(this).addClass("disabled");
+                    $(`${containerId} .loading-message`).show();
+                    clearMessages();
+                    self.modules.tnthAjax.timeWarpPatientData(self.subjectId, $(inputFieldId).val(), {"max_attempts": 1}, function(data) {
+                        $(`${containerId} .loading-message`).hide();
+                        $(`${containerId} .submit`).removeClass("disabled");
+                        if (data && data.error) {
+                            $(`${containerId} .error-message`).html("Unable to update data. Server error.");
+                            return;
+                        }
+                        if (data && data.changed) {
+                            $(`${containerId} .info-message`).html(`<b>Data changed</b>: <br/>${data.changed.join("<br/>")}`);
+                        }
+                    });
+                });
+            },
             initAssessmentListSection: function() {
                 var self = this;
                 $("#assessmentListMessage").text(i18next.t("No questionnaire data found."));
@@ -2093,6 +2137,9 @@ export default (function() {
                     if (!entries || entries.length === 0) {
                         return false;
                     }
+                    //test/debug feature to allow time warping patient data
+                    //non-production environment ONLY
+                    self.initTimeWarpUI();
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
                         if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {

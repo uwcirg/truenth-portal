@@ -1951,6 +1951,35 @@ div.footer-wrapper.right-panel {
       left: 100%;
   }
 }
+#timeWarpContainer {
+  cursor: pointer;
+  .error-message {
+    margin-top: 16px;
+  }
+  .prompt .edit-icon {
+    margin-right: 8px;
+  }
+  .text:hover {
+    color: darken(@mutedColor, 10%);
+  }
+  .button-container {
+    position: relative;
+    .loading-message {
+      display: none;
+      position: absolute;
+      top: 0;
+      min-height: 40px;
+    }
+  }
+}
+#timeWarpModal {
+  input {
+    width: 50px;
+    display: inline-block;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+}
 #adminTableContainer {
   position: relative;
   opacity: 0;

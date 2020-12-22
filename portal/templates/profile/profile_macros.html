@@ -981,6 +981,44 @@
         {% raw %}
             <div id="profileSessionListError" class="error-message">{{assessment.assessmentListError}}</div>
         {% endraw %}
+        <!-- testing feature -->
+        {% if config["SYSTEM_TYPE"].lower() != "production" and (current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.STAFF_ADMIN.value)) -%}
+            <div id="timeWarpContainer" class="tnth-hide">
+                <div class="prompt">
+                    <span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span><span class="text text-muted">[ time warp patient data ]</span>
+                </div>
+                <div class="modal fade" id="timeWarpModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <div class="modal-header-title">Time warp patient's data back in time</div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="body-content">
+                                <div class="form-group">
+                                    By <input type="text" id="timeWarpDays" class="form-control" disabled="false" pattern="(\d)?\d" maxlength="2" width="50"> Days
+                                    <div class="help-block"></div>
+                                </div>
+                                <div class="button-container">
+                                    <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    <a class="btn btn-tnth-primary submit">
+                                        <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>
+                                        Submit
+                                    </a>
+                                </div>
+                                <div class="error-message"></div>
+                                <div class="info-message text-info"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
     </div>
 {%- endmacro %}
 {% macro profileClinicalQuestions(person, current_user) -%}
