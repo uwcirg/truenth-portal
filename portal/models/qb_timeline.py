@@ -448,6 +448,7 @@ class RP_flyweight(object):
                         initial_trigger=self.td)
                     self.nxt_exp = calc_and_adjust_expired(
                         user=self.user, qbd=self.nxt_qbd,
+                        research_study_id=self.research_study_id,
                         initial_trigger=self.td)
                 if self.cur_start > self.nxt_start + relativedelta(months=1):
                     # Still no match means poorly defined RP QBs
@@ -1079,7 +1080,7 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
                 results['action_state'] = ts.triggers.get(
                     'action_state', 'due')
             else:
-                results['action_state'] = 'due'
+                results['action_state'] = 'not applicable'
 
     return results
 
