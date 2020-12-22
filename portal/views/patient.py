@@ -7,24 +7,28 @@ for staff
 from datetime import datetime
 import json
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, current_app, jsonify, request
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.communication import Communication
 from ..models.fhir import bundle_results
 from ..models.identifier import (
     Identifier,
     UserIdentifier,
     parse_identifier_params,
 )
+from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
-from ..models.qb_timeline import QBT, update_users_QBT
+from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
+from ..models.research_study import ResearchStudy
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from .crossdomain import crossdomain
@@ -450,3 +454,79 @@ def patient_timeline(patient_id):
             timeline=results,
             trace=dump_trace("END time line lookup"))
     return jsonify(rps=rps, status=status, posted=posted, timeline=results)
+
+
+@patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')
+@crossdomain()
+@oauth.require_oauth()
+def patient_timewarp(patient_id, days):
+    """Debugging view to time warp patient's data back in time
+
+    :param patient_id: the patient to time warp
+    :param days: the number of days to move back - forward moves not supported
+
+    NB: only available on testing and development systems.
+    """
+    from dateutil.relativedelta import relativedelta
+    from copy import deepcopy
+    from portal.models.questionnaire_response import QuestionnaireResponse
+    from portal.models.user_consent import UserConsent
+
+    if current_app.config['SYSTEM_TYPE'] not in ('development', 'testing'):
+        abort(404)
+
+    if days < 1:
+        abort(500, 'only possible to move a positive number of days back')
+    user = get_user(patient_id, 'edit')
+
+    # user_consent
+    changed = []
+    delta = relativedelta(days=days)
+    for uc in UserConsent.query.filter(UserConsent.user_id == user.id):
+        changed.append(f"user_consent {uc.id}")
+        uc.acceptance_date = uc.acceptance_date - delta
+
+    # questionnaire_responses
+    for qnr in QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user.id):
+        changed.append(f"questionnaire_response {qnr.id}")
+        authored = qnr.authored - delta
+        qnr.authored = authored
+        doc = deepcopy(qnr.document)
+        doc['authored'] = authored
+
+    # trigger_state
+    if current_app.config['GIL'] is None:
+        from ..trigger_states.models import TriggerState
+        for ts in TriggerState.query.filter(
+                TriggerState.user_id == user.id):
+            changed.append(f"trigger_state {ts.id}")
+            ts.timestamp = ts.timestamp - delta
+            if ts.triggers is not None:
+                triggers = deepcopy(ts.triggers)
+                triggers['source']['authored'] = FHIR_datetime.as_fhir(
+                    FHIR_datetime.parse(triggers['source']['authored'])
+                    - delta)
+                for email in triggers['actions']['email']:
+                    email['timestamp'] = FHIR_datetime.as_fhir(
+                        FHIR_datetime.parse(email['timestamp']) - delta)
+                ts.triggers = triggers
+
+    # reminder email dates
+    for em in EmailMessage.query.join(
+            Communication, Communication.message_id == EmailMessage.id).filter(
+            EmailMessage.recipient_id == user.id):
+        changed.append(f'email_message {em.id}')
+        em.sent_at = em.sent_at - delta
+
+    db.session.commit()
+
+    # Invalidate users timeline & qnr associations - forces lookup next round
+    for rs in ResearchStudy.assigned_to(user):
+        invalidate_users_QBT(user_id=user.id, research_study_id=rs)
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=user.id,
+            research_study_id=rs,
+            acting_user_id=current_user().id)
+
+    return jsonify(changed=changed)
