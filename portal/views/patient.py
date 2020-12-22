@@ -504,9 +504,11 @@ def patient_timewarp(patient_id, days):
             ts.timestamp = ts.timestamp - delta
             if ts.triggers is not None:
                 triggers = deepcopy(ts.triggers)
-                triggers['source']['authored'] = FHIR_datetime.as_fhir(
-                    FHIR_datetime.parse(triggers['source']['authored'])
-                    - delta)
+                # Some early records don't include source-authored
+                if 'authored' in triggers['source']:
+                    triggers['source']['authored'] = FHIR_datetime.as_fhir(
+                        FHIR_datetime.parse(triggers['source']['authored'])
+                        - delta)
                 for email in triggers['actions']['email']:
                     email['timestamp'] = FHIR_datetime.as_fhir(
                         FHIR_datetime.parse(email['timestamp']) - delta)
