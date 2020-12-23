@@ -8,18 +8,44 @@
 {% macro dataSavingIndicator() -%}
     <div class="data-saving-indicator text-muted tnth-hide"><i class='fa fa-spinner fa-spin indicator-icon'></i><span>{{_("saving data...")}}</span></div>
 {%- endmacro %}
-{% macro sectionContent(sectionId="", title="", display="", config="") -%}
-    <div id="{{sectionId}}" class="section-container iq-container" data-parent-section="true" data-display="{{display}}" data-config="{{config}}">
+{% macro sectionContent(sectionId="", title="", display="", config="", class="", showLoader=true) -%}
+    <div id="{{sectionId}}" class="section-container iq-container {{class}}" data-parent-section="true" data-display="{{display}}" data-config="{{config}}">
       <div class="content">
-          <div class="heading"><h3 class="tnth-headline">{{title}}</h3></div>
+          {% if title %}
+            <div class="heading"><h3 class="tnth-headline">{{title}}</h3></div>
+          {% endif %}
           <div class="content-body">
               {{ caller() }}
           </div>
       </div>
       {{saveLoaderDiv(sectionId)}}
-      {{dataSavingIndicator()}}
+      {% if showLoader -%}
+        {{dataSavingIndicator()}}
+      {%- endif %}
     </div>
 {%- endmacro %}
+{% macro substudy_tou(terms, user) %}
+  <div class="well">
+    <div class="terms-text">{{ terms['asset']|safe if terms}}</div>
+    <!-- todo get top org -->
+    <div class="terms-checkbox-container">
+      <label class="terms-label">
+        <i class="fa fa-square-o fa-lg terms-tick-box edit-view"
+          data-org="{{user and user.first_top_organization().id}}"
+          data-url="{{terms['url']}}"
+          data-type="terms"
+          data-tou-type="EMPRO website terms of use"
+          data-core-data-type="empro_website_terms_of_use"
+          data-agree="false"
+        ></i>
+        <span class="terms-tick-box-text" 
+        >{{_("By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent.")}}</span>
+      </label>
+    </div>
+    {{dataSavingIndicator()}}
+  </div>
+  <div class="error-message post-tou-error"></div>
+{% endmacro %}
 {% macro tou(terms, user) -%}
     <div id="topTerms" class="section-container hide-terms" data-display="{{_('terms')}}" data-config="website_terms_of_use,subject_website_consent,privacy_policy">
         <br/>

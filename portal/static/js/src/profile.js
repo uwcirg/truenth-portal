@@ -671,6 +671,7 @@ export default (function() {
                     sessionStorage.clear();
                     self.handleLoginAs(e);
                 });
+                $("#loginAsButton, #btnLoginAs").removeClass("disabled").attr("disabled", false);
             },
             initEditButtons: function() {
                 var self = this;
@@ -1541,7 +1542,7 @@ export default (function() {
                     }
                     setTimeout(function() {
                         this.initPostTxQuestionnaireSection({clearCache: true});
-                    }.bind(this), 3000);
+                    }.bind(this), 2750);
                 });
                 return false;
             },

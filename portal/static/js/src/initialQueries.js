@@ -92,6 +92,11 @@ import Consent from "./modules/Consent.js";
                     self.setSectionDataLoadedFlag("topTerms", true);
                 });
             },
+            "substudyTerms": function() {
+                tnthAjax.getTerms(self.userId, "", "", function() {
+                    self.setSectionDataLoadedFlag("substudyTerms", true);
+                });
+            },
             "demographicsContainer": function() {
                 tnthAjax.getDemo(self.userId, {useWorker:true}, function(data) {
                     self.setSectionDataLoadedFlag("demographicsContainer", true);
@@ -121,6 +126,10 @@ import Consent from "./modules/Consent.js";
                 continue;
             }
             if (self.sectionCompleted(section)) {
+                continue;
+            }
+            let sectionConfigs = self.getSectionConfigs(section);
+            if (!self.inConfig(sectionConfigs)) {
                 continue;
             }
             initDataObj[section](); //will initialize data for the first/current incomplete section
@@ -452,6 +461,9 @@ import Consent from "./modules/Consent.js";
                 }
                 setTimeout(function() { Utility.disableHeaderFooterLinks();}, 1000);
             },
+            "substudyTerms": function() {
+                setTimeout(function() { Utility.disableHeaderFooterLinks();}, 1000);
+            },
             "orgsContainer": function() {
                 if (preselectClinic) {
                     self.handlePreSelectedClinic();
@@ -476,6 +488,10 @@ import Consent from "./modules/Consent.js";
         //check all
         for (var section in self.mainSections) {
             if (!self.mainSections.hasOwnProperty(section) || self.sectionCompleted(section)) {
+                continue;
+            }
+            let sectionConfigs = self.getSectionConfigs(section);
+            if (!self.inConfig(sectionConfigs)) {
                 continue;
             }
             if (!isLoaded) {
@@ -506,6 +522,9 @@ import Consent from "./modules/Consent.js";
             "topTerms": function() {
                 self.termsCheckboxEvent();
             },
+            "substudyTerms": function() {
+                self.termsCheckboxEvent();
+            },
             "demographicsContainer": function() {
                 self.nameGroupEvent();
                 self.bdGroupEvent();
@@ -533,7 +552,7 @@ import Consent from "./modules/Consent.js";
         $("#updateProfile").on("click", function() {
             $(this).hide();
             $("#next").removeClass("open");
-            $(".loading-message-indicator").show();
+            $(".updated-loading-indicator").show();
             $("#queriesForm").submit();
         });
 
@@ -575,6 +594,9 @@ import Consent from "./modules/Consent.js";
                 self.getNext();
                 $("#aboutForm").fadeIn();
             }
+        }
+        if (self.CONFIG_REQUIRED_CORE_DATA.length === 1) {
+            $("#buttonsContainer.reg-incomplete").hide();
         }
         setTimeout(function() {
             $("#iqFooterWrapper").show();
@@ -753,7 +775,7 @@ import Consent from "./modules/Consent.js";
             }
             var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
             arrTypes.forEach(function(type) {
-                if ($("#termsCheckbox [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
+                if ($(".terms-checkbox-container [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
                     return true;
                 }
                 var theTerms = {};
@@ -761,6 +783,9 @@ import Consent from "./modules/Consent.js";
                 theTerms["type"] = type;
                 var org = $("#userOrgs input[name='organization']:checked"),
                     userOrgId = org.val();
+                if (!userOrgId) {
+                    $(this).attr("data-org");
+                }
                 /*** if UI for orgs is not present, need to get the user org from backend ***/
                 if (!userOrgId) {
                     $.ajax({
@@ -785,7 +810,7 @@ import Consent from "./modules/Consent.js";
                     $("#topTerms .post-tou-error").html(i18next.t("Missing information for consent agreement.  Unable to complete request."));
                     return;
                 }
-                tnthAjax.postTerms(theTerms, $("#topTerms")); // Post terms agreement via API
+                tnthAjax.postTerms(theTerms, $(this).closest(".section-container")); // Post terms agreement via API
             });
             // Update UI
             if (this.nodeName.toLowerCase() === "label") {
@@ -841,6 +866,9 @@ import Consent from "./modules/Consent.js";
             $(this).on("click", function(e) {
                 e.stopPropagation();
             });
+        });
+        $("#substudyTerms .terms-tick-box").on("click", function() {
+            termsEvent.apply(this);
         });
     };
 

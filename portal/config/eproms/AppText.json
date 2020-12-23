@@ -31,6 +31,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=60c7a272-a79e-5795-06c3-5f55d358469b&editorUrl=true",
+      "name": "IRONMAN EMPRO Study patient website consent URL",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true",
       "name": "IRONMAN staff privacy URL",
       "resourceType": "AppText"
