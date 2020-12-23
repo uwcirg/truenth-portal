@@ -455,7 +455,7 @@ class Empro_Website_Terms_Of_UseData(TOU_core):
         if not user.has_role(ROLE.PATIENT.value):
             return False
         # check if subject is in the sub-study first
-        if not EMPRO_RS_ID in ResearchStudy.assigned_to(user):
+        if EMPRO_RS_ID not in ResearchStudy.assigned_to(user):
             return False
         # check if sub-study assessment is ready
         research_study_status = patient_research_study_status(user)
