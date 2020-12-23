@@ -1078,7 +1078,7 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
                 TriggerState.timestamp.desc()).first()
             if ts and ts.triggers:
                 results['action_state'] = ts.triggers.get(
-                    'action_state', 'due')
+                    'action_state', 'required')
             else:
                 results['action_state'] = 'not applicable'
 
