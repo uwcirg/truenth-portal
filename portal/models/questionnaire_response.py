@@ -83,6 +83,16 @@ class QuestionnaireResponse(db.Model):
         default=default_authored
     )
 
+    @property
+    def qb_id(self):
+        raise ValueError(
+            'questionnaire_bank_id referenced by wrong name `qb_id`')
+
+    @qb_id.setter
+    def qb_id(self, value):
+        raise ValueError(
+            'questionnaire_bank_id assignment to wrong name `qb_id`')
+
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
@@ -101,6 +111,10 @@ class QuestionnaireResponse(db.Model):
 
         """
         authored = FHIR_datetime.parse(self.document['authored'])
+        if authored != self.authored:
+            current_app.logger.error(
+                "QNR %d has conflicting 'authored' values!", self.id)
+
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
@@ -122,7 +136,9 @@ class QuestionnaireResponse(db.Model):
                 research_study_id=research_study_id,
                 as_of_date=authored)
 
-            def qbstats_current_qbd(as_of_date, classification):
+            def qbstats_current_qbd(as_of_date, classification, instrument):
+                # TODO: consider instrument?  Introduced in patching
+                #  overlapping QBs from v3->v5
                 if as_of_date != authored:
                     raise RuntimeError(
                         "local QB_Status instantiated w/ wrong as_of_date")
@@ -135,8 +151,14 @@ class QuestionnaireResponse(db.Model):
         # clear both until current values are determined
         self.questionnaire_bank_id, self.qb_iteration = None, None
 
-        qbd = qbd_accessor(as_of_date=authored, classification=None)
-        if qbd and qn and qn.id in (
+        classification = (
+                qn_name.startswith('irondemog') and 'indefinite' or None)
+        qbd = qbd_accessor(
+            as_of_date=authored,
+            classification=classification,
+            instrument=qn_name)
+
+        if qbd and qbd.questionnaire_bank and qn and qn.id in (
                 q.questionnaire.id for q in
                 qbd.questionnaire_bank.questionnaires):
             self.questionnaire_bank_id = qbd.qb_id
@@ -144,8 +166,10 @@ class QuestionnaireResponse(db.Model):
         # if a valid qb wasn't found, try the indefinite option
         else:
             qbd = qbd_accessor(
-                as_of_date=authored, classification='indefinite')
-            if qbd and qn and qn.id in (
+                as_of_date=authored,
+                classification='indefinite',
+                instrument=qn_name)
+            if qbd and qbd.questionnaire_bank and qn and qn.id in (
                     q.questionnaire.id for q in
                     qbd.questionnaire_bank.questionnaires):
                 self.questionnaire_bank_id = qbd.qb_id
@@ -454,15 +478,24 @@ class QNR_results(object):
         if not td and old_td and withdrawal_date:
             td = old_td
 
-        def qbd_accessor(as_of_date, classification):
+        def qbd_accessor(as_of_date, classification, instrument):
             """Simplified qbd lookup consults only assigned qbs"""
             if classification == 'indefinite':
                 container = indef_qbs
             else:
                 container = qbs
 
-            # Loop until date matching qb found, break if beyond
+            # Loop until date matching qb found.  Occasionally
+            # QBs overlap, such as during a protocol change.  Look
+            # ahead one beyond match, preferring second if two fit.
+            match, laps = None, 0
             for qbd in container:
+                if match:
+                    # once a match is found, only look ahead a
+                    # single QB for a second, overlapping match
+                    laps += 1
+                    if laps > 1:
+                        return match
                 qb_start = calc_and_adjust_start(
                     user=self.user,
                     research_study_id=self.research_study_id,
@@ -476,9 +509,27 @@ class QNR_results(object):
                 if as_of_date < qb_start:
                     continue
                 if qb_start <= as_of_date < qb_expired:
-                    return qbd
-                if qb_expired > as_of_date:
-                    break
+                    if not match:
+                        # first match found.  retain as the likely fit
+                        match = qbd
+                    else:
+                        # second hit only happens with overlapping QBs and is
+                        # as far as we look.  if the instrument only fits in
+                        # one, return it - otherwise, prefer the second.
+                        these_qs = [
+                            q.name for q in
+                            qbd.questionnaire_bank.questionnaires]
+                        match_qs = [
+                            q.name for q in
+                            match.questionnaire_bank.questionnaires]
+
+                        if instrument in these_qs:
+                            return qbd
+                        if instrument in match_qs:
+                            return match
+                        return qbd
+
+            return match
 
         # typically triggered from updating task job - use system
         # as acting user in audits, if no current user is available
@@ -512,6 +563,22 @@ class QNR_results(object):
         """
         associated = [qnr for qnr in self.qnrs if qnr.qb_id is not None]
         return len(self.qnrs) != len(associated)
+
+    def reassign_qb_association(self, existing, desired):
+        """Update any contained QNRs from existing QB to desired"""
+        changed = False
+        for qnr in self.qnrs:
+            if (
+                    qnr.qb_id == existing['qb_id'] and
+                    qnr.iteration == existing['iteration']):
+                changed = True
+                actual_qnr = QuestionnaireResponse.query.get(qnr.qnr_id)
+                actual_qnr.questionnaire_bank_id = desired['qb_id']
+                actual_qnr.qb_iteration = desired['iteration']
+        if changed:
+            db.session.commit()
+            self._qnrs = None
+        return changed
 
     def authored_during_period(self, start, end, restrict_to_instruments=None):
         """Return the ordered list of QNRs with authored in [start, end)"""

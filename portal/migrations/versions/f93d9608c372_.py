@@ -74,7 +74,8 @@ def upgrade():
         # generate dots so it doesn't look hung, as this takes forever
         print('.', end='')
 
-        for visit, authored in existing_qnr_deets(session, tp, six_mo_qb).items():
+        for visit, authored in existing_qnr_deets(
+                session, tp, six_mo_qb).items():
             results[authored] = (tp, visit)
         # Force reprocessing of QNR -> QB relationships and QB Timeline
         # to pick up missing QB and refresh any missing relationships
