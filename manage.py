@@ -456,7 +456,7 @@ def update_qnr_authored(qnr_id, authored, actor):
     # Must clear the qb_id and iteration in case this authored date
     # change moves the QNR to a different visit.
     qnr.questionnaire_bank_id = None
-    qnr.qb_id = None
+    qnr.qb_iteration = None
     db.session.commit()
 
     # Invalidate timeline as this probably altered the status
