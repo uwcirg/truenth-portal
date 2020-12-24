@@ -56,11 +56,11 @@
           <thead>
               <tr>
                   <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
-                  <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Username (email)") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
+                  <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input" data-width="150">{{ _("Username (email)") }}</th>
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input" data-visible="false">{{ _("Date of Birth") }}</th>
-                  <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{_("EMPRO Questionnaire Status")}}</th>
+                  <th data-field="status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{_("EMPRO Questionnaire Status")}}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input" data-visible="false">{{ _("Visit") }}</th>
                   <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Clinician Action Status") }}</th>
                   <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
@@ -73,9 +73,9 @@
                {% for patient in patients_list | sort(attribute='id')%}
                   <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
                       <td>{{ patient.id }}</td>
-                      <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
+                      <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
                       <td>{{patient.assessment_status if patient.assessment_status}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
