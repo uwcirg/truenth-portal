@@ -349,7 +349,7 @@
                 }
                 this.questionnaireData = questionnaireData[0];
                 this.assessmentData = (assessmentData[0].entry).sort(function(a, b) {
-                                        return new Date(b.authored) - new Date(a.authored);
+                                        return new Date(a.authored) - new Date(b.authored);
                                     });
                 if (triggerData && triggerData[0]) {
                     this.triggerData.data = triggerData[0].filter(item => {
