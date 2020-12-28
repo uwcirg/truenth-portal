@@ -420,6 +420,7 @@ def patient_timeline(patient_id):
 
     if trace:
         return jsonify(
+            rps=rps,
             status=status,
             posted=posted,
             timeline=results,
