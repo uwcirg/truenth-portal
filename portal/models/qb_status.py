@@ -143,8 +143,8 @@ class QB_Status(object):
                 self.overall_status != OverallStatus.withdrawn):
             from flask import current_app
             current_app.logger.error(
-                "Unexpected state %s, user %d should be withdrawn", 
-                    self.overall_status, self.user.id)
+                "Unexpected state %s, user %d should be withdrawn",
+                self.overall_status, self.user.id)
 
     def older_qbds(self, last_known):
         """Generator to return QBDs and status prior to last known
