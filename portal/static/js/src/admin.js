@@ -743,7 +743,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 $("#adminTableToolbar .orgs-filter-warning").popover("show");
                 setTimeout(function() {
                     $("#adminTableToolbar .orgs-filter-warning").popover("hide");
-                }, 5000);
+                }, 10000);
             },
             initOrgsEvent: function () {
                 var ofields = $("#userOrgs input[name='organization']");
@@ -938,6 +938,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         }
                         //note this is based on the trigger event for filtering specify in the plugin
                         $(fname).val(prefData.filters[item]);
+                        $(fname).addClass("active");
                         $(fname).trigger($(fname).get(0).tagName === "INPUT" ? "keyup" : "change");
                     }
                 }

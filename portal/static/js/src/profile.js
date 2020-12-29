@@ -2093,11 +2093,15 @@ export default (function() {
                     show: false
                 });
                 $(modalId).on("shown.bs.modal", function() {
+                    $(`${containerId} .submit`).removeAttr("actionTaken");
                     $(inputFieldId).focus();
                 });
-                $(modalId).on("hidden.bs.modal", function() {
+                $(modalId).on("hidden.bs.modal", function(event) {
                     clearMessages();
                     $(inputFieldId).val("");
+                    if (!$(`${containerId} .submit`).attr("actionTaken")) {
+                        return;
+                    }
                     setTimeout(() => {
                         location.reload();
                     }, 0);
@@ -2120,6 +2124,7 @@ export default (function() {
                         if (data && data.changed) {
                             $(`${containerId} .info-message`).html(`<b>Data changed</b>: <br/>${data.changed.join("<br/>")}`);
                         }
+                        $(`${containerId} .submit`).attr("actionTaken", true);
                     });
                 });
             },
