@@ -1,4 +1,6 @@
 from sqlalchemy.dialects.postgresql import ENUM
+
+from ..cache import TWO_HOURS, cache
 from ..database import db
 from .questionnaire_bank import QuestionnaireBank, qbs_by_intervention
 from .research_protocol import ResearchProtocol
@@ -70,10 +72,9 @@ class ResearchStudy(db.Model):
         return results
 
 
-def research_study_id_from_questionnaire(questionnaire_name):
-    """Reverse lookup research_study_id from a questionnaire_name"""
-    # TODO cache map and results
-    # expensive mapping - store cacheable value once determined
+@cache.memoize(timeout=TWO_HOURS)
+def qb_name_map():
+    """returns QB.name -> research_study_id map"""
     map = {}
     for qb in QuestionnaireBank.query.all():
         rp_id = qb.research_protocol_id
@@ -88,7 +89,12 @@ def research_study_id_from_questionnaire(questionnaire_name):
                         f"Configuration error, {q.name} belongs to multiple "
                         "research studies")
             map[q.name] = rs_id
-    return map.get(questionnaire_name)
+    return map
+
+
+def research_study_id_from_questionnaire(questionnaire_name):
+    """Reverse lookup research_study_id from a questionnaire_name"""
+    return qb_name_map().get(questionnaire_name)
 
 
 def add_static_research_studies():
