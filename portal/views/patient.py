@@ -524,7 +524,7 @@ def patient_timewarp(patient_id, days):
 
     db.session.commit()
 
-    # Invalidate users timeline & qnr associations - forces lookup next round
+    # Recalculate users timeline & qnr associations
     cache.delete_memoized(trigger_date)
     for research_study_id in ResearchStudy.assigned_to(user):
         QuestionnaireResponse.purge_qb_relationship(
