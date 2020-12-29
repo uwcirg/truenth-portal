@@ -277,7 +277,7 @@ def fire_trigger_events():
                 "patient thank you"))
 
             if hard_triggers:
-                triggers['action_state'] = 'due'
+                triggers['action_state'] = 'required'
 
                 # In the event of hard_triggers, clinicians/staff get mail
                 for msg in staff_emails(patient, hard_triggers, True):

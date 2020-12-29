@@ -1107,8 +1107,8 @@ select:not([multiple]) {
   z-index: 20;
   position: relative;
   visibility: hidden;
-  -webkit-transition: visibility 350ms ease 350ms;
-  transition: visibility 350ms ease 350ms;
+  -webkit-transition: visibility 550ms ease 350ms;
+  transition: visibility 550ms ease 350ms;
 }
 #iqFooterWrapper {
   display: none;
@@ -1258,6 +1258,9 @@ select:not([multiple]) {
   #phone, #email, #altPhone  {
     width: 300px;
     max-width: 100%;
+  }
+  #erroremail {
+    color: @errorMessageColor;
   }
   #study_id_view {
     margin-top: 0.4em;
@@ -1441,7 +1444,25 @@ div.footer-wrapper.right-panel {
   padding: 0;
 }
 .terms-text {
-  padding: 8px 24px 8px;
+  padding: 16px 24px 16px;
+  .title {
+    width: 90%;
+    text-align: center;
+    margin: auto;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  p {
+    line-height: 1.5;
+  }
+}
+@media (min-width: 699px) {
+  .terms-text {
+    padding: 8px 32px 8px;
+    .title {
+      width: 64%;
+    }
+  }
 }
 #agreeLabel {
   margin-left: 2em;
@@ -1463,11 +1484,6 @@ div.footer-wrapper.right-panel {
     margin-right: 8px;
   }
 }
-@media (min-width: 992px) {
-  .data-saving-indicator {
-    margin-left: 10%;
-  }
-}
 #topTerms {
   position: relative;
   .well {
@@ -1484,7 +1500,9 @@ div.footer-wrapper.right-panel {
     text-decoration: underline;
   }
   .terms-checkbox-container {
-    margin-top: 0.5em;
+    margin-top: 16px;
+    padding: 16px 0;
+    border-top: 2px solid @muterColor;
     .terms-label {
       font-size: 1em;
     }
@@ -1563,14 +1581,13 @@ div.footer-wrapper.right-panel {
 }
 
 #topTerms ~ #aboutForm {
-  margin: 1em auto;
   min-height: 50vh;
 }
 
 #aboutForm {
   max-width: 100%;
   padding: 1em;
-  margin: 3em auto;
+  margin: 2em auto;
   min-height: 50vh;
 
   .view-container {
@@ -1589,6 +1606,7 @@ div.footer-wrapper.right-panel {
     display: none;
     .update-button-container {
       margin-top: 32px;
+      position: relative;
       .loading-message-indicator {
         min-height: 56px;
       }
@@ -1599,10 +1617,9 @@ div.footer-wrapper.right-panel {
     margin: 24px auto;
     position: relative;
     .loading-message-indicator {
-      width: 320px;
       position: absolute;
       top: 8px;
-      left: calc(50% - 40px);
+      left: 8px
     }
   }
   #buttonsContainer.continue {
@@ -1615,7 +1632,7 @@ div.footer-wrapper.right-panel {
     padding: 1em;
     max-width: 100%;
     margin-left: 0.2em;
-    transition: opacity 150ms ease;
+    transition: opacity 350ms ease;
   }
   #updateProfile {
     opacity: 0;
@@ -1667,8 +1684,16 @@ div.footer-wrapper.right-panel {
     padding: 0;
     margin: 16px auto;
     .terms-checkbox-container {
-      padding: 16px;
-      border-top: 1px solid @muterColor;
+      margin-top: 16px;
+      padding: 16px 16px;
+      border-top: 2px solid @muterColor;
+    }
+  }
+  @media (min-width: 699px) {
+    .iq-container .content-body {
+      .terms-checkbox-container {
+        padding: 16px 24px;
+      }
     }
   }
   .iq-container .subtitle {
@@ -2154,8 +2179,7 @@ div.footer-wrapper.right-panel {
   div.filterControl input
   {
     font-weight: normal;
-    min-height: 2.3em;
-    height: 2.3em;
+    height: 2.5em;
   }
   th.status-field {
     position: relative;
@@ -2387,6 +2411,19 @@ div.footer-wrapper.right-panel {
     max-width: 100%;
   }
 }
+#patientList .fixed-table-body::-webkit-scrollbar {
+  width: 12px;               /* width of the entire scrollbar */
+}
+
+#patientList .fixed-table-body::-webkit-scrollbar-track {
+  background:#FFF;        /* color of the tracking area */
+}
+
+#patientList .fixed-table-body::-webkit-scrollbar-thumb {
+  background-color:  lighten(@featureBtnColor, 25%);    /* color of the scroll thumb */
+  border-radius: 24px;       /* roundness of the scroll thumb */
+  border: 3px solid #FFF;  /* creates padding around scroll thumb */
+}
 #patientList {
   margin-top: 16px;
   position: relative;
@@ -2398,6 +2435,20 @@ div.footer-wrapper.right-panel {
   @media (min-width: 992px) {
     & {
       margin-top: 16px;
+    }
+  }
+  .search {
+    top: 0;
+    margin-top: 14px;
+  }
+  @media (min-width: 992px) {
+    .search {
+      margin-top: 0;
+    }
+  }
+  @media (min-width: 1200px) {
+    .search {
+      margin-top: 10px
     }
   }
   #adminTableToolbar {
@@ -2431,7 +2482,7 @@ div.footer-wrapper.right-panel {
       .byline-text {
         display: block;
         font-weight: 500;
-        color: darken(@mutedColor, 5%);
+        color: darken(@mutedColor, 10%);
         letter-spacing: 0.04rem;
         margin-left: 4px;
         font-size: 0.875em;
@@ -2553,15 +2604,6 @@ div.footer-wrapper.right-panel {
   #_downloadLink {
     visibility: hidden;
   }
-  .firstname-field, .lastname-field {
-    max-width: 150px;
-    word-wrap: break-word;
-  }
-  .email-field {
-    max-width: 200px;
-    min-width: 180px;
-    word-wrap: break-word;
-  }
 }
 #chkDeletedUsersFilter {
   margin: 0 0 0 4px;
@@ -2600,7 +2642,8 @@ div.footer-wrapper.right-panel {
 #staffList {
   #staffListOptions {
     border-bottom: 1px solid @HRColor;
-    padding-bottom: 4px;
+    padding-bottom: 16px;
+    margin-top: 32px;
   }
   div.or {
     display: inline-block;
@@ -3111,6 +3154,10 @@ body.portal .copyright-container  {
   .button-container {
     align-self: flex-end;
   }
+  .error-message {
+    color: lighten(@errorMessageColor, 25%);
+    margin: 16px 40px 0px;
+  }
 }
 .portal-flex-container .button-container,
 .portal-description .button-container {
@@ -3197,7 +3244,6 @@ body.portal .copyright-container  {
   }
 }
 @media (min-width: 992px) {
-
   .portal-skyscraper-container {
     .bottom {
       flex-direction: row;
@@ -4137,12 +4183,10 @@ section.header {
   color: #FFF;
   background: @btnColor;
   border-color: @btnColor;
+  align-self: flex-start;
    &:hover {
     color: @featureBtnHoverColor;
     background: @linkHover;
-  }
-  @media (min-width: 480px) {
-    max-width: 400px;
   }
 }
 
@@ -4364,6 +4408,9 @@ input.clinic {
   background: @wellColor;
   box-shadow: 1px 2px 4px darken(@wellColor, 3%);
   overflow: hidden;
+  #erroremail {
+    color: @errorMessageColor;
+  }
 }
 #accountCreationContentContainer {
   position: relative;
@@ -4918,6 +4965,11 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   }
   .modal-body__privacy {
     display: none;
+  }
+}
+#urlAuthenticatedModal {
+  .btn {
+    margin-bottom: 12px;
   }
 }
 .cookie-monster-modal-backdrop-cover {

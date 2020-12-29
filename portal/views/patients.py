@@ -78,7 +78,8 @@ def render_patients_list(
             patient.current_qb = qb_status['visit_name']
             if research_study_id == EMPRO_RS_ID:
                 patient.clinician = clinician_name_map[patient.clinician_id]
-                patient.action_state = qb_status['action_state']
+                patient.action_state = qb_status['action_state'].title() \
+                    if qb_status['action_state'] else ""
             patients_list.append(patient)
     else:
         patients_list = query

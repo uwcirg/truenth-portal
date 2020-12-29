@@ -10,7 +10,7 @@
         "STAFF_BULK_DATA_ACCESS = True\n",
         "SMARTLING_PROJECT_ID = 'dd112801a'\n",
         "BABEL_CONFIG_FILENAME = 'eproms.babel.cfg'\n",
-        "REQUIRED_CORE_DATA = ['org', 'website_terms_of_use', 'subject_website_consent', 'stored_website_consent_form', 'privacy_policy', 'race', 'ethnicity']\n",
+        "REQUIRED_CORE_DATA = ['org', 'website_terms_of_use', 'subject_website_consent', 'stored_website_consent_form', 'privacy_policy', 'race', 'ethnicity', 'empro_website_terms_of_use']\n",
         "REPORTING_IDENTIFIER_SYSTEMS = ['http://pcctc.org/']\n",
         "SHOW_EXPLORE = False\n",
         "SHOW_PROFILE_MACROS = ['race', 'ethnicity', 'language', 'procedures']\n",
