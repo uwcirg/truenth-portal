@@ -12,6 +12,7 @@ from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
@@ -25,7 +26,7 @@ from ..models.identifier import (
 from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
 from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
-from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
 from ..models.research_study import ResearchStudy
@@ -342,9 +343,7 @@ def patient_timeline(patient_id):
                 research_study_id=research_study_id,
                 acting_user_id=current_user().id)
 
-        from ..cache import cache
-        from ..models.questionnaire_bank import trigger_date
-        cache.delete_memoized(trigger_date, user, research_study_id)
+        cache.delete_memoized(trigger_date)
         update_users_QBT(
             patient_id,
             research_study_id=research_study_id,
@@ -490,10 +489,12 @@ def patient_timewarp(patient_id, days):
     for qnr in QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == user.id):
         changed.append(f"questionnaire_response {qnr.id}")
-        authored = qnr.authored - delta
-        qnr.authored = authored
+        assert qnr.authored == FHIR_datetime.parse(qnr.document['authored'])
+        new_authored = qnr.authored - delta
+        qnr.authored = new_authored
         doc = deepcopy(qnr.document)
-        doc['authored'] = authored
+        doc['authored'] = FHIR_datetime.as_fhir(new_authored)
+        qnr.document = doc
 
     # trigger_state
     if current_app.config['GIL'] is None:
@@ -524,11 +525,16 @@ def patient_timewarp(patient_id, days):
     db.session.commit()
 
     # Invalidate users timeline & qnr associations - forces lookup next round
-    for rs in ResearchStudy.assigned_to(user):
-        invalidate_users_QBT(user_id=user.id, research_study_id=rs)
+    cache.delete_memoized(trigger_date)
+    for research_study_id in ResearchStudy.assigned_to(user):
         QuestionnaireResponse.purge_qb_relationship(
-            subject_id=user.id,
-            research_study_id=rs,
+            subject_id=patient_id,
+            research_study_id=research_study_id,
             acting_user_id=current_user().id)
+
+        update_users_QBT(
+            patient_id,
+            research_study_id=research_study_id,
+            invalidate_existing=True)
 
     return jsonify(changed=changed)

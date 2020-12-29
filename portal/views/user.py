@@ -734,7 +734,7 @@ def set_user_consents(user_id):
 
         # Moving consent dates potentially invalidates
         # (questionnaire_response: visit_name) associations.
-        cache.delete_memoized(trigger_date, user, consent.research_study_id)
+        cache.delete_memoized(trigger_date)
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=user.id,
             research_study_id=consent.research_study_id,
@@ -986,7 +986,7 @@ def delete_user_consents(user_id):
     remove_uc.status = 'deleted'
     # The deleted consent may have altered the cached assessment
     # status, even the qb assignments - force re-eval by invalidating now
-    cache.delete_memoized(trigger_date, user, research_study_id)
+    cache.delete_memoized(trigger_date)
     QuestionnaireResponse.purge_qb_relationship(
         subject_id=user_id,
         research_study_id=research_study_id,
