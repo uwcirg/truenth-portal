@@ -94,7 +94,7 @@ def qb_name_map():
 
 def research_study_id_from_questionnaire(questionnaire_name):
     """Reverse lookup research_study_id from a questionnaire_name"""
-    return qb_name_map().get(questionnaire_name)
+    return qb_name_map().get(questionnaire_name, 0)
 
 
 def add_static_research_studies():
