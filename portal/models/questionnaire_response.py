@@ -439,12 +439,19 @@ class QNR_results(object):
                     QuestionnaireResponse.qb_iteration == self.qb_iteration)
         self._qnrs = []
         for qnr in query:
+            # Cheaper to toss those from the wrong research study now
+            instrument = qnr.instrument_id.split('/')[-1]
+            research_study_id = research_study_id_from_questionnaire(
+                instrument)
+            if research_study_id != self.research_study_id:
+                continue
+
             self._qnrs.append(QNR(
                 qnr_id=qnr.id,
                 qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
-                instrument=qnr.instrument_id.split('/')[-1],
+                instrument=instrument,
                 authored=qnr.authored,
                 encounter_id=qnr.encounter_id))
         return self._qnrs

@@ -542,6 +542,16 @@ export default { /*global $ */
         });
         return consentedOrgIds.length;
     },
+    "timeWarpPatientData": function(userId, days, params, callback) {
+        callback = callback || function() {};
+        if (!userId || !days) {
+            callback({error: true});
+            return false;
+        }
+        this.sendRequest(`/api/patient/${userId}/timewarp/${days}`, "GET", userId, params, function(data) {
+            callback(data);
+        });
+    },
     "getDemo": function(userId, params, callback) {
         callback = callback || function() {};
         if (!userId) {

@@ -5,11 +5,11 @@
         <div class="content" :class="{triggers:hasTriggers()}" v-show="!loading">
             <div v-show="hasTriggers()" class="text-muted text-right report-legend" :class="{active: hasTriggers()}">
                 <span class="title" v-text="triggerLegendTitle"></span>
-                <span class="hard-trigger-legend" v-text="hardTriggerLegend"></span>
-                <span class="soft-trigger-legend" v-text="softTriggerLegend"></span>
+                <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
+                <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
             </div>
-            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)">&lt;</span>
-            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)">&gt;</span>
+            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
+            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
                 <THEAD>
                     <TH class="title" v-text="questionTitleHeader"></TH>
@@ -95,7 +95,7 @@
             /*
              * display column(s) responsively based on viewport width
              */
-            if (bodyWidth >= 1200) {
+            if (bodyWidth >= 1400) {
                 this.maxToShow = 4;
             } else if (bodyWidth >= 992) {
                 this.maxToShow = 3;
@@ -133,25 +133,18 @@
         },
         setNavCellVis() {
             /*
-             * set navigation vis
-             */
-            if (this.navEndIndex >= this.questionnaireDates.length) {
-                $(".report .nav-arrow.end").addClass("disabled");
-            } else {
-                $(".report .nav-arrow.end").removeClass("disabled");
-            }
-             if (this.navStartIndex <= 1) {
-                $(".report .nav-arrow.start").addClass("disabled");
-            } else {
-                $(".report .nav-arrow.start").removeClass("disabled");
-            }
-            /*
              * set columns vis
              */
             $(".report-table .cell").removeClass("active").addClass("inactive");
             for (let i = this.navStartIndex; i <= this.navEndIndex; i++) {
                 $(".report-table .cell[data-column-index="+i+"]").removeClass("inactive").addClass("active");
             }
+        },
+        getToEndIndex() {
+            return this.navEndIndex >= this.questionnaireDates.length;
+        },
+        getToStartIndex() {
+            return this.navStartIndex <= 1;
         },
         setDisplayDate(date) {
             if (!date) return "";
@@ -231,7 +224,13 @@
             });
         },
         hasTriggers() {
-            return this.triggerData.hardTriggers.length || this.triggerData.softTriggers.length;
+            return this.hasSoftTriggers() || this.hasHardTriggers();
+        },
+        hasSoftTriggers() {
+            return this.triggerData.softTriggers.length;
+        },
+        hasHardTriggers() {
+            return this.triggerData.hardTriggers.length;
         }, 
         setDisplayData() {
             /*

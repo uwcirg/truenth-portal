@@ -1843,14 +1843,14 @@ div.footer-wrapper.right-panel {
     top: 4px;
   }
   div.search {
-    top: 0.3em;
+    top: 4px;
   }
 }
 
 
 .admin-table {
    .search .form-control {
-    height: 3em !important;
+    height: 42px !important;
     width: 150px;
     max-width: 100%;
   }
@@ -1976,6 +1976,50 @@ div.footer-wrapper.right-panel {
       left: 100%;
   }
 }
+#timeWarpContainer {
+  cursor: pointer;
+  .error-message {
+    margin-top: 16px;
+  }
+  .prompt .edit-icon {
+    margin-right: 8px;
+  }
+  .text:hover {
+    color: darken(@mutedColor, 10%);
+  }
+  .button-container {
+    position: relative;
+    .loading-message {
+      display: none;
+      position: absolute;
+      top: 0;
+      min-height: 40px;
+    }
+  }
+}
+#timeWarpModal {
+  input {
+    width: 64px;
+    display: inline-block;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+  .body-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+@media (min-width: 768px) {
+  #timeWarpModal {
+    .modal-dialog {
+      width: 480px;
+    }
+  }
+}
+.fixed-table-toolbar .btn-group>.btn-group:first-child>.btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
 #adminTableContainer {
   position: relative;
   opacity: 0;
@@ -2000,6 +2044,18 @@ div.footer-wrapper.right-panel {
   }
   .fixed-table-container {
     border: 1px solid darken(@HRColor, 5%);
+    thead th:not(:first-of-type),
+    tbody td:not(:first-of-type) {
+      border-left: 1px solid darken(@muterColor, 15%);
+    }
+  }
+  .btn-group>.btn-group:last-child:not(:first-child)>.btn:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .fixed-table-toolbar .btn-group>.btn-group:last-child>.btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
   }
   .fht-cell,
   .filterControl {
@@ -2078,7 +2134,8 @@ div.footer-wrapper.right-panel {
   }
   .filterControl {
     .form-control.active {
-        border: 2px solid darken(@muterColor, 17%);
+        border: 2px solid darken(@muterColor, 10%);
+        font-weight: 500;
     }
   }
   tr.loading {
@@ -2583,14 +2640,6 @@ div.footer-wrapper.right-panel {
   }
 }
 #staffList {
-  .firstname-data-field, .lastname-data-field {
-    max-width: 150px;
-    word-wrap: break-word;
-  }
-  .email-data-field {
-    max-width: 235px;
-    word-wrap: break-word;
-  }
   #staffListOptions {
     border-bottom: 1px solid @HRColor;
     padding-bottom: 16px;
@@ -2604,14 +2653,6 @@ div.footer-wrapper.right-panel {
   }
   #_downloadLink {
     visibility: hidden;
-  }
-  .firstname-field, .lastname-field {
-    max-width: 150px;
-    word-wrap: break-word;
-  }
-  .email-field {
-    max-width: 250px;
-    word-wrap: break-word;
   }
 }
 #patientListOptions,
@@ -2634,9 +2675,6 @@ div.footer-wrapper.right-panel {
 #dataDownloadModal {
   .modal-dialog {
     max-width: 500px;
-  }
-  .profile-radio-list {
-    margin-left:1.5em
   }
   div.checkbox label{
     font-size: @modalInputSize;
@@ -2811,7 +2849,7 @@ div.footer-wrapper.right-panel {
   margin: 0;
   padding: 18px;
   background-color:rgba(255, 255, 255, 0.7);
-  color: #000000;
+  color: #444;
   height: 60%;
   text-align: center;
   position: relative;
@@ -3340,18 +3378,18 @@ section.header {
     }
   }
   .answer {
-    border-radius: 20px;
+    border-radius: 32px;
     background: @muterColor;
     display: inline-block;
     padding: 8px 16px;
     min-width: 132px;
     text-align: center;
     &.darker {
-      background: lighten(@mutedColor, 10%);
+      background: lighten(@mutedColor, 5%);
       color: #FFF;
     }
     &.darkest {
-      background: darken(@mutedColor, 10%);
+      background: darken(@mutedColor, 12%);
       color: #FFF;
     }
     &.no-value {
@@ -3366,7 +3404,7 @@ section.header {
   }
   .item,
   td.item {
-    padding: 16px 12px 16px 16px;
+    padding: 16px 12px 16px 12px;
     &.question {
       padding-left: 12px;
       padding-right: 32px;
@@ -4457,6 +4495,9 @@ input.clinic {
 
 #userSessionReportDetailTable {
   margin-left: -1%;
+  th, td {
+    padding: 8px;
+  }
 }
 
 #userSessionReportDetailHeader a[href] {
@@ -4471,14 +4512,15 @@ input.clinic {
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   color: #606a73;
-  padding: 0.25em 0.3em;
+  padding: 8px 12px;
   margin-top: 0.5em;
 }
 #userSessionReportDetailHeader a[href]:hover {
   color: @linkHover;
 }
 #userSessionReportDetailTable caption {
-  padding: 0;
+  padding: 0 8px;
+  font-weight: 500;
 }
 #userSessionsList label {
   margin-bottom: 6px;
@@ -4890,7 +4932,7 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
 }
 .modal-header,
 .modal-footer {
-  font-size: @baseMobileFontSize;
+  font-size: @baseFontSize;
 }
 .modal-footer {
   min-height: 4em;
