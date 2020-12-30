@@ -510,9 +510,10 @@ def patient_timewarp(patient_id, days):
                     triggers['source']['authored'] = FHIR_datetime.as_fhir(
                         FHIR_datetime.parse(triggers['source']['authored'])
                         - delta)
-                for email in triggers['actions']['email']:
-                    email['timestamp'] = FHIR_datetime.as_fhir(
-                        FHIR_datetime.parse(email['timestamp']) - delta)
+                if 'actions' in triggers:
+                    for email in triggers['actions']['email']:
+                        email['timestamp'] = FHIR_datetime.as_fhir(
+                            FHIR_datetime.parse(email['timestamp']) - delta)
                 ts.triggers = triggers
 
     # reminder email dates
