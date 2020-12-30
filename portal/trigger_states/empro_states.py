@@ -132,10 +132,6 @@ def initiate_trigger(user_id):
 
     # Check and update the status of pending work.
     if ts.state == 'triggered':
-        # Just ran out of time, resolve as 'missed'
-        current_app.logger.debug(f"resolve 'missed' trigger for {user_id}")
-        triggers = copy.deepcopy(ts.triggers)
-        triggers['action_state'] = 'missed'
         sm = EMPRO_state(ts)
         sm.resolve()
         db.session.commit()
@@ -358,9 +354,9 @@ def empro_staff_qbd_accessor(qnr):
                 "specialized QBD accessor given wrong instrument "
                 f"{instrument}")
 
-        # find best match from subject's trigger_states.  should always be
-        # in `triggered` state, unless re-eval is in process due to consent
-        # change, or the like.
+        # find best match from subject's trigger_states.  will be in
+        # `triggered` state if current, or `resolved` if time has
+        # passed and the user now has the subsequent month due.
         query = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state.in_(('triggered', 'resolved'))).order_by(
