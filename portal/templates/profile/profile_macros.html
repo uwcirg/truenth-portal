@@ -864,8 +864,9 @@
         <!-- don't show this if no hard triggers ?? -->
         <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
             <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
-            <h5 class="muted">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
-            <div id="triggersSection">
+            <!-- display trigger areas if indicated -->
+            <div id="triggersSection" v-if="hasSubStudyTriggers()">
+                <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
                 <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
                 <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
                     <ul class="list">
@@ -873,8 +874,19 @@
                     </ul>
                 </div>
             </div>
+            <!-- no triggers indicated -->
+            <div id="noTriggersSection" v-else>
+                <div class="item">{{_("Last EMPRO questionnaire completed on:")}} <span class="text" v-text="getLastSubStudyAssessmentDate()"></span></div>
+                <div class="item text-muted">{{_("No high distress areas indicated")}}</div>
+            </div>
             <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
-            <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved()}">
+            <!-- 
+                post intervention questionnaire section 
+                NOTE: 
+                will display if there are currently triggers
+                will be in a disabled state if the action state is "resolved"
+            -->
+            <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                 <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                     <!-- question text -->
                     <span class="title" :class="item.type" v-text="item.text"></span>

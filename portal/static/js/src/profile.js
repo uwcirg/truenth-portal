@@ -1227,7 +1227,16 @@ export default (function() {
                 });
             },
             setSubStudyAssessmentData: function(data) {
+                if (!data || !data.length) return;
+                //latest first
+                data = (data).sort(function(a, b) {
+                    return new Date(b.authored) - new Date(a.authored);
+                });
                 this.subStudyAssessment.data = data;
+            },
+            getLastSubStudyAssessmentDate: function() {
+                if (!this.subStudyAssessment.data || !this.subStudyAssessment.data.length) return "";
+                return this.modules.tnthDates.formatDateString(this.subStudyAssessment.data[0].authored);
             },
             hasSubStudyAsssessmentData: function() {
                 return this.computedSubStudyAssessmentData.length;
@@ -1348,11 +1357,10 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                //TODO need to also show post tx section IF there is previous response for this subject and the subject does not have triggers in the current patient questionnaire responses
                 return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx());
             },
             isSubStudyTriggersResolved: function() {
-                return this.subStudyTriggers.state === "resolved";
+                return this.subStudyTriggers.state === "resolved" || this.subStudyTriggers.state === "completed";
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
@@ -1434,7 +1442,7 @@ export default (function() {
                         });
 
                     });
-                }, params);
+                }, {...params, ...{clearCache: true}});
             },
             submitPostTxQuestionnaire: function(e) {
                 e.preventDefault();
@@ -1541,8 +1549,8 @@ export default (function() {
                         return;
                     }
                     setTimeout(function() {
-                        this.initPostTxQuestionnaireSection({clearCache: true});
-                    }.bind(this), 2750);
+                        location.reload();
+                    }.bind(this), 2000);
                 });
                 return false;
             },
