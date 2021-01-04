@@ -2676,6 +2676,9 @@ div.footer-wrapper.right-panel {
   .modal-dialog {
     max-width: 500px;
   }
+  .modal-body {
+    padding: 24px 24px 16px;
+  }
   div.checkbox label{
     font-size: @modalInputSize;
   }
@@ -2684,8 +2687,42 @@ div.footer-wrapper.right-panel {
   }
   input[type="radio"] {
     position: relative;
-    top: -1px;
-    left: -1px;
+  }
+  .prompt {
+    font-weight: 500;
+    display: block;
+    clear: both;
+  }
+  .data-types-container {
+    border-top: 1px solid @muterColor;
+    padding-top: 8px;
+  }
+  .list-selector {
+    float: right;
+    border: 2px solid @muterColor;
+    padding: 4px 8px;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    .items {
+      display: flex;
+      .item input {
+        cursor: pointer;
+      }
+    }
+    .item:first-of-type {
+      margin-right: 4px;
+    }
+    .text {
+      font-size: 12px;
+      display: inline-block;
+      margin-right: 8px;
+      position: relative;
+      top: -2px;
+      color: @mutedColor;
+      &.active {
+        font-weight: 500;
+      }
+    }
   }
 }
 #patientAssessmentDownload {
@@ -2694,17 +2731,27 @@ div.footer-wrapper.right-panel {
 }
 #patientsInstrumentListWrapper {
   position: relative;
-  padding: 0.6em 0 0.3em 0;
+  padding: 4px 0 8px 0;
 }
 #patientsInstrumentList {
   opacity: 0;
   transition: opacity 250ms ease-in;
-  display: flex;
-  flex-direction: column;
-  max-height: 200px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
+  clear: both;
+  .list {
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .title {
+    margin-top: 16px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: @mutedColor;
+    font-weight: 500;
+  }
   .instrument-container {
     margin: 4px 0;
   }
