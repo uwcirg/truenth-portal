@@ -49,7 +49,7 @@ python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 python-statemachine==0.8.0	# via python-statemachine
-pytz==2020.4              # via babel, celery
+pytz==2020.5              # via babel, celery
 pyyaml==5.3.1              # via flask-swagger, swagger-spec-validator
 redis==3.5.3
 requests-cache==0.5.2
