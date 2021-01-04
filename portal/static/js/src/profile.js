@@ -1357,10 +1357,13 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx());
+                return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
+            },
+            isPostTxActionRequired: function() {
+                return String(this.subStudyTriggers.state).toLowerCase() === "due" || String(this.subStudyTriggers.state).toLowerCase() === "overdue";
             },
             isSubStudyTriggersResolved: function() {
-                return this.subStudyTriggers.state === "resolved" || this.subStudyTriggers.state === "completed";
+                return String(this.subStudyTriggers.state).toLowerCase() === "resolved" || String(this.subStudyTriggers.state).toLowerCase() === "completed";
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
@@ -1401,6 +1404,9 @@ export default (function() {
                     return;
                 }
                 $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
+            },
+            shouldShowPostTxQuestionnaireSection: function() {
+                return this.isSubStudyPatient() && this.hasSubStudyAsssessmentData();
             },
             initPostTxQuestionnaireSection: function(params) {
                 if (!this.subjectId || !this.isSubStudyPatient()) {

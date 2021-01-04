@@ -859,101 +859,108 @@
     {% endcall %}
 {%- endmacro -%}
 {%- macro postInterventionQuestionnaire(person) -%}
-    {% call profileSection(editable=false) %}
-    {% call titleSection() -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
-        <!-- don't show this if no hard triggers ?? -->
-        <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
-            <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
-            <!-- display trigger areas if indicated -->
-            <div id="triggersSection" v-if="hasSubStudyTriggers()">
-                <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
-                <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
-                <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
-                    <ul class="list">
-                        <li v-for="item in subStudyTriggers.domains" v-text="item" class="text"></li>
-                    </ul>
+<!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
+<a href="#postInterventionQuestionnaireLoc"></a>
+<div id="postInterventionQuestionnaireLoc">&nbsp;</div>
+<div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowPostTxQuestionnaireSection()"> 
+    <div class="col-md-12 col-xs-12">
+        {% call profileSection(editable=false) %}
+        {% call titleSection() -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
+            <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
+                <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
+                <!-- display trigger areas if indicated -->
+                <div id="triggersSection" v-if="hasSubStudyTriggers()">
+                    <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
+                    <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
+                    <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
+                        <ul class="list">
+                            <li v-for="item in subStudyTriggers.domains" v-text="item" class="text"></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <!-- no triggers indicated -->
-            <div id="noTriggersSection" v-else>
-                <div class="item">{{_("Last EMPRO questionnaire completed on:")}} <span class="text" v-text="getLastSubStudyAssessmentDate()"></span></div>
-                <div class="item text-muted">{{_("No high distress areas indicated")}}</div>
-            </div>
-            <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
-            <!-- 
-                post intervention questionnaire section 
-                NOTE: 
-                will display if there are currently triggers
-                will be in a disabled state if the action state is "resolved"
-            -->
-            <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
-                <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
-                    <!-- question text -->
-                    <span class="title" :class="item.type" v-text="item.text"></span>
-                    <!-- date type answer-->
-                    <input type="text" class="data-datepicker form-control answer" readonly placeholder="d M yyyy"
-                            :class="{disabled: isSubStudyTriggersResolved()}"
-                            :dataType="item.type"
+                <!-- no triggers indicated -->
+                <!-- show the last completed EMPRO date && indicate no triggers -->
+                <div id="noTriggersSection" v-else>
+                    <div class="item">{{_("Last EMPRO questionnaire completed on:")}} <span class="text" v-text="getLastSubStudyAssessmentDate()"></span></div>
+                    <div class="item text-muted">{{_("No high distress areas indicated")}}</div>
+                </div>
+                <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
+                <!-- 
+                    post intervention questionnaire section 
+                    NOTE: 
+                    will display if there are currently triggers or action state is due or overdue
+                    will be in a disabled state if the action state is "resolved"
+                -->
+                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
+                    <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
+                        <!-- question text -->
+                        <span class="title" :class="item.type" v-text="item.text"></span>
+                        <!-- date type answer-->
+                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="d M yyyy"
+                                :class="{disabled: isSubStudyTriggersResolved()}"
+                                :dataType="item.type"
+                                :linkId="item.linkId"
+                                @change="onResponseChangeFieldEvent"
+                                v-if="item.type == 'date'"
+                        >
+                        <!-- boolean type answer-->
+                        <input type="checkbox"
+                            class="bool answer" 
+                            :dataType = "item.type"
                             :linkId="item.linkId"
                             @change="onResponseChangeFieldEvent"
-                            v-if="item.type == 'date'"
-                    >
-                    <!-- boolean type answer-->
-                    <input type="checkbox"
-                        class="bool answer" 
-                        :dataType = "item.type"
-                        :linkId="item.linkId"
-                        @change="onResponseChangeFieldEvent"
-                        v-if="item.type == 'boolean'">
-                    <!-- open-choice (checkboxes) type answer -->
-                    <div class="choices answer" v-if="item.type == 'open-choice'">
-                        <div class="choice" v-for="option in item.option">
-                            <input 
-                                type="checkbox"
+                            v-if="item.type == 'boolean'">
+                        <!-- open-choice (checkboxes) type answer -->
+                        <div class="choices answer" v-if="item.type == 'open-choice'">
+                            <div class="choice" v-for="option in item.option">
+                                <input 
+                                    type="checkbox"
+                                    :code="option.valueCoding.code"
+                                    :class="{other: /other/gi.test(option.valueCoding.display)}"
+                                    :dataType="item.type"
+                                    :linkId="item.linkId"
+                                    :value="option.valueCoding.display"
+                                    @change="onResponseChangeFieldEvent"
+                                >
+                                <span class="text" v-text="option.valueCoding.display"></span>
+                                <textarea
+                                    class="form-control addl-text other-text"
+                                    dataType="string"
+                                    :code="option.valueCoding.code"
+                                    :linkId="item.linkId"
+                                    @change="onResponseChangeFieldEvent"
+                                    v-if="/other/gi.test(option.valueCoding.display)"
+                                ></textarea>
+                            </div>
+                        </div>
+                        <!-- choice (select) type answer -->
+                        <select class="form-control answer" v-if="item.type == 'choice'" 
+                            :linkId="item.linkId"
+                            :dataType="item.type"
+                            @change="onResponseChangeFieldEvent"
+                        >
+                            <option value="">{{_("Select")}}</option>
+                            <option v-for="option in item.option"
                                 :code="option.valueCoding.code"
-                                :class="{other: /other/gi.test(option.valueCoding.display)}"
                                 :dataType="item.type"
                                 :linkId="item.linkId"
                                 :value="option.valueCoding.display"
-                                @change="onResponseChangeFieldEvent"
-                            >
-                            <span class="text" v-text="option.valueCoding.display"></span>
-                            <textarea
-                                class="form-control addl-text other-text"
-                                dataType="string"
-                                :code="option.valueCoding.code"
-                                :linkId="item.linkId"
-                                @change="onResponseChangeFieldEvent"
-                                v-if="/other/gi.test(option.valueCoding.display)"
-                            ></textarea>
+                                v-text="option.valueCoding.display"></option>
+                        </select>
+                    </div>
+                    <div class="footer-container">
+                        <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
+                            <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
                         </div>
+                        {{saveLoaderDiv("postTxSubmitContainer")}}
+                        <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
                     </div>
-                    <!-- choice (select) type answer -->
-                    <select class="form-control answer" v-if="item.type == 'choice'" 
-                        :linkId="item.linkId"
-                        :dataType="item.type"
-                        @change="onResponseChangeFieldEvent"
-                    >
-                        <option value="">{{_("Select")}}</option>
-                        <option v-for="option in item.option"
-                            :code="option.valueCoding.code"
-                            :dataType="item.type"
-                            :linkId="item.linkId"
-                            :value="option.valueCoding.display"
-                            v-text="option.valueCoding.display"></option>
-                    </select>
                 </div>
-                <div class="footer-container">
-                    <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
-                        <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
-                    </div>
-                    {{saveLoaderDiv("postTxSubmitContainer")}}
-                    <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
-                </div>
+                <div class="post-intervention-questionnaire-error error-message"></div>
             </div>
-            <div class="post-intervention-questionnaire-error error-message"></div>
-        </div>
-    {% endcall %}
+        {% endcall %}
+    </div>
+  </div>
 {%- endmacro -%}
 {% macro profileTreatingClinician(person) %}
     {% call profileSection(data_sections="locale, timezone") %}
