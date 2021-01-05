@@ -5,4 +5,4 @@ gunicorn==20.0.4
 
 # build from source for prod, use pre-compiled binary for testing
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
-psycopg2==2.8.4
+psycopg2==2.8.6
