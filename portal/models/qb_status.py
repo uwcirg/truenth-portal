@@ -141,9 +141,10 @@ class QB_Status(object):
         # Withdrawn sanity check
         if self.withdrawn_by(self.as_of_date) and (
                 self.overall_status != OverallStatus.withdrawn):
-            raise RuntimeError(
-                "Unexpected state {}, should be withdrawn".format(
-                    self.overall_status))
+            from flask import current_app
+            current_app.logger.error(
+                "Unexpected state %s, user %d should be withdrawn",
+                self.overall_status, self.user.id)
 
     def older_qbds(self, last_known):
         """Generator to return QBDs and status prior to last known
