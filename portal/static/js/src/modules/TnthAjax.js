@@ -356,6 +356,22 @@ export default { /*global $ */
             return true;
         });
     },
+    "getTriggersHistory": function(userId, params, callback) {
+        callback = callback || function() {};
+        params = params || {};
+        if (!userId) {
+            callback({error: true});
+            return false;
+        }
+        this.sendRequest(`/api/user/${userId}/trigger_history`, "GET", userId, params, (data) => {
+            if (!data || data.error) {
+                callback({"error": true});
+                return false;
+            }
+            callback(data);
+            return true;
+        });
+    },
     "getCliniciansList": function(orgIds, callback) {
         callback = callback || function() {};
         orgIds = orgIds || [];

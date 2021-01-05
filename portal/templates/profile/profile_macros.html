@@ -888,8 +888,8 @@
                 <!-- 
                     post intervention questionnaire section 
                     NOTE: 
-                    will display if there are currently triggers or action state is due or overdue
-                    will be in a disabled state if the action state is "resolved"
+                    will display triggers were present in the last determined trigger state
+                    will be in a disabled state if the action state is "completed"
                 -->
                 <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                     <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
