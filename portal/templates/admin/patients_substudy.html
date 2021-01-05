@@ -4,7 +4,7 @@
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
   <div id="patientList" class="substudy">
-    {% set list_title = gettext('Sub-Study Patient List') %}
+    {% set list_title = gettext('EMPRO Patient List') %}
     {% set list_subtitle = gettext('Select a patient below to view or update details') %}
     {%- if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
       <div class="patientList-header">
