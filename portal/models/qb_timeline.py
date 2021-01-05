@@ -1071,9 +1071,10 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
                     if s.isdigit()]
                 assert len(digits) == 1
                 visit_month = digits[0]
-
+            # make sure triggers have been fired before evaluating acting state
             ts = TriggerState.query.filter(
                 TriggerState.user_id == user_id).filter(
+                TriggerState.state == 'triggered',
                 TriggerState.visit_month == visit_month).order_by(
                 TriggerState.timestamp.desc()).first()
             if ts and ts.triggers:
