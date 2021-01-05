@@ -9,6 +9,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
+                            <!-- radio buttons selector for either main study or sub-study instruments -->
                             <div id="studyListSelector" class="list-selector sub-study">
                                 <div class="items">
                                     <div class="item">
@@ -105,16 +106,20 @@
             isCurrentSubStudy: function() {
                 return this.currentStudy === this.subStudyIdentifier;
             },
+            setErrorMessage: function(message) {
+                document.querySelector("#instrumentsExportErrorMessage").innerText = message;
+            },
             getInstrumentList: function () {
                 var self = this;
+                //set sub-study elements vis
                 Global.setSubstudyElementsVis(".sub-study", (data) => {
                     tnthAjax.getInstrumentsList(false, function (data) {
                         if (!data || !data.length) {
-                            document.querySelector("#instrumentsExportErrorMessage").innerText = data.error;
-                            document.querySelector("#patientsInstrumentList").classList.add("ready");
+                            self.setErrorMessage(data.error);
+                            self.setInstrumentsListReady();
                             return false;
                         }
-                        document.querySelector("#instrumentsExportErrorMessage").innerText = "";
+                        self.setErrorMessage("");
                         let entries = data.sort();
                         self.setMainStudyInstrumentsListContent(entries);
                         self.setSubStuyInstrumentsListContent(entries);
@@ -177,7 +182,7 @@
                     self.instruments.selected = "";
                     self.instruments.dataType = "csv";
                     self.resetExportError();
-                    $("#patientsInstrumentList").addClass("ready");
+                    self.setInstrumentsListReady();
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
             },
