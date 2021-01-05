@@ -168,6 +168,11 @@ def evaluate_triggers(qnr, override_state=False):
     :return: None
 
     """
+    if qnr.status != 'completed':
+        raise ValueError(
+            f"QuestionnaireResponse: {qnr.id} with status: {qnr.status} "
+            "sent to evaluate_triggers, only 'completed' are eligible")
+
     try:
         # first, confirm state transition is allowed - raises if not
         ts = users_trigger_state(qnr.subject_id)
