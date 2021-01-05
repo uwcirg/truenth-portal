@@ -3,7 +3,7 @@ export default {
     closeLabel: i18next.t("Close"),
     exportLabel: i18next.t("Export"),
     mainStudySelectorLabel: i18next.t("Main Study"),
-    subStudySelectorLabel: i18next.t("Sub-Study"),
+    subStudySelectorLabel: i18next.t("EMPRO Study"),
     dataTypesPromptLabel: i18next.t("Data type:"),
     instrumentsPromptLabel: i18next.t("Instrument(s) to export data from:"),
     dataTypes: [
