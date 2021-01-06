@@ -24,7 +24,7 @@ def test_initial_state(test_user):
 def test_initial_state_view(client, initialized_patient_logged_in):
     """Confirm unknown user gets initial state"""
     user_id = initialized_patient_logged_in.id
-    results = client.get(f'/api/user/{user_id}/triggers')
+    results = client.get(f'/api/patient/{user_id}/triggers')
     assert results.status_code == 200
     assert results.json['state'] == 'unstarted'
 

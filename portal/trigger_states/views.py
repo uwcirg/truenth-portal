@@ -8,7 +8,7 @@ from ..models.user import get_user
 trigger_states = Blueprint('trigger_states', __name__)
 
 
-@trigger_states.route('/api/user/<int:user_id>/triggers')
+@trigger_states.route('/api/patient/<int:user_id>/triggers')
 @crossdomain()
 @oauth.require_oauth()
 def user_triggers(user_id):
@@ -64,7 +64,7 @@ def user_triggers(user_id):
     return jsonify(ts.as_json())
 
 
-@trigger_states.route('/api/user/<int:user_id>/trigger_history')
+@trigger_states.route('/api/patient/<int:user_id>/trigger_history')
 @crossdomain()
 @oauth.require_oauth()
 def user_trigger_history(user_id):
