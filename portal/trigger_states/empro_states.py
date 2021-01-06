@@ -313,7 +313,7 @@ def fire_trigger_events():
 
         # Now seek out any pending actions, such as reminders to staff
         for ts in TriggerState.query.filter(
-                TriggerState.state.in_('triggered', 'resolved')):
+                TriggerState.state.in_(('triggered', 'resolved'))):
             # Need to consider state == resolved, as the user may
             # have a newer EMPRO due, but the previous still hasn't
             # received a post intervention QB from staff, noted by
