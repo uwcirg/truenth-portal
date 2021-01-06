@@ -468,6 +468,42 @@ class RP_flyweight(object):
         else:
             trace("out of QBs!")
 
+    def pre_loop_transition(self):
+        """Check start state before looping through timeline
+
+        If the organization has already retired one or more RPs,
+        step forward to the correct starting RP
+
+        """
+        # confirm the now current isn't already retired. rare situation that
+        # happens when an org has retired multiple RPs before a user's trigger
+
+        # historically, Research Protocol changes recorded in persistence
+        # files include retroactive dates, that is retired values far in the
+        # past.  add a safe buffer as a "look ahead", so we don't move too
+        # far in the RP history - allowing for the checks in `ordered_qbs()`
+        # to tie a user to the older, well retired RP if they have submitted
+        # QuestionnaireResponses defining the older RP.
+        retro_buffer = relativedelta(months=9)
+        while True:
+            # indefinite plays by a different set of rules
+            if self.classification == 'indefinite':
+                if (
+                        self.cur_rpd.retired and
+                        self.cur_rpd.retired + retro_buffer < self.td and
+                        self.consider_transition()):
+                    trace('pre-loop transition as RP retired before user trigger')
+                    self.transition()
+                else:
+                    break
+            else:
+                if self.consider_transition() and (
+                        self.cur_rpd.retired + retro_buffer) < self.cur_start:
+                    trace('pre-loop transition')
+                    self.transition()
+                else:
+                    break
+
     def transition(self):
         """Transition internal state to 'next' Research Protocol"""
         trace("transitioning to the next RP [{} - {})".format(
@@ -500,15 +536,6 @@ class RP_flyweight(object):
 
         # reset in case of another advancement
         self.skipped_nxt_start = None
-
-        # confirm the now current isn't already retired. rare situation that
-        # happens when an org has retired multiple RPs before a user's trigger
-        if (
-                self.cur_rpd.retired and
-                self.cur_rpd.retired < self.td and
-                self.consider_transition()):
-            trace('fire double transition as RP retired before user trigger')
-            self.transition()
 
 
 def ordered_qbs(user, research_study_id, classification=None):
@@ -558,6 +585,7 @@ def ordered_qbs(user, research_study_id, classification=None):
             trace("no current found in initial QBD lookup, bail")
             return
 
+        rp_flyweight.pre_loop_transition()
         while True:
             if rp_flyweight.consider_transition():
                 # if there's a nextRP and curRP is retired before the
