@@ -207,6 +207,19 @@ def evaluate_triggers(qnr, override_state=False):
             f"evaluate_triggers() for {qnr.subject_id}")
         ts.insert(from_copy=True)
 
+        # a submission closes the window of availability for the
+        # post-intervention clinician follow up.  mark state if
+        # one is found
+        previous = TriggerState.query.filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.timestamp.desc()).first()
+        if previous and previous.triggers.get('action_state') not in (
+                'completed', 'missed'):
+            triggers = copy.deepcopy(previous.triggers)
+            triggers['action_state'] = 'missed'
+            previous.triggers = triggers
+            db.session.commit()
+
         return ts
 
     except (TransitionNotAllowed, LockTimeout) as e:
@@ -299,7 +312,17 @@ def fire_trigger_events():
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
-        for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
+        for ts in TriggerState.query.filter(
+                TriggerState.state.in_('triggered', 'resolved')):
+            # Need to consider state == resolved, as the user may
+            # have a newer EMPRO due, but the previous still hasn't
+            # received a post intervention QB from staff, noted by
+            # the action_state:
+            if (
+                    'action_state' in ts.triggers and
+                    ts.triggers['action_state'] in ('completed', 'missed')):
+                continue
+
             if ts.reminder_due():
                 patient = User.query.get(ts.user_id)
                 pending_emails = staff_emails(
