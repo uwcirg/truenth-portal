@@ -2774,6 +2774,9 @@ div.footer-wrapper.right-panel {
   }
   .instrument-container {
     margin: 4px 0;
+    label.active {
+      font-weight: 500;
+    }
   }
   &.ready {
     opacity: 1;
@@ -3536,9 +3539,7 @@ section.header {
 }
 #postTxQuestionnaireContainer {
   position: relative;
-  &.active {
-    min-height: 250px;
-  }
+  min-height: 250px;
   .loader {
     position: absolute;
     top: 0;
@@ -3592,20 +3593,6 @@ section.header {
       }
     }
   }
-  #noTriggersSection {
-      margin-bottom: 12px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(0, 0, 0, 0.2);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-      .item {
-        margin-bottom: 16px;
-        .text {
-          font-weight: 500;
-        }
-      }
-  }
-
   #reportNoteSection {
     margin-bottom: 32px;
     font-style: italic;

@@ -161,7 +161,8 @@
                     $("input[name=instrument]").each(function() {
                         if ($(this).is(":checked")) {
                             arrSelected.push($(this).val());
-                        }
+                            $(this).closest("label").addClass("active");
+                        } else $(this).closest("label").removeClass("active");
                     });
                     if (!arrSelected.length) {
                         self.instruments.selected = "";
@@ -205,6 +206,7 @@
             },
             resetInstrumentSelections: function() {
                 $("#patientsInstrumentList [name='instrument']").prop("checked", false);
+                $("#patientsInstrumentList label").removeClass("active");
                 this.instruments.selected = "";
             },
             setInstrumentsListReady: function() {
