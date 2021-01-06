@@ -50,15 +50,16 @@
 		</form>
 	</caption>
 {%- endmacro -%}
+<!-- this widget is only applicable for sub-study users -->
 {%- macro patientListToggle(selected="mainStudy") -%}
 	<div id="patientListToggle" class="patientlist-toggle-container eproms-substudy tnth-hide">
 		<a href="/patients">
 			<input type="radio" class="radio" name="patientListToggle" id="mainStudy" {%if selected == 'mainStudy'%}checked{%endif%}>
-			<span class="label">{{_("Main Study")}}</span>
+			<span class="label">{{_("IRONMAN")}}</span>
 		</a>
 		<a href="/patients/substudy">
 			<input type="radio" class="radio" name="patientListToggle" id="subStudy" {%if selected == 'subStudy'%}checked{%endif%}>
-			<span class="label">{{_("Sub-Study")}}</span>
+			<span class="label">{{_("EMPRO")}}</span>
 		</a>
 	</div>
 {%- endmacro -%}
