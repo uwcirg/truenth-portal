@@ -1011,6 +1011,20 @@ select:not([multiple]) {
 }
 #resourcesContentContainer {
   min-height: 50vh;
+  .video {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56%;
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
   .tab-label {
     font-size: 1.1em;
     background: @featureBtnColor;
@@ -1030,6 +1044,14 @@ select:not([multiple]) {
     li {
       line-height: 3rem;
       margin-left: 1em;
+    }
+  }
+}
+@media (min-width: 699px) {
+  #resourcesContentContainer {
+    .video {
+      width: 45%;
+      padding-bottom: 25.2%;
     }
   }
 }
