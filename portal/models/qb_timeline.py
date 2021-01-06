@@ -1024,7 +1024,7 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
     a new lookup with each passing moment.
 
     If no data is available for the user, returns
-     {'status': 'expired', 'visit_name': None}
+     {'status': 'expired', 'visit_name': None, 'action_state': 'not applicable'}
 
     :returns: dictionary with key/values for:
       status: string like 'expired'
@@ -1061,20 +1061,11 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
             # Not available to all products, thus the nested import
             from ..trigger_states.models import TriggerState
 
-            # month count present only beyond baseline
-            if qbt.qbd().questionnaire_bank.classification == 'baseline':
-                visit_month = 0
-            else:
-                # pull digit from possibly translated string
-                digits = [
-                    int(s) for s in results['visit_name'].split()
-                    if s.isdigit()]
-                assert len(digits) == 1
-                visit_month = digits[0]
-
+            # Don't include the most recent `due` as they hide
+            # outstanding work, allowed till subsequent submission.
             ts = TriggerState.query.filter(
                 TriggerState.user_id == user_id).filter(
-                TriggerState.visit_month == visit_month).order_by(
+                TriggerState.state != 'due').order_by(
                 TriggerState.timestamp.desc()).first()
             if ts and ts.triggers:
                 results['action_state'] = ts.triggers.get(

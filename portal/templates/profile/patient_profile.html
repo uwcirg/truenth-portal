@@ -62,14 +62,7 @@
           {{profile_macro.longitudinalReport(user)}}
       </div>
     </div>
-    <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
-    <a href="#postInterventionQuestionnaireLoc"></a>
-    <div id="postInterventionQuestionnaireLoc">&nbsp;</div>
-    <div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowSubstudyPostTx()"> 
-      <div class="col-md-12 col-xs-12">
-          {{profile_macro.postInterventionQuestionnaire(user)}}
-      </div>
-    </div>
+    {{profile_macro.postInterventionQuestionnaire(user)}}
   {%- endif -%}
   {{profile_macro.profileDemoDetail(user, current_user)}}
   {{profile_macro.profileCommunications(user, current_user)}}
