@@ -149,11 +149,6 @@
                     return this.isSubStudyInstrument(code);
                 });
             },
-            setInstrumentsListReady: function() {
-                Vue.nextTick(function() {
-                    document.querySelector("#patientsInstrumentList").classList.add("ready");
-                });
-            },
             getDisplayInstrumentName: function(code) {
                 if (!code) return "";
                 return code.replace(/_/g, " ").toUpperCase();
@@ -174,9 +169,15 @@
                     }
                     self.instruments.selected = arrSelected.map(item => `instrument_id=${item}`).join("&");
                 });
-                $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType'], #studyListSelector [name='listSelector']").on("click", function() {
+                $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
                     //clear pre-existing error
                     self.resetExportError();
+                });
+                //study selector onclick event
+                $("#studyListSelector [name='listSelector']").on("click", function() {
+                    //clear pre-existing error
+                    self.resetExportError();
+                    self.resetInstrumentSelections();
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
@@ -202,12 +203,21 @@
                 this.instruments.showMessage = false;
                 this.instruments.dataType = event.target.value;
             },
-            getExportUrl: function() {
-                return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
+            resetInstrumentSelections: function() {
+                $("#patientsInstrumentList [name='instrument']").prop("checked", false);
+                this.instruments.selected = "";
+            },
+            setInstrumentsListReady: function() {
+                Vue.nextTick(function() {
+                    document.querySelector("#patientsInstrumentList").classList.add("ready");
+                });
             },
             hasInstrumentsSelection: function () {
                 return this.instruments.selected !== "" && this.instruments.dataType !== "";
-            }
+            },
+            getExportUrl: function() {
+                return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
+            },
         }
     };
 </script>
