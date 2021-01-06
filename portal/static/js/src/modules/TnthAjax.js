@@ -335,7 +335,7 @@ export default { /*global $ */
                 return;
             }
         }
-        this.sendRequest(`/api/user/${userId}/triggers`, "GET", userId, params, (data) => {
+        this.sendRequest(`/api/patient/${userId}/triggers`, "GET", userId, params, (data) => {
             if (!data || data.error || !data.state) {
                 callback({"error": true});
                 return false;
@@ -363,7 +363,7 @@ export default { /*global $ */
             callback({error: true});
             return false;
         }
-        this.sendRequest(`/api/user/${userId}/trigger_history`, "GET", userId, params, (data) => {
+        this.sendRequest(`/api/patient/${userId}/trigger_history`, "GET", userId, params, (data) => {
             if (!data || data.error) {
                 callback({"error": true});
                 return false;
