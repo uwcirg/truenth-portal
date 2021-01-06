@@ -387,7 +387,7 @@ def patient_timeline(patient_id):
         QuestionnaireResponse.authored)
 
     def get_recur_id(qnr):
-        if len(qnr.questionnaire_bank.recurs):
+        if qnr.questionnaire_bank and len(qnr.questionnaire_bank.recurs):
             return qnr.questionnaire_bank.recurs[0].id
         return None
 

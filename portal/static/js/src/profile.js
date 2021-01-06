@@ -183,6 +183,10 @@ export default (function() {
                 answers: [],
                 loading: true
             },
+            /*
+             * based on trigger history
+             * last triggers state
+             */
             subStudyTriggers: {
                 domains: [],
                 date: "",
@@ -1227,7 +1231,16 @@ export default (function() {
                 });
             },
             setSubStudyAssessmentData: function(data) {
+                if (!data || !data.length) return;
+                //latest first
+                data = (data).sort(function(a, b) {
+                    return new Date(b.authored) - new Date(a.authored);
+                });
                 this.subStudyAssessment.data = data;
+            },
+            getLastSubStudyAssessmentDate: function() {
+                if (!this.subStudyAssessment.data || !this.subStudyAssessment.data.length) return "";
+                return this.modules.tnthDates.formatDateString(this.subStudyAssessment.data[0].authored);
             },
             hasSubStudyAsssessmentData: function() {
                 return this.computedSubStudyAssessmentData.length;
@@ -1256,33 +1269,48 @@ export default (function() {
                             return;
                         }
                         this.setSubStudyAssessmentData(data.entry);
-                        this.modules.tnthAjax.getSubStudyTriggers(this.subjectId, params, (data) => {
-                            if (!data.triggers || !data.triggers.domain) {
+                        this.modules.tnthAjax.getTriggersHistory(this.subjectId, params, (data) => {
+                            if (!data || !data.length) {
                                 callback();
                                 return;
                             }
                             let domains = new Array();
-                            for (let topic in data.triggers.domain) {
-                                if (!Object.keys(data.triggers.domain[topic]).length) {
+                            let lastTriggerItem = null;
+                            for (var index = data.length-1; index >= 0; index--) {
+                               if (String(data[index].state).toLowerCase() !== "due") {
+                                    lastTriggerItem = data[index];
+                                    break;
+                               }
+                            }
+                            if (!lastTriggerItem || !lastTriggerItem.triggers) {
+                                callback();
+                                return false;
+                            }
+                            for (let topic in lastTriggerItem.triggers.domain) {
+                                if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
                                     continue;
                                 }
-                                for (let q in data.triggers.domain[topic]) {
+                                for (let q in lastTriggerItem.triggers.domain[topic]) {
                                     /*
                                      * HARD triggers ONLY 
                                      */
-                                    if (data.triggers.domain[topic][q] === "hard"
+                                    if (lastTriggerItem.triggers.domain[topic][q] === "hard"
                                         && domains.indexOf(topic) === -1) {
                                         domains.push(topic);
                                     }
                                 }
                             }
-                            let completedDate = data.triggers.source && data.triggers.source.authored ? data.triggers.source.authored : data.timestamp;
+                            let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
                             [
                                 this.subStudyTriggers.domains,
                                 this.subStudyTriggers.date,
                                 this.subStudyTriggers.state,
                                 this.subStudyTriggers.data
-                            ] = [domains, this.modules.tnthDates.formatDateString(completedDate), data.state, data.triggers];
+                            ] = [
+                                domains,
+                                this.modules.tnthDates.formatDateString(completedDate),
+                                lastTriggerItem.state,
+                                lastTriggerItem.triggers];
                             callback();
                     });
                 });
@@ -1348,11 +1376,17 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                //TODO need to also show post tx section IF there is previous response for this subject and the subject does not have triggers in the current patient questionnaire responses
-                return this.isSubStudyPatient() && (this.hasSubStudyTriggers() || this.hasPrevSubStudyPostTx());
+                return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
+            },
+            isPostTxActionRequired: function() {
+                return this.subStudyTriggers.data &&
+                ["due", "overdue", "required"].indexOf(String(this.subStudyTriggers.data.action_state).toLowerCase()) !== -1;
             },
             isSubStudyTriggersResolved: function() {
-                return this.subStudyTriggers.state === "resolved";
+                if (!this.subStudyTriggers.data) {
+                    return true;
+                }
+                return String(this.subStudyTriggers.data.action_state).toLowerCase() === "completed" || this.subStudyTriggers.data.resolution;
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
@@ -1394,6 +1428,9 @@ export default (function() {
                 }
                 $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
             },
+            shouldShowPostTxQuestionnaireSection: function() {
+                return this.isSubStudyPatient() && this.hasSubStudyAsssessmentData();
+            },
             initPostTxQuestionnaireSection: function(params) {
                 if (!this.subjectId || !this.isSubStudyPatient()) {
                     return false;
@@ -1434,7 +1471,7 @@ export default (function() {
                         });
 
                     });
-                }, params);
+                }, {...params, ...{clearCache: true}});
             },
             submitPostTxQuestionnaire: function(e) {
                 e.preventDefault();
@@ -1541,8 +1578,8 @@ export default (function() {
                         return;
                     }
                     setTimeout(function() {
-                        this.initPostTxQuestionnaireSection({clearCache: true});
-                    }.bind(this), 2750);
+                        location.reload();
+                    }.bind(this), 2000);
                 });
                 return false;
             },

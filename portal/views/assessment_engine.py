@@ -991,7 +991,7 @@ def assessment_update(patient_id):
 
     # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
     qn_name = existing_qnr.document.get("questionnaire").get("reference", '').split('/')[-1]
-    if  qn_name == 'ironman_ss':
+    if qn_name == 'ironman_ss' and existing_qnr.status == 'completed':
         from ..tasks import extract_observations_task
         extract_observations_task.apply_async(
             kwargs={'questionnaire_response_id': existing_qnr.id}
@@ -1680,7 +1680,7 @@ def assessment_add(patient_id):
 
     # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
     qn_name = questionnaire_response.document.get("questionnaire").get("reference", '').split('/')[-1]
-    if  qn_name == 'ironman_ss':
+    if qn_name == 'ironman_ss' and questionnaire_response.status == 'completed':
         from ..tasks import extract_observations_task
         extract_observations_task.apply_async(
             kwargs={'questionnaire_response_id': questionnaire_response.id}

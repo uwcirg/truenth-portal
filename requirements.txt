@@ -32,7 +32,7 @@ flask-wtf==0.14.3         # via flask-user
 flask==1.0.3
 fuzzywuzzy==0.17.0
 healthcheck==1.3.3
-idna==2.8                 # via requests
+idna==3.1                 # via requests
 itsdangerous==1.1.0        # via flask
 jinja2==2.11.2              # via flask, flask-babel, sphinx
 jsonschema==3.0.2
@@ -49,7 +49,7 @@ python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
 python-statemachine==0.8.0	# via python-statemachine
-pytz==2020.4              # via babel, celery
+pytz==2020.5              # via babel, celery
 pyyaml==5.3.1              # via flask-swagger, swagger-spec-validator
 redis==3.5.3
 requests-cache==0.5.2

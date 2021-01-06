@@ -4,7 +4,7 @@
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
   <div id="patientList" class="substudy">
-    {% set list_title = gettext('Sub-Study Patient List') %}
+    {% set list_title = gettext('EMPRO Patient List') %}
     {% set list_subtitle = gettext('Select a patient below to view or update details') %}
     {%- if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
       <div class="patientList-header">
@@ -60,10 +60,10 @@
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input" data-width="150">{{ _("Username (email)") }}</th>
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input" data-visible="false">{{ _("Date of Birth") }}</th>
+                  <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
                   <th data-field="status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{_("EMPRO Questionnaire Status")}}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input" data-visible="false">{{ _("Visit") }}</th>
                   <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Clinician Action Status") }}</th>
-                  <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
                   <th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-visible="false" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-visible="false" data-class="consentdate-field text-center" data-filter-control="input" data-visible="true">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field"  data-filter-control="select" data-visible="true">{{ _("Site(s)") }}</th>
@@ -77,6 +77,7 @@
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
+                      <td>{{patient.clinician if patient.clinician else ""}}</td>
                       <td>{{patient.assessment_status if patient.assessment_status}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
                       <td>
@@ -86,7 +87,6 @@
                           {{patient.action_state}}
                         {% endif %}
                       </td>
-                      <td>{{patient.clinician if patient.clinician else ""}}</td>
                       <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}

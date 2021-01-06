@@ -132,10 +132,6 @@ def initiate_trigger(user_id):
 
     # Check and update the status of pending work.
     if ts.state == 'triggered':
-        # Just ran out of time, resolve as 'missed'
-        current_app.logger.debug(f"resolve 'missed' trigger for {user_id}")
-        triggers = copy.deepcopy(ts.triggers)
-        triggers['action_state'] = 'missed'
         sm = EMPRO_state(ts)
         sm.resolve()
         db.session.commit()
@@ -172,6 +168,11 @@ def evaluate_triggers(qnr, override_state=False):
     :return: None
 
     """
+    if qnr.status != 'completed':
+        raise ValueError(
+            f"QuestionnaireResponse: {qnr.id} with status: {qnr.status} "
+            "sent to evaluate_triggers, only 'completed' are eligible")
+
     try:
         # first, confirm state transition is allowed - raises if not
         ts = users_trigger_state(qnr.subject_id)
@@ -205,6 +206,19 @@ def evaluate_triggers(qnr, override_state=False):
             "record state change to 'processed' from "
             f"evaluate_triggers() for {qnr.subject_id}")
         ts.insert(from_copy=True)
+
+        # a submission closes the window of availability for the
+        # post-intervention clinician follow up.  mark state if
+        # one is found
+        previous = TriggerState.query.filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.timestamp.desc()).first()
+        if previous and previous.triggers.get('action_state') not in (
+                'completed', 'missed'):
+            triggers = copy.deepcopy(previous.triggers)
+            triggers['action_state'] = 'missed'
+            previous.triggers = triggers
+            db.session.commit()
 
         return ts
 
@@ -298,7 +312,17 @@ def fire_trigger_events():
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
-        for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
+        for ts in TriggerState.query.filter(
+                TriggerState.state.in_(('triggered', 'resolved'))):
+            # Need to consider state == resolved, as the user may
+            # have a newer EMPRO due, but the previous still hasn't
+            # received a post intervention QB from staff, noted by
+            # the action_state:
+            if (
+                    'action_state' in ts.triggers and
+                    ts.triggers['action_state'] in ('completed', 'missed')):
+                continue
+
             if ts.reminder_due():
                 patient = User.query.get(ts.user_id)
                 pending_emails = staff_emails(
@@ -358,9 +382,9 @@ def empro_staff_qbd_accessor(qnr):
                 "specialized QBD accessor given wrong instrument "
                 f"{instrument}")
 
-        # find best match from subject's trigger_states.  should always be
-        # in `triggered` state, unless re-eval is in process due to consent
-        # change, or the like.
+        # find best match from subject's trigger_states.  will be in
+        # `triggered` state if current, or `resolved` if time has
+        # passed and the user now has the subsequent month due.
         query = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state.in_(('triggered', 'resolved'))).order_by(
