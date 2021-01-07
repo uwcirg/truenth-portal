@@ -214,7 +214,7 @@ export default {
             params.maxTryAttempts = params.maxTryAttempts || 5;
             //get trigger domains IF a patient
             Promise.allSettled([
-                this.$http(`/api/user/${this.getUserID()}/triggers`)
+                this.$http(`/api/patient/${this.getUserID()}/triggers`)
             ]).then(response => {
                 let processedData = "";
                 try {
