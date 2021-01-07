@@ -2155,7 +2155,7 @@ div.footer-wrapper.right-panel {
   }
   .filterControl {
     .form-control.active {
-        border: 2px solid darken(@muterColor, 10%);
+        border: 2px solid darken(@muterColor, 15%);
         font-weight: 500;
     }
   }
@@ -2582,6 +2582,7 @@ div.footer-wrapper.right-panel {
         font-size: 14px;
         font-weight: 400;
         vertical-align: middle;
+        letter-spacing: 0.03rem;
         &:first-of-type {
           margin-right: 8px;
         }
@@ -2714,6 +2715,9 @@ div.footer-wrapper.right-panel {
     display: block;
     clear: both;
   }
+  label.active {
+    font-weight: 500;
+  }
   .data-types-container {
     border-top: 1px solid @muterColor;
     padding-top: 8px;
@@ -2739,6 +2743,7 @@ div.footer-wrapper.right-panel {
       position: relative;
       top: -2px;
       color: @mutedColor;
+      letter-spacing: 0.03rem;
       &.active {
         font-weight: 500;
       }
@@ -2774,9 +2779,6 @@ div.footer-wrapper.right-panel {
   }
   .instrument-container {
     margin: 4px 0;
-    label.active {
-      font-weight: 500;
-    }
   }
   &.ready {
     opacity: 1;

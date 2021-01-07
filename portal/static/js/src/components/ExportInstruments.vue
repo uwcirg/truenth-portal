@@ -44,8 +44,8 @@
                         <div class="form-group data-types-container">
                             <label class="text-muted prompt" v-text="dataTypesPromptLabel"></label>
                             <div id="patientsDownloadTypeList" class="profile-radio-list">
-                                <label class="radio-inline" v-for="item in dataTypes" :key="item.id">
-                                    <input type="radio" name="downloadType" :id="item.id" :value="item.value" @click="setDataType" :checked="item.value == 'csv'"/>
+                                <label class="radio-inline" v-for="item in dataTypes" :key="item.id" :class="{'active': item.value == 'csv'}">
+                                    <input type="radio" name="downloadType" :id="item.id" :value="item.value" @click="setDataType" :checked="item.value == 'csv'" />
                                     {{item.label}}
                                 </label>
                             </div>
@@ -179,6 +179,14 @@
                     //clear pre-existing error
                     self.resetExportError();
                     self.resetInstrumentSelections();
+                });
+                //patientsDownloadTypeList downloadType
+                $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
+                    $("#patientsDownloadTypeList label").removeClass("active");
+                    if ($(this).is(":checked")) {
+                        $(this).closest("label").addClass("active");
+                        return;
+                    }
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
