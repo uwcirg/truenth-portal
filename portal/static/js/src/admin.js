@@ -878,7 +878,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 var tnthAjax = self.getDependency("tnthAjax");
 
                 tnthAjax.getTablePreference(uid, tableIdentifier, {
-                    "sync": true
+                    "sync": false
                 }, function (data) {
                     if (!data || data.error) {
                         return false;
