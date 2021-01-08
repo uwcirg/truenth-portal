@@ -211,6 +211,7 @@ def evaluate_triggers(qnr, override_state=False):
         # post-intervention clinician follow up.  mark state if
         # one is found
         previous = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state == 'resolved').order_by(
             TriggerState.timestamp.desc()).first()
         if previous and previous.triggers.get('action_state') not in (

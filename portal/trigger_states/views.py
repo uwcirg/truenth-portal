@@ -1,14 +1,15 @@
 from flask import Blueprint, current_app, jsonify, request
 from .empro_states import users_trigger_state
 from .models import TriggerState
-from ..views.crossdomain import crossdomain
+from ..database import db
 from ..extensions import oauth
 from ..models.user import get_user
+from ..views.crossdomain import crossdomain
 
 trigger_states = Blueprint('trigger_states', __name__)
 
 
-@trigger_states.route('/api/user/<int:user_id>/triggers')
+@trigger_states.route('/api/patient/<int:user_id>/triggers')
 @crossdomain()
 @oauth.require_oauth()
 def user_triggers(user_id):
@@ -55,6 +56,14 @@ def user_triggers(user_id):
 
             extract_observations(qnr.id)
 
+        # remove stale / redundant rows for the user from the
+        # time of the requested qnr authored.
+        for ts in TriggerState.query.filter(
+                TriggerState.user_id == user_id).filter(
+                TriggerState.timestamp > qnr.authored):
+            db.session.delete(ts)
+        db.session.commit()
+
         current_app.logger.debug(
             f"triggers view: evaluate_triggers() for {user_id} on request"
         )
@@ -64,7 +73,7 @@ def user_triggers(user_id):
     return jsonify(ts.as_json())
 
 
-@trigger_states.route('/api/user/<int:user_id>/trigger_history')
+@trigger_states.route('/api/patient/<int:user_id>/trigger_history')
 @crossdomain()
 @oauth.require_oauth()
 def user_trigger_history(user_id):

@@ -96,8 +96,14 @@ class DomainManifold(object):
         for timepoint in 'cur', 'initial', 'prev':
             process_qnr = getattr(self, f"{timepoint}_qnr")
             if process_qnr:
+                qnr_id = (
+                    getattr(process_qnr, 'qnr_id', None) or
+                    getattr(process_qnr, 'id', None))
+                if not qnr_id:
+                    raise ValueError(f"Unable to determine qnr_id from {process_qnr}")
+
                 obs = Observation.query.filter(
-                    Observation.derived_from == str(process_qnr.id)
+                    Observation.derived_from == str(qnr_id)
                 )
                 # Extract useful bits for trigger calc from observations
                 # format as dictionary, keyed by `domain`.  Each domain
