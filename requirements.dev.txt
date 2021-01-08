@@ -24,7 +24,7 @@ snowballstemmer==2.0.0    # via sphinx
 sphinx-rtd-theme==0.5.1
 sphinx==3.3.1
 sphinxcontrib-websupport==1.1.2  # via sphinx
-tox==3.14.6
+tox==3.21.0
 typing==3.7.4.3             # via sphinx
 virtualenv==16.7.8        # via tox
 waitress==1.4.3           # via webtest
