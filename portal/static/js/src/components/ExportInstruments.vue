@@ -9,18 +9,43 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label class="text-muted" v-text="instrumentsPromptLabel"></label>
+                            <!-- radio buttons selector for either main study or sub-study instruments -->
+                            <div id="studyListSelector" class="list-selector sub-study">
+                                <div class="items">
+                                    <div class="item">
+                                        <input type="radio" name="listSelector" @click="setCurrentMainStudy()" checked>
+                                        <span class="text" v-text="mainStudySelectorLabel" :class="{'active': isCurrentMainStudy()}"></span>
+                                    </div>
+                                    <div class="item">
+                                        <input type="radio" name="listSelector" @click="setCurrentSubStudy()">
+                                        <span class="text" v-text="subStudySelectorLabel" :class="{'active': isCurrentSubStudy()}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="text-muted prompt" v-text="instrumentsPromptLabel"></label>
                             <div id="patientsInstrumentListWrapper">
                                 <!-- dynamically load instruments list -->
-                                <div id="patientsInstrumentList" class="profile-radio-list"></div>
+                                <div id="patientsInstrumentList" class="profile-radio-list">
+                                    <div v-show="isCurrentMainStudy()">
+                                        <div class="list">
+                                            <div class="checkbox instrument-container" :id="code+'_container'" v-for="code in mainStudyInstrumentsList"><label><input type="checkbox" name="instrument" :value="code">{{getDisplayInstrumentName(code)}}</label></div>
+                                        </div>
+                                    </div>
+                                    <!-- sub-study instrument list, should only display when the user is part of the sub-study -->
+                                    <div v-show="isCurrentSubStudy()">
+                                        <div class="list">
+                                            <div class="checkbox instrument-container" :id="code+'_container'" v-for="code in subStudyInstrumentsList"><label><input type="checkbox" name="instrument" :value="code">{{getDisplayInstrumentName(code)}}</label></div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="text-muted" v-text="dataTypesPromptLabel"></label>
+                        <div class="form-group data-types-container">
+                            <label class="text-muted prompt" v-text="dataTypesPromptLabel"></label>
                             <div id="patientsDownloadTypeList" class="profile-radio-list">
-                                <label class="radio-inline" v-for="item in dataTypes" :key="item.id">
-                                    <input type="radio" name="downloadType" :id="item.id" :value="item.value" @click="setDataType" :checked="item.value == 'csv'"/>
+                                <label class="radio-inline" v-for="item in dataTypes" :key="item.id" :class="{'active': item.value == 'csv'}">
+                                    <input type="radio" name="downloadType" :id="item.id" :value="item.value" @click="setDataType" :checked="item.value == 'csv'" />
                                     {{item.label}}
                                 </label>
                             </div>
@@ -42,19 +67,21 @@
     </div>
 </template>
 <script>
+    import Global from "../modules/Global.js";
     import tnthAjax from "../modules/TnthAjax.js";
+    import {EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "../data/common/consts.js";
     import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
     import ExportDataLoader from "./asyncExportDataLoader.vue";
     export default { /*global i18next */
-        props: {
-            instrumentsList: {
-                type: Array,
-                required: false
-            }
-        },
         components: {ExportDataLoader},
         data: function() {
-            return ExportInstrumentsData;
+            return {...ExportInstrumentsData, ...{
+                currentStudy: "main",
+                mainStudyIdentifier: "main",
+                subStudyIdentifier: "substudy",
+                mainStudyInstrumentsList:[],
+                subStudyInstrumentsList:[]
+            }};
         },
         mounted: function() {
             this.getInstrumentList();
@@ -62,55 +89,110 @@
         methods: {
             getInitElementId: function() {
                 return "patientsDownloadButton";
-            }, 
+            },
+            setCurrentStudy: function(identifier) {
+                if (!identifier) return;
+                this.currentStudy = identifier;
+            },
+            setCurrentMainStudy: function() {
+                this.setCurrentStudy(this.mainStudyIdentifier);
+            },
+            setCurrentSubStudy: function() {
+                this.setCurrentStudy(this.subStudyIdentifier);
+            },
+            isCurrentMainStudy: function() {
+                return this.currentStudy === this.mainStudyIdentifier;
+            },
+            isCurrentSubStudy: function() {
+                return this.currentStudy === this.subStudyIdentifier;
+            },
+            setErrorMessage: function(message) {
+                document.querySelector("#instrumentsExportErrorMessage").innerText = message;
+            },
             getInstrumentList: function () {
-                if (this.instrumentsList && this.instrumentsList.length) {
-                    this.setInstrumentsListContent(this.instrumentsList);
-                    this.setInstrumentInputEvent();
-                    return;
-                }
                 var self = this;
-                tnthAjax.getInstrumentsList(false, function (data) {
-                    if (!data || !data.length) {
-                        document.querySelector("#instrumentsExportErrorMessage").innerText = data.error;
-                        document.querySelector("#patientsInstrumentList").classList.add("ready");
-                        return false;
-                    }
-                    document.querySelector("#instrumentsExportErrorMessage").innerText = "";
-                    self.setInstrumentsListContent(data.sort());
-                    setTimeout(function() {
-                        self.setInstrumentInputEvent();
-                    }.bind(self), 150);
+                //set sub-study elements vis
+                Global.setSubstudyElementsVis(".sub-study", (data) => {
+                    tnthAjax.getInstrumentsList(false, function (data) {
+                        if (!data || !data.length) {
+                            self.setErrorMessage(data.error);
+                            self.setInstrumentsListReady();
+                            return false;
+                        }
+                        self.setErrorMessage("");
+                        let entries = data.sort();
+                        self.setMainStudyInstrumentsListContent(entries);
+                        self.setSubStuyInstrumentsListContent(entries);
+                        self.setInstrumentsListReady();
+                        setTimeout(function() {
+                            self.setInstrumentInputEvent();
+                        }.bind(self), 150);
+                    });
                 });
             },
-            setInstrumentsListContent: function(list) {
-                let content = "";
-                (list).forEach(function(code) {
-                    content += `<div class="checkbox instrument-container" id="${code}_container"><label><input type="checkbox" name="instrument" value="${code}">${code.replace(/_/g, " ").toUpperCase()}</label></div>`;
+            isSubStudyInstrument: function(instrument_code) {
+                if (!instrument_code) return false;
+                let re = new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, "i");
+                if (re.test(instrument_code)) {
+                    return true;
+                }
+            },
+            setMainStudyInstrumentsListContent: function(list) {
+                if (!list) return false;
+                this.mainStudyInstrumentsList = list.filter(code => {
+                    return !this.isSubStudyInstrument(code);
                 });
-                document.querySelector("#patientsInstrumentList").innerHTML = content;
-                document.querySelector("#patientsInstrumentList").classList.add("ready");
+            },
+            setSubStuyInstrumentsListContent: function(list) {
+                if (!list) return false;
+                this.subStudyInstrumentsList = list.filter(code => {
+                    return this.isSubStudyInstrument(code);
+                });
+            },
+            getDisplayInstrumentName: function(code) {
+                if (!code) return "";
+                return code.replace(/_/g, " ").toUpperCase();
             },
             setInstrumentInputEvent: function() {
                 var self = this;
                 $("#patientsInstrumentList [name='instrument']").on("click", function(event) {
-                    if (event.target.value && $(event.target).is(":checked")) {
-                        self.instruments.selected = self.instruments.selected + (self.instruments.selected !== "" ? "&" : "") + "instrument_id=" + event.target.value;
+                    self.instruments.selected = "";
+                    let arrSelected = [];
+                    $("input[name=instrument]").each(function() {
+                        if ($(this).is(":checked")) {
+                            arrSelected.push($(this).val());
+                            $(this).closest("label").addClass("active");
+                        } else $(this).closest("label").removeClass("active");
+                    });
+                    if (!arrSelected.length) {
+                        self.instruments.selected = "";
                         return;
                     }
-                    if ($("input[name=instrument]:checked").length === 0) {
-                        self.instruments.selected = "";
-                    }
+                    self.instruments.selected = arrSelected.map(item => `instrument_id=${item}`).join("&");
                 });
                 $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
                     //clear pre-existing error
                     self.resetExportError();
                 });
+                //study selector onclick event
+                $("#studyListSelector [name='listSelector']").on("click", function() {
+                    //clear pre-existing error
+                    self.resetExportError();
+                    self.resetInstrumentSelections();
+                });
+                //patientsDownloadTypeList downloadType
+                $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
+                    $("#patientsDownloadTypeList label").removeClass("active");
+                    if ($(this).is(":checked")) {
+                        $(this).closest("label").addClass("active");
+                        return;
+                    }
+                });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
                     self.instruments.selected = "";
                     self.instruments.dataType = "csv";
                     self.resetExportError();
-                    $("#patientsInstrumentList").addClass("ready");
+                    self.setInstrumentsListReady();
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
             },
@@ -130,12 +212,22 @@
                 this.instruments.showMessage = false;
                 this.instruments.dataType = event.target.value;
             },
-            getExportUrl: function() {
-                return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
+            resetInstrumentSelections: function() {
+                $("#patientsInstrumentList [name='instrument']").prop("checked", false);
+                $("#patientsInstrumentList label").removeClass("active");
+                this.instruments.selected = "";
+            },
+            setInstrumentsListReady: function() {
+                Vue.nextTick(function() {
+                    document.querySelector("#patientsInstrumentList").classList.add("ready");
+                });
             },
             hasInstrumentsSelection: function () {
                 return this.instruments.selected !== "" && this.instruments.dataType !== "";
-            }
+            },
+            getExportUrl: function() {
+                return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
+            },
         }
     };
 </script>

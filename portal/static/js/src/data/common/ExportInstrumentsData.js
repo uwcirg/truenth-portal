@@ -2,6 +2,8 @@ export default {
     title: i18next.t("Export questionnaire data"),
     closeLabel: i18next.t("Close"),
     exportLabel: i18next.t("Export"),
+    mainStudySelectorLabel: i18next.t("IRONMAN"),
+    subStudySelectorLabel: i18next.t("EMPRO"),
     dataTypesPromptLabel: i18next.t("Data type:"),
     instrumentsPromptLabel: i18next.t("Instrument(s) to export data from:"),
     dataTypes: [

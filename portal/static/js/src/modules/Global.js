@@ -102,22 +102,26 @@ export default { /*global $ i18next */ /*initializing functions performed only o
      * dynamically show/hide sub-study specific UI elements
      * @param elementSelector A DOMString containing one or more selectors to match, e.g. #tnthWrapper .blah
      */
-    setSubstudyElementsVis: function(elementSelector) {
+    setSubstudyElementsVis: function(elementSelector, callback) {
+        callback = callback || function() {};
         if (!elementSelector) {
+            callback({error: true});
             return;
         }
         this.getCurrentUser((userId) => {
             if (!userId) return;
             this.getUserResearchStudies(userId, data => {
                 if (!data || !data.research_study || !data.research_study.length) {
+                    callback({error: true});
                     return;
                 }
                 let substudyRS = (data.research_study).filter(item => item.id === EPROMS_SUBSTUDY_ID);
                 if (substudyRS.length) {
                     $(elementSelector).show();
-                    return;
+                } else {
+                    $(elementSelector).hide();
                 }
-                $(elementSelector).hide();
+                callback(data);
             });
         });
     },

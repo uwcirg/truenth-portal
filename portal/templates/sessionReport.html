@@ -12,10 +12,10 @@
 			{% if current_user.id == user.id %}
 			<a href="{{url_for('portal.profile')}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
 			{% else %}
-				{% if not current_user.has_role(ROLE.PATIENT.value) %}
-					<a href="{{url_for('patients.patient_profile', patient_id=user.id) }}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Patient Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
-				{% else %}
+				{% if current_user.has_role(ROLE.PATIENT.value) %}
 					<a href="{{url_for('portal.profile', user_id=user.id)}}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to User Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+				{% else %}
+					<a href="{{url_for('patients.patient_profile', patient_id=user.id) }}" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Patient Profile') }}" class="btn"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
 				{% endif %}
 			{% endif %}
 			&nbsp;&nbsp;<a href="/" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Truenth Home') }}" class="btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
