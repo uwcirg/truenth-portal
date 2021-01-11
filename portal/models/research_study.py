@@ -4,7 +4,7 @@ from ..cache import TWO_HOURS, cache
 from ..database import db
 from .questionnaire_bank import QuestionnaireBank, qbs_by_intervention
 from .research_protocol import ResearchProtocol
-from .user_consent import latest_consent
+from .user_consent import consent_withdrawal_dates
 
 BASE_RS_ID = 0
 EMPRO_RS_ID = 1
@@ -66,7 +66,10 @@ class ResearchStudy(db.Model):
             if rs_id is None:
                 continue
 
-            if latest_consent(user, rs_id) and rs_id not in results:
+            # As timeline rebuilds are necessary, withdrawn users
+            # count in an `assigned_to` check
+            c_date, w_date = consent_withdrawal_dates(user, rs_id)
+            if c_date or w_date and rs_id not in results:
                 results.append(rs_id)
         results.sort()
         return results
