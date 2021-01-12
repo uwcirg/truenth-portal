@@ -203,11 +203,9 @@ def patient_profile(patient_id):
                 display.link_label is not None):
             user_interventions.append({"name": intervention.name})
 
-    substudy_status = [
-        study for study in patient_research_study_status(patient) if
-        study['research_study_id'] == EMPRO_RS_ID]
+    study_status = patient_research_study_status(patient)
     substudy_assessment_is_ready = (
-        substudy_status and substudy_status[0]['ready'])
+        EMPRO_RS_ID in study_status and study_status[EMPRO_RS_ID]['ready'])
 
     return render_template(
         'profile/patient_profile.html', user=patient,

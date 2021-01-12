@@ -482,9 +482,8 @@ def patient_research_study_status(patient, ignore_QB_status=False):
     :param patient: subject to check
     :param ignore_QB_status: set to prevent recursive call, if used during
       process of evaluating QB_status.  Will restrict results to eligible
-    :returns: ordered list of applicable research studies.  Each contains a
-     dictionary with keys:
-     - research_study_id: integer value of research study
+    :returns: dictionary of applicable studies keyed by research_study_id.
+      Each contains a dictionary with keys:
      - eligible: set True if assigned to research study and pre-requisites
          have been met, such as assigned clinician if applicable.
      - ready: set True or False based on complex rules.  True means pending
@@ -497,17 +496,16 @@ def patient_research_study_status(patient, ignore_QB_status=False):
     from .research_study import EMPRO_RS_ID, ResearchStudy
     as_of_date = datetime.utcnow()
 
-    results = []
-    # Returns studies in required order - first found with pending work
+    results = {}
+    # check studies in required order - first found with pending work
     # preempts subsequent
     for rs in ResearchStudy.assigned_to(patient):
         rs_status = {
-            'research_study_id': rs,
             'eligible': True,
             'ready': False,
             'errors': [],
         }
-        results.append(rs_status)
+        results[rs] = rs_status
         if rs == EMPRO_RS_ID and patient.clinician_id is None:
             # Enforce biz rule - must have clinician on file.
             trace("no clinician; not eligible")

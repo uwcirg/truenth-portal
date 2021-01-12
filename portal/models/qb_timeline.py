@@ -778,12 +778,11 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
 
             # Check eligibility - some studies aren't available till
             # business rules have been met
-            study_eligibility = [
-                study for study in patient_research_study_status(
-                    user, ignore_QB_status=True) if
-                study['research_study_id'] == research_study_id]
+            rss = patient_research_study_status(user, ignore_QB_status=True)
+            study_eligibility = (
+                research_study_id in rss and rss[research_study_id]['eligible'])
 
-            if not study_eligibility or not study_eligibility[0]['eligible']:
+            if not study_eligibility:
                 trace(f"user determined ineligible for {research_study_id}")
                 return
 
