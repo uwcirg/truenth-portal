@@ -796,6 +796,10 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                 user_qnrs.assign_qb_relationships(qb_generator=ordered_qbs)
 
             # As we move forward, capture state at each time point
+            kwargs = {
+                "user_id": user.id,
+                "research_study_id": research_study_id,
+            }
 
             pending_qbts = AtOrderedList()
             for qbd in qb_generator:
@@ -920,11 +924,17 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                 trace("withdrawn as of {}".format(withdrawal_date))
                 store_rows = [
                     qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
+                if store_rows:
+                    # To satisfy the `Withdrawn sanity check` in qb_status
+                    # the withdrawn row needs to match the last valid qb
+                    kwargs['qb_id'] = store_rows[-1].qb_id
+                    kwargs['qb_iteration'] = store_rows[-1].qb_iteration
+                    kwargs['qb_recur_id'] = store_rows[-1].qb_recur_id
+
                 store_rows.append(QBT(
                     at=withdrawal_date,
                     status='withdrawn',
-                    user_id=user_id,
-                    research_study_id=research_study_id))
+                    **kwargs))
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
             else:
