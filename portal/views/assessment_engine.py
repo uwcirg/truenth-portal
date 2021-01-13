@@ -600,7 +600,8 @@ def assessment(patient_id, instrument_id):
     patient = get_user(
         patient_id, 'view', allow_on_url_authenticated_encounters=True)
     questionnaire_responses = QuestionnaireResponse.query.filter_by(
-        subject_id=patient.id).order_by(QuestionnaireResponse.authored.desc())
+        subject_id=patient.id).order_by(
+        QuestionnaireResponse.document['authored'].desc())
 
     instrument_id = request.args.get('instrument_id', instrument_id)
     if instrument_id is not None:

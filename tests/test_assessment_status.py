@@ -80,7 +80,6 @@ def mock_qr(
     qr = QuestionnaireResponse(
         subject_id=user_id,
         status=status,
-        authored=timestamp,
         document=qr_document,
         encounter_id=enc.id,
         questionnaire_bank=qb,

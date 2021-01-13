@@ -143,7 +143,7 @@ class DomainManifold(object):
                 triggers['domain'][domain] = dt.triggers
 
         triggers['source'] = {
-            'authored': FHIR_datetime.as_fhir(self.cur_qnr.authored),
+            'authored': self.cur_qnr.document['authored'],
             'qnr_id': self.cur_qnr.id,
             'qb_id': self.cur_qnr.questionnaire_bank_id,
             'qb_iteration': self.cur_qnr.qb_iteration}

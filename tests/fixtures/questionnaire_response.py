@@ -31,7 +31,6 @@ def initialized_with_ss_qnr(test_user, initialized_with_ss_qb):
         status='in-progress',
         auth_method='password_authenticated')
     qnr = QuestionnaireResponse(
-        authored=timestamp,
         document=qr_document,
         encounter=encounter,
         subject_id=test_user_id,

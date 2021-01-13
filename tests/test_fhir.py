@@ -121,7 +121,6 @@ class TestFHIR(TestCase):
         qr = QuestionnaireResponse(
             subject_id=TEST_USER_ID,
             status='in-progress',
-            authored=datetime.utcnow(),
             encounter=self.test_user.current_encounter()
         )
         db.session.add(qr)

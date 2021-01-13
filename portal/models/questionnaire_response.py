@@ -46,13 +46,6 @@ class QuestionnaireResponse(db.Model):
     def default_status(context):
         return context.current_parameters['document']['status']
 
-    def default_authored(context):
-        # Includes a call to validate_authored - exception raised if not valid
-        authored = FHIR_datetime.parse(
-            context.current_parameters['document']['authored'])
-        QuestionnaireResponse.validate_authored(authored)
-        return authored
-
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
     subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
@@ -78,11 +71,6 @@ class QuestionnaireResponse(db.Model):
         default=default_status
     )
 
-    authored = db.Column(
-        db.DateTime,
-        default=default_authored
-    )
-
     @property
     def qb_id(self):
         raise ValueError(
@@ -96,7 +84,7 @@ class QuestionnaireResponse(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
-               "{0.status} {0.authored}".format(self)
+               "{0.status} {0.document['authored']}".format(self)
 
     def assign_qb_relationship(self, acting_user_id, qbd_accessor=None):
         """Lookup and assign questionnaire bank and iteration
@@ -111,10 +99,6 @@ class QuestionnaireResponse(db.Model):
 
         """
         authored = FHIR_datetime.parse(self.document['authored'])
-        if authored != self.authored:
-            current_app.logger.error(
-                "QNR %d has conflicting 'authored' values!", self.id)
-
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
@@ -428,9 +412,9 @@ class QNR_results(object):
             QuestionnaireResponse.status,
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')].label('instrument_id'),
-            QuestionnaireResponse.authored,
+            QuestionnaireResponse.document['authored'].label('authored'),
             QuestionnaireResponse.encounter_id).order_by(
-            QuestionnaireResponse.authored)
+            QuestionnaireResponse.document['authored'])
         if self.qb_ids:
             query = query.filter(
                 QuestionnaireResponse.questionnaire_bank_id.in_(self.qb_ids))
@@ -452,7 +436,7 @@ class QNR_results(object):
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=instrument,
-                authored=qnr.authored,
+                authored=FHIR_datetime.parse(qnr.authored),
                 encounter_id=qnr.encounter_id))
         return self._qnrs
 
@@ -683,9 +667,9 @@ class QNR_indef_results(QNR_results):
             QuestionnaireResponse.status,
             QuestionnaireResponse.document[
                 ('questionnaire', 'reference')].label('instrument_id'),
-            QuestionnaireResponse.authored,
+            QuestionnaireResponse.document['authored'].label('authored'),
             QuestionnaireResponse.encounter_id).order_by(
-            QuestionnaireResponse.authored)
+            QuestionnaireResponse.document['authored'])
 
         self._qnrs = []
         for qnr in query:
@@ -695,7 +679,7 @@ class QNR_indef_results(QNR_results):
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=qnr.instrument_id.split('/')[-1],
-                authored=qnr.authored,
+                authored=FHIR_datetime.parse(qnr.authored),
                 encounter_id=qnr.encounter_id))
 
     def completed_qs(self, qb_id, iteration):
@@ -752,7 +736,7 @@ def aggregate_responses(
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
-        QuestionnaireResponse.authored.desc())
+        QuestionnaireResponse.document['authored'].desc())
 
     if instrument_ids:
         instrument_filters = (
@@ -792,7 +776,9 @@ def aggregate_responses(
             document["subject"]["careProvider"] = providers
 
         qb_status = qb_status_visit_name(
-            subject.id, research_study_id, questionnaire_response.authored)
+            subject.id,
+            research_study_id,
+            FHIR_datetime.parse(questionnaire_response.document['authored']))
         document["timepoint"] = qb_status['visit_name']
 
         # Hack: add missing "resource" wrapper for DTSU2 compliance

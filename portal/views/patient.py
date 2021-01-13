@@ -384,7 +384,7 @@ def patient_timeline(patient_id):
 
     qnrs = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id == patient_id).order_by(
-        QuestionnaireResponse.authored)
+        QuestionnaireResponse.document['authored'])
 
     def get_recur_id(qnr):
         if qnr.questionnaire_bank and len(qnr.questionnaire_bank.recurs):
@@ -394,7 +394,7 @@ def patient_timeline(patient_id):
     posted = [
         "{}, {}, {} ({}, {}), {}, {}".format(
             qnr.id,
-            qnr.authored,
+            qnr.document['authored'],
             visit_name(QBD(
                 relative_start=None, qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration, recur_id=get_recur_id(qnr))),
@@ -490,9 +490,7 @@ def patient_timewarp(patient_id, days):
     for qnr in QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == user.id):
         changed.append(f"questionnaire_response {qnr.id}")
-        assert qnr.authored == FHIR_datetime.parse(qnr.document['authored'])
-        new_authored = qnr.authored - delta
-        qnr.authored = new_authored
+        new_authored = FHIR_datetime.parse(qnr.document['authored']) - delta
         doc = deepcopy(qnr.document)
         doc['authored'] = FHIR_datetime.as_fhir(new_authored)
         qnr.document = doc

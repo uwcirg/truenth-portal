@@ -2,6 +2,7 @@ from flask import Blueprint, current_app, jsonify, request
 from .empro_states import users_trigger_state
 from .models import TriggerState
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.user import get_user
 from ..views.crossdomain import crossdomain
@@ -60,7 +61,8 @@ def user_triggers(user_id):
         # time of the requested qnr authored.
         for ts in TriggerState.query.filter(
                 TriggerState.user_id == user_id).filter(
-                TriggerState.timestamp > qnr.authored):
+                FHIR_datetime.as_fhir(TriggerState.timestamp) >
+                qnr.document['authored']):
             db.session.delete(ts)
         db.session.commit()
 
