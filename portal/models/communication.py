@@ -186,7 +186,8 @@ def load_template_args(
                 QBT.qb_iteration == qb_iteration).filter(
                 QBT.status == OverallStatus.due).one()
         except NoResultFound:
-            raise NoCurrentQB("no applicable QB for {}".format(user))
+            raise NoCurrentQB("no applicable QB{}:{} for {}".format(
+                questionnaire_bank_id, qb_iteration, user))
 
         # Due and start are synonymous in all contexts other than
         # communicating the "due" date to the user.  Adjust what is
