@@ -261,7 +261,9 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
-def initialized_patient(app, test_user, initialize_static, shallow_org_tree):
+def initialized_patient(
+        app, test_user, initialize_static, initialized_with_research_protocol,
+        shallow_org_tree):
     """returns test patient with data necessary to avoid initial_queries"""
     now = datetime.utcnow()
     test_user = db.session.merge(test_user)
@@ -275,6 +277,10 @@ def initialized_patient(app, test_user, initialize_static, shallow_org_tree):
 
     org = Organization.query.filter(
         Organization.partOf_id.isnot(None)).first()
+    if len(org.research_protocols) < 1:
+        rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'test_rp').one()
+        org.research_protocols.append(rp)
     test_user = db.session.merge(test_user)
     test_user.organizations.append(org)
 

@@ -109,40 +109,36 @@ def assessment_engine_view(user):
             classification='indefinite'))
 
     # variables needed for the templates
-    due_date = localize_datetime(
-        assessment_status.due_date, user) \
-        if assessment_status.due_date else None
-    expired_date = localize_datetime(assessment_status.expired_date, user) \
-        if assessment_status.expired_date else None
-    comp_date = localize_datetime(assessment_status.completed_date, user) \
-        if assessment_status.completed_date else None
-    assessment_is_due = (
-        assessment_status.overall_status == OverallStatus.overdue) \
-        or (assessment_status.due_date is not None
-            and assessment_status.due_date < now)
+    due_date = (
+        localize_datetime(assessment_status.due_date, user)
+        if assessment_status.due_date else None)
+    expired_date = (
+        localize_datetime(assessment_status.expired_date, user)
+        if assessment_status.expired_date else None)
+    comp_date = (
+        localize_datetime(assessment_status.completed_date, user)
+        if assessment_status.completed_date else None)
+    assessment_is_due = research_study_status[BASE_RS_ID]['ready']
     enrolled_in_indefinite = assessment_status.enrolled_in_classification(
         "indefinite")
     substudy_assessment_status = QB_Status(
         user=user,
         research_study_id=EMPRO_RS_ID,
         as_of_date=now)
-    enrolled_in_substudy = EMPRO_RS_ID \
-        in ResearchStudy.assigned_to(user)
-    substudy_due_date = localize_datetime(
-        substudy_assessment_status.due_date, user) \
-        if substudy_assessment_status.due_date else None
-    substudy_comp_date = localize_datetime(
-        substudy_assessment_status.completed_date, user) \
-        if substudy_assessment_status.completed_date else None
-    substudy_assessment_is_due = enrolled_in_substudy \
-        and substudy_assessment_status.overall_status in (
-            OverallStatus.due,
-            OverallStatus.overdue,
-            OverallStatus.in_progress)
-    substudy_assessment_is_ready = enrolled_in_substudy \
-        and research_study_status[EMPRO_RS_ID]['ready']
-    substudy_assessment_errors = enrolled_in_substudy \
-        and research_study_status[EMPRO_RS_ID]['errors'] \
+    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
+    substudy_due_date = (
+        localize_datetime(substudy_assessment_status.due_date, user)
+        if substudy_assessment_status.due_date else None)
+    substudy_comp_date = (
+        localize_datetime(substudy_assessment_status.completed_date, user)
+        if substudy_assessment_status.completed_date else None)
+    substudy_assessment_is_due = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
+
+    substudy_assessment_is_ready = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
+    substudy_assessment_errors = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['errors'])
 
     return render_template(
         "eproms/assessment_engine.html",
