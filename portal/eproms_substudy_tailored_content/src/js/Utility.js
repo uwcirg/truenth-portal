@@ -112,7 +112,7 @@ export function PromiseAllSettledPolyfill() {
 }
 
 export function ElementClosestPolyfill() {
-  //see https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+  //see https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#polyfill
   if (!Element.prototype.matches) {
     Element.prototype.matches =
       Element.prototype.msMatchesSelector ||
