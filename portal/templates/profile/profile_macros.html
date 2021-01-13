@@ -865,7 +865,7 @@
 <div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowPostTxQuestionnaireSection()"> 
     <div class="col-md-12 col-xs-12">
         {% call profileSection(editable=false) %}
-        {% call titleSection() -%}{{_("IRONMAN EMPRO")}}{%- endcall %}
+        {% call titleSection() -%}{{_("EMPRO Intervention Report")}}{%- endcall %}
             <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
                 <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
                 <!-- display trigger areas if indicated -->
@@ -896,7 +896,7 @@
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
                         <!-- date type answer-->
-                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="d M yyyy"
+                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="dd mmm yyyy"
                                 :class="{disabled: isSubStudyTriggersResolved()}"
                                 :dataType="item.type"
                                 :linkId="item.linkId"
