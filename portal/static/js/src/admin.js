@@ -1011,7 +1011,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     __filters["column_selections"].push($(this).attr("data-field"));
                 });
                 data["filters"] = __filters;
-                console.log("data? ", data)
+               
                 if (Object.keys(data).length > 0) {
                     tnthAjax.setTablePreference(userId, this.tableIdentifier, {
                         "data": JSON.stringify(data)
