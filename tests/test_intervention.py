@@ -575,6 +575,8 @@ def test_card_html_update(
     mock_questionnairebanks('eproms')
     metastatic_org = Organization.query.filter_by(name='metastatic').one()
     test_user = db.session.merge(test_user)
+    for o in test_user.organizations:
+        test_user.organizations.remove(o)
     test_user.organizations.append(metastatic_org)
     consent = UserConsent.query.filter(
         UserConsent.user_id == test_user_id).one()
@@ -631,6 +633,8 @@ def test_expired(client, initialized_patient_logged_in):
     mock_questionnairebanks('eproms')
     localized_org = Organization.query.filter_by(name='localized').one()
     test_user = db.session.merge(test_user)
+    for o in test_user.organizations:
+        test_user.organizations.remove(o)
     test_user.organizations.append(localized_org)
     consent = UserConsent.query.filter(
         UserConsent.user_id == test_user.id).one()

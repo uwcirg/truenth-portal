@@ -117,9 +117,12 @@ class AtOrderedList(list):
 def ordered_rp_qbs(rp_id, trigger_date):
     """Generator to yield ordered qbs by research protocol alone"""
     baselines = qbs_by_rp(rp_id, 'baseline')
-    if len(baselines) != 1:
+    if len(baselines) > 1:
         raise RuntimeError(
             "Expect exactly one QB for baseline by rp {}".format(rp_id))
+    if len(baselines) == 0:
+        # typically only test scenarios - easy catch otherwise
+        return
     baseline = baselines[0]
     if baseline not in db.session:
         baseline = db.session.merge(baseline, load=False)
