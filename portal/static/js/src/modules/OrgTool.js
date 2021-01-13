@@ -614,7 +614,7 @@ export default (function() { /*global i18next $ */
         var self = this;
         $("#userOrgs input[name='organization']").each(function() {
             $(this).attr("data-save-container-id", "userOrgs");
-            $(this).on("click", function() {
+            $(this).on("click", function(e) {
                 var parentOrg = self.getElementParentOrg(this);
                 var orgsElements = $("#userOrgs input[name='organization']").not("[id='noOrgs']");
                 if ($(this).prop("checked")) {
@@ -628,7 +628,14 @@ export default (function() { /*global i18next $ */
                 if (sessionStorage.getItem("noOrgModalViewed")) {
                     sessionStorage.removeItem("noOrgModalViewed");
                 }
-
+                //validate for at least one selection checked
+                if (! $("#userOrgs input[name='organization']:checked").length || $(this).attr("id") === "noOrgs") {
+                    if (!$(this).is(":checked")) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+               
                 if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                     if (tnthAjax.hasConsent(userId, parentOrg)) {
                         self.updateOrgs(userId, $("#clinics"), true);

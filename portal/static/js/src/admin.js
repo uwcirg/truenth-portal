@@ -485,6 +485,20 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     });
                 }
                 $("#adminTableToolbar .orgs-filter-warning").popover();
+                $("#adminTable .filterControl select").on("change", function() {
+                    if ($(this).find("option:selected").val()) {
+                        $(this).addClass("active");
+                        return;
+                    }
+                    $(this).removeClass("active");
+                });
+                $("#adminTable .filterControl input").on("change", function() {
+                    if ($(this).val()) {
+                        $(this).addClass("active");
+                        return;
+                    }
+                    $(this).removeClass("active");
+                });
             },
             allowDeletedUserFilter: function() {
                 return $("#chkDeletedUsersFilter").length;
@@ -938,7 +952,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         }
                         //note this is based on the trigger event for filtering specify in the plugin
                         $(fname).val(prefData.filters[item]);
-                        $(fname).addClass("active");
+                        if (prefData.filters[item]) {
+                            $(fname).addClass("active");
+                        }
                         $(fname).trigger($(fname).get(0).tagName === "INPUT" ? "keyup" : "change");
                     }
                 }
@@ -995,6 +1011,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     __filters["column_selections"].push($(this).attr("data-field"));
                 });
                 data["filters"] = __filters;
+               
                 if (Object.keys(data).length > 0) {
                     tnthAjax.setTablePreference(userId, this.tableIdentifier, {
                         "data": JSON.stringify(data)

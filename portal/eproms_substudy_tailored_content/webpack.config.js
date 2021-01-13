@@ -113,7 +113,7 @@ module.exports = function(_env, argv) {
     plugins: [
       new VueLoaderPlugin(),
       new HtmlWebpackPlugin({
-        title: "Substudy Tailored Content",
+        title: "EMPRO Resources",
         template: path.join(__dirname, '/src/app.html'),
         filename: path.join(__dirname, `${templateDirectory}/substudy_tailored_content.html`),
         favicon: path.join(__dirname, '/src/assets/favicon.ico'),

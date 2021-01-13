@@ -1203,6 +1203,15 @@ export default (function() {
                         selectListHTML += `<option value="${item.identifier[0].value}" ${String(item.identifier[0].value) === String(selectedValue) ? "selected": ""}>${item.name[0].given} ${item.name[0].family}</option>`
                     });
                     selectListHTML += "</select>";
+                    let selectedEntry = (data.entry).filter(item => {
+                        return String(item.identifier[0].value) === String(selectedValue);
+                    });
+
+                    if (selectedValue && !selectedEntry.length) {
+                        //clinician site changed, doesn't belong to the available sub-study clinic(s)
+                        $("#treatingCliniciansSection .get-clinicians-error").text(i18next.t("Assigned clinician is not from the site."));
+                    }
+
                     $("#treatingClinicianContainer .select-list").append(selectListHTML);
                     $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
                         if ($(this).val() === "") {
@@ -2609,6 +2618,16 @@ export default (function() {
                 var roles = $("#rolesGroup input:checkbox:checked").map(function() {
                     return {name: $(this).val()};
                 }).get();
+                /*
+                 * check if a role is selected
+                 */
+                if (!roles.length) {
+                    //make sure at least one role is selected
+                    //admin, staff admin functionality
+                    $(".put-roles-error").html("A role must be selected.");
+                    return false;
+                }
+                $(".put-roles-error").html("");
                 this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
                 /*
                  * refresh user roles list since it has been uploaded
@@ -2629,7 +2648,9 @@ export default (function() {
                         self.userRoles = data.roles.map(function(role) {
                             return role.name;
                         });
-                        self.updateRolesUI(self.userRoles);
+                        Vue.nextTick(() => {
+                            self.updateRolesUI(self.userRoles);
+                        });
                     }
                 }, params);
             },
@@ -2654,6 +2675,7 @@ export default (function() {
                             });
                         }
                     }
+
                     /*
                      * alphabetize role list by the name property of each item in the array
                      * for ease of viewing and selection
