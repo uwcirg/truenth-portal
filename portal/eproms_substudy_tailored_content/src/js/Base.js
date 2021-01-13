@@ -1,10 +1,11 @@
 import NavMethods from "./Nav";
 import VideoMethods from "./Video";
-import {checkIE, getUrlParameter, tryParseJSON, PromiseAllSettledPolyfill} from "./Utility";
+import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, PromiseAllSettledPolyfill} from "./Utility";
 
 export default {
     created() {
         PromiseAllSettledPolyfill();
+        ElementClosestPolyfill();
     },
     mounted() {
         Promise.allSettled([
@@ -307,19 +308,20 @@ export default {
             let collapsibleElements = document.querySelectorAll(".collapsible");
             collapsibleElements.forEach(el => {
                 el.addEventListener('click', event => {
-                    let parentEl = event.target.parentElement;
+                    let targetElement = event.target.closest(".collapsible");
+                    let parentEl = targetElement.parentElement;
                     let collapsibleItems = parentEl.querySelectorAll(".collapsible");
                     collapsibleItems.forEach(item => {
-                        if (item === event.target) return true;
+                        if (item === targetElement) return true;
                         item.classList.remove("open");
                     });
-                    if (event.target.classList.contains("open")) {
-                        event.target.classList.remove("open");
+                    if (targetElement.classList.contains("open")) {
+                        targetElement.classList.remove("open");
                         return;
                     }
-                    event.target.classList.add("open");
+                    targetElement.classList.add("open");
                 });
-            })
+            }, true);
         },
         setTileLinkEvent() {
             let tileElements = document.querySelectorAll(".tiles-container .tile");

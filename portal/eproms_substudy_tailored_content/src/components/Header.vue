@@ -15,6 +15,7 @@
                         this.content = response;
                         Vue.nextTick(() => {
                             getWrapperJS(`#${this.sectionId}`);
+                            this.setElementsVis();
                             setTimeout(function() {
                                 this.loaded = true;
                             }.bind(this), 300);
@@ -29,6 +30,12 @@
             getAppObj() {
                 return this.$parent;
             },
+            setElementsVis() {
+                let subStudyElements = document.querySelectorAll("#tnthNavWrapper .eproms-substudy");
+                subStudyElements.forEach(el => {
+                    el.classList.add("show");
+                });
+            }
         },
         data() {
             return {
