@@ -12,7 +12,8 @@ import {
     EPROMS_SUBSTUDY_TITLE,
     EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
     EPROMS_SUBSTUDY_SHORT_TITLE,
-    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER
+    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+    EMPRO_TRIGGER_UNPROCCESSED_STATES
 } from "./data/common/consts.js";
 
 /*
@@ -1286,7 +1287,7 @@ export default (function() {
                             let domains = new Array();
                             let lastTriggerItem = null;
                             for (var index = data.length-1; index >= 0; index--) {
-                               if (String(data[index].state).toLowerCase() !== "due") {
+                               if (EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(String(data[index].state).toLowerCase()) === -1) {
                                     lastTriggerItem = data[index];
                                     break;
                                }
@@ -1389,7 +1390,8 @@ export default (function() {
             },
             isPostTxActionRequired: function() {
                 return this.subStudyTriggers.data &&
-                ["due", "overdue", "required"].indexOf(String(this.subStudyTriggers.data.action_state).toLowerCase()) !== -1;
+                (["due", "overdue", "required"].indexOf(String(this.subStudyTriggers.data.action_state).toLowerCase()) !== -1
+                );
             },
             isSubStudyTriggersResolved: function() {
                 if (!this.subStudyTriggers.data) {
