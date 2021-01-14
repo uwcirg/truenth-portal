@@ -85,10 +85,17 @@ class TriggerState(db.Model):
 
     def reminder_due(self):
         """Determine if reminder is due from internal state"""
-        first_sent = FHIR_datetime.parse(
-            self.triggers['actions']['email'][0]['timestamp'])
-        last_sent = FHIR_datetime.parse(
-            self.triggers['actions']['email'][-1]['timestamp'])
+        # locate first and most recent *staff* email
+        first_sent, last_sent = None, None
+        for email in self.triggers['actions']['email']:
+            if 'staff' in email['context']:
+                if not first_sent:
+                    first_sent = FHIR_datetime.parse(email['timestamp'])
+                last_sent = FHIR_datetime.parse(email['timestamp'])
+
+        if not first_sent:
+            return
+
         now = datetime.utcnow()
 
         # To be sent daily after the initial 48 hours
