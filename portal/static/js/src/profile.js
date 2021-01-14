@@ -1380,7 +1380,7 @@ export default (function() {
                             });
                         }
                         
-                        $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate}").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
+                        $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate} GMT").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
                      });
                 });
             },

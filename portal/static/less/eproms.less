@@ -3540,7 +3540,9 @@ section.header {
 }
 #postTxQuestionnaireContainer {
   position: relative;
-  min-height: 250px;
+  &.active {
+    min-height: 250px;
+  } 
   .loader {
     position: absolute;
     top: 0;
@@ -3593,6 +3595,13 @@ section.header {
         margin-bottom: 4px;
       }
     }
+  }
+  #noTriggersSection {
+    .item {
+      margin-bottom: 8px;
+    }
+    margin-bottom: 4px;
+    border-bottom: 1px solid darken(@muterColor, 10%);
   }
   #reportNoteSection {
     margin-bottom: 32px;
