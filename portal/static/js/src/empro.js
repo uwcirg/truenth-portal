@@ -5,6 +5,7 @@ import tnthDate from "./modules/TnthDate.js";
 
 var emproObj = function() {
     this.domains = [];
+    this.mappedDomains = [];
     this.hardTriggerDomains = [];
     this.softTriggerDomains = [];
     this.hasHardTrigger = false;
@@ -12,15 +13,15 @@ var emproObj = function() {
     this.userId = 0;
 };
 emproObj.prototype.populateDomainDisplay = function() {
-    this.domains.forEach(domain => {
+    this.mappedDomains.forEach(domain => {
         $("#emproModal .triggersButtonsContainer").append(
             `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}" target="_blank">
-            ${i18next.t("{domain} Tips").replace("{domain}", domain.replace(/_/g, " "))}
+            ${i18next.t("{domain} Tips").replace("{domain}", domain.replace(/\_/g, " "))}
             </a>`
         );
     });
     this.hardTriggerDomains.forEach(domain => {
-        $("#emproModal .hardTriggersDisplayList").append(`<li>${domain.replace(/_/g, " ")}</li>`);
+        $("#emproModal .hardTriggersDisplayList").append(`<li>${domain.replace(/\_/g, " ")}</li>`);
     });
 };
 emproObj.prototype.initThankyouModal = function(autoShow) {
@@ -136,8 +137,14 @@ emproObj.prototype.initTriggerDomains = function() {
             /*
              * get all user domains that have related triggers
              */
-            if (self.domains.indexOf(mappedDomain) === -1) {
-                self.domains.push(mappedDomain);
+            if (self.domains.indexOf(key) === -1) {
+                self.domains.push(key);
+            }
+             /*
+             * get all mapped domains for tailored content
+             */
+            if (self.mappedDomains.indexOf(mappedDomain) === -1) {
+                self.mappedDomains.push(mappedDomain);
             }
             for (let q in data.triggers.domain[key]) {
                 if (data.triggers.domain[key][q] === "hard") {
@@ -145,8 +152,8 @@ emproObj.prototype.initTriggerDomains = function() {
                     /*
                      * get all domain topics that have hard trigger
                      */
-                    if (self.hardTriggerDomains.indexOf(mappedDomain) === -1) {
-                        self.hardTriggerDomains.push(mappedDomain);
+                    if (self.hardTriggerDomains.indexOf(key) === -1) {
+                        self.hardTriggerDomains.push(key);
                     }
                 }
                 if (data.triggers.domain[key][q] === "soft") {
@@ -154,8 +161,8 @@ emproObj.prototype.initTriggerDomains = function() {
                      /*
                      * get all domain topics that have soft trigger
                      */
-                    if (self.softTriggerDomains.indexOf(mappedDomain) === -1) {
-                        self.softTriggerDomains.push(mappedDomain);
+                    if (self.softTriggerDomains.indexOf(key) === -1) {
+                        self.softTriggerDomains.push(key);
                     }
                 }
             }

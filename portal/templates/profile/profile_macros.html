@@ -361,41 +361,54 @@
     {%- endif -%}
 {%- endmacro %}
 {% macro profileCommunications(person, current_user) -%}
-    {%- if person and person.has_role(ROLE.PATIENT.value) and (current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value)) -%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container" data-profile-section-id="communication">
-                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    <div id="communicationsContainer" class="tabs-container">
-                        {% if person.is_registered() %}
+    {%- if person and person.has_role(ROLE.PATIENT.value) and (current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value)) -%}
+        {%- if current_user.has_role(ROLE.CLINICIAN.value) -%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container" data-profile-section-id="communication">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        <p class="communication-title text-muted singleton">{{_("Email audit log")}}</p>
+                        {{profileEmailLog(person)}}
+                    </div>
+                </div>
+            </div>
+        {%- else -%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container" data-profile-section-id="communication">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        <div id="communicationsContainer" class="tabs-container">
+                            {% if person.is_registered() %}
+                                <div class="tab">
+                                <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                                <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
+                                <div class="tab-content">
+                                {{resetPassword(person)}}
+                                </div>
+                                </div>
+                            {% endif %}
+                            {%- if not config.CUSTOM_PATIENT_DETAIL -%}
+                                <div class="tab">
+                                <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                                <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if not person.is_registered()%}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
+                                <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
+                                    {{profileSendEmail(person)}}
+                                </div>
+                                </div>
+                            {%- endif %}
                             <div class="tab">
-                              <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                              <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
-                              <div class="tab-content">
-                               {{resetPassword(person)}}
-                              </div>
+                            <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
+                            <div class="tab-content">
+                                {{profileEmailLog(person)}}
                             </div>
-                        {% endif %}
-                        {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                            <div class="tab">
-                              <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                              <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if not person.is_registered()%}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
-                              <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
-                                {{profileSendEmail(person)}}
-                              </div>
                             </div>
-                        {%- endif %}
-                         <div class="tab">
-                          <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
-                          <div class="tab-content">
-                            {{profileEmailLog(person)}}
-                          </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {%- endif -%}
+        
     {%- elif person and person.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -874,7 +887,7 @@
                     <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
                     <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
                         <ul class="list">
-                            <li v-for="item in subStudyTriggers.domains" v-text="item" class="text"></li>
+                            <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>
                         </ul>
                     </div>
                 </div>

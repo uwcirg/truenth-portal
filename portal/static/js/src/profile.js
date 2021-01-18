@@ -1722,9 +1722,11 @@ export default (function() {
                         });
                     } else {
                         $("#emailLogContent").html("<span class='text-muted'>" + i18next.t("No email log entry found.") + "</span>");
+                        $(".communication-title").hide();
                     }
                 } else {
                     $("#emailLogMessage").text(data.error);
+                    $(".communication-title").hide();
                 }
             },
             setEmailContentLinkEvent: function() {
@@ -2953,6 +2955,9 @@ export default (function() {
                     self.modules.tnthAjax.getTerms(this.subjectId, "", true, function(data) {
                         if (data && data.tous) {
                             (data.tous).forEach(function(item) {
+                                if (self.consent.touObj.length) {
+                                    return true;
+                                }
                                 var fType = $.trim(item.type).toLowerCase();
                                 var org = orgsList[item.organization_id];
                                 if (["subject website consent", "website terms of use"].indexOf(String(fType)) !== -1) {

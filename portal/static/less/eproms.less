@@ -3768,7 +3768,6 @@ section.header {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    margin-bottom: 24px;
     &.hard-trigger,
     &.soft-trigger {
       display: none;
@@ -3814,6 +3813,10 @@ section.header {
       border-bottom: 1px solid @HRColor;
       &:last-of-type {
         border-bottom: 0;
+      }
+      ul {
+        padding-left: 20px;
+        margin-bottom: 20px;
       }
       li:not(:last-of-type) {
         margin-bottom: 8px;
@@ -4202,6 +4205,15 @@ section.header {
 #profileassessmentSendEmailContainer {
   display: none;
 }
+
+.communication-title {
+  font-weight: 500;
+  letter-spacing: 0.02rem;
+  &.singleton {
+    margin-bottom: -24px;
+  }
+}
+
 .communication-prompt {
   margin-bottom: 1em;
 }
@@ -5329,9 +5341,6 @@ div.biopsy-option:last-of-type{
   .button--LR.show {
     margin: 0 0.5em;
     display: inline-block !important;
-  }
-  tr[data-tou-type='website terms of use'] {
-    display: none;
   }
 }
 #profileConsentList,

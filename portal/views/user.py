@@ -2319,7 +2319,7 @@ def invite(user_id):
 @oauth.require_oauth()
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
-     ROLE.INTERVENTION_STAFF.value])
+     ROLE.CLINICIAN.value, ROLE.INTERVENTION_STAFF.value])
 def get_user_messages(user_id):
     """Returns simple JSON defining user email messages
 
