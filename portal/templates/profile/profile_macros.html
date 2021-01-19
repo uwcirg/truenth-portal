@@ -865,7 +865,8 @@
 {%- endmacro %}
 {%- macro longitudinalReport(person) -%}
     {% call profileSection(editable=false, id="longitudinalReportSection") %}
-        {% call titleSection(id="longitudinalReportsLoc") -%}{{ _("Longitudinal Report") }}{%-endcall %}
+        {% call titleSection(id="longitudinalReportsLoc") -%}{{ _("IRONMAN EMPRO Longitudinal Report") }}{%-endcall %}
+        <p class="body-content text-muted">{{_("This report shows the patient's questionnaire responses over time and indicates their areas of distress. Please check for any actions required on your behalf.")}}</p>
         <div id="longitudinalReportContainer" class="eproms-substudy" data-profile-section-id="longitudinalReport">
             <!-- populate dynamically based on whether there is longitudinal report available for the subject -->
         </div>
