@@ -1,4 +1,5 @@
 """Test module for trigger_states blueprint """
+from flask_webtest import SessionScope
 import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
@@ -146,6 +147,11 @@ def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
     user.clinician_id = user.id
     promote_user(user=user, role_name=ROLE.CLINICIAN.value)
 
+    # back state to `processed` for event processing
+    ts = db.session.merge(triggered_ts)
+    ts.state = 'processed'
+    with SessionScope(db):
+        db.session.commit()
     fire_trigger_events()
 
     # user's trigger should now include actions and with hard
@@ -153,5 +159,7 @@ def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
     # and patient
     ts = users_trigger_state(user_id)
     assert ts.state == 'triggered'
-    assert len(ts.triggers['actions']['email']) > 1
-    assert 'reminder' in ts.triggers['actions']['email'][-1]['context']
+    emails = ts.triggers['actions']['email']
+    assert len(emails) == 2
+    assert 'patient thank you' == emails[0]['context']
+    assert 'initial staff alert' == emails[1]['context']

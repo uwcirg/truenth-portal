@@ -215,7 +215,7 @@ def evaluate_triggers(qnr, override_state=False):
             TriggerState.state == 'resolved').order_by(
             TriggerState.timestamp.desc()).first()
         if previous and previous.triggers.get('action_state') not in (
-                'completed', 'missed'):
+                'completed', 'missed', 'not applicable'):
             triggers = copy.deepcopy(previous.triggers)
             triggers['action_state'] = 'missed'
             previous.triggers = triggers
@@ -320,9 +320,12 @@ def fire_trigger_events():
             # received a post intervention QB from staff, noted by
             # the action_state:
             if (
-                    'action_state' in ts.triggers and
-                    ts.triggers['action_state'] in ('completed', 'missed')):
+                    'action_state' not in ts.triggers or
+                    ts.triggers['action_state'] in (
+                    'completed', 'missed', 'not applicable')):
                 continue
+
+            assert ts.triggers['action_state'] in ('required', 'overdue')
 
             if ts.reminder_due():
                 patient = User.query.get(ts.user_id)
