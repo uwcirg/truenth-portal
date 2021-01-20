@@ -81,11 +81,11 @@
                       <td>{{patient.assessment_status if patient.assessment_status}}</td>
                       <td>{{patient.current_qb if patient.current_qb}}</td>
                       <td>
-                        {% if patient.action_state in ("Required", "Due", "Overdue") %}
-                          <a href='{{url_for("patients.patient_profile", patient_id=patient.id, _anchor="postInterventionQuestionnaireLoc")}}'>{{patient.action_state}}</a>
-                        {% else %}
+                        {%- if patient.action_state in ("Required", "Due", "Overdue") -%}
+                          <a class="cta" href='{{url_for("patients.patient_profile", patient_id=patient.id, _anchor="postInterventionQuestionnaireLoc")}}'>{{patient.action_state}}</a>
+                        {%- else -%}
                           {{patient.action_state}}
-                        {% endif %}
+                        {%- endif -%}
                       </td>
                       <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       <td>{%- if patient.valid_consents -%}

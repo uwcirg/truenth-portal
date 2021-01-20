@@ -99,11 +99,14 @@ def staff_emails(patient, hard_triggers, initial_notification):
             _anchor='postInterventionQuestionnaireLoc',
             _external=True),
             label=_('View Participant Details')))
+    triggered_domains = ", ".join(hard_triggers) if hard_triggers else ""
+    triggered_domains_display = "<b>{triggered_domains}</b>".format(
+        triggered_domains=triggered_domains)
     args = {
         'clinic_name': clinic,
         'patient_id': patient.id,
         'post_intervention_assessment_link': link,
-        'triggered_domains': hard_triggers
+        'triggered_domains': triggered_domains_display
     }
     emails = []
     for staff in staff_list:
