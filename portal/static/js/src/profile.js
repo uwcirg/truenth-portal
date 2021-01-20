@@ -1477,7 +1477,7 @@ export default (function() {
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
-                                {"format": "d M yyyy","forceParse": false, "autoclose": true, endDate: new Date()}
+                                {"format": "dd M yyyy","forceParse": false, "autoclose": true, endDate: new Date()}
                             ).on("changeDate", self.onResponseChangeFieldEvent);
                         });
 

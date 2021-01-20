@@ -323,7 +323,7 @@
                 <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
                 {% if substudy_assessment_is_ready %}
                     <!-- reactive option, will only show when user is in sub-study and email is available -->
-                    <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("TrueNTH Sub-Study Welcome")}}</option>
+                    <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("EMPRO Welcome")}}</option>
                 {% endif %}
             {% endcall %}
             <!--
@@ -910,7 +910,7 @@
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
                         <!-- date type answer-->
-                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="dd mmm yyyy"
+                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
                                 :class="{disabled: isSubStudyTriggersResolved()}"
                                 :dataType="item.type"
                                 :linkId="item.linkId"
