@@ -53,12 +53,18 @@ class ResearchStudy(db.Model):
 
     @staticmethod
     def assigned_to(user):
-        """Returns set of all ResearchStudy IDs assigned to given user"""
+        """Returns list of all ResearchStudy IDs assigned to given user
+
+        NB: assignment doesn't equate to ready status.  User may have
+        since withdrawn or failed to meet necessary business rules such
+        as clinician assignments.  For user's current status, see
+         ``qb_status.patient_research_study_status()``
+        """
         base_study = 0
-        results = []
+        results = set()
         iqbs = qbs_by_intervention(user, classification=None)
         if iqbs:
-            results.append(base_study)  # Use dummy till system need arises
+            results.add(base_study)  # Use dummy till system need arises
 
         for rp, _ in ResearchProtocol.assigned_to(
                 user, research_study_id='all'):
@@ -70,9 +76,8 @@ class ResearchStudy(db.Model):
             # count in an `assigned_to` check
             c_date, w_date = consent_withdrawal_dates(user, rs_id)
             if c_date or w_date and rs_id not in results:
-                results.append(rs_id)
-        results.sort()
-        return results
+                results.add(rs_id)
+        return sorted(results)
 
 
 @cache.memoize(timeout=TWO_HOURS)
