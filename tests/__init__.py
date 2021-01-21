@@ -20,6 +20,7 @@ from sqlalchemy.exc import IntegrityError
 from portal.cache import cache
 from portal.config.config import TestConfig
 from portal.database import db
+from portal.date_tools import utcnow_sans_micro
 from portal.factories.app import create_app
 from portal.models.audit import Audit
 from portal.models.client import Client
@@ -132,9 +133,9 @@ def calc_date_params(backdate, setdate):
             raise ValueError(
                 "moving dates by month values is non-associative; use"
                 "`associative_backdate` and pass in `setdate` param")
-        acceptance_date = datetime.utcnow() - backdate
+        acceptance_date = utcnow_sans_micro() - backdate
     else:
-        acceptance_date = datetime.utcnow()
+        acceptance_date = utcnow_sans_micro()
     return acceptance_date
 
 
