@@ -71,7 +71,7 @@ def test_base_eval(
         TriggerState.state == 'processed').one()
     assert ts.questionnaire_response_id == initialized_with_ss_qnr.id
     assert ts.triggers['source']['qnr_id'] == ts.questionnaire_response_id
-    assert ts.triggers['source']['authored'] == '2020-09-30T00:00:00+00:00'
+    assert ts.triggers['source']['authored'] == '2020-09-30T00:00:00Z'
 
 
 def test_cur_hard_trigger():
