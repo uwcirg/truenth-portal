@@ -9,7 +9,7 @@ from flask_webtest import SessionScope
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from portal.date_tools import FHIR_datetime
+from portal.date_tools import FHIR_datetime, utcnow_sans_micro
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -37,7 +37,7 @@ from portal.models.user import User
 from portal.system_uri import ICHOM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 
-now = datetime.utcnow()
+now = utcnow_sans_micro()
 
 
 def mock_qr(
@@ -527,6 +527,7 @@ class TestQB_Status(TestQuestionnaireSetup):
 
     def test_metastatic_on_time(self):
         # User finished both on time
+
         self.bless_with_basics(
             local_metastatic='metastatic', setdate=now)
         for i in metastatic_baseline_instruments:
