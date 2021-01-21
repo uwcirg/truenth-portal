@@ -831,31 +831,45 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         "Found overlapping dates and results on former;"
                         f" NOT adding {qbd}")
 
-                    # For questionnaires with common instrument names that
-                    # happen to fit in both QBs, need to now reassign the
-                    # QB associations as the second is getting tossed
-                    changed = user_qnrs.reassign_qb_association(
-                        existing={
-                            'qb_id': qbd.qb_id,
-                            'iteration': qbd.iteration},
-                        desired={
-                            'qb_id': pending_qbts[-1].qb_id,
-                            'iteration': pending_qbts[-1].qb_iteration})
+                    last_posted_index = len(pending_qbts) - 1
+                    if pending_qbts[-1].status == 'partially_completed':
+                        # Look back further for status implying last posted
+                        last_posted_index -= 1
+                        assert pending_qbts[last_posted_index].status == 'in_progress'
 
-                    # IF the reassignment caused a change, AND the previous
-                    # visit was in a partially_completed state AND the change
-                    # now completes that visit, update the status.
-                    if (
-                            changed and
-                            pending_qbts[-1].status == 'partially_completed'):
-                        complete_date = user_qnrs.completed_date(
-                            pending_qbts[-1].qb_id,
-                            pending_qbts[-1].qb_iteration)
-                        if complete_date:
-                            pending_qbts[-1].at = complete_date
-                            pending_qbts[-1].status = 'completed'
+                    # Must double check overlap; may no longer be true, if
+                    # last_posted_index was one before...
+                    if pending_qbts[last_posted_index].at > start:
+                        # For questionnaires with common instrument names that
+                        # happen to fit in both QBs, need to now reassign the
+                        # QB associations as the second is getting tossed
+                        changed = user_qnrs.reassign_qb_association(
+                            existing={
+                                'qb_id': qbd.qb_id,
+                                'iteration': qbd.iteration},
+                            desired={
+                                'qb_id': pending_qbts[last_posted_index].qb_id,
+                                'iteration': pending_qbts[last_posted_index].qb_iteration})
 
-                    continue  # effectively removes the unwanted visit
+                        # IF the reassignment caused a change, AND the previous
+                        # visit was in a partially_completed state AND the change
+                        # now completes that visit, update the status.
+                        if (
+                                changed and
+                                pending_qbts[-1].status == 'partially_completed'):
+                            complete_date = user_qnrs.completed_date(
+                                pending_qbts[-1].qb_id,
+                                pending_qbts[-1].qb_iteration)
+                            if complete_date:
+                                pending_qbts[-1].at = complete_date
+                                pending_qbts[-1].status = 'completed'
+
+                        continue  # effectively removes the unwanted visit
+                    else:
+                        assert pending_qbts[-1].status == 'partially_completed'
+                        assert pending_qbts[-1].at > start
+                        # Move the partially completed event just prior to start
+                        pending_qbts[-1].at = start - relativedelta(seconds=1)
 
                 # Always add start (due)
                 pending_qbts.append(QBT(at=start, status='due', **kwargs))
