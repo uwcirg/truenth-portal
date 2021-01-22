@@ -27,8 +27,8 @@ var CurrentUser = { /* global $ i18next */
                     callback({error: true});
                     return false;
                 }
-                self.setUserResearchStudies(function() {
-                    self.setUserRoles(function() { /* set user roles */
+                self.setUserRoles(function() { /* set user roles */
+                    self.setUserResearchStudies(function() {
                         self.setUserOrgs(self.getUserId());
                         self.initOrgsList(function() { /* set user orgs */
                             callback();
@@ -89,15 +89,36 @@ var CurrentUser = { /* global $ i18next */
         isAdminUser: function() {
             return this.isAdmin;
         },
+        isPatientUser: function() {
+            return this.userRoles.indexOf("patient") !== -1
+        },
         setUserResearchStudies: function(callback) {
             callback = callback || function() {};
-            tnthAjax.getResearchStudies(this.userId, "", data => {
+            if (this.isPatientUser()) {
+                this.setPatientResearchStudies(callback);
+                return;
+            }
+            this.setStaffResearchStudies(callback);
+        },
+        setStaffResearchStudies: function(callback) {
+            callback = callback || function() {};
+            tnthAjax.getStaffResearchStudies(this.userId, "", data => {
                 if (data && data.research_study) {
                     this.userResearchStudyIds = data.research_study.map(item => item.id);
                 }
                 callback();
             });
-        },  
+        },
+        setPatientResearchStudies: function(callback) {
+            callback = callback || function() {};
+            let self = this;
+            tnthAjax.getPatientResearchStudies(this.userId, "", data => {
+                if (data && data.research_study) {
+                    this.userResearchStudyIds = Object.keys(data.research_study).map(item => parseInt(item));
+                }
+                callback();
+            });
+        },
         getUserOrgs: function () {
             if (this.userOrgs.length === 0) {
                 this.setUserOrgs(this.userId);

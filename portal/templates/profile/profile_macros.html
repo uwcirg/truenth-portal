@@ -905,7 +905,7 @@
                     will display triggers were present in the last determined trigger state
                     will be in a disabled state if the action state is "completed"
                 -->
-                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
+                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved() || hasSubStudyStatusErrors(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                     <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
@@ -970,6 +970,7 @@
                         <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
                     </div>
                 </div>
+                <div class="study-error error-message" v-html="getSubStudyStatusErrors()"></div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
             </div>
         {% endcall %}
@@ -977,7 +978,9 @@
   </div>
 {%- endmacro -%}
 {% macro profileTreatingClinician(person) %}
-    {% call profileSection(data_sections="locale, timezone") %}
+<div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
+    <div class="col-md-12 col-xs-12">
+        {% call profileSection(data_sections="locale, timezone") %}
         {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
         {% call viewSection(id="profileTreatingCliniciansViewContainer") -%}
             <table>
@@ -991,9 +994,11 @@
             </div>
             {{saveLoaderDiv("treatingClinicianContainer")}}
         {%- endcall %}
-        <div class="put-demo-error error-message"></div>
-        <div class="get-clinicians-error error-message"></div>
-    {% endcall %}
+            <div class="put-demo-error error-message"></div>
+            <div class="get-clinicians-error error-message"></div>
+        {% endcall %}
+    </div>
+</div>
 {%- endmacro %}
 {% macro profileSessionList(person, current_user) -%}
     <div id="userSessionsListContainer" data-profile-section-id="assessmentlist">

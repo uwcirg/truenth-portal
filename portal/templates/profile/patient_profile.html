@@ -50,11 +50,7 @@
   {%- endif %}
   {{profile_macro.profileDemo(user, current_user)}}
   {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
-    <div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
-      <div class="col-md-12 col-xs-12">
-          {{profile_macro.profileTreatingClinician(user)}}
-      </div>
-    </div>
+      {{profile_macro.profileTreatingClinician(user)}}
   {%- endif -%}
   {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value) -%}
     <div class="row" id="longitudinalReportSection" class="eproms-substudy" v-show="hasSubStudyAsssessmentData()"> 

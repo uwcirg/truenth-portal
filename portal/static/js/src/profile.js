@@ -112,6 +112,7 @@ export default (function() {
             userOrgs: [],
             subjectOrgs: [],
             subjectReseachStudies: [],
+            subjectResearchStudyStatuses: {},
             userRoles: [],
             cliniciansList: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
@@ -569,11 +570,11 @@ export default (function() {
                 }
             },
             setSubjectResearchStudies: function() {
-                this.modules.tnthAjax.getResearchStudies(this.subjectId, "", data => {
+                let self = this;
+                this.modules.tnthAjax.getPatientResearchStudies(this.subjectId, "", data => {
                     if (data && data.research_study) {
-                        this.subjectReseachStudies = data.research_study.map(item => {
-                            return item.id
-                        });
+                        this.subjectResearchStudyStatuses = data.research_study;
+                        this.subjectReseachStudies = Object.keys(data.research_study).map(item => parseInt(item));
                     }
                 });
             },
@@ -623,6 +624,25 @@ export default (function() {
             },
             isSubStudyPatient: function() {
                 return this.computedIsSubStudyPatient;
+            },
+            hasSubStudyStatusErrors: function() {
+                return this.hasResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
+            },
+            getSubStudyStatusErrors: function() {
+                return this.getResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
+            },
+            /*
+             * return any error associated with a research study status, e.g. patient withdrew
+             */
+            hasResearchStudyStatusErrors: function(studyId) {
+                return this.subjectResearchStudyStatuses[studyId] &&
+                this.subjectResearchStudyStatuses[studyId]["errors"].length;
+            },
+            getResearchStudyStatusErrors: function(studyId) {
+                if (!this.hasResearchStudyStatusErrors(studyId)) {
+                    return "";
+                }
+                return this.subjectResearchStudyStatuses[studyId]["errors"].join(", ");
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
@@ -1386,7 +1406,7 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
+                return this.isSubStudyPatient() && ((!this.hasSubStudyStatusErrors() && this.isPostTxActionRequired()) || this.hasPrevSubStudyPostTx());
             },
             isPostTxActionRequired: function() {
                 return this.subStudyTriggers.data &&
@@ -1443,7 +1463,7 @@ export default (function() {
                 return this.isSubStudyPatient() && this.hasSubStudyAsssessmentData();
             },
             initPostTxQuestionnaireSection: function(params) {
-                if (!this.subjectId || !this.isSubStudyPatient()) {
+                if (!this.isSubStudyPatient()) {
                     return false;
                 }
                 let self = this;

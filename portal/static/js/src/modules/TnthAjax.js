@@ -298,13 +298,31 @@ export default { /*global $ */
             }
         });
     },
-    "getResearchStudies": function(userId, params, callback) {
+    "getPatientResearchStudies": function(userId, params, callback) {
         callback = callback || function() {};
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/research_study", "GET", userId, params, function(data) {
+        this.sendRequest("/api/patient/" + userId + "/research_study", "GET", userId, params, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                    return true;
+                } else {
+                    callback({"error": data.error});
+                    return false;
+                }
+            }
+        });
+    },
+    "getStaffResearchStudies": function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({error: i18next.t("User id is required.")});
+            return false;
+        }
+        this.sendRequest("/api/staff/" + userId + "/research_study", "GET", userId, params, function(data) {
             if (data) {
                 if (!data.error) {
                     callback(data);

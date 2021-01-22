@@ -81,28 +81,11 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         return cachedCurrentUserId;
     },
     /*
-     * return research study object containing research studies participated by user
-     * @param userId Id of the user
-     * @param callback post ajax callback function that will receive data
-     */
-    getUserResearchStudies: function(userId, callback) {
-        callback = callback || function() {};
-        if (!userId) {
-            callback();
-            return;
-        }
-        $.ajax({
-            type: "GET",
-            url: `/api/user/${userId}/research_study`
-        }).done(data => {
-           callback(data);
-        }).fail(callback);
-    },
-    /*
-     * dynamically show/hide sub-study specific UI elements
+     * dynamically show/hide sub-study specific UI resources elements
+     * for the consumption by staff users
      * @param elementSelector A DOMString containing one or more selectors to match, e.g. #tnthWrapper .blah
      */
-    setSubstudyElementsVis: function(elementSelector, callback) {
+    setSubstudyResourcesVis: function(elementSelector, callback) {
         callback = callback || function() {};
         if (!elementSelector) {
             callback({error: true});
@@ -110,7 +93,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         }
         this.getCurrentUser((userId) => {
             if (!userId) return;
-            this.getUserResearchStudies(userId, data => {
+            $.ajax({
+                type: "GET",
+                url: `/api/staff/${userId}/research_study`
+            }).done(data => {
                 if (!data || !data.research_study || !data.research_study.length) {
                     callback({error: true});
                     return;
@@ -181,9 +167,9 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 });
                 self.handleDisableLinks();
                 /*
-                 * show sub-study specific links
+                 * show sub-study specific resources links
                  */
-                self.setSubstudyElementsVis("#tnthNavWrapper .eproms-substudy")
+                self.setSubstudyResourcesVis("#tnthNavWrapper .empro-resources");
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);
