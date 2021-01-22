@@ -1,4 +1,5 @@
 import Utility from "./Utility.js";
+import {convertArrayToObject} from "./Utility.js";
 import Validator from "./Validator.js";
 import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
@@ -82,10 +83,9 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     },
     /*
      * dynamically show/hide sub-study specific UI resources elements
-     * for the consumption by staff users
      * @param elementSelector A DOMString containing one or more selectors to match, e.g. #tnthWrapper .blah
      */
-    setSubstudyResourcesVis: function(elementSelector, callback) {
+    setSubstudyElementsVis: function(elementSelector, callback) {
         callback = callback || function() {};
         if (!elementSelector) {
             callback({error: true});
@@ -93,21 +93,32 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         }
         this.getCurrentUser((userId) => {
             if (!userId) return;
+            let roleType = "staff";
             $.ajax({
-                type: "GET",
-                url: `/api/staff/${userId}/research_study`
+                url: `/api/user/${userId}/roles`
             }).done(data => {
-                if (!data || !data.research_study || !data.research_study.length) {
-                    callback({error: true});
-                    return;
-                }
-                let substudyRS = (data.research_study).filter(item => item.id === EPROMS_SUBSTUDY_ID);
-                if (substudyRS.length) {
-                    $(elementSelector).show();
-                } else {
-                    $(elementSelector).hide();
-                }
-                callback(data);
+                if (data && data.roles) {
+                    let roles = data.roles.map(item => item.name);
+                    if (roles.indexOf("patient") !== -1) {
+                        roleType = "patient";
+                    }
+                } 
+                $.ajax({
+                    type: "GET",
+                    url: `/api/${roleType}/${userId}/research_study`
+                }).done(data => {
+                    if (!data || !data.research_study) {
+                        callback({error: true});
+                        return;
+                    }
+                    let researchStudyObj = convertArrayToObject(data.research_study, "id");
+                    if (researchStudyObj[EPROMS_SUBSTUDY_ID]) {
+                        $(elementSelector).show();
+                    } else {
+                        $(elementSelector).hide();
+                    }
+                    callback(data);
+                });
             });
         });
     },
@@ -167,9 +178,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                 });
                 self.handleDisableLinks();
                 /*
-                 * show sub-study specific resources links
+                 * show sub-study specific resources links, consumed by staff users
+                 * NB: can also add any patient specific elements
                  */
-                self.setSubstudyResourcesVis("#tnthNavWrapper .empro-resources");
+                self.setSubstudyElementsVis("#tnthNavWrapper .empro-resources");
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);

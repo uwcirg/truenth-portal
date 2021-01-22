@@ -413,3 +413,21 @@ export function sortArrayByField(arrObj, fieldName) {
     });
     return sortedArray;
 }
+/*
+ * convert an object into array based on an given key
+ */
+export function convertArrayToObject (array, key) {
+    if (!array) {
+        return false;
+    }
+    if (!Array.isArray(array)) {
+        return array;
+    }
+    array.reduce((acc, curr, index) => {
+        let useKey = curr[key];
+        if (!useKey) useKey = index;
+        acc[useKey] = curr;
+        return acc;
+    }, {});
+    return array;
+}

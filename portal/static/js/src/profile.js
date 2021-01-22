@@ -570,11 +570,10 @@ export default (function() {
                 }
             },
             setSubjectResearchStudies: function() {
-                let self = this;
-                this.modules.tnthAjax.getPatientResearchStudies(this.subjectId, "", data => {
-                    if (data && data.research_study) {
-                        this.subjectResearchStudyStatuses = data.research_study;
-                        this.subjectReseachStudies = Object.keys(data.research_study).map(item => parseInt(item));
+                this.modules.tnthAjax.getUserResearchStudies(this.subjectId, "patient", "", data => {
+                    if (data) {
+                        this.subjectResearchStudyStatuses = data;
+                        this.subjectReseachStudies = Object.keys(data).map(item => parseInt(item));
                     }
                 });
             },
@@ -2984,13 +2983,24 @@ export default (function() {
                     };
                     self.modules.tnthAjax.getTerms(this.subjectId, "", true, function(data) {
                         if (data && data.tous) {
+                            let websiteConsentTerms = [
+                                ["website terms of use",
+                                "subject website consent"],
+                                ["empro website terms of use"]
+                            ];
                             (data.tous).forEach(function(item) {
-                                if (self.consent.touObj.length) {
+                                let fType = $.trim(item.type).toLowerCase();
+                                let exists = (self.consent.touObj).filter(tou => {
+                                    return tou.agreement_url === item.agreement_url;
+                                });
+                                if (exists.length) {
                                     return true;
                                 }
-                                var fType = $.trim(item.type).toLowerCase();
-                                var org = orgsList[item.organization_id];
-                                if (["subject website consent", "website terms of use"].indexOf(String(fType)) !== -1) {
+                                let org = orgsList[item.organization_id];
+                                let matchedTermTypes = websiteConsentTerms.filter(o => {
+                                    return o.indexOf(String(fType)) !== -1;
+                                });
+                                if (matchedTermTypes.length) {
                                     item.name = (org && org.name ? i18next.t(org.name) : "--");
                                     item.truenth_name = i18next.t("TrueNTH USA");
                                     item.accepted = self.modules.tnthDates.formatDateString(item.accepted); //format to accepted format D m y

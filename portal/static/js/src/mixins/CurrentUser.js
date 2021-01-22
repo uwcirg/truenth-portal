@@ -92,29 +92,14 @@ var CurrentUser = { /* global $ i18next */
         isPatientUser: function() {
             return this.userRoles.indexOf("patient") !== -1
         },
+        getRoleType: function() {
+            return this.isPatientUser()?"patient":"staff";
+        },
         setUserResearchStudies: function(callback) {
             callback = callback || function() {};
-            if (this.isPatientUser()) {
-                this.setPatientResearchStudies(callback);
-                return;
-            }
-            this.setStaffResearchStudies(callback);
-        },
-        setStaffResearchStudies: function(callback) {
-            callback = callback || function() {};
-            tnthAjax.getStaffResearchStudies(this.userId, "", data => {
-                if (data && data.research_study) {
-                    this.userResearchStudyIds = data.research_study.map(item => item.id);
-                }
-                callback();
-            });
-        },
-        setPatientResearchStudies: function(callback) {
-            callback = callback || function() {};
-            let self = this;
-            tnthAjax.getPatientResearchStudies(this.userId, "", data => {
-                if (data && data.research_study) {
-                    this.userResearchStudyIds = Object.keys(data.research_study).map(item => parseInt(item));
+            tnthAjax.getUserResearchStudies(this.userId, this.getRoleType(), "", data => {
+                if (data) {
+                    this.userResearchStudyIds = Object.keys(data).map(item => parseInt(item));
                 }
                 callback();
             });
