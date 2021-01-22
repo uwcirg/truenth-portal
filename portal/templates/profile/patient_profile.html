@@ -18,7 +18,7 @@
 {% endblock %}
 {% block profile_content %}
   {% if config.CUSTOM_PATIENT_DETAIL and current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
-    {{ profile_macro.profileCustomDetail(person=user, substudy_assessment_is_ready=substudy_assessment_is_ready) }}
+    {{ profile_macro.profileCustomDetail(person=user) }}
     <div class="row">
       <div class="col-md-12 col-xs-12">
         <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>

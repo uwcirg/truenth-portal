@@ -622,6 +622,12 @@ export default (function() {
                     return  orgTool.isSubStudyOrg(orgId);
                 }).length;
             },
+            /*
+             * subject is ready to take EMPRO assessment
+             */
+            isSubStudyReadyPatient: function() {
+                return this.isSubStudyPatient() && this.getResearchStudyStatus(EPROMS_SUBSTUDY_ID)["ready"];
+            },
             isSubStudyPatient: function() {
                 return this.computedIsSubStudyPatient;
             },
@@ -630,6 +636,9 @@ export default (function() {
             },
             getSubStudyStatusErrors: function() {
                 return this.getResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
+            },
+            getResearchStudyStatus: function(studyId) {
+                return this.subjectResearchStudyStatuses[studyId];
             },
             /*
              * return any error associated with a research study status, e.g. patient withdrew
@@ -1758,10 +1767,11 @@ export default (function() {
             allowSubStudyWelcomeEmail: function() {
                 /*
                  *  to allow option for sub-study welcome email in the dropdown
-                 *  the subject needs to have consented to the sub-study, have a valid email and an
-                 *  assigned treating clinician
+                 *  the subject needs to have consented to the sub-study,
+                 *  ready for EMPRO assessment, 
+                 *  have a valid email and an assigned treating clinician
                  */
-                return this.isSubStudyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
+                return this.isSubStudyReadyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
             },
             initPatientEmailFormSection: function() {
                 var self = this;
