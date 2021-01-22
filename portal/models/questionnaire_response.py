@@ -84,7 +84,7 @@ class QuestionnaireResponse(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} " \
-               "{0.status} {0.document['authored']}".format(self)
+               "{0.status} {1}".format(self, self.document.get('authored'))
 
     def assign_qb_relationship(self, acting_user_id, qbd_accessor=None):
         """Lookup and assign questionnaire bank and iteration
