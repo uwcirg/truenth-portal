@@ -45,7 +45,7 @@ def mock_qr(
         doc_id=None, iteration=None, user_id=TEST_USER_ID, entry_method=None):
     if not doc_id:
         doc_id = ''.join(choice(ascii_letters) for _ in range(10))
-    timestamp = timestamp or datetime.utcnow()
+    timestamp = timestamp or utcnow_sans_micro()
     qr_document = {
         "authored": FHIR_datetime.as_fhir(timestamp),
         "questionnaire": {
