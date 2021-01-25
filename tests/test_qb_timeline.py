@@ -171,7 +171,8 @@ class TestQbTimeline(TestQuestionnaireBank):
     def test_completed_input(self):
         # Basic w/ one complete QB
         crv = self.setup_org_qbs()
-        self.bless_with_basics()  # pick up a consent, etc.
+        nowish, back_3_mos = associative_backdate(now, relativedelta(months=3))
+        self.bless_with_basics(setdate=back_3_mos)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
@@ -183,7 +184,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         for q in threeMo.questionnaires:
             q = db.session.merge(q)
-            mock_qr(q.name, qb=threeMo, iteration=0)
+            mock_qr(q.name, qb=threeMo, iteration=0, timestamp=nowish)
 
         self.test_user = db.session.merge(self.test_user)
         update_users_QBT(TEST_USER_ID, research_study_id=0)
@@ -197,7 +198,6 @@ class TestQbTimeline(TestQuestionnaireBank):
         # should be one less expired as it became partially_completed
         assert QBT.query.filter(
             QBT.status == OverallStatus.expired).count() == 7
-        assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
         assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
 
     def test_consent_change(self):
