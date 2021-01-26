@@ -32,7 +32,6 @@ from portal.system_uri import (
 )
 from tests import TEST_USER_ID, TestCase
 
-
 class TestAssessmentEngine(TestCase):
 
     def test_qnr_validation(self):
@@ -99,49 +98,6 @@ class TestAssessmentEngine(TestCase):
         updated_qnr_response = self.client.get(
             '/api/patient/{}/assessment/epic26'.format(TEST_USER_ID))
         assert updated_qnr_response.status_code == 200
-
-    def test_duplicate_identifier(self):
-        swagger_spec = swagger(self.app)
-        identifier = Identifier(system='https://unique.org', value='abc123')
-        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        data['identifier'] = identifier.as_fhir()
-
-        self.promote_user(role_name=ROLE.PATIENT.value)
-        self.login()
-        response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
-        assert response.status_code == 200
-
-        # Submit a second, with the same identifier, expect error
-        data2 = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        data2['identifier'] = identifier.as_fhir()
-        response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data2)
-        assert response.status_code == 409
-        self.test_user = db.session.merge(self.test_user)
-        assert self.test_user.questionnaire_responses.count() == 1
-
-        # And a third, with just the id.value changed
-        data3 = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        identifier.value = 'do-over'
-        data3['identifier'] = identifier.as_fhir()
-        response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data3)
-        assert response.status_code == 200
-        self.test_user = db.session.merge(self.test_user)
-        assert self.test_user.questionnaire_responses.count() == 2
-
-    def test_invalid_identifier(self):
-        swagger_spec = swagger(self.app)
-        identifier = Identifier(system=None, value='abc-123')
-        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
-        data['identifier'] = identifier.as_fhir()
-
-        self.promote_user(role_name=ROLE.PATIENT.value)
-        self.login()
-        response = self.client.post(
-            '/api/patient/{}/assessment'.format(TEST_USER_ID), json=data)
-        assert response.status_code == 400
 
     def test_duplicate_identifier(self):
         swagger_spec = swagger(self.app)
