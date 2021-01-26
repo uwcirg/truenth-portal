@@ -1,4 +1,5 @@
 import Utility from "./Utility.js";
+import {convertArrayToObject} from "./Utility.js";
 import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
@@ -298,22 +299,20 @@ export default { /*global $ */
             }
         });
     },
-    "getResearchStudies": function(userId, params, callback) {
+    "getUserResearchStudies": function(userId, roleType, params, callback) {
         callback = callback || function() {};
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/research_study", "GET", userId, params, function(data) {
-            if (data) {
-                if (!data.error) {
-                    callback(data);
-                    return true;
-                } else {
-                    callback({"error": data.error});
-                    return false;
-                }
+        roleType = roleType || "patient";
+        this.sendRequest(`/api/${roleType}/${userId}/research_study`, "GET", userId, params, 
+        function(data) {
+            if (!data || data.error || !data.research_study) {
+                callback({"error": data.error});
+                return;
             }
+            callback(convertArrayToObject(data.research_study, "id"));
         });
     },
     getSubStudyTriggers: function(userId, params, callback) {

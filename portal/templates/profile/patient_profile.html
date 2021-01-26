@@ -18,7 +18,7 @@
 {% endblock %}
 {% block profile_content %}
   {% if config.CUSTOM_PATIENT_DETAIL and current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
-    {{ profile_macro.profileCustomDetail(person=user, substudy_assessment_is_ready=substudy_assessment_is_ready) }}
+    {{ profile_macro.profileCustomDetail(person=user) }}
     <div class="row">
       <div class="col-md-12 col-xs-12">
         <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
@@ -50,11 +50,7 @@
   {%- endif %}
   {{profile_macro.profileDemo(user, current_user)}}
   {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
-    <div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
-      <div class="col-md-12 col-xs-12">
-          {{profile_macro.profileTreatingClinician(user)}}
-      </div>
-    </div>
+      {{profile_macro.profileTreatingClinician(user)}}
   {%- endif -%}
   {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value) -%}
     <div class="row" id="longitudinalReportSection" class="eproms-substudy" v-show="hasSubStudyAsssessmentData()"> 

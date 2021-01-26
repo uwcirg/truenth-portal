@@ -112,6 +112,7 @@ export default (function() {
             userOrgs: [],
             subjectOrgs: [],
             subjectReseachStudies: [],
+            subjectResearchStudyStatuses: {},
             userRoles: [],
             cliniciansList: [],
             staffEditableRoles: ["clinician", "staff", "staff_admin"],
@@ -569,11 +570,10 @@ export default (function() {
                 }
             },
             setSubjectResearchStudies: function() {
-                this.modules.tnthAjax.getResearchStudies(this.subjectId, "", data => {
-                    if (data && data.research_study) {
-                        this.subjectReseachStudies = data.research_study.map(item => {
-                            return item.id
-                        });
+                this.modules.tnthAjax.getUserResearchStudies(this.subjectId, "patient", "", data => {
+                    if (data) {
+                        this.subjectResearchStudyStatuses = data;
+                        this.subjectReseachStudies = Object.keys(data).map(item => parseInt(item));
                     }
                 });
             },
@@ -621,8 +621,36 @@ export default (function() {
                     return  orgTool.isSubStudyOrg(orgId);
                 }).length;
             },
+            /*
+             * subject is ready to take EMPRO assessment
+             */
+            isSubStudyReadyPatient: function() {
+                return this.isSubStudyPatient() && this.getResearchStudyStatus(EPROMS_SUBSTUDY_ID)["ready"];
+            },
             isSubStudyPatient: function() {
                 return this.computedIsSubStudyPatient;
+            },
+            hasSubStudyStatusErrors: function() {
+                return this.hasResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
+            },
+            getSubStudyStatusErrors: function() {
+                return this.getResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
+            },
+            getResearchStudyStatus: function(studyId) {
+                return this.subjectResearchStudyStatuses[studyId];
+            },
+            /*
+             * return any error associated with a research study status, e.g. patient withdrew
+             */
+            hasResearchStudyStatusErrors: function(studyId) {
+                return this.subjectResearchStudyStatuses[studyId] &&
+                this.subjectResearchStudyStatuses[studyId]["errors"].length;
+            },
+            getResearchStudyStatusErrors: function(studyId) {
+                if (!this.hasResearchStudyStatusErrors(studyId)) {
+                    return "";
+                }
+                return this.subjectResearchStudyStatuses[studyId]["errors"].join(", ");
             },
             isStaffAdmin: function() {
                 return this.currentUserRoles.indexOf("staff_admin") !== -1;
@@ -1386,7 +1414,7 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
+                return this.isSubStudyPatient() && ((!this.hasSubStudyStatusErrors() && this.isPostTxActionRequired()) || this.hasPrevSubStudyPostTx());
             },
             isPostTxActionRequired: function() {
                 return this.subStudyTriggers.data &&
@@ -1443,7 +1471,7 @@ export default (function() {
                 return this.isSubStudyPatient() && this.hasSubStudyAsssessmentData();
             },
             initPostTxQuestionnaireSection: function(params) {
-                if (!this.subjectId || !this.isSubStudyPatient()) {
+                if (!this.isSubStudyPatient()) {
                     return false;
                 }
                 let self = this;
@@ -1738,10 +1766,11 @@ export default (function() {
             allowSubStudyWelcomeEmail: function() {
                 /*
                  *  to allow option for sub-study welcome email in the dropdown
-                 *  the subject needs to have consented to the sub-study, have a valid email and an
-                 *  assigned treating clinician
+                 *  the subject needs to have consented to the sub-study,
+                 *  ready for EMPRO assessment, 
+                 *  have a valid email and an assigned treating clinician
                  */
-                return this.isSubStudyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
+                return this.isSubStudyReadyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
             },
             initPatientEmailFormSection: function() {
                 var self = this;
@@ -2954,13 +2983,24 @@ export default (function() {
                     };
                     self.modules.tnthAjax.getTerms(this.subjectId, "", true, function(data) {
                         if (data && data.tous) {
+                            let websiteConsentTerms = [
+                                ["website terms of use",
+                                "subject website consent"],
+                                ["empro website terms of use"]
+                            ];
                             (data.tous).forEach(function(item) {
-                                if (self.consent.touObj.length) {
+                                let fType = $.trim(item.type).toLowerCase();
+                                let exists = (self.consent.touObj).filter(tou => {
+                                    return tou.agreement_url === item.agreement_url;
+                                });
+                                if (exists.length) {
                                     return true;
                                 }
-                                var fType = $.trim(item.type).toLowerCase();
-                                var org = orgsList[item.organization_id];
-                                if (["subject website consent", "website terms of use"].indexOf(String(fType)) !== -1) {
+                                let org = orgsList[item.organization_id];
+                                let matchedTermTypes = websiteConsentTerms.filter(o => {
+                                    return o.indexOf(String(fType)) !== -1;
+                                });
+                                if (matchedTermTypes.length) {
                                     item.name = (org && org.name ? i18next.t(org.name) : "--");
                                     item.truenth_name = i18next.t("TrueNTH USA");
                                     item.accepted = self.modules.tnthDates.formatDateString(item.accepted); //format to accepted format D m y

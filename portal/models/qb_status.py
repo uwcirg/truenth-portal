@@ -518,7 +518,7 @@ def patient_research_study_status(patient, ignore_QB_status=False):
 
         assessment_status = QB_Status(
             patient, research_study_id=rs, as_of_date=as_of_date)
-        if assessment_status.overall_status == 'Withdrawn':
+        if assessment_status.overall_status == OverallStatus.withdrawn:
             rs_status['errors'].append('Withdrawn')
             continue
 

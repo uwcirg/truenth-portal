@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, abort, jsonify
 
 from ..extensions import oauth
 from ..models.organization import (
     OrgTree,
     OrganizationResearchProtocol,
 )
+from ..models.qb_status import patient_research_study_status
 from ..models.research_protocol import ResearchProtocol
 from ..models.research_study import ResearchStudy
 from ..models.role import ROLE
@@ -14,20 +15,78 @@ from .crossdomain import crossdomain
 research_study_api = Blueprint('research_study_api', __name__)
 
 
-@research_study_api.route('/api/user/<int:user_id>/research_study')
+@research_study_api.route('/api/patient/<int:user_id>/research_study')
 @crossdomain()
 @oauth.require_oauth()
-def rs_for_user(user_id):
-    """Returns simple JSON for research study user is eligible for
+def rs_for_patient(user_id):
+    """Returns simple JSON for patient's research study status
 
-    NB a user may be "eligible" but not yet "ready" for a given study. Use
-    ``qb_status.patient_research_study_status()`` to check.
+    ---
+    tags:
+      - Patient
+      - ResearchStudy
+    operationId: research_studies_for_patient
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the list of research_studies and status the requested
+          patient is eligible for.
+        schema:
+          id: nested_research_study_status
+          properties:
+            research_study_status:
+              type: array
+              items:
+                type: object
+                required:
+                  - eligible
+                  - ready
+                properties:
+                  eligible:
+                    type: boolean
+                    description: is patient eligible (not necessarily ready) for study
+                  ready:
+                    type: boolean
+                    description: true if patient is ready for given study
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    security:
+      - ServiceToken: []
+
+    """
+    user = get_user(
+        user_id, 'view', allow_on_url_authenticated_encounters=True)
+    if not user.has_role(ROLE.PATIENT.value):
+        abort(
+            400,
+            "only supported on patients."
+            "  see also /api/staff/<id>/research_study")
+
+    return jsonify(research_study=patient_research_study_status(user))
+
+
+@research_study_api.route('/api/staff/<int:user_id>/research_study')
+@crossdomain()
+@oauth.require_oauth()
+def rs_for_staff(user_id):
+    """Returns simple JSON for research studies in staff user's domain
 
     ---
     tags:
       - User
       - ResearchStudy
-    operationId: research_studies_for_user
+    operationId: research_studies_for_staff
     parameters:
       - name: user_id
         in: path
@@ -40,7 +99,7 @@ def rs_for_user(user_id):
     responses:
       200:
         description:
-          Returns the list of research_studies the requested user is
+          Returns the list of research_studies the requested staff user is
           associated with.
         schema:
           id: nested_research_studies
@@ -69,24 +128,28 @@ def rs_for_user(user_id):
     user = get_user(
         user_id, 'view', allow_on_url_authenticated_encounters=True)
     if user.has_role(ROLE.PATIENT.value):
-        study_ids = ResearchStudy.assigned_to(user)
-    else:
-        # Assume some staff like role - find all research studies
-        # in the org tree at, above or below all of the user's orgs
-        orgs = set()
-        ot = OrgTree()
-        for org in user.organizations:
-            orgs.update(ot.at_and_above_ids(org.id))
-            orgs.update(ot.here_and_below_id(org.id))
-        studies = OrganizationResearchProtocol.query.filter(
-            OrganizationResearchProtocol.organization_id.in_(
-                tuple(orgs))).join(
-            ResearchProtocol,
-            OrganizationResearchProtocol.research_protocol_id ==
-            ResearchProtocol.id).with_entities(
-            ResearchProtocol.research_study_id).distinct()
-        study_ids = [s.research_study_id for s in studies]
-        study_ids.sort()
+        abort(
+            400,
+            "wrong request path for patient,"
+            " see /api/patient/<int:user_id>/research_study")
 
-    return jsonify(research_study=[
-        ResearchStudy.query.get(r).as_fhir() for r in study_ids])
+    # Assume some staff like role - find all research studies
+    # in the org tree at, above or below all of the user's orgs
+    orgs = set()
+    ot = OrgTree()
+    for org in user.organizations:
+        orgs.update(ot.at_and_above_ids(org.id))
+        orgs.update(ot.here_and_below_id(org.id))
+    studies = OrganizationResearchProtocol.query.filter(
+        OrganizationResearchProtocol.organization_id.in_(
+            tuple(orgs))).join(
+        ResearchProtocol,
+        OrganizationResearchProtocol.research_protocol_id ==
+        ResearchProtocol.id).with_entities(
+        ResearchProtocol.research_study_id).order_by(
+        ResearchProtocol.research_study_id).distinct()
+    results = [
+        ResearchStudy.query.get(s.research_study_id).as_fhir()
+        for s in studies]
+
+    return jsonify(research_study=results)

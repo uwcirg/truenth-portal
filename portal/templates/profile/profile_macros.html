@@ -313,7 +313,7 @@
         {{emailReadyMessage()}}
     </div>
 {%- endmacro %}
-{% macro profileSendEmail(person, substudy_assessment_is_ready=false) -%}
+{% macro profileSendEmail(person) -%}
     {%- if person -%}
         <div class="email-form-container">
             {% call profileEmailForm(person) %}
@@ -321,10 +321,8 @@
                     <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("TrueNTH Invite")}}</option>
                 {%endif %}
                 <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
-                {% if substudy_assessment_is_ready %}
-                    <!-- reactive option, will only show when user is in sub-study and email is available -->
-                    <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("EMPRO Welcome")}}</option>
-                {% endif %}
+                <!-- reactive option, will only show when user is in ready for sub-study and email is available -->
+                <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("EMPRO Welcome")}}</option>
             {% endcall %}
             <!--
                 set P3P invite/reminder tile visibility based on whether user's org matches config variable, ACCEPT_TERMS_ON_NEXT_ORG - this is the case of MUSIC patient
@@ -905,7 +903,7 @@
                     will display triggers were present in the last determined trigger state
                     will be in a disabled state if the action state is "completed"
                 -->
-                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
+                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved() || hasSubStudyStatusErrors(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                     <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
@@ -970,6 +968,11 @@
                         <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
                     </div>
                 </div>
+                <div class="study-error error-message" v-show="hasSubStudyStatusErrors()">
+                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                    <b>{{_("Errors:")}}</b>
+                    <div v-html="getSubStudyStatusErrors()" ></div>
+                </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
             </div>
         {% endcall %}
@@ -977,7 +980,9 @@
   </div>
 {%- endmacro -%}
 {% macro profileTreatingClinician(person) %}
-    {% call profileSection(data_sections="locale, timezone") %}
+<div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
+    <div class="col-md-12 col-xs-12">
+        {% call profileSection(data_sections="locale, timezone") %}
         {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
         {% call viewSection(id="profileTreatingCliniciansViewContainer") -%}
             <table>
@@ -991,9 +996,11 @@
             </div>
             {{saveLoaderDiv("treatingClinicianContainer")}}
         {%- endcall %}
-        <div class="put-demo-error error-message"></div>
-        <div class="get-clinicians-error error-message"></div>
-    {% endcall %}
+            <div class="put-demo-error error-message"></div>
+            <div class="get-clinicians-error error-message"></div>
+        {% endcall %}
+    </div>
+</div>
 {%- endmacro %}
 {% macro profileSessionList(person, current_user) -%}
     <div id="userSessionsListContainer" data-profile-section-id="assessmentlist">
@@ -1232,7 +1239,7 @@
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
 {%- endmacro %}
-{% macro profileCustomDetail(person, substudy_assessment_is_ready=false) -%}
+{% macro profileCustomDetail(person) -%}
      <div class="row" data-profile-section-id="custompatientdetail">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
@@ -1242,7 +1249,7 @@
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
-                    <div>{{profileSendEmail(person, substudy_assessment_is_ready)}}</div>
+                    <div>{{profileSendEmail(person)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
