@@ -969,7 +969,8 @@
                     </div>
                 </div>
                 <div class="study-error error-message" v-show="hasSubStudyStatusErrors()">
-                    <b>{{_("Errors: ")}}</b>
+                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                    <b>{{_("Errors:")}}</b>
                     <div v-html="getSubStudyStatusErrors()" ></div>
                 </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>

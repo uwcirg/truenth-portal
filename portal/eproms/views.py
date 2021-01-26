@@ -119,8 +119,7 @@ def assessment_engine_view(user):
         localize_datetime(assessment_status.completed_date, user)
         if assessment_status.completed_date else None)
     assessment_is_due = (
-        BASE_RS_ID in research_study_status and
-        research_study_status[BASE_RS_ID]['ready'])
+        research_study_status.get(BASE_RS_ID, {}).get('ready', False))
     enrolled_in_indefinite = assessment_status.enrolled_in_classification(
         "indefinite")
     substudy_assessment_status = QB_Status(
