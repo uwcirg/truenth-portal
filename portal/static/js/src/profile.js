@@ -1264,7 +1264,12 @@ export default (function() {
                             display: $("#clincianSelector option:selected").text(),
                             reference: `api/clinician/${$(this).val()}`
                         });
-                        self.postDemoData($("#treatingClinicianContainer"), postData);
+                        self.postDemoData($("#treatingClinicianContainer"), postData, () => {
+                            /*
+                             * set research study status after clinician is set
+                             */
+                            self.setSubjectResearchStudies();
+                        });
                     });
                 });
             },
