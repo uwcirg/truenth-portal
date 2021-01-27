@@ -56,6 +56,7 @@ URLAuthenticatedModalObj.prototype.setUI = function() {
         }
         $(".modal").modal("hide");
         $("#"+self.MODAL_ELEMENT_IDENTIFIER).modal("show");
+        return false;
     })
     //elements needing to be hidden
     $(".portal-weak-auth-hide").each(
