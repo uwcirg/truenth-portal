@@ -20,9 +20,9 @@
         <a class="btn-lg btn-tnth-primary" href="/logout">{{ _("Log out") }}</a>
     </div>
 {%- endmacro -%}
-{%- macro render_call_to_button(button_label="", button_url="") -%}
+{%- macro render_call_to_button(button_label="", button_url="", css_class="") -%}
     <div class="button-container">
-        <a class="btn-lg btn-tnth-primary" href="{{button_url}}">{{button_label}}</a>
+        <a class="btn-lg btn-tnth-primary {{css_class}}" href="{{button_url}}">{{button_label}}</a>
     </div>
 {%- endmacro -%}
 {%- macro render_greeting(full_name="") -%}

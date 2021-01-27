@@ -65,7 +65,8 @@
             title_text=title_text,
             card_class="portal-completed-container") -%}
             <div class="text-content">{{_("No questionnaire is due.")}}</div>
-            {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"))}}
+            {{render_call_to_button(button_label=_("View previous questionnaire"), button_url=url_for("portal.profile", _anchor="proAssessmentsLoc"),
+            css_class="portal-weak-auth-disabled")}}
         {%- endcall -%}
         <!-- main study completed card -->
         {{completed_card(

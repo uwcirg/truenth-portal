@@ -6,7 +6,7 @@ $(document).on("ready", function() {
     $(".button-container").each(function() {
         $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-    $(".btn-tnth-primary").on("click", function(event) {
+    $(".btn-tnth-primary:not(.portal-weak-auth-disabled)").on("click", function(event) {
         if ($(this).hasClass("disabled")) {
             return false;
         }
