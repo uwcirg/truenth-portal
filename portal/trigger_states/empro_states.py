@@ -11,11 +11,14 @@ from statemachine import StateMachine, State
 from statemachine.exceptions import TransitionNotAllowed
 
 from .empro_domains import DomainManifold
+from .empro_messages import patient_email, staff_emails
 from .models import TriggerState
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..models.qb_status import QB_Status
 from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.user import User
 from ..timeout_lock import LockTimeout, TimeoutLock
 
 EMPRO_STUDY_ID = 1
@@ -248,10 +251,6 @@ def fire_trigger_events():
     'resolved'.
 
     """
-    from ..models.user import User
-    from .empro_messages import patient_email, staff_emails
-    from ..date_tools import FHIR_datetime
-
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
         result = {'context': context, 'timestamp': FHIR_datetime.now()}
