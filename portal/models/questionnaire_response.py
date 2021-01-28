@@ -423,6 +423,7 @@ class QNR_results(object):
                 query = query.filter(
                     QuestionnaireResponse.qb_iteration == self.qb_iteration)
         self._qnrs = []
+        prev_auth = None
         for qnr in query:
             # Cheaper to toss those from the wrong research study now
             instrument = qnr.instrument_id.split('/')[-1]
@@ -431,13 +432,21 @@ class QNR_results(object):
             if research_study_id != self.research_study_id:
                 continue
 
+            # confirm a timezone extension in authored didn't foil the sort
+            auth_datetime = FHIR_datetime.parse(qnr.authored)
+            if prev_auth and prev_auth > auth_datetime:
+                raise ValueError(
+                    "Can't sort questionnaire_response.document['authored']"
+                    f" due to non UTC timezone info for user {self.user.id}")
+            prev_auth = auth_datetime
+
             self._qnrs.append(QNR(
                 qnr_id=qnr.id,
                 qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration,
                 status=qnr.status,
                 instrument=instrument,
-                authored=FHIR_datetime.parse(qnr.authored),
+                authored=auth_datetime,
                 encounter_id=qnr.encounter_id))
         return self._qnrs
 

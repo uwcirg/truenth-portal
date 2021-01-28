@@ -1,6 +1,8 @@
 """Module to test assessment_status"""
 
+import copy
 from datetime import datetime
+from pytz import timezone, utc
 from random import choice
 from string import ascii_letters
 
@@ -26,6 +28,7 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBankQuestionnaire,
 )
 from portal.models.questionnaire_response import (
+    QNR_results,
     QuestionnaireResponse,
     aggregate_responses,
     qnr_document_id,
@@ -60,6 +63,10 @@ def mock_qr(
             "system": "https://stg-ae.us.truenth.org/eproms-demo"}
     }
 
+    # Strip TZ info if test happens to include
+    if timestamp.tzinfo is not None:
+        utc_time = timestamp.astimezone(utc)
+        timestamp = utc_time.replace(tzinfo=None)
     enc = Encounter(
         status='planned', auth_method='url_authenticated', user_id=user_id,
         start_time=timestamp)
@@ -324,6 +331,33 @@ class TestQuestionnaireSetup(TestCase):
 
 
 class TestAggregateResponses(TestQuestionnaireSetup):
+
+    def test_authored_sort(self):
+        consent_date = datetime.strptime(
+            "2021-01-25 23:43:38", "%Y-%m-%d %H:%M:%S")
+        self.bless_with_basics(
+            setdate=consent_date, local_metastatic='metastatic')
+        instrument_id = 'eortc'
+        d1 = timezone('Australia/Sydney').localize(
+            consent_date + relativedelta(days=10, seconds=2))
+        d2 = timezone('US/Eastern').localize(
+            consent_date + relativedelta(days=10))
+
+        # d1 and d2 sort differently depending on datetime or
+        # lexicographical string sort:
+        assert d1 < d2
+        assert FHIR_datetime.as_fhir(d1) > FHIR_datetime.as_fhir(d2)
+
+        for dt in (d1, d2):
+            # each qr added forces a sort - confirm it raises due to tz
+            mock_qr(instrument_id=instrument_id, timestamp=dt)
+
+        # Confirm sort order by authored, regardless of timezone, etc.
+        user = db.session.merge(self.test_user)
+        qr = QNR_results(user=user, research_study_id=0)
+        with pytest.raises(ValueError) as e:
+            qr.qnrs
+        assert "non UTC timezone" in str(e.value)
 
     def test_aggregate_response_timepoints(self):
         # generate a few mock qr's from various qb iterations, confirm
