@@ -5,6 +5,7 @@ import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
 import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+const MAX_ATTEMPTS = 3
 export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
@@ -17,7 +18,7 @@ export default { /*global $ */
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: 3, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         params.async = params.sync ? false: params.async;
@@ -319,7 +320,7 @@ export default { /*global $ */
         callback = callback || function() {};
         params = params || {};
         params.retryAttempt = params.retryAttempt || 0;
-        params.maxTryAttempts = params.maxTryAttempts || 5;
+        params.maxTryAttempts = params.maxTryAttempts || MAX_ATTEMPTS;
 
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
