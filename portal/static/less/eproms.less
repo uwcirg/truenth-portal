@@ -3388,7 +3388,8 @@ section.header {
       font-weight: 500;
     }
     .soft-trigger-legend,
-    .hard-trigger-legend {
+    .hard-trigger-legend,
+    .in-progress-legend {
       display:inline-block;
       margin-left: 8px;
     }
@@ -3399,6 +3400,18 @@ section.header {
     .hard-trigger-legend:before {
       content: "**";
       display: inline-block;
+    }
+    .in-progress-legend:before {
+      display: inline-block;
+      font-family: 'Glyphicons Halflings';
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      content: "\270f";
+      margin-right: 4px;
+      position: relative;
+      top: 2px;
     }
   }
   .nav-arrow {
@@ -3429,7 +3442,7 @@ section.header {
       cursor: not-allowed;
     }
   }
-  .triggers {
+  .has-legend {
     .nav-arrow {
       top: 36px;
     }

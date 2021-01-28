@@ -1281,6 +1281,19 @@ export default (function() {
                 });
                 this.subStudyAssessment.data = data;
             },
+            hasSubStudyAsssessmentData: function() {
+                return this.subStudyAssessment.data.length;
+            },
+            getSubStudyAssessmentStatus: function() {
+                if (!this.hasSubStudyAsssessmentData()) return "";
+                return String(this.subStudyAssessment.data[0].status).toLowerCase();
+            },
+            isSubStudyAssessmentCompleted: function() {
+                return this.getSubStudyAssessmentStatus() === "completed";
+            },
+            getSubStudyAssessmentStatusDisplay: function() {
+                return i18next.t("Last EMPRO questionnaire {status} on:").replace("{status}", this.getSubStudyAssessmentStatus());
+            },
             getLastSubStudyAssessmentDate: function() {
                 if (!this.subStudyAssessment.data || !this.subStudyAssessment.data.length) return "";
                 return this.modules.tnthDates.formatDateString(this.subStudyAssessment.data[0].authored);
@@ -1421,16 +1434,25 @@ export default (function() {
             shouldShowSubstudyPostTx: function() {
                 return this.isSubStudyPatient() && ((!this.hasSubStudyStatusErrors() && this.isPostTxActionRequired()) || this.hasPrevSubStudyPostTx());
             },
+            getPostTxActionStatus: function() {
+                if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
+                    return "";
+                }
+                return String(this.subStudyTriggers.data.action_state).toLowerCase();
+            },
+            hasMissedPostTxAction: function() {
+                return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
+            },
             isPostTxActionRequired: function() {
                 return this.subStudyTriggers.data &&
-                (["due", "overdue", "required"].indexOf(String(this.subStudyTriggers.data.action_state).toLowerCase()) !== -1
+                (["due", "overdue", "required"].indexOf(this.getPostTxActionStatus()) !== -1
                 );
             },
             isSubStudyTriggersResolved: function() {
                 if (!this.subStudyTriggers.data) {
                     return true;
                 }
-                return String(this.subStudyTriggers.data.action_state).toLowerCase() === "completed" || this.subStudyTriggers.data.resolution;
+                return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
