@@ -425,7 +425,7 @@ def empro_staff_qbd_accessor(qnr):
         triggers['resolution'] = {
             'qnr_id': qnr.id,
             'qb_iteration': None,
-            'authored': FHIR_datetime.as_fhir(qnr.authored)}
+            'authored': qnr.document['authored']}
         match.triggers = triggers
         if match.state != 'resolved':
             sm = EMPRO_state(match)

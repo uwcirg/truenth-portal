@@ -879,34 +879,6 @@ def settings():
         organization_consents = Organization.consent_agreements(
             locale_code=user.locale_code)
 
-    if form.patient_id.data and form.timestamp.data:
-        # TODO: is this in use?  would change all a user's QNR authored
-        # dates - guessing it is dead.  Remove soon unless needed
-        msg = (
-            "Attempt to use QNR authored adjustment from /settings by %s",
-            user.id)
-        current_app.logger.error(msg)
-        abort(400, msg)
-
-        patient = get_user(form.patient_id.data, 'edit')
-        try:
-            dt = FHIR_datetime.parse(form.timestamp.data)
-            for qnr in QuestionnaireResponse.query.filter_by(
-                    subject_id=patient.id):
-                qnr.authored = dt
-                document = qnr.document
-                document['authored'] = FHIR_datetime.as_fhir(dt)
-                # Due to the infancy of JSON support in POSTGRES and SQLAlchemy
-                # one must force the update to get a JSON field change to stick
-                db.session.query(QuestionnaireResponse).filter(
-                    QuestionnaireResponse.id == qnr.id
-                ).update({"document": document})
-            db.session.commit()
-            invalidate_users_QBT(patient.id)  # fenced out
-        except ValueError as e:
-            trace("Invalid date format {}".format(form.timestamp.data))
-            trace("ERROR: {}".format(e))
-
     response = make_response(render_template(
         'settings.html',
         form=form,

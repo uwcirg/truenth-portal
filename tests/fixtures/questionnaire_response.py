@@ -11,7 +11,7 @@ def initialized_with_ss_qnr(test_user, initialized_with_ss_qb):
     test_user_id = db.session.merge(test_user).id
     instrument_id = 'empro'
     doc_id = '538.0'
-    timestamp = '2020-09-30 00:00:00'
+    timestamp = '2020-09-30T00:00:00Z'
     qr_document = {
         "authored": timestamp,
         "questionnaire": {
@@ -31,7 +31,6 @@ def initialized_with_ss_qnr(test_user, initialized_with_ss_qb):
         status='in-progress',
         auth_method='password_authenticated')
     qnr = QuestionnaireResponse(
-        authored=timestamp,
         document=qr_document,
         encounter=encounter,
         subject_id=test_user_id,

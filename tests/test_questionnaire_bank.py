@@ -7,6 +7,7 @@ from flask_webtest import SessionScope
 import pytest
 
 from portal.cache import cache
+from portal.date_tools import utcnow_sans_micro
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
@@ -34,7 +35,7 @@ from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 
-now = datetime.utcnow()
+now = utcnow_sans_micro()
 
 
 class TestQuestionnaireBank(TestCase):

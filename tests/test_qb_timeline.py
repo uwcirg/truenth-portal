@@ -5,7 +5,7 @@ import pytest
 
 from portal.cache import cache
 from portal.database import db
-from portal.date_tools import FHIR_datetime
+from portal.date_tools import FHIR_datetime, utcnow_sans_micro
 from portal.models.audit import Audit
 from portal.models.clinical_constants import CC
 from portal.models.overall_status import OverallStatus
@@ -29,10 +29,12 @@ from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBank
 
+now = utcnow_sans_micro()
+
 
 def test_sort():
-    yesterday = datetime.utcnow() - relativedelta(days=1)
-    items = set([('b', None), ('a', yesterday),  ('c', datetime.utcnow())])
+    yesterday = now - relativedelta(days=1)
+    items = set([('b', None), ('a', yesterday),  ('c', now)])
     results = sorted(list(items), key=second_null_safe_datetime, reverse=True)
     # Assert expected order
     x, y = results.pop()
@@ -145,7 +147,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         # submit a mock response for 3 month QB after overdue
         # before expired
-        post_overdue = datetime.now() + relativedelta(months=4, weeks=1)
+        post_overdue = now + relativedelta(months=4, weeks=1)
         qb_name = "CRV_recurring_3mo_period v2"
         threeMo = QuestionnaireBank.query.filter(
             QuestionnaireBank.name == qb_name).one()
@@ -169,7 +171,8 @@ class TestQbTimeline(TestQuestionnaireBank):
     def test_completed_input(self):
         # Basic w/ one complete QB
         crv = self.setup_org_qbs()
-        self.bless_with_basics()  # pick up a consent, etc.
+        nowish, back_3_mos = associative_backdate(now, relativedelta(months=3))
+        self.bless_with_basics(setdate=back_3_mos)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
 
@@ -181,7 +184,7 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         for q in threeMo.questionnaires:
             q = db.session.merge(q)
-            mock_qr(q.name, qb=threeMo, iteration=0)
+            mock_qr(q.name, qb=threeMo, iteration=0, timestamp=nowish)
 
         self.test_user = db.session.merge(self.test_user)
         update_users_QBT(TEST_USER_ID, research_study_id=0)
@@ -195,7 +198,6 @@ class TestQbTimeline(TestQuestionnaireBank):
         # should be one less expired as it became partially_completed
         assert QBT.query.filter(
             QBT.status == OverallStatus.expired).count() == 7
-        assert QBT.query.filter(QBT.status == OverallStatus.in_progress).one()
         assert QBT.query.filter(QBT.status == OverallStatus.completed).one()
 
     def test_consent_change(self):
@@ -336,7 +338,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         crv = self.setup_org_qbs()
         crv_id = crv.id
         # consent 17 months in past
-        backdate = datetime.utcnow() - relativedelta(months=17)
+        backdate = now - relativedelta(months=17)
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id, setdate=backdate)
@@ -347,7 +349,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         user = db.session.merge(self.test_user)
         withdraw_consent(
             user=user, org_id=crv_id, acting_user=user,
-            research_study_id=0, acceptance_date=datetime.utcnow())
+            research_study_id=0, acceptance_date=now)
         gen = ordered_qbs(user=user, research_study_id=0)
 
         # expect each in order despite overlapping nature
@@ -360,7 +362,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_change_midstream_rp(self):
-        now = datetime.utcnow()
         back7, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
@@ -390,7 +391,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_change_before_start_rp(self):
-        now = datetime.utcnow()
         back7, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
@@ -420,7 +420,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_change_before_start_multiple_rps(self):
-        now = datetime.utcnow()
         back1, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=1))
         back7, nowish = associative_backdate(
@@ -450,7 +449,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_change_midstream_results_rp(self):
-        now = datetime.utcnow()
         back1, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=1))
         back10, nowish = associative_backdate(
@@ -488,7 +486,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_change_before_start_rp_w_result(self):
-        now = datetime.utcnow()
         back7, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
@@ -522,7 +519,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_indef_change_before_start_rp(self):
-        now = datetime.utcnow()
         back7, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
@@ -547,7 +543,6 @@ class TestQbTimeline(TestQuestionnaireBank):
             next(gen)
 
     def test_indef_change_before_start_rp_w_result(self):
-        now = datetime.utcnow()
         back7, nowish = associative_backdate(
             now=now, backdate=relativedelta(months=7))
         back14, nowish = associative_backdate(
@@ -588,7 +583,7 @@ class Test_QB_StatusCacheKey(TestCase):
         assert relativedelta(datetime.utcnow() - cur_val).seconds < 5
 
     def test_update(self):
-        hourback = datetime.utcnow() - relativedelta(hours=1)
+        hourback = now - relativedelta(hours=1)
         cache_key = QB_StatusCacheKey()
         cache_key.update(hourback)
         assert hourback.replace(microsecond=0) == cache_key.current()
