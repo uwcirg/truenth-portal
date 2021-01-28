@@ -32,6 +32,7 @@ from portal.system_uri import (
 )
 from tests import TEST_USER_ID, TestCase
 
+
 class TestAssessmentEngine(TestCase):
 
     def test_qnr_validation(self):
