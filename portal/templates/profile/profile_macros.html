@@ -898,7 +898,7 @@
                             <span class="text" v-text="getSubStudyAssessmentStatusDisplay()"></span>
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
-                        <!-- for assessment that has been completed, as triggers aren't calculated yet for assessment still in progress -->
+                        <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
                         <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No high distress areas indicated")}}</div>
                     </div>
                 </div>
@@ -974,7 +974,7 @@
                         <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
                     </div>
                 </div>
-                <!-- indicate missed action status if triggers are displayed -->
+                <!-- indicate missed action status if triggers are present -->
                 <div class="action-status" v-show="hasMissedPostTxAction()">
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
