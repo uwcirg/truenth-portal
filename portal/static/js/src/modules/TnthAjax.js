@@ -1134,7 +1134,7 @@ export default { /*global $ */
             return false;
         }
         params = params || {};
-        this.sendRequest("/api/user/" + userId + "/questionnaire_bank", "GET", userId, {data: {as_of_date: completionDate}, sync: params.sync, max_attempts: MAX_ATTEMPTS}, function(data) {
+        this.sendRequest("/api/user/" + userId + "/questionnaire_bank", "GET", userId, {data: {as_of_date: completionDate}, sync: params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred retrieving current questionnaire bank for user.")});
                 return false;
