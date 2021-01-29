@@ -4,17 +4,21 @@ See also:
     [IRONMAN EMPRO Study Experience](https://promowiki.movember.com/display/ISS/Product+Development+-+IRONMAN+EMPRO+Study)
 """
 import copy
+from datetime import datetime
 from flask import current_app
 from smtplib import SMTPRecipientsRefused
 from statemachine import StateMachine, State
 from statemachine.exceptions import TransitionNotAllowed
 
 from .empro_domains import DomainManifold
+from .empro_messages import patient_email, staff_emails
 from .models import TriggerState
 from ..database import db
 from ..date_tools import FHIR_datetime
+from ..models.qb_status import QB_Status
 from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.user import User
 from ..timeout_lock import LockTimeout, TimeoutLock
 
 EMPRO_STUDY_ID = 1
@@ -247,10 +251,6 @@ def fire_trigger_events():
     'resolved'.
 
     """
-    from ..models.user import User
-    from .empro_messages import patient_email, staff_emails
-    from ..date_tools import FHIR_datetime
-
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
         result = {'context': context, 'timestamp': FHIR_datetime.now()}
@@ -313,6 +313,7 @@ def fire_trigger_events():
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
+        now = datetime.utcnow()
         for ts in TriggerState.query.filter(
                 TriggerState.state.in_(('triggered', 'resolved'))):
             # Need to consider state == resolved, as the user may
@@ -326,9 +327,16 @@ def fire_trigger_events():
                 continue
 
             assert ts.triggers['action_state'] in ('required', 'overdue')
+            patient = User.query.get(ts.user_id)
+
+            # Withdrawn users should never receive reminders, nor staff
+            # about them.
+            qb_status = QB_Status(
+                user=patient, research_study_id=EMPRO_STUDY_ID, as_of_date=now)
+            if qb_status.withdrawn_by(now):
+                continue
 
             if ts.reminder_due():
-                patient = User.query.get(ts.user_id)
                 pending_emails = staff_emails(
                     patient, ts.hard_trigger_list(), False)
 

@@ -394,7 +394,7 @@ def extract_observations(questionnaire_response_id):
     fire_trigger_events()
 
 
-@celery.task(name="tasks.process_triggers_task", queue=LOW_PRIORITY)
+@celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def process_triggers_task(**kwargs):
     """Task form - wraps call to testable function `fire_trigger_events` """
