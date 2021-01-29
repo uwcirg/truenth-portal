@@ -2,18 +2,22 @@
 	<div id="longitudinalReportContainer" class="report">
         <div class="loader" v-show="loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
-        <div class="content" :class="{triggers:hasTriggers()}" v-show="!loading">
-            <div v-show="hasTriggers()" class="text-muted text-right report-legend" :class="{active: hasTriggers()}">
+        <div class="content" :class="{'has-legend':shouldShowLegend()}" v-show="!loading">
+            <div v-show="shouldShowLegend()" class="text-muted text-right report-legend" :class="{active: shouldShowLegend()}">
                 <span class="title" v-text="triggerLegendTitle"></span>
                 <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
                 <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
+                <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
             </div>
             <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
             <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
                 <THEAD>
                     <TH class="title" v-text="questionTitleHeader"></TH>
-                    <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index" v-html="item"></TH>
+                    <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
+                        <span v-html="item"></span>
+                        <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
+                    </TH>
                 </THEAD>
                 <TBODY>
                     <TR v-for="(item, qindex) in questions" :key="'question_'+ qindex">
@@ -231,7 +235,20 @@
         },
         hasHardTriggers() {
             return this.triggerData.hardTriggers.length;
-        }, 
+        },
+        hasInProgressData() {
+            return this.assessmentData.filter(item => {
+                console.log(item)
+                return String(item.status).toLowerCase() === "in-progress";
+            }).length;
+        },
+        shouldShowLegend() {
+            return this.hasTriggers() || this.hasInProgressData();
+        },
+        isAssessmentInProgress(index) {
+            if (!this.assessmentData[index]) return false;
+            return String(this.assessmentData[index].status).toLowerCase() === "in-progress";
+        },
         setDisplayData() {
             /*
              * prepping data for display
