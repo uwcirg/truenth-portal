@@ -1163,7 +1163,6 @@ export default (function() {
                 });
             
                 $("#profileForm").on("change postEventUpdate", "#email", function(e) {
-                    console.log("WTF? ", self.updateEmailVis())
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }
@@ -3011,6 +3010,9 @@ export default (function() {
                     };
                     self.modules.tnthAjax.getTerms(this.subjectId, "", true, function(data) {
                         if (data && data.tous) {
+                            data.tous = (data.tous).sort(function(a, b) {
+                                return new Date(a.accepted) - new Date(b.accepted);
+                            });
                             let websiteConsentTerms = [
                                 ["website terms of use",
                                 "subject website consent"],
