@@ -238,7 +238,6 @@
         },
         hasInProgressData() {
             return this.assessmentData.filter(item => {
-                console.log(item)
                 return String(item.status).toLowerCase() === "in-progress";
             }).length;
         },
