@@ -3010,9 +3010,6 @@ export default (function() {
                     };
                     self.modules.tnthAjax.getTerms(this.subjectId, "", true, function(data) {
                         if (data && data.tous) {
-                            data.tous = (data.tous).sort(function(a, b) {
-                                return new Date(a.accepted) - new Date(b.accepted);
-                            });
                             let websiteConsentTerms = [
                                 ["website terms of use",
                                 "subject website consent"],
