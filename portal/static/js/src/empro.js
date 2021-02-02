@@ -84,6 +84,10 @@ emproObj.prototype.init = function() {
                 tnthDate.getDateWithTimeZone(new Date(assessmentDate), "yyyy-mm-dd"),
                 assessmentData[0].status];
             let assessmentCompleted = String(status).toLowerCase() === "completed";
+
+            /*
+             * associating each thank you modal popup accessed by assessment date
+             */
             let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${assessmentDate}`;
             /*
              * automatically pops up thank you modal IF sub-study assessment is completed,
