@@ -10,6 +10,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..date_tools import FHIR_datetime
+from ..trigger_states.models import TriggerState
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -24,7 +25,7 @@ from .questionnaire_response import (
     qnr_csv_column_headers,
     generate_qnr_csv,
 )
-from .research_study import ResearchStudy
+from .research_study import EMPRO_RS_ID, ResearchStudy
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import latest_consent
@@ -119,6 +120,18 @@ def adherence_report(
                     entry_method, row['visit'], last_viable.qb_id)
                 row['entry_method'] = entry_method
 
+            if research_study_id == EMPRO_RS_ID:
+                # Add clinician data for EMPRO reports
+                if patient.clinician_id:
+                    row['clinician'] = (
+                        User.query.get(patient.clinician_id).display_name)
+
+                # Correct for zero index visit month in db
+                visit_month = int(row['visit'].split()[-1]) - 1
+                ts = TriggerState.latest_action_state(patient.id, visit_month)
+                if ts:
+                    row['clinician_status'] = ts.title()
+
         data.append(row)
 
         # as we require a full history, continue to add rows for each previous
@@ -137,6 +150,13 @@ def adherence_report(
                 historic['entry_method'] = entry_method
             else:
                 historic.pop('entry_method', None)
+
+            if research_study_id == EMPRO_RS_ID:
+                # Correct for zero index visit month in db
+                visit_month = int(historic['visit'].split()[-1]) - 1
+                ts = TriggerState.latest_action_state(patient.id, visit_month)
+                if ts:
+                    historic['clinician_status'] = ts.title()
             data.append(historic)
 
         # if user is eligible for indefinite QB, add status
@@ -172,6 +192,10 @@ def adherence_report(
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method', 'site',
             'consent']
+        if research_study_id == EMPRO_RS_ID:
+            results['column_headers'] = [
+                'user_id', 'study_id', 'clinician', 'status', 'visit',
+                'clinician_status', 'site']
 
     return results
 
