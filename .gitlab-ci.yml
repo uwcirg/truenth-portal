@@ -27,7 +27,7 @@ before_script:
 .unit_test_template: &unit_test_definition
   <<: *test_definition
   services:
-    - postgres:10
+    - postgres:13
     - redis:latest
 
 
