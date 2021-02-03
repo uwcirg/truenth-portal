@@ -78,12 +78,17 @@ emproObj.prototype.init = function() {
             let assessmentData = (data.entry).sort(function(a, b) {
                 return new Date(b.authored) - new Date(a.authored);
             });
+            let assessmentDate = assessmentData[0]["authored"];
             let [today, authoredDate, status] = [
                 tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
-                tnthDate.getDateWithTimeZone(new Date(assessmentData[0]["authored"]), "yyyy-mm-dd"),
+                tnthDate.getDateWithTimeZone(new Date(assessmentDate), "yyyy-mm-dd"),
                 assessmentData[0].status];
-            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}`;
             let assessmentCompleted = String(status).toLowerCase() === "completed";
+
+            /*
+             * associating each thank you modal popup accessed by assessment date
+             */
+            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${assessmentDate}`;
             /*
              * automatically pops up thank you modal IF sub-study assessment is completed,
              * and sub-study assessment is completed today and the thank you modal has not already popped up today
