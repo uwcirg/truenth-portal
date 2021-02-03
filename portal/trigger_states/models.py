@@ -21,7 +21,6 @@ class TriggerState(db.Model):
     """ORM class for trigger state
 
     Model patient's trigger state, retaining historical record for reporting.
-    NB only rows with `state` = `processed` include triggers.
 
     """
     __tablename__ = 'trigger_states'
@@ -122,3 +121,21 @@ class TriggerState(db.Model):
             if 'soft' in link_triggers.values():
                 results.add(domain)
         return list(results)
+
+    @staticmethod
+    def latest_action_state(user_id, visit_month):
+        """Query method to return row matching params
+
+        :param user_id: User/patient in question
+        :param visit_month: integer, zero indexed visit month
+        :return: latest action state or empty string if not found
+
+        """
+        found = TriggerState.query.filter(
+            TriggerState.user_id == user_id).filter(
+            TriggerState.visit_month == visit_month).order_by(
+            TriggerState.id.desc()).first()
+        if not found or found.triggers is None:
+            return ''
+
+        return found.triggers['action_state']
