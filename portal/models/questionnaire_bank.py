@@ -590,8 +590,16 @@ def qbs_by_rp(rp_id, classification):
 
 
 def visit_name(qbd):
+    from .research_study import (
+        EMPRO_RS_ID,
+        research_study_id_from_questionnaire,
+    )
+
     if not qbd.questionnaire_bank:
         return None
+
+    rs_id = research_study_id_from_questionnaire(
+        qbd.questionnaire_bank.questionnaires[0].name)
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
         if (
@@ -606,7 +614,12 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
+        if rs_id == EMPRO_RS_ID:
+            return _('Month %(month_total)d', month_total=total+1)
         return _('Month %(month_total)d', month_total=total)
+
+    if rs_id == EMPRO_RS_ID:
+        return _('Month %(month_total)d', month_total=1)
     return _(qbd.questionnaire_bank.classification.title())
 
 
