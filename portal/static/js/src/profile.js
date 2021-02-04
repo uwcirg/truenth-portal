@@ -1162,14 +1162,14 @@ export default (function() {
                     $("#erroremail").html("");
                 });
             
-                $("#profileForm").on("change, postEventUpdate", "#email", function(e) {
+                $("#profileForm").on("change postEventUpdate", "#email", function(e) {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
                     }
                 });
             },
             updateEmailVis: function() {
-                var hasError = $("#emailGroup").hasClass("has-error") || $("#erroremail").hasClass("with-errors");
+                var hasError = $("#emailGroup").hasClass("has-error") || $("#erroremail").text();
                 var emailValue = $("#email").val();
                 if (!hasError) {
                     this.demo.data.email = emailValue;
