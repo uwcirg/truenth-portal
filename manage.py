@@ -686,14 +686,15 @@ def preview_site_update(org_id, retired):
     previous_rp = organization.research_protocols[-1]
     latest_rp = ResearchProtocol.query.order_by(
         ResearchProtocol.id.desc()).first()
-    previous_orgRP = OrganizationResearchProtocol.query.filter(
-        OrganizationResearchProtocol.research_protocol_id == previous_rp.id).filter(
+    previous_org_rp = OrganizationResearchProtocol.query.filter(
+        OrganizationResearchProtocol.research_protocol_id ==
+        previous_rp.id).filter(
         OrganizationResearchProtocol.organization_id == org_id).one()
-    previous_orgRP.retired_as_of=retired
-    new_orgRP = OrganizationResearchProtocol(
+    previous_org_rp.retired_as_of = retired
+    new_org_rp = OrganizationResearchProtocol(
         research_protocol=latest_rp,
         organization=organization)
-    db.session.add(new_orgRP)
+    db.session.add(new_org_rp)
     db.session.commit()
     print(f"Extending Research Protocols for {organization}")
     print(f"  - Adding RP {latest_rp.name}")
@@ -746,5 +747,5 @@ def preview_site_update(org_id, retired):
                 print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
 
     # Restore organization to pre-test RPs
-    db.session.delete(new_orgRP)
+    db.session.delete(new_org_rp)
     db.session.commit()
