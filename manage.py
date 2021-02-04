@@ -35,10 +35,16 @@ from portal.models.i18n_utils import (
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
-from portal.models.questionnaire_bank import add_static_questionnaire_bank
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    add_static_questionnaire_bank,
+)
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
-from portal.models.research_study import add_static_research_studies
+from portal.models.research_study import (
+    add_static_research_studies,
+    research_study_id_from_questionnaire,
+)
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.url_token import (
     BadSignature,
@@ -448,13 +454,17 @@ def update_qnr_authored(qnr_id, authored, actor):
 
     acting_user.check_role(permission='edit', other_id=qnr.subject_id)
 
-    new_authored = FHIR_datetime.parse(authored)
-    old_authored = qnr.authored
-
-    qnr.authored = new_authored
     document = copy.deepcopy(qnr.document)
-    document['authored'] = datetime.strftime(new_authored, "%Y-%m-%d %H:%M:%S")
+    new_authored = FHIR_datetime.parse(authored)
+    old_authored = FHIR_datetime.parse(document['authored'])
+    document['authored'] = datetime.strftime(new_authored, "%Y-%m-%dT%H:%M:%SZ")
     qnr.document = document
+
+    # Determine research study if qb_id is currently set, default to 0
+    rs_id = 0
+    if qnr.questionnaire_bank_id:
+        qb = QuestionnaireBank.query.get(qnr.questionnaire_bank_id)
+        rs_id = research_study_id_from_questionnaire(qb.questionnaires[0])
 
     # Must clear the qb_id and iteration in case this authored date
     # change moves the QNR to a different visit.
@@ -463,7 +473,7 @@ def update_qnr_authored(qnr_id, authored, actor):
     db.session.commit()
 
     # Invalidate timeline as this probably altered the status
-    invalidate_users_QBT(qnr.subject_id)
+    invalidate_users_QBT(qnr.subject_id, research_study_id=rs_id)
 
     message = (
         "Updated QNR {qnr_id} authored from {old_authored} to "
@@ -560,7 +570,7 @@ def merge_users(src_id, tgt_id, actor):
                         (str(i) for i in tgt_user.questionnaire_responses))
                 ))):
         tgt_user.merge_others_relationship(src_user, 'questionnaire_responses')
-        invalidate_users_QBT(tgt_user.id)
+        invalidate_users_QBT(tgt_user.id, research_study_id=0)
 
     src_email = src_user.email  # capture, as it changes on delete
     replace_email = False
