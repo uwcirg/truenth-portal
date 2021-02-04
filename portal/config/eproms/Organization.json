@@ -378,12 +378,6 @@
         {
           "timezone": "Australia/Brisbane",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-			{"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
       ],
       "id": 21300,
