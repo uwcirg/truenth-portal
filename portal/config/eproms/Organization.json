@@ -3751,6 +3751,145 @@
           "valueCodeableConcept": {
             "coding": [
               {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Africa/Lagos",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 31000,
+      "language": "en_GB",
+      "name": "Nigeria (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Lagos",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146154,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-154"
+        }
+      ],
+      "language": "en_GB",
+      "name": "University of Ilorin Teaching Hospital",
+      "partOf": {
+        "reference": "api/organization/31000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Lagos",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146155,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-155"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Lagos State University Teaching Hospital",
+      "partOf": {
+        "reference": "api/organization/31000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Lagos",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146156,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-156"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Federal Medical Centre Abeokuta",
+      "partOf": {
+        "reference": "api/organization/31000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Lagos",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146157,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-157"
+        }
+      ],
+      "language": "en_GB",
+      "name": "University of Maiduguri Teaching Hospital",
+      "partOf": {
+        "reference": "api/organization/31000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
                 "code": "en_AU",
                 "display": "Australian English",
                 "system": "urn:ietf:bcp:47"
