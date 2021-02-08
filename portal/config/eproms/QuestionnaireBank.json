@@ -723,7 +723,7 @@
       "classification": "baseline",
       "name": "ironman_ss_baseline",
       "start": "{\"days\": 0}",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 14}",
       "overdue": "{\"days\": 15}",
       "expired": "{\"months\": 1, \"days\": -1}",
       "recurs": [],
@@ -746,7 +746,7 @@
       "classification": "recurring",
       "name": "ironman_ss_recurring_monthly_pattern",
       "start": "{\"days\": 0}",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 14}",
       "overdue": "{\"days\": 15}",
       "expired": "{\"months\": 1, \"days\": -1}",
       "recurs": [
