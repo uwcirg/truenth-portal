@@ -537,4 +537,10 @@ def patient_timewarp(patient_id, days):
             research_study_id=research_study_id,
             invalidate_existing=True)
 
+    auditable_event(
+        message=f"TIME WARPED existing data back {days} days.",
+        user_id=current_user().id,
+        subject_id=patient_id,
+        context="assessment"
+    )
     return jsonify(changed=changed)
