@@ -595,7 +595,7 @@ def visit_name(qbd):
         research_study_id_from_questionnaire,
     )
 
-    if not qbd.questionnaire_bank:
+    if not qbd.questionnaire_bank or qbd.questionnaire_bank.id == 0:
         return None
 
     rs_id = research_study_id_from_questionnaire(
