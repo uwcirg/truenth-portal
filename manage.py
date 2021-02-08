@@ -601,9 +601,10 @@ def merge_users(src_id, tgt_id, actor):
     print(message)
 
 
-@click.option('--org_id', help="Organization (site) ID")
+@click.option('--org_id', help="Organization (site) ID", required=True)
 @click.option(
     '--retired',
+    required=True,
     help="datetime for site's current protocol expiration,"
          " format example: 2019-04-09 15:14:43")
 @app.cli.command()
