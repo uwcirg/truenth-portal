@@ -125,6 +125,10 @@ def adherence_report(
                 if patient.clinician_id:
                     row['clinician'] = (
                         User.query.get(patient.clinician_id).display_name)
+                # As we may be looking at `prev_qbd` can't use qb_stats
+                cd = last_viable.completed_date(patient.id)
+                if cd:
+                    row['EMPRO_questionnaire_completion_date'] = cd
 
                 # Correct for zero index visit month in db
                 visit_month = int(row['visit'].split()[-1]) - 1
@@ -157,6 +161,9 @@ def adherence_report(
                 ts = TriggerState.latest_action_state(patient.id, visit_month)
                 if ts:
                     historic['clinician_status'] = ts.title()
+                cd = qbd.completed_date(patient.id)
+                if cd:
+                    historic['EMPRO_questionnaire_completion_date'] = cd
             data.append(historic)
 
         # if user is eligible for indefinite QB, add status
@@ -195,7 +202,8 @@ def adherence_report(
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
                 'user_id', 'study_id', 'clinician', 'status', 'visit',
-                'clinician_status', 'site']
+                'EMPRO_questionnaire_completion_date', 'clinician_status',
+                'site']
 
     return results
 
