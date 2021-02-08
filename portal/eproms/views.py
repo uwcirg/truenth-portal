@@ -110,8 +110,8 @@ def assessment_engine_view(user):
 
     # variables needed for the templates
     due_date = (
-        localize_datetime(assessment_status.due_date, user)
-        if assessment_status.due_date else None)
+        localize_datetime(assessment_status.target_date, user)
+        if assessment_status.target_date else None)
     expired_date = (
         localize_datetime(assessment_status.expired_date, user)
         if assessment_status.expired_date else None)
@@ -128,8 +128,8 @@ def assessment_engine_view(user):
         as_of_date=now)
     enrolled_in_substudy = EMPRO_RS_ID in research_study_status
     substudy_due_date = (
-        localize_datetime(substudy_assessment_status.due_date, user)
-        if substudy_assessment_status.due_date else None)
+        localize_datetime(substudy_assessment_status.target_date, user)
+        if substudy_assessment_status.target_date else None)
     substudy_comp_date = (
         localize_datetime(substudy_assessment_status.completed_date, user)
         if substudy_assessment_status.completed_date else None)
