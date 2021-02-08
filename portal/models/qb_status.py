@@ -117,6 +117,10 @@ class QB_Status(object):
 
             if row.status == OverallStatus.due:
                 self._due_date = row.at
+                # HACK to manage target date until due means due (not start)
+                self._target_date = cur_qbd.questionnaire_bank.calculated_due(
+                    self._due_date)
+
             if row.status == OverallStatus.overdue:
                 self._overdue_date = row.at
             if row.status == OverallStatus.completed:
@@ -301,6 +305,18 @@ class QB_Status(object):
     @property
     def due_date(self):
         return self._due_date
+
+    @property
+    def target_date(self):
+        """HACK to address due vs start/available confusion
+
+        TN-2468 captures how the original intent of due was lost and
+        became the start/available date.  Until this is cleaned up (
+        by replacing OverallStatus.due with OverallStatus.start and
+        all related usage) continue to treat due == start/available
+        and provide a `target_date` for the QB.calculated_due value.
+        """
+        return self._target_date
 
     @property
     def expired_date(self):
