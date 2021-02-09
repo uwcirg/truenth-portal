@@ -307,7 +307,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         }
                         self.updateProgressDisplay(data["state"], "");
                         setTimeout(function() {
-                            callback();
+                            callback(exportStatus === "SUCCESS" ? data : {error: true});
                         }, 300);
                     }
                     else {
@@ -317,8 +317,8 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         }.bind(self), 2000); //each update invocation should be assigned a unique timeoutid
                         (self.arrExportReportTimeoutID).push(self.exportReportTimeoutID);
                     }
-                }).fail(function() {
-                    callback({error: true});
+                }).fail(function(xhr) {
+                    callback({error: true, message: xhr.responseText});
                 });
             },
             onCurrentUserInit: function() {
