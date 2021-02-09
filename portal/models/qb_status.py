@@ -26,6 +26,7 @@ class QB_Status(object):
         self.research_study_id = research_study_id
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
+        self._target_date = None
         self._overall_status = None
         self._enrolled_in_common = False
         self._current = None
