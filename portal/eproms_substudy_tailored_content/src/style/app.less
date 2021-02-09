@@ -323,35 +323,43 @@ section.active {
 }
 
 section.main {
-    flex-grow: 1;
-    margin: 0;
-    display: none;
-    transition: opacity 750ms ease, transform 350ms @defaultAnimationSpeed, height 350ms @defaultAnimationSpeed;
-   // position: relative;
-   // z-index: 5;
+  flex-grow: 1;
+  margin: 0;
+  display: none;
+  transition: opacity 750ms ease, transform 350ms @defaultAnimationSpeed, height 350ms @defaultAnimationSpeed;
+  // position: relative;
+  // z-index: 5;
+  .body-content {
+    opacity: 0;
+  }
+  &.active {
+    display: block;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 90%;
+    animation-name: popIn;
+    animation-duration: 350ms;
+    animation-timing-function: @defaultAnimationSpeed;
+    animation-fill-mode: forwards;
     .body-content {
-      opacity: 0;
+        opacity: 1;
     }
-    &.active {
-      display: block;
-      min-width: 100%;
-      max-width: 100%;
-      min-height: 90%;
-      animation-name: popIn;
-      animation-duration: 350ms;
-      animation-timing-function: @defaultAnimationSpeed;
-      animation-fill-mode: forwards;
-      .body-content {
-          opacity: 1;
-      }
-    }
-    ul {
+  }
+  ul {
+    padding: 0 16px;
+    margin-bottom: 24px;
+    li:not(:last-of-type) {
       margin-bottom: 16px;
-      padding: 0 16px;
-      li:not(:last-of-type) {
-        margin-bottom: 16px;
-      }
     }
+  }
+  ol {
+    padding: 0 16px;
+    margin-bottom: 24px;
+    li:not(:last-of-type) {
+      padding: 0 4px;
+      margin-bottom: 16px;
+    }
+  }
 }
 a {
   color: @linkColor;
@@ -742,6 +750,9 @@ a {
       ul {
         margin: 0 0 16px;
       }
+      ol {
+        margin-left: 24px;
+      }
     }
 //    margin-bottom: 16px;
     // .collapsible {
@@ -959,7 +970,7 @@ a {
     margin-bottom: 4px;
     font-size: @subtitleFontSize;
   }
-  ul {
+  ul, ol {
     margin-left: 16px;
   }
 }
