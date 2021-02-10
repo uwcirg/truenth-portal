@@ -11,7 +11,7 @@ certifi==2019.9.11        # via requests
 cffi==1.14.0              # via bcrypt
 chardet==3.0.4            # via requests
 click==7.0                # via flask
-coverage==5.1
+coverage==5.4
 decorator==4.4.0          # via validators
 dogpile.cache==0.9.0      # via flask-sqlalchemy-caching
 enum34==1.1.6
