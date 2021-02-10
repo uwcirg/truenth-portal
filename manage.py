@@ -431,12 +431,14 @@ def no_email(email, actor):
     suppress_email(email, actor)
 
 
-@click.option('--qnr_id', help="Questionnaire Response ID")
+@click.option('--qnr_id', help="Questionnaire Response ID", required=True)
 @click.option(
     '--authored',
+    required=True,
     help="new datetime for qnr authored, format example: 2019-04-09 15:14:43")
 @click.option(
     '--actor',
+    required=True,
     help='email address of user taking this action, for audit trail'
 )
 @app.cli.command()
@@ -464,7 +466,8 @@ def update_qnr_authored(qnr_id, authored, actor):
     rs_id = 0
     if qnr.questionnaire_bank_id:
         qb = QuestionnaireBank.query.get(qnr.questionnaire_bank_id)
-        rs_id = research_study_id_from_questionnaire(qb.questionnaires[0])
+        rs_id = research_study_id_from_questionnaire(
+            qb.questionnaires[0].name)
 
     # Must clear the qb_id and iteration in case this authored date
     # change moves the QNR to a different visit.
