@@ -332,6 +332,7 @@ class TestQuestionnaireSetup(TestCase):
 
 class TestAggregateResponses(TestQuestionnaireSetup):
 
+    @pytest.mark.skip("no longer raising on str vs datetime sort")
     def test_authored_sort(self):
         consent_date = datetime.strptime(
             "2021-01-25 23:43:38", "%Y-%m-%d %H:%M:%S")

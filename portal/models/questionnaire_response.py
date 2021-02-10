@@ -435,9 +435,12 @@ class QNR_results(object):
             # confirm a timezone extension in authored didn't foil the sort
             auth_datetime = FHIR_datetime.parse(qnr.authored)
             if prev_auth and prev_auth > auth_datetime:
-                raise ValueError(
-                    "Can't sort questionnaire_response.document['authored']"
-                    f" due to non UTC timezone info for user {self.user.id}")
+                message = (
+                    "String sort order for"
+                    " `questionnaire_response.document['authored']`"
+                    " differs from datetime sort.  Review authored values"
+                    f" for user {self.user.id}")
+                current_app.logger.error(message)
             prev_auth = auth_datetime
 
             self._qnrs.append(QNR(
