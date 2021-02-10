@@ -36,7 +36,7 @@ def upgrade():
         dt = FHIR_datetime.parse(document['authored'])
         cp_doc = deepcopy(document)
         cp_doc['authored'] = datetime.strftime(dt, "%Y-%m-%dT%H:%M:%SZ")
-        print(f"migrate {document['authored']} to {cp_doc['authored']}")
+        #print(f"migrate {document['authored']} to {cp_doc['authored']}")
         conn.execute(text(update_sql), document=json.dumps(cp_doc), qnr_id=qnr_id)
 
 
