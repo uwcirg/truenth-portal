@@ -710,10 +710,11 @@ def preview_site_update(org_id, retired):
     for patient in query:
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=patient.id,
+            research_study_id=0,
             acting_user_id=admin.id,
         )
         update_users_QBT(
-            patient.id, invalidate_existing=True)
+            patient.id, research_study_id=0, invalidate_existing=True)
 
         after_qnrs = qnr_state(patient, name_map=qb_name_map)
         after_timeline = timeline_state(patient, name_map=qb_name_map)
