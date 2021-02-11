@@ -10,7 +10,7 @@ celery==4.3.0
 certifi==2019.9.11        # via requests
 cffi==1.14.0              # via bcrypt
 chardet==3.0.4            # via requests
-click==7.0                # via flask
+click==7.1.2                # via flask
 coverage==5.4
 decorator==4.4.0          # via validators
 dogpile.cache==0.9.0      # via flask-sqlalchemy-caching
