@@ -1,11 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 import pytest
 from werkzeug.exceptions import BadRequest
 
-from portal.date_tools import FHIR_datetime, RelativeDelta, localize_datetime
-from tests import TestCase
+from portal.date_tools import (
+    FHIR_datetime,
+    RelativeDelta,
+    localize_datetime,
+    weekday_delta,
+)
 
 
 def test_localize_datetime_none():
@@ -54,3 +58,15 @@ def test_int_date(app_logger):
     with pytest.raises(BadRequest) as e:
         dt = FHIR_datetime.parse(acceptance_date, 'acceptance date')
     assert 'acceptance date' in str(e.value)
+
+
+def test_weekday_count():
+    monday = datetime.strptime("2021-01-04T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
+    friday = datetime.strptime("2021-01-08T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
+    assert weekday_delta(monday, friday) == timedelta(days=4)
+
+
+def test_weekday_count_skips_weekends():
+    monday = datetime.strptime("2021-01-04T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
+    next_monday = datetime.strptime("2021-01-11T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
+    assert weekday_delta(monday, next_monday) == timedelta(days=5)
