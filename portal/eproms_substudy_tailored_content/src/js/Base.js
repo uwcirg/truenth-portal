@@ -522,6 +522,9 @@ export default {
                         resourceSection.append(div);
                     }
                     resourceSection.querySelector(".content").innerHTML = response;
+                    setTimeout(function() {
+                        this.setTileLinkEvent();
+                    }.bind(this), 150);
                 }).catch(e => {
                     this.setErrorMessage(`error fetching resources for country code ${countryCode} `, e)
                 });
