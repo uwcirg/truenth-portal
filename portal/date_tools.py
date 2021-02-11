@@ -179,15 +179,14 @@ def weekday_delta(start, end):
     if end < start:
         raise ValueError("unexpected end date less than start")
 
-    days = end - start
-    includes_weekend_days = 0
+    included_weekend_days = 0
     i = start
     while True:
         if i > end:
             break
         if i.isoweekday() > 5:
-            includes_weekend_days += 1
+            included_weekend_days += 1
         i = i + timedelta(days=1)
 
-    corrected_end = end - timedelta(days=includes_weekend_days)
+    corrected_end = end - timedelta(days=included_weekend_days)
     return corrected_end - start
