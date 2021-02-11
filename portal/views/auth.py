@@ -1025,3 +1025,21 @@ def authorize(*args, **kwargs):
         return redirect('/')
     # See "hardwired" note in docstring above
     return True
+
+
+@auth.route('/unauthorized_endpoint')
+@oauth.require_oauth()
+def unauthorized_endpoint():
+    """Redirection endpoint for logged-in users w/o adequate role/permission
+
+    Flask-User can be configured to point to a view such as this on an event
+    such as a user being logged in but lacking adequate role, say the view
+    is decorated with @roles_required().
+
+    By default, such a case redirects to '', and fails to return an adequate
+    status code, but rather a 302.
+
+    Most importantly, raise a 401 so clients can catch this scenario.
+
+    """
+    abort(401)

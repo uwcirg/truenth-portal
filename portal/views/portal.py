@@ -141,6 +141,8 @@ def report_slow_queries(response):
 
     """
     if current_app.config.get("LOG_SLOW_RESPONSES"):
+        if not hasattr(g, 'start_request_time'):
+            return response
         duration = time() - g.start_request_time
         if duration > 5.0:
             current_app.logger.warning("{} took {}".format(

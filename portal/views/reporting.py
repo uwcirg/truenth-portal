@@ -142,7 +142,7 @@ def generate_numbers():
 @reporting_api.route('/api/report/questionnaire_status')
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
-     ROLE.INTERVENTION_STAFF.value])
+     ROLE.INTERVENTION_STAFF.value, ROLE.CLINICIAN.value])
 @oauth.require_oauth()
 def questionnaire_status():
     """Return ad hoc JSON or CSV listing questionnaire_status
