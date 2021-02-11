@@ -253,8 +253,6 @@ def fire_trigger_events():
     """
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
-        if True:
-            return
         result = {'context': context, 'timestamp': FHIR_datetime.now()}
         try:
             em.send_message()
