@@ -161,6 +161,7 @@ class BaseConfig(object):
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
     USER_SHOW_USERNAME_EMAIL_DOES_NOT_EXIST = False
+    USER_UNAUTHORIZED_ENDPOINT = 'auth.unauthorized_endpoint'
     ENABLE_URL_AUTHENTICATED = os.environ.get('ENABLE_URL_AUTHENTICATED', 'false').lower() == 'true'
 
     STAFF_BULK_DATA_ACCESS = True
