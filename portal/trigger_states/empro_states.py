@@ -219,7 +219,7 @@ def evaluate_triggers(qnr, override_state=False):
             TriggerState.state == 'resolved').order_by(
             TriggerState.timestamp.desc()).first()
         if previous and previous.triggers.get('action_state') not in (
-                'completed', 'missed', 'not applicable'):
+                'completed', 'missed', 'not applicable', 'withdrawn'):
             triggers = copy.deepcopy(previous.triggers)
             triggers['action_state'] = 'missed'
             previous.triggers = triggers
@@ -253,6 +253,8 @@ def fire_trigger_events():
     """
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
+        if True:
+            return
         result = {'context': context, 'timestamp': FHIR_datetime.now()}
         try:
             em.send_message()
@@ -323,10 +325,15 @@ def fire_trigger_events():
             if (
                     'action_state' not in ts.triggers or
                     ts.triggers['action_state'] in (
-                    'completed', 'missed', 'not applicable')):
+                    'completed', 'missed', 'not applicable',
+                    'withdrawn')):
                 continue
 
-            assert ts.triggers['action_state'] in ('required', 'overdue')
+            if ts.triggers['action_state'] not in ('required', 'overdue'):
+                raise ValueError(
+                    f"Invalid action_state {ts.triggers['action_state']} "
+                    f"for patient {ts.user_id}")
+
             patient = User.query.get(ts.user_id)
 
             # Withdrawn users should never receive reminders, nor staff
@@ -334,6 +341,9 @@ def fire_trigger_events():
             qb_status = QB_Status(
                 user=patient, research_study_id=EMPRO_STUDY_ID, as_of_date=now)
             if qb_status.withdrawn_by(now):
+                triggers = copy.deepcopy(ts.triggers)
+                triggers['action_state'] = 'withdrawn'
+                ts.triggers = triggers
                 continue
 
             if ts.reminder_due():
