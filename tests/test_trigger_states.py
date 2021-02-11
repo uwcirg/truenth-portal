@@ -1,5 +1,6 @@
 """Test module for trigger_states blueprint """
 from flask_webtest import SessionScope
+from datetime import datetime
 import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
@@ -163,3 +164,49 @@ def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
     assert len(emails) == 2
     assert 'patient thank you' == emails[0]['context']
     assert 'initial staff alert' == emails[1]['context']
+
+
+def test_initial_reminder_skips_weekends(initialized_patient):
+    user_id = db.session.merge(initialized_patient).id
+    # 2021-02-05 is a Friday
+    triggers = {'actions': {'email': [
+        {'context': "patient thank you", 'timestamp': '2021-02-05T12:00:00Z'},
+        {'context': "initial staff alert",
+         'timestamp': '2021-02-05T12:00:00Z'}
+    ]}}
+    ts = TriggerState(user_id=user_id, triggers=triggers)
+    # as of the following Monday, still shouldn't be due given the weekend
+    assert not ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-08T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+    # even mins before on Tuesday shouldn't trigger
+    assert not ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-09T11:58:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+    # but 48 non weekday hours later should
+    assert ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-09T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+
+def test_subsequent_reminder_skips_weekends(initialized_patient):
+    user_id = db.session.merge(initialized_patient).id
+    # 2021-02-05 & 2021-02-12 are a Fridays
+    triggers = {'actions': {'email': [
+        {'context': "patient thank you", 'timestamp': '2021-02-05T12:00:00Z'},
+        {'context': "initial staff alert",
+         'timestamp': '2021-02-05T12:00:00Z'},
+        {'context': "staff reminder",
+         'timestamp': '2021-02-12T12:00:00Z'}
+
+    ]}}
+    ts = TriggerState(user_id=user_id, triggers=triggers)
+
+    # as of the following Saturday and Sunday, still shouldn't be due
+    assert not ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-13T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+    assert not ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-14T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+    # until Monday
+    assert ts.reminder_due(as_of_date=datetime.strptime(
+        "2021-02-15T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))

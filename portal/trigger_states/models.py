@@ -3,8 +3,7 @@ from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
 from ..database import db
-from ..date_tools import FHIR_datetime
-
+from ..date_tools import FHIR_datetime, weekday_delta
 
 trigger_state_enum = ENUM(
     'unstarted',
@@ -82,7 +81,7 @@ class TriggerState(db.Model):
                 results.append(domain)
         return results
 
-    def reminder_due(self):
+    def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""
         # locate first and most recent *staff* email
         first_sent, last_sent = None, None
@@ -95,7 +94,8 @@ class TriggerState(db.Model):
         if not first_sent:
             return
 
-        now = datetime.utcnow()
+        if not as_of_date:
+            as_of_date = datetime.utcnow()
 
         # To be sent daily after the initial 48 hours
         needed_delta = timedelta(days=1)
@@ -103,7 +103,7 @@ class TriggerState(db.Model):
             # only initial has been sent.  need 48 hours to have passed
             needed_delta = timedelta(days=2)
 
-        return now > last_sent + needed_delta
+        return weekday_delta(last_sent, as_of_date) >= needed_delta
 
     def soft_trigger_list(self):
         """Convenience function to return list of soft trigger domains
