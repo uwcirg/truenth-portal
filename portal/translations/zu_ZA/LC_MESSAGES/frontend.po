@@ -2,12 +2,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2020-08-03T21:28:27.906Z\n"
-"PO-Revision-Date: 2020-08-03T21:28:27.906Z\n"
+"POT-Creation-Date: 2021-02-12T03:16:53.721Z\n"
+"PO-Revision-Date: 2021-02-12T03:16:53.721Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
 
 msgid "Server error occurred updating data."
 msgstr "Kwenzeke iphutha le-server ukulungisa ukwaziswa."
@@ -21,11 +21,11 @@ msgstr "Isiyenziwe i-akhawunti  Ikuyisa kuyi phrofayili..."
 msgid "[Processing error] "
 msgstr "[Iphutha lokuphrosesa] "
 
-msgid "Email is already in use."
-msgstr "Le email kunomuntu oyisebenzisayo"
-
 msgid "An organization must be selected."
 msgstr "Inhlangano kumelwe ikhethwe."
+
+msgid "A role must be selected."
+msgstr ""
 
 msgid "no data returned"
 msgstr "ayikho idatha ebuyisiwe"
@@ -115,6 +115,9 @@ msgid "Error occurred retrieving subject ID"
 msgstr ""
 
 msgid "Error occurred - unable to reach destination"
+msgstr ""
+
+msgid "{domain} Tips"
 msgstr ""
 
 msgid "Unable to set session variable for organization modal viewed."
@@ -414,6 +417,27 @@ msgstr "Akunembile okufakile"
 msgid "Validation error."
 msgstr "Iphutha lokuqinisekisa"
 
+msgid "No treating clinician available for this site"
+msgstr ""
+
+msgid "Assigned clinician is not from the site."
+msgstr ""
+
+msgid "You must select a clinician"
+msgstr ""
+
+msgid "Last EMPRO questionnaire {status} on:"
+msgstr ""
+
+msgid "View {title} Report"
+msgstr ""
+
+msgid "Last updated on {authoredDate} GMT"
+msgstr ""
+
+msgid "Error occurred submitting data, try again"
+msgstr ""
+
 msgid "Date (GMT), Y-M-D"
 msgstr "Usuku (GMT), Y-M-D"
 
@@ -495,6 +519,9 @@ msgstr "Alukho ulwazi lwemibuzo olutholakele."
 msgid "Problem retrieving session data from server."
 msgstr "Inkinga yokuvula idatha yekhasi kuyi server."
 
+msgid "EMPRO Questionnaire"
+msgstr ""
+
 msgid "Click to view report"
 msgstr "Chofoza ukuze ubheke umbiko"
 
@@ -530,6 +557,9 @@ msgstr "Usuku/Isikhathi <span class='gmt'>{gmt}</span>"
 
 msgid "Version"
 msgstr "Uhlobo"
+
+msgid "Not consented"
+msgstr ""
 
 msgid "View"
 msgstr "Bheka"
@@ -671,6 +701,12 @@ msgstr "Ayikho idatha etholakele"
 
 msgid "Server error occurred retrieving organization/clinic information."
 msgstr "Kube nephutha le server ukulandeni ulwazi lwenhlangano/lomtholampilo"
+
+msgid "Organization id is required."
+msgstr "Kufuneka i-id yenhlangano"
+
+msgid "Server error occurred retrieving clinicians."
+msgstr ""
 
 msgid "Server error occurred retrieving consent information."
 msgstr "Kwenzeke iphutha ngesikhathi i-server ilanda ulwazi lwemvume."
@@ -849,6 +885,9 @@ msgstr ""
 msgid "Response"
 msgstr ""
 
+msgid "Questions"
+msgstr ""
+
 msgid "Server Error occurred retrieving report data"
 msgstr "Kwenzeke iphutha ngesikhathi kuvulwa ulwazi lombiko"
 
@@ -858,11 +897,29 @@ msgstr "Ayikho idatha ebuyiselwe evela kwiseva"
 msgid "Unable to load report data"
 msgstr "Ayikwazi ukufaka idatha yombiko"
 
+msgid "Clinician use only"
+msgstr ""
+
+msgid "Support needed"
+msgstr ""
+
+msgid "Action required"
+msgstr ""
+
+msgid "In-progress"
+msgstr ""
+
 msgid "Export questionnaire data"
 msgstr "Thumela ulwazi lwemibuzo"
 
 msgid "Export"
 msgstr "Thumela"
+
+msgid "IRONMAN"
+msgstr "I-IRONMAN"
+
+msgid "EMPRO"
+msgstr ""
 
 msgid "Data type:"
 msgstr "Uhlobo lwedatha"
@@ -880,4 +937,7 @@ msgid "Export request submitted"
 msgstr "Isicelo soku-expotha sithunyelwe"
 
 msgid "Request to export data failed."
+msgstr ""
+
+msgid "IRONMAN EMPRO study"
 msgstr ""

@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2020-08-03T21:28:27.906Z\n"
-"PO-Revision-Date: 2020-08-03T21:28:27.906Z\n"
+"POT-Creation-Date: 2021-02-12T03:16:53.721Z\n"
+"PO-Revision-Date: 2021-02-12T03:16:53.721Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,11 +21,11 @@ msgstr "Iakhawunti iyiliwe.  Ikusa kwiprofayile..."
 msgid "[Processing error] "
 msgstr "[Idlulisela impazamo] "
 
-msgid "Email is already in use."
-msgstr "Le imeyile sele isetyenziswa."
-
 msgid "An organization must be selected."
 msgstr "Intlangano ifanele ikhethwe"
+
+msgid "A role must be selected."
+msgstr ""
 
 msgid "no data returned"
 msgstr "akukho nkcazelo ibuyisiweyo"
@@ -115,6 +115,9 @@ msgid "Error occurred retrieving subject ID"
 msgstr ""
 
 msgid "Error occurred - unable to reach destination"
+msgstr ""
+
+msgid "{domain} Tips"
 msgstr ""
 
 msgid "Unable to set session variable for organization modal viewed."
@@ -414,6 +417,27 @@ msgstr "Akufakwanga okufanelekileyo kwindawo."
 msgid "Validation error."
 msgstr "Ingxaki noNgqinisiso"
 
+msgid "No treating clinician available for this site"
+msgstr ""
+
+msgid "Assigned clinician is not from the site."
+msgstr ""
+
+msgid "You must select a clinician"
+msgstr ""
+
+msgid "Last EMPRO questionnaire {status} on:"
+msgstr ""
+
+msgid "View {title} Report"
+msgstr ""
+
+msgid "Last updated on {authoredDate} GMT"
+msgstr ""
+
+msgid "Error occurred submitting data, try again"
+msgstr ""
+
 msgid "Date (GMT), Y-M-D"
 msgstr "Umhla (GMT), Y-M-D"
 
@@ -495,6 +519,9 @@ msgstr "Ayikho inkcazelo efunyenweyo kwiphepha lemibuzo."
 msgid "Problem retrieving session data from server."
 msgstr "Kukho ingxaki nokukhangelwa kwenkcazelo yeseshoni ekwiseva."
 
+msgid "EMPRO Questionnaire"
+msgstr ""
+
 msgid "Click to view report"
 msgstr "Cofa ukuze uhlole ingxelo"
 
@@ -530,6 +557,9 @@ msgstr "Umhla/Ixesha <span class='gmt'>{gmt}</span>"
 
 msgid "Version"
 msgstr "Uhlobo"
+
+msgid "Not consented"
+msgstr ""
 
 msgid "View"
 msgstr "Hlola"
@@ -671,6 +701,12 @@ msgstr "Akukho nkcazelo ifunyenweyo"
 
 msgid "Server error occurred retrieving organization/clinic information."
 msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yentlangano/yekliniki."
+
+msgid "Organization id is required."
+msgstr "I-id yentlangano iyafuneka."
+
+msgid "Server error occurred retrieving clinicians."
+msgstr ""
 
 msgid "Server error occurred retrieving consent information."
 msgstr "Kwenzeke impazamo kwiseva kukhangelwa inkcazelo yemvume."
@@ -849,6 +885,9 @@ msgstr "Umbuzo"
 msgid "Response"
 msgstr "Impendulo"
 
+msgid "Questions"
+msgstr ""
+
 msgid "Server Error occurred retrieving report data"
 msgstr "Kwenzeke Impazamo kwiseva kukhangelwa inkcazelo yengxelo"
 
@@ -858,11 +897,29 @@ msgstr "Akukho nkcazelo ibuyisiweyo kwiseva"
 msgid "Unable to load report data"
 msgstr "Ayikwazanga ukulayisha ingxelo yedatha"
 
+msgid "Clinician use only"
+msgstr ""
+
+msgid "Support needed"
+msgstr ""
+
+msgid "Action required"
+msgstr ""
+
+msgid "In-progress"
+msgstr ""
+
 msgid "Export questionnaire data"
 msgstr "Thumela inkcazelo Yephepha Lemibuzo"
 
 msgid "Export"
 msgstr "Ezithunyelwayo"
+
+msgid "IRONMAN"
+msgstr "I-IRONMAN"
+
+msgid "EMPRO"
+msgstr ""
 
 msgid "Data type:"
 msgstr "Uhlobo lwenkcazelo:"
@@ -880,4 +937,7 @@ msgid "Export request submitted"
 msgstr "Isicelo sokukhuphela sifakiwe"
 
 msgid "Request to export data failed."
+msgstr ""
+
+msgid "IRONMAN EMPRO study"
 msgstr ""

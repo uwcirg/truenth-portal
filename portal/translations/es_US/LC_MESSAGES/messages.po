@@ -1,16 +1,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: portal 20.5.14.7.dev21+g21ec302c\n"
+"Project-Id-Version: portal 21.2.12.dev2+g1c1fdfd5f\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-03 21:28+0000\n"
+"POT-Creation-Date: 2021-02-12 03:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.7.0\n"
+"Generated-By: Babel 2.9.0\n"
 
 #: eproms/templates/eproms/404.html:32
 msgid "Page Not Found."
@@ -23,14 +23,6 @@ msgstr "Lo sentimos, no se ha encontrado la página solicitada. Pudo haber sido 
 #: eproms/templates/eproms/404.html:37 eproms/templates/eproms/500.html:39
 msgid "Back To Home"
 msgstr "Volver a Inicio"
-
-#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
-msgid "Explore How This Works"
-msgstr ""
-
-#: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
-msgid "Explore"
-msgstr ""
 
 #: eproms/templates/eproms/404.html:40 eproms/templates/eproms/500.html:42
 msgid "Learn About TrueNTH"
@@ -52,14 +44,13 @@ msgstr "Su solicitud no se ha podido procesar debido a error(es) del servidor. S
 #: eproms/templates/eproms/privacy.html:4 eproms/templates/eproms/terms.html:4
 #: exercise_diet/templates/exercise_diet/base.html:19
 #: exercise_diet/templates/exercise_diet/base.html:32
-#: gil/templates/gil/base.html:67 templates/explore.html:48
-#: templates/portal_footer.html:29
+#: gil/templates/gil/base.html:67 templates/portal_footer.html:29
 msgid "Home"
 msgstr "Inicio"
 
 #: eproms/templates/eproms/about.html:5 gil/templates/gil/base.html:74
 #: gil/templates/gil/portal.html:28 templates/portal_wrapper.html:70
-#: templates/portal_wrapper.html:127
+#: templates/portal_wrapper.html:130
 msgid "About TrueNTH"
 msgstr "Acerca de TrueNTH"
 
@@ -72,19 +63,21 @@ msgstr "Cargando..."
 msgid "You are using an outdated browser. Please upgrade your browser to improve your experience."
 msgstr "Está usando un navegador desactualizado. Actualice el navegador para mejorar su experiencia."
 
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:243
 #: eproms/templates/eproms/base.html:77 eproms/templates/eproms/base.html:89
 #: gil/templates/gil/base.html:261 gil/templates/gil/base.html:289
-#: templates/admin/admin_base.html:24 templates/admin/patients_by_org.html:125
-#: templates/admin/patients_by_org.html:151
+#: templates/admin/admin_base.html:24 templates/admin/patients_by_org.html:130
+#: templates/admin/patients_by_org.html:156
 #: templates/flask_user/_macros.html:119 templates/flask_user/_macros.html:131
 #: templates/flask_user/register.html:89 templates/layout.html:77
-#: templates/layout.html:89 templates/profile/profile_macros.html:449
-#: templates/profile/profile_macros.html:618
-#: templates/profile/profile_macros.html:695
-#: templates/profile/profile_macros.html:705
-#: templates/profile/profile_macros.html:734
-#: templates/profile/profile_macros.html:743
-#: templates/profile/profile_macros.html:771
+#: templates/layout.html:89 templates/profile/profile_macros.html:461
+#: templates/profile/profile_macros.html:632
+#: templates/profile/profile_macros.html:716
+#: templates/profile/profile_macros.html:726
+#: templates/profile/profile_macros.html:755
+#: templates/profile/profile_macros.html:764
+#: templates/profile/profile_macros.html:792
+#: templates/profile/profile_macros.html:1065
 msgid "Close"
 msgstr "Cerrar"
 
@@ -102,8 +95,8 @@ msgid "Use this form to get in touch with TrueNTH"
 msgstr "Utilice este formulario para ponerse en contacto con TrueNTH"
 
 #: eproms/templates/eproms/contact.html:15 templates/challenge_identity.html:16
-#: templates/profile/profile_macros.html:48
-#: templates/profile/profile_macros.html:175
+#: templates/profile/profile_macros.html:47
+#: templates/profile/profile_macros.html:174
 msgid "Name"
 msgstr "Nombre"
 
@@ -116,9 +109,9 @@ msgid "Your Name"
 msgstr "Su nombre"
 
 #: eproms/templates/eproms/contact.html:22 templates/admin/admin.html:44
-#: templates/admin/patients_by_org.html:61 templates/admin/staff_by_org.html:43
+#: templates/admin/patients_by_org.html:64 templates/admin/staff_by_org.html:42
 #: templates/flask_user/register.html:17
-#: templates/profile/profile_macros.html:50
+#: templates/profile/profile_macros.html:49
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -161,7 +154,8 @@ msgid "What is on your mind?"
 msgstr "¿Qué está pensando?"
 
 #: eproms/templates/eproms/contact.html:57 gil/templates/gil/base.html:250
-#: gil/templates/gil/contact.html:96 templates/profile/profile_macros.html:770
+#: gil/templates/gil/contact.html:96 templates/profile/profile_macros.html:791
+#: templates/profile/profile_macros.html:971
 msgid "Submit"
 msgstr "Enviar"
 
@@ -186,8 +180,8 @@ msgstr "Iniciar sesión"
 #: gil/templates/gil/contact.html:51
 #: templates/profile/patient_profile_create.html:12
 #: templates/profile/patient_profile_create.html:13
+#: templates/profile/profile_macros.html:277
 #: templates/profile/profile_macros.html:278
-#: templates/profile/profile_macros.html:279
 #: templates/profile/staff_profile_create.html:12
 #: templates/profile/staff_profile_create.html:13
 msgid "Email Address"
@@ -215,24 +209,23 @@ msgstr "Se ha cerrado la sesión debido a falta de actividad. Por favor inicie u
 msgid "TrueNTH Footer Logo"
 msgstr "Logotipo del pie de página de TrueNTH"
 
-#: eproms/templates/eproms/portal.html:15 templates/explore.html:12
-#: AppText:landing title
+#: eproms/templates/eproms/portal.html:6 AppText:landing title
 msgid "Welcome to TrueNTH"
 msgstr "Bienvenido a TrueNTH"
 
-#: eproms/templates/eproms/portal.html:16 AppText:landing sub-title
+#: eproms/templates/eproms/portal.html:7 AppText:landing sub-title
 msgid "Tools for navigating the prostate cancer journey"
 msgstr ""
 
-#: eproms/templates/eproms/portal.html:39
+#: eproms/templates/eproms/portal.html:24
 msgid "Not available"
 msgstr "No disponible"
 
-#: eproms/templates/eproms/portal.html:57
+#: eproms/templates/eproms/portal.html:42
 msgid "Not Available"
 msgstr ""
 
-#: eproms/templates/eproms/portal.html:61
+#: eproms/templates/eproms/portal.html:46
 msgid "Go to link"
 msgstr ""
 
@@ -241,7 +234,7 @@ msgid "Privacy"
 msgstr "Privacidad"
 
 #: eproms/templates/eproms/resources.html:3 templates/portal_wrapper.html:90
-#: templates/portal_wrapper.html:143
+#: templates/portal_wrapper.html:146
 msgid "Resources"
 msgstr ""
 
@@ -259,12 +252,12 @@ msgid "General Terms"
 msgstr "Términos generales"
 
 #: eproms/templates/eproms/website_consent_script.html:13
-#: templates/initial_queries.html:45
+#: templates/initial_queries.html:46
 msgid "Continue to TrueNTH"
 msgstr "Continuar a TrueNTH"
 
 #: eproms/templates/eproms/work_instruction.html:6
-#: templates/initial_queries_macros.html:180
+#: templates/initial_queries_macros.html:206
 msgid "Print"
 msgstr "Imprimir"
 
@@ -272,11 +265,239 @@ msgstr "Imprimir"
 msgid "Back to Resources"
 msgstr ""
 
-#: exercise_diet/templates/exercise_diet/base.html:2 Intervention:exercise_diet
-#: gil/templates/gil/exercise-and-diet.html:2 gil/templates/gil/base.html:94
-#: gil/templates/gil/exercise-and-diet.html:9
-#: Intervention:community_of_wellness
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:8
+#, python-format
+msgid "Please complete your questionnaire as soon as possible. It is due on %(substudy_due_date)s."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:22
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:24
+#: eproms/templates/eproms/assessment_engine/ae_due.html:26
+#: eproms/templates/eproms/assessment_engine/ae_due.html:29
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:13
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:16
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:117
+#, python-format
+msgid "%(assigning_authority)s Questionnaire"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:23
+#: eproms/templates/eproms/assessment_engine/ae_due.html:27
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:14
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:33
+msgid "Open Questionnaire"
+msgstr "Abrir cuestionario"
+
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:25
+#: eproms/templates/eproms/assessment_engine/ae_due.html:31
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:17
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:42
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:122
+msgid "Completed Questionnaires"
+msgstr "Cuestionarios completos"
+
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:31
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:38
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:67
+msgid "No questionnaire is due."
+msgstr "No hay cuestionario pendiente."
+
+#: eproms/templates/eproms/assessment_engine/ae_complete.html:68
+msgid "View previous questionnaire"
+msgstr "Ver el cuestionario anterior"
+
+#: eproms/templates/eproms/assessment_engine/ae_due.html:8
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
+msgstr "Por favor complete su cuestionario %(assigning_authority)s lo más pronto posible. Expirará el %(expired_date)s."
+
+#: eproms/templates/eproms/assessment_engine/ae_due.html:15
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
+msgstr "Por favor complete su cuestionario %(assigning_authority)s antes del %(due_date)s."
+
+#: eproms/templates/eproms/assessment_engine/ae_due.html:23
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:11
+msgid "Continue questionnaire"
+msgstr "Continuar con el cuestionario"
+
+#: eproms/templates/eproms/assessment_engine/ae_due.html:23
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:11
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:34
+msgid "Go to questionnaire"
+msgstr "Ir al cuestionario"
+
+#: eproms/templates/eproms/assessment_engine/ae_indefinite_due.html:6
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
+msgstr "Por favor complete su cuestionario %(assigning_authority)s cuando le resulte conveniente."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:20
+msgid "Log out"
+msgstr "Cerrar la sesión"
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:29
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:181
+#, python-format
+msgid "Hi, %(full_name)s."
+msgstr "Hola, %(full_name)s."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:38
+#, python-format
+msgid "Please complete your %(assigning_authority)s questionnaire here."
+msgstr "Por favor complete su cuestionario %(assigning_authority)s aquí."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:47
+#, python-format
+msgid "View questionnaire completed on %(comp_date)s"
+msgstr "Ver el cuestionario terminado el %(comp_date)s"
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:53
+msgid "When you are done, completed questionnaires will be shown here."
+msgstr "Una vez que haya terminado, los cuestionarios completos aparecerán aquí"
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:58
+#, python-format
+msgid "Thank you, %(full_name)s."
+msgstr "Gracias, %(full_name)s."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:59
+#, python-format
+msgid "You've completed the %(registry)s questionnaire."
+msgstr "Usted ha completado el cuestionario %(registry)s."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:60
+msgid "You will be notified when the next questionnaire is ready to complete."
+msgstr "Le enviaremos una notificación cuando el siguiente cuestionario esté listo para completar."
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:80
+msgid "complete questionnaire"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:82
+#, python-format
+msgid "%(substudy_title)s Questionnaire"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:86
+#, python-format
+msgid "Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:91
+#, python-format
+msgid "Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:95
+#, python-format
+msgid "Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:160
+#, python-format
+msgid "%(substudy_title)s Study"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:163
+msgid "View a summary of your questionnaire responses, as well as key health tips and resources."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:168
+msgid "View report and resources"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:171
+#, python-format
+msgid "No %(substudy_title)s questionnaire has been completed yet."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:182
+msgid "None of your questionnaires are due. You can view your completed questionnaires below:"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:187
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:194
+msgid "Your Support Team"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:188
+#, python-format
+msgid "If you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:195
+msgid "You reported having some particular challenges with: "
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:199
+msgid "To help address any issues, we've informed your care team and they'll be in contact with you soon."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:201
+#, python-format
+msgid "In the meantime, if you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:207
+msgid "Your Report"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:208
+msgid "Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:212
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:214
+msgid "View My Report"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:221
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:230
+msgid "Your Health Tips"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:222
+msgid "Based on your questionnaire responses, we've gathered tips and resources on managing the topic(s) below:"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:231
+msgid "Explore ways to manage common prostate cancer challenges. Here you'll find plenty of helpful information and resources."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:233
+msgid "Explore Topics"
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:249
+msgid "Thank you for being part of the IRONMAN EMPRO study."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:251
+msgid "We truly value your time and participation."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:253
+msgid "Find your latest tips and tools below."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_macros.html:273
+msgid "If you are experiencing a medical emergency, please contact your local emergency services right away."
+msgstr ""
+
+#: eproms/templates/eproms/assessment_engine/ae_not_available.html:9
+msgid "Questionnaire Expired"
+msgstr "Cuestionario caducado"
+
+#: eproms/templates/eproms/assessment_engine/ae_not_available.html:11
+msgid "The assessment is no longer available. A research staff member will contact you for assistance."
+msgstr "La evaluación ya no está disponible. Un miembro del personal de investigación lo contactará para brindarle ayuda."
+
+#: Intervention:exercise_diet gil/templates/gil/exercise-and-diet.html:2
+#: exercise_diet/templates/exercise_diet/base.html:2
+#: gil/templates/gil/base.html:94 Intervention:community_of_wellness
 #: exercise_diet/templates/exercise_diet/exercise-diet_portal.html:13
+#: gil/templates/gil/exercise-and-diet.html:9
 msgid "Exercise and Diet"
 msgstr ""
 
@@ -482,11 +703,11 @@ msgstr ""
 msgid "Tool N<em>o</em>1: Post Diagnosis "
 msgstr ""
 
-#: Intervention:decision_support_unavailable
-#: gil/templates/gil/decision-support.html:2 Intervention:decision_support_p3p
-#: gil/templates/gil/about.html:32 gil/templates/gil/decision-support.html:62
-#: templates/portal_footer.html:38 gil/templates/gil/decision-support.html:9
-#: gil/templates/gil/index.html:81 gil/templates/gil/base.html:90
+#: gil/templates/gil/decision-support.html:2
+#: gil/templates/gil/decision-support.html:62 gil/templates/gil/index.html:81
+#: gil/templates/gil/base.html:90 gil/templates/gil/decision-support.html:9
+#: Intervention:decision_support_p3p gil/templates/gil/about.html:32
+#: Intervention:decision_support_unavailable templates/portal_footer.html:38
 msgid "Decision Support"
 msgstr ""
 
@@ -499,11 +720,11 @@ msgstr ""
 msgid "Tool N<em>o</em>2: Monitoring"
 msgstr ""
 
-#: Intervention:self_management gil/templates/gil/about.html:37
-#: gil/templates/gil/symptom-tracker.html:2 models/communication.py:210
-#: gil/templates/gil/index.html:121 QuestionnaireBank:symptom_tracker
-#: templates/portal_footer.html:41 gil/templates/gil/symptom-tracker.html:33
-#: gil/templates/gil/symptom-tracker.html:9 gil/templates/gil/base.html:92
+#: QuestionnaireBank:symptom_tracker gil/templates/gil/symptom-tracker.html:33
+#: gil/templates/gil/about.html:37 gil/templates/gil/symptom-tracker.html:9
+#: gil/templates/gil/base.html:92 gil/templates/gil/symptom-tracker.html:2
+#: gil/templates/gil/index.html:121 templates/portal_footer.html:41
+#: Intervention:self_management models/communication.py:220
 msgid "Symptom Tracker"
 msgstr ""
 
@@ -523,8 +744,8 @@ msgstr ""
 msgid "Tool N<em>o</em>4: All Stages"
 msgstr ""
 
-#: gil/templates/gil/base.html:95 Intervention:lived_experience
-#: gil/templates/gil/lived-experience.html:2 gil/templates/gil/about.html:54
+#: gil/templates/gil/lived-experience.html:2 Intervention:lived_experience
+#: gil/templates/gil/base.html:95 gil/templates/gil/about.html:54
 msgid "Lived Experience"
 msgstr ""
 
@@ -577,11 +798,11 @@ msgstr ""
 msgid "Dana Farber Cancer Institute"
 msgstr ""
 
-#: gil/templates/gil/about.html:88 Organization:Duke University
+#: Organization:Duke University gil/templates/gil/about.html:88
 msgid "Duke University"
 msgstr ""
 
-#: gil/templates/gil/about.html:89 Organization:Emory University
+#: Organization:Emory University gil/templates/gil/about.html:89
 msgid "Emory University"
 msgstr ""
 
@@ -593,12 +814,12 @@ msgstr ""
 msgid "Karmanos Cancer Institute"
 msgstr ""
 
-#: Organization:Memorial Sloan Kettering Cancer Center
-#: gil/templates/gil/about.html:92
+#: gil/templates/gil/about.html:92 Organization:Memorial Sloan Kettering Cancer
+#: Center
 msgid "Memorial Sloan Kettering Cancer Center"
 msgstr ""
 
-#: gil/templates/gil/about.html:93 Organization:University of Michigan
+#: Organization:University of Michigan gil/templates/gil/about.html:93
 msgid "University of Michigan"
 msgstr ""
 
@@ -626,7 +847,7 @@ msgstr ""
 msgid "UNC"
 msgstr ""
 
-#: gil/templates/gil/about.html:101 Organization:University of Washington
+#: Organization:University of Washington gil/templates/gil/about.html:101
 msgid "University of Washington"
 msgstr ""
 
@@ -729,42 +950,42 @@ msgid "Navigation"
 msgstr ""
 
 #: gil/templates/gil/base.html:69 templates/portal_wrapper.html:75
-#: templates/portal_wrapper.html:129
+#: templates/portal_wrapper.html:132
 msgid "Patients"
 msgstr "Pacientes"
 
 #: gil/templates/gil/base.html:72 templates/portal_wrapper.html:68
-#: templates/portal_wrapper.html:126 templates/profile/my_profile.html:4
+#: templates/portal_wrapper.html:129 templates/profile/my_profile.html:4
 msgid "My TrueNTH Profile"
 msgstr "Mi perfil de TrueNTH"
 
 #: gil/templates/gil/base.html:76 templates/portal_wrapper.html:72
-#: templates/portal_wrapper.html:128
+#: templates/portal_wrapper.html:131
 msgid "Client Applications"
 msgstr ""
 
 #: gil/templates/gil/base.html:79 templates/portal_wrapper.html:87
-#: templates/portal_wrapper.html:140 templates/research.html:3
+#: templates/portal_wrapper.html:143 templates/research.html:3
 msgid "Research Data"
 msgstr "Datos de la investigación"
 
 #: gil/templates/gil/base.html:82 templates/portal_wrapper.html:77
-#: templates/portal_wrapper.html:130
+#: templates/portal_wrapper.html:133
 msgid "Staff List"
 msgstr "Lista del personal"
 
 #: gil/templates/gil/base.html:85 templates/admin/admin.html:12
-#: templates/portal_wrapper.html:79 templates/portal_wrapper.html:132
+#: templates/portal_wrapper.html:79 templates/portal_wrapper.html:135
 msgid "User Administration"
 msgstr "Administración de usuarios"
 
 #: gil/templates/gil/base.html:86 templates/admin/admin.html:8
-#: templates/portal_wrapper.html:80 templates/portal_wrapper.html:133
+#: templates/portal_wrapper.html:80 templates/portal_wrapper.html:136
 msgid "Scheduled Jobs"
 msgstr "Trabajos programados"
 
 #: gil/templates/gil/base.html:87 templates/portal_wrapper.html:81
-#: templates/portal_wrapper.html:134
+#: templates/portal_wrapper.html:137
 msgid "Settings"
 msgstr "Configuración"
 
@@ -798,11 +1019,10 @@ msgstr ""
 
 #: gil/templates/gil/base.html:101 gil/templates/gil/base.html:126
 #: gil/templates/gil/contact.html:16 gil/templates/gil/lived-experience.html:16
-#: templates/explore.html:31
 msgid "Log In"
 msgstr "Iniciar sesión"
 
-#: gil/templates/gil/base.html:103 templates/portal_wrapper.html:166
+#: gil/templates/gil/base.html:103 templates/portal_wrapper.html:172
 msgid "Log Out"
 msgstr "Cerrar sesión"
 
@@ -841,7 +1061,7 @@ msgstr ""
 msgid "Enter Access Code"
 msgstr ""
 
-#: gil/templates/gil/base.html:175 templates/initial_queries.html:44
+#: gil/templates/gil/base.html:175 templates/initial_queries.html:51
 #: templates/shortcut_alias.html:13
 msgid "Next"
 msgstr "Siguiente"
@@ -860,8 +1080,7 @@ msgid "Login"
 msgstr ""
 
 #: gil/templates/gil/base.html:201 gil/templates/gil/base.html:224
-#: templates/explore.html:30 templates/flask_user/login.html:28
-#: templates/flask_user/register.html:38
+#: templates/flask_user/login.html:28 templates/flask_user/register.html:38
 msgid "or"
 msgstr "o"
 
@@ -873,13 +1092,13 @@ msgstr ""
 msgid "Log in with Google"
 msgstr ""
 
-#: gil/templates/gil/base.html:238 templates/initial_queries_macros.html:403
-#: templates/profile/profile_macros.html:502
+#: gil/templates/gil/base.html:238 templates/initial_queries_macros.html:429
+#: templates/profile/profile_macros.html:516
 msgid "What is your main clinic for prostate cancer care?"
 msgstr "¿Cuál es su clínica principal para atención del cáncer de próstata?"
 
-#: gil/templates/gil/base.html:248 templates/profile/profile_macros.html:508
-#: templates/profile/profile_macros.html:539
+#: gil/templates/gil/base.html:248 templates/profile/profile_macros.html:522
+#: templates/profile/profile_macros.html:553
 msgid "None of the Above"
 msgstr "Ninguno de los anteriores"
 
@@ -892,9 +1111,9 @@ msgid "You have been logged out due to inactivity.  Please log in again to conti
 msgstr ""
 
 #: gil/templates/gil/base.html:265 gil/templates/gil/base.html:300
-#: templates/initial_queries_macros.html:111
+#: templates/initial_queries_macros.html:137
 #: templates/profile/patient_profile.html:43
-#: templates/profile/profile_macros.html:1133
+#: templates/profile/profile_macros.html:1342
 msgid "OK"
 msgstr "OK"
 
@@ -923,18 +1142,20 @@ msgid "Use this form to get in touch with TrueNTH USA."
 msgstr ""
 
 #: gil/templates/gil/contact.html:40 gil/templates/gil/contact.html:41
-#: templates/admin/admin.html:42 templates/admin/patients_by_org.html:58
-#: templates/admin/staff_by_org.html:41 templates/challenge_identity.html:21
-#: templates/initial_queries_macros.html:219
-#: templates/profile/profile_macros.html:179
+#: templates/admin/admin.html:42 templates/admin/patients_by_org.html:61
+#: templates/admin/patients_substudy.html:59
+#: templates/admin/staff_by_org.html:40 templates/challenge_identity.html:21
+#: templates/initial_queries_macros.html:245
+#: templates/profile/profile_macros.html:178
 msgid "First Name"
 msgstr "Nombre"
 
 #: gil/templates/gil/contact.html:44 gil/templates/gil/contact.html:45
-#: templates/admin/admin.html:43 templates/admin/patients_by_org.html:59
-#: templates/admin/staff_by_org.html:42 templates/challenge_identity.html:29
-#: templates/initial_queries_macros.html:226
-#: templates/profile/profile_macros.html:187
+#: templates/admin/admin.html:43 templates/admin/patients_by_org.html:62
+#: templates/admin/patients_substudy.html:60
+#: templates/admin/staff_by_org.html:41 templates/challenge_identity.html:29
+#: templates/initial_queries_macros.html:252
+#: templates/profile/profile_macros.html:186
 msgid "Last Name"
 msgstr "Apellido"
 
@@ -946,7 +1167,8 @@ msgstr "Mensaje"
 msgid "About You"
 msgstr ""
 
-#: gil/templates/gil/contact.html:83 templates/profile/profile_macros.html:918
+#: gil/templates/gil/contact.html:83 templates/profile/profile_macros.html:960
+#: templates/profile/profile_macros.html:1127
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -1279,7 +1501,7 @@ msgstr ""
 msgid "Learning about the factors that impact your decision"
 msgstr ""
 
-#: gil/templates/gil/index.html:70 templates/admin/patients_by_org.html:62
+#: gil/templates/gil/index.html:70 templates/admin/patients_by_org.html:65
 msgid "Reports"
 msgstr "Informes"
 
@@ -1524,8 +1746,8 @@ msgid "The older a man is, the greater his risk for getting prostate cancer."
 msgstr ""
 
 #: gil/templates/gil/what-is-prostate-cancer.html:62 templates/coredata.html:31
-#: templates/profile/profile_macros.html:91
-#: templates/profile/profile_macros.html:219
+#: templates/profile/profile_macros.html:90
+#: templates/profile/profile_macros.html:218
 msgid "Race"
 msgstr "Raza"
 
@@ -1804,123 +2026,40 @@ msgid "Online Prostate Cancer Discussion Forum and Community"
 msgstr ""
 
 #: models/communication.py:104
+msgid "View My Report and Resources"
+msgstr ""
+
+#: models/communication.py:113
 msgid "Complete Questionnaire"
 msgstr "Completar cuestionario"
 
-#: models/communication.py:128
+#: models/communication.py:137
 msgid "TrueNTH P3P"
 msgstr ""
 
-#: models/communication.py:166
+#: models/communication.py:175
 msgid "Password Reset"
 msgstr "Restablecer contraseña"
 
-#: models/communication.py:227
+#: models/communication.py:237
 msgid "Verify Account"
 msgstr "Verificar cuenta"
 
-#: models/intervention_strategies.py:237
-#, python-format
-msgid "Thank you, %(full_name)s."
-msgstr "Gracias, %(full_name)s."
-
-#: models/intervention_strategies.py:238
-#, python-format
-msgid "You've completed the %(registry)s questionnaire."
-msgstr "Usted ha completado el cuestionario %(registry)s."
-
-#: models/intervention_strategies.py:241
-msgid "You will be notified when the next questionnaire is ready to complete."
-msgstr "Le enviaremos una notificación cuando el siguiente cuestionario esté listo para completar."
-
-#: models/intervention_strategies.py:244
-msgid "Log out"
-msgstr "Cerrar la sesión"
-
-#: models/intervention_strategies.py:270 models/intervention_strategies.py:302
-#: models/intervention_strategies.py:479
-#, python-format
-msgid "Hi, %(full_name)s"
-msgstr "Hola, %(full_name)s"
-
-#: models/intervention_strategies.py:276
-#, python-format
-msgid "Please complete your %(assigning_authority)s questionnaire as soon as possible. It will expire on %(expired_date)s."
-msgstr "Por favor complete su cuestionario %(assigning_authority)s lo más pronto posible. Expirará el %(expired_date)s."
-
-#: models/intervention_strategies.py:286
-#, python-format
-msgid "Please complete your %(assigning_authority)s questionnaire by %(due_date)s."
-msgstr "Por favor complete su cuestionario %(assigning_authority)s antes del %(due_date)s."
-
-#: models/intervention_strategies.py:303
-#, python-format
-msgid "Please complete your %(assigning_authority)s questionnaire at your convenience."
-msgstr "Por favor complete su cuestionario %(assigning_authority)s cuando le resulte conveniente."
-
-#: models/intervention_strategies.py:325 models/intervention_strategies.py:354
-msgid "Completed Questionnaires"
-msgstr "Cuestionarios completos"
-
-#: models/intervention_strategies.py:326
-msgid "When you are done, completed questionnaires will be shown here."
-msgstr "Una vez que haya terminado, los cuestionarios completos aparecerán aquí"
-
-#: models/intervention_strategies.py:357
-#, python-format
-msgid "View questionnaire completed on %(comp_date)s"
-msgstr "Ver el cuestionario terminado el %(comp_date)s"
-
-#: models/intervention_strategies.py:375 models/intervention_strategies.py:409
-msgid "Go to questionnaire"
-msgstr "Ir al cuestionario"
-
-#: models/intervention_strategies.py:378 models/intervention_strategies.py:407
-msgid "Continue questionnaire"
-msgstr "Continuar con el cuestionario"
-
-#: models/intervention_strategies.py:381 models/intervention_strategies.py:411
-#: models/intervention_strategies.py:440
-msgid "Open Questionnaire"
-msgstr "Abrir cuestionario"
-
-#: models/intervention_strategies.py:382 models/intervention_strategies.py:412
-#, python-format
-msgid "Please complete your %(assigning_authority)s questionnaire here."
-msgstr "Por favor complete su cuestionario %(assigning_authority)s aquí."
-
-#: models/intervention_strategies.py:438
-msgid "View previous questionnaire"
-msgstr "Ver el cuestionario anterior"
-
-#: models/intervention_strategies.py:441
-msgid "No questionnaire is due."
-msgstr "No hay cuestionario pendiente."
-
-#: models/intervention_strategies.py:480
-msgid "Questionnaire Expired"
-msgstr "Cuestionario caducado"
-
-#: models/intervention_strategies.py:481
-msgid ""
-"The assessment is no longer available.\n"
-"A research staff member will contact you for assistance."
-msgstr ""
-
-#: models/questionnaire_bank.py:552
+#: models/questionnaire_bank.py:618 models/questionnaire_bank.py:619
+#: models/questionnaire_bank.py:622
 #, python-format
 msgid "Month %(month_total)d"
 msgstr "Mes %(month_total)d"
 
-#: models/user.py:555 models/user.py:566
+#: models/user.py:556 models/user.py:567
 msgid "invalid email address"
 msgstr "dirección de correo electrónico no válida"
 
-#: models/user.py:560
+#: models/user.py:561
 msgid "user requests no email"
 msgstr "el usuario solicita no recibir correo electrónico"
 
-#: models/user.py:575
+#: models/user.py:576
 msgid "missing required data: "
 msgstr "faltan datos requeridos: "
 
@@ -1930,22 +2069,22 @@ msgstr "Verificación de identidad"
 
 #: templates/challenge_identity.html:7
 msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
-msgstr ""
+msgstr "Para asegurar que sus datos personales no se compartan con otros, introduzca los siguientes datos para la confirmación de la cuenta."
 
 #: templates/challenge_identity.html:21
-#: templates/initial_queries_macros.html:219
+#: templates/initial_queries_macros.html:245
 msgid "First name is required"
 msgstr "Se requiere un nombre"
 
 #: templates/challenge_identity.html:29
-#: templates/initial_queries_macros.html:226
+#: templates/initial_queries_macros.html:252
 msgid "Last name is required"
 msgstr "Se requiere un apellido"
 
 #: templates/challenge_identity.html:35
-#: templates/initial_queries_macros.html:253
-#: templates/profile/profile_macros.html:125
-#: templates/profile/profile_macros.html:127
+#: templates/initial_queries_macros.html:279
+#: templates/profile/profile_macros.html:124
+#: templates/profile/profile_macros.html:126
 msgid "Birth Date"
 msgstr "Fecha de nacimiento"
 
@@ -1958,14 +2097,14 @@ msgid "Day is required"
 msgstr "Es necesario completar el día"
 
 #: templates/challenge_identity.html:50 templates/challenge_identity.html:52
-#: templates/initial_queries_macros.html:260
-#: templates/initial_queries_macros.html:303
-#: templates/profile/profile_macros.html:132
-#: templates/profile/profile_macros.html:792
-#: templates/profile/profile_macros.html:993
-#: templates/profile/profile_macros.html:1102
-#: templates/profile/profile_macros.html:1103
-#: templates/profile/profile_macros.html:1206
+#: templates/initial_queries_macros.html:286
+#: templates/initial_queries_macros.html:329
+#: templates/profile/profile_macros.html:131
+#: templates/profile/profile_macros.html:813
+#: templates/profile/profile_macros.html:1202
+#: templates/profile/profile_macros.html:1311
+#: templates/profile/profile_macros.html:1312
+#: templates/profile/profile_macros.html:1415
 msgid "Month"
 msgstr "Mes"
 
@@ -1974,134 +2113,134 @@ msgid "Month is required"
 msgstr "Es necesario completar el mes"
 
 #: templates/challenge_identity.html:53
-#: templates/initial_queries_macros.html:261
-#: templates/initial_queries_macros.html:304
-#: templates/profile/profile_macros.html:133
-#: templates/profile/profile_macros.html:793
-#: templates/profile/profile_macros.html:994
-#: templates/profile/profile_macros.html:1104
-#: templates/profile/profile_macros.html:1207
+#: templates/initial_queries_macros.html:287
+#: templates/initial_queries_macros.html:330
+#: templates/profile/profile_macros.html:132
+#: templates/profile/profile_macros.html:814
+#: templates/profile/profile_macros.html:1203
+#: templates/profile/profile_macros.html:1313
+#: templates/profile/profile_macros.html:1416
 msgid "January"
 msgstr "Enero"
 
 #: templates/challenge_identity.html:54
-#: templates/initial_queries_macros.html:262
-#: templates/initial_queries_macros.html:305
-#: templates/profile/profile_macros.html:134
-#: templates/profile/profile_macros.html:794
-#: templates/profile/profile_macros.html:995
-#: templates/profile/profile_macros.html:1105
-#: templates/profile/profile_macros.html:1208
+#: templates/initial_queries_macros.html:288
+#: templates/initial_queries_macros.html:331
+#: templates/profile/profile_macros.html:133
+#: templates/profile/profile_macros.html:815
+#: templates/profile/profile_macros.html:1204
+#: templates/profile/profile_macros.html:1314
+#: templates/profile/profile_macros.html:1417
 msgid "February"
 msgstr "Febrero"
 
 #: templates/challenge_identity.html:55
-#: templates/initial_queries_macros.html:263
-#: templates/initial_queries_macros.html:306
-#: templates/profile/profile_macros.html:135
-#: templates/profile/profile_macros.html:795
-#: templates/profile/profile_macros.html:996
-#: templates/profile/profile_macros.html:1106
-#: templates/profile/profile_macros.html:1209
+#: templates/initial_queries_macros.html:289
+#: templates/initial_queries_macros.html:332
+#: templates/profile/profile_macros.html:134
+#: templates/profile/profile_macros.html:816
+#: templates/profile/profile_macros.html:1205
+#: templates/profile/profile_macros.html:1315
+#: templates/profile/profile_macros.html:1418
 msgid "March"
 msgstr "Marzo"
 
 #: templates/challenge_identity.html:56
-#: templates/initial_queries_macros.html:264
-#: templates/initial_queries_macros.html:307
-#: templates/profile/profile_macros.html:136
-#: templates/profile/profile_macros.html:796
-#: templates/profile/profile_macros.html:997
-#: templates/profile/profile_macros.html:1107
-#: templates/profile/profile_macros.html:1210
+#: templates/initial_queries_macros.html:290
+#: templates/initial_queries_macros.html:333
+#: templates/profile/profile_macros.html:135
+#: templates/profile/profile_macros.html:817
+#: templates/profile/profile_macros.html:1206
+#: templates/profile/profile_macros.html:1316
+#: templates/profile/profile_macros.html:1419
 msgid "April"
 msgstr "Abril"
 
 #: templates/challenge_identity.html:57
-#: templates/initial_queries_macros.html:265
-#: templates/initial_queries_macros.html:308
-#: templates/profile/profile_macros.html:137
-#: templates/profile/profile_macros.html:797
-#: templates/profile/profile_macros.html:998
-#: templates/profile/profile_macros.html:1108
-#: templates/profile/profile_macros.html:1211
+#: templates/initial_queries_macros.html:291
+#: templates/initial_queries_macros.html:334
+#: templates/profile/profile_macros.html:136
+#: templates/profile/profile_macros.html:818
+#: templates/profile/profile_macros.html:1207
+#: templates/profile/profile_macros.html:1317
+#: templates/profile/profile_macros.html:1420
 msgid "May"
 msgstr "Mayo"
 
 #: templates/challenge_identity.html:58
-#: templates/initial_queries_macros.html:266
-#: templates/initial_queries_macros.html:309
-#: templates/profile/profile_macros.html:138
-#: templates/profile/profile_macros.html:798
-#: templates/profile/profile_macros.html:999
-#: templates/profile/profile_macros.html:1109
-#: templates/profile/profile_macros.html:1212
+#: templates/initial_queries_macros.html:292
+#: templates/initial_queries_macros.html:335
+#: templates/profile/profile_macros.html:137
+#: templates/profile/profile_macros.html:819
+#: templates/profile/profile_macros.html:1208
+#: templates/profile/profile_macros.html:1318
+#: templates/profile/profile_macros.html:1421
 msgid "June"
 msgstr "Junio"
 
 #: templates/challenge_identity.html:59
-#: templates/initial_queries_macros.html:267
-#: templates/initial_queries_macros.html:310
-#: templates/profile/profile_macros.html:139
-#: templates/profile/profile_macros.html:799
-#: templates/profile/profile_macros.html:1000
-#: templates/profile/profile_macros.html:1110
-#: templates/profile/profile_macros.html:1213
+#: templates/initial_queries_macros.html:293
+#: templates/initial_queries_macros.html:336
+#: templates/profile/profile_macros.html:138
+#: templates/profile/profile_macros.html:820
+#: templates/profile/profile_macros.html:1209
+#: templates/profile/profile_macros.html:1319
+#: templates/profile/profile_macros.html:1422
 msgid "July"
 msgstr "Julio"
 
 #: templates/challenge_identity.html:60
-#: templates/initial_queries_macros.html:268
-#: templates/initial_queries_macros.html:311
-#: templates/profile/profile_macros.html:140
-#: templates/profile/profile_macros.html:800
-#: templates/profile/profile_macros.html:1001
-#: templates/profile/profile_macros.html:1111
-#: templates/profile/profile_macros.html:1214
+#: templates/initial_queries_macros.html:294
+#: templates/initial_queries_macros.html:337
+#: templates/profile/profile_macros.html:139
+#: templates/profile/profile_macros.html:821
+#: templates/profile/profile_macros.html:1210
+#: templates/profile/profile_macros.html:1320
+#: templates/profile/profile_macros.html:1423
 msgid "August"
 msgstr "Agosto"
 
 #: templates/challenge_identity.html:61
-#: templates/initial_queries_macros.html:269
-#: templates/initial_queries_macros.html:312
-#: templates/profile/profile_macros.html:141
-#: templates/profile/profile_macros.html:801
-#: templates/profile/profile_macros.html:1002
-#: templates/profile/profile_macros.html:1112
-#: templates/profile/profile_macros.html:1215
+#: templates/initial_queries_macros.html:295
+#: templates/initial_queries_macros.html:338
+#: templates/profile/profile_macros.html:140
+#: templates/profile/profile_macros.html:822
+#: templates/profile/profile_macros.html:1211
+#: templates/profile/profile_macros.html:1321
+#: templates/profile/profile_macros.html:1424
 msgid "September"
 msgstr "Septiembre"
 
 #: templates/challenge_identity.html:62
-#: templates/initial_queries_macros.html:270
-#: templates/initial_queries_macros.html:313
-#: templates/profile/profile_macros.html:142
-#: templates/profile/profile_macros.html:802
-#: templates/profile/profile_macros.html:1003
-#: templates/profile/profile_macros.html:1113
-#: templates/profile/profile_macros.html:1216
+#: templates/initial_queries_macros.html:296
+#: templates/initial_queries_macros.html:339
+#: templates/profile/profile_macros.html:141
+#: templates/profile/profile_macros.html:823
+#: templates/profile/profile_macros.html:1212
+#: templates/profile/profile_macros.html:1322
+#: templates/profile/profile_macros.html:1425
 msgid "October"
 msgstr "Octubre"
 
 #: templates/challenge_identity.html:63
-#: templates/initial_queries_macros.html:271
-#: templates/initial_queries_macros.html:314
-#: templates/profile/profile_macros.html:143
-#: templates/profile/profile_macros.html:803
-#: templates/profile/profile_macros.html:1004
-#: templates/profile/profile_macros.html:1114
-#: templates/profile/profile_macros.html:1217
+#: templates/initial_queries_macros.html:297
+#: templates/initial_queries_macros.html:340
+#: templates/profile/profile_macros.html:142
+#: templates/profile/profile_macros.html:824
+#: templates/profile/profile_macros.html:1213
+#: templates/profile/profile_macros.html:1323
+#: templates/profile/profile_macros.html:1426
 msgid "November"
 msgstr "Noviembre"
 
 #: templates/challenge_identity.html:64
-#: templates/initial_queries_macros.html:272
-#: templates/initial_queries_macros.html:315
-#: templates/profile/profile_macros.html:144
-#: templates/profile/profile_macros.html:804
-#: templates/profile/profile_macros.html:1005
-#: templates/profile/profile_macros.html:1115
-#: templates/profile/profile_macros.html:1218
+#: templates/initial_queries_macros.html:298
+#: templates/initial_queries_macros.html:341
+#: templates/profile/profile_macros.html:143
+#: templates/profile/profile_macros.html:825
+#: templates/profile/profile_macros.html:1214
+#: templates/profile/profile_macros.html:1324
+#: templates/profile/profile_macros.html:1427
 msgid "December"
 msgstr "Diciembre"
 
@@ -2125,20 +2264,20 @@ msgstr "Verificación de identidad"
 msgid "I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself."
 msgstr "Confirmo que soy participante del Estudio de registro IRONMAN y completo este cuestionario sin asistencia."
 
-#: templates/confirm_identity.html:17 templates/initial_queries_macros.html:291
-#: templates/initial_queries_macros.html:363
-#: templates/initial_queries_macros.html:384
-#: templates/profile/profile_macros.html:609
-#: templates/profile/profile_macros.html:976
-#: templates/profile/profile_macros.html:1255
+#: templates/confirm_identity.html:17 templates/initial_queries_macros.html:317
+#: templates/initial_queries_macros.html:389
+#: templates/initial_queries_macros.html:410
+#: templates/profile/profile_macros.html:623
+#: templates/profile/profile_macros.html:1185
+#: templates/profile/profile_macros.html:1464
 msgid "Yes"
 msgstr "Sí"
 
-#: templates/confirm_identity.html:18 templates/initial_queries_macros.html:327
-#: templates/initial_queries_macros.html:389
-#: templates/profile/profile_macros.html:611
-#: templates/profile/profile_macros.html:976
-#: templates/profile/profile_macros.html:1255
+#: templates/confirm_identity.html:18 templates/initial_queries_macros.html:353
+#: templates/initial_queries_macros.html:415
+#: templates/profile/profile_macros.html:625
+#: templates/profile/profile_macros.html:1185
+#: templates/profile/profile_macros.html:1464
 msgid "No"
 msgstr "No"
 
@@ -2151,7 +2290,7 @@ msgid "We have sent an email to the team supporting TrueNTH."
 msgstr "Hemos enviado un correo electrónico al equipo de apoyo de TrueNTH."
 
 #: templates/contact_sent.html:11 templates/portal_wrapper.html:66
-#: templates/portal_wrapper.html:125
+#: templates/portal_wrapper.html:128
 msgid "TrueNTH Home"
 msgstr "TrueNTH Inicio"
 
@@ -2171,41 +2310,41 @@ msgstr ""
 "Usted puede\n"
 " saltar cualquier pregunta que prefiera no responder."
 
-#: templates/coredata.html:13 templates/profile/profile_macros.html:90
-#: templates/profile/profile_macros.html:259
+#: templates/coredata.html:13 templates/profile/profile_macros.html:89
+#: templates/profile/profile_macros.html:258
 msgid "Ethnicity"
 msgstr "Origen étnico"
 
-#: templates/coredata.html:18 templates/profile/profile_macros.html:263
+#: templates/coredata.html:18 templates/profile/profile_macros.html:262
 msgid "Hispanic or Latino"
 msgstr "Hispano o latino"
 
-#: templates/coredata.html:23 templates/profile/profile_macros.html:268
+#: templates/coredata.html:23 templates/profile/profile_macros.html:267
 msgid "Not Hispanic or Latino"
 msgstr "No hispano o latino"
 
-#: templates/coredata.html:35 templates/profile/profile_macros.html:223
+#: templates/coredata.html:35 templates/profile/profile_macros.html:222
 msgid "American Indian or Alaska Native"
 msgstr "Amerindio o nativo de Alaska"
 
-#: templates/coredata.html:40 templates/profile/profile_macros.html:228
+#: templates/coredata.html:40 templates/profile/profile_macros.html:227
 msgid "Asian"
 msgstr "Asiática"
 
-#: templates/coredata.html:45 templates/profile/profile_macros.html:233
+#: templates/coredata.html:45 templates/profile/profile_macros.html:232
 msgid "Black or African American"
 msgstr "Negro o afroamericano"
 
-#: templates/coredata.html:50 templates/profile/profile_macros.html:238
+#: templates/coredata.html:50 templates/profile/profile_macros.html:237
 msgid "Native Hawaiian or Other Pacific Islander"
 msgstr "Hawaiano o nativo de otras islas del Pacífico"
 
-#: templates/coredata.html:55 templates/profile/profile_macros.html:243
+#: templates/coredata.html:55 templates/profile/profile_macros.html:242
 msgid "White"
 msgstr "Blanco"
 
-#: templates/profile/profile_macros.html:248 classification_enum:Other
-#: templates/profile/profile_macros.html:210 templates/coredata.html:60
+#: templates/profile/profile_macros.html:247 classification_enum:Other
+#: templates/coredata.html:60 templates/profile/profile_macros.html:209
 msgid "Other"
 msgstr "Otros"
 
@@ -2217,55 +2356,43 @@ msgstr "Omitir esto"
 msgid "Continue"
 msgstr "Continuar"
 
-#: templates/explore.html:13
-msgid "Explore How TrueNTH Works"
-msgstr ""
-
-#: templates/explore.html:20
-msgid "A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers."
-msgstr ""
-
-#: templates/explore.html:21
-msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
-msgstr "Muy pronto... descubra herramientas diseñadas para ayudar a los afectados por el cáncer de próstata."
-
-#: templates/explore.html:29
-msgid "Register Now"
-msgstr ""
-
 #: templates/initial_queries.html:17
+msgid "Substudy Website Terms of Use"
+msgstr ""
+
+#: templates/initial_queries.html:20
 msgid "Tell us a little about yourself."
 msgstr "Cuéntenos un poco acerca de usted."
 
-#: templates/initial_queries.html:17
+#: templates/initial_queries.html:20
 msgid "your information"
 msgstr "su información"
 
-#: templates/initial_queries.html:26
+#: templates/initial_queries.html:29
 msgid "Now it is time to build your prostate cancer profile."
 msgstr ""
 
-#: templates/initial_queries.html:26
+#: templates/initial_queries.html:29
 msgid "your clinical profile"
 msgstr "su perfil clínico"
 
-#: templates/initial_queries.html:27
+#: templates/initial_queries.html:30
 msgid "The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey."
 msgstr ""
 
-#: templates/initial_queries.html:30
+#: templates/initial_queries.html:33
 msgid "Your clinic of care."
 msgstr "Su clínica de atención."
 
-#: templates/initial_queries.html:30
+#: templates/initial_queries.html:33
 msgid "your clinic"
 msgstr "su clínica"
 
-#: templates/initial_queries.html:39
+#: templates/initial_queries.html:42
 msgid "Thank you."
 msgstr "Gracias."
 
-#: templates/initial_queries.html:40
+#: templates/initial_queries.html:43
 msgid "Click continue to start using TrueNTH"
 msgstr "Haga clic en continuar para comenzar a utilizar TrueNTH"
 
@@ -2281,23 +2408,28 @@ msgstr "Error al guardar datos. Error del sistema."
 msgid "saving data..."
 msgstr "grabando datos..."
 
-#: templates/initial_queries_macros.html:24
+#: templates/initial_queries_macros.html:42
+#: templates/initial_queries_macros.html:78
+msgid "By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent."
+msgstr "Al marcar esta casilla, confirmo que ha leído la nota informativa anterior y otorgo mi consentimiento y acuerdo para que sea procesada mi información personal (incluyendo la información sobre mi salud) en los términos descritos en este Consentimiento."
+
+#: templates/initial_queries_macros.html:50
 msgid "terms"
 msgstr "términos"
 
-#: templates/initial_queries_macros.html:27
+#: templates/initial_queries_macros.html:53
 msgid "Terms of Use"
 msgstr "Términos de uso"
 
-#: templates/initial_queries_macros.html:30
+#: templates/initial_queries_macros.html:56
 msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
 msgstr ""
 
-#: templates/initial_queries_macros.html:37
+#: templates/initial_queries_macros.html:63
 msgid "View TrueNTH Terms"
 msgstr "Ver términos de TrueNTH"
 
-#: templates/initial_queries_macros.html:40
+#: templates/initial_queries_macros.html:66
 #, python-format
 msgid ""
 "\n"
@@ -2307,199 +2439,195 @@ msgid ""
 "              "
 msgstr ""
 
-#: templates/initial_queries_macros.html:52
-msgid "By checking this box, I confirm that I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent."
-msgstr "Al marcar esta casilla, confirmo que ha leído la nota informativa anterior y otorgo mi consentimiento y acuerdo para que sea procesada mi información personal (incluyendo la información sobre mi salud) en los términos descritos en este Consentimiento."
-
-#: templates/initial_queries_macros.html:55
+#: templates/initial_queries_macros.html:81
 msgid "You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact."
 msgstr "Usted ha dado previamente su consentimiento a la página web durante una visita a su sitio de tratamiento. Si desea una copia de esto, por favor póngase en contacto con su enlace en el estudio."
 
-#: templates/initial_queries_macros.html:73
+#: templates/initial_queries_macros.html:99
 #, python-format
 msgid "<span class=\"terms-tick-box-text\">&nbsp;By checking this box, I confirm that I have read and accept the website <a href=\"%(privacy_url)s\" class=\"required-link\">privacy policy</a> and <a href=\"%(terms_url)s\" class=\"required-link\">terms</a>.</span>"
 msgstr ""
 "<span class=\"terms-tick-box-text\"> Al marcar esta casilla, confirmo que he leído y aceptado la <a href=\"%(privacy_url)s\" class=\"required-link\">Política de privacidad</a> y los \n"
 "                            <a href=\"%(terms_url)s\" class=\"required-link\">Términos</a> del sitio web.</span>"
 
-#: templates/initial_queries_macros.html:103
+#: templates/initial_queries_macros.html:129
 msgid "To Continue"
 msgstr "Continuar"
 
-#: templates/initial_queries_macros.html:107
+#: templates/initial_queries_macros.html:133
 msgid "You must agree to the terms and conditions by checking the provided checkbox."
 msgstr "Debe aceptar los términos y condiciones marcando la casilla."
 
-#: templates/initial_queries_macros.html:120
+#: templates/initial_queries_macros.html:146
 msgid "Website Consent Script - Enter Manually - Paper Form"
 msgstr "Script de Consentimiento del sitio web - Introducir manualmente - Formulario de papel"
 
-#: templates/initial_queries_macros.html:121
-#: templates/initial_queries_macros.html:144
+#: templates/initial_queries_macros.html:147
+#: templates/initial_queries_macros.html:170
 msgid "For Staff Use Only"
 msgstr "Para uso exclusivo del personal"
 
-#: templates/initial_queries_macros.html:133
+#: templates/initial_queries_macros.html:159
 msgid "By checking this box, I confirm that the patient has read the Website Consent and consents and agrees to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures."
 msgstr "Al marcar esta casilla, confirmo que el paciente ha leído el convenio de Consentimiento del sitio web y otorga su consentimiento y acepta que sus datos personales (incluyendo la información sobre su salud) sean procesados en los términos descritos en el presente Consentimiento, así como en Términos y condiciones. Asimismo, una copia de este consentimiento y la información proporcionada por el paciente han sido almacenadas de forma segura conforme a los procedimientos de mi sitio local."
 
-#: templates/initial_queries_macros.html:143
+#: templates/initial_queries_macros.html:169
 msgid "Website Consent Script - Enter Manually - Interview Assisted"
 msgstr "Script de Consentimiento del sitio web - Introducir manualmente - Entrevista asistida"
 
-#: templates/initial_queries_macros.html:148
+#: templates/initial_queries_macros.html:174
 msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study."
 msgstr "Lo estamos invitando a utilizar la herramienta del sitio web de TrueNTH porque usted ha accedido a participar en el Estudio de los registros [organización]."
 
-#: templates/initial_queries_macros.html:149
+#: templates/initial_queries_macros.html:175
 msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
 msgstr "La información que usted proporcione será utilizada en un estudio global y beneficiará en un futuro a pacientes con mejores opciones de tratamiento y atención.  ¿Esto le suena a algo en lo que estaría usted dispuesto a participar?"
 
-#: templates/initial_queries_macros.html:151
+#: templates/initial_queries_macros.html:177
 msgid "If yes, continue to read below text and Consent."
 msgstr "En caso afirmativo, continuar leyendo debajo del texto y el Consentimiento."
 
-#: templates/initial_queries_macros.html:152
-#: templates/initial_queries_macros.html:165
+#: templates/initial_queries_macros.html:178
+#: templates/initial_queries_macros.html:191
 msgid "If no, thank them for their time."
 msgstr "Si no, darles las gracias por su tiempo."
 
-#: templates/initial_queries_macros.html:154
+#: templates/initial_queries_macros.html:180
 msgid "Read consent [exactly as written]"
 msgstr "Leer el consentimiento [tal y como está escrito]"
 
-#: templates/initial_queries_macros.html:161
+#: templates/initial_queries_macros.html:187
 msgid "Do you have any questions?"
 msgstr "¿Tiene alguna pregunta?"
 
-#: templates/initial_queries_macros.html:162
+#: templates/initial_queries_macros.html:188
 msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
 msgstr "¿Está de acuerdo en participar en la herramienta del sitio web TrueNTH y da su consentimiento para el procesamiento de su información personal (incluyendo la información sobre su estado de salud) en los términos que le acabo de leer a usted?"
 
-#: templates/initial_queries_macros.html:164
+#: templates/initial_queries_macros.html:190
 msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
 msgstr "En caso afirmativo, documente a continuación el consentimiento oral. [NOTA: El presente consentimiento les debe ser leído antes de recopilar cualquier información personal. El paciente debe decir 'sí, estoy de acuerdo'; un 'mmmm', 'sí', 'ok' o algo en un tono casual similar no será satisfactorio]."
 
-#: templates/initial_queries_macros.html:172
+#: templates/initial_queries_macros.html:198
 msgid "Please print and fill out the form"
 msgstr "Por favor imprima y llene el formulario"
 
-#: templates/initial_queries_macros.html:181
+#: templates/initial_queries_macros.html:207
 msgid "CLOSE"
 msgstr "CERRAR"
 
-#: templates/initial_queries_macros.html:188
+#: templates/initial_queries_macros.html:214
 msgid "View/print website declaration form"
 msgstr "Ver/imprimir formulario de declaración del sitio web"
 
-#: templates/initial_queries_macros.html:204
+#: templates/initial_queries_macros.html:230
 msgid "By checking this box, I confirm that I have read the required information to the patient and provided the opportunity for the patient to ask questions. I have addressed the questions to the patient’s satisfaction and have created an electronic copy of this declaration and have stored this copy. The patient has provided oral consent to participate in the TrueNTH Global Registry on the terms set out above."
 msgstr "Al marcar esta casilla, confirmo que he leído la información solicitada al paciente y le ha dado a este la oportunidad de hacer preguntas. He hecho las preguntas a la entera satisfacción del paciente y he creado una copia electrónica de esta declaración y he almacenado dicha copia. El paciente ha otorgado oralmente su consentimiento para participar en el Registro global de TrueNTH en los términos que han sido descritos."
 
-#: templates/initial_queries_macros.html:205
+#: templates/initial_queries_macros.html:231
 msgid "By checking this box, I confirm that I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
 msgstr "Al marcar esta casilla, confirmo que he leído o repasado la información necesaria para el tema y he completado el consentimiento requerido para el uso de la herramienta del sitio web de TrueNTH y he creado una copia electrónica de esta declaración y he almacenado dicha copia."
 
-#: templates/initial_queries_macros.html:207
+#: templates/initial_queries_macros.html:233
 msgid "Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration.."
 msgstr "El sujeto ha dado su consentimiento previamente y usted ha previamente firmado y almacenado una copia electrónica de la declaración de consentimiento..."
 
-#: templates/initial_queries_macros.html:219
-#: templates/profile/profile_macros.html:179
+#: templates/initial_queries_macros.html:245
+#: templates/profile/profile_macros.html:178
 msgid "First name"
 msgstr "Nombre"
 
-#: templates/initial_queries_macros.html:226
-#: templates/profile/profile_macros.html:187
+#: templates/initial_queries_macros.html:252
+#: templates/profile/profile_macros.html:186
 msgid "Last name"
 msgstr "Apellido"
 
-#: templates/initial_queries_macros.html:236
+#: templates/initial_queries_macros.html:262
 msgid "I'm a man who is concerned about prostate cancer for myself"
 msgstr ""
 
-#: templates/initial_queries_macros.html:241
+#: templates/initial_queries_macros.html:267
 msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
 msgstr ""
 
-#: templates/initial_queries_macros.html:253
+#: templates/initial_queries_macros.html:279
 msgid "(optional)"
 msgstr "(opcional)"
 
-#: templates/initial_queries_macros.html:256
+#: templates/initial_queries_macros.html:282
 msgid "Birth date"
 msgstr "Fecha de nacimiento"
 
-#: templates/initial_queries_macros.html:256
+#: templates/initial_queries_macros.html:282
 msgid "The birth day field is required and must be valid format"
 msgstr "Se requiere llenar el campo de día de nacimiento y debe estar en formato válido"
 
-#: templates/initial_queries_macros.html:259
+#: templates/initial_queries_macros.html:285
 msgid "Birth month"
 msgstr "Mes de nacimiento"
 
-#: templates/initial_queries_macros.html:259
+#: templates/initial_queries_macros.html:285
 msgid "A birth month must be selected"
 msgstr "Se debe seleccionar un mes de nacimiento"
 
-#: templates/initial_queries_macros.html:276
+#: templates/initial_queries_macros.html:302
 msgid "The birth year is required and must be in valid format"
 msgstr "Se requiere año de nacimiento y debe estar en formato válido"
 
-#: templates/initial_queries_macros.html:287
-#: templates/profile/profile_macros.html:877
+#: templates/initial_queries_macros.html:313
+#: templates/profile/profile_macros.html:1086
 msgid "Have you had a prostate cancer biopsy?"
 msgstr "¿Le han hecho una biopsia de cáncer de próstata?"
 
-#: templates/initial_queries_macros.html:295
+#: templates/initial_queries_macros.html:321
 msgid "Biopsy Date"
 msgstr "Fecha de la biopsia"
 
-#: templates/initial_queries_macros.html:299
+#: templates/initial_queries_macros.html:325
 msgid "The biopsy day field is required and must be valid format"
 msgstr "Se requiere campo del día de la biopsia y debe estar en formato válido"
 
-#: templates/initial_queries_macros.html:302
+#: templates/initial_queries_macros.html:328
 msgid "A biopsy month must be selected"
 msgstr "Se debe seleccionar un mes de biopsia"
 
-#: templates/initial_queries_macros.html:319
+#: templates/initial_queries_macros.html:345
 msgid "The biopsy year is required and must be in valid format"
 msgstr "Se requiere el año de la biopsia y debe estar en formato válido"
 
-#: templates/initial_queries_macros.html:332
-#: templates/initial_queries_macros.html:352
-#: templates/initial_queries_macros.html:373
+#: templates/initial_queries_macros.html:358
+#: templates/initial_queries_macros.html:378
+#: templates/initial_queries_macros.html:399
 msgid "I don't know"
 msgstr "No sé"
 
-#: templates/initial_queries_macros.html:338
-#: templates/profile/profile_macros.html:878
+#: templates/initial_queries_macros.html:364
+#: templates/profile/profile_macros.html:1087
 msgid "Have you been diagnosed with prostate cancer?"
 msgstr "¿Ha sido diagnosticado con cáncer de próstata?"
 
-#: templates/initial_queries_macros.html:342
+#: templates/initial_queries_macros.html:368
 msgid "Yes (my biopsy was positive)"
 msgstr "Sí (mi biopsia resultó positiva)"
 
-#: templates/initial_queries_macros.html:347
+#: templates/initial_queries_macros.html:373
 msgid "No (my biopsy was negative)"
 msgstr "No (mi biopsia resultó negativa)"
 
-#: templates/initial_queries_macros.html:359
-#: templates/profile/profile_macros.html:879
+#: templates/initial_queries_macros.html:385
+#: templates/profile/profile_macros.html:1088
 msgid "Is the prostate cancer only within the prostate?"
 msgstr "¿Está el cáncer de próstata solo dentro de la próstata?"
 
-#: templates/initial_queries_macros.html:368
+#: templates/initial_queries_macros.html:394
 msgid "No (the cancer is in other parts of my body, too)"
 msgstr ""
 
-#: templates/initial_queries_macros.html:380
+#: templates/initial_queries_macros.html:406
 msgid "Have you begun prostate cancer treatment?"
 msgstr ""
 
-#: templates/initial_queries_macros.html:407
+#: templates/initial_queries_macros.html:433
 msgid "I'm not receiving care at any of the above clinics"
 msgstr "No estoy recibiendo atención en ninguna de las clínicas anteriores"
 
@@ -2523,8 +2651,8 @@ msgstr "Invitación para probar TrueNTH"
 msgid "Body"
 msgstr "Cuerpo"
 
-#: templates/invite.html:17 AppText:profileSendEmail option invite
-#: email_subject
+#: templates/invite.html:17 AppText:profileSendEmail invite email_subject
+#: option
 msgid "TrueNTH Invitation"
 msgstr "Invitación de TrueNTH"
 
@@ -2543,6 +2671,37 @@ msgstr "Para"
 #: templates/invite_sent.html:14
 msgid "Sent"
 msgstr "Enviado"
+
+#: templates/longitudinalReport.html:9
+#, python-format
+msgid "%(organization)s EMPRO Assessment Report Detail"
+msgstr ""
+
+#: templates/longitudinalReport.html:11
+#, python-format
+msgid "%(organization)s Assessment Report Detail"
+msgstr ""
+
+#: templates/longitudinalReport.html:13
+#, python-format
+msgid "Patient #%(id)d - %(first_name)s %(last_name)s"
+msgstr ""
+
+#: templates/longitudinalReport.html:17 templates/sessionReport.html:13
+msgid "Back to Profile"
+msgstr "Regresar al perfil"
+
+#: templates/longitudinalReport.html:20 templates/sessionReport.html:16
+msgid "Back to User Profile"
+msgstr "Regresar al perfil de usuario"
+
+#: templates/longitudinalReport.html:22 templates/sessionReport.html:18
+msgid "Back to Patient Profile"
+msgstr "Regresar a Perfil del paciente"
+
+#: templates/longitudinalReport.html:25 templates/sessionReport.html:21
+msgid "Back to Truenth Home"
+msgstr "Regresar a página de inicio de Truenth"
 
 #: templates/portal_footer.html:36
 msgid "Tools"
@@ -2572,52 +2731,56 @@ msgstr "Política de privacidad"
 msgid "dismiss"
 msgstr "descartar"
 
-#: templates/portal_wrapper.html:55 templates/portal_wrapper.html:115
+#: templates/portal_wrapper.html:55 templates/portal_wrapper.html:118
 msgid "TrueNTH logo"
 msgstr "logotipo TrueNTH"
 
-#: templates/portal_wrapper.html:58 templates/portal_wrapper.html:118
+#: templates/portal_wrapper.html:58 templates/portal_wrapper.html:121
 msgid "brand logo"
 msgstr "logotipo de la marca"
 
-#: Intervention:analytics templates/portal_wrapper.html:137
+#: Intervention:analytics templates/portal_wrapper.html:140
 #: templates/portal_wrapper.html:84
 msgid "Analytics"
 msgstr "Análisis"
 
-#: templates/portal_wrapper.html:92 templates/portal_wrapper.html:145
+#: templates/portal_wrapper.html:93 templates/portal_wrapper.html:149
+msgid "EMPRO Resources"
+msgstr ""
+
+#: templates/portal_wrapper.html:95 templates/portal_wrapper.html:151
 msgid "Log Out of TrueNTH"
 msgstr "Cerrar sesión de TruNTH"
 
-#: templates/portal_wrapper.html:96 templates/portal_wrapper.html:113
+#: templates/portal_wrapper.html:99 templates/portal_wrapper.html:116
 msgid "MENU"
 msgstr "MENÚ"
 
-#: templates/portal_wrapper.html:97 templates/portal_wrapper.html:113
+#: templates/portal_wrapper.html:100 templates/portal_wrapper.html:116
 msgid "Profile image"
 msgstr "Imagen del perfil"
 
-#: templates/portal_wrapper.html:99 templates/portal_wrapper.html:104
+#: templates/portal_wrapper.html:102 templates/portal_wrapper.html:107
 msgid "Welcome"
 msgstr "Bienvenido"
 
-#: templates/portal_wrapper.html:103 templates/portal_wrapper.html:124
+#: templates/portal_wrapper.html:106 templates/portal_wrapper.html:127
 msgid "Log In to TrueNTH"
 msgstr "Iniciar sesión de TrueNTH"
 
-#: templates/portal_wrapper.html:114
+#: templates/portal_wrapper.html:117
 msgid "Return to TrueNTH home"
 msgstr "Regresar a la página de inicio de TrueNTH"
 
-#: templates/portal_wrapper.html:163
+#: templates/portal_wrapper.html:169
 msgid "Your session is about to expire"
 msgstr "Su sesión está a punto de caducar"
 
-#: templates/portal_wrapper.html:165
+#: templates/portal_wrapper.html:171
 msgid "Your session will expire in approximately {time} seconds due to inactivity."
 msgstr "Su sesión expirará en aproximadamente {time} segundos por inactividad."
 
-#: templates/portal_wrapper.html:166
+#: templates/portal_wrapper.html:172
 msgid "Stay Logged In"
 msgstr "Permanecer conectado"
 
@@ -2650,25 +2813,9 @@ msgstr ""
 msgid "Assessment Report Detail"
 msgstr "Detalle del informe de la evaluación"
 
-#: Role:patient templates/sessionReport.html:9
+#: templates/sessionReport.html:9 Role:patient
 msgid "Patient"
 msgstr "Paciente"
-
-#: templates/sessionReport.html:13
-msgid "Back to Profile"
-msgstr "Regresar al perfil"
-
-#: templates/sessionReport.html:16
-msgid "Back to Patient Profile"
-msgstr "Regresar a Perfil del paciente"
-
-#: templates/sessionReport.html:18
-msgid "Back to User Profile"
-msgstr "Regresar al perfil de usuario"
-
-#: templates/sessionReport.html:21
-msgid "Back to Truenth Home"
-msgstr "Regresar a página de inicio de Truenth"
 
 #: templates/shortcut_alias.html:8
 msgid "Do you have an Access Code?"
@@ -2696,12 +2843,15 @@ msgstr ""
 msgid "Site"
 msgstr "Sitio"
 
-#: templates/admin/patients_by_org.html:56 templates/site_overdue_table.html:6
+#: templates/admin/patients_by_org.html:59
+#: templates/admin/patients_substudy.html:58
+#: templates/site_overdue_table.html:6
 msgid "TrueNTH ID"
 msgstr "ID TrueNTH"
 
-#: templates/admin/patients_by_org.html:67
-#: templates/profile/profile_macros.html:1027
+#: templates/admin/patients_by_org.html:70
+#: templates/admin/patients_substudy.html:67
+#: templates/profile/profile_macros.html:1236
 #: templates/site_overdue_table.html:7
 msgid "Study ID"
 msgstr "ID de Estudio"
@@ -2711,7 +2861,7 @@ msgid "Visit Name"
 msgstr ""
 
 #: templates/site_overdue_table.html:9
-msgid "Due Date"
+msgid "Available From"
 msgstr ""
 
 #: templates/site_overdue_table.html:10
@@ -2734,7 +2884,7 @@ msgstr "Seleccione un usuario para ver detalles o hacer cambios."
 msgid "AdminList_"
 msgstr "AdminList_"
 
-#: templates/admin/admin.html:41 templates/admin/staff_by_org.html:40
+#: templates/admin/admin.html:41 templates/admin/staff_by_org.html:39
 msgid "ID"
 msgstr "ID"
 
@@ -2746,12 +2896,12 @@ msgstr "Papeles"
 msgid "Sites"
 msgstr "Sitios"
 
-#: templates/admin/admin.html:47 templates/admin/staff_by_org.html:46
+#: templates/admin/admin.html:47 templates/admin/staff_by_org.html:44
 msgid "Deactivate Account"
 msgstr "Desactivar cuenta"
 
-#: templates/admin/admin.html:48 templates/admin/patients_by_org.html:76
-#: templates/admin/staff_by_org.html:47
+#: templates/admin/admin.html:48 templates/admin/patients_by_org.html:79
+#: templates/admin/staff_by_org.html:45
 msgid "activation status"
 msgstr "estado de activación"
 
@@ -2775,7 +2925,7 @@ msgstr "Filtro del sitio aplicado"
 msgid "View deactivated accounts"
 msgstr "Ver cuentas desactivadas"
 
-#: templates/admin/admin_base.html:41 templates/admin/patients_by_org.html:74
+#: templates/admin/admin_base.html:41 templates/admin/patients_by_org.html:77
 msgid "Deactivate"
 msgstr "Desactivar"
 
@@ -2791,137 +2941,179 @@ msgstr "Reactivar cuenta"
 msgid "include test accounts"
 msgstr "Incluir cuentas de prueba"
 
-#: templates/admin/patients_by_org.html:6
+#: templates/admin/admin_base.html:58
+msgid "IRONMAN"
+msgstr "IRONMAN"
+
+#: templates/admin/admin_base.html:62
+msgid "EMPRO"
+msgstr ""
+
+#: templates/admin/admin_base.html:66
+msgid "Export adherence report"
+msgstr ""
+
+#: templates/admin/admin_base.html:70
+msgid "CSV"
+msgstr "CSV"
+
+#: templates/admin/admin_base.html:70
+msgid "JSON"
+msgstr "JSON"
+
+#: templates/admin/admin_base.html:74
+msgid "Export request submitted"
+msgstr "Solicitud de exportación enviada"
+
+#: templates/admin/admin_base.html:75
+msgid "Note: due to the size of result data, this may take a while."
+msgstr "Nota: Debido al tamaño de los datos de resultados, puede tomar unos minutos."
+
+#: templates/admin/admin_base.html:83
+msgid "Retry"
+msgstr "Reintentar"
+
+#: templates/admin/patients_by_org.html:7
 msgid "Patient List"
 msgstr "Lista de pacientes"
 
-#: templates/admin/patients_by_org.html:9
+#: templates/admin/patients_by_org.html:12
+#: templates/admin/patients_substudy.html:15
 msgid "Create a patient record"
 msgstr "Crear un registro del paciente"
 
-#: templates/admin/patients_by_org.html:12
+#: templates/admin/patients_by_org.html:15
 msgid "Select a patient below to view or update details."
 msgstr "Seleccione un paciente a continuación para ver o actualizar datos."
 
-#: templates/admin/patients_by_org.html:15
+#: templates/admin/patients_by_org.html:18
+#: templates/admin/patients_substudy.html:24
 msgid "PatientList_"
 msgstr ""
 
-#: templates/admin/patients_by_org.html:23
+#: templates/admin/patients_by_org.html:26
+#: templates/admin/patients_substudy.html:31
 msgid "Refresh Patient List"
 msgstr "Actualizar lista de pacientes"
 
-#: templates/admin/patients_by_org.html:24
+#: templates/admin/patients_by_org.html:27
+#: templates/admin/patients_substudy.html:32
 #, python-format
 msgid "Last updated %(minutes)d minutes ago"
 msgstr "Última actualización hace %(minutes)d minutos"
 
-#: templates/admin/patients_by_org.html:57
+#: templates/admin/patients_by_org.html:60
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: templates/admin/patients_by_org.html:60
-#: templates/profile/profile_macros.html:49
+#: templates/admin/patients_by_org.html:63
+#: templates/admin/patients_substudy.html:62
+#: templates/profile/profile_macros.html:48
 msgid "Date of Birth"
 msgstr "Fecha de nacimiento"
 
-#: templates/admin/patients_by_org.html:64
+#: templates/admin/patients_by_org.html:67
 msgid "Questionnaire Status"
 msgstr "Estado del cuestionario"
 
-#: templates/admin/patients_by_org.html:65
-#: templates/profile/profile_macros.html:850
+#: templates/admin/patients_by_org.html:68
+#: templates/admin/patients_substudy.html:65
+#: templates/profile/profile_macros.html:1021
 msgid "Visit"
 msgstr "Visita"
 
-#: templates/admin/patients_by_org.html:68
+#: templates/admin/patients_by_org.html:71
+#: templates/admin/patients_substudy.html:68
 msgid "(GMT)"
 msgstr "(GMT)"
 
-#: templates/admin/patients_by_org.html:69 templates/admin/staff_by_org.html:44
+#: templates/admin/patients_by_org.html:72
+#: templates/admin/patients_substudy.html:69
+#: templates/admin/staff_by_org.html:43
 msgid "Site(s)"
 msgstr "Sitio(s)"
 
-#: templates/admin/patients_by_org.html:71
-#: templates/profile/profile_macros.html:1149
+#: templates/admin/patients_by_org.html:74
+#: templates/profile/profile_macros.html:1358
 msgid "Interventions"
 msgstr "Intervenciones"
 
-#: templates/admin/patients_by_org.html:93
+#: templates/admin/patients_by_org.html:96
 msgid "ST"
 msgstr "ST"
 
-#: templates/admin/patients_by_org.html:93
+#: templates/admin/patients_by_org.html:96
 msgid "DS"
 msgstr "DS"
 
-#: templates/admin/patients_by_org.html:126
+#: templates/admin/patients_by_org.html:131
 msgid "Patient Report"
 msgstr ""
 
-#: templates/admin/patients_by_org.html:135
+#: templates/admin/patients_by_org.html:140
 msgid "Type"
 msgstr "Tipo"
 
-#: templates/admin/patients_by_org.html:135
+#: templates/admin/patients_by_org.html:140
 msgid "Report Name"
 msgstr "Nombre del informe"
 
-#: templates/admin/patients_by_org.html:135
+#: templates/admin/patients_by_org.html:140
 msgid "Generated (GMT)"
 msgstr "Generado (GMT)"
 
-#: templates/admin/patients_by_org.html:135
+#: templates/admin/patients_by_org.html:140
 msgid "Downloaded"
 msgstr "Descargado"
 
-#: templates/admin/patients_by_org.html:144
+#: templates/admin/patients_by_org.html:149
 msgid "View All"
 msgstr "Ver todo"
 
-#: templates/admin/patients_by_org.html:161
-msgid "Export report data"
-msgstr "Exportar datos del informe"
+#: templates/admin/patients_substudy.html:7
+msgid "EMPRO Patient List"
+msgstr ""
 
-#: templates/admin/patients_by_org.html:162
-msgid "CSV"
-msgstr "CSV"
+#: templates/admin/patients_substudy.html:8
+msgid "Select a patient below to view or update details"
+msgstr ""
 
-#: templates/admin/patients_by_org.html:162
-msgid "JSON"
-msgstr "JSON"
+#: templates/admin/patients_substudy.html:61
+msgid "Username (email)"
+msgstr ""
 
-#: templates/admin/patients_by_org.html:166
-msgid "Export request submitted"
-msgstr "Solicitud de exportación enviada"
+#: templates/admin/patients_substudy.html:63
+#: templates/profile/profile_macros.html:996
+msgid "Treating Clinician"
+msgstr ""
 
-#: templates/admin/patients_by_org.html:167
-msgid "Note: due to the size of result data, this may take a while."
-msgstr "Nota: Debido al tamaño de los datos de resultados, puede tomar unos minutos."
+#: templates/admin/patients_substudy.html:64
+msgid "EMPRO Questionnaire Status"
+msgstr ""
 
-#: templates/admin/patients_by_org.html:176
-msgid "Retry"
-msgstr "Reintentar"
+#: templates/admin/patients_substudy.html:66
+msgid "Clinician Action Status"
+msgstr ""
+
+#: templates/admin/patients_substudy.html:106
+msgid "Export EMPRO adherence report"
+msgstr ""
 
 #: templates/admin/staff_by_org.html:6
 msgid "Staff Administration"
 msgstr "Administración del personal"
 
-#: templates/admin/staff_by_org.html:9
+#: templates/admin/staff_by_org.html:8
 msgid "Create a staff record"
 msgstr "Crear un registro del personal"
 
-#: templates/admin/staff_by_org.html:11
+#: templates/admin/staff_by_org.html:10
 msgid "Select a user below to view or update details."
 msgstr "Seleccione un usuario más abajo para ver o actualizar datos."
 
-#: templates/admin/staff_by_org.html:15
+#: templates/admin/staff_by_org.html:14
 msgid "StaffList_"
 msgstr "ListaEmpleados_"
-
-#: templates/admin/staff_by_org.html:45 Role:staff_admin
-msgid "Staff Admin"
-msgstr "Administrador de personal"
 
 #: templates/flask_user/_macros.html:55
 msgid "Back to"
@@ -3159,20 +3351,16 @@ msgstr "Si usted no solicitó este cambio de contraseña, comuníquese con su re
 msgid "My Questionnaires"
 msgstr "Mis cuestionarios"
 
-#: templates/profile/my_profile.html:21
-msgid "My Reports"
-msgstr "Mis Informes"
-
-#: templates/profile/my_profile.html:32 templates/profile/my_profile.html:42
-#: templates/profile/my_profile.html:61
+#: templates/profile/my_profile.html:25 templates/profile/my_profile.html:35
+#: templates/profile/my_profile.html:54
 msgid "My Clinic"
 msgstr "Mi clínica"
 
-#: templates/profile/my_profile.html:51
+#: templates/profile/my_profile.html:44
 msgid "My Agreement"
 msgstr "Mi acuerdo"
 
-#: templates/profile/my_profile.html:76
+#: templates/profile/my_profile.html:69
 msgid "My Roles"
 msgstr "Mis roles"
 
@@ -3198,46 +3386,41 @@ msgid "This is intended for \"kiosk\" style administration of an assessment, whe
 msgstr "Esto está destinado a una administración estilo \"kiosco\" de una evaluación, en donde un miembro del personal \"inicia sesión como el paciente\", lo que desconecta a dicho miembro de su sesión, e inicia una sesión automáticamente para este paciente sin necesidad de introducir las credenciales de inicio de sesión. ¿Proceder?"
 
 #: templates/profile/patient_profile.html:44
-#: templates/profile/profile_macros.html:1134
+#: templates/profile/profile_macros.html:1343
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: templates/profile/patient_profile.html:58
+#: templates/profile/patient_profile.html:69
 #: templates/profile/staff_profile.html:16
 #: templates/profile/user_profile.html:24
 msgid "Clinic"
 msgstr "Clínica"
 
-#: templates/profile/patient_profile.html:66
+#: templates/profile/patient_profile.html:77
 #: templates/profile/user_profile.html:33
 msgid "Agreement to Share Clinical Information"
 msgstr "Acuerdo para compartir información clínica"
 
-#: templates/profile/patient_profile.html:66
-#: templates/profile/profile_macros.html:691
+#: templates/profile/patient_profile.html:77
+#: templates/profile/profile_macros.html:712
 #: templates/profile/user_profile.html:33
 msgid "Consent History"
 msgstr "Historial de consentimiento"
 
-#: templates/profile/patient_profile.html:77
+#: templates/profile/patient_profile.html:88
 #: templates/profile/user_profile.html:48
 msgid "PRO Questionnaires"
 msgstr "Cuestionarios PRO"
 
-#: templates/profile/patient_profile.html:88
-#: templates/profile/user_profile.html:62
-msgid "Patient Reports"
-msgstr "Informes de pacientes"
-
-#: templates/profile/patient_profile.html:101
-#: templates/profile/staff_profile.html:26
-#: templates/profile/user_profile.html:76
+#: templates/profile/patient_profile.html:105
+#: templates/profile/staff_profile.html:28
+#: templates/profile/user_profile.html:69
 msgid "User Roles"
 msgstr "Roles de usuario"
 
-#: templates/profile/patient_profile.html:111
-#: templates/profile/staff_profile.html:36
-#: templates/profile/user_profile.html:87
+#: templates/profile/patient_profile.html:115
+#: templates/profile/staff_profile.html:38
+#: templates/profile/user_profile.html:80
 msgid "Audit Log"
 msgstr "Bitácora de auditoría"
 
@@ -3254,7 +3437,7 @@ msgid "TrueNTH Profile"
 msgstr "Perfil de TrueNTH"
 
 #: templates/profile/profile_create_base.html:7
-#: templates/profile/profile_macros.html:532
+#: templates/profile/profile_macros.html:546
 msgid "Clinics"
 msgstr "Clínicas"
 
@@ -3262,269 +3445,283 @@ msgstr "Clínicas"
 msgid "Role"
 msgstr "Rol"
 
-#: templates/profile/profile_create_base.html:17
+#: templates/profile/profile_create_base.html:17 Role:staff
+msgid "Staff"
+msgstr "Personal"
+
+#: templates/profile/profile_create_base.html:18 Role:clinician
+msgid "Clinician"
+msgstr ""
+
+#: templates/profile/profile_create_base.html:19
 msgid "Admin staff"
 msgstr "Personal administrativo"
 
-#: templates/profile/profile_create_base.html:31
+#: templates/profile/profile_create_base.html:34
 msgid "New Patient"
 msgstr "Paciente nuevo"
 
-#: templates/profile/profile_macros.html:13
+#: templates/profile/profile_macros.html:12
 msgid "loading section data..."
 msgstr "cargando datos de la sección..."
 
-#: templates/profile/profile_macros.html:14
+#: templates/profile/profile_macros.html:13
 msgid "Edit"
 msgstr "EDITAR"
 
-#: templates/profile/profile_macros.html:14
+#: templates/profile/profile_macros.html:13
 msgid "Edit Button"
 msgstr "Botón de editar"
 
-#: templates/profile/profile_macros.html:26
+#: templates/profile/profile_macros.html:25
 msgid "Updated"
 msgstr "Actualizado"
 
-#: templates/profile/profile_macros.html:26
+#: templates/profile/profile_macros.html:25
 msgid "Unable to Update. System error."
 msgstr "Error No es posible Update.System."
 
-#: templates/profile/profile_macros.html:37
+#: templates/profile/profile_macros.html:36
 msgid "My Information"
 msgstr "Mi información"
 
-#: templates/profile/profile_macros.html:40
+#: templates/profile/profile_macros.html:39
 msgid "Patient Information"
 msgstr "Información del paciente"
 
-#: templates/profile/profile_macros.html:42
+#: templates/profile/profile_macros.html:41
 msgid "User Information"
 msgstr "Información de usuario"
 
-#: templates/profile/profile_macros.html:51
+#: templates/profile/profile_macros.html:50
 msgid "Study Id"
 msgstr "ID de Estudio"
 
-#: templates/profile/profile_macros.html:52
+#: templates/profile/profile_macros.html:51
 msgid "Site Id"
 msgstr "ID del sitio"
 
-#: templates/profile/profile_macros.html:53
-#: templates/profile/profile_macros.html:458
+#: templates/profile/profile_macros.html:52
+#: templates/profile/profile_macros.html:470
 msgid "Cell"
 msgstr "Celular"
 
-#: templates/profile/profile_macros.html:54
-#: templates/profile/profile_macros.html:468
+#: templates/profile/profile_macros.html:53
+#: templates/profile/profile_macros.html:480
 msgid "Phone (Other)"
 msgstr "Teléfono (otro)"
 
-#: templates/profile/profile_macros.html:78
+#: templates/profile/profile_macros.html:77
 msgid "My Detail"
 msgstr "Mi detalle"
 
-#: templates/profile/profile_macros.html:81
+#: templates/profile/profile_macros.html:80
 msgid "Patient Detail"
 msgstr "Detalle del paciente"
 
-#: templates/profile/profile_macros.html:83
+#: templates/profile/profile_macros.html:82
 msgid "User Detail"
 msgstr "Detalle del usuario"
 
-#: templates/profile/profile_macros.html:89
-#: templates/profile/profile_macros.html:198
+#: templates/profile/profile_macros.html:88
+#: templates/profile/profile_macros.html:197
 msgid "Gender"
 msgstr "Género"
 
-#: templates/profile/profile_macros.html:108
+#: templates/profile/profile_macros.html:107
 msgid "Locale / Time Zone"
 msgstr "Localidad/zona horaria"
 
-#: templates/profile/profile_macros.html:111
-#: templates/profile/profile_macros.html:161
+#: templates/profile/profile_macros.html:110
+#: templates/profile/profile_macros.html:160
 msgid "Language"
 msgstr "Idioma"
 
-#: templates/profile/profile_macros.html:112
+#: templates/profile/profile_macros.html:111
 msgid "Time Zone"
 msgstr "Zona horaria"
 
-#: templates/profile/profile_macros.html:127
-#: templates/profile/profile_macros.html:131
-#: templates/profile/profile_macros.html:149
+#: templates/profile/profile_macros.html:126
+#: templates/profile/profile_macros.html:130
+#: templates/profile/profile_macros.html:148
 msgid "Birth date must be valid and in the required format."
 msgstr "La fecha de nacimiento debe ser válida y en el formato requerido."
 
-#: templates/profile/profile_macros.html:131
+#: templates/profile/profile_macros.html:130
 msgid "Birth Month"
 msgstr "Mes de nacimiento"
 
-#: templates/profile/profile_macros.html:149
+#: templates/profile/profile_macros.html:148
 msgid "Birth Year"
 msgstr "Año de nacimiento"
 
-#: templates/profile/profile_macros.html:164
+#: templates/profile/profile_macros.html:163
 msgid "Default"
 msgstr "Default"
 
-#: templates/profile/profile_macros.html:179
+#: templates/profile/profile_macros.html:178
 msgid "First name is required and must not contain invalid characters."
 msgstr "Se requiere un nombre y no debe contener caracteres inválidos."
 
-#: templates/profile/profile_macros.html:187
+#: templates/profile/profile_macros.html:186
 msgid "Last name is required and must not contain invalid characters."
 msgstr "Se requiere un apellido y no debe contener caracteres inválidos."
 
-#: templates/profile/profile_macros.html:202
+#: templates/profile/profile_macros.html:201
 msgid "Male"
 msgstr "Masculino"
 
-#: templates/profile/profile_macros.html:206
+#: templates/profile/profile_macros.html:205
 msgid "Female"
 msgstr "Femenino"
 
-#: templates/profile/profile_macros.html:284
+#: templates/profile/profile_macros.html:283
 msgid "Registration Status:"
 msgstr "Estado del registro:"
 
-#: templates/profile/profile_macros.html:284
-#: templates/profile/profile_macros.html:293
+#: templates/profile/profile_macros.html:283
+#: templates/profile/profile_macros.html:292
 msgid "not registered"
 msgstr "no registrado"
 
-#: templates/profile/profile_macros.html:291
-#: templates/profile/profile_macros.html:344
+#: templates/profile/profile_macros.html:290
+#: templates/profile/profile_macros.html:345
 msgid "registered"
 msgstr "registrado"
 
-#: templates/profile/profile_macros.html:296
+#: templates/profile/profile_macros.html:295
 msgid "complete"
 msgstr "completo"
 
-#: templates/profile/profile_macros.html:297
+#: templates/profile/profile_macros.html:296
 msgid "incomplete"
 msgstr "incompleto"
 
-#: templates/profile/profile_macros.html:298
+#: templates/profile/profile_macros.html:297
 msgid "View reports"
 msgstr "Ver informes"
 
-#: templates/profile/profile_macros.html:301
+#: templates/profile/profile_macros.html:300
 msgid "Send email to patient"
 msgstr "Enviar correo electrónico a paciente"
 
-#: templates/profile/profile_macros.html:303
+#: templates/profile/profile_macros.html:302
 msgid "Select Email..."
 msgstr "Seleccione correo electrónico..."
 
-#: templates/profile/profile_macros.html:308
-#: templates/profile/profile_macros.html:351
-#: templates/profile/profile_macros.html:478
-#: templates/profile/profile_macros.html:1050
+#: templates/profile/profile_macros.html:307
+#: templates/profile/profile_macros.html:352
+#: templates/profile/profile_macros.html:490
+#: templates/profile/profile_macros.html:1259
 msgid "Send email"
 msgstr "Enviar correo electrónico"
 
-#: templates/profile/profile_macros.html:322
+#: templates/profile/profile_macros.html:321
 msgid "TrueNTH Invite"
 msgstr "Invitación de TrueNTH"
 
-#: templates/profile/profile_macros.html:324 AppText:profileSendEmail option
-#: reminder email_subject
+#: AppText:profileSendEmail option reminder email_subject
+#: templates/profile/profile_macros.html:323
 msgid "TrueNTH Reminder"
 msgstr "Recordatorio de TrueNTH"
 
-#: templates/profile/profile_macros.html:330
+#: templates/profile/profile_macros.html:325
+msgid "EMPRO Welcome"
+msgstr ""
+
+#: templates/profile/profile_macros.html:331
 msgid "P3P Assessment Status:"
 msgstr ""
 
-#: templates/profile/profile_macros.html:330
+#: templates/profile/profile_macros.html:331
 msgid "not available"
 msgstr "No disponible"
 
-#: templates/profile/profile_macros.html:331
+#: templates/profile/profile_macros.html:332
 msgid "Initial invite to complete P3P assessment"
 msgstr ""
 
-#: templates/profile/profile_macros.html:332
+#: templates/profile/profile_macros.html:333
 msgid "Reminder to complete P3P assessment"
 msgstr ""
 
-#: templates/profile/profile_macros.html:342
+#: templates/profile/profile_macros.html:343
 msgid "Registration status:"
 msgstr "Estado del registro:"
 
-#: templates/profile/profile_macros.html:346
+#: templates/profile/profile_macros.html:347
 msgid "not yet registered"
 msgstr "no se ha registrado aún"
 
-#: templates/profile/profile_macros.html:365
-#: templates/profile/profile_macros.html:402
+#: templates/profile/profile_macros.html:367
+#: templates/profile/profile_macros.html:377
+#: templates/profile/profile_macros.html:414
 msgid "Communications"
 msgstr "Comunicaciones"
 
-#: templates/profile/profile_macros.html:370
-msgid "Send reset password email to patient"
-msgstr "Enviar correo electrónico al paciente para restablecer contraseña"
-
-#: templates/profile/profile_macros.html:379
-msgid "Send invitation and reminder emails to patient"
-msgstr "Enviar correos electrónicos de invitación y recordatorio para el paciente"
-
-#: templates/profile/profile_macros.html:388
-#: templates/profile/profile_macros.html:414
+#: templates/profile/profile_macros.html:368
+#: templates/profile/profile_macros.html:399
+#: templates/profile/profile_macros.html:434
 msgid "Email audit log"
 msgstr "Bitácora de auditoría de correo electrónico"
 
-#: templates/profile/profile_macros.html:407
-msgid "Send registration email to user"
-msgstr "Enviar correo electrónico de registro al usuario"
+#: templates/profile/profile_macros.html:382
+msgid "Send reset password email to patient"
+msgstr "Enviar correo electrónico al paciente para restablecer contraseña"
 
-#: templates/profile/profile_macros.html:423
+#: templates/profile/profile_macros.html:391
+msgid "Send invitation and reminder emails to patient"
+msgstr "Enviar correos electrónicos de invitación y recordatorio para el paciente"
+
+#: templates/profile/profile_macros.html:419
 msgid "Send reset password email to staff"
 msgstr "Enviar correo electrónico al personal para restablecer contraseña"
 
-#: templates/profile/profile_macros.html:435
+#: templates/profile/profile_macros.html:425
+msgid "Send registration email to user"
+msgstr "Enviar correo electrónico de registro al usuario"
+
+#: templates/profile/profile_macros.html:447
 msgid "None available"
 msgstr "Ninguno disponible"
 
-#: templates/profile/profile_macros.html:443
+#: templates/profile/profile_macros.html:455
 msgid "Email Message Content"
 msgstr "Contenido del mensaje de correo electrónico"
 
-#: templates/profile/profile_macros.html:458
-#: templates/profile/profile_macros.html:468
-#: templates/profile/profile_macros.html:532
-#: templates/profile/profile_macros.html:1027
+#: templates/profile/profile_macros.html:470
+#: templates/profile/profile_macros.html:480
+#: templates/profile/profile_macros.html:546
+#: templates/profile/profile_macros.html:1236
 msgid "Optional"
 msgstr "Opcional"
 
-#: templates/profile/profile_macros.html:459
-#: templates/profile/profile_macros.html:469
+#: templates/profile/profile_macros.html:471
+#: templates/profile/profile_macros.html:481
 msgid "Phone number must be in numbers."
 msgstr "Número de teléfono debe ser en números."
 
-#: templates/profile/profile_macros.html:493
+#: templates/profile/profile_macros.html:507
 msgid "In what state is the patient currently receiving prostate cancer care?"
 msgstr ""
 
-#: templates/profile/profile_macros.html:495
+#: templates/profile/profile_macros.html:509
 msgid "In what state are you currently receiving prostate cancer care?"
 msgstr ""
 
-#: templates/profile/profile_macros.html:511
+#: templates/profile/profile_macros.html:525
 msgid "No clinic found in selected state."
 msgstr ""
 
-#: templates/profile/profile_macros.html:531
+#: templates/profile/profile_macros.html:545
 msgid "Main clinic for prostate cancer care"
 msgstr "Clínica principal de atención del cáncer de próstata"
 
-#: templates/profile/profile_macros.html:592
+#: templates/profile/profile_macros.html:606
 msgid "Consent to share information"
 msgstr "Consentimiento para compartir información"
 
-#: templates/profile/profile_macros.html:604
+#: templates/profile/profile_macros.html:618
 #, python-format
 msgid ""
 "\n"
@@ -3535,432 +3732,472 @@ msgstr ""
 "                                    Doy mi consentimiento para compartir información con <span class=\"consent-clinic-name\">%(org_shortname)s</span>.\n"
 "                                "
 
-#: templates/profile/profile_macros.html:652
+#: templates/profile/profile_macros.html:658
+msgid "Patient Reports"
+msgstr "Informes de pacientes"
+
+#: templates/profile/profile_macros.html:673
 msgid "No consent record found"
 msgstr "Ningún Registro de consentimiento encontrado"
 
-#: templates/profile/profile_macros.html:685
+#: templates/profile/profile_macros.html:706
 msgid "History"
 msgstr "Historial"
 
-#: templates/profile/profile_macros.html:706
+#: templates/profile/profile_macros.html:727
 msgid "Consent Status Editor"
 msgstr "Editor de estado de consentimiento"
 
-#: templates/profile/profile_macros.html:709
+#: templates/profile/profile_macros.html:730
 msgid "Modify the consent status for this user to"
 msgstr "Modificar el estado de consentimiento para este usuario"
 
-#: templates/profile/profile_macros.html:712
+#: templates/profile/profile_macros.html:733
 msgid "Consented / Enrolled"
 msgstr "Con consentimiento/inscrito"
 
-#: templates/profile/profile_macros.html:719
+#: templates/profile/profile_macros.html:740
 msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
 msgstr "Retirado: suspender levantamiento de datos y reportar datos históricos"
 
-#: templates/profile/profile_macros.html:720
+#: templates/profile/profile_macros.html:741
 msgid "Suspend Data Collection and Report Historic Data"
 msgstr "Suspender levantamiento de datos y reportar datos históricos"
 
-#: templates/profile/profile_macros.html:727
+#: templates/profile/profile_macros.html:748
 msgid "Purged / Removed"
 msgstr "Purgado/eliminado"
 
-#: templates/profile/profile_macros.html:744
+#: templates/profile/profile_macros.html:765
 msgid "Consent Date Editor"
 msgstr "Editor de fecha de consentimiento"
 
-#: templates/profile/profile_macros.html:747
+#: templates/profile/profile_macros.html:768
 msgid "Current consent date: "
 msgstr "Fecha de consentimiento actual: "
 
-#: templates/profile/profile_macros.html:749
+#: templates/profile/profile_macros.html:770
 msgid "Modify the consent date"
 msgstr "Modificar la fecha de consentimiento"
 
-#: templates/profile/profile_macros.html:749
+#: templates/profile/profile_macros.html:770
 msgid "GMT 24-hour format"
 msgstr "Formato de 24 horas GMT"
 
-#: templates/profile/profile_macros.html:749
+#: templates/profile/profile_macros.html:770
 msgid "for this agreement to:"
 msgstr "para este acuerdo:"
 
-#: templates/profile/profile_macros.html:788
-#: templates/profile/profile_macros.html:791
-#: templates/profile/profile_macros.html:808
-#: templates/profile/profile_macros.html:1099
-#: templates/profile/profile_macros.html:1102
-#: templates/profile/profile_macros.html:1119
-#: templates/profile/profile_macros.html:1202
-#: templates/profile/profile_macros.html:1205
-#: templates/profile/profile_macros.html:1222
+#: templates/profile/profile_macros.html:809
+#: templates/profile/profile_macros.html:812
+#: templates/profile/profile_macros.html:829
+#: templates/profile/profile_macros.html:1308
+#: templates/profile/profile_macros.html:1311
+#: templates/profile/profile_macros.html:1328
+#: templates/profile/profile_macros.html:1411
+#: templates/profile/profile_macros.html:1414
+#: templates/profile/profile_macros.html:1431
 msgid "Date must be valid and in the required format."
 msgstr "La fecha debe ser válida y en el formato requerido."
 
-#: templates/profile/profile_macros.html:827
+#: templates/profile/profile_macros.html:847
 msgid "for"
 msgstr "para"
 
-#: templates/profile/profile_macros.html:828
+#: templates/profile/profile_macros.html:849
 msgid "Editable by admins only."
 msgstr "Editable por los administradores solamente."
 
-#: templates/profile/profile_macros.html:849
+#: templates/profile/profile_macros.html:866
+msgid "IRONMAN EMPRO Longitudinal Report"
+msgstr ""
+
+#: templates/profile/profile_macros.html:867
+msgid "This report shows the patient's questionnaire responses over time and indicates their areas of distress. Please check for any actions required on your behalf."
+msgstr ""
+
+#: templates/profile/profile_macros.html:880
+msgid "EMPRO Intervention Report"
+msgstr ""
+
+#: templates/profile/profile_macros.html:885
+msgid "Actions Required (for Clinicians/Site Staff)"
+msgstr ""
+
+#: templates/profile/profile_macros.html:886
+msgid "EMPRO questionnaire completed on:"
+msgstr ""
+
+#: templates/profile/profile_macros.html:887
+msgid "ACTION REQUIRED for high distress areas:"
+msgstr ""
+
+#: templates/profile/profile_macros.html:902
+msgid "No high distress areas indicated"
+msgstr ""
+
+#: templates/profile/profile_macros.html:905
+msgid "View subject EMPRO report for more information"
+msgstr ""
+
+#: templates/profile/profile_macros.html:979
+msgid "Action status:"
+msgstr ""
+
+#: templates/profile/profile_macros.html:1020
 msgid "Session History"
 msgstr "Historial de la sesión"
 
-#: templates/profile/profile_macros.html:849
+#: templates/profile/profile_macros.html:1020
 msgid "click each row to review report"
 msgstr "Haga clic en cada hilera para revisar el informe"
 
-#: templates/profile/profile_macros.html:850
+#: templates/profile/profile_macros.html:1021
 msgid "Questionnaire Name"
 msgstr "Nombre del cuestionario"
 
-#: templates/profile/profile_macros.html:850
+#: templates/profile/profile_macros.html:1021
 msgid "Status"
 msgstr "Estado"
 
-#: templates/profile/profile_macros.html:850
+#: templates/profile/profile_macros.html:1021
 msgid "Last Updated"
 msgstr "Última actualización"
 
-#: templates/profile/profile_macros.html:850
+#: templates/profile/profile_macros.html:1021
 msgid "GMT, Y-M-D"
 msgstr "GMT, AA-MM-DD"
 
-#: templates/profile/profile_macros.html:872
+#: templates/profile/profile_macros.html:1081
 msgid "My Prostate Cancer Profile"
 msgstr "Mi perfil de cáncer de próstata"
 
-#: templates/profile/profile_macros.html:872
+#: templates/profile/profile_macros.html:1081
 msgid "Clinical Questions"
 msgstr "Preguntas clínicas"
 
-#: templates/profile/profile_macros.html:874
+#: templates/profile/profile_macros.html:1083
 msgid "Questions asked of the patient at registration"
 msgstr "Preguntas acerca del paciente al momento del registro"
 
-#: templates/profile/profile_macros.html:900
+#: templates/profile/profile_macros.html:1109
 msgid "Intervention Reports"
 msgstr "Informes de intervención"
 
-#: templates/profile/profile_macros.html:905
+#: templates/profile/profile_macros.html:1114
 msgid "No reports available."
 msgstr "No hay informes disponibles."
 
-#: templates/profile/profile_macros.html:919
+#: templates/profile/profile_macros.html:1128
 msgid "Africa/Johannesburg"
 msgstr "África/Johannesburgo"
 
-#: templates/profile/profile_macros.html:920
+#: templates/profile/profile_macros.html:1129
 msgid "America/Chicago"
 msgstr ""
 
-#: templates/profile/profile_macros.html:921
+#: templates/profile/profile_macros.html:1130
 msgid "America/Denver"
 msgstr "Estados Unidos/Denver"
 
-#: templates/profile/profile_macros.html:922
+#: templates/profile/profile_macros.html:1131
 msgid "America/Los Angeles"
 msgstr "Estados Unidos/Los Ángeles"
 
-#: templates/profile/profile_macros.html:923
+#: templates/profile/profile_macros.html:1132
 msgid "America/Indianapolis"
 msgstr "Estados Unidos/Indianápolis"
 
-#: templates/profile/profile_macros.html:924
+#: templates/profile/profile_macros.html:1133
 msgid "America/New York"
 msgstr "Estados Unidos/Nueva York"
 
-#: templates/profile/profile_macros.html:925
+#: templates/profile/profile_macros.html:1134
 msgid "America/Sao Paulo"
 msgstr "América/San Paulo"
 
-#: templates/profile/profile_macros.html:926
+#: templates/profile/profile_macros.html:1135
 msgid "Australia/Adelaide"
 msgstr "Australia/Adelaida"
 
-#: templates/profile/profile_macros.html:927
+#: templates/profile/profile_macros.html:1136
 msgid "Australia/Brisbane"
 msgstr "Australia/Brisbane"
 
-#: templates/profile/profile_macros.html:928
+#: templates/profile/profile_macros.html:1137
 msgid "Australia/Broken_Hill"
 msgstr "Australia/Broken_Hill"
 
-#: templates/profile/profile_macros.html:929
+#: templates/profile/profile_macros.html:1138
 msgid "Australia/Canberra"
 msgstr "Australia/Canberra"
 
-#: templates/profile/profile_macros.html:930
+#: templates/profile/profile_macros.html:1139
 msgid "Australia/Currie"
 msgstr "Australia/Currie"
 
-#: templates/profile/profile_macros.html:931
+#: templates/profile/profile_macros.html:1140
 msgid "Australia/Darwin"
 msgstr "Australia/Darwin"
 
-#: templates/profile/profile_macros.html:932
+#: templates/profile/profile_macros.html:1141
 msgid "Australia/Eucla"
 msgstr "Australia/Eucla"
 
-#: templates/profile/profile_macros.html:933
+#: templates/profile/profile_macros.html:1142
 msgid "Australia/Hobart"
 msgstr "Australia/Hobart"
 
-#: templates/profile/profile_macros.html:934
+#: templates/profile/profile_macros.html:1143
 msgid "Australia/Lindeman"
 msgstr "Australia/Lindeman"
 
-#: templates/profile/profile_macros.html:935
+#: templates/profile/profile_macros.html:1144
 msgid "Australia/Lord_Howe"
 msgstr "Australia/Lord_Howe"
 
-#: templates/profile/profile_macros.html:936
+#: templates/profile/profile_macros.html:1145
 msgid "Australia/Melbourne"
 msgstr "Australia/Melbourne"
 
-#: templates/profile/profile_macros.html:937
+#: templates/profile/profile_macros.html:1146
 msgid "Australia/North"
 msgstr "Australia/Norte"
 
-#: templates/profile/profile_macros.html:938
+#: templates/profile/profile_macros.html:1147
 msgid "Australia/Perth"
 msgstr "Australia/Perth"
 
-#: templates/profile/profile_macros.html:939
+#: templates/profile/profile_macros.html:1148
 msgid "Australia/Queensland"
 msgstr "Australia/Queensland"
 
-#: templates/profile/profile_macros.html:940
+#: templates/profile/profile_macros.html:1149
 msgid "Australia/South"
 msgstr "Australia/Meridional"
 
-#: templates/profile/profile_macros.html:941
+#: templates/profile/profile_macros.html:1150
 msgid "Australia/Sydney"
 msgstr "Australia/Sydney"
 
-#: templates/profile/profile_macros.html:942
+#: templates/profile/profile_macros.html:1151
 msgid "Australia/Tasmania"
 msgstr "Australia/Tasmania"
 
-#: templates/profile/profile_macros.html:943
+#: templates/profile/profile_macros.html:1152
 msgid "Australia/Victoria"
 msgstr "Australia/Victoria"
 
-#: templates/profile/profile_macros.html:944
+#: templates/profile/profile_macros.html:1153
 msgid "Australia/West"
 msgstr "Australia/Occidental"
 
-#: templates/profile/profile_macros.html:945
+#: templates/profile/profile_macros.html:1154
 msgid "Australia/Yancowinna"
 msgstr "Australia/Yancowinna"
 
-#: templates/profile/profile_macros.html:946
-#: templates/profile/profile_macros.html:949
+#: templates/profile/profile_macros.html:1155
+#: templates/profile/profile_macros.html:1158
 msgid "Europe/Andorra"
 msgstr "Europa/Andorra"
 
-#: templates/profile/profile_macros.html:947
+#: templates/profile/profile_macros.html:1156
 msgid "Europe/Vienna"
 msgstr ""
 
-#: templates/profile/profile_macros.html:948
+#: templates/profile/profile_macros.html:1157
 msgid "Europe/Brussels"
 msgstr ""
 
-#: templates/profile/profile_macros.html:950
+#: templates/profile/profile_macros.html:1159
 msgid "Europe/Stockholm"
 msgstr ""
 
-#: templates/profile/profile_macros.html:951
+#: templates/profile/profile_macros.html:1160
 msgid "Europe/Sofia"
 msgstr ""
 
-#: templates/profile/profile_macros.html:952
+#: templates/profile/profile_macros.html:1161
 msgid "Europe/Zurich"
 msgstr ""
 
-#: templates/profile/profile_macros.html:962
+#: templates/profile/profile_macros.html:1171
 msgid "Deceased Status"
 msgstr "Difunto"
 
-#: templates/profile/profile_macros.html:965
+#: templates/profile/profile_macros.html:1174
 msgid "Patient is deceased"
 msgstr "Paciente ha fallecido"
 
-#: templates/profile/profile_macros.html:971
+#: templates/profile/profile_macros.html:1180
 msgid "no data provided"
 msgstr "no se proporcionaron datos"
 
-#: templates/profile/profile_macros.html:975
+#: templates/profile/profile_macros.html:1184
 msgid "Has the patient passed away?"
 msgstr "¿El paciente falleció?"
 
-#: templates/profile/profile_macros.html:976
+#: templates/profile/profile_macros.html:1185
 #, python-format
 msgid "By checking this box, the patient's consent status will be updated to '%(new_consent_status)s'. Do you want to continue?"
 msgstr "Al marcar esta casilla, el estado de consentimiento del paciente se actualizar´a a '%(new_consent_status)s'. ¿Desea continuar?"
 
-#: templates/profile/profile_macros.html:976
+#: templates/profile/profile_macros.html:1185
 msgid "Withdrawn - Suspend Data Collection"
 msgstr "Retirado - Suspender la recopilación de datos"
 
-#: templates/profile/profile_macros.html:981
+#: templates/profile/profile_macros.html:1190
 msgid "Deceased Date"
 msgstr "Fecha de defunción"
 
-#: templates/profile/profile_macros.html:1036
+#: templates/profile/profile_macros.html:1245
 msgid "Site ID"
 msgstr "ID del sitio"
 
-#: templates/profile/profile_macros.html:1046
+#: templates/profile/profile_macros.html:1255
 msgid "Three ways to complete questionnaire"
 msgstr "Tres maneras de completar el cuestionario"
 
-#: templates/profile/profile_macros.html:1052
+#: templates/profile/profile_macros.html:1261
 msgid "Invite or remind patient over email to complete their questionnaire"
 msgstr "Invitar o recordarle al paciente por correo electrónico de completar su cuestionario"
 
-#: templates/profile/profile_macros.html:1056
-#: templates/profile/profile_macros.html:1058
+#: templates/profile/profile_macros.html:1265
+#: templates/profile/profile_macros.html:1267
 msgid "Log in as patient"
 msgstr "Iniciar sesión como paciente"
 
-#: templates/profile/profile_macros.html:1057
+#: templates/profile/profile_macros.html:1266
 msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr "Esto va a cerrar su sesión y va a iniciar la sesión del paciente sin necesidad de ingresar credenciales. Esto es para que el paciente pueda completar su cuestionario en este dispositivo. Ideal para tabletas y computadoras en \"kiosco\"."
 
-#: templates/profile/profile_macros.html:1061
-#: templates/profile/profile_macros.html:1065
+#: templates/profile/profile_macros.html:1270
+#: templates/profile/profile_macros.html:1274
 msgid "Enter manually"
 msgstr "Introducir manualmente"
 
-#: templates/profile/profile_macros.html:1063
+#: templates/profile/profile_macros.html:1272
 msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr "Introducir las respuestas del cuestionario en nombre del paciente. Útil si se han completado las respuestas en papel."
 
-#: templates/profile/profile_macros.html:1071
+#: templates/profile/profile_macros.html:1280
 msgid "Enter questionnaire manually on patient's behalf"
 msgstr "Escribir el cuestionario manualmente en nombre del paciente"
 
-#: templates/profile/profile_macros.html:1078
+#: templates/profile/profile_macros.html:1287
 msgid "Select the method in which the questionnaire will be completed:"
 msgstr "Seleccionar método con el que se completará el cuestionario:"
 
-#: templates/profile/profile_macros.html:1086
+#: templates/profile/profile_macros.html:1295
 msgid "Interview assisted"
 msgstr "Entrevista asistida"
 
-#: templates/profile/profile_macros.html:1091
+#: templates/profile/profile_macros.html:1300
 msgid "Paper"
 msgstr "papel"
 
-#: templates/profile/profile_macros.html:1096
+#: templates/profile/profile_macros.html:1305
 msgid "Questionnaire completion date"
 msgstr "Fecha de finalización del cuestionario."
 
-#: templates/profile/profile_macros.html:1099
+#: templates/profile/profile_macros.html:1308
 msgid "Completion Day"
 msgstr "Día de finalización"
 
-#: templates/profile/profile_macros.html:1119
+#: templates/profile/profile_macros.html:1328
 msgid "Completion Year"
 msgstr "Año de finalización"
 
-#: templates/profile/profile_macros.html:1151
+#: templates/profile/profile_macros.html:1360
 msgid "Patient is participating in the following intervention(s): "
 msgstr "El paciente participa en las siguientes intervenciones: "
 
-#: templates/profile/profile_macros.html:1155
-#: templates/profile/profile_macros.html:1157
+#: templates/profile/profile_macros.html:1364
+#: templates/profile/profile_macros.html:1366
 msgid "None"
 msgstr "Ninguno"
 
-#: templates/profile/profile_macros.html:1172
+#: templates/profile/profile_macros.html:1381
 msgid "My Treatments"
 msgstr "Mis tratamientos"
 
-#: templates/profile/profile_macros.html:1172
+#: templates/profile/profile_macros.html:1381
 msgid "Clinical Data"
 msgstr "Datos clínicos"
 
-#: templates/profile/profile_macros.html:1172
+#: templates/profile/profile_macros.html:1381
 msgid "(Optional)"
 msgstr "(Opcional)"
 
-#: templates/profile/profile_macros.html:1178
-#: templates/profile/profile_macros.html:1183
+#: templates/profile/profile_macros.html:1387
+#: templates/profile/profile_macros.html:1392
 msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
-#: templates/profile/profile_macros.html:1180
+#: templates/profile/profile_macros.html:1389
 msgid ""
 "Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
 "                            date, please make your best guess."
 msgstr ""
 
-#: templates/profile/profile_macros.html:1188
+#: templates/profile/profile_macros.html:1397
 msgid "Select an option"
 msgstr "Seleccione una opción"
 
-#: templates/profile/profile_macros.html:1199
+#: templates/profile/profile_macros.html:1408
 msgid "Date"
 msgstr "Fecha"
 
-#: templates/profile/profile_macros.html:1227
-#: templates/profile/profile_macros.html:1269
+#: templates/profile/profile_macros.html:1436
+#: templates/profile/profile_macros.html:1478
 msgid "Save"
 msgstr "Guardar"
 
-#: templates/profile/profile_macros.html:1227
+#: templates/profile/profile_macros.html:1436
 msgid "Add"
 msgstr "Agregar"
 
-#: templates/profile/profile_macros.html:1237
+#: templates/profile/profile_macros.html:1446
 msgid "My History"
 msgstr "Mi historial"
 
-#: templates/profile/profile_macros.html:1239
+#: templates/profile/profile_macros.html:1448
 msgid "Past"
 msgstr "Pasado"
 
-#: templates/profile/profile_macros.html:1239
+#: templates/profile/profile_macros.html:1448
 msgid "Management(s)"
 msgstr "Manejo(s)"
 
-#: templates/profile/profile_macros.html:1250
+#: templates/profile/profile_macros.html:1459
 msgid "Delete"
 msgstr "Eliminar"
 
-#: templates/profile/profile_macros.html:1253
+#: templates/profile/profile_macros.html:1462
 msgid "Are you sure you want to delete this treatment?"
 msgstr "¿Está seguro que quiere eliminar este tratamiento?"
 
-#: templates/profile/profile_macros.html:1266
+#: templates/profile/profile_macros.html:1475
 msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr "Ha actualizado su perfil. Haga clic en el botón Guardar para enviar los cambios."
 
-#: templates/profile/profile_macros.html:1266
+#: templates/profile/profile_macros.html:1475
 msgid "Or"
 msgstr "O"
 
-#: templates/profile/profile_macros.html:1266
+#: templates/profile/profile_macros.html:1475
 msgid "cancel"
 msgstr "cancelar"
 
-#: templates/profile/profile_macros.html:1267
+#: templates/profile/profile_macros.html:1476
 msgid "There is a problem with your profile. Please correct it before saving."
 msgstr "Hay un problema con su perfil. Por favor, corríjalo antes de guardarlo."
 
-#: templates/profile/profile_macros.html:1267
+#: templates/profile/profile_macros.html:1476
 msgid "Make sure all required fields are filled out and all entries are valid."
 msgstr "Asegúrese de que todos los campos requeridos hayan sido llenados y que todas las entradas sean válidas."
 
-#: templates/profile/profile_macros.html:1270
+#: templates/profile/profile_macros.html:1479
 msgid "Profile changes have been saved"
 msgstr "Se han guardado los cambios del perfil"
 
@@ -3978,7 +4215,11 @@ msgstr "Perfil de #%(user_id)s"
 msgid "New Staff"
 msgstr "Personal nuevo"
 
-#: views/assessment_engine.py:1620
+#: trigger_states/empro_messages.py:101
+msgid "View Participant Details"
+msgstr ""
+
+#: views/assessment_engine.py:1757
 msgid "All available questionnaires have been completed"
 msgstr "Se completaron todos los cuestionarios disponibles"
 
@@ -3992,19 +4233,23 @@ msgstr "Vemos que está teniendo problemas. Permítanos ayudarlo.               
 msgid "If the email address '%(email)s' is in the system, a reset password email will now have been sent to it. Please open that email and follow the instructions to reset your password."
 msgstr "Si la dirección de correo electrónico '%(email)s' está en el sistema, se habrá enviado a ella un correo electrónico de restablecimiento de contraseña. Abra ese correo electrónico y siga las instrucciones para restablecer su contraseña."
 
-#: views/portal.py:95
+#: views/patients.py:77
+msgid "status"
+msgstr ""
+
+#: views/portal.py:98
 msgid "This application requires Javascript enabled. Please check your browser settings."
 msgstr "Esta aplicación requiere Javascript activado. Por favor verifique la configuración de su navegador."
 
-#: views/portal.py:526
+#: views/portal.py:540
 msgid "Unable to match identity"
 msgstr "No se encontró ninguna identidad"
 
-#: views/portal.py:528
+#: views/portal.py:542
 msgid "User Not Found"
 msgstr "Usuario no encontrado"
 
-#: views/portal.py:1282
+#: views/portal.py:1292
 #, python-format
 msgid "I consent to sharing information with %(org_name)s"
 msgstr "Doy mi consentimiento para compartir información con %(org_name)s"
@@ -4025,7 +4270,7 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=d57adc33-738c-67bf-187d-a6a9c5af81c5&editorUrl=true"
 msgstr ""
 
-#: AppText:P3P Clinical Institution organization consent URL AppText:WiserCare
+#: AppText:WiserCare Clinical Institution organization consent URL AppText:P3P
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true"
 msgstr ""
 
@@ -4033,7 +4278,7 @@ msgstr ""
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true"
 msgstr ""
 
-#: AppText:Terms and Conditions URL AppText:patient terms conditions
+#: AppText:patient terms and conditions URL AppText:Terms Conditions
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=80f5cf6a-527f-b8c3-9593-fab69c678ca1&editorUrl=true"
 msgstr ""
 
@@ -4349,6 +4594,10 @@ msgstr ""
 msgid "Bay Area Urology"
 msgstr ""
 
+#: Organization:Western Michigan Urological Associates
+msgid "Western Michigan Urological Associates"
+msgstr ""
+
 #: QuestionnaireBank:symptom_tracker_recurring
 msgid "Symptom Tracker Recurring"
 msgstr ""
@@ -4397,9 +4646,9 @@ msgstr ""
 msgid "Researcher"
 msgstr "Investigador"
 
-#: Role:staff
-msgid "Staff"
-msgstr "Personal"
+#: Role:staff_admin
+msgid "Staff Admin"
+msgstr "Administrador de personal"
 
 #: Role:service
 msgid "Service"
@@ -4469,6 +4718,10 @@ msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true"
 
+#: AppText:IRONMAN EMPRO Study patient website consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=60c7a272-a79e-5795-06c3-5f55d358469b&editorUrl=true"
+msgstr ""
+
 #: AppText:IRONMAN staff privacy URL
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true"
@@ -4489,8 +4742,8 @@ msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=bd917d2f-1534-6c57-6e6d-d392fc64c81a&editorUrl=true"
 msgstr ""
 
-#: AppText:TrueNTH Global Registry patient terms and conditions URL
-#: AppText:Initial Consent Terms
+#: AppText:Initial Consent Terms URL AppText:TrueNTH Global Registry patient
+#: terms and conditions
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
 msgstr "nfig[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=958a83c7-3e3f-d147-ee38-2980dafb1396&editorUrl=true"
 
@@ -4546,29 +4799,53 @@ msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d6b8
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e6e21c27-6bc1-c0c5-de58-bcce0ba63f34"
 msgstr ""
 
+#: AppText:patient invite email IRONMAN EMPRO Study
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=01fbb874-b7cb-21b5-625c-8221e10cec6b"
+msgstr ""
+
 #: AppText:patient reminder email TrueNTH Global Registry
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea"
+msgstr ""
+
+#: AppText:empro patient thank you email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9bd6f29d-965d-7752-f4f4-d0d26c14b89f"
+msgstr ""
+
+#: AppText:empro patient both triggers email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76ae0f03-3018-52f3-34a1-f477bd5f8a1b"
+msgstr ""
+
+#: AppText:empro patient soft triggers email
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=dcd1f80b-6d6d-a649-75c6-5e042c8442fd"
+msgstr ""
+
+#: AppText:empro clinician trigger notification
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=faab8398-fa93-f1ca-9d81-3ddc38769d96"
+msgstr ""
+
+#: AppText:empro clinician trigger reminder
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=86b1c0ef-e3ee-e264-0190-71678d21b6a5"
 msgstr ""
 
 #: AppText:profileSendEmail invite email_body
 msgid "<p>(greeting),</p><p>This email was sent to you because you are a patient at (clinic name) and consented to participate in the Prostate Cancer Outcomes - (parent org) Registry Study.</p><p>This is an invitation to use the TrueNTH website, where you will report on your health. Your participation will help us collectively improve the care that men receive during their prostate cancer journey.</p><p>To complete your first questionnaire, please first verify your account.</p><div><a class=\"btn\" href=\"{0}\">Verify your account</a></div><p>You can also access the TrueNTH website with this link:<p/><p><a href=\"{0}\">{0}</a></p><p>Save this email so that you can return to TrueNTH any time.</p><p>If you have any queries, please contact your representative at (clinic name).</p>"
 msgstr "<p>(saludo),</p><p>Este correo le fue enviado porque usted es un paciente de (nombre de la clínica) y otorgó su consentimiento para participar en el Estudio de registros de Resultados del cáncer de próstata (parent org).</p><p>Esta es una invitación para utilizar el sitio web de TrueNTH, donde usted informará sobre su estado de salud. Su participación nos ayudará de manera colectiva a mejorar la atención que los hombres reciben durante su travesía de cáncer de próstata.</p><p>Para completar su primer cuestionario, por favor verifique su cuenta.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta</a></div><p>Usted también puede ingresar al sitio de TrueNTH a través del enlace siguiente:<p/><p><a href=\"{0}\">{0}</a></p><p>Guarde este correo para regresar a TrueNTH en el momento que quiera.</p><p>Si tiene alguna duda, por favor póngase en contacto con su representante en (nombre de la clínica).</p>"
 
-#: AppText:profileSendEmail reminder email_body
-msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
-msgstr "<p>Hola,</p><p>Este correo le fue enviado a usted por (nombre de la clínica). Aquí es donde reporta usted sobre su estado de salud a lo largo de su travesía de cáncer de próstata. La información recolectada se usará para determinar si puede haber mejoras en el cuidado del cáncer de próstata.</p><p>Ingrese ahora para completar su cuestionario.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta y responda al cuestionario ahora</a></div><p>Haga clic en el botón de arriba o utilice el enlace a continuación para visitar TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Si usted tiene alguna pregunta o dudas, por favor contacte a (nombre de la clínica).</p><p><em>—Este correo electrónico le fue enviado a usted porque otorgó su consentimiento para participar en el proyecto de registro de TrueNTH</em></p>"
-
 #: AppText:profileSendEmail reminder email_subject
 msgid "Report your health on TrueNTH. Email from (clinic name)"
 msgstr "Informe su estado de salud en TrueNTH Correo electrónico de (nombre de la clínica)"
 
-#: AppText:registration prompt
-msgid "Create a password"
-msgstr "Crear contraseña"
-
 #: AppText:site summary email IRONMAN
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
 msgstr "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04"
+
+#: AppText:profileSendEmail reminder email_body
+msgid "<p>Hello,</p><p>This email was sent to you by (clinic name). This is where you report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in Prostate Cancer Care can be made.</p><p>Login now to complete your questionnaire.</p><div><a class=\"btn\" href=\"{0}\">Verify your account and answer questionnaire now</a></div><p>Click the button above or use the link below to visit TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (clinic name).</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p>"
+msgstr "<p>Hola,</p><p>Este correo le fue enviado a usted por (nombre de la clínica). Aquí es donde reporta usted sobre su estado de salud a lo largo de su travesía de cáncer de próstata. La información recolectada se usará para determinar si puede haber mejoras en el cuidado del cáncer de próstata.</p><p>Ingrese ahora para completar su cuestionario.</p><div><a class=\"btn\" href=\"{0}\">Verifique su cuenta y responda al cuestionario ahora</a></div><p>Haga clic en el botón de arriba o utilice el enlace a continuación para visitar TrueNTH:</p><p><a href=\"{0}\">{0}</a></p><p>Si usted tiene alguna pregunta o dudas, por favor contacte a (nombre de la clínica).</p><p><em>—Este correo electrónico le fue enviado a usted porque otorgó su consentimiento para participar en el proyecto de registro de TrueNTH</em></p>"
+
+#: AppText:registration prompt
+msgid "Create a password"
+msgstr "Crear contraseña"
 
 #: AppText:site summary email TrueNTH Global Registry
 msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=d4bb3797-f5e3-eb48-87dc-e92c03a1a0f3"
@@ -4582,8 +4859,8 @@ msgstr "Herramienta de apoyo de decisión"
 msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
 msgstr "<p>Aprenda sobre los síntomas que son comunes en los hombres con cáncer de próstata y sobre las maneras de manejar y mejorar estos síntomas.</p>"
 
-#: Organization:Ottawa Hospital Cancer Centre
-msgid "Ottawa Hospital Cancer Centre"
+#: Organization:Centre Hospitalier de l'Université Montréal
+msgid "Centre Hospitalier de l'Université de Montréal"
 msgstr ""
 
 #: Organization:TrueNTH Global Registry
@@ -4635,10 +4912,6 @@ msgstr ""
 msgid "The Alfred"
 msgstr ""
 
-#: Organization:IRONMAN
-msgid "IRONMAN"
-msgstr "IRONMAN"
-
 #: Organization:Australia (Region/Country Site)
 msgid "Australia (Region/Country Site)"
 msgstr "Australia (Región/Sitio del país)"
@@ -4689,6 +4962,10 @@ msgstr ""
 
 #: Organization:St. Vincent's Hospital Sydney
 msgid "St. Vincent's Hospital Sydney"
+msgstr ""
+
+#: Organization:Peter MacCallum Cancer Centre
+msgid "Peter MacCallum Cancer Centre"
 msgstr ""
 
 #: Organization:USA (Region/Country Site)
@@ -4808,6 +5085,10 @@ msgstr ""
 msgid "Kishwaukee Cancer Center"
 msgstr ""
 
+#: Organization:University of Florida
+msgid "University of Florida"
+msgstr ""
+
 #: Organization:Canada (Region/Country Site)
 msgid "Canada (Region/Country Site)"
 msgstr ""
@@ -4820,36 +5101,36 @@ msgstr ""
 msgid "CHU de Quebec - Universite Laval"
 msgstr ""
 
-#: Organization:Centre Hospitalier de l'Université Montréal
-msgid "Centre Hospitalier de l'Université de Montréal"
-msgstr ""
-
 #: Organization:Juravinski Cancer Centre
 msgid "Juravinski Cancer Centre"
+msgstr ""
+
+#: Organization:Ottawa Hospital Cancer Centre
+msgid "Ottawa Hospital Cancer Centre"
 msgstr ""
 
 #: Organization:Cross Cancer Institute (Alberta Health Services)
 msgid "Cross Cancer Institute (Alberta Health Services)"
 msgstr ""
 
+#: Organization:Princess Margaret Cancer Center
+msgid "Princess Margaret Cancer Center"
+msgstr ""
+
 #: Organization:Winship Cancer Institute Emory University
 msgid "Winship Cancer Institute Emory University"
+msgstr ""
+
+#: Organization:Memphis VA Medical Center
+msgid "Memphis VA Medical Center"
 msgstr ""
 
 #: Organization:Sweden (Region/Country Site)
 msgid "Sweden (Region/Country Site)"
 msgstr ""
 
-#: Organization:Skane University Hospital
-msgid "Skane University Hospital"
-msgstr ""
-
 #: Organization:Örebro University Hospital
 msgid "Örebro University Hospital"
-msgstr ""
-
-#: Organization:Switzerland (Region/Country Site)
-msgid "Switzerland (Region/Country Site)"
 msgstr ""
 
 #: Organization:Kantonsspitals Chur
@@ -4858,6 +5139,10 @@ msgstr ""
 
 #: Organization:Universitätsspital Zürich
 msgid "Universitätsspital Zürich"
+msgstr ""
+
+#: Organization:Ente Ospedaliero Cantonale (EOC)
+msgid "Ente Ospedaliero Cantonale (EOC)"
 msgstr ""
 
 #: Organization:The Royal Marsden NHS Foundation Trust
@@ -4948,12 +5233,40 @@ msgstr ""
 msgid "St. Vincent's University Hospital"
 msgstr ""
 
-#: Organization:Test Site
-msgid "Test Site"
+#: Organization:Nigeria (Region/Country Site)
+msgid "Nigeria (Region/Country Site)"
+msgstr ""
+
+#: Organization:Lagos State University Teaching Hospital
+msgid "Lagos State University Teaching Hospital"
+msgstr ""
+
+#: Organization:University of Maiduguri Teaching Hospital
+msgid "University of Maiduguri Teaching Hospital"
+msgstr ""
+
+#: Organization:Test Site II
+msgid "Test Site II"
+msgstr ""
+
+#: Organization:NewYork-Presbyterian Brooklyn Methodist Hospital
+msgid "NewYork-Presbyterian Brooklyn Methodist Hospital"
+msgstr ""
+
+#: Organization:Skane University Hospital
+msgid "Skane University Hospital"
+msgstr ""
+
+#: Organization:Switzerland (Region/Country Site)
+msgid "Switzerland (Region/Country Site)"
 msgstr ""
 
 #: Organization:Kantonsspitals St. Gallen
 msgid "Kantonsspitals St. Gallen"
+msgstr ""
+
+#: Organization:Universitätsspital Basel
+msgid "Universitätsspital Basel"
 msgstr ""
 
 #: Organization:United Kingdom (Region/Country Site)
@@ -5044,8 +5357,16 @@ msgstr ""
 msgid "Sligo University Hospital"
 msgstr ""
 
-#: Organization:Test Site II
-msgid "Test Site II"
+#: Organization:University of Ilorin Teaching Hospital
+msgid "University of Ilorin Teaching Hospital"
+msgstr ""
+
+#: Organization:Federal Medical Centre Abeokuta
+msgid "Federal Medical Centre Abeokuta"
+msgstr ""
+
+#: Organization:Test Site
+msgid "Test Site"
 msgstr ""
 
 #: QuestionnaireBank:IRONMAN_recurring_3mo_pattern
@@ -5088,6 +5409,22 @@ msgstr "Patrón recurrente anual de Ironman V3"
 msgid "Ironman V5 Recurring Annual Pattern"
 msgstr ""
 
+#: QuestionnaireBank:ironman_ss_recurring_monthly_pattern
+msgid "Ironman Ss Recurring Monthly Pattern"
+msgstr ""
+
+#: QuestionnaireBank:ironman_ss_post_tx_recurring_monthly_pattern
+msgid "Ironman Ss Post Tx Recurring Monthly Pattern"
+msgstr ""
+
+#: QuestionnaireBank:ironman_ss_post_tx_baseline
+msgid "Ironman Ss Post Tx Baseline"
+msgstr ""
+
+#: QuestionnaireBank:ironman_ss_baseline
+msgid "Ironman Ss Baseline"
+msgstr ""
+
 #: QuestionnaireBank:IRONMAN_baseline
 msgid "Ironman Baseline"
 msgstr "Base de Ironman"
@@ -5114,6 +5451,14 @@ msgstr "Base de Ironman V3"
 
 #: QuestionnaireBank:IRONMAN_v5_indefinite
 msgid "Ironman V5 Indefinite"
+msgstr ""
+
+#: ResearchProtocol:EMPRO v1
+msgid "Empro V1"
+msgstr ""
+
+#: ResearchProtocol:EMPRO STAFF v1
+msgid "Empro Staff V1"
 msgstr ""
 
 #: ResearchProtocol:IRONMAN v5

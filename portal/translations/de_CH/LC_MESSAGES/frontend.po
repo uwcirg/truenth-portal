@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2020-08-03T21:28:10.475Z\n"
-"PO-Revision-Date: 2020-08-03T21:28:10.475Z\n"
+"POT-Creation-Date: 2021-02-12T03:16:58.685Z\n"
+"PO-Revision-Date: 2021-02-12T03:16:58.685Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,11 +21,11 @@ msgstr "Konto wurde erstellt.  Umleitung zum Profil ..."
 msgid "[Processing error] "
 msgstr "[Bearbeitungsfehler] "
 
-msgid "Email is already in use."
-msgstr "Diese E-Mail-Adresse wird bereits verwendet."
-
 msgid "An organization must be selected."
 msgstr "Eine Organisation muss ausgewählt werden."
+
+msgid "A role must be selected."
+msgstr ""
 
 msgid "no data returned"
 msgstr "keine Daten zurückerhalten"
@@ -115,6 +115,9 @@ msgid "Error occurred retrieving subject ID"
 msgstr ""
 
 msgid "Error occurred - unable to reach destination"
+msgstr ""
+
+msgid "{domain} Tips"
 msgstr ""
 
 msgid "Unable to set session variable for organization modal viewed."
@@ -414,6 +417,27 @@ msgstr "Ungültiger Feldwert."
 msgid "Validation error."
 msgstr "Validierungsfehler."
 
+msgid "No treating clinician available for this site"
+msgstr ""
+
+msgid "Assigned clinician is not from the site."
+msgstr ""
+
+msgid "You must select a clinician"
+msgstr ""
+
+msgid "Last EMPRO questionnaire {status} on:"
+msgstr ""
+
+msgid "View {title} Report"
+msgstr ""
+
+msgid "Last updated on {authoredDate} GMT"
+msgstr ""
+
+msgid "Error occurred submitting data, try again"
+msgstr ""
+
 msgid "Date (GMT), Y-M-D"
 msgstr "Datum (GMT/WEZ), J-M-T"
 
@@ -495,6 +519,9 @@ msgstr "Es wurden keine Fragebogendaten gefunden."
 msgid "Problem retrieving session data from server."
 msgstr "Es gab ein Problem beim Aufrufen der Session-Daten vom Server."
 
+msgid "EMPRO Questionnaire"
+msgstr ""
+
 msgid "Click to view report"
 msgstr "Hier klicken, um Bericht anzuzeigen"
 
@@ -530,6 +557,9 @@ msgstr "Datum/Uhrzeit <span class='gmt'>{GMT}</span>"
 
 msgid "Version"
 msgstr "Version"
+
+msgid "Not consented"
+msgstr ""
 
 msgid "View"
 msgstr "Ansicht"
@@ -671,6 +701,12 @@ msgstr "Keine Daten gefunden"
 
 msgid "Server error occurred retrieving organization/clinic information."
 msgstr "Beim Abrufen der Organisations-/Klinikdaten ist ein Serverfehler aufgetreten."
+
+msgid "Organization id is required."
+msgstr "Die Organisations-Kennung ist erforderlich."
+
+msgid "Server error occurred retrieving clinicians."
+msgstr ""
 
 msgid "Server error occurred retrieving consent information."
 msgstr "Beim Abrufen der Einwilligungsinformationen ist ein Serverfehler aufgetreten."
@@ -849,6 +885,9 @@ msgstr "Frage"
 msgid "Response"
 msgstr "Antwort"
 
+msgid "Questions"
+msgstr ""
+
 msgid "Server Error occurred retrieving report data"
 msgstr "Beim Aufrufen von Berichtsdaten ist ein Serverfehler aufgetreten"
 
@@ -858,11 +897,29 @@ msgstr "Keine Daten vom Server zurückerhalten"
 msgid "Unable to load report data"
 msgstr "Berichtsdaten können nicht geladen werden"
 
+msgid "Clinician use only"
+msgstr ""
+
+msgid "Support needed"
+msgstr ""
+
+msgid "Action required"
+msgstr ""
+
+msgid "In-progress"
+msgstr ""
+
 msgid "Export questionnaire data"
 msgstr "Fragebogendaten exportieren"
 
 msgid "Export"
 msgstr "Exportieren"
+
+msgid "IRONMAN"
+msgstr "IRONMAN"
+
+msgid "EMPRO"
+msgstr ""
 
 msgid "Data type:"
 msgstr "Datentyp:"
@@ -880,4 +937,7 @@ msgid "Export request submitted"
 msgstr "Exportanfrage übermittelt"
 
 msgid "Request to export data failed."
+msgstr ""
+
+msgid "IRONMAN EMPRO study"
 msgstr ""
