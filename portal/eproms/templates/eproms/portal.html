@@ -1,15 +1,6 @@
 {% extends "eproms/base.html" %}
 {%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
-{#
-{%- if not user.is_registered()) -%}
-    <div class="portal-item">
-        <h2 class="tnth-subhead">{{ _("Explore TrueNTH") }}</h2>
-        <p>{{ _("Discover online tools to guide you through the cancer journey.") }}</p>
-        <a class="btn-lg btn-tnth-primary" href="{{url_for('portal.explore')}}">{{ _("Learn More") }}</a>
-    </div>
-{%- endif -%}
-#}
 {%- if config.get("SHOW_WELCOME") and user.has_role(ROLE.WRITE_ONLY.value) -%}
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Welcome to TrueNTH") }}</h2>
@@ -23,13 +14,7 @@
         {%- if display.access -%}
             <div class="portal-item">
                 {%- if intervention.name == "assessment_engine" %}
-                    {%- if display.card_html -%}
-                        {{ display.card_html | safe }}
-                        <input type="hidden" class="link-label" value="{{display.link_label}}" />
-                        <input type="hidden" class="link-url" value="{{display.link_url}}" />
-                    {%- else -%}
-                        {{render_card_content(intervention, display, class='portal-description-incomplete portal-no-description-container')}}
-                    {%- endif %}
+                    {{ assessment_engine_view(user) | safe }}
                 {%- else -%}
                     {% call render_card_content(intervention, display) %}
                         <div class="portal-description-body">
@@ -47,7 +32,7 @@
 </div>
 {% endblock %}
 {% block footer %}{{footer(False, True, user)}}{% endblock %}
-{% block additional_scripts %}<script src="{{ url_for('.static', filename='js/portal.js') }}"></script>{% endblock %}
+{% block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/portal.bundle.js') }}"></script>{% endblock %}
 {% macro render_card_content(intervention, display, class='') -%}
     <div class="portal-description {{class}}">
         {%- if intervention.description -%}<h2 class="tnth-subhead title">{{ intervention.description }}</h2>{% endif %}

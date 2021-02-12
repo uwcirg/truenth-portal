@@ -62,7 +62,7 @@
                 <div class="tnth-btn-group">
                     {% if user %}
                         {% if enable_links %}
-                        <ul class="tnth-dropdown-menu" style="list-style-type:none">
+                        <ul class="tnth-dropdown-menu nav-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
                             <li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>
@@ -71,7 +71,7 @@
                             {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}
                             <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                             {% endif %}
-                            {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
+                            {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
                             <li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>
                             {% endif %}
                             {% if user and user.has_role(ROLE.STAFF_ADMIN.value) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
@@ -88,6 +88,9 @@
                             {% endif %}
                             {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                             <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
+                            {% endif %}
+                            {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
+                                <li class="eproms-substudy empro-resources"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPRO Resources") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>
                         </ul>
@@ -120,13 +123,13 @@
             </div>
             {% if enable_links %}
             <div id="tnthNavbarXs">
-                <ul class="tnth-navbar-xs" style="list-style-type:none">
+                <ul class="tnth-navbar-xs nav-menu" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                     {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
-                    {% if user and user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
+                    {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF_ADMIN.value) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.ADMIN.value) %}
                     <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
@@ -141,6 +144,9 @@
                     {% endif %}
                     {% if user and user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                         <li class="resources-menu-item"><a href="{{PORTAL}}/resources">{{ _("Resources") }}</a></li>
+                    {% endif %}
+                    {% if user and user.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
+                        <li class="eproms-substudy empro-resources"><a href="{{PORTAL}}/substudy-tailored-content">{{ _("EMPRO Resources") }}</a></li>
                     {% endif %}
                     {% if user %}<li><a href="{{PORTAL}}/logout" class="logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>

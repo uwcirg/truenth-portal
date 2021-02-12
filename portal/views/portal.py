@@ -20,7 +20,9 @@ from flask import (
     render_template,
     render_template_string,
     request,
+    safe_join,
     session,
+    send_from_directory,
     url_for,
 )
 from flask_babel import gettext as _
@@ -71,6 +73,7 @@ from ..models.organization import (
 )
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
+from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
@@ -138,6 +141,8 @@ def report_slow_queries(response):
 
     """
     if current_app.config.get("LOG_SLOW_RESPONSES"):
+        if not hasattr(g, 'start_request_time'):
+            return response
         duration = time() - g.start_request_time
         if duration > 5.0:
             current_app.logger.warning("{} took {}".format(
@@ -209,6 +214,15 @@ class ShortcutAliasForm(FlaskForm):
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
+
+@portal.route('/substudy-tailored-content')
+@oauth.require_oauth()
+def substudy_tailored_content():
+    return send_from_directory(
+        safe_join(current_app.static_folder, 'templates'),
+        'substudy_tailored_content.html',
+        cache_timeout=-1
+    )
 
 @portal.route('/go', methods=['GET', 'POST'])
 def specific_clinic_entry():
@@ -583,12 +597,19 @@ def initial_queries():
             r = ROLE.STAFF.value if r == ROLE.STAFF_ADMIN.value else r
             role = r
     terms = get_terms(user.locale_code, org, role)
+    substudy_terms = None
+    enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
+    if enrolled_in_substudy:
+        substudy_terms = get_terms(locale_code=user.locale_code, org=org,
+                                   role=role, research_study_id=EMPRO_RS_ID)
+
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements(
         locale_code=user.locale_code)
 
     return render_template(
         'initial_queries.html', user=user, terms=terms,
+        substudy_terms=substudy_terms,
         consent_agreements=consent_agreements)
 
 
@@ -696,19 +717,25 @@ def profile(user_id):
                            consent_agreements=consent_agreements)
 
 
-@portal.route('/patient-invite-email/<int:user_id>')
+@portal.route(
+    '/patient-invite-email/<int:user_id>', defaults={'research_study_id': 0})
+@portal.route('/patient-invite-email/<int:user_id>/<int:research_study_id>')
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
-def patient_invite_email(user_id):
+def patient_invite_email(user_id, research_study_id):
     """Patient Invite Email Content"""
     user = get_user(user_id, 'edit')
 
     try:
         top_org = user.first_top_organization()
         if top_org:
-            name_key = UserInviteEmail_ATMA.name_key(org=top_org.name)
+            name_key = UserInviteEmail_ATMA.name_key(
+                org=top_org.name,
+                research_study_id=research_study_id)
         else:
-            name_key = UserInviteEmail_ATMA.name_key()
+            name_key = UserInviteEmail_ATMA.name_key(
+                research_study_id=research_study_id
+            )
         args = load_template_args(user=user)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
@@ -723,19 +750,29 @@ def patient_invite_email(user_id):
 @roles_required([ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def patient_reminder_email(user_id):
-    """Patient Reminder Email Content"""
+    """Patient Reminder Email Content
+
+    Query string
+    :param research_study_id: set for targeted reminder emails, defaults to 0
+
+    """
     from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
-
+    research_study_id = int(request.args.get('research_study_id', 0))
     try:
         top_org = user.first_top_organization()
         if top_org:
+            # TODO lookup sub-study specific email content
+            #  if research_study_id == 1
             name_key = UserReminderEmail_ATMA.name_key(org=top_org.name)
         else:
             name_key = UserReminderEmail_ATMA.name_key()
 
         # If the user has a pending questionnaire bank, include for due date
-        qstats = QB_Status(user, as_of_date=datetime.utcnow())
+        qstats = QB_Status(
+            user,
+            research_study_id=research_study_id,
+            as_of_date=datetime.utcnow())
         qbd = qstats.current_qbd()
         if qbd:
             qb_id, qb_iteration = qbd.qb_id, qbd.iteration
@@ -751,13 +788,6 @@ def patient_reminder_email(user_id):
         return '', 204
 
     return jsonify(subject=item.subject, body=item.body)
-
-
-@portal.route('/explore')
-def explore():
-    user = get_user(current_user().id, 'view')
-    """Explore TrueNTH page"""
-    return render_template('explore.html', user=user)
 
 
 @portal.route('/share-your-story')
@@ -850,26 +880,6 @@ def settings():
         OrgTree().invalidate_cache()
         organization_consents = Organization.consent_agreements(
             locale_code=user.locale_code)
-
-    if form.patient_id.data and form.timestamp.data:
-        patient = get_user(form.patient_id.data, 'edit')
-        try:
-            dt = FHIR_datetime.parse(form.timestamp.data)
-            for qnr in QuestionnaireResponse.query.filter_by(
-                    subject_id=patient.id):
-                qnr.authored = dt
-                document = qnr.document
-                document['authored'] = FHIR_datetime.as_fhir(dt)
-                # Due to the infancy of JSON support in POSTGRES and SQLAlchemy
-                # one must force the update to get a JSON field change to stick
-                db.session.query(QuestionnaireResponse).filter(
-                    QuestionnaireResponse.id == qnr.id
-                ).update({"document": document})
-            db.session.commit()
-            invalidate_users_QBT(patient.id)
-        except ValueError as e:
-            trace("Invalid date format {}".format(form.timestamp.data))
-            trace("ERROR: {}".format(e))
 
     response = make_response(render_template(
         'settings.html',

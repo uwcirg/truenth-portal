@@ -7,9 +7,9 @@ from .notification import Notification, UserNotification
 from .organization import Organization, OrgTree
 from .role import ROLE, Role
 from .user import User
-
 tou_types = ENUM('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
+                 'EMPRO website terms of use',
                  name='tou_types', create_type=False)
 
 

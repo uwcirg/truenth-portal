@@ -53,6 +53,8 @@ STATIC_ROLES = {
         'user authentication',
     'application_developer':
         'Gives users permission to add/view/edit TrueNTH applications',
+    'clinician':
+        "Clinical staff member, with a subset of staff privileges",
     'content_manager':
         'Gives user permission to add/view/edit associated content '
         'managment systems',

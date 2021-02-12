@@ -12,6 +12,9 @@ class ResearchProtocol(db.Model):
     name = db.Column(db.Text, nullable=False, unique=True)
     created_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow)
+    research_study_id = db.Column(
+        db.ForeignKey('research_studies.id', ondelete='cascade'),
+        index=True, nullable=False)
 
     @classmethod
     def from_json(cls, data):
@@ -22,6 +25,7 @@ class ResearchProtocol(db.Model):
 
     def update_from_json(self, data):
         self.name = data['name']
+        self.research_study_id = data['research_study_id']
         if 'created_at' in data:
             self.created_at = FHIR_datetime.parse(data['created_at'])
         return self
@@ -32,6 +36,7 @@ class ResearchProtocol(db.Model):
             'resourceType': 'ResearchProtocol',
             'name': self.name,
             'display_name': self.display_name,
+            'research_study_id': self.research_study_id,
             'created_at': FHIR_datetime.as_fhir(self.created_at)}
 
     @property
@@ -43,10 +48,11 @@ class ResearchProtocol(db.Model):
         return ' '.join([n.title() for n in word_list])
 
     @staticmethod
-    def assigned_to(user):
-        """Returns set of all ResearchProtocols assigned to given user"""
+    def assigned_to(user, research_study_id):
+        """Returns set of tuples (ResearchProtocol, retired) for user"""
         rps = set()
         for org in user.organizations:
-            for r in org.rps_w_retired(consider_parents=True):
+            for r in org.rps_w_retired(
+                    research_study_id, consider_parents=True):
                 rps.add(r)
         return rps

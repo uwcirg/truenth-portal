@@ -10,6 +10,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..date_tools import FHIR_datetime
+from ..trigger_states.models import TriggerState
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -24,6 +25,7 @@ from .questionnaire_response import (
     qnr_csv_column_headers,
     generate_qnr_csv,
 )
+from .research_study import EMPRO_RS_ID, ResearchStudy
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import latest_consent
@@ -31,7 +33,7 @@ from .user_consent import latest_consent
 
 def adherence_report(
         requested_as_of_date, acting_user_id, include_test_role, org_id,
-        response_format, lock_key, celery_task):
+        research_study_id, response_format, lock_key, celery_task):
     """Generates the adherence report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -41,6 +43,7 @@ def adherence_report(
     :param acting_user_id: id of user evoking request, for permission check
     :param include_test_role: set to include test patients in results
     :param org_id: set to limit to patients belonging to a branch of org tree
+    :param research_study_id: research study to report on
     :param response_format: 'json' or 'csv'
     :param lock_key: name of TimeoutLock key used to throttle requests
     :param celery_task: used to update status when run as a celery task
@@ -73,9 +76,7 @@ def adherence_report(
             celery_task.update_state(
                 state='PROGRESS', meta={'current': current, 'total': total})
 
-        if len(patient.organizations) == 0:
-            # Very unlikely we want to include patients w/o at least
-            # one org, skip this patient
+        if research_study_id not in ResearchStudy.assigned_to(patient):
             continue
 
         try:
@@ -84,14 +85,17 @@ def adherence_report(
             # simply exclude any patients the user can't view
             continue
 
-        qb_stats = QB_Status(user=patient, as_of_date=as_of_date)
+        qb_stats = QB_Status(
+            user=patient,
+            research_study_id=research_study_id,
+            as_of_date=as_of_date)
         row = {
             'user_id': patient.id,
             'site': patient.organizations[0].name,
             'status': str(qb_stats.overall_status)}
 
-        # TODO: address research_study_id
-        consent = latest_consent(user=patient, research_study_id=0)
+        consent = latest_consent(
+            user=patient, research_study_id=research_study_id)
         if consent:
             row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
 
@@ -106,10 +110,31 @@ def adherence_report(
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
             entry_method = QNR_results(
-                patient, last_viable.qb_id,
-                last_viable.iteration).entry_method()
+                patient,
+                research_study_id=research_study_id,
+                qb_ids=[last_viable.qb_id],
+                qb_iteration=last_viable.iteration).entry_method()
             if entry_method:
+                current_app.logger.warn(
+                    "entry method %s visit %s last viable qb %d ",
+                    entry_method, row['visit'], last_viable.qb_id)
                 row['entry_method'] = entry_method
+
+            if research_study_id == EMPRO_RS_ID:
+                # Add clinician data for EMPRO reports
+                if patient.clinician_id:
+                    row['clinician'] = (
+                        User.query.get(patient.clinician_id).display_name)
+                # As we may be looking at `prev_qbd` can't use qb_stats
+                cd = last_viable.completed_date(patient.id)
+                if cd:
+                    row['EMPRO_questionnaire_completion_date'] = cd
+
+                # Correct for zero index visit month in db
+                visit_month = int(row['visit'].split()[-1]) - 1
+                ts = TriggerState.latest_action_state(patient.id, visit_month)
+                if ts:
+                    row['clinician_status'] = ts.title()
 
         data.append(row)
 
@@ -121,11 +146,24 @@ def adherence_report(
             historic['qb'] = qbd.questionnaire_bank.name
             historic['visit'] = visit_name(qbd)
             entry_method = QNR_results(
-                patient, qbd.qb_id, qbd.iteration).entry_method()
+                patient,
+                research_study_id=research_study_id,
+                qb_ids=[qbd.qb_id],
+                qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 historic['entry_method'] = entry_method
             else:
                 historic.pop('entry_method', None)
+
+            if research_study_id == EMPRO_RS_ID:
+                # Correct for zero index visit month in db
+                visit_month = int(historic['visit'].split()[-1]) - 1
+                ts = TriggerState.latest_action_state(patient.id, visit_month)
+                if ts:
+                    historic['clinician_status'] = ts.title()
+                cd = qbd.completed_date(patient.id)
+                if cd:
+                    historic['EMPRO_questionnaire_completion_date'] = cd
             data.append(historic)
 
         # if user is eligible for indefinite QB, add status
@@ -136,7 +174,10 @@ def adherence_report(
             indef['qb'] = qbd.questionnaire_bank.name
             indef['visit'] = "Indefinite"
             entry_method = QNR_results(
-                patient, qbd.qb_id, qbd.iteration).entry_method()
+                patient,
+                research_study_id=research_study_id,
+                qb_ids=[qbd.qb_id],
+                qb_iteration=qbd.iteration).entry_method()
             if entry_method:
                 indef['entry_method'] = entry_method
             else:
@@ -158,13 +199,18 @@ def adherence_report(
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method', 'site',
             'consent']
+        if research_study_id == EMPRO_RS_ID:
+            results['column_headers'] = [
+                'user_id', 'study_id', 'clinician', 'status', 'visit',
+                'EMPRO_questionnaire_completion_date', 'clinician_status',
+                'site']
 
     return results
 
 
 def research_report(
-        instrument_ids, acting_user_id, patch_dstu2, request_url,
-        response_format, lock_key, celery_task):
+        instrument_ids, research_study_id, acting_user_id, patch_dstu2,
+        request_url, response_format, lock_key, celery_task):
     """Generates the research report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -172,6 +218,7 @@ def research_report(
 
     :param acting_user_id: id of user evoking request, for permission check
     :param instrument_ids: list of instruments to include
+    :param research_study_id: study id to report on
     :param patch_dstu2: set to make bundle dstu2 compliant
     :param request_url: original request url, for inclusion in FHIR bundle
     :param response_format: 'json' or 'csv'
@@ -187,6 +234,7 @@ def research_report(
     # in the bundle, delegate that responsibility to aggregate_responses()
     bundle = aggregate_responses(
         instrument_ids=instrument_ids,
+        research_study_id=research_study_id,
         current_user=acting_user,
         patch_dstu2=patch_dstu2,
         celery_task=celery_task
@@ -212,30 +260,32 @@ def research_report(
     return results
 
 
-def overdue_dates(user, as_of):
+def overdue_dates(user, research_study_id, as_of):
     """Determine if user is overdue, return details if applicable
 
     :param user: for whom QB Status should be evaluated
-    :param as_of: utc datetime for comparision, typically utcnow
+    :param research_study_id: research study in question
+    :param as_of: utc datetime for comparison, typically utcnow
     :return: IF user is overdue, tuple of
      (visit_name, due_date, expired_date), otherwise (None, None, None)
 
     """
     na = None, None, None
-    status, visit = qb_status_visit_name(user.id, as_of)
+    qb_status = qb_status_visit_name(user.id, research_study_id, as_of)
 
-    if status != OverallStatus.overdue:
+    if qb_status['status'] != OverallStatus.overdue:
         return na
 
-    a_s = QB_Status(user, as_of_date=as_of)
-    if a_s.overall_status != status:
+    a_s = QB_Status(
+        user, research_study_id=research_study_id, as_of_date=as_of)
+    if a_s.overall_status != qb_status['status']:
         current_app.logger.error(
             "%s != %s for %s as of %s".format(
-                a_s.overall_status, status, user.id, as_of))
+                a_s.overall_status, qb_status['status'], user.id, as_of))
     if a_s.overdue_date is None:
         return na
 
-    return visit, a_s.due_date, a_s.expired_date
+    return qb_status['visit_name'], a_s.due_date, a_s.expired_date
 
 
 @cache.cached(timeout=60*60*12, key_prefix='overdue_stats_by_org')
@@ -255,10 +305,13 @@ def overdue_stats_by_org():
     overdue_stats = defaultdict(list)
     now = datetime.utcnow()
 
+    # TODO: handle research study id; currently only reporting on id==0
+    research_study_id = 0
     # use system user to avoid pruning any patients during cache population
     sys = User.query.filter_by(email='__system__').one()
     for user in patients_query(acting_user=sys):
-        visit, due_date, expired_date = overdue_dates(user, as_of=now)
+        visit, due_date, expired_date = overdue_dates(
+            user, research_study_id=research_study_id, as_of=now)
         study_id = user.external_study_id or ''
         if due_date is not None:
             for org in user.organizations:

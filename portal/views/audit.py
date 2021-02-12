@@ -15,7 +15,8 @@ audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 @audit_api.route('/user/<int:user_id>/audit')
 @crossdomain()
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def get_audit(user_id):
     """Access audit info for given user

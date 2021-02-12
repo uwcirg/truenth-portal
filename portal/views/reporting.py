@@ -24,7 +24,7 @@ reporting_api = Blueprint('reporting', __name__)
 
 
 @reporting_api.route('/admin/overdue-table')
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
 def overdue_table(top_org=None):
     """View for staff access to generated email content
@@ -92,7 +92,8 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
 
 @reporting_api.route('/admin/overdue-numbers')
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 @oauth.require_oauth()
 def generate_numbers():
 
@@ -111,9 +112,14 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
+    # TODO: handle research study id; currently only reporting on id==0
+    research_study_id = 0
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
-        a_s = QB_Status(user, as_of_date=datetime.utcnow())
+        a_s = QB_Status(
+            user,
+            research_study_id=research_study_id,
+            as_of_date=datetime.utcnow())
         email = (
             user.email.encode('ascii', 'ignore') if user.email else None)
         od = overdue(a_s)
@@ -135,7 +141,8 @@ def generate_numbers():
 
 @reporting_api.route('/api/report/questionnaire_status')
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value, ROLE.CLINICIAN.value])
 @oauth.require_oauth()
 def questionnaire_status():
     """Return ad hoc JSON or CSV listing questionnaire_status
@@ -173,6 +180,11 @@ def questionnaire_status():
         description: expects json or csv, defaults to json if not provided
         required: false
         type: string
+      - name: research_study_id
+        in: query
+        description: research study id, defaults to 0
+        required: false
+        type: integer
     produces:
       - application/json
       - text/csv
@@ -198,6 +210,7 @@ def questionnaire_status():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id'),
+        'research_study_id': int(request.args.get('research_study_id', 0)),
         'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'json').lower()
     }

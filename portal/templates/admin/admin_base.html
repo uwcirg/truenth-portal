@@ -50,4 +50,41 @@
 		</form>
 	</caption>
 {%- endmacro -%}
-
+<!-- this widget is only applicable for sub-study users -->
+{%- macro patientListToggle(selected="mainStudy") -%}
+	<div id="patientListToggle" class="patientlist-toggle-container eproms-substudy tnth-hide">
+		<a href="/patients">
+			<input type="radio" class="radio" name="patientListToggle" id="mainStudy" {%if selected == 'mainStudy'%}checked{%endif%}>
+			<span class="label">{{_("IRONMAN")}}</span>
+		</a>
+		<a href="/patients/substudy">
+			<input type="radio" class="radio" name="patientListToggle" id="subStudy" {%if selected == 'subStudy'%}checked{%endif%}>
+			<span class="label">{{_("EMPRO")}}</span>
+		</a>
+	</div>
+{%- endmacro -%}
+{%- macro ExportPopover(title=_("Export adherence report")) -%}
+	<div id="exportReportPopoverWrapper" class="tnth-hide">
+		<div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="">
+			<button id="btnExportReport" class="btn btn-tnth-primary dropdown-toggle" title="{{title}}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-download-alt icon-share"></i> <span class="caret"></span></button>
+			<ul class="dropdown-menu data-types" role="menu"><li data-type="csv"><a>{{_("CSV")}}</a></li><li data-type="json"><a>{{_("JSON")}}</a></li></ul>
+		</div>
+		<div id="exportReportPopoverContent" class="tnth-hide">
+			<div class="exportReport__popovercontent">
+				<div class='text-info text-center'><h4>{{_("Export request submitted")}}</h4></div>
+				<span class='exportReport__text-warning'>{{_("Note: due to the size of result data, this may take a while.")}}</span>
+				<div class="text-center exportReport__display-container">
+					<span class="exportReport__status"></span>
+					<span class="exportReport__percentage"></span>
+					<span class="exportReport__result"></span>
+					<div class="exportReport__error" class="error-message">
+						<div class="message error-message"></div>
+						<div>
+							<button class="exportReport__retry tnth-hide">{{_("Retry")}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+  	</div>
+{%- endmacro -%}

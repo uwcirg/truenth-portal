@@ -1,5 +1,8 @@
 import Utility from "./Utility.js";
+import {convertArrayToObject} from "./Utility.js";
 import Validator from "./Validator.js";
+import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
+
 export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
@@ -78,6 +81,47 @@ export default { /*global $ i18next */ /*initializing functions performed only o
 
         return cachedCurrentUserId;
     },
+    /*
+     * dynamically show/hide sub-study specific UI resources elements
+     * @param elementSelector A DOMString containing one or more selectors to match, e.g. #tnthWrapper .blah
+     */
+    setSubstudyElementsVis: function(elementSelector, callback) {
+        callback = callback || function() {};
+        if (!elementSelector) {
+            callback({error: true});
+            return;
+        }
+        this.getCurrentUser((userId) => {
+            if (!userId) return;
+            let roleType = "staff";
+            $.ajax({
+                url: `/api/user/${userId}/roles`
+            }).done(data => {
+                if (data && data.roles) {
+                    let roles = data.roles.map(item => item.name);
+                    if (roles.indexOf("patient") !== -1) {
+                        roleType = "patient";
+                    }
+                } 
+                $.ajax({
+                    type: "GET",
+                    url: `/api/${roleType}/${userId}/research_study`
+                }).done(data => {
+                    if (!data || !data.research_study) {
+                        callback({error: true});
+                        return;
+                    }
+                    let researchStudyObj = convertArrayToObject(data.research_study, "id");
+                    if (researchStudyObj[EPROMS_SUBSTUDY_ID]) {
+                        $(elementSelector).show();
+                    } else {
+                        $(elementSelector).hide();
+                    }
+                    callback(data);
+                });
+            });
+        });
+    },
     "prePopulateEmail": function() {
         var requestEmail =  Utility.getUrlParameter("email"), emailField = document.querySelector("#email");
         if (requestEmail && emailField) { /*global Utility getUrlParameter */
@@ -133,6 +177,11 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     self.handleLogout();
                 });
                 self.handleDisableLinks();
+                /*
+                 * show sub-study specific resources links, consumed by staff users
+                 * NB: can also add any patient specific elements
+                 */
+                self.setSubstudyElementsVis("#tnthNavWrapper .empro-resources");
             }, 350);
             self.getNotification(function(data) { //ajax to get notifications information
                 self.notifications(data);

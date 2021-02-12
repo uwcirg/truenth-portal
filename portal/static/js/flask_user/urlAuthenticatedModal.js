@@ -49,10 +49,14 @@ URLAuthenticatedModalObj.prototype.setUI = function() {
         e.preventDefault();
         e.stopPropagation();
         var originalHref = $(this).attr("href");
-        var redirectHref = self.getPromoteEncounterURL()+"?next="+originalHref;
-        $(this).attr("href", redirectHref);
-        $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
+        if (! /next\=/.test(originalHref)) {
+            var redirectHref = self.getPromoteEncounterURL()+"?next="+originalHref;
+            $(this).attr("href", redirectHref);
+            $("#btnUrlAuthenticatedContinue").attr("href", redirectHref);
+        }
+        $(".modal").modal("hide");
         $("#"+self.MODAL_ELEMENT_IDENTIFIER).modal("show");
+        return false;
     })
     //elements needing to be hidden
     $(".portal-weak-auth-hide").each(

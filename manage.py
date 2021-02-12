@@ -2,6 +2,7 @@
 
 FLASK_APP=manage.py flask --help
 
+(bogus comment line added to triger build)
 """
 import copy
 from datetime import datetime
@@ -34,9 +35,16 @@ from portal.models.i18n_utils import (
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.qb_timeline import invalidate_users_QBT
-from portal.models.questionnaire_bank import add_static_questionnaire_bank
+from portal.models.questionnaire_bank import (
+    QuestionnaireBank,
+    add_static_questionnaire_bank,
+)
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
+from portal.models.research_study import (
+    add_static_research_studies,
+    research_study_id_from_questionnaire,
+)
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.url_token import (
     BadSignature,
@@ -154,6 +162,7 @@ def seed(keep_unmentioned=False):
     add_static_questionnaire_bank()
     add_static_relationships()
     add_static_roles()
+    add_static_research_studies()
     db.session.commit()
 
     # import site export file if found
@@ -422,12 +431,14 @@ def no_email(email, actor):
     suppress_email(email, actor)
 
 
-@click.option('--qnr_id', help="Questionnaire Response ID")
+@click.option('--qnr_id', help="Questionnaire Response ID", required=True)
 @click.option(
     '--authored',
+    required=True,
     help="new datetime for qnr authored, format example: 2019-04-09 15:14:43")
 @click.option(
     '--actor',
+    required=True,
     help='email address of user taking this action, for audit trail'
 )
 @app.cli.command()
@@ -445,13 +456,18 @@ def update_qnr_authored(qnr_id, authored, actor):
 
     acting_user.check_role(permission='edit', other_id=qnr.subject_id)
 
-    new_authored = FHIR_datetime.parse(authored)
-    old_authored = qnr.authored
-
-    qnr.authored = new_authored
     document = copy.deepcopy(qnr.document)
-    document['authored'] = datetime.strftime(new_authored, "%Y-%m-%d %H:%M:%S")
+    new_authored = FHIR_datetime.parse(authored)
+    old_authored = FHIR_datetime.parse(document['authored'])
+    document['authored'] = datetime.strftime(new_authored, "%Y-%m-%dT%H:%M:%SZ")
     qnr.document = document
+
+    # Determine research study if qb_id is currently set, default to 0
+    rs_id = 0
+    if qnr.questionnaire_bank_id:
+        qb = QuestionnaireBank.query.get(qnr.questionnaire_bank_id)
+        rs_id = research_study_id_from_questionnaire(
+            qb.questionnaires[0].name)
 
     # Must clear the qb_id and iteration in case this authored date
     # change moves the QNR to a different visit.
@@ -460,7 +476,7 @@ def update_qnr_authored(qnr_id, authored, actor):
     db.session.commit()
 
     # Invalidate timeline as this probably altered the status
-    invalidate_users_QBT(qnr.subject_id)
+    invalidate_users_QBT(qnr.subject_id, research_study_id=rs_id)
 
     message = (
         "Updated QNR {qnr_id} authored from {old_authored} to "
@@ -557,7 +573,7 @@ def merge_users(src_id, tgt_id, actor):
                         (str(i) for i in tgt_user.questionnaire_responses))
                 ))):
         tgt_user.merge_others_relationship(src_user, 'questionnaire_responses')
-        invalidate_users_QBT(tgt_user.id)
+        invalidate_users_QBT(tgt_user.id, research_study_id=0)
 
     src_email = src_user.email  # capture, as it changes on delete
     replace_email = False
@@ -586,3 +602,155 @@ def merge_users(src_id, tgt_id, actor):
         user_id=acting_user.id,
         subject_id=tgt_id)
     print(message)
+
+
+@click.option('--org_id', help="Organization (site) ID", required=True)
+@click.option(
+    '--retired',
+    required=True,
+    help="datetime for site's current protocol expiration,"
+         " format example: 2019-04-09 15:14:43")
+@app.cli.command()
+def preview_site_update(org_id, retired):
+    """Preview Timeline changes for affected users
+
+    As research protocol changes can affect patients' timeline (for example
+    if the new protocol overlaps with visits, i.e. quarterly time points,
+    and user's submission prevents inclusion of new overlapped visits),
+    capture the organization's patients' timeline state before and after the
+    protocol change, and generate a diff report.
+
+    """
+    from portal.dict_tools import dict_compare
+    from portal.models.organization import (
+        Organization,
+        OrganizationResearchProtocol,
+    )
+    from portal.models.qb_timeline import QBD, QBT, update_users_QBT
+    from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
+    from portal.models.research_protocol import ResearchProtocol
+    from portal.models.user import patients_query
+
+    def qnr_state(patient, name_map):
+        qnrs = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == patient.id).with_entities(
+            QuestionnaireResponse.id,
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration)
+
+        return {
+            f"qnr {qnr.id}":
+                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
+            qnr in qnrs}
+
+    def timeline_state(patient, name_map):
+        tl = QBT.query.filter(
+            QBT.user_id == patient.id).with_entities(
+            QBT.at,
+            QBT.qb_id,
+            QBT.status,
+            QBT.qb_iteration).order_by(
+            QBT.at)
+
+        results = dict()
+        for i in tl:
+            qb = QuestionnaireBank.query.get(i.qb_id)
+            recur_id = qb.recurs[0].id if qb.recurs else None
+            vn = visit_name(QBD(
+                relative_start=None,
+                questionnaire_bank=qb,
+                iteration=i.qb_iteration,
+                recur_id=recur_id))
+            results[f"{i.at} {i.status}"] = [
+                vn, name_map[i.qb_id], i.qb_iteration]
+        return results
+
+    if app.config['SYSTEM_TYPE'].lower() == 'production':
+        raise RuntimeError("Not to be run on prod: changes user records")
+
+    organization = Organization.query.get(org_id)
+    admin = User.query.filter(User.email == '__system__').one()
+
+    query = patients_query(
+        acting_user=admin,
+        include_test_role=False,
+        include_deleted=True,
+        requested_orgs=[org_id])
+
+    # Capture state for all potentially affected patients
+    qb_name_map = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
+    qb_name_map[None] = "None"
+    patient_state = {}
+    for patient in query:
+        qnrs = qnr_state(patient, name_map=qb_name_map)
+        tl = timeline_state(patient, name_map=qb_name_map)
+        patient_state[patient.id] = {'qnrs': qnrs, 'timeline': tl}
+
+    # Update the org's research protocol as requested - assume to the latest
+    previous_rp = organization.research_protocols[-1]
+    latest_rp = ResearchProtocol.query.order_by(
+        ResearchProtocol.id.desc()).first()
+    previous_org_rp = OrganizationResearchProtocol.query.filter(
+        OrganizationResearchProtocol.research_protocol_id ==
+        previous_rp.id).filter(
+        OrganizationResearchProtocol.organization_id == org_id).one()
+    previous_org_rp.retired_as_of = retired
+    new_org_rp = OrganizationResearchProtocol(
+        research_protocol=latest_rp,
+        organization=organization)
+    db.session.add(new_org_rp)
+    db.session.commit()
+    print(f"Extending Research Protocols for {organization}")
+    print(f"  - Adding RP {latest_rp.name}")
+    print(f"  - {previous_rp.name} now retired as of {retired}")
+    print("-"*80)
+
+    # With new RP in place, cycle through patients, purge and
+    # refresh timeline and QNR data, and report any diffs
+    for patient in query:
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=patient.id,
+            research_study_id=0,
+            acting_user_id=admin.id,
+        )
+        update_users_QBT(
+            patient.id, research_study_id=0, invalidate_existing=True)
+
+        after_qnrs = qnr_state(patient, name_map=qb_name_map)
+        after_timeline = timeline_state(patient, name_map=qb_name_map)
+
+        # Compare results
+        added_q, removed_q, modified_q, same = dict_compare(
+            after_qnrs, patient_state[patient.id]['qnrs'])
+        assert not added_q
+        assert not removed_q
+
+        added_t, removed_t, modified_t, same = dict_compare(
+            after_timeline, patient_state[patient.id]['timeline'])
+
+        if any((added_t, removed_t, modified_t, modified_q)):
+            print(f"\nPatient {patient.id} ({patient.external_study_id}):")
+        if modified_q:
+            print("\tModified QNRs (old, new)")
+            for mod in sorted(modified_q):
+                print(f"\t\t{mod} {modified_q[mod][1]} ==>"
+                      f" {modified_q[mod][0]}")
+        if added_t:
+            print("\tAdditional timeline rows:")
+            for item in sorted(added_t):
+                print(f"\t\t{item} {after_timeline[item]}")
+        if removed_t:
+            print("\tRemoved timeline rows:")
+            for item in sorted(removed_t):
+                print(
+                    f"\t\t{item} "
+                    f"{patient_state[patient.id]['timeline'][item]}")
+        if modified_t:
+            print(f"\tModified timeline rows: (old, new)")
+            for item in sorted(modified_t):
+                print(f"\t\t{item}")
+                print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
+
+    # Restore organization to pre-test RPs
+    db.session.delete(new_org_rp)
+    db.session.commit()

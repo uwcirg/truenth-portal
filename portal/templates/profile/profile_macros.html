@@ -1,5 +1,4 @@
 {% from "initial_queries_macros.html" import patientQGroup, consent_fields %}
-
 {% macro profileImage(person) -%}
     {% if person and person.image_url %}<div class="profile-img hidden-xs"><img src="{{ person and person.image_url }}" /></div>{% endif %}
 {%- endmacro %}
@@ -70,7 +69,7 @@
     </div>
 {%- endmacro %}
 {% macro profileDemoDetail(person, current_user) -%}
-    <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail">
+    <div id="profileDetailContainer" class="row" data-profile-section-id="demodetail" v-show="hasOptionalCoreData()">
         <div class="col-md-12 col-xs-12">
             {% call profileSection(data_sections="detail", class="patient-detail-container") -%}
                 {% call titleSection(id="patientDetailLoc") -%}
@@ -322,6 +321,8 @@
                     <option value="invite" data-url="{{url_for('portal.patient_invite_email', user_id=person.id)}}">{{_("TrueNTH Invite")}}</option>
                 {%endif %}
                 <option value="reminder" data-url="{{url_for('portal.patient_reminder_email', user_id=person.id)}}">{{_("TrueNTH Reminder")}}</option>
+                <!-- reactive option, will only show when user is in ready for sub-study and email is available -->
+                <option value="welcome" data-url="{{url_for('portal.patient_invite_email', user_id=person.id, research_study_id=1)}}"  :hidden="!allowSubStudyWelcomeEmail()" :disabled="!allowSubStudyWelcomeEmail()">{{_("EMPRO Welcome")}}</option>
             {% endcall %}
             <!--
                 set P3P invite/reminder tile visibility based on whether user's org matches config variable, ACCEPT_TERMS_ON_NEXT_ORG - this is the case of MUSIC patient
@@ -358,73 +359,84 @@
     {%- endif -%}
 {%- endmacro %}
 {% macro profileCommunications(person, current_user) -%}
-    {%- if person and person.has_role(ROLE.PATIENT.value) -%}
+    {%- if person and person.has_role(ROLE.PATIENT.value) and (current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value)) -%}
+        {%- if current_user.has_role(ROLE.CLINICIAN.value) -%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container" data-profile-section-id="communication">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        <p class="communication-title text-muted singleton">{{_("Email audit log")}}</p>
+                        {{profileEmailLog(person)}}
+                    </div>
+                </div>
+            </div>
+        {%- else -%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container" data-profile-section-id="communication">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        <div id="communicationsContainer" class="tabs-container">
+                            {% if person.is_registered() %}
+                                <div class="tab">
+                                <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                                <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
+                                <div class="tab-content">
+                                {{resetPassword(person)}}
+                                </div>
+                                </div>
+                            {% endif %}
+                            {%- if not config.CUSTOM_PATIENT_DETAIL -%}
+                                <div class="tab">
+                                <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                                <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if not person.is_registered()%}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
+                                <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
+                                    {{profileSendEmail(person)}}
+                                </div>
+                                </div>
+                            {%- endif %}
+                            <div class="tab">
+                            <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
+                            <div class="tab-content">
+                                {{profileEmailLog(person)}}
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {%- endif -%}
+        
+    {%- elif person and person.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container" data-profile-section-id="communication">
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <div id="communicationsContainer" class="tabs-container">
-                        {% if person.is_registered() %}
-                            <div class="tab">
-                              <input id="tab-one" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                              <label for="tab-one" class="tab-label">{{_("Send reset password email to patient")}}</label>
-                              <div class="tab-content">
-                               {{resetPassword(person)}}
-                              </div>
-                            </div>
-                        {% endif %}
-                        {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                            <div class="tab">
-                              <input id="tab-two" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                              <label id="lbPatientRegEmail" for="tab-two" class="tab-label {% if not person.is_registered()%}active{%endif %}">{{_("Send invitation and reminder emails to patient")}}</label>
-                              <div id="sendPatientEmailTabContent" class="tab-content send-email-tab-content">
-                                {{profileSendEmail(person)}}
-                              </div>
-                            </div>
-                        {%- endif %}
-                        {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) %}
-                         <div class="tab">
-                          <input id="tab-three" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                          <label id="lbEmailLog" for="tab-three" class="tab-label">{{_("Email audit log")}}</label>
-                          <div class="tab-content">
-                            {{profileEmailLog(person)}}
-                          </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {%- elif person and person.has_role(ROLE.STAFF.value) and current_user and current_user.has_role(ROLE.STAFF_ADMIN.value)-%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container" data-profile-section-id="communication">
-                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    {%- if not person.is_registered() -%}
-                        <div id="communicationsContainer" class="tabs-container">
-                            <div class="tab">
-                                <input id="tab-five" name="tabStaffGroup" type="radio" data-validate="false" class="tab-input">
-                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label active">{{_("Send registration email to user")}}</label>
+                        <div class="tab">
+                            <input id="tab-five" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            {%- if person.is_registered() -%}
+                                <label id="lbStaffResetPassword" for="tab-five" class="tab-label">{{_("Send reset password email to staff")}}</label>
                                 <div class="tab-content">
+                                    <!-- reset password -->
+                                    {{resetPassword(person)}}
+                                </div>
+                            {%- else -%}
+                                <label id="lbStaffRegEmail" for="tab-five" class="tab-label">{{_("Send registration email to user")}}</label>
+                                <div class="tab-content">
+                                    <!-- registration -->
                                     {{profileStaffRegistrationEmail(person)}}
                                 </div>
-                            </div>
-                            <div class="tab">
-                                <input id="tab-six" name="tabGroup" type="radio" data-validate="false" class="tab-input">
-                                <label id="lbEmailLog" for="tab-six" class="tab-label">{{_("Email audit log")}}</label>
-                                <div class="tab-content">
-                                    {{profileEmailLog(person)}}
-                                </div>
+                            {%- endif -%}
+                        </div>
+                        <div class="tab">
+                            <input id="tab-six" name="tabGroup" type="radio" data-validate="false" class="tab-input">
+                            <label id="lbEmailLog" for="tab-six" class="tab-label">{{_("Email audit log")}}</label>
+                            <div class="tab-content">
+                                {{profileEmailLog(person)}}
                             </div>
                         </div>
-                    {%- else -%}
-                        <div class="flex">
-                            <div id="resetPasswordContainer" class="flex-item">
-                                <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
-                                {{resetPassword(person)}}
-                            </div>
-                        </div>
-                    {%- endif -%}
+                    </div>
                 </div>
             </div>
         </div>
@@ -474,9 +486,11 @@
 {%- endmacro %}
 
 {% macro resetPassword(person) %}
-    <div id="resetPasswordGroup" class="form-group profile-section flex-item" data-profile-section-id="resetpassword">
+    <div id="resetPasswordGroup" class="form-group" data-profile-section-id="resetpassword">
         <button id="btnPasswordResetEmail" class="btn btn-tnth-primary sm-btn">{{_("Send email")}}</button>
+        <div class="loading-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
         <div id="passwordResetMessage" class="text-info"></div>
+        <div id="passwordResetErrorMessage" class="error-message"></div>
     </div>
 {%-endmacro %}
 
@@ -489,7 +503,7 @@
             <div id="userOrgs" class="customized">
                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
                <p class="prompt">
-                {% if  current_user and current_user.has_role(ROLE.STAFF.value) %}
+                {% if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) %}
                     {{_("In what state is the patient currently receiving prostate cancer care?")}}
                 {% else %}
                     {{_("In what state are you currently receiving prostate cancer care?")}}
@@ -638,11 +652,18 @@
     {%- endif -%}
 {%- endmacro %}
 {% macro patientReports(person) -%}
-    <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
-    <div id="prTableToolBar"><span id="tableCount"></span></div>
-    <a href="#profilePatientReportTable"></a>
-    <table id="profilePatientReportTable" data-profile-section-id="patientreport"></table>
-    <div id="patientReportErrorMessage" class="text-muted"></div>
+    <div class="row" id="patientReportsContainer">
+        <div class="col-md-12 col-xs-12">
+        {% call profileSection(editable=False) -%}
+            {% call titleSection(id="patientReportsLoc") -%}{{ _("Patient Reports") }}{%-endcall %}
+            <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
+            <div id="prTableToolBar"><span id="tableCount"></span></div>
+            <a href="#profilePatientReportTable"></a>
+            <table id="profilePatientReportTable" data-profile-section-id="patientreport"></table>
+            <div id="patientReportErrorMessage" class="text-muted"></div>
+        {%- endcall %}
+        </div>
+    </div>
 {%- endmacro %}
 
 {% macro profileConsent(person, current_user) -%}
@@ -709,12 +730,12 @@
                             <h4>{{_("Modify the consent status for this user to")}}</h4>
                             <div class="radio">
                                 <label>
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="consented" data-orgId="" data-agreementUrl="" data-userId="">{{_("Consented / Enrolled")}}</input>
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="consented" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">{{_("Consented / Enrolled")}}</input>
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="text-warning">
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="suspended" data-orgId="" data-agreementUrl="" data-userId="">
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="suspended" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">
                                         <span class="withdrawn-label">
                                             <span data-eproms='true'>{{_("Withdrawn - Suspend Data Collection and Report Historic Data")}}</span>
                                             <span data-truenth='true'>{{_("Suspend Data Collection and Report Historic Data")}}</span>
@@ -724,7 +745,7 @@
                             </div>
                             <div class="radio admin-radio tnth-hide">
                                 <label class="text-danger">
-                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="purged" data-orgId="" data-agreementUrl="" data-userId="">{{_("Purged / Removed")}}</input>
+                                    <input class="radio_consent_input" name="radio_consent" type="radio" value="purged" data-orgId="" data-agreementUrl="" data-userId="" data-researchStudyId="0">{{_("Purged / Removed")}}</input>
                                 </label>
                             </div>
                             <div id="#profileConsentListModalErrorMessage" class="text-danger"></div>
@@ -814,7 +835,7 @@
 </div>
 {%- endmacro %}
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar" data-profile-section-id="auditlog"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
@@ -823,24 +844,174 @@
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN.value) and not person.has_role(ROLE.SERVICE.value) %}
-        <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
+    <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
+    {% if current_user and current_user.has_role(ROLE.ADMIN.value) %}
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
-        <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
-            <div class='checkbox' v-for="item in roles.data">
-                {% raw %}
-                    <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-model="userRoles" v-on:click="updateRolesData">{{item.display_name}}</label>
-                {% endraw %}
-            </div>
-        </div>
-        {{saveLoaderDiv("rolesGroup")}}
-        <div class="get-roles-error error-message"></div>
-        <div class="put-roles-error error-message"></div>
-        <div class="delete-roles-error error-message"></div>
     {% endif %}
+    <!-- roles are populated in main.js -->
+    <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
+        <div class='checkbox' v-for="item in roles.data">
+            {% raw %}
+                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData">{{item.display_name}}</label>
+            {% endraw %}
+        </div>
+    </div>
+    {{saveLoaderDiv("rolesGroup")}}
+    <div class="get-roles-error error-message"></div>
+    <div class="put-roles-error error-message"></div>
+    <div class="delete-roles-error error-message"></div>
 {%- endmacro %}
-
+{%- macro longitudinalReport(person) -%}
+    {% call profileSection(editable=false, id="longitudinalReportSection") %}
+        {% call titleSection(id="longitudinalReportsLoc") -%}{{ _("IRONMAN EMPRO Longitudinal Report") }}{%-endcall %}
+        <p class="body-content text-muted">{{_("This report shows the patient's questionnaire responses over time and indicates their areas of distress. Please check for any actions required on your behalf.")}}</p>
+        <div id="longitudinalReportContainer" class="eproms-substudy" data-profile-section-id="longitudinalReport">
+            <!-- populate dynamically based on whether there is longitudinal report available for the subject -->
+        </div>
+    {% endcall %}
+{%- endmacro -%}
+{%- macro postInterventionQuestionnaire(person) -%}
+<!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
+<a href="#postInterventionQuestionnaireLoc"></a>
+<div id="postInterventionQuestionnaireLoc">&nbsp;</div>
+<div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowPostTxQuestionnaireSection()"> 
+    <div class="col-md-12 col-xs-12">
+        {% call profileSection(editable=false) %}
+        {% call titleSection() -%}{{_("EMPRO Intervention Report")}}{%- endcall %}
+            <div id="postTxQuestionnaireContainer" class="eproms-substudy" data-profile-section-id="postTxQuestionnaire">
+                <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
+                <!-- display trigger areas if indicated -->
+                <div id="triggersSection" v-if="hasSubStudyTriggers()">
+                    <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
+                    <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-text="subStudyTriggers.date"></span></div>
+                    <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
+                        <ul class="list">
+                            <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- no triggers indicated -->
+                <!-- show the last completed EMPRO date && indicate no triggers -->
+                <div v-else>
+                    <div id="noTriggersSection">
+                        <div class="item">
+                            <span class="text" v-text="getSubStudyAssessmentStatusDisplay()"></span>
+                            <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
+                        </div>
+                        <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
+                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No high distress areas indicated")}}</div>
+                    </div>
+                </div>
+                <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
+                <!-- 
+                    post intervention questionnaire section 
+                    NOTE: 
+                    will display triggers were present in the last determined trigger state
+                    will be in a disabled state if the action state is "completed"
+                -->
+                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved() || hasSubStudyStatusErrors(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
+                    <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
+                        <!-- question text -->
+                        <span class="title" :class="item.type" v-text="item.text"></span>
+                        <!-- date type answer-->
+                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
+                                :class="{disabled: isSubStudyTriggersResolved()}"
+                                :dataType="item.type"
+                                :linkId="item.linkId"
+                                @change="onResponseChangeFieldEvent"
+                                v-if="item.type == 'date'"
+                        >
+                        <!-- boolean type answer-->
+                        <input type="checkbox"
+                            class="bool answer" 
+                            :dataType = "item.type"
+                            :linkId="item.linkId"
+                            @change="onResponseChangeFieldEvent"
+                            v-if="item.type == 'boolean'">
+                        <!-- open-choice (checkboxes) type answer -->
+                        <div class="choices answer" v-if="item.type == 'open-choice'">
+                            <div class="choice" v-for="option in item.option">
+                                <input 
+                                    type="checkbox"
+                                    :code="option.valueCoding.code"
+                                    :class="{other: /other/gi.test(option.valueCoding.display)}"
+                                    :dataType="item.type"
+                                    :linkId="item.linkId"
+                                    :value="option.valueCoding.display"
+                                    @change="onResponseChangeFieldEvent"
+                                >
+                                <span class="text" v-text="option.valueCoding.display"></span>
+                                <textarea
+                                    class="form-control addl-text other-text"
+                                    dataType="string"
+                                    :code="option.valueCoding.code"
+                                    :linkId="item.linkId"
+                                    @change="onResponseChangeFieldEvent"
+                                    v-if="/other/gi.test(option.valueCoding.display)"
+                                ></textarea>
+                            </div>
+                        </div>
+                        <!-- choice (select) type answer -->
+                        <select class="form-control answer" v-if="item.type == 'choice'" 
+                            :linkId="item.linkId"
+                            :dataType="item.type"
+                            @change="onResponseChangeFieldEvent"
+                        >
+                            <option value="">{{_("Select")}}</option>
+                            <option v-for="option in item.option"
+                                :code="option.valueCoding.code"
+                                :dataType="item.type"
+                                :linkId="item.linkId"
+                                :value="option.valueCoding.display"
+                                v-text="option.valueCoding.display"></option>
+                        </select>
+                    </div>
+                    <div class="footer-container">
+                        <div id="postTxSubmitContainer" class="buttons-container" v-show="!isSubStudyTriggersResolved()">
+                            <button class="btn-submit btn btn-tnth-primary disabled" @click="submitPostTxQuestionnaire">{{_("Submit")}}</button>
+                        </div>
+                        {{saveLoaderDiv("postTxSubmitContainer")}}
+                        <div id="postTxResolutionContainer" v-show="isSubStudyTriggersResolved()"></div>
+                    </div>
+                </div>
+                <!-- indicate missed action status if triggers are present -->
+                <div class="action-status" v-show="hasMissedPostTxAction()">
+                    <span>{{_("Action status:")}}</span>
+                    <span class="text error-message" v-text="getPostTxActionStatus()"></span>
+                </div>
+                <div class="study-error error-message" v-show="hasSubStudyStatusErrors()">
+                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                    <span v-html="getSubStudyStatusErrors()" ></span>
+                </div>
+                <div class="post-intervention-questionnaire-error error-message"></div>
+            </div>
+        {% endcall %}
+    </div>
+  </div>
+{%- endmacro -%}
+{% macro profileTreatingClinician(person) %}
+<div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
+    <div class="col-md-12 col-xs-12">
+        {% call profileSection(data_sections="locale, timezone") %}
+        {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
+        {% call viewSection(id="profileTreatingCliniciansViewContainer") -%}
+            <table>
+                <tr class="clinicians-view"><td>{% raw %}<section-view v-bind:data="demo.data.clinician.display" v-bind:nodatatext="notProvidedText()"></section-view>{%endraw%}</td></tr>
+            </table>
+        {%- endcall %}
+        {% call editSection() -%}
+            <div id="treatingClinicianContainer" class="eproms-substudy" data-profile-section-id="treatingclinician">
+                <div class="select-list"></div>
+                <div class="select-list-error error-message"></div>
+            </div>
+            {{saveLoaderDiv("treatingClinicianContainer")}}
+        {%- endcall %}
+            <div class="put-demo-error error-message"></div>
+            <div class="get-clinicians-error error-message"></div>
+        {% endcall %}
+    </div>
+</div>
+{%- endmacro %}
 {% macro profileSessionList(person, current_user) -%}
     <div id="userSessionsListContainer" data-profile-section-id="assessmentlist">
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
@@ -850,8 +1021,8 @@
             <THEAD><th>{{_("Questionnaire Name")}}</th><th>{{_("Visit")}}</th><th>{{_("Status")}}</th><th>{{_("Last Updated")}} <small id="gmtText" class="gmt">({{ _("GMT, Y-M-D") }})</small></th></THEAD>
             {% raw %}
                 <tr v-for="item in assessment.assessmentListItems" v-bind:title="item.title" v-bind:class="item.class">
-                    <td><a v-bind:href="item.link">{{item.display}}</a></td>
-                    <td><a v-bind:href="item.link">{{item.visit}}</a></td>
+                    <td><a v-bind:href="item.link" v-html="item.display"></a></td>
+                    <td><a v-bind:href="item.link" v-html="item.visit"></a></td>
                     <td><a v-bind:href="item.link">{{item.status}}</a></td>
                     <td><a v-bind:href="item.link">{{item.date}}</a></td>
                 </tr>
@@ -860,6 +1031,44 @@
         {% raw %}
             <div id="profileSessionListError" class="error-message">{{assessment.assessmentListError}}</div>
         {% endraw %}
+        <!-- testing feature -->
+        {% if config["SYSTEM_TYPE"].lower() != "production" and (current_user.has_role(ROLE.ADMIN.value) or current_user.has_role(ROLE.STAFF_ADMIN.value)) -%}
+            <div id="timeWarpContainer" class="tnth-hide">
+                <div class="prompt">
+                    <span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span><span class="text text-muted">[ time warp patient data ]</span>
+                </div>
+                <div class="modal fade" id="timeWarpModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <div class="modal-header-title">Time warp patient's data back in time</div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="body-content">
+                                <div class="form-group">
+                                    By <input type="text" id="timeWarpDays" class="form-control" disabled="false" pattern="(\d)?\d" maxlength="2" width="50"> Days
+                                    <div class="help-block"></div>
+                                </div>
+                                <div class="button-container">
+                                    <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                    <a class="btn btn-tnth-primary submit">
+                                        <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>
+                                        Submit
+                                    </a>
+                                </div>
+                                <div class="error-message"></div>
+                                <div class="info-message text-info"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Close")}}</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
     </div>
 {%- endmacro %}
 {% macro profileClinicalQuestions(person, current_user) -%}
@@ -1055,7 +1264,7 @@
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
-                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
+                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn disabled" type="button" disabled>{{_("Log in as patient")}}</button>
                 </div>
                  <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
@@ -1174,7 +1383,7 @@
                 {% call viewSection() %}<div id="procedure_view"></div>{% endcall %}
                 {% call editSection() -%}
                     <p class="title-text text-muted">
-                        {%-if current_user and current_user.has_role(ROLE.STAFF.value)-%}
+                        {%-if current_user and current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
                             {{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}
                         {%-elif person and current_user and (person.id == current_user.id) -%}
                             {{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact

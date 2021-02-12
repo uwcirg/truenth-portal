@@ -264,7 +264,7 @@ class User(db.Model, UserMixin):
     registered = db.Column(db.DateTime, default=datetime.utcnow)
     _email = db.Column(
         'email', db.String(120), unique=True, nullable=False,
-        default=default_email)
+        default=default_email, index=True)
     phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
                                                    ondelete='cascade'))
     alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
@@ -283,6 +283,7 @@ class User(db.Model, UserMixin):
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
     practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
+    clinician_id = db.Column(db.ForeignKey('users.id'), index=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -1021,7 +1022,8 @@ class User(db.Model, UserMixin):
         db.session.add(UserObservation(
             user_id=self.id, encounter=encounter, audit=audit,
             observation_id=observation.id))
-        invalidate_users_QBT(self.id)
+        # TODO: limit invalidation to set of observations that may alter QBT
+        invalidate_users_QBT(self.id, research_study_id='all')
         return observation
 
     def clinical_history(self, requestURL=None, patch_dstu2=False):
@@ -1114,6 +1116,9 @@ class User(db.Model, UserMixin):
         if self.practitioner_id:
             d['careProvider'].append(Reference.practitioner(
                 self.practitioner_id).as_fhir())
+        if self.clinician_id:
+            d['careProvider'].append(Reference.clinician(
+                self.clinician_id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
@@ -1179,7 +1184,7 @@ class User(db.Model, UserMixin):
         Called when the ToU agreement language is updated.
 
         :param acting_user: user behind the request for permission checks
-        :param types: ToU types for which to invalide agreements (optional)
+        :param types: ToU types for which to invalid agreements (optional)
 
         """
         from .tou import ToU
@@ -1454,6 +1459,8 @@ class User(db.Model, UserMixin):
                     org_list.append(parsed)
                 elif isinstance(parsed, Practitioner):
                     self.practitioner_id = parsed.id
+                elif isinstance(parsed, User):
+                    self.clinician_id = parsed.id
             self.update_orgs(org_list, acting_user)
 
         if 'name' in fhir:
@@ -1685,7 +1692,8 @@ class User(db.Model, UserMixin):
             return True
 
         orgtree = OrgTree()
-        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) and
+        if (self.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value,
+                          ROLE.CLINICIAN.value) and
                 other.has_role(ROLE.PATIENT.value)):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
@@ -1721,7 +1729,9 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF.value)):
+                other.has_role(ROLE.STAFF_ADMIN.value) or
+                other.has_role(ROLE.STAFF.value) or
+                other.has_role(ROLE.CLINICIAN.value)):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -1738,7 +1748,7 @@ class User(db.Model, UserMixin):
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, *roles):
-        """Given one or my roles by name, true if user has at least one"""
+        """Given one or more roles by name, true if user has at least one"""
         users_roles = set((r.name for r in self.roles))
         for item in roles:
             if item in users_roles:
@@ -1762,6 +1772,24 @@ class User(db.Model, UserMixin):
         else:
             return '<div>' + '</div><div>'.join(
                 [ui.staff_html for ui in uis]) + '</div>'
+
+    @classmethod
+    def find_by_email(cls, email):
+        """Lookup routine hiding details such as INVITE_PREFIX"""
+        if '@' not in email:
+            return None
+        exact = User.query.filter(
+            func.lower(User._email) == email.lower()).first()
+        if exact:
+            return exact
+
+        # Try with INVITE_PREFIX
+        invited = User.query.filter(
+            func.lower(User._email) == f"{INVITE_PREFIX}{email}".lower(
+            )).first()
+        if invited:
+            return invited
+        return None
 
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""
@@ -1982,8 +2010,11 @@ def get_user(
 
 def patients_query(
         acting_user,
-        include_test_role=False, include_deleted=False,
-        requested_orgs=None, filter_by_ids=None):
+        include_test_role=False,
+        include_deleted=False,
+        research_study_id=0,
+        requested_orgs=None,
+        filter_by_ids=None):
     """Return query for patients, filtered as specified
 
     Build live SQLAlchemy query for patients, to which the acting_user has
@@ -1997,6 +2028,7 @@ def patients_query(
       some criteria
     :param include_test_role: Set true to include users with ``test`` role
     :param include_deleted: Set true to include deleted users
+    :param research_study_id: Limit result to patients consented with study
     :param requested_orgs: Set if user requests a limited list of org IDs
     :return: Live SQLAlchemy ``Query``, for further filter additions or
      execution
@@ -2027,8 +2059,11 @@ def patients_query(
             User.id == UserOrganization.user_id).filter(
             UserOrganization.organization_id.in_(require_orgs))
 
+    if require_orgs or research_study_id:
+        """With required orgs or study id, require consent with given id"""
         consent_query = UserConsent.query.filter(and_(
             UserConsent.deleted_id.is_(None),
+            UserConsent.research_study_id == research_study_id,
             UserConsent.expires > datetime.utcnow()))
         consented_users = [
             u.user_id for u in consent_query if u.staff_editable]

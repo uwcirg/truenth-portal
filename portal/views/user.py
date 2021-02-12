@@ -20,6 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth, user_manager
@@ -32,6 +33,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
@@ -419,7 +421,7 @@ def reactivate_user(user_id):
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
     [ROLE.APPLICATION_DEVELOPER.value, ROLE.ADMIN.value, ROLE.SERVICE.value,
-     ROLE.STAFF.value])
+     ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
@@ -732,12 +734,16 @@ def set_user_consents(user_id):
 
         # Moving consent dates potentially invalidates
         # (questionnaire_response: visit_name) associations.
+        cache.delete_memoized(trigger_date)
         QuestionnaireResponse.purge_qb_relationship(
-            subject_id=user.id, acting_user_id=current_user().id)
+            subject_id=user.id,
+            research_study_id=consent.research_study_id,
+            acting_user_id=current_user().id)
 
         # The updated consent may have altered the cached assessment
         # status - invalidate this user's data at this time.
-        invalidate_users_QBT(user_id=user.id)
+        invalidate_users_QBT(
+            user_id=user.id, research_study_id=consent.research_study_id)
     except ValueError as e:
         abort(400, str(e))
 
@@ -881,7 +887,8 @@ def withdraw_consent(
         # in this case, as the user is withdrawing, not altering initial
         # consent dates.  Doing so does alter the QB_timeline from point of
         # withdrawal forward, so force QB_timeline renewal
-        invalidate_users_QBT(user_id=user.id)
+        invalidate_users_QBT(
+            user_id=user.id, research_study_id=research_study_id)
 
     except ValueError as e:
         abort(400, str(e))
@@ -925,6 +932,13 @@ def delete_user_consents(user_id):
               description:
                 Organization identifier defining with whom the consent
                 agreement applies
+            research_study_id:
+              type: integer
+              format: int64
+              description:
+                Research Study identifier defining which research study the
+                consent agreement applies to.  Include to override the default
+                value of 0 (zero).
     responses:
       200:
         description: successful operation
@@ -952,12 +966,15 @@ def delete_user_consents(user_id):
         request.json))
     user = get_user(user_id, 'edit')
     remove_uc = None
+    research_study_id = request.json.get('research_study_id', 0)
     try:
         id_to_delete = int(request.json['organization_id'])
     except ValueError:
         abort(400, "requires integer value for `organization_id`")
     for uc in user.valid_consents:
-        if uc.organization.id == id_to_delete:
+        if (
+                uc.organization.id == id_to_delete and
+                uc.research_study_id == research_study_id):
             remove_uc = uc
             break
     if not remove_uc:
@@ -969,10 +986,13 @@ def delete_user_consents(user_id):
     remove_uc.status = 'deleted'
     # The deleted consent may have altered the cached assessment
     # status, even the qb assignments - force re-eval by invalidating now
+    cache.delete_memoized(trigger_date)
     QuestionnaireResponse.purge_qb_relationship(
-        subject_id=user_id, acting_user_id=current_user().id)
+        subject_id=user_id,
+        research_study_id=research_study_id,
+        acting_user_id=current_user().id)
 
-    invalidate_users_QBT(user_id=user_id)
+    invalidate_users_QBT(user_id=user_id, research_study_id=research_study_id)
     db.session.commit()
 
     return jsonify(message="ok")
@@ -1965,7 +1985,8 @@ def upload_user_document(user_id):
 @crossdomain()
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value])
 def trigger_password_reset_email(user_id):
     """Trigger a password reset email for the specified user
 
@@ -2297,7 +2318,8 @@ def invite(user_id):
 @crossdomain()
 @oauth.require_oauth()
 @roles_required(
-    [ROLE.ADMIN.value, ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value])
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.CLINICIAN.value, ROLE.INTERVENTION_STAFF.value])
 def get_user_messages(user_id):
     """Returns simple JSON defining user email messages
 
@@ -2380,6 +2402,11 @@ def get_current_user_qb(user_id):
         required: true
         type: integer
         format: int64
+      - name: research_study_id
+        in: query
+        description: research study id, defaults to 0
+        required: false
+        type: integer
       - name: as_of_date
         in: query
         description: Optional datetime for user-specific QB (otherwise, now)
@@ -2408,7 +2435,9 @@ def get_current_user_qb(user_id):
     # allow date and time info to be available
     date = FHIR_datetime.parse(date) if date else datetime.utcnow()
 
-    qstats = QB_Status(user=user, as_of_date=date)
+    research_study_id = int(request.args.get('research_study_id', 0))
+    qstats = QB_Status(
+        user=user, research_study_id=research_study_id, as_of_date=date)
     qbd = qstats.current_qbd()
 
     if not qbd:

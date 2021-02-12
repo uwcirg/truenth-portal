@@ -1,5 +1,5 @@
 """Module for additional datetime tools/utilities"""
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import json
 
 from dateutil import parser
@@ -172,3 +172,21 @@ def utcnow_sans_micro():
     """
     now = datetime.utcnow()
     return now.replace(microsecond=0)
+
+
+def weekday_delta(start, end):
+    """Returns the datetime delta of end-start excluding weekends"""
+    if end < start:
+        raise ValueError("unexpected end date less than start")
+
+    included_weekend_days = 0
+    i = start
+    while True:
+        if i > end:
+            break
+        if i.isoweekday() > 5:
+            included_weekend_days += 1
+        i = i + timedelta(days=1)
+
+    corrected_end = end - timedelta(days=included_weekend_days)
+    return corrected_end - start

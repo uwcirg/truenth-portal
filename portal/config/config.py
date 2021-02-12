@@ -161,6 +161,7 @@ class BaseConfig(object):
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
     USER_SHOW_USERNAME_EMAIL_DOES_NOT_EXIST = False
+    USER_UNAUTHORIZED_ENDPOINT = 'auth.unauthorized_endpoint'
     ENABLE_URL_AUTHENTICATED = os.environ.get('ENABLE_URL_AUTHENTICATED', 'false').lower() == 'true'
 
     STAFF_BULK_DATA_ACCESS = True
@@ -180,10 +181,15 @@ class BaseConfig(object):
     LR_GROUP = os.environ.get('LR_GROUP', 20129)
     LR_FOLDER_ST = os.environ.get('LR_FOLDER_ST', 34666)
 
+    SDC_BASE_URL = os.environ.get('SDC_BASE_URL', 'http://sdc:5000/v/r2/fhir')
+
     SYSTEM_TYPE = os.environ.get('SYSTEM_TYPE', 'development')
 
     # Only set cookies over "secure" channels (HTTPS) for non-dev deployments
     SESSION_COOKIE_SECURE = SYSTEM_TYPE.lower() != 'development'
+
+    # include cookies in cross-domain requests eg portal banner
+    SESSION_COOKIE_SAMESITE = 'None'
     PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'http')
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'

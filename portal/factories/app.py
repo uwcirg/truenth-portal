@@ -36,6 +36,7 @@ from ..views.auth import (
 )
 from ..views.client import client_api
 from ..views.clinical import clinical_api
+from ..views.clinician import clinician_api
 from ..views.coredata import coredata_api
 from ..views.demographics import demographics_api
 from ..views.extend_flask_user import (
@@ -62,6 +63,7 @@ from ..views.practitioner import practitioner_api
 from ..views.procedure import procedure_api
 from ..views.questionnaire import questionnaire_api
 from ..views.reporting import reporting_api
+from ..views.research_study import research_study_api
 from ..views.role import role_api
 from ..views.scheduled_job import scheduled_job_api
 from ..views.staff import staff
@@ -77,6 +79,7 @@ DEFAULT_BLUEPRINTS = (
     client_api,
     coredata_api,
     clinical_api,
+    clinician_api,
     csrf_blueprint,
     demographics_api,
     facebook_blueprint,
@@ -96,6 +99,7 @@ DEFAULT_BLUEPRINTS = (
     portal,
     questionnaire_api,
     reporting_api,
+    research_study_api,
     role_api,
     scheduled_job_api,
     staff,
@@ -225,7 +229,9 @@ def configure_blueprints(app, blueprints):
         app.register_blueprint(exercise_diet)
     else:
         from ..eproms.views import eproms
+        from ..trigger_states.views import trigger_states
         app.register_blueprint(eproms)
+        app.register_blueprint(trigger_states)
 
     for blueprint in blueprints:
         app.register_blueprint(blueprint)

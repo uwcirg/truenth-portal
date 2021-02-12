@@ -210,7 +210,7 @@ class Organization(db.Model):
     def timezone(self, value):
         self._timezone = value
 
-    def rps_w_retired(self, consider_parents=False):
+    def rps_w_retired(self, research_study_id, consider_parents=False):
         """accessor to collate research protocols and retired_as_of values
 
         The SQLAlchemy association proxy doesn't provide easy access to
@@ -219,6 +219,7 @@ class Organization(db.Model):
         in the intermediary table, `retired_as_of` with the research protocols
         for this organization.
 
+        :param research_study_id: the study being processed, or "all"
         :param consider_parents: if set and the org doesn't have an
          associated RP, continue up the org hiearchy till one is found.
 
@@ -238,6 +239,10 @@ class Organization(db.Model):
                 ResearchProtocol,
                 OrganizationResearchProtocol.retired_as_of).order_by(
                 OrganizationResearchProtocol.retired_as_of.desc())
+
+            if research_study_id != "all":
+                items = items.filter(
+                    ResearchProtocol.research_study_id == research_study_id)
             return items
 
         items = fetch_for_org(self.id)
@@ -253,7 +258,7 @@ class Organization(db.Model):
         # no match found; return valid (empty) query for client iteration
         return items
 
-    def research_protocol(self, as_of_date):
+    def research_protocol(self, research_study_id, as_of_date):
         """Lookup research protocol for this org valid at as_of_date
 
         Complicated scenario as it may only be defined on the parent or
@@ -266,7 +271,7 @@ class Organization(db.Model):
 
         def rp_from_org(org):
             best_candidate = None
-            for rp, retired_as_of in org.rps_w_retired():
+            for rp, retired_as_of in org.rps_w_retired(research_study_id):
                 if not retired_as_of:
                     best_candidate = rp
                 elif retired_as_of > as_of_date:
@@ -371,14 +376,20 @@ class Organization(db.Model):
         self.default_locale = data.get('language')
         return self
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
         """Return JSON representation of organization
 
         :param include_empties: if True, returns entire object definition;
             if False, empty elements are removed from the result
+        :param include_inherited: if True, attributes not defined at instance
+            level will be looked up climbing the org tree - first found
+            defines.  by default (False) only attributes set directly on
+            the (self) organization are included.  Only implemented on
+            the following attributes {timezone, research_protocol}
         :return: JSON representation of a FHIR Organization resource
 
         """
+        # TODO implement `include_inherited` on additional attributes
         d = {}
         d['resourceType'] = 'Organization'
         d['id'] = self.id
@@ -401,7 +412,9 @@ class Organization(db.Model):
         extensions = []
         for kls in org_extension_classes:
             instance = org_extension_map(self, {'url': kls.extension_url})
-            data = instance.as_fhir(include_empties)
+            data = instance.as_fhir(
+                include_empties=include_empties,
+                include_inherited=include_inherited)
             if data:
                 extensions.append(data)
         d['extension'] = extensions
@@ -542,17 +555,37 @@ class ResearchProtocolExtension(CCExtension):
 
     extension_url = TRUENTH_RP_EXTENSION
 
-    def as_fhir(self, include_empties=True):
+    def as_fhir(self, include_empties=True, include_inherited=False):
         rps = []
-        for rp, retired_as_of in self.organization.rps_w_retired():
-            d = {'name': rp.name}
-            if retired_as_of:
-                d['retired_as_of'] = FHIR_datetime.as_fhir(retired_as_of)
-            rps.append(d)
+
+        def rps_from_org(org):
+            for rp, retired_as_of in org.rps_w_retired(
+                    research_study_id='all'):
+                d = {
+                    'name': rp.name,
+                    'research_study_id': rp.research_study_id}
+                if retired_as_of:
+                    d['retired_as_of'] = FHIR_datetime.as_fhir(retired_as_of)
+                rps.append(d)
+            return rps
+
+        rps = rps_from_org(self.organization)
         if rps:
             return {'url': self.extension_url, 'research_protocols': rps}
         elif include_empties:
             return {'url': self.extension_url}
+        elif include_inherited:
+            # Climb the org inheritance tree till an rp is found
+            org = self.organization
+            while True:
+                if org.partOf_id is None:
+                    return
+                org = Organization.query.get(org.partOf_id)
+                rps = rps_from_org(org)
+                if rps:
+                    return {
+                        'url': self.extension_url,
+                        'research_protocols': rps}
 
     def apply_fhir(self):
         if self.extension['url'] != self.extension_url:
@@ -932,20 +965,6 @@ class OrgTree(object):
             return next(iter(results)) if results else None
         return results
 
-    @staticmethod
-    def all_ids_with_rp(research_protocol):
-        """Returns set of org IDs that are associated with Research Protocol
-
-        As child orgs are considered to be associated if the parent org
-        is, this will return the full list for optimized comparisons.
-
-        """
-        results = set()
-        for o in Organization.query.all():
-            if research_protocol == o.research_protocol:
-                results.add(o.id)
-        return results
-
 
 def org_restriction_by_role(user, requested_orgs):
     """Return list of organizations user can and wants to see
@@ -964,12 +983,8 @@ def org_restriction_by_role(user, requested_orgs):
         return requested_orgs
 
     org_list = set()
-    if user.has_role(ROLE.STAFF.value):
-        if user.has_role(ROLE.INTERVENTION_STAFF.value):
-            raise BadRequest(
-                "Patients list for staff and intervention-staff are"
-                " mutually exclusive - user shouldn't have both roles")
-
+    if user.has_role(
+            ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value):
         # Build list of all organization ids, and their descendants, the
         # user belongs to
         ot = OrgTree()

@@ -3,9 +3,12 @@
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
   <div id="patientList">
-    <h4 class="tnth-headline">{% trans %}Patient List{% endtrans %}</h4>
+    <div class="patientList-header">
+      <h4 class="tnth-headline">{{_("Patient List")}}</h4>
+      {{patientListToggle(selected='mainStudy')}}
+    </div>
     <div id="patientListOptions">
-      {%- if user.has_role(ROLE.STAFF.value) -%}
+      {%- if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
       <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
       {%- endif -%}
@@ -103,7 +106,9 @@
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
-                          {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
+                            {%- if consent.research_study_id == 0 -%}
+                            {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
+                            {%- endif -%}
                         {%-endfor-%}
                       {%-endif-%}
                       </td>
@@ -156,30 +161,7 @@
       {% endif %}
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
-  <div id="exportReportPopoverWrapper" class="tnth-hide">
-    <div id="exportReportContainer" data-trigger="manual" data-container="body" data-html="true" data-toggle="popover" data-placement="bottom" data-content="">
-      <button id="btnExportReport" class="btn btn-tnth-primary dropdown-toggle" title="{{_('Export report data')}}" data-toggle="dropdown" type="button" aria-expanded="true"><i class="glyphicon glyphicon-export icon-share"></i> <span class="caret"></span></button>
-      <ul class="dropdown-menu data-types" role="menu"><li data-type="csv"><a>{{_("CSV")}}</a></li><li data-type="json"><a>{{_("JSON")}}</a></li></ul>
-    </div>
-    <div id="exportReportPopoverContent" class="tnth-hide">
-      <div class="exportReport__popovercontent">
-        <div class='text-info text-center'><h4>{{_("Export request submitted")}}</h4></div>
-        <span class='exportReport__text-warning'>{{_("Note: due to the size of result data, this may take a while.")}}</span>
-        <div class="text-center exportReport__display-container">
-          <!--<span class="exportReport__loader tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></span>-->
-          <span class="exportReport__status"></span>
-          <span class="exportReport__percentage"></span>
-          <span class="exportReport__result"></span>
-          <div class="exportReport__error" class="error-message">
-            <div class="message error-message"></div>
-            <div>
-              <button class="exportReport__retry tnth-hide">{{_("Retry")}}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {{ExportPopover()}}
 </div>
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}

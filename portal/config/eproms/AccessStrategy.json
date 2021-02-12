@@ -1,16 +1,6 @@
 {
   "entry": [
     {
-      "function_details": {
-        "function": "update_card_html_on_completion",
-        "kwargs": []
-      },
-      "id": 2002,
-      "intervention_name": "assessment_engine",
-      "name": "fix assessment_engine link_url and update on completion",
-      "resourceType": "AccessStrategy"
-    },
-    {
       "description": "Confirm patient associated with an org with self_management identifier",
       "function_details": {
         "function": "combine_strategies",

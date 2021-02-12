@@ -95,12 +95,12 @@ def home():
         return next_after_login()
 
     # All checks passed - present appropriate view for user role
+    if user.has_role(ROLE.STAFF_ADMIN.value):
+        return redirect(url_for('staff.staff_index'))
     if user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value):
         return redirect(url_for('patients.patients_root'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
-    if user.has_role(ROLE.STAFF_ADMIN.value):
-        return redirect(url_for('staff.staff_index'))
 
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()

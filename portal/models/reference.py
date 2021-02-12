@@ -30,6 +30,16 @@ class Reference(object):
         return ''.join(result)
 
     @classmethod
+    def clinician(cls, clinician_id):
+        """Create a reference object from a known id
+
+        NB clinician is a user with the clinician role
+        """
+        instance = cls()
+        instance.clinician_id = int(clinician_id)
+        return instance
+
+    @classmethod
     def organization(cls, organization_id):
         """Create a reference object from a known organization id"""
         instance = cls()
@@ -45,7 +55,7 @@ class Reference(object):
 
     @classmethod
     def practitioner(cls, practitioner_id):
-        """Create a reference object from a known patient id"""
+        """Create a reference object from a known practitioner id"""
         instance = cls()
         instance.practitioner_id = int(practitioner_id)
         return instance
@@ -62,6 +72,15 @@ class Reference(object):
         """Create a reference object from a known questionnaire bank"""
         instance = cls()
         instance.questionnaire_bank_name = questionnaire_bank_name
+        return instance
+
+    @classmethod
+    def questionnaire_response(cls, qnr_identifier):
+        """Create a reference from given questionnaire response identifier"""
+        instance = cls()
+        instance.questionnaire_response_reference = (
+            f"{qnr_identifier['system']}/QuestionnaireResponse/"
+            f"{qnr_identifier['value']}")
         return instance
 
     @classmethod
@@ -85,7 +104,7 @@ class Reference(object):
 
     @classmethod
     def parse(cls, reference_dict):
-        """Parse an organization from a FHIR Reference resource
+        """Parse a Reference Object from a FHIR Reference resource
 
         Typical format: "{'Reference': 'Organization/12'}"
         or "{'reference': 'api/patient/6'}"
@@ -107,6 +126,7 @@ class Reference(object):
         from .organization import Organization, OrganizationIdentifier
         from .practitioner import Practitioner, PractitionerIdentifier
         from .questionnaire import Questionnaire, QuestionnaireIdentifier
+        from .questionnaire_response import QuestionnaireResponse
         from .questionnaire_bank import QuestionnaireBank
         from .research_protocol import ResearchProtocol
         from .user import User
@@ -136,6 +156,11 @@ class Reference(object):
                         Identifier.id == QuestionnaireIdentifier.identifier_id,
                         Identifier.system == system,
                         Identifier._value == value))
+            elif obj == QuestionnaireResponse:
+                # NB the order of system, value is swaped with all other regex
+                # patterns - swap back in identifier instance
+                ident = Identifier(system=value, _value=system)
+                query = obj.by_identifier(identifier=ident)
             else:
                 raise ValueError(
                     '`{}` does not support external identifier '
@@ -159,19 +184,22 @@ class Reference(object):
                     reference_dict))
 
         lookup = (
-            (re.compile('[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'[Cc]linician/(\d+)'), User, 'id'),
+            (re.compile(r'[Oo]rganization/([^?]+)\?[Ss]ystem=(\S+)'),
              Organization, 'identifier'),
-            (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
-            (re.compile('[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'[Oo]rganization/(\d+)'), Organization, 'id'),
+            (re.compile(r'[Qq]uestionnaire/(\w+)\?[Ss]ystem=(\S+)'),
              Questionnaire, 'identifier'),
-            (re.compile('[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
+            (re.compile(r'[Qq]uestionnaire_[Bb]ank/(\w+[.]?\w*)'),
              QuestionnaireBank, 'name'),
-            (re.compile('[Ii]ntervention/(\w+)'), Intervention, 'name'),
-            (re.compile('[Pp]atient/(\d+)'), User, 'id'),
-            (re.compile('[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
+            (re.compile(r'(\S+)/QuestionnaireResponse/(\S+)'),
+             QuestionnaireResponse, 'identifier'),
+            (re.compile(r'[Ii]ntervention/(\w+)'), Intervention, 'name'),
+            (re.compile(r'[Pp]atient/(\d+)'), User, 'id'),
+            (re.compile(r'[Pp]ractitioner/(\w+)\?[Ss]ystem=(\S+)'),
              Practitioner, 'identifier'),
-            (re.compile('[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
-            (re.compile('[Rr]esearch_[Pp]rotocol/(.+)'),
+            (re.compile(r'[Pp]ractitioner/(\d+)'), Practitioner, 'id'),
+            (re.compile(r'[Rr]esearch_[Pp]rotocol/(.+)'),
              ResearchProtocol, 'name'))
 
         for pattern, obj, attribute in lookup:
@@ -218,32 +246,43 @@ class Reference(object):
         from .practitioner import Practitioner
         from .user import User
 
-        if hasattr(self, 'patient_id'):
+        display = None
+        if hasattr(self, 'clinician_id'):
+            ref = "api/clinician/{}".format(self.clinician_id)
+            display = User.query.get(self.clinician_id).display_name
+        elif hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
             display = User.query.get(self.patient_id).display_name
-        if hasattr(self, 'practitioner_id'):
+        elif hasattr(self, 'practitioner_id'):
             p = Practitioner.query.get(self.practitioner_id)
             i = [i for i in p.identifiers if i.system == US_NPI][0]
             ref = "api/practitioner/{}?system={}".format(i.value, i.system)
             display = p.display_name
-        if hasattr(self, 'organization_id'):
+        elif hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
             display = Organization.query.get(self.organization_id).name
-        if hasattr(self, 'questionnaire_name'):
+        elif hasattr(self, 'questionnaire_name'):
             ref = "api/questionnaire/{}?system={}".format(
                 self.questionnaire_name, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM)
             display = self.questionnaire_name
-        if hasattr(self, 'questionnaire_bank_name'):
+        elif hasattr(self, 'questionnaire_bank_name'):
             ref = "api/questionnaire_bank/{}".format(
                 self.questionnaire_bank_name)
             display = self.questionnaire_bank_name
-        if hasattr(self, 'research_protocol_name'):
+        elif hasattr(self, 'questionnaire_response_reference'):
+            ref = self.questionnaire_response_reference
+        elif hasattr(self, 'research_protocol_name'):
             ref = "api/research_protocol/{}".format(
                 self.research_protocol_name)
             display = self.research_protocol_name
-        if hasattr(self, 'intervention_name'):
+        elif hasattr(self, 'intervention_name'):
             ref = "api/intervention/{}".format(
                 self.intervention_name)
             display = self.intervention_name
+        else:
+            raise ValueError("lacking internal attribute")
 
-        return {"reference": ref, "display": display}
+        result = {'reference': ref}
+        if display:
+            result['display'] = display
+        return result

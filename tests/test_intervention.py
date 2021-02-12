@@ -23,8 +23,9 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.research_study import ResearchStudy
 from portal.models.role import ROLE
-from portal.models.user import add_role
+from portal.models.user import User, add_role
 from portal.models.user_consent import UserConsent
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, associative_backdate
@@ -557,10 +558,10 @@ def test_in_role(initialize_static, test_user):
 
 
 def test_card_html_update(
-        initialize_static, bless_with_basics, test_user):
-    """Test strategy with side effects - card_html update"""
-    ae = INTERVENTION.ASSESSMENT_ENGINE
-    ae_id = ae.id
+        client, initialize_static, initialized_patient_logged_in):
+    """Confirm assessment status state affects AE card on /home view"""
+    test_user = initialized_patient_logged_in
+    test_user_id = test_user.id
 
     # Need a current date, adjusted slightly to test UTC boundary
     # date rendering, one day back so the assessment period will have
@@ -574,26 +575,19 @@ def test_card_html_update(
     mock_questionnairebanks('eproms')
     metastatic_org = Organization.query.filter_by(name='metastatic').one()
     test_user = db.session.merge(test_user)
+    for o in test_user.organizations:
+        test_user.organizations.remove(o)
     test_user.organizations.append(metastatic_org)
     consent = UserConsent.query.filter(
-        UserConsent.user_id == test_user.id).one()
+        UserConsent.user_id == test_user_id).one()
     consent.organization_id = metastatic_org.id
     consent.acceptance_date = dt
 
-    with SessionScope(db):
-        d = {'function': 'update_card_html_on_completion',
-             'kwargs': []}
-        strat = AccessStrategy(
-            name="update assessment_engine card_html on completion",
-            intervention_id=ae_id,
-            function_details=json.dumps(d))
-        db.session.add(strat)
-        db.session.commit()
-    user, ae, metastatic_org = map(
-        db.session.merge, (test_user, ae, metastatic_org))
+    # Fetch home page, which should include Assessment Engine "card"
+    results = client.get("/home")
 
     # without completing an assessment, card_html should include username
-    assert user.display_name in ae.display_for_user(user).card_html
+    assert bytes(test_user.display_name, 'utf-8') in results.data
 
     # Add a fake assessments and see a change
     m_qb = QuestionnaireBank.query.filter(
@@ -605,31 +599,31 @@ def test_card_html_update(
         name='metastatic_indefinite').first()
     mock_qr(instrument_id='irondemog', timestamp=dt, qb=mi_qb)
 
-    user, ae = map(db.session.merge, (test_user, ae))
+    invalidate_users_QBT(test_user_id, research_study_id='all')
 
-    invalidate_users_QBT(user.id)
-    card_html = ae.display_for_user(user).card_html
-    assert "Thank you" in card_html
-    assert ae.quick_access_check(user)
+    results = client.get("/home")
+    assert bytes("Thank you", 'utf-8') in results.data
+
+    ae = INTERVENTION.ASSESSMENT_ENGINE
+    assert ae.quick_access_check(test_user)
 
     # test datetime display based on user timezone
     today = datetime.strftime(dt, '%e %b %Y')
-    assert today in card_html
-    user.timezone = "Asia/Tokyo"
+    assert bytes(today, 'utf-8') in results.data
+    test_user = db.session.merge(test_user)
+    test_user.timezone = "Asia/Tokyo"
     with SessionScope(db):
-        db.session.add(user)
         db.session.commit()
-    user, ae = map(db.session.merge, (test_user, ae))
-    card_html = ae.display_for_user(user).card_html
     tomorrow = datetime.strftime(
         dt + timedelta(days=1), '%e %b %Y')
-    assert tomorrow in card_html
+    results = client.get("/home")
+    assert bytes(tomorrow, 'utf-8') in results.data
 
 
-def test_expired(bless_with_basics, test_user):
+def test_expired(client, initialized_patient_logged_in):
     """If baseline expired check message"""
-    ae = INTERVENTION.ASSESSMENT_ENGINE
-    ae_id = ae.id
+    test_user = initialized_patient_logged_in
+
     # backdate so baseline is expired
     backdate, nowish = associative_backdate(
         now=datetime.utcnow(), backdate=relativedelta(months=3))
@@ -639,26 +633,17 @@ def test_expired(bless_with_basics, test_user):
     mock_questionnairebanks('eproms')
     localized_org = Organization.query.filter_by(name='localized').one()
     test_user = db.session.merge(test_user)
+    for o in test_user.organizations:
+        test_user.organizations.remove(o)
     test_user.organizations.append(localized_org)
     consent = UserConsent.query.filter(
         UserConsent.user_id == test_user.id).one()
     consent.organization_id = localized_org.id
     consent.acceptance_date = backdate
 
-    with SessionScope(db):
-        d = {'function': 'update_card_html_on_completion',
-             'kwargs': []}
-        strat = AccessStrategy(
-            name="update assessment_engine card_html on completion",
-            intervention_id=ae_id,
-            function_details=json.dumps(d))
-        db.session.add(strat)
-        db.session.commit()
-    user, ae = map(db.session.merge, (test_user, ae))
-
-    assert (
-        "The assessment is no longer available" in
-        ae.display_for_user(user).card_html)
+    results = client.get("/home")
+    assert bytes(
+        "The assessment is no longer available", 'utf-8') in results.data
 
 
 def test_strat_from_json(initialize_static):
@@ -1266,6 +1251,7 @@ def setUp(initialize_static):
     # Load minimal set of persistence files for access_strategy, in same
     # order defined in site_persistence
     needed = {
+        ResearchStudy,
         ResearchProtocol,
         Coding,
         Organization,

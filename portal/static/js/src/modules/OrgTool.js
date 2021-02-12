@@ -1,6 +1,7 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
 import Consent from "./Consent.js";
+import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
 export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
@@ -100,6 +101,10 @@ export default (function() { /*global i18next $ */
         return orgList;
     };
     OrgTool.prototype.getOrgsList = function(){
+        if (!Object.keys(this.orgsList).length) {
+            this.init();
+            return this.orgsList;
+        }
         return this.orgsList;
     };
     OrgTool.prototype.getOrgName = function(orgId){
@@ -108,6 +113,45 @@ export default (function() { /*global i18next $ */
             return orgsList[orgId].name;
         }
         return "";
+    };
+    OrgTool.prototype.getResearchProtocolsByOrgId = function(orgId) {
+        var orgsList = this.getOrgsList();
+        if (!orgId || !orgsList.hasOwnProperty(orgId) || !orgsList[orgId].extension) return [];
+        let researchProtocols =  orgsList[orgId].extension.filter(ex => {
+            return ex.research_protocols;
+        });
+        if (!researchProtocols.length) return [];
+        return researchProtocols[0].research_protocols;
+    }
+    OrgTool.prototype.isSubStudyOrg = function(orgId, params) {
+        if (!orgId) return false;
+        params = params || {};
+        var orgsList = this.getOrgsList();
+        if (!orgsList.hasOwnProperty(orgId)) return false;
+        if (!this.getResearchProtocolsByOrgId(orgId).length) {
+            if (sessionStorage.getItem(`extension_${orgId}`)) {
+                orgsList[orgId].extension = [...JSON.parse(sessionStorage.getItem(`extension_${orgId}`))];
+            } else {
+                /*
+                * include flag for inherited attributes to find added inherited attributes that include research study
+                * information
+                */
+                tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: params.async ? false : true}, function(data) {
+                    if (data && data.extension) {
+                        orgsList[orgId].extension = [...data.extension];
+                        sessionStorage.setItem(`extension_${orgId}`, JSON.stringify(data.extension));
+                    }
+                });
+            }
+        }
+        let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
+
+        /*
+         * match substudy research protocol study id with that from the org
+         */
+        return researchProtocolSet.filter(p => {
+            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
+        }).length > 0;
     };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
@@ -259,11 +303,15 @@ export default (function() { /*global i18next $ */
         return orgsList;
     };
     OrgTool.prototype.populateUI = function(){
+        let container = $("#"+this.getContainerElementId());
+        if (!container.length) {
+            return;
+        }
         if (sessionStorage.orgsHTML) {
             $("#" + this.getContainerElementId()).html(sessionStorage.orgsHTML);
             return true;
         }
-        var self = this, container = $("#"+this.getContainerElementId()), orgsList = this.orgsList, parentContent = "";
+        var self = this, orgsList = this.orgsList, parentContent = "";
         var getState = (item) => {
             if (!item.identifier) {
                 return "";
@@ -566,7 +614,7 @@ export default (function() { /*global i18next $ */
         var self = this;
         $("#userOrgs input[name='organization']").each(function() {
             $(this).attr("data-save-container-id", "userOrgs");
-            $(this).on("click", function() {
+            $(this).on("click", function(e) {
                 var parentOrg = self.getElementParentOrg(this);
                 var orgsElements = $("#userOrgs input[name='organization']").not("[id='noOrgs']");
                 if ($(this).prop("checked")) {
@@ -580,7 +628,14 @@ export default (function() { /*global i18next $ */
                 if (sessionStorage.getItem("noOrgModalViewed")) {
                     sessionStorage.removeItem("noOrgModalViewed");
                 }
-
+                //validate for at least one selection checked
+                if (! $("#userOrgs input[name='organization']:checked").length || $(this).attr("id") === "noOrgs") {
+                    if (!$(this).is(":checked")) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+               
                 if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                     if (tnthAjax.hasConsent(userId, parentOrg)) {
                         self.updateOrgs(userId, $("#clinics"), true);
@@ -603,12 +658,24 @@ export default (function() { /*global i18next $ */
             });
         });
     };
+    OrgTool.prototype.getOrgsByCareProvider = function(data) {
+        if (!data) return false;
+        let cloneSet = [...data];
+        let orgFilteredSet = cloneSet.filter(item => {
+            return item.reference.match(/^api\/organization/gi);
+        });
+        if (!orgFilteredSet.length) return false;
+        return orgFilteredSet.map(item => {
+            return item.reference.split("/")[2];
+        });
+    };
     OrgTool.prototype.setOrgsVis = function(data, callback) {
         callback = callback || function() {};
         if (!data || ! data.careProvider) { callback(); return false;}
-        for (var i = 0; i < data.careProvider.length; i++) {
-            let careProvider = data.careProvider[i];
-            let orgID = careProvider.reference.split("/").pop();
+        let orgsSet = this.getOrgsByCareProvider(data.careProvider);
+        if (!orgsSet || !orgsSet.length) return false;
+        for (var i = 0; i < orgsSet.length; i++) {
+           let orgID = orgsSet[i];
             if (parseInt(orgID) === 0) {
                 $("#userOrgs #noOrgs").prop("checked", true);
                 if ($("#stateSelector").length > 0) {
@@ -643,31 +710,41 @@ export default (function() { /*global i18next $ */
     };
     OrgTool.prototype.updateOrgs = function(userId, targetField, sync, callback) {
         callback = callback || function() {};
-        var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val();
-        if (preselectClinic) {
-            demoArray.careProvider = [{reference: "api/organization/" + preselectClinic}]; /* add this regardless of consent */
-        } else {
-            var orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
-                return {reference: "api/organization/" + $(this).val()};
-            }).get();
-            if (orgIDs && orgIDs.length > 0) {
-                demoArray.careProvider = orgIDs;
+        tnthAjax.getDemo(userId, "", function(existingDemoData) {
+            var demoArray = {"resourceType": "Patient"}, preselectClinic = $("#preselectClinic").val();
+            if (existingDemoData && existingDemoData.careProvider) {
+                //make sure we don't wipe out reference to other than organization
+                let cloneSet = [...existingDemoData.careProvider];
+                demoArray.careProvider = cloneSet.filter(item => {
+                    return !item.reference.match(/^api\/organization/gi);
+                });
+            } else {
+                demoArray.careProvider = [];
             }
-            /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
-            $("#fillOrgs legend[data-checked]").each(function() {
-                var tOrg = $(this).attr("orgid");
-                if (tOrg) {
-                    demoArray.careProvider = demoArray.careProvider || [];
-                    demoArray.careProvider.push({reference: "api/organization/" + tOrg});
+            if (preselectClinic) {
+                demoArray.careProvider.push({reference: "api/organization/" + preselectClinic}); /* add this regardless of consent */
+            } else {
+                var orgIDs = $("#userOrgs input[name='organization']:checked").map(function() {
+                    return {reference: "api/organization/" + $(this).val()};
+                }).get();
+                if (orgIDs && orgIDs.length > 0) {
+                    demoArray.careProvider = orgIDs;
                 }
+                /**** dealing with the scenario where user can be affiliated with top level org e.g. TrueNTH Global Registry, IRONMAN, via direct database addition **/
+                $("#fillOrgs legend[data-checked]").each(function() {
+                    var tOrg = $(this).attr("orgid");
+                    if (tOrg) {
+                        demoArray.careProvider.push({reference: "api/organization/" + tOrg});
+                    }
+                });
+            }
+            if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
+                demoArray.careProvider.push({reference: "api/organization/" + 0});
+            }
+            tnthAjax.putDemo(userId, demoArray, targetField, sync, function() {
+                $("#clinics").trigger("updated");
+                callback();
             });
-        }
-        if ($("#aboutForm").length === 0 && (!demoArray.careProvider)) { //don't update org to none if there are top level org affiliation above
-            demoArray.careProvider = [{reference: "api/organization/" + 0}];
-        }
-        tnthAjax.putDemo(userId, demoArray, targetField, sync, function() {
-            $("#clinics").trigger("updated");
-            callback();
         });
     };
     OrgTool.prototype.getShortName = function(orgId) {

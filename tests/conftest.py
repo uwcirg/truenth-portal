@@ -1,6 +1,7 @@
 # test plugin
 # https://docs.pytest.org/en/latest/writing_plugins.html#conftest-py-plugins
 from datetime import datetime
+from glob import glob
 
 from flask import url_for
 from flask_webtest import SessionScope
@@ -29,6 +30,7 @@ from portal.models.practitioner import Practitioner
 from portal.models.procedure import Procedure
 from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.relationship import add_static_relationships
+from portal.models.research_protocol import ResearchProtocol
 from portal.models.research_study import add_static_research_studies
 from portal.models.role import ROLE, Role, add_static_roles
 from portal.models.tou import ToU
@@ -39,15 +41,19 @@ from portal.models.user_consent import (
     STAFF_EDITABLE_MASK,
     UserConsent,
 )
-from portal.system_uri import (
-    IETF_LANGUAGE_TAG,
-    PRACTICE_REGION,
-    SHORTCUT_ALIAS,
-    SHORTNAME_ID,
-    SNOMED,
-    US_NPI,
-)
+from portal.system_uri import SNOMED, US_NPI
 from tests import TEST_USER_ID
+
+
+""" Include all fixtures found in nested fixtures dir as modules """
+# The double load attempt is necessary given different IDE/tox/CI envs
+pytest_plugins = [
+    f"tests.{fixture.replace('/', '.')}"[:-3]
+    for fixture in glob("fixtures/*.py")]
+if not pytest_plugins:
+    pytest_plugins = [
+        f"{fixture.replace('/', '.')}"[:-3]
+        for fixture in glob("tests/fixtures/*.py")]
 
 
 def pytest_addoption(parser):
@@ -150,11 +156,27 @@ def calc_date_params(backdate, setdate):
 
 
 @pytest.fixture
+def initialized_with_research_study(initialized_db):
+    add_static_research_studies()
+    db.session.commit()
+
+
+@pytest.fixture
+def initialized_with_research_protocol(initialized_with_research_study):
+    rp = ResearchProtocol(name="test_rp", research_study_id=0)
+    with SessionScope(db):
+        db.session.add(rp)
+        db.session.commit()
+    return db.session.merge(rp)
+
+
+@pytest.fixture
 def initialize_static(initialized_db):
     add_static_concepts(only_quick=True)
     add_static_interventions()
     add_static_organization()
     add_static_relationships()
+    add_static_research_studies()
     add_static_roles()
     db.session.commit()
 
@@ -239,16 +261,12 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
-def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
+def initialized_patient(
+        app, test_user, initialize_static, initialized_with_research_protocol,
+        shallow_org_tree):
     """returns test patient with data necessary to avoid initial_queries"""
-    TEST_USERNAME = 'test@example.com'
-    FIRST_NAME = '✓'
-    LAST_NAME = 'Last'
-    IMAGE_URL = 'http://examle.com/photo.jpg'
     now = datetime.utcnow()
-    test_user = add_user(
-        username=TEST_USERNAME, first_name=FIRST_NAME,
-        last_name=LAST_NAME, image_url=IMAGE_URL)
+    test_user = db.session.merge(test_user)
     test_user.birthdate = now
     test_user_id = test_user.id
     role_id = db.session.query(Role.id).filter(
@@ -259,6 +277,10 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
 
     org = Organization.query.filter(
         Organization.partOf_id.isnot(None)).first()
+    if len(org.research_protocols) < 1:
+        rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'test_rp').one()
+        org.research_protocols.append(rp)
     test_user = db.session.merge(test_user)
     test_user.organizations.append(org)
 
@@ -322,6 +344,20 @@ def initialized_patient(app, add_user, initialized_db, shallow_org_tree):
 
 
 @pytest.fixture
+def initialized_patient_logged_in(client, initialized_patient):
+    """Fixture to extend initialized patient to one logged in"""
+    initialized_patient = db.session.merge(initialized_patient)
+    oauth_info = {'user_id': initialized_patient.id}
+
+    client.get(
+        'test/oauth',
+        query_string=oauth_info,
+        follow_redirects=True
+    )
+    return initialized_patient
+
+
+@pytest.fixture
 def add_user(app, initialized_db):
     def add_user(
             username, first_name="James", last_name="Nguyen",
@@ -340,7 +376,7 @@ def add_user(app, initialized_db):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_users_QBT(test_user.id)
+        invalidate_users_QBT(test_user.id, research_study_id='all')
         return test_user
     return add_user
 

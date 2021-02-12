@@ -86,13 +86,20 @@ export default { /*global i18next datepicker $*/
         });
     },
     initConsentListModalEvent: function() {
-        $("#profileConsentListModal").on("show.bs.modal", function(e) {
+        $("#profileConsentListModal").off("show.bs.modal").on("show.bs.modal", function(e) {
             var relatedTarget = $(e.relatedTarget), orgId = $(e.relatedTarget).attr("data-orgId"), agreementUrl = relatedTarget.attr("data-agreementUrl");
             var userId = relatedTarget.attr("data-userId"), status = relatedTarget.attr("data-status");
             $(this).find("input[class='radio_consent_input']").each(function() {
-                $(this).attr({ "data-agreementUrl": agreementUrl, "data-userId": userId, "data-orgId": orgId});
+                $(this).attr({ "data-agreementUrl": agreementUrl, "data-userId": userId, "data-orgId": orgId,
+                    "data-researchStudyId": relatedTarget.attr("data-researchStudyId")
+                });
                 if (String($(this).val()) === String(status)) {
                     $(this).prop("checked", true);
+                }
+                if ((status === "unknown") && $(this).val() !== "consented") {
+                    $(this).closest("label").hide();
+                } else {
+                    $(this).closest("label").show();
                 }
             });
         });
@@ -102,16 +109,17 @@ export default { /*global i18next datepicker $*/
                 if (o) {
                     o.org = $(this).attr("data-orgId");
                     o.agreementUrl = $(this).attr("data-agreementUrl");
+                    o.research_study_id = $(this).attr("data-researchStudyId");
                 }
                 if (String($(this).val()) === "purged") {
-                    tnthAjax.deleteConsent($(this).attr("data-userId"), {
-                        org: $(this).attr("data-orgId")
+                    tnthAjax.deleteConsent($(this).attr("data-userId"), o, function() {
+                        $("#profileConsentListModal").removeClass("fade").modal("hide");
+                        $("#profileConsentListModal").trigger("updated");
                     });
                     $("#profileConsentListModal").trigger("updated");
                 } else if (String($(this).val()) === "suspended") {
-                    var modalElement = $("#profileConsentListModal");
-                    tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"), null, function() {
-                        modalElement.removeClass("fade").modal("hide");
+                    tnthAjax.withdrawConsent($(this).attr("data-userId"), $(this).attr("data-orgId"), o, function() {
+                        $("#profileConsentListModal").removeClass("fade").modal("hide");
                         $("#profileConsentListModal").trigger("updated");
                     });
                 } else {
@@ -152,7 +160,8 @@ export default { /*global i18next datepicker $*/
                     "data-agreementUrl": agreementUrl,
                     "data-userId": userId,
                     "data-orgId": orgId,
-                    "data-status": status
+                    "data-status": status,
+                    "data-researchStudyId": relatedTarget.attr("data-researchStudyId")
                 });
                 if ($(this).attr("data-default-value")) {
                     $(this).val($(this).attr("data-default-value"));
@@ -170,7 +179,7 @@ export default { /*global i18next datepicker $*/
         $("#consentDateModal").on("hidden.bs.modal", function() {
             $(this).removeClass("active");
         });
-        $("#consentDateModal .consent-date").datepicker({"format": "d M yyyy","forceParse": false,"endDate": new Date(),"autoclose": true});
+        $("#consentDateModal .consent-date").datepicker({"format": "d M yyyy","forceParse": false, "autoclose": true});
         $("#consentDateModal .consent-hour, #consentDateModal .consent-minute, #consentDateModal .consent-second").each(function() {
             Utility.convertToNumericField($(this));
         });
@@ -204,6 +213,7 @@ export default { /*global i18next datepicker $*/
             o.agreementUrl = ct.attr("data-agreementUrl");
             o.acceptance_date = cDate;
             o.testPatient = true;
+            o.research_study_id = ct.attr("data-researchStudyId");
             setTimeout((function() { $("#consentDateContainer").hide();})(), 200);
             setTimeout((function() {$("#consentDateLoader").show();})(), 450);
             $("#consentDateModal button[data-dismiss]").attr("disabled", true); //disable close buttons while processing reques

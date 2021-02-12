@@ -82,3 +82,26 @@ class QBD(object):
             rel_start=results['relative_start'],
             qb_name=qb_name,
         )
+
+    def completed_date(self, user_id):
+        """Specialized query to return datetime of completion if applicable
+
+        Typically ``QB_Status.completed_date`` can be used, but for arbitrary
+        (say historical during reporting lookups) QBDs, execute query
+        specifically for the time of completion matching instance (self) data.
+
+        :returns: datetime of completion or None
+
+        """
+        from .qb_timeline import QBT
+        query = QBT.query.filter(QBT.user_id == user_id).filter(
+            QBT.qb_id == self.qb_id).filter(
+            QBT.qb_recur_id == self.recur_id).filter(
+            QBT.qb_iteration == self.iteration).filter(
+            QBT.status == 'completed')
+        if query.count() > 1:
+            raise ValueError(
+                f"Should never find multiple completed for {user_id} {self}")
+        if not query.count():
+            return None
+        return query.first().at

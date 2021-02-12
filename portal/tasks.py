@@ -15,7 +15,7 @@ from traceback import format_exc
 from celery.utils.log import get_task_logger
 from flask import current_app
 import redis
-from requests import Request, Session
+from requests import Request, Session, post
 from requests.exceptions import RequestException
 from sqlalchemy import and_
 
@@ -24,6 +24,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.observation import Observation
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
@@ -31,6 +32,7 @@ from .models.reporting import (
     generate_and_send_summaries,
     research_report,
 )
+from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
 from .models.tou import update_tous
@@ -218,19 +220,20 @@ def update_patients_task(patient_list, update_cache, queue_messages):
 def update_patients(patient_list, update_cache, queue_messages):
     now = datetime.utcnow()
     for user_id in patient_list:
-        if update_cache:
-            update_users_QBT(user_id)
-        if queue_messages:
-            user = User.query.get(user_id)
-            qbstatus = QB_Status(user, now)
-            qbd = qbstatus.current_qbd()
-            if qbd:
-                queue_outstanding_messages(
-                    user=user,
-                    questionnaire_bank=qbd.questionnaire_bank,
-                    iteration_count=qbd.iteration)
+        user = User.query.get(user_id)
+        for research_study_id in ResearchStudy.assigned_to(user):
+            if update_cache:
+                update_users_QBT(user_id, research_study_id)
+            if queue_messages:
+                qbstatus = QB_Status(user, research_study_id, now)
+                qbd = qbstatus.current_qbd()
+                if qbd:
+                    queue_outstanding_messages(
+                        user=user,
+                        questionnaire_bank=qbd.questionnaire_bank,
+                        iteration_count=qbd.iteration)
 
-        db.session.commit()
+            db.session.commit()
 
 
 @celery.task(queue=LOW_PRIORITY)
@@ -283,14 +286,20 @@ def send_user_messages(user, force_update=False):
         raise ValueError("Cannot send messages to {user}; {reason}".format(
             user=user, reason=reason))
 
+    users_rs_ids = ResearchStudy.assigned_to(user)
+
     if force_update:
-        invalidate_users_QBT(user_id=user.id)
-        qbd = QB_Status(user=user, as_of_date=datetime.utcnow()).current_qbd()
-        if qbd:
-            queue_outstanding_messages(
+        for rs_id in users_rs_ids:
+            invalidate_users_QBT(user_id=user.id, research_study_id=rs_id)
+            qbd = QB_Status(
                 user=user,
-                questionnaire_bank=qbd.questionnaire_bank,
-                iteration_count=qbd.iteration)
+                research_study_id=rs_id,
+                as_of_date=datetime.utcnow()).current_qbd()
+            if qbd:
+                queue_outstanding_messages(
+                    user=user,
+                    questionnaire_bank=qbd.questionnaire_bank,
+                    iteration_count=qbd.iteration)
     count = 0
     ready = Communication.query.join(User).filter(
         Communication.status == 'preparation').filter(User.id == user.id)
@@ -348,3 +357,47 @@ def celery_beat_health_check(**kwargs):
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
         value=str(datetime.utcnow()),
     )
+
+
+@celery.task(name="tasks.extract_observations_task", queue=LOW_PRIORITY)
+def extract_observations_task(questionnaire_response_id):
+    """Task wrapper for extract_observations"""
+    extract_observations(questionnaire_response_id)
+
+
+def extract_observations(questionnaire_response_id):
+    """Format and submit QuestionnaireResponse to SDC service; store returned Observations"""
+    from .models.questionnaire_response import QuestionnaireResponse
+    from .trigger_states.empro_states import (
+        enter_user_trigger_critical_section,
+        evaluate_triggers,
+        fire_trigger_events,
+    )
+    qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
+
+    enter_user_trigger_critical_section(user_id=qnr.subject_id)
+
+    qnr_json = qnr.as_sdc_fhir()
+
+    SDC_BASE_URL = current_app.config['SDC_BASE_URL']
+    response = post(f"{SDC_BASE_URL}/$extract", json=qnr_json)
+    response.raise_for_status()
+
+    Observation.parse_obs_bundle(response.json())
+    db.session.commit()
+
+    # As scoring is complete, pass baton to evaluation process
+    # which also frees the locked critical section on completion
+    evaluate_triggers(qnr)
+
+    # Finally, fire any outstanding actions
+    fire_trigger_events()
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def process_triggers_task(**kwargs):
+    """Task form - wraps call to testable function `fire_trigger_events` """
+    # Include within function as not all applications include the blueprint
+    from portal.trigger_states.empro_states import fire_trigger_events
+    fire_trigger_events()

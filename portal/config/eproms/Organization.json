@@ -3958,8 +3958,9 @@
         },
        {
           "research_protocols": [
-			{"name": "IRONMAN v3", "retired_as_of": "2019-12-17T00:00:00Z"},
-			{"name": "IRONMAN v5"}
+            {"name": "IRONMAN v3", "retired_as_of": "2019-12-17T00:00:00Z"},
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -4054,9 +4055,9 @@
         },
        {
           "research_protocols": [
-			{"name": "IRONMAN v2", "retired_as_of": "2015-12-15T00:00:00Z"},
-			{"name": "IRONMAN v3", "retired_as_of": "2016-12-15T00:00:00Z"},
-			{"name": "IRONMAN v5"}
+            {"name": "IRONMAN v2", "retired_as_of": "2015-12-15T00:00:00Z"},
+            {"name": "IRONMAN v3", "retired_as_of": "2016-12-15T00:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }

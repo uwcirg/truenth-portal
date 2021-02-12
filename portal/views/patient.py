@@ -7,24 +7,29 @@ for staff
 from datetime import datetime
 import json
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, current_app, jsonify, request
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..cache import cache
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.communication import Communication
 from ..models.fhir import bundle_results
 from ..models.identifier import (
     Identifier,
     UserIdentifier,
     parse_identifier_params,
 )
+from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
-from ..models.qb_timeline import QBT, update_users_QBT
-from ..models.questionnaire_bank import QuestionnaireBank
+from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
+from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
+from ..models.research_study import ResearchStudy
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from .crossdomain import crossdomain
@@ -298,6 +303,16 @@ def post_patient_dob(patient_id):
 @patient_api.route('/api/patient/<int:patient_id>/timeline')
 @oauth.require_oauth()
 def patient_timeline(patient_id):
+    """Display details for the user's Questionnaire Bank Timeline
+
+    Optional query parameters
+    :param purge: set 'true' to recreate QBTimeline, 'all' to also reset
+      QNR -> QB assignments
+    :param research_study_id: set to alternative research study ID - default 0
+    :param trace: set 'true' to view detailed logs generated, works best in
+      concert with purge
+
+    """
     from ..date_tools import FHIR_datetime, RelativeDelta
     from ..models.organization import (
         UserOrganization,
@@ -309,20 +324,30 @@ def patient_timeline(patient_id):
     from ..models.research_protocol import ResearchProtocol
     from ..trace import dump_trace, establish_trace
 
-    get_user(patient_id, permission='view')
+    user = get_user(patient_id, permission='view')
     trace = request.args.get('trace', False)
     if trace:
         establish_trace("BEGIN time line lookup for {}".format(patient_id))
 
+    try:
+        research_study_id = int(request.args.get('research_study_id', 0))
+    except ValueError:
+        abort(400, "integer value required for 'research_study_id'")
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
         # questionnaire_response : qb relationships.
         if purge == 'all':
             QuestionnaireResponse.purge_qb_relationship(
-                subject_id=patient_id, acting_user_id=current_user().id)
+                subject_id=patient_id,
+                research_study_id=research_study_id,
+                acting_user_id=current_user().id)
 
-        update_users_QBT(patient_id, invalidate_existing=purge)
+        cache.delete_memoized(trigger_date)
+        update_users_QBT(
+            patient_id,
+            research_study_id=research_study_id,
+            invalidate_existing=purge)
     except ValueError as ve:
         abort(500, str(ve))
 
@@ -330,7 +355,8 @@ def patient_timeline(patient_id):
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
     #  `due` == `completed`, but the row insertion defines priority
-    for qbt in QBT.query.filter(QBT.user_id == patient_id).order_by(
+    for qbt in QBT.query.filter(QBT.user_id == patient_id).filter(
+            QBT.research_study_id == research_study_id).order_by(
             QBT.at, QBT.id):
         # build qbd for visit name
         qbd = QBD(
@@ -358,17 +384,17 @@ def patient_timeline(patient_id):
 
     qnrs = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id == patient_id).order_by(
-        QuestionnaireResponse.authored)
+        QuestionnaireResponse.document['authored'])
 
     def get_recur_id(qnr):
-        if len(qnr.questionnaire_bank.recurs):
+        if qnr.questionnaire_bank and len(qnr.questionnaire_bank.recurs):
             return qnr.questionnaire_bank.recurs[0].id
         return None
 
     posted = [
         "{}, {}, {} ({}, {}), {}, {}".format(
             qnr.id,
-            qnr.authored,
+            qnr.document['authored'],
             visit_name(QBD(
                 relative_start=None, qb_id=qnr.questionnaire_bank_id,
                 iteration=qnr.qb_iteration, recur_id=get_recur_id(qnr))),
@@ -395,7 +421,9 @@ def patient_timeline(patient_id):
         rps.append(msg)
 
     qbstatus = QB_Status(
-        user=User.query.get(patient_id), as_of_date=datetime.utcnow())
+        user=User.query.get(patient_id),
+        research_study_id=research_study_id,
+        as_of_date=datetime.utcnow())
     prev_qbd = qbstatus.prev_qbd
     current = qbstatus.current_qbd()
     next_qbd = qbstatus.next_qbd
@@ -426,3 +454,93 @@ def patient_timeline(patient_id):
             timeline=results,
             trace=dump_trace("END time line lookup"))
     return jsonify(rps=rps, status=status, posted=posted, timeline=results)
+
+
+@patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')
+@crossdomain()
+@oauth.require_oauth()
+def patient_timewarp(patient_id, days):
+    """Debugging view to time warp patient's data back in time
+
+    :param patient_id: the patient to time warp
+    :param days: the number of days to move back - forward moves not supported
+
+    NB: only available on testing and development systems.
+    """
+    from dateutil.relativedelta import relativedelta
+    from copy import deepcopy
+    from portal.models.questionnaire_response import QuestionnaireResponse
+    from portal.models.user_consent import UserConsent
+
+    if current_app.config['SYSTEM_TYPE'] not in ('development', 'testing'):
+        abort(404)
+
+    if days < 1:
+        abort(500, 'only possible to move a positive number of days back')
+    user = get_user(patient_id, 'edit')
+
+    # user_consent
+    changed = []
+    delta = relativedelta(days=days)
+    for uc in UserConsent.query.filter(UserConsent.user_id == user.id):
+        changed.append(f"user_consent {uc.id}")
+        uc.acceptance_date = uc.acceptance_date - delta
+
+    # questionnaire_responses
+    for qnr in QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user.id):
+        changed.append(f"questionnaire_response {qnr.id}")
+        new_authored = FHIR_datetime.parse(qnr.document['authored']) - delta
+        doc = deepcopy(qnr.document)
+        doc['authored'] = FHIR_datetime.as_fhir(new_authored)
+        qnr.document = doc
+
+    # trigger_state
+    if current_app.config['GIL'] is None:
+        from ..trigger_states.models import TriggerState
+        for ts in TriggerState.query.filter(
+                TriggerState.user_id == user.id):
+            changed.append(f"trigger_state {ts.id}")
+            ts.timestamp = ts.timestamp - delta
+            if ts.triggers is not None:
+                triggers = deepcopy(ts.triggers)
+                # Some early records don't include source-authored
+                if 'authored' in triggers['source']:
+                    triggers['source']['authored'] = FHIR_datetime.as_fhir(
+                        FHIR_datetime.parse(triggers['source']['authored'])
+                        - delta)
+                if 'actions' in triggers:
+                    for email in triggers['actions']['email']:
+                        email['timestamp'] = FHIR_datetime.as_fhir(
+                            FHIR_datetime.parse(email['timestamp']) - delta)
+                ts.triggers = triggers
+
+    # reminder email dates
+    for em in EmailMessage.query.join(
+            Communication, Communication.message_id == EmailMessage.id).filter(
+            EmailMessage.recipient_id == user.id):
+        changed.append(f'email_message {em.id}')
+        em.sent_at = em.sent_at - delta
+
+    db.session.commit()
+
+    # Recalculate users timeline & qnr associations
+    cache.delete_memoized(trigger_date)
+    for research_study_id in ResearchStudy.assigned_to(user):
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=patient_id,
+            research_study_id=research_study_id,
+            acting_user_id=current_user().id)
+
+        update_users_QBT(
+            patient_id,
+            research_study_id=research_study_id,
+            invalidate_existing=True)
+
+    auditable_event(
+        message=f"TIME WARPED existing data back {days} days.",
+        user_id=current_user().id,
+        subject_id=patient_id,
+        context="assessment"
+    )
+    return jsonify(changed=changed)

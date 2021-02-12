@@ -21,6 +21,11 @@ from .procedure_codes import (
     known_treatment_not_started,
     known_treatment_started,
 )
+from .qb_status import patient_research_study_status
+from .research_study import (
+    EMPRO_RS_ID,
+    ResearchStudy
+)
 from .role import ROLE
 from .tou import ToU
 
@@ -441,6 +446,24 @@ class Subject_Website_ConsentData(TOU_core):
         return user.has_role(ROLE.PATIENT.value)
 
 
+class Empro_Website_Terms_Of_UseData(TOU_core):
+    tou_type = 'EMPRO website terms of use'
+
+    def required(self, user, **kwargs):
+        if not super(self.__class__, self).required(user, **kwargs):
+            return False
+        if not user.has_role(ROLE.PATIENT.value):
+            return False
+        # check if subject is in the sub-study first
+        if EMPRO_RS_ID not in ResearchStudy.assigned_to(user):
+            return False
+        # check if sub-study assessment is ready
+        research_study_status = patient_research_study_status(user)
+        return (
+            EMPRO_RS_ID in research_study_status and
+            research_study_status[EMPRO_RS_ID]['ready'])
+
+
 class Stored_Website_Consent_FormData(TOU_core):
     tou_type = 'stored website consent form'
 
@@ -473,6 +496,7 @@ def configure_coredata(app):
             'treatment', 'race', 'ethnicity', 'indigenous',
             'website_terms_of_use', 'subject_website_consent',
             'stored_website_consent_form', 'privacy_policy',
+            'empro_website_terms_of_use'
         ])
 
     for name in config_datapoints:

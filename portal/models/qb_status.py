@@ -12,6 +12,7 @@ from .questionnaire_response import (
     qnr_document_id,
 )
 
+
 class NoCurrentQB(Exception):
     """Exception to raise when no current QB is available yet required"""
     pass
@@ -19,12 +20,16 @@ class NoCurrentQB(Exception):
 
 class QB_Status(object):
 
-    def __init__(self, user, as_of_date):
+    def __init__(self, user, research_study_id, as_of_date):
         self.user = user
         self.as_of_date = as_of_date
+        self.research_study_id = research_study_id
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
+        self._target_date = None
         self._overall_status = None
+        self._enrolled_in_common = False
+        self._current = None
         self._sync_timeline()
         self._indef_init()
 
@@ -33,16 +38,22 @@ class QB_Status(object):
         self.prev_qbd, self.next_qbd = None, None
 
         # Update QB_Timeline for user, if necessary
-        update_users_QBT(self.user.id)
+        update_users_QBT(self.user.id, self.research_study_id)
 
         # Every QB should have "due" - filter by to get one per QB
         users_qbs = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.due).order_by(QBT.at.asc())
 
         # Obtain withdrawal date if applicable
         withdrawn = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.withdrawn).first()
         self._withdrawal_date = withdrawn.at if withdrawn else None
+        if self.withdrawn_by(self.as_of_date):
+            self._overall_status = OverallStatus.withdrawn
+            trace("found user withdrawn; no valid qbs")
+            return
 
         # convert query to list of tuples for easier manipulation
         self.__ordered_qbs = [qbt.qbd() for qbt in users_qbs]
@@ -54,8 +65,6 @@ class QB_Status(object):
             else:
                 self._overall_status = OverallStatus.expired
                 trace("no qb timeline data for {}".format(self.user))
-            self._enrolled_in_common = False
-            self._current = None
             return
         self._enrolled_in_common = True
 
@@ -71,17 +80,12 @@ class QB_Status(object):
         # w/o a cur, probably hasn't started, set expired and leave
         if not cur_qbd and (
                 self.__ordered_qbs[0].relative_start > self.as_of_date):
-            if self.withdrawn_by(self.as_of_date):
-                trace("user withdrawn prior to first qb start")
-                self._overall_status = OverallStatus.withdrawn
-            else:
-                trace(
-                    "no current QBD (too early); first qb doesn't start till"
-                    " {} vs as_of {}".format(
-                        self.__ordered_qbs[0].relative_start, self.as_of_date))
-                self._overall_status = OverallStatus.expired
-                self.next_qbd = self.__ordered_qbs[0]
-            self._current = None
+            trace(
+                "no current QBD (too early); first qb doesn't start till"
+                " {} vs as_of {}".format(
+                    self.__ordered_qbs[0].relative_start, self.as_of_date))
+            self._overall_status = OverallStatus.expired
+            self.next_qbd = self.__ordered_qbs[0]
             return
 
         if cur_index > 0:
@@ -114,6 +118,10 @@ class QB_Status(object):
 
             if row.status == OverallStatus.due:
                 self._due_date = row.at
+                # HACK to manage target date until due means due (not start)
+                self._target_date = cur_qbd.questionnaire_bank.calculated_due(
+                    self._due_date)
+
             if row.status == OverallStatus.overdue:
                 self._overdue_date = row.at
             if row.status == OverallStatus.completed:
@@ -178,7 +186,9 @@ class QB_Status(object):
 
     def _indef_init(self):
         """Lookup stats for indefinite case - requires special handling"""
-        qbs = ordered_qbs(self.user, classification='indefinite')
+        qbs = ordered_qbs(
+            self.user, research_study_id=self.research_study_id,
+            classification='indefinite')
         self._current_indef = None
         for q in qbs:
             if self._current_indef is not None:
@@ -190,7 +200,10 @@ class QB_Status(object):
         if not self.enrolled_in_classification(classification='indefinite'):
             return None, None
 
-        qbd = next(ordered_qbs(self.user, classification='indefinite'))
+        qbd = next(ordered_qbs(
+            self.user,
+            research_study_id=self.research_study_id,
+            classification='indefinite'))
         self._response_lookup()
         if self.overall_status == OverallStatus.withdrawn:
             status = OverallStatus.withdrawn
@@ -210,7 +223,9 @@ class QB_Status(object):
         # As order counts, required is a list; partial and completed are sets
         if self._current:
             user_qnrs = QNR_results(
-                self.user, qb_id=self._current.qb_id,
+                self.user,
+                research_study_id=self.research_study_id,
+                qb_ids=[self._current.qb_id],
                 qb_iteration=self._current.iteration)
             self._required = user_qnrs.required_qs(self._current.qb_id)
             self._partial = user_qnrs.partial_qs(
@@ -221,7 +236,9 @@ class QB_Status(object):
         # Indefinite is similar, but *special*
         if self._current_indef:
             user_indef_qnrs = QNR_indef_results(
-                self.user, qb_id=self._current_indef.qb_id)
+                self.user,
+                research_study_id=self.research_study_id,
+                qb_id=self._current_indef.qb_id)
             self._required_indef = user_indef_qnrs.required_qs(
                 qb_id=self._current_indef.qb_id)
             self._partial_indef = user_indef_qnrs.partial_qs(
@@ -289,6 +306,18 @@ class QB_Status(object):
     @property
     def due_date(self):
         return self._due_date
+
+    @property
+    def target_date(self):
+        """HACK to address due vs start/available confusion
+
+        TN-2468 captures how the original intent of due was lost and
+        became the start/available date.  Until this is cleaned up (
+        by replacing OverallStatus.due with OverallStatus.start and
+        all related usage) continue to treat due == start/available
+        and provide a `target_date` for the QB.calculated_due value.
+        """
+        return self._target_date
 
     @property
     def expired_date(self):
@@ -456,3 +485,79 @@ class QB_Status(object):
             current_app.logger.error(
                 f"Caught TN-2747 in action!  User {self.user.id} completed"
                 f" {requested_indef} already!")
+
+
+def patient_research_study_status(patient, ignore_QB_status=False):
+    """Returns details regarding patient readiness for available studies
+
+    Wraps complexity of checking multiple QB_Status and ResearchStudy
+    availability.  Includes several business rule checks as well
+    as enforcing user has completed outstanding work from other studies
+    if applicable.  NB - a user may be "ready" for a study, but another
+    study may have outstanding work.
+
+    :param patient: subject to check
+    :param ignore_QB_status: set to prevent recursive call, if used during
+      process of evaluating QB_status.  Will restrict results to eligible
+    :returns: dictionary of applicable studies keyed by research_study_id.
+      Each contains a dictionary with keys:
+     - eligible: set True if assigned to research study and pre-requisites
+         have been met, such as assigned clinician if applicable.
+     - ready: set True or False based on complex rules.  True means pending
+         work user can immediately do.  NOT determined w/ ``ignore_QB_status``
+     - errors: list of strings detailing anything preventing user from being
+         "ready"
+
+    """
+    from datetime import datetime
+    from .research_study import EMPRO_RS_ID, ResearchStudy
+    as_of_date = datetime.utcnow()
+
+    results = {}
+    # check studies in required order - first found with pending work
+    # preempts subsequent
+    for rs in ResearchStudy.assigned_to(patient):
+        rs_status = {
+            'eligible': True,
+            'ready': False,
+            'errors': [],
+        }
+        results[rs] = rs_status
+        if rs == EMPRO_RS_ID and patient.clinician_id is None:
+            # Enforce biz rule - must have clinician on file.
+            trace("no clinician; not eligible")
+            rs_status['eligible'] = False
+            rs_status['errors'].append("No clinician")
+
+        if ignore_QB_status:
+            # Bootstrap issues, can't yet check QB_Status.
+            continue
+
+        assessment_status = QB_Status(
+            patient, research_study_id=rs, as_of_date=as_of_date)
+        if assessment_status.overall_status == OverallStatus.withdrawn:
+            rs_status['errors'].append('Withdrawn')
+            continue
+
+        needing_full = assessment_status.instruments_needing_full_assessment(
+            classification='all')
+        resume_ids = assessment_status.instruments_in_progress(
+            classification='all')
+
+        if needing_full or resume_ids:
+            # work to be done in this study
+            rs_status['ready'] = True
+
+        # Apply business rules specific to EMPRO
+        if rs == EMPRO_RS_ID:
+            if results[0]['ready']:
+                # Clear ready status when base has pending work
+                rs_status['ready'] = False
+                rs_status['errors'].append('Pending work in base study')
+            elif rs_status['ready']:
+                # As user may have just entered ready status on EMPRO
+                # move trigger_states.state to due
+                from ..trigger_states.empro_states import initiate_trigger
+                initiate_trigger(patient.id)
+
+    return results

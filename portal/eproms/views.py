@@ -12,6 +12,7 @@ from flask import (
 from flask_user import roles_required
 
 from ..database import db
+from ..date_tools import localize_datetime
 from ..extensions import oauth, recaptcha
 from ..models.app_text import (
     AboutATMA,
@@ -72,13 +73,106 @@ def landing():
         init_login_modal=init_login_modal)
 
 
+def assessment_engine_view(user):
+    """View like function for this very special intervention
+
+    Most interventions maintain a small block of HTML in the interventions
+    or (when customized per user) in the user_interventions table.
+
+    The assessment engine is special, as much of the state used to determine
+    logic switches within the displayed HTML only lives within the portal
+    and not with the intervention.  Furthermore, the displayed HTML exceeds
+    the "card" model, is significantly more complex (i.e. modal use) and
+    therefore gets this function to render the "main well" of the page used
+    to display intervention cards.
+
+    NB - not a real flask view method, as the returned HTML needs to be
+    embedded within another page, not made into a response object.
+
+    """
+    from datetime import datetime
+    from ..models.overall_status import OverallStatus
+    from ..models.qb_status import QB_Status, patient_research_study_status
+    from ..models.research_study import BASE_RS_ID, EMPRO_RS_ID, ResearchStudy
+    now = datetime.utcnow()
+
+    research_study_status = patient_research_study_status(user)
+    assessment_status = QB_Status(
+        user=user,
+        research_study_id=BASE_RS_ID,
+        as_of_date=now)
+    unstarted_indefinite_instruments = (
+        assessment_status.instruments_needing_full_assessment(
+            classification='indefinite'))
+    unfinished_indefinite_instruments = (
+        assessment_status.instruments_in_progress(
+            classification='indefinite'))
+
+    # variables needed for the templates
+    due_date = (
+        localize_datetime(assessment_status.target_date, user)
+        if assessment_status.target_date else None)
+    expired_date = (
+        localize_datetime(assessment_status.expired_date, user)
+        if assessment_status.expired_date else None)
+    comp_date = (
+        localize_datetime(assessment_status.completed_date, user)
+        if assessment_status.completed_date else None)
+    assessment_is_due = (
+        research_study_status.get(BASE_RS_ID, {}).get('ready', False))
+    enrolled_in_indefinite = assessment_status.enrolled_in_classification(
+        "indefinite")
+    substudy_assessment_status = QB_Status(
+        user=user,
+        research_study_id=EMPRO_RS_ID,
+        as_of_date=now)
+    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
+    substudy_due_date = (
+        localize_datetime(substudy_assessment_status.target_date, user)
+        if substudy_assessment_status.target_date else None)
+    substudy_comp_date = (
+        localize_datetime(substudy_assessment_status.completed_date, user)
+        if substudy_assessment_status.completed_date else None)
+    substudy_assessment_is_due = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
+
+    substudy_assessment_is_ready = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
+    substudy_assessment_errors = (
+        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['errors'])
+
+    return render_template(
+        "eproms/assessment_engine.html",
+        user=user,
+        research_study_status=research_study_status,
+        assessment_status=assessment_status,
+        enrolled_in_indefinite=enrolled_in_indefinite,
+        unstarted_indefinite_instruments=unstarted_indefinite_instruments,
+        unfinished_indefinite_instruments=unfinished_indefinite_instruments,
+        OverallStatus=OverallStatus,
+        full_name=user.display_name,
+        registry=assessment_status.assigning_authority,
+        due_date=due_date,
+        expired_date=expired_date,
+        assessment_is_due=assessment_is_due,
+        comp_date=comp_date,
+        enrolled_in_substudy=enrolled_in_substudy,
+        substudy_assessment_status=substudy_assessment_status,
+        substudy_assessment_is_due=substudy_assessment_is_due,
+        substudy_due_date=substudy_due_date,
+        substudy_comp_date=substudy_comp_date,
+        substudy_assessment_is_ready=substudy_assessment_is_ready,
+        substudy_assessment_errors=substudy_assessment_errors
+    )
+
+
 @eproms.route('/home')
 def home():
     """home page view function
 
     Present user with appropriate view dependent on roles.
 
-    The inital flow through authentication and data collection is
+    The initial flow through authentication and data collection is
     controlled by next_after_login().  Only expecting requests
     here after login and intermediate steps have been handled, and then
     only if the login didn't include a 'next' target.
@@ -100,20 +194,31 @@ def home():
         return next_after_login()
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF.value, ROLE.INTERVENTION_STAFF.value):
-        return redirect(url_for('patients.patients_root'))
-    if user.has_role(ROLE.RESEARCHER.value):
-        return redirect(url_for('portal.research_dashboard'))
     if user.has_role(ROLE.STAFF_ADMIN.value):
         return redirect(url_for('staff.staff_index'))
+    if user.has_role(
+            ROLE.INTERVENTION_STAFF.value,
+            ROLE.STAFF.value):
+        return redirect(url_for('patients.patients_root'))
+    if user.has_role(ROLE.CLINICIAN.value):
+        return redirect(url_for('patients.patients_substudy'))
+    if user.has_role(ROLE.RESEARCHER.value):
+        return redirect(url_for('portal.research_dashboard'))
+
+    if not user.has_role(ROLE.PATIENT.value):
+        abort(404, "no /home view for user with roles: {}".format(
+            str([r.name for r in user.roles])))
 
     interventions = Intervention.query.order_by(
         Intervention.display_rank).all()
 
     consent_agreements = {}
     return render_template(
-        'eproms/portal.html', user=user,
-        interventions=interventions, consent_agreements=consent_agreements)
+        'eproms/portal.html',
+        user=user,
+        assessment_engine_view=assessment_engine_view,
+        interventions=interventions,
+        consent_agreements=consent_agreements)
 
 
 @eproms.route('/privacy')
@@ -234,7 +339,7 @@ def contact():
 
 
 @eproms.route('/website-consent-script/<int:patient_id>', methods=['GET'])
-@roles_required(ROLE.STAFF.value)
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)

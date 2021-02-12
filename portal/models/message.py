@@ -167,7 +167,7 @@ class EmailMessage(db.Model):
         user = User.query.filter_by(email='__system__').first()
         user_id = user.id if user else None
         recipient = self.recipients.split()[0]
-        subject = User.query.filter_by(email=recipient).first()
+        subject = User.find_by_email(recipient)
         subject_id = subject.id if subject else self.user_id
 
         if user_id and subject_id:
@@ -180,7 +180,8 @@ class EmailMessage(db.Model):
         else:
             # This should never happen, alert if it does
             current_app.logger.error(
-                "Unable to generate audit log for email: %s", str(message))
+                "Unable to generate audit log for email to %s: %s",
+                recipient, str(message))
         # If an exception was raised when attempting the send, re-raise now
         # for clients to manage
         if exc:

@@ -262,7 +262,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_recurring_3mo_pattern",
       "overdue": "{\"days\": 16}",
@@ -298,7 +298,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_v3_recurring_3mo_pattern",
       "overdue": "{\"days\": 16}",
@@ -334,7 +334,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"months\": 1}",
       "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_recurring_3mo_pattern",
       "overdue": "{\"months\": 1, \"days\": 1}",
@@ -370,7 +370,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_recurring_6mo_pattern",
       "overdue": "{\"days\": 16}",
@@ -413,7 +413,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_v3_recurring_6mo_pattern",
       "overdue": "{\"days\": 16}",
@@ -456,7 +456,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"months\": 1}",
       "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_start6mo_yearly_end30mo",
       "overdue": "{\"months\": 1, \"days\": 1}",
@@ -506,7 +506,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"months\": 1}",
       "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_start3.5years_yearly",
       "overdue": "{\"months\": 1, \"days\": 1}",
@@ -549,7 +549,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_recurring_annual_pattern",
       "overdue": "{\"days\": 16}",
@@ -606,7 +606,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"days\": 15}",
       "expired": "{\"months\": 3, \"days\": -2}",
       "name": "IRONMAN_v3_recurring_annual_pattern",
       "overdue": "{\"days\": 16}",
@@ -663,7 +663,7 @@
     },
     {
       "classification": "recurring",
-      "due": "{\"days\": 0}",
+      "due": "{\"months\": 1}",
       "expired": "{\"months\": 3, \"days\": -1}",
       "name": "IRONMAN_v5_recurring_annual_pattern",
       "overdue": "{\"months\": 1, \"days\": 1}",
@@ -717,6 +717,110 @@
       },
       "resourceType": "QuestionnaireBank",
       "start": "{\"days\": 0}"
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "baseline",
+      "name": "ironman_ss_baseline",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 14}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [],
+      "research_protocol": {
+        "display": "EMPRO v1",
+        "reference": "api/research_protocol/EMPRO v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_ss",
+            "reference": "api/questionnaire/ironman_ss?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "recurring",
+      "name": "ironman_ss_recurring_monthly_pattern",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 14}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [
+        {
+          "cycle_length": "{\"months\": 1}",
+          "start": "{\"months\": 1}",
+          "termination": "{\"months\": 11}"
+        }
+      ],
+      "research_protocol": {
+        "display": "EMPRO v1",
+        "reference": "api/research_protocol/EMPRO v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_ss",
+            "reference": "api/questionnaire/ironman_ss?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "baseline",
+      "name": "ironman_ss_post_tx_baseline",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 0}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [],
+      "research_protocol": {
+        "display": "EMPRO STAFF v1",
+        "reference": "api/research_protocol/EMPRO STAFF v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_ss_post_tx",
+            "reference": "api/questionnaire/ironman_ss_post_tx?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
+    },
+    {
+      "resourceType": "QuestionnaireBank",
+      "classification": "recurring",
+      "name": "ironman_ss_post_tx_recurring_monthly_pattern",
+      "start": "{\"days\": 0}",
+      "due": "{\"days\": 0}",
+      "overdue": "{\"days\": 15}",
+      "expired": "{\"months\": 1, \"days\": -1}",
+      "recurs": [
+        {
+          "cycle_length": "{\"months\": 1}",
+          "start": "{\"months\": 1}",
+          "termination": "{\"months\": 11}"
+        }
+      ],
+      "research_protocol": {
+        "display": "EMPRO STAFF v1",
+        "reference": "api/research_protocol/EMPRO STAFF v1"
+      },
+      "questionnaires": [
+        {
+          "questionnaire": {
+            "display": "ironman_ss_post_tx",
+            "reference": "api/questionnaire/ironman_ss_post_tx?system=http://us.truenth.org/questionnaire"
+          },
+          "rank": 0
+        }
+      ]
     }
   ],
   "id": "SitePersistence v0.2",

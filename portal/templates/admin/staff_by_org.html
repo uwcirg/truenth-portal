@@ -4,7 +4,6 @@
 <div id="staffList">
     <br/>
     <h3 class="tnth-headline">{{ _("Staff Administration") }}</h3>
-    <br/>
     <div id="staffListOptions">
       <a href="{{ url_for('.staff_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a staff record") }}</a>
       <div class="or">or</div>
@@ -42,7 +41,6 @@
                 <th data-field="lastname" data-sortable="true" class="lastname-data-field" data-filter-control="input">{{ _("Last Name") }}</th>
                 <th data-field="email" data-sortable="true" class="email-data-field" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="organization" data-sortable="true" class="org-data-field" data-filter-control="select">{{ _("Site(s)") }}</th>
-                <th data-field="role" data-searchable="false" data-card-visible="false">{{_("Staff Admin")}}</th>
                 <th class="text-center" data-field="deactivate" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate Account") }}</th>
                 <th data-field="activationstatus" data-class="deleted-field" data-visible="false">{{_("activation status")}}</th>
             </tr>
@@ -62,12 +60,6 @@
                   <td>{{ user.last_name if user.last_name }}</td>
                   <td class="email-data-field">{{ user.email if user.email }}</td>
                   <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
-                  <td class="text-center">
-                    <div class="check-role-container">
-                      <div id="loadingIndicator_{{user.id}}" class="loading-indicator"><i class="fa fa-spinner fa-spin"></i></div>
-                      <input type="checkbox" name="chkRole" data-user-id="{{user.id}}" data-role="staff_admin" {%if user.has_role(ROLE.STAFF_ADMIN.value)%}checked="checked"{%endif%} />
-                    </div>
-                  </td>
                   {{deletedUserCell(user, allowReactivate=allowReactivate)}}
                   <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
               </tr>

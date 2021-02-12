@@ -6,7 +6,7 @@ from flask_sqlalchemy_caching import FromCache
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
-from ..cache import TWO_HOURS, cache
+from ..cache import FIVE_MINS, TWO_HOURS, cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
@@ -92,6 +92,18 @@ class QuestionnaireBank(db.Model):
     def from_json(cls, data):
         instance = cls()
         return instance.update_from_json(data)
+
+    @property
+    def research_study_id(self):
+        """A questionnaire bank w/ a research protocol has a research study"""
+        # intervention linked qbs hardcoded to use study id 0
+        if self.intervention_id is not None:
+            return 0
+
+        if self.research_protocol_id is None:
+            return
+
+        return self.research_protocol.research_study_id
 
     def update_from_json(self, data):
         self.name = data['name']
@@ -291,8 +303,9 @@ class QuestionnaireBank(db.Model):
         return start + RelativeDelta(self.overdue)
 
 
-def trigger_date(user, qb=None):
-    """Return trigger date for user
+@cache.memoize(timeout=FIVE_MINS)
+def trigger_date(user, research_study_id, qb=None):
+    """Return trigger date for user, research_study
 
     The trigger date for a questionnaire bank depends on its
     association.  i.e. for org affiliated QBs, use the respective
@@ -307,11 +320,14 @@ def trigger_date(user, qb=None):
     new procedure or the consent date is modified).
 
     :param user: subject of query
+    :param research_study_id: research study being processed
     :param qb: QuestionnaireBank if available (really only necessary
         to distinguish different behavior on recurring RP case).
     :return: UTC datetime for the given user / QB, or None if N/A
 
     """
+    from .research_study import EMPRO_RS_ID
+    trace("calculate trigger date (not currently cached)")
 
     def biopsy_date(user):
         b_date = user.fetch_datetime_for_concept(CC.BIOPSY)
@@ -344,7 +360,48 @@ def trigger_date(user, qb=None):
             trace("no treatment or biopsy date, no trigger_date")
         return t
 
+    def completed_global_date(user, consent_date):
+        """EMPRO requires a global study completed w/i 4 weeks
+
+        :returns: the completed datetime of a global study QB either
+          prior to consent_date, but within 4 weeks or
+          after consent_date or
+          None
+
+        """
+        from .qb_timeline import QBT
+        four_weeks_back = consent_date - RelativeDelta(weeks=4)
+        completed = QBT.query.filter(QBT.user_id == user.id).filter(
+            QBT.status == 'completed').filter(
+            QBT.research_study_id == 0).filter(
+            QBT.at > four_weeks_back).order_by(QBT.at).with_entities(
+            QBT.at)
+
+        best = None
+        for timepoint in completed:
+            if not best:
+                best = timepoint.at
+                continue
+            if timepoint.at > consent_date:
+                # already have a match, don't accept a "better" option
+                # beyond the consent date.
+                break
+        return best
+
     trigger = None
+
+    if research_study_id == EMPRO_RS_ID:
+        c_date = consent_date(user, research_study_id)
+        if not c_date:
+            return None
+        completed_global = completed_global_date(user, c_date)
+        if not completed_global:
+            trace(
+                "no completed global study found, therefore not EMPRO ready")
+            return None
+        if completed_global < c_date:
+            return c_date
+        return completed_global
 
     # If given a QB, use its details to determine trigger
     if qb and qb.research_protocol_id:
@@ -353,8 +410,7 @@ def trigger_date(user, qb=None):
             trigger = tx_date(user)
 
         if not trigger:
-            # TODO: address research_study_id
-            trigger = consent_date(user, research_study_id=0)
+            trigger = consent_date(user, research_study_id=research_study_id)
 
         if not trigger:
             trace(
@@ -370,9 +426,8 @@ def trigger_date(user, qb=None):
     # the intervention method.  (Yes, it's possible the user has neither
     # intervention nor RP, but the intervention method is too expensive
     # for a simple trigger date lookup - will be caught in qb_timeline)
-    if ResearchProtocol.assigned_to(user):
-        # TODO: address research_study_id
-        return consent_date(user, research_study_id=0)
+    if ResearchProtocol.assigned_to(user, research_study_id):
+        return consent_date(user, research_study_id=research_study_id)
     else:
         return intervention_trigger(user)
 
@@ -535,8 +590,16 @@ def qbs_by_rp(rp_id, classification):
 
 
 def visit_name(qbd):
-    if not qbd.questionnaire_bank:
+    from .research_study import (
+        EMPRO_RS_ID,
+        research_study_id_from_questionnaire,
+    )
+
+    if not qbd.questionnaire_bank or qbd.questionnaire_bank.id == 0:
         return None
+
+    rs_id = research_study_id_from_questionnaire(
+        qbd.questionnaire_bank.questionnaires[0].name)
     if qbd.recur:
         srd = RelativeDelta(qbd.recur.start)
         if (
@@ -551,7 +614,12 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
+        if rs_id == EMPRO_RS_ID:
+            return _('Month %(month_total)d', month_total=total+1)
         return _('Month %(month_total)d', month_total=total)
+
+    if rs_id == EMPRO_RS_ID:
+        return _('Month %(month_total)d', month_total=1)
     return _(qbd.questionnaire_bank.classification.title())
 
 

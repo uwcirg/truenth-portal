@@ -2,8 +2,11 @@ from datetime import datetime
 
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
+from .coding import Coding
+from .codeable_concept import CodeableConcept
 from .performer import Performer
 from .value_quantity import ValueQuantity
+from .reference import Reference
 
 
 class Observation(db.Model):
@@ -13,14 +16,16 @@ class Observation(db.Model):
     status = db.Column(db.String(80))
     codeable_concept_id = db.Column(
         db.ForeignKey('codeable_concepts.id'), nullable=False)
-    value_quantity_id = db.Column(
-        db.ForeignKey('value_quantities.id'), nullable=False)
+    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'))
+    value_coding_id = db.Column(db.ForeignKey('codings.id'))
     codeable_concept = db.relationship(
         'CodeableConcept', cascade="save-update")
     value_quantity = db.relationship('ValueQuantity')
+    value_coding = db.relationship('Coding')
     performers = db.relationship(
         'Performer', lazy='dynamic', cascade="save-update",
         secondary="observation_performers", backref=db.backref('observations'))
+    derived_from = db.Column(db.Text, index=True)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -32,6 +37,8 @@ class Observation(db.Model):
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
+        from .questionnaire_response import QuestionnaireResponse
+
         fhir = {"resourceType": "Observation"}
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
@@ -39,9 +46,18 @@ class Observation(db.Model):
             fhir['status'] = self.status
         fhir['id'] = self.id
         fhir['code'] = self.codeable_concept.as_fhir()
-        fhir.update(self.value_quantity.as_fhir())
+        if self.value_quantity_id:
+            fhir.update(self.value_quantity.as_fhir())
+        if self.value_coding_id:
+            fhir.update(self.value_coding.as_fhir())
         if self.performers:
             fhir['performer'] = [p.as_fhir() for p in self.performers]
+        if self.derived_from:
+            # Only QNRs supported - if defined, it is a QNR.id.
+            # In FHIR format, present as single item list reference
+            qnr = QuestionnaireResponse.query.get(self.derived_from)
+            ref = Reference.questionnaire_response(qnr.document['identifier'])
+            fhir['derivedFrom'] = [ref.as_fhir()]
         return fhir
 
     def update_from_fhir(self, data):
@@ -49,6 +65,9 @@ class Observation(db.Model):
             issued = FHIR_datetime.parse(data['issued']) if data[
                 'issued'] else None
             setattr(self, 'issued', issued)
+        if 'code' in data:
+            self.codeable_concept = CodeableConcept.from_fhir(
+                data['code'])
         if 'status' in data:
             setattr(self, 'status', data['status'])
         if 'performer' in data:
@@ -65,6 +84,20 @@ class Observation(db.Model):
                 code=v.get('code') or current_v.code).add_if_not_found(True)
             setattr(self, 'value_quantity_id', vq.id)
             setattr(self, 'value_quantity', vq)
+        if 'valueCoding' in data:
+            self.value_coding = Coding.from_fhir(
+                data['valueCoding']).add_if_not_found(True)
+            self.value_coding_id = self.value_coding.id
+        if 'derivedFrom' in data:
+            # The only reference supported at this time is a single
+            # QuestionnaireResponse.  If given, must refer to
+            # a value QNR in the system - store PK if found.
+            if len(data['derivedFrom']) != 1:
+                raise ValueError(
+                    "only single QuestionnareResponse reference supported in "
+                    "Observation.derivedFrom")
+            qnr = Reference.parse(data['derivedFrom'][0])
+            self.derived_from = qnr.id
         return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):
@@ -91,6 +124,13 @@ class Observation(db.Model):
         elif self is not match:
             self = db.session.merge(match)
         return self
+
+    @classmethod
+    def parse_obs_bundle(cls, obs_bundle):
+        for obs in obs_bundle['entry']:
+            observation = cls()
+            observation.update_from_fhir(obs)
+            db.session.add(observation)
 
 
 class UserObservation(db.Model):

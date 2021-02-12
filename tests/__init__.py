@@ -20,6 +20,7 @@ from sqlalchemy.exc import IntegrityError
 from portal.cache import cache
 from portal.config.config import TestConfig
 from portal.database import db
+from portal.date_tools import utcnow_sans_micro
 from portal.factories.app import create_app
 from portal.models.audit import Audit
 from portal.models.client import Client
@@ -132,9 +133,9 @@ def calc_date_params(backdate, setdate):
             raise ValueError(
                 "moving dates by month values is non-associative; use"
                 "`associative_backdate` and pass in `setdate` param")
-        acceptance_date = datetime.utcnow() - backdate
+        acceptance_date = utcnow_sans_micro() - backdate
     else:
-        acceptance_date = datetime.utcnow()
+        acceptance_date = utcnow_sans_micro()
     return acceptance_date
 
 
@@ -184,7 +185,7 @@ class TestCase(Base):
             db.session.commit()
         test_user = db.session.merge(test_user)
         # Avoid testing cached/stale data
-        invalidate_users_QBT(test_user.id)
+        invalidate_users_QBT(test_user.id, research_study_id='all')
         return test_user
 
     def add_user_identifier(self, user=None, system=None, value=None):
@@ -432,6 +433,9 @@ class TestCase(Base):
         privacy = ToU(
             audit=audit, agreement_url='http://not.really.org',
             type='privacy policy')
+        web_consent = ToU(
+            audit=audit, agreement_url='http://not.really.org',
+            type='subject website consent')
         parent_org = OrgTree().find(org.id).top_level()
         options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                    SEND_REMINDERS_MASK)
@@ -444,6 +448,7 @@ class TestCase(Base):
         with SessionScope(db):
             db.session.add(tou)
             db.session.add(privacy)
+            db.session.add(web_consent)
             db.session.add(consent)
             db.session.commit()
 

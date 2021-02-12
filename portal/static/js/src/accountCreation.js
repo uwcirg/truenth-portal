@@ -7,11 +7,11 @@ import ProcApp from "./modules/Procedures.js";
 import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
 (function() {
-    var AccountCreationObj = window.AccountCreationObj = function (roles, dependencies) { /*global $ tnthDates Utility*/
+    var AccountCreationObj = window.AccountCreationObj = function (dependencies) { /*global $ tnthDates Utility*/
         this.attempts = 0;
         this.maxAttempts = 3;
         this.params = null;
-        this.roles = roles;
+        this.roles = [];
         this.userId = "None created";
         this.dependencies = dependencies||{};
         this.treatmentIntervalVar = null;
@@ -21,6 +21,8 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             timeout: 5000,
             retryAfter:3000
         });
+
+        const HELP_BLOCK_IDENTIFIER = ".help-block";
 
         function getParentOrgId(obj) {
             var parentOrgId =  $(obj).attr("data-parent-id");
@@ -334,72 +336,89 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
 
-        this.__checkFields = function(silent) {
+        this.__checkFields = function() {
+           
             var hasError = false;
 
-            /* check all required fields to make sure all fields are filled in */
-            $("input[required], select[required]").each(function() {
-                if (!$(this).val()) {
-                    //this should display error message associated with empty field
-                    if (!silent) {
-                        $(this).trigger("focusout");
-                    }
-                    hasError = true;
-                }
-            });
-            /* check email field */
-            if ($("#noEmail").length > 0 && !$("#noEmail").is(":checked")) {
-                if ($("#emailGroup").hasClass("has-error")) {
-                    hasError = true;
-                } else {
-                    if ($("#current_user_email").val() === $("#email").val()) {
-                        if (!silent) {
-                            this.setHelpText("emailGroup", i18next.t("Email is already in use."), true);
-                        }
-                        hasError = true;
-                    } else {
-                        this.setHelpText("emailGroup", "", false);
-                    }
-                }
+            /* organization fields */
+            if ($("#userOrgs input").length) {
+                hasError = $("#userOrgs input:checked").length === 0;
+                this.setHelpText("userOrgs", hasError?i18next.t("An organization must be selected."):"", hasError);
             }
-            /* check organization */
-            if ($("#userOrgs input").length > 0 && $("#userOrgs input:checked").length === 0) {
-                if (!silent) {
-                    this.setHelpText("userOrgs", i18next.t("An organization must be selected."), true);
-                }
-                hasError = true;
-            } else {
-                this.setHelpText("userOrgs", "", false);
+    
+            let rolesList = $("#rolesContainer .input-role");
+            /* check if at least one required role is checked */
+            if (rolesList.length) {
+                let requiredRoleSelected = false;
+                rolesList.each(function() {
+                    if (requiredRoleSelected) {
+                        return false;
+                    }
+                    requiredRoleSelected = $(this).is(":checked");
+                });
+                hasError = !requiredRoleSelected;
+                this.setHelpText("rolesContainer", hasError?i18next.t("A role must be selected."):"", hasError);
             }
 
             /* finally check fields to make sure there isn't error, e.g. due to validation error */
-            $("#createProfileForm .help-block.with-errors").each(function() {
-                if ($(this).text() !== "") {
-                    hasError = true;
-                }
-            });
+              if (!hasError) {
+                $("#createProfileForm " + HELP_BLOCK_IDENTIFIER).each(function() {
+                    if (hasError) {
+                        return false;
+                    }
+                    hasError = ($(this).text() !== "");
+                });
+            }
 
             if (hasError) {
-                if (!silent) {
-                    $("#errorMsg").fadeIn("slow");
-                }
+                this.showError();
             } else {
-                $("#errorMsg").hide();
-                $("#serviceErrorMsg").html("").hide();
+                this.clearError();
             }
+    
             return hasError;
         };
+
+        this.initFieldEvents = function() {
+            let self = this;
+            Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
+
+            $("#createProfileForm [required]").on("change", function() {
+                $("#updateProfile").attr("disabled", false);
+                setTimeout(function() { self.clearError(); }, 600);
+            });
+    
+            //clear error text if value changed
+            $("#createProfileForm input[type='text']").on("change keyup", function() {
+                $(this).closest(".profile-section").find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
+            });
+            //clear error text when checkbox is checked
+            $("#createProfileForm input[type='checkbox']").on("change", function() {
+                $(this).closest(".profile-section").find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
+            });
+        };
+
+        this.setDefaultRoles = function() {
+            this.roles =  [{"name": "write_only"}];
+            if (this.__isPatient()) {
+                this.roles =  [{"name": "patient"}, {"name": "write_only"}];
+            }
+        };
+
+        this.showError = function() {
+            $("#errorMsg").fadeIn("slow");
+        }
+
         this.clearError = function() {
-            var hasError = this.__checkFields(true);
-            if (!hasError) { $("#errorMsg").html("").hide(); }
+            $("#errorMsg").html("").hide();
+            $("#serviceErrorMsg").html("").hide();
         };
         this.setHelpText = function(elementId, message, hasError) {
             if (hasError) {
-                $("#" + elementId).find(".help-block").text(message).addClass("error-message");
+                $("#" + elementId).find(HELP_BLOCK_IDENTIFIER).text(message).addClass("error-message");
+                return;
             }
-            else {
-                $("#" + elementId).find(".help-block").text("").removeClass("error-message");
-            }
+            $("#" + elementId).find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
         };
         this.getOrgs = function(callback, params) {
             var self = this;
@@ -443,9 +462,6 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             } else {
                 this.populateStaffOrgs();
             }
-            $("#userOrgs input[name='organization']").on("click", function() {
-                $("#userOrgs").find(".help-block").html("");
-            });
             var visibleOrgs = $("#userOrgs input[name='organization']:visible");
             if (visibleOrgs.length === 1) {
                 visibleOrgs.prop("checked", true);
@@ -516,13 +532,10 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 }
             });
         };
-        this. setDisableAccountCreation = function() {
-            if ($("#accountCreationContentContainer[data-account='patient']").length > 0) { //creating an overlay that prevents user from editing fields
+        this.setDisableAccountCreation = function() {
+            if (this.__isPatient()) { //creating an overlay that prevents user from editing fields
                 $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
             }
-        };
-        this.initFieldEvents = function() {
-            Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
         };
         this.initButtons = function() {
             var self = this;
@@ -535,21 +548,15 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
                 window.location = $(this).attr("href");
             });
             $("#updateProfile").attr("disabled", true);
-            $("#createProfileForm input, #createProfileForm select").on("focusout", function() {
-                $("#updateProfile").attr("disabled", false);
-                setTimeout(function() { self.clearError(); }, 600);
-            });
             $("#createProfileForm").on("submit", function (e) { //submit on clicking save button
                 if (e.isDefaultPrevented()) {
-                    self.__checkFields(); // handle the invalid form...
+                    // handle the invalid form...
                     return false;
-                } else {
-                    var hasError = self.__checkFields();
-                    if (hasError) { return false; }
-                    e.preventDefault(); // everything looks good!
-                    self.__handleButton("hide");
-                    setTimeout(function() { self.__setAccount(); } , 0);
-                }
+                } 
+                if (self.__checkFields()) { return false; }
+                e.preventDefault(); // everything looks good!
+                self.__handleButton("hide");
+                setTimeout(function() { self.__setAccount(); } , 0);
             });
         };
         this.getConsentOrgId = function(element, CONSENT_WITH_TOP_LEVEL_ORG) {
@@ -668,14 +675,12 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
     //events associated with elements on the account creation page
     $(document).ready(function(){
-        var isStaff = $("#accountCreationContentContainer").attr("data-account") === "staff";
-        var roles =  [{"name": "patient"}, {"name": "write_only"}];
-        if (isStaff) {
-            roles = [{"name": "staff"}, {"name": "write_only"}];
-        }
         /* global i18next, tnthAjax, OrgTool, SYSTEM_IDENTIFIER_ENUM */
-        var aco = new AccountCreationObj(roles, {"i18next": i18next});
-        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+        var aco = new AccountCreationObj({"i18next": i18next});
+        aco.setDefaultRoles();
+        /*** 
+         *** need to run this instead of the one function from main.js because we don't want to pre-check any org here
+         ***/
         aco.handleCurrentUser();
         aco.handleEditConsentDate();
         aco.initFieldEvents();

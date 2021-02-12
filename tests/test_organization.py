@@ -24,15 +24,24 @@ from portal.models.organization import (
 )
 from portal.models.reference import Reference
 from portal.models.research_protocol import ResearchProtocol
+from portal.models.research_study import ResearchStudy
 from portal.models.role import ROLE
 from portal.system_uri import (
     IETF_LANGUAGE_TAG,
     PRACTICE_REGION,
     SHORTCUT_ALIAS,
     SHORTNAME_ID,
+    TRUENTH_RP_EXTENSION,
     US_NPI,
 )
 from tests import TEST_USER_ID
+
+
+def item_from_extensions(extensions, item_url):
+    """test helper to extract and return just the requested extension"""
+    for ext in extensions:
+        if ext['url'] == item_url:
+            return ext
 
 
 def test_from_fhir():
@@ -107,6 +116,10 @@ def test_timezone_inheritance():
         db.session.commit()
     parent, org = map(db.session.merge, (parent, org))
     assert org.timezone == 'UTC'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'UTC'
 
     # test that timezone-less child org inherits from parent
     parent.timezone = 'Asia/Tokyo'
@@ -115,6 +128,10 @@ def test_timezone_inheritance():
         db.session.commit()
     parent, org = map(db.session.merge, (parent, org))
     assert org.timezone == 'Asia/Tokyo'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'Asia/Tokyo'
 
     # test that child org with timezone does NOT inherit from parent
     org.timezone = 'Europe/Rome'
@@ -123,6 +140,10 @@ def test_timezone_inheritance():
         db.session.commit()
     org = db.session.merge(org)
     assert org.timezone == 'Europe/Rome'
+    tz_ext = item_from_extensions(
+        org.as_fhir()['extension'],
+        'http://hl7.org/fhir/StructureDefinition/user-timezone')
+    assert tz_ext['timezone'] == 'Europe/Rome'
 
 
 def test_as_fhir():
@@ -136,12 +157,16 @@ def test_as_fhir():
 
 
 def test_multiple_rps_in_fhir():
+    with SessionScope(db):
+        db.session.add(ResearchStudy(title='base study'))
+        db.session.commit()
+    rs_id = ResearchStudy.query.with_entities(ResearchStudy.id).first()
     yesterday = datetime.utcnow() - timedelta(days=1)
     lastyear = datetime.utcnow() - timedelta(days=365)
     org = Organization(name='Testy')
-    rp1 = ResearchProtocol(name='rp1')
-    rp2 = ResearchProtocol(name='yesterday')
-    rp3 = ResearchProtocol(name='last year')
+    rp1 = ResearchProtocol(name='rp1', research_study_id=rs_id)
+    rp2 = ResearchProtocol(name='yesterday', research_study_id=rs_id)
+    rp3 = ResearchProtocol(name='last year', research_study_id=rs_id)
     with SessionScope(db):
         map(db.session.add, (org, rp1, rp2, rp3))
         db.session.commit()
@@ -166,7 +191,9 @@ def test_multiple_rps_in_fhir():
     assert len(rps[0]['research_protocols']) == 3
 
     # confirm the order is descending in the custom accessor method
-    results = [(rp, retired) for rp, retired in org.rps_w_retired()]
+    results = [
+        (rp, retired) for rp, retired in
+        org.rps_w_retired(research_study_id=rs_id)]
     assert [(rp1, None), (rp2, yesterday), (rp3, lastyear)] == results
 
 
@@ -216,8 +243,7 @@ def test_organization_get_by_identifier(test_user_login, client):
 
 
 def test_org_missing_identifier(
-        login, client, initialized_patient):
-    login()
+        client, initialized_patient_logged_in):
     # should get 404 w/o finding a match
     response = client.get(
         '/api/organization/{value}?system={system}'.format(
@@ -226,10 +252,9 @@ def test_org_missing_identifier(
 
 
 def test_organization_list(
-        login, client, shallow_org_tree, initialized_patient):
+        client, initialized_patient_logged_in):
     count = Organization.query.count()
 
-    login()
     # use api to obtain FHIR bundle
     response = client.get('/api/organization')
     assert response.status_code == 200
@@ -400,6 +425,28 @@ def test_organization_put_update(
     assert org.timezone == 'US/Pacific'
 
 
+def test_org_rp_inheritance(initialized_with_org):
+    fhir = initialized_with_org.as_fhir()
+    assert fhir['resourceType'] == 'Organization'
+    rp_ext = item_from_extensions(fhir['extension'], TRUENTH_RP_EXTENSION)
+    assert rp_ext['research_protocols'][0]['research_study_id'] == 0
+
+    # Add child org, w/o a research protocol to pick up parent value
+    child = Organization(name='child', partOf_id=initialized_with_org.id)
+    with SessionScope(db):
+        db.session.add(child)
+        db.session.commit()
+    child = db.session.merge(child)
+    child_fhir = child.as_fhir()
+    rp_ext = item_from_extensions(
+        child_fhir['extension'], TRUENTH_RP_EXTENSION)
+    assert 'research_protocols' not in rp_ext
+    inherited = child.as_fhir(include_empties=False, include_inherited=True)
+    rp_ext = item_from_extensions(
+        inherited['extension'], TRUENTH_RP_EXTENSION)
+    assert 'research_protocols' in rp_ext
+
+
 def test_organization_extension_update(
         promote_user, test_user_login, client):
     # confirm clearing one of several extensions works
@@ -414,7 +461,7 @@ def test_organization_extension_update(
         value='state:NY', system=PRACTICE_REGION))
     org.locales.append(en_AU)
     org.default_locale = 'en_AU'
-    rp = ResearchProtocol(name='rp1')
+    rp = ResearchProtocol(name='rp1', research_study_id=0)
 
     with SessionScope(db):
         db.session.add(rp)
@@ -449,7 +496,8 @@ def test_organization_extension_update(
     assert org.default_locale == 'en_AU'
     assert org.locales.count() == 0
     assert org.timezone == 'US/Pacific'
-    assert org.research_protocol(as_of_date=datetime.utcnow()).id == rp_id
+    assert org.research_protocol(
+        research_study_id=0, as_of_date=datetime.utcnow()).id == rp_id
 
     # Confirm empty extension isn't included in result
     results = response.json

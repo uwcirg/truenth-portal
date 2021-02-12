@@ -10,6 +10,7 @@ var CurrentUser = { /* global $ i18next */
             userId: null,
             orgTool: null,
             isAdmin: false,
+            userResearchStudyIds: [],
             userRoles: [],
             userOrgs: [],
             topLevelOrgs: [],
@@ -27,10 +28,12 @@ var CurrentUser = { /* global $ i18next */
                     return false;
                 }
                 self.setUserRoles(function() { /* set user roles */
-                    self.setUserOrgs(self.getUserId());
-                    self.initOrgsList(function() { /* set user orgs */
-                        callback();
-                    }, doPopulateOrgsUI, orgElementsContainerId);
+                    self.setUserResearchStudies(function() {
+                        self.setUserOrgs(self.getUserId());
+                        self.initOrgsList(function() { /* set user orgs */
+                            callback();
+                        }, doPopulateOrgsUI, orgElementsContainerId);
+                    });
                 });
             });
         },
@@ -86,6 +89,21 @@ var CurrentUser = { /* global $ i18next */
         isAdminUser: function() {
             return this.isAdmin;
         },
+        isPatientUser: function() {
+            return this.userRoles.indexOf("patient") !== -1
+        },
+        getRoleType: function() {
+            return this.isPatientUser()?"patient":"staff";
+        },
+        setUserResearchStudies: function(callback) {
+            callback = callback || function() {};
+            tnthAjax.getUserResearchStudies(this.userId, this.getRoleType(), "", data => {
+                if (data) {
+                    this.userResearchStudyIds = Object.keys(data).map(item => parseInt(item));
+                }
+                callback();
+            });
+        },
         getUserOrgs: function () {
             if (this.userOrgs.length === 0) {
                 this.setUserOrgs(this.userId);
@@ -103,10 +121,8 @@ var CurrentUser = { /* global $ i18next */
                 url: "/api/demographics/" + this.userId
             }).done(function (data) {
                 if (data && data.careProvider) {
-                    self.userOrgs = (data.careProvider).map(function (val) {
-                        var orgID = val.reference.split("/").pop();
-                        return orgID;
-                    });
+                    let orgFilteredSet = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
+                    self.userOrgs = orgFilteredSet;
                 }
             }).fail(function () {
                 alert(i18next.t("Error occurred setting user organizations"));
