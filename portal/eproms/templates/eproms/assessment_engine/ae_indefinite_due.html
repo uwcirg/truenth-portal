@@ -14,7 +14,7 @@
         if enrolled_in_substudy else _("Open Questionnaire") %}
     <!-- tile title for completed card, NOTE:  need to differentiate between main and sub-study -->
     {% set completed_title_text = _("%(assigning_authority)s Questionnaire", assigning_authority=_(assessment_status.assigning_authority))
-        if enrolled_in_substudy else _("Completed Questionnaire") %}
+        if enrolled_in_substudy else _("Completed Questionnaires") %}
     <!-- main study due card -->
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
