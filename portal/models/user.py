@@ -2080,7 +2080,7 @@ def patients_query(
         query = query.filter(User.id.notin_(
             disallow_patient_ids))
 
-    if consented_users:
+    if consented_users is not None:
         query = query.filter(User.id.in_(consented_users))
     if filter_by_ids:
         query = query.filter(User.id.in_(filter_by_ids))
