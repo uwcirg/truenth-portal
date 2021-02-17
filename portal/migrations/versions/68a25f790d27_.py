@@ -6,6 +6,7 @@ Create Date: 2020-12-08 14:17:28.279106
 
 """
 from alembic import op
+from flask import current_app
 import sqlalchemy as sa
 
 
@@ -15,6 +16,8 @@ down_revision = '7fd6b3abfec2'
 
 
 def upgrade():
+    if current_app.config.get('GIL'):
+        return
     op.add_column(
         'trigger_states',
         sa.Column('visit_month', sa.Integer()))
@@ -29,6 +32,8 @@ def upgrade():
 
 
 def downgrade():
+    if current_app.config.get('GIL'):
+        return
     op.drop_index(
         op.f('ix_trigger_states_visit_month'),
         table_name='trigger_states')
