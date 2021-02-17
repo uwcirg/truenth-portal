@@ -36,11 +36,11 @@ def upgrade():
         " code = 'paper'").next()[0]
     those_with_diffs = (
         "SELECT questionnaire_responses.id as id, subject_id, authored,"
-        " TO_TIMESTAMP(document->>'authored', 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone AS doc_authored,"
+        " TO_TIMESTAMP(document->>'authored', 'YYYY-MM-DDTHH24:MI:SS')::timestamp without time zone AS doc_authored,"
         " coding_id, document FROM questionnaire_responses"
         " LEFT JOIN encounter_codings"
         " ON questionnaire_responses.encounter_id = encounter_codings.encounter_id"
-        " WHERE authored != TO_TIMESTAMP(document->>'authored', 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone;"
+        " WHERE authored != TO_TIMESTAMP(document->>'authored', 'YYYY-MM-DDTHH24:MI:SS')::timestamp without time zone;"
     )
     result = conn.execute(those_with_diffs)
     preferred_authored = []
