@@ -570,7 +570,8 @@ export default (function() {
                 }
             },
             setSubjectResearchStudies: function() {
-                this.modules.tnthAjax.getUserResearchStudies(this.subjectId, "patient", "", data => {
+                let roleType = this.isSubjectPatient() ? "patient": "staff";
+                this.modules.tnthAjax.getUserResearchStudies(this.subjectId, roleType, "", data => {
                     if (data) {
                         this.subjectResearchStudyStatuses = data;
                         this.subjectReseachStudies = Object.keys(data).map(item => parseInt(item));
