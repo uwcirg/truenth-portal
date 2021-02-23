@@ -25,6 +25,7 @@
         "HIDE_TRUENTH_ID_FIELD = True\n",
         "TRUENTH_LINK_URL = False\n",
         "MOVEMER_LINK_URL = 'https://movember.com/'\n",
+        "CONTACT_RECIPIENTS = [('EMPRO', 'empro@truenth.org')]\n",
         "TREATMENT_OPTIONS = [\n",
         "   ('424313000', 'http://snomed.info/sct'),\n",
         "   ('373818007', 'http://snomed.info/sct'),\n",
