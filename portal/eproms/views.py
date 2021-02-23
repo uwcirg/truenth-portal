@@ -298,7 +298,7 @@ def contact():
         for org in Organization.query.filter(Organization.email.isnot(None)):
             if '@' in org.email:
                 recipient_types.append((org.name, org.email))
-        config_recipients = current_app.config.get('CONTACT_RECIPIENTS', None)
+        config_recipients = current_app.config.get('CONTACT_RECIPIENTS')
         if config_recipients:
             recipient_types = recipient_types + config_recipients
         return render_template(
