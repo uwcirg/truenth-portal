@@ -138,7 +138,10 @@ def rs_for_staff(user_id):
     orgs = set()
     ot = OrgTree()
     for org in user.organizations:
-        orgs.update(ot.at_and_above_ids(org.id))
+        try:
+            orgs.update(ot.at_and_above_ids(org.id))
+        except ValueError as ve:
+            raise ValueError(f"Failed at_and_above lookup on {org.id}")
         orgs.update(ot.here_and_below_id(org.id))
     studies = OrganizationResearchProtocol.query.filter(
         OrganizationResearchProtocol.organization_id.in_(
