@@ -20,7 +20,8 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    op.create_table('user_clinicians',
+    op.create_table(
+        'user_clinicians',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('patient_id', sa.Integer(), nullable=False),
         sa.Column('clinician_id', sa.Integer(), nullable=False),
