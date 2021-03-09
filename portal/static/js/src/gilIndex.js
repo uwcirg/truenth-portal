@@ -13,5 +13,9 @@ $(document).ready(function() {
         /ipad/i.test(String(navigator.userAgent))) {
         window.kp_Browser_clearCookies();
     }
+    $("#naModal").modal({
+        show: true,
+        backdrop: "static"
+    });
 });
 

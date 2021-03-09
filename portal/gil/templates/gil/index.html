@@ -129,6 +129,18 @@
         </div>
       </div>
     </main>
+    <div class="modal fade" id="naModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content box-modal">
+          <div class="box-modal__inner">
+            <p class="box-modal__copy text-left">{{_("Thanks for using this website. Please note that this site is no longer available.")}}</p>
+            <p class="box-modal__copy">{{_("Please go to: ")}}</p>
+            <p class="box-modal__copy"><a href="http://truenorth.movember.com">http://truenorth.movember.com</a></p>
+            <p>{{_("<b>MUSIC</b> users, please login to your account from <a href='/user/sign-in'>here</a>")}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   {% endblock %}
   {% block document_ready %}
   <script src="{{url_for('static', filename='js/dist/gilIndex.bundle.js')}}"></script>
