@@ -1193,6 +1193,8 @@ class User(db.Model, UserMixin):
                 pi = User.query.filter(User.roles.any(
                     name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
                     User.organizations.any(id=consent.organization_id)).one()
+                self.clinicians.append(pi)
+                db.session.commit()
             except NoResultFound:
                 current_app.logger.error(
                     "Primary Investigator not assigned to organization"
@@ -1201,8 +1203,6 @@ class User(db.Model, UserMixin):
                 current_app.logger.error(
                     "Multiple Primary Investigators for organization"
                     f" {consent.organization_id}")
-            self.clinicians.append(pi)
-            db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
