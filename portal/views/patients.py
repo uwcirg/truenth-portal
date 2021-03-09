@@ -17,7 +17,6 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization
-from ..models.qb_status import patient_research_study_status
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
@@ -77,7 +76,9 @@ def render_patients_list(
             patient.assessment_status = _(qb_status['status'])
             patient.current_qb = qb_status['visit_name']
             if research_study_id == EMPRO_RS_ID:
-                patient.clinician = clinician_name_map[patient.clinician_id]
+                patient.clinician = '; '.join(
+                    (clinician_name_map[c.id] for c in
+                     patient.clinicians))
                 patient.action_state = qb_status['action_state'].title() \
                     if qb_status['action_state'] else ""
             patients_list.append(patient)
