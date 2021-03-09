@@ -64,6 +64,8 @@ class TestDemographics(TestCase):
 
         pract = self.add_practitioner(first_name='Indiana', last_name='Jones')
         pract_id = pract.id
+        pi = self.add_primary_investigator(first_name='Bob', last_name='Sponge')
+        pi_id = pi.id
 
         family = 'User'
         given = 'Test'
@@ -109,6 +111,7 @@ class TestDemographics(TestCase):
                     {"reference": "Organization/{}".format(org_id)},
                     {"reference": "api/organization/{}".format(org2_id)},
                     {"reference": "Practitioner/{}".format(pract_id)},
+                    {"reference": "Clinician/{}".format(pi_id)},
                     {"reference": "Clinician/{}".format(TEST_USER_ID)},
                 ]
                 }
@@ -141,12 +144,15 @@ class TestDemographics(TestCase):
         # ignore added timezone and empty extensions
         assert 2 == len([ext for ext in fhir['extension']
                          if 'valueCodeableConcept' in ext])
-        assert 4 == len(fhir['careProvider'])
+        assert 5 == len(fhir['careProvider'])
         assert (
             Reference.practitioner(pract_id).as_fhir()
             in fhir['careProvider'])
         assert (
             Reference.clinician(TEST_USER_ID).as_fhir()
+            in fhir['careProvider'])
+        assert (
+            Reference.clinician(pi_id).as_fhir()
             in fhir['careProvider'])
 
         user = db.session.merge(self.test_user)
@@ -160,7 +166,9 @@ class TestDemographics(TestCase):
         assert user.organizations[0].name == org_name
         assert user.organizations[1].name == org2_name
         assert user.practitioner_id == pract_id
-        assert user.clinician_id == TEST_USER_ID
+        assert len(user.clinicians) == 2
+        assert set([c.id for c in user.clinicians]) == set(
+            (TEST_USER_ID, pi_id))
 
     def test_auth_identifiers(self):
         # add a fake FB and Google auth provider for user
@@ -333,6 +341,31 @@ class TestDemographics(TestCase):
         user = db.session.merge(self.test_user)
         assert len(user.organizations) == 1
         assert user.organizations[0].name == org_name
+
+    def test_demographics_delete_clinician(self):
+        self.login()
+        # add two clinicians - a PI and self.
+        pi = self.add_primary_investigator()
+        pi_id = pi.id
+        user = db.session.merge(self.test_user)
+
+        user.clinicians.append(pi)
+        user.clinicians.append(user)
+
+        just_the_pi = {
+            "resourceType": "Patient",
+            "careProvider": [
+                {"reference": "Clinician/{}".format(pi_id)}]
+            }
+
+        response = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps(just_the_pi))
+
+        assert response.status_code == 200
+        user = db.session.merge(self.test_user)
+        assert len(user.clinicians) == 1
+        assert user.clinicians[0] == pi
 
     def test_demographics_delete_ref(self):
         # existing careProvider should get removed
