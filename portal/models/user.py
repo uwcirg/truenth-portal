@@ -17,7 +17,7 @@ from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from ..database import db
@@ -1179,6 +1179,30 @@ class User(db.Model, UserMixin):
             replaced.status = "deleted"
             db.session.add(replaced)
         db.session.commit()
+        self.check_consents()
+
+    def check_consents(self):
+        """Hook method for application of consent related rules"""
+
+        # For EMPRO, automatically add the PI on consent
+        from .user_consent import latest_consent
+        from .research_study import EMPRO_RS_ID
+        consent = latest_consent(self, EMPRO_RS_ID)
+        if consent and len(self.clinicians) == 0:
+            try:
+                pi = User.query.filter(User.roles.any(
+                    name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
+                    User.organizations.any(id=consent.organization_id)).one()
+            except NoResultFound:
+                current_app.logger.error(
+                    "Primary Investigator not assigned to organization"
+                    f" {consent.organization_id}")
+            except MultipleResultsFound:
+                current_app.logger.error(
+                    "Multiple Primary Investigators for organization"
+                    f" {consent.organization_id}")
+            self.clinicians.append(pi)
+            db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
