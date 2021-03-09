@@ -287,8 +287,8 @@ class User(db.Model, UserMixin):
     clinicians = db.relationship(
         'User',
         secondary="user_clinicians",
-        primaryjoin=id==UserClinician.patient_id,
-        secondaryjoin=id==UserClinician.clinician_id)
+        primaryjoin=id == UserClinician.patient_id,
+        secondaryjoin=id == UserClinician.clinician_id)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.

@@ -64,7 +64,7 @@ class TestDemographics(TestCase):
 
         pract = self.add_practitioner(first_name='Indiana', last_name='Jones')
         pract_id = pract.id
-        pi = self.add_primary_investigator(first_name='Bob', last_name='Sponge')
+        pi = self.add_primary_investigator(first_name='Bob', last_name='S')
         pi_id = pi.id
 
         family = 'User'
