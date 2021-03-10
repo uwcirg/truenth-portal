@@ -1240,7 +1240,7 @@ export default (function() {
                 }).join(", ");
             },
             addClinician: function() {
-                let selectedOption = $("#clincianSelector option:selected");
+                let selectedOption = $("#clinicianSelector option:selected");
                 if (!selectedOption.length) return;
                 let reference = `api/clinician/${selectedOption.val()}`;
                 let exist = this.selectedClinicians.filter(item => {
@@ -1277,6 +1277,9 @@ export default (function() {
                 }
             },
             updateClinicians: function() {
+                if (!this.selectedClinicians || !this.selectedClinicians.length) {
+                    return;
+                }
                 let postData = {"careProvider": []};
                 if (this.demo.data.careProvider && this.demo.data.careProvider.length) {
                     postData.careProvider = [...this.demo.data.careProvider];
@@ -1290,6 +1293,8 @@ export default (function() {
                 }
                 postData.careProvider = [...postData.careProvider, ...this.selectedClinicians];
                 this.postDemoData($("#treatingClinicianContainer"), postData, () => {
+                    /* reset selector value */
+                    $("#clinicianSelector").val("");
                     /*
                         * set research study status after clinician is set
                         */
@@ -1307,7 +1312,7 @@ export default (function() {
                         $("#treatingClinicianContainer .select-list-error").text(errorMessage);
                         return;
                     }
-                    let selectListHTML = `<select id="clincianSelector" class="form-control">;
+                    let selectListHTML = `<select id="clinicianSelector" class="form-control">;
                                             <option value="">-- ${i18next.t("Add a Clinician")} --</option>`;
                     (data.entry).forEach(item => {
                         let cloneItem = JSON.parse(JSON.stringify(item));
