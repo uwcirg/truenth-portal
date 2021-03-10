@@ -114,8 +114,9 @@ export default (function() {
             subjectReseachStudies: [],
             subjectResearchStudyStatuses: {},
             userRoles: [],
-            cliniciansList: [],
-            staffEditableRoles: ["clinician", "staff", "staff_admin"],
+            PIList: [],
+            selectedClinicians: [],
+            staffEditableRoles: ["clinician", "primary_investigator", "staff", "staff_admin"],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -256,7 +257,7 @@ export default (function() {
                 return this.demo.data.email;
             },
             computedTreatingClinician: function() {
-                return this.demo.data.clinician && Object.keys(this.demo.data.clinician).length;
+                return this.demo.data.clinicians && this.demo.data.clinicians.length;
             },
             computedSubStudyTriggers: function() {
                 return this.subStudyTriggers.domains;
@@ -542,10 +543,11 @@ export default (function() {
                             let clinicianFilteredSet = clone.filter(item => {
                                 return item.reference.match(/^api\/clinician/gi);
                             });
-                            self.demo.data.clinician = clinicianFilteredSet.length? clinicianFilteredSet[0] : {};
+                            self.demo.data.clinicians = clinicianFilteredSet.length? clinicianFilteredSet : [];
+                            self.selectedClinicians = self.demo.data.clinicians;
                             self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
                         } else {
-                            self.demo.data.clinician = {};
+                            self.demo.data.clinicians = [];
                             self.subjectOrgs = [];
                         }
                     }
@@ -1218,6 +1220,85 @@ export default (function() {
             hasTreatingClinician: function() {
                 return this.computedTreatingClinician;
             },
+            isPI: function(reference) {
+                if (!reference) return false;
+                let referenceValue = this.getReferenceValue(reference);
+                return this.PIList.filter(item => {
+                    return item.identifier[0].value == referenceValue;
+                }).length;
+            },
+            getReferenceValue: function(reference) {
+                if (!reference) return "";
+                return reference.split("/")[2];
+            },
+            getSelectedCliniciansDisplays: function() {
+                if (!this.demo.data.clinicians || ! this.demo.data.clinicians.length) {
+                    return "";
+                }
+                return this.demo.data.clinicians.map(item => {
+                    return item.display;
+                }).join(", ");
+            },
+            addClinician: function() {
+                let selectedOption = $("#clincianSelector option:selected");
+                if (!selectedOption.length) return;
+                let reference = `api/clinician/${selectedOption.val()}`;
+                let exist = this.selectedClinicians.filter(item => {
+                    return item.reference === reference;
+                });
+                if (exist.length) return;
+                this.selectedClinicians.push({
+                    "display": selectedOption.text(),
+                    "reference": reference
+                });
+            },
+            removeClinicianEvent: function(event) {
+                event.stopPropagation();
+                if (this.selectedClinicians.length === 1) {
+                    $("#treatingClinicianContainer .select-list-error").text("You must add a clinician before removing the last.");
+                    return;
+                }
+                let targetValue = $(event.target).closest(".clinician-item").attr("dataValue");
+                if (!targetValue) return;
+                this.removeClinicians(targetValue);
+            },
+            removeClinicians: function(targetValue) {
+                if (!targetValue) return;
+                let targetIndex = -1;
+                this.selectedClinicians.forEach((item, index) => {
+                    if (item.reference == targetValue) {
+                        targetIndex = index;
+                    }
+                });
+                if (targetIndex !== -1) {
+                    $("#treatingClinicianContainer .select-list-error").text("");
+                    this.selectedClinicians.splice(targetIndex, 1);
+                    this.updateClinicians();
+                }
+            },
+            updateClinicians: function() {
+                let postData = {"careProvider": []};
+                if (this.demo.data.careProvider && this.demo.data.careProvider.length) {
+                    postData.careProvider = [...this.demo.data.careProvider];
+                    /*
+                        * exclude pre-existing clinician reference
+                        */
+                    let filteredSet = (postData.careProvider).filter(item => {
+                        return !item.reference.match(/^api\/clinician/gi);
+                    });
+                    postData.careProvider = filteredSet;
+                }
+                postData.careProvider = [...postData.careProvider, ...this.selectedClinicians];
+                this.postDemoData($("#treatingClinicianContainer"), postData, () => {
+                    /*
+                        * set research study status after clinician is set
+                        */
+                    this.setSubjectResearchStudies();
+                });
+            },
+            getPIIndicatorText: function() {
+                return i18next.t("principal investigator");
+            },
             initTreatingClinicianSection: function() {
                 let self = this;
                 this.modules.tnthAjax.getCliniciansList(this.subjectOrgs, function(data) {
@@ -1226,21 +1307,20 @@ export default (function() {
                         $("#treatingClinicianContainer .select-list-error").text(errorMessage);
                         return;
                     }
-                    let selectedValue = (self.demo.data.clinician).reference? (self.demo.data.clinician.reference).split("/")[2]: "";
                     let selectListHTML = `<select id="clincianSelector" class="form-control">;
-                                            <option value="">Select</option>`;
+                                            <option value="">-- ${i18next.t("Add a Clinician")} --</option>`;
                     (data.entry).forEach(item => {
-                        selectListHTML += `<option value="${item.identifier[0].value}" ${String(item.identifier[0].value) === String(selectedValue) ? "selected": ""}>${item.name[0].given} ${item.name[0].family}</option>`
+                        let cloneItem = JSON.parse(JSON.stringify(item));
+                        let isPI = item.identifier.filter(i => {
+                            return i.system == SYSTEM_IDENTIFIER_ENUM["primary_investigator"];
+                        }).length;
+                        if (isPI) {
+                            /* gather a list of PI for use later */
+                            self.PIList.push(cloneItem);
+                        }
+                        selectListHTML += `<option value="${item.identifier[0].value}" ${isPI.length ? "data-pi": ""}>${item.name[0].given} ${item.name[0].family}</option>`
                     });
                     selectListHTML += "</select>";
-                    let selectedEntry = (data.entry).filter(item => {
-                        return String(item.identifier[0].value) === String(selectedValue);
-                    });
-
-                    if (selectedValue && !selectedEntry.length) {
-                        //clinician site changed, doesn't belong to the available sub-study clinic(s)
-                        $("#treatingCliniciansSection .get-clinicians-error").text(i18next.t("Assigned clinician is not from the site."));
-                    }
 
                     $("#treatingClinicianContainer .select-list").append(selectListHTML);
                     $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
@@ -1249,28 +1329,10 @@ export default (function() {
                             return false;
                         }
                         $("#treatingClinicianContainer .select-list-error").text("");
-                        let postData = {"careProvider": []};
-                        if (self.demo.data.careProvider) {
-                            postData.careProvider = [...self.demo.data.careProvider];
-                            /*
-                             * exclude pre-existing clinician reference
-                             */
-                            let filteredSet = (postData.careProvider).filter(item => {
-                                return !item.reference.match(/^api\/clinician/gi);
-                            });
-                            postData.careProvider = filteredSet;
-                        }
-                        //post data
-                        postData.careProvider.push({
-                            display: $("#clincianSelector option:selected").text(),
-                            reference: `api/clinician/${$(this).val()}`
-                        });
-                        self.postDemoData($("#treatingClinicianContainer"), postData, () => {
-                            /*
-                             * set research study status after clinician is set
-                             */
-                            self.setSubjectResearchStudies();
-                        });
+                        //add clinician
+                        self.addClinician();
+                        //update via api
+                        self.updateClinicians();
                     });
                 });
             },
@@ -3130,6 +3192,7 @@ export default (function() {
                         self.modules.tnthAjax.getConsent(userId || self.subjectId, {sync: true}, function(data) {
                             self.getConsentList(data);
                             self.setSubjectResearchStudies();
+                            self.setDemoData();
                         });
                     }, 1500);
                 });
