@@ -399,6 +399,62 @@ a.btn {
   padding: 0;
   margin: 1em 0.2em;
 }
+.chips-list {
+  margin-bottom: 16px;
+}
+.chip {
+  align-items: center;
+  cursor: default;
+  display: inline-flex;
+  line-height: 20px;
+  max-width: 100%;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-decoration: none;
+  transition-duration: .28s;
+  transition-property: box-shadow,opacity;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  vertical-align: middle;
+  white-space: nowrap;
+  background-color: #FFF;
+  border-color: #FFF;
+  color: @baseColor;
+  border-radius: 16px;
+  margin-right: 12px;
+  margin-bottom: 16px;
+  .chip-content {
+    align-items: center;
+    display: inline-flex;
+    height: 100%;
+    max-width: 100%;
+    padding: 8px;
+  }
+  .decorator-text {
+    font-weight: 500;
+    margin-left: 8px;
+    font-size: @mobileSize;
+    color: @mutedColor;
+  }
+  //button
+  .chip-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    margin-right: 12px;
+    margin-left: -16px;
+    color: inherit;
+    background-color: transparent;
+    border: 0;
+  }
+  .v-icon__svg {
+    fill: @mutedColor;
+    font-size: 18px;
+    height: 18px; 
+    width: 18px;
+  } 
+}
 body.landing {
   min-height: 100%;
   width: 100%;
@@ -4162,6 +4218,8 @@ section.header {
   .profile-item-container .view-container {
     display: block;
     position: relative;
+    max-width: calc(~"100% - 70px");
+    line-height: 1.65;
   }
   .profile-item-container .view-container td:first-of-type {
     display: inline-block;
@@ -4289,10 +4347,12 @@ section.header {
 }
 #treatingClinicianContainer {
   .select-list {
-    margin-bottom: 16px;
+    margin-top: 16px;
+    margin-bottom: 24px;
   }
-  #clincianSelector {
+  #clinicianSelector {
     min-width: 172px;
+    max-width: 488px;
   }
 }
 

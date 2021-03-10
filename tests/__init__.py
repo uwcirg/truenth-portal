@@ -52,7 +52,12 @@ from portal.models.user_consent import (
     STAFF_EDITABLE_MASK,
     UserConsent,
 )
-from portal.system_uri import SNOMED, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM, US_NPI
+from portal.system_uri import (
+    SNOMED,
+    TRUENTH_PI,
+    TRUENTH_QUESTIONNAIRE_CODE_SYSTEM,
+    US_NPI,
+)
 
 DEFAULT_PASSWORD = 'fakePa$$'
 
@@ -321,6 +326,18 @@ class TestCase(Base):
             db.session.commit()
         p = db.session.merge(p)
         return p
+
+    @staticmethod
+    def add_primary_investigator(
+            first_name='first', last_name='last', email='pi@example.com'):
+        pi = User(first_name=first_name, last_name=last_name, email=email)
+        i = Identifier(system=TRUENTH_PI, value=True)
+        pi.identifiers.append(i)
+        with SessionScope(db):
+            db.session.add(pi)
+            db.session.commit()
+        pi = db.session.merge(pi)
+        return pi
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                       system=SNOMED, setdate=None):
