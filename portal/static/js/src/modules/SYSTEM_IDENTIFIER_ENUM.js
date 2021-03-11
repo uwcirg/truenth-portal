@@ -11,6 +11,7 @@ export default {
     "language": "http://hl7.org/fhir/valueset/languages",
     "language_system": "urn:ietf:bcp:47",
     "shortname": "http://us.truenth.org/identity-codes/shortname",
+    "primary_investigator": "http://us.truenth.org/identity-codes/Primary-Investigator",
     SNOMED_SYS_URL: "http://snomed.info/sct",
     CLINICAL_SYS_URL: "http://us.truenth.org/clinical-codes",
     CANCER_TREATMENT_CODE: "118877007",

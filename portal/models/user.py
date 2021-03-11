@@ -17,7 +17,7 @@ from sqlalchemy import UniqueConstraint, and_, func, or_
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from werkzeug.exceptions import BadRequest, Conflict, Forbidden, NotFound
 
 from ..database import db
@@ -51,6 +51,7 @@ from .practitioner import Practitioner
 from .reference import Reference
 from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
+from .user_clinician import UserClinician
 from .user_preference import UserPreference
 from .telecom import ContactPoint, Telecom
 from .value_quantity import ValueQuantity
@@ -283,7 +284,11 @@ class User(db.Model, UserMixin):
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
     practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
-    clinician_id = db.Column(db.ForeignKey('users.id'), index=True)
+    clinicians = db.relationship(
+        'User',
+        secondary="user_clinicians",
+        primaryjoin=id == UserClinician.patient_id,
+        secondaryjoin=id == UserClinician.clinician_id)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -1116,9 +1121,9 @@ class User(db.Model, UserMixin):
         if self.practitioner_id:
             d['careProvider'].append(Reference.practitioner(
                 self.practitioner_id).as_fhir())
-        if self.clinician_id:
+        for clinician in self.clinicians:
             d['careProvider'].append(Reference.clinician(
-                self.clinician_id).as_fhir())
+                clinician.id).as_fhir())
         d['deleted'] = (
             FHIR_datetime.as_fhir(self.deleted.timestamp)
             if self.deleted_id else None)
@@ -1174,6 +1179,30 @@ class User(db.Model, UserMixin):
             replaced.status = "deleted"
             db.session.add(replaced)
         db.session.commit()
+        self.check_consents()
+
+    def check_consents(self):
+        """Hook method for application of consent related rules"""
+
+        # For EMPRO, automatically add the PI on consent
+        from .user_consent import latest_consent
+        from .research_study import EMPRO_RS_ID
+        consent = latest_consent(self, EMPRO_RS_ID)
+        if consent and len(self.clinicians) == 0:
+            try:
+                pi = User.query.filter(User.roles.any(
+                    name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
+                    User.organizations.any(id=consent.organization_id)).one()
+                self.clinicians.append(pi)
+                db.session.commit()
+            except NoResultFound:
+                current_app.logger.error(
+                    "Primary Investigator not assigned to organization"
+                    f" {consent.organization_id}")
+            except MultipleResultsFound:
+                current_app.logger.error(
+                    "Multiple Primary Investigators for organization"
+                    f" {consent.organization_id}")
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
@@ -1204,6 +1233,24 @@ class User(db.Model, UserMixin):
                 db.session.add(tou)
                 db.session.add(audit)
         db.session.commit()
+
+    def update_clinicians(self, clinician_list):
+        """Update user's clinicians
+
+        Uses given list of clinicians as the definitive list for
+        the user.
+
+        :param clinician_list: list of user objects for user's clinicians
+
+        """
+        remove_if_not_requested = {c.id: c for c in self.clinicians}
+        for clinician in clinician_list:
+            if clinician.id in remove_if_not_requested:
+                remove_if_not_requested.pop(clinician.id)
+            if clinician not in self.clinicians:
+                self.clinicians.append(clinician)
+        for clinician in remove_if_not_requested.values():
+            self.clinicians.remove(clinician)
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
         """Update user's organizations
@@ -1453,6 +1500,7 @@ class User(db.Model, UserMixin):
         def update_care_providers(fhir):
             """Update user fields based on careProvider Reference types"""
             org_list = []
+            clinician_list = []
             for cp in fhir.get('careProvider'):
                 parsed = Reference.parse(cp)
                 if isinstance(parsed, Organization):
@@ -1460,8 +1508,9 @@ class User(db.Model, UserMixin):
                 elif isinstance(parsed, Practitioner):
                     self.practitioner_id = parsed.id
                 elif isinstance(parsed, User):
-                    self.clinician_id = parsed.id
+                    clinician_list.append(parsed)
             self.update_orgs(org_list, acting_user)
+            self.update_clinicians(clinician_list)
 
         if 'name' in fhir:
             name = v_or_first(fhir['name'], 'name')

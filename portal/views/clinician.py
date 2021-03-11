@@ -9,7 +9,7 @@ from ..models.organization import org_restriction_by_role
 from ..models.practitioner import Practitioner
 from ..models.role import Role, ROLE
 from ..models.user import User, UserOrganization, UserRoles, current_user
-from ..system_uri import TRUENTH_ID
+from ..system_uri import TRUENTH_ID, TRUENTH_PI
 from .crossdomain import crossdomain
 
 clinician_api = Blueprint('clinician_api', __name__)
@@ -20,8 +20,9 @@ def clinician_query(acting_user, org_filter=None):
     query = User.query.join(UserRoles).filter(
         UserRoles.user_id == User.id).join(Role).filter(
         UserRoles.role_id == Role.id).filter(
-        Role.name == ROLE.CLINICIAN.value).with_entities(
-        User.id, User.first_name, User.last_name)
+        Role.name.in_((
+            ROLE.CLINICIAN.value,
+            ROLE.PRIMARY_INVESTIGATOR.value)))
 
     limit_to_orgs = org_restriction_by_role(acting_user, org_filter)
     if limit_to_orgs:
@@ -79,13 +80,18 @@ def clinician_search():
     """
     clinicians = []
     org_filter = request.args.getlist('organization_id', int)
-    for item in clinician_query(current_user(), org_filter):
+    for user in clinician_query(current_user(), org_filter):
+        identifiers = [
+            Identifier(use='official', system=TRUENTH_ID, value=user.id)
+        ]
+        if user.has_role(ROLE.PRIMARY_INVESTIGATOR.value):
+            identifiers.append(
+                Identifier(use='secondary', system=TRUENTH_PI, value=True)
+            )
         clinicians.append(Practitioner(
-            first_name=item.first_name,
-            last_name=item.last_name,
-            identifiers=[
-                Identifier(use='official', system=TRUENTH_ID, value=item.id)
-            ]).as_fhir())
+            first_name=user.first_name,
+            last_name=user.last_name,
+            identifiers=identifiers).as_fhir())
 
     link = {
         'rel': 'self', 'href': url_for(
