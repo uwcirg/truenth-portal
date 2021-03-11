@@ -42,7 +42,6 @@ from wtforms import (
 
 from ..audit import auditable_event
 from ..database import db
-from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..factories.celery import create_celery
 from ..models.app_text import (
@@ -71,8 +70,6 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
-from ..models.qb_timeline import invalidate_users_QBT
-from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
@@ -728,14 +725,10 @@ def patient_invite_email(user_id, research_study_id):
 
     try:
         top_org = user.first_top_organization()
-        if top_org:
-            name_key = UserInviteEmail_ATMA.name_key(
-                org=top_org.name,
-                research_study_id=research_study_id)
-        else:
-            name_key = UserInviteEmail_ATMA.name_key(
-                research_study_id=research_study_id
-            )
+        org_name = top_org.name if top_org else None
+        name_key = UserInviteEmail_ATMA.name_key(
+            org=org_name,
+            research_study_id=research_study_id)
         args = load_template_args(user=user)
         item = MailResource(
             app_text(name_key), locale_code=user.locale_code, variables=args)
