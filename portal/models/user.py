@@ -432,11 +432,18 @@ class User(db.Model, UserMixin):
             name = self.username
         return escape(name) if name else None
 
-    def current_encounter(self, generate_failsafe_if_missing=True):
+    def current_encounter(
+            self, force_refresh=False, generate_failsafe_if_missing=True):
         """Shortcut to current encounter, generate failsafe if not found
 
         An encounter is typically bound to the logged in user, not
         the subject, if a different user is performing the action.
+
+        :param force_refresh: set to close out existing and generate new
+        :param generate_failsafe_if_missing: by default, if one isn't found
+            a new is generated.  Set false to prevent generation if missing
+        :return: live encounter for user
+
         """
         query = Encounter.query.filter(Encounter.user_id == self.id).filter(
             Encounter.status == 'in-progress').order_by(
@@ -457,7 +464,10 @@ class User(db.Model, UserMixin):
                 [(e.status, str(e.start_time), str(e.end_time))
                  for e in query])
             current_app.logger.error(msg)
-        return query.first()
+        existing = query.first()
+        if force_refresh:
+            return initiate_encounter(self, auth_method=existing.auth_method)
+        return existing
 
     @property
     def locale(self):
