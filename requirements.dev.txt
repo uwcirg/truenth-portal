@@ -14,7 +14,7 @@ pluggy==0.13.1             # via tox
 # use pre-compiled binary for testing, build from source for prod
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 psycopg2-binary==2.8.6
-py==1.8.0                 # via tox
+py==1.10.0                # via tox
 pygments==2.7.3           # via sphinx
 pyparsing==2.4.7          # via packaging
 pytest==5.2.2
