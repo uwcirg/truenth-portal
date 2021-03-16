@@ -944,7 +944,7 @@ class OrgTree(object):
         while node is not self.root:
             ids.append(node.id)
             if node.parent is None:
-                raise ValueError(f"{node.id} has null parent")
+                break
             node = node.parent
         return ids
 
