@@ -728,7 +728,7 @@ class OrgNode(object):
         """Insert new nodes into the org tree
 
         Designed for this special organization purpose, we expect the
-        tree is built from the top (root) down, so no rebalancing is
+        tree is built from the top (root) down, so no re-balancing is
         necessary.
 
         :param id: of organization to insert
@@ -748,13 +748,11 @@ class OrgNode(object):
             node = OrgNode(id=id, parent=self)
             self.children[id] = node
             return node
-        else:
-            # Could be adding to root node, confirm it's top level
-            assert (self.id is None and partOf_id is None)
-            node = OrgNode(id=id, parent=self)
-            assert id not in self.children
-            self.children[id] = node
-            return node
+
+        # Invalid case if still here
+        raise ValueError(
+            "Bogus OrgTree node insertion attempt "
+            f"{id}: {partOf_id}")
 
     def top_level(self):
         """Lookup top_level organization id from the given node
@@ -944,7 +942,8 @@ class OrgTree(object):
         while node is not self.root:
             ids.append(node.id)
             if node.parent is None:
-                raise ValueError(f"{node.id} has null parent")
+                raise ValueError(
+                    f"invalid OrgTree state - {node.id} lost parent!")
             node = node.parent
         return ids
 
