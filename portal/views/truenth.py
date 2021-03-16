@@ -58,6 +58,9 @@ def auditlog_addevent():
           required:
             - message
           properties:
+            context:
+              type: string
+              description: context such as "access", default "other"
             message:
               type: string
               description: message text
