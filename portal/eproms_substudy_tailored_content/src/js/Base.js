@@ -1,6 +1,6 @@
 import NavMethods from "./Nav";
 import VideoMethods from "./Video";
-import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, PromiseAllSettledPolyfill} from "./Utility";
+import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, postData, PromiseAllSettledPolyfill} from "./Utility";
 
 export default {
     created() {
@@ -61,7 +61,7 @@ export default {
                     return false;
                 }
                 if (this.domains.indexOf(to.params.topic) !== -1 ||
-                    this.mainPageIdentifiers.indexOf(to.params.topic) !== -1) {
+                    this.isAtMainPage(to.params.topic)) {
                     location.reload();
                     return false;
                 }
@@ -202,6 +202,15 @@ export default {
         },
         getDefaultDomains() {
             return Object.keys(this.domainMappings);
+        },
+        getMappedDomain() {
+            let mappedDomain = [];
+            for (let index in this.domainMappings) {
+                if (this.domainMappings[index] === this.getSelectedDomain()) {
+                    mappedDomain.push(index);
+                }
+            }
+            return mappedDomain.join(",");
         },
         initTriggerDomains(params) {
             if (!this.isTriggersNeeded()) {
@@ -363,7 +372,7 @@ export default {
                 this.$route.params && 
                 this.$route.params.topic &&
                 (this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1 ||
-                 this.mainPageIdentifiers.indexOf(this.$route.params.topic.toLowerCase()) !== -1
+                 this.isAtMainPage(this.$route.params.topic.toLowerCase())
                 )) {
                 return this.$route.params.topic;
             }
@@ -417,6 +426,7 @@ export default {
         },
         getDomainContent() {
             if (this.domainContent) {
+                console.log("WTF")
                 //already populated
                 this.setInitView();
                 return this.domainContent;
@@ -428,6 +438,15 @@ export default {
                     .then(() => {
                         // DOM updated
                         this.onDomainContentDidLoad();
+                        if (this.isAtMainPage(this.getSelectedDomain())) {
+                            return;
+                        }
+                        //log access to domain content
+                        //TODO add a context?
+                        //just log the domain(s) here?
+                        postData("/api/auditlog", {
+                            "message": (this.getMappedDomain() || this.getSelectedDomain())
+                        });
                     });
                     
                 } else {
@@ -456,6 +475,10 @@ export default {
         },
         isAtDefaultDomain() {
             return this.getSelectedDomain() === this.defaultDomain;
+        },
+        isAtMainPage(domain) {
+            if (!domain) return false;
+            return this.mainPageIdentifiers.indexOf(domain) !== -1;
         },
         isTriggersNeeded() {
             return this.isPatient() && this.isAtDefaultDomain();
