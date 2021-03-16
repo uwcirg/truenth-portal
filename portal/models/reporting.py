@@ -122,9 +122,10 @@ def adherence_report(
 
             if research_study_id == EMPRO_RS_ID:
                 # Add clinician data for EMPRO reports
-                if patient.clinician_id:
-                    row['clinician'] = (
-                        User.query.get(patient.clinician_id).display_name)
+                if len(patient.clinicians) > 0:
+                    row['clinician'] = ';'.join(
+                        clinician.display_name for clinician in
+                        patient.clinicians)
                 # As we may be looking at `prev_qbd` can't use qb_stats
                 cd = last_viable.completed_date(patient.id)
                 if cd:
