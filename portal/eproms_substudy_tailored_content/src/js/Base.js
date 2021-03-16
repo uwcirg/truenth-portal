@@ -431,10 +431,9 @@ export default {
                         if (this.isAtMainPage(this.getSelectedDomain())) {
                             return;
                         }
-                        //log access to domain content
-                        //log accessed URL which includes the domain accessed
+                        //log accessed content domain url 
                         postData("/api/auditlog", {
-                            "message": window.location.href,
+                            "message": "GET " + window.location.pathname + window.location.hash,
                             "context": "access"
                         });
                     });
