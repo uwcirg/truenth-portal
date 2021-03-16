@@ -203,15 +203,6 @@ export default {
         getDefaultDomains() {
             return Object.keys(this.domainMappings);
         },
-        getMappedDomain() {
-            let mappedDomain = [];
-            for (let index in this.domainMappings) {
-                if (this.domainMappings[index] === this.getSelectedDomain()) {
-                    mappedDomain.push(index);
-                }
-            }
-            return mappedDomain.join(",");
-        },
         initTriggerDomains(params) {
             if (!this.isTriggersNeeded()) {
                 setTimeout(function() {
@@ -426,7 +417,6 @@ export default {
         },
         getDomainContent() {
             if (this.domainContent) {
-                console.log("WTF")
                 //already populated
                 this.setInitView();
                 return this.domainContent;
@@ -442,10 +432,10 @@ export default {
                             return;
                         }
                         //log access to domain content
-                        //TODO add a context?
-                        //just log the domain(s) here?
+                        //log accessed URL which includes the domain accessed
                         postData("/api/auditlog", {
-                            "message": (this.getMappedDomain() || this.getSelectedDomain())
+                            "message": window.location.href,
+                            "context": "access"
                         });
                     });
                     
