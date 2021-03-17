@@ -69,6 +69,31 @@ export function tryParseJSON (jsonString){
   return false;
 };
 
+export function postData(url, data, callback) {
+  if (!url) return;
+  callback = callback || function() {};
+  let csrfToken = document.querySelector("#sessionMonitorProps").getAttribute("data-crsftoken");
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrfToken);
+        }
+    }
+  });
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: data
+  }).done(function(data) {
+      console.log("data posted. url: " + url);
+      callback(data);
+  }).fail(function(xhr) {
+      //log error to console
+      console.log(`data not posted. url: ${url} status: ${xhr.status}`);
+      callback({error: true});
+  });
+}
+
 export function isInViewport(element) {
   if (!element) return false;
   const rect = element.getBoundingClientRect();

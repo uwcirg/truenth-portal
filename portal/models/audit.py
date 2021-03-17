@@ -17,7 +17,7 @@ class Context(Enum):
     # only add new contexts to END of list, otherwise ordering gets messed up
     (other, login, assessment, authentication, intervention, account,
      consent, user, observation, organization, group, procedure,
-     relationship, role, tou) = range(15)
+     relationship, role, tou, access) = range(16)
 
 
 class Audit(db.Model):
