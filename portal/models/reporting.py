@@ -57,7 +57,7 @@ def adherence_report(
     else:
         as_of_date = datetime.utcnow()
 
-    # If limited by org - grab org and all it's children as filter list
+    # If limited by org - use org and its children as filter list
     requested_orgs = (
         OrgTree().here_and_below_id(organization_id=org_id) if org_id
         else None)
@@ -115,9 +115,6 @@ def adherence_report(
                 qb_ids=[last_viable.qb_id],
                 qb_iteration=last_viable.iteration).entry_method()
             if entry_method:
-                current_app.logger.warn(
-                    "entry method %s visit %s last viable qb %d ",
-                    entry_method, row['visit'], last_viable.qb_id)
                 row['entry_method'] = entry_method
 
             if research_study_id == EMPRO_RS_ID:
