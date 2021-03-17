@@ -153,6 +153,11 @@ def initiate_trigger(user_id):
     sm = EMPRO_state(ts)
     sm.initial_available()
 
+    # Record the historical transformation via insert
+    if ts.id is None:
+        current_app.logger.debug("record state change to 'due' for {user_id}")
+        ts.insert()
+
     # TN-2863 auto send invite when first available
     if ts.visit_month == 0:
         user = User.query.get(user_id)
@@ -173,11 +178,9 @@ def initiate_trigger(user_id):
             current_app.logger.error(
                 "Error sending EMPRO Invite to %s: %s",
                 user.email, exc)
+        db.session.add(msg)
+        db.session.commit()
 
-    # Record the historical transformation via insert
-    if ts.id is None:
-        current_app.logger.debug("record state change to 'due' for {user_id}")
-        ts.insert()
     return ts
 
 
