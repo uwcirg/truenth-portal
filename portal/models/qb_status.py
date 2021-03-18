@@ -110,9 +110,15 @@ class QB_Status(object):
             QBT.qb_iteration == cur_qbd.iteration).order_by(
             QBT.at, QBT.id)
 
+        # If the user has withdrawn, don't update status beyond the user's
+        # withdrawal date.
+        fencepost = (
+            self._withdrawal_date if self.withdrawn_by(self.as_of_date)
+            else self.as_of_date)
+
         # whip through ordered rows picking up available status
         for row in cur_rows:
-            if row.at <= self.as_of_date:
+            if row.at <= fencepost:
                 self._overall_status = row.status
 
             if row.status == OverallStatus.due:
