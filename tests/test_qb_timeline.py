@@ -339,6 +339,7 @@ class TestQbTimeline(TestQuestionnaireBank):
         crv_id = crv.id
         # consent 17 months in past
         backdate = now - relativedelta(months=17)
+        self.promote_user(self.test_user, 'patient')
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
         self.consent_with_org(org_id=crv_id, setdate=backdate)
@@ -360,6 +361,16 @@ class TestQbTimeline(TestQuestionnaireBank):
 
         with pytest.raises(StopIteration):
             next(gen)
+
+        # Confirm withdrawn user can still access "current"
+        # as needed for reporting
+        user = db.session.merge(self.test_user)
+        qb_stats = QB_Status(
+            user=user,
+            research_study_id=0,
+            as_of_date=now)
+        current = qb_stats.current_qbd(even_if_withdrawn=True)
+        assert current
 
     def test_change_midstream_rp(self):
         back7, nowish = associative_backdate(
