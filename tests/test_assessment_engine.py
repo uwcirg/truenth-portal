@@ -437,7 +437,7 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/{}/assessment'.format(TEST_USER_ID), json=qnr)
         assert update_qnr_response.status_code == 404
 
-    @pytest.mark.timeout(600)
+    @pytest.mark.timeout(60)
     def test_assessments_bundle(self):
         swagger_spec = swagger(self.app)
         example_data = swagger_spec['definitions']['QuestionnaireResponse'][
