@@ -290,7 +290,7 @@ def fire_trigger_events():
         except SMTPRecipientsRefused as e:
             msg = ("Error sending trigger email to {}: "
                    "{}".format(em.recipients, e))
-            current_app.logger.errors(msg)
+            current_app.logger.error(msg)
             result['error'] = msg
             record.append(result)
 
@@ -437,7 +437,7 @@ def empro_staff_qbd_accessor(qnr):
             TriggerState.state.in_(('triggered', 'resolved'))).order_by(
             TriggerState.timestamp)
         if not query.count():
-            current_app.logger.errors(no_match_message)
+            current_app.logger.error(no_match_message)
             return result
 
         match = None
