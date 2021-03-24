@@ -15,6 +15,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
 from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from ..timeout_lock import LockTimeout, TimeoutLock
 from .app_text import (
     ConsentByOrg_ATMA,
     UndefinedAppText,
@@ -767,6 +768,9 @@ class OrgNode(object):
         return self.parent.top_level()
 
 
+ORG_TREE_LOCK_KEY = 'OrgTree-LOCK'
+
+
 class OrgTree(object):
     """In-memory organizations tree for hierarchy and structure
 
@@ -789,8 +793,13 @@ class OrgTree(object):
 
     def __init__(self):
         # Maintain a singleton root object and lookup_table
-        if not OrgTree.root:
-            self.__reset_cache()
+        try:
+            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300):
+                if not OrgTree.root:
+                    self.__reset_cache()
+        except LockTimeout:
+            current_app.logger.error(
+                f"couldn't acquire {ORG_TREE_LOCK_KEY}")
 
     def __reset_cache(self):
         # Internal method to manage cached org data
