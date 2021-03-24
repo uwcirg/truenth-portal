@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
+from jmespath import search
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
 from ..database import db
 from ..date_tools import FHIR_datetime, weekday_delta
+from ..models.audit import Audit
 
 trigger_state_enum = ENUM(
     'unstarted',
@@ -123,19 +125,112 @@ class TriggerState(db.Model):
         return list(results)
 
     @staticmethod
-    def latest_action_state(user_id, visit_month):
+    def latest_for_visit(patient_id, visit_month):
         """Query method to return row matching params
 
-        :param user_id: User/patient in question
+        :param patient_id: User/patient in question
+        :param visit_month: integer, zero indexed visit month
+        :return: latest trigger state or None if not found
+        """
+        return TriggerState.query.filter(
+            TriggerState.user_id == patient_id).filter(
+            TriggerState.visit_month == visit_month).order_by(
+            TriggerState.id.desc()).first()
+
+
+class TriggerStatesReporting:
+    """Manage reporting details for a given patient"""
+    MAX_VISIT = 12
+
+    def __init__(self, patient_id):
+        self.patient_id = patient_id
+        self.latest_by_visit = dict()
+        for v in range(self.MAX_VISIT):
+            self.latest_by_visit[v] = TriggerState.latest_for_visit(
+                patient_id, v)
+
+    def domains_accessed(self, visit_month):
+        """Return list of domains accessed for visit_month
+
+        :param visit_month: zero indexed month value
+        :returns list of EMPRO content domains accessed during the time period
+          defined by [EMPRO post date of visit -> post date of next EMPRO],
+          or None if n/a
+
+        """
+        def authored_from_visit(visit_month):
+            """Extract authored datetime from given visit month"""
+            if not hasattr(self.latest_by_visit[visit_month], 'triggers'):
+                return None
+            authored = search(
+                "source.authored",
+                self.latest_by_visit[visit_month].triggers)
+            if authored:
+                return FHIR_datetime.parse(authored)
+
+        # Need datetime boundaries for queries
+        start_date = authored_from_visit(visit_month)
+        if not start_date:
+            return None
+
+        # user didn't necessarily fill out next.  continue till another
+        # submission of EMPRO is found, or default to now()
+        visit = visit_month + 1
+        while visit < self.MAX_VISIT:
+            end_date = authored_from_visit(visit)
+            visit += 1
+            if end_date:
+                break
+        if not end_date:
+            end_date = datetime.utcnow()
+
+        # Access records are kept in audit table with context 'access'
+        hits = Audit.query.filter(
+            Audit.subject_id == self.patient_id).filter(
+            Audit._context == 'access').filter(
+            Audit.timestamp.between(start_date, end_date)).with_entities(
+                Audit.comment.distinct())
+
+        if hits.count() == 0:
+            return None
+        viewed = []
+        for path in hits:
+            # expected pattern:
+            # "remote message: GET /substudy-tailored-content#/pain"
+            viewed.append(path[0].split('/')[-1])
+        return viewed
+
+    def latest_action_state(self, visit_month):
+        """Query method to return row matching params
+
         :param visit_month: integer, zero indexed visit month
         :return: latest action state or empty string if not found
 
         """
-        found = TriggerState.query.filter(
-            TriggerState.user_id == user_id).filter(
-            TriggerState.visit_month == visit_month).order_by(
-            TriggerState.id.desc()).first()
-        if not found or found.triggers is None:
-            return ''
+        ts = self.latest_by_visit[visit_month]
+        if not ts or ts.triggers is None:
+            return None
 
-        return found.triggers['action_state']
+        return ts.triggers['action_state']
+
+    def hard_triggers_for_visit(self, visit_month):
+        """Return list of hard triggers for given visit month
+
+        :param visit_month: zero indexed month value
+        :returns list of hard triggers, or None if n/a
+
+        """
+        ts = self.latest_by_visit[visit_month]
+        if ts:
+            return ts.hard_trigger_list()
+
+    def soft_triggers_for_visit(self, visit_month):
+        """Return list of soft triggers for given visit month
+
+        :param visit_month: zero indexed month value
+        :returns list of soft triggers, or None if n/a
+
+        """
+        ts = self.latest_by_visit[visit_month]
+        if ts:
+            return ts.soft_trigger_list()
