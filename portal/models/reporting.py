@@ -10,7 +10,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..date_tools import FHIR_datetime
-from ..trigger_states.models import TriggerState
+from ..trigger_states.models import TriggerState, TriggerStatesReporting
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -118,7 +118,10 @@ def adherence_report(
                 row['entry_method'] = entry_method
 
             if research_study_id == EMPRO_RS_ID:
-                # Add clinician data for EMPRO reports
+                # Initialize trigger states reporting for patient
+                ts_reporting = TriggerStatesReporting(patient_id=patient.id)
+
+                # Add clinician and trigger data for EMPRO reports
                 if len(patient.clinicians) > 0:
                     row['clinician'] = ';'.join(
                         clinician.display_name for clinician in
@@ -130,9 +133,15 @@ def adherence_report(
 
                 # Correct for zero index visit month in db
                 visit_month = int(row['visit'].split()[-1]) - 1
-                ts = TriggerState.latest_action_state(patient.id, visit_month)
-                if ts:
-                    row['clinician_status'] = ts.title()
+                t_status = ts_reporting.latest_action_state(visit_month)
+                row['clinician_status'] = (
+                    t_status.title() if t_status else '')
+                ht = ts_reporting.hard_triggers_for_visit(visit_month)
+                row['hard_trigger_domains'] = ', '.join(ht) if ht else ''
+                st = ts_reporting.soft_triggers_for_visit(visit_month)
+                row['soft_trigger_domains'] = ', '.join(st) if st else ''
+                da = ts_reporting.domains_accessed(visit_month)
+                row['content_domains_accessed'] = ', '.join(da) if da else ''
 
         data.append(row)
 
@@ -156,9 +165,17 @@ def adherence_report(
             if research_study_id == EMPRO_RS_ID:
                 # Correct for zero index visit month in db
                 visit_month = int(historic['visit'].split()[-1]) - 1
-                ts = TriggerState.latest_action_state(patient.id, visit_month)
-                if ts:
-                    historic['clinician_status'] = ts.title()
+                t_status = ts_reporting.latest_action_state(visit_month)
+                historic['clinician_status'] = (
+                    t_status.title() if t_status else '')
+                ht = ts_reporting.hard_triggers_for_visit(visit_month)
+                historic['hard_trigger_domains'] = ', '.join(ht) if ht else ''
+                st = ts_reporting.soft_triggers_for_visit(visit_month)
+                historic['soft_trigger_domains'] = ', '.join(st) if st else ''
+                da = ts_reporting.domains_accessed(visit_month)
+                historic['content_domains_accessed'] = (
+                    ', '.join(da) if da else '')
+
                 cd = qbd.completed_date(patient.id)
                 if cd:
                     historic['EMPRO_questionnaire_completion_date'] = cd
@@ -199,9 +216,18 @@ def adherence_report(
             'consent']
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
-                'user_id', 'study_id', 'clinician', 'status', 'visit',
-                'EMPRO_questionnaire_completion_date', 'clinician_status',
-                'site']
+                'user_id',
+                'study_id',
+                'site',
+                'visit',
+                'status',
+                'EMPRO_questionnaire_completion_date',
+                'soft_trigger_domains',
+                'hard_trigger_domains',
+                'content_domains_accessed',
+                'clinician',
+                'clinician_status',
+                ]
 
     return results
 
