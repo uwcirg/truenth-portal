@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from jmespath import search
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
@@ -81,7 +80,7 @@ class TriggerState(db.Model):
         for domain, link_triggers in self.triggers['domain'].items():
             if 'hard' in link_triggers.values():
                 results.append(domain)
-        return results
+        return sorted(results)
 
     def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""
@@ -122,7 +121,7 @@ class TriggerState(db.Model):
         for domain, link_triggers in self.triggers['domain'].items():
             if 'soft' in link_triggers.values():
                 results.add(domain)
-        return list(results)
+        return sorted(list(results))
 
     @staticmethod
     def latest_for_visit(patient_id, visit_month):
@@ -160,11 +159,13 @@ class TriggerStatesReporting:
         """
         def authored_from_visit(visit_month):
             """Extract authored datetime from given visit month"""
-            if not hasattr(self.latest_by_visit[visit_month], 'triggers'):
+            if not getattr(
+                    self.latest_by_visit[visit_month],
+                    'triggers',
+                    None):
                 return None
-            authored = search(
-                "source.authored",
-                self.latest_by_visit[visit_month].triggers)
+            authored = self.latest_by_visit[visit_month].triggers.get(
+                "source", {}).get("authored")
             if authored:
                 return FHIR_datetime.parse(authored)
 
