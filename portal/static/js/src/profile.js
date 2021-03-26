@@ -1600,7 +1600,12 @@ export default (function() {
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
-                                {"format": "dd M yyyy","forceParse": false, "autoclose": true, endDate: new Date()}
+                                {
+                                    "format": "dd M yyyy",
+                                    "forceParse": false,
+                                    "autoclose": true,
+                                    startDate: new Date(self.subStudyTriggers.date), //restrict entry so date entered cannot be before the trigger date
+                                    endDate: new Date()}
                             ).on("changeDate", self.onResponseChangeFieldEvent);
                         });
 
