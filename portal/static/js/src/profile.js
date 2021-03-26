@@ -1599,7 +1599,6 @@ export default (function() {
                             }
                             if (self.isSubStudyTriggersResolved()) return;
                             //initialize datepicker
-                            console.log("timestamp? ", self.subStudyTriggers.date)
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
                                 {
                                     "format": "dd M yyyy",
