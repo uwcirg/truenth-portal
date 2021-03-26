@@ -8,7 +8,6 @@ from portal.database import db
 from portal.models.role import ROLE
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
-    enter_user_trigger_critical_section,
     evaluate_triggers,
     fire_trigger_events,
     initiate_trigger,
@@ -128,7 +127,7 @@ def test_fire_trigger_events(initialized_patient, processed_ts, promote_user):
     # pretend patient is it's own clinician for staff email
     user = db.session.merge(initialized_patient)
     user_id = user.id
-    user.clinician_id = user.id
+    user.clinicians.append(user)
     promote_user(user=user, role_name=ROLE.CLINICIAN.value)
 
     fire_trigger_events()
@@ -145,7 +144,7 @@ def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
     # pretend patient is it's own clinician for staff email
     user = db.session.merge(initialized_patient)
     user_id = user.id
-    user.clinician_id = user.id
+    user.clinicians.append(user)
     promote_user(user=user, role_name=ROLE.CLINICIAN.value)
 
     # back state to `processed` for event processing

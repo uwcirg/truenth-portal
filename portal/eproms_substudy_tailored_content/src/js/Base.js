@@ -1,6 +1,6 @@
 import NavMethods from "./Nav";
 import VideoMethods from "./Video";
-import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, PromiseAllSettledPolyfill} from "./Utility";
+import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, postData, PromiseAllSettledPolyfill} from "./Utility";
 
 export default {
     created() {
@@ -61,7 +61,7 @@ export default {
                     return false;
                 }
                 if (this.domains.indexOf(to.params.topic) !== -1 ||
-                    this.mainPageIdentifiers.indexOf(to.params.topic) !== -1) {
+                    this.isAtMainPage(to.params.topic)) {
                     location.reload();
                     return false;
                 }
@@ -363,7 +363,7 @@ export default {
                 this.$route.params && 
                 this.$route.params.topic &&
                 (this.domains.indexOf(this.$route.params.topic.toLowerCase()) !== -1 ||
-                 this.mainPageIdentifiers.indexOf(this.$route.params.topic.toLowerCase()) !== -1
+                 this.isAtMainPage(this.$route.params.topic.toLowerCase())
                 )) {
                 return this.$route.params.topic;
             }
@@ -428,6 +428,14 @@ export default {
                     .then(() => {
                         // DOM updated
                         this.onDomainContentDidLoad();
+                        if (this.isAtMainPage(this.getSelectedDomain())) {
+                            return;
+                        }
+                        //log accessed content domain url 
+                        postData("/api/auditlog", {
+                            "message": "GET " + window.location.pathname + window.location.hash,
+                            "context": "access"
+                        });
                     });
                     
                 } else {
@@ -456,6 +464,10 @@ export default {
         },
         isAtDefaultDomain() {
             return this.getSelectedDomain() === this.defaultDomain;
+        },
+        isAtMainPage(domain) {
+            if (!domain) return false;
+            return this.mainPageIdentifiers.indexOf(domain) !== -1;
         },
         isTriggersNeeded() {
             return this.isPatient() && this.isAtDefaultDomain();

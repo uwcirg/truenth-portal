@@ -40,7 +40,7 @@ def time_request(url, params=None):
     return response
 
 
-def get_terms(locale_code, org=None, role=None, research_study_id=None):
+def get_terms(locale_code, org=None, role=None, research_study_id=0):
     """Shortcut to lookup correct terms given org and role"""
     if org:
         try:

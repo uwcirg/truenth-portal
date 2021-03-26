@@ -15,6 +15,9 @@ from .empro_messages import patient_email, staff_emails
 from .models import TriggerState
 from ..database import db
 from ..date_tools import FHIR_datetime
+from ..models.app_text import MailResource, app_text
+from ..models.communication import load_template_args
+from ..models.message import EmailMessage
 from ..models.qb_status import QB_Status
 from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
@@ -154,6 +157,30 @@ def initiate_trigger(user_id):
     if ts.id is None:
         current_app.logger.debug("record state change to 'due' for {user_id}")
         ts.insert()
+
+    # TN-2863 auto send invite when first available
+    if ts.visit_month == 0:
+        user = User.query.get(user_id)
+        args = load_template_args(user=user)
+        item = MailResource(
+            app_text("patient invite email IRONMAN EMPRO Study"),
+            locale_code=user.locale_code,
+            variables=args)
+        msg = EmailMessage(
+            subject=item.subject,
+            body=item.body,
+            recipients=user.email,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            user_id=user_id)
+        try:
+            msg.send_message()
+        except SMTPRecipientsRefused as exc:
+            current_app.logger.error(
+                "Error sending EMPRO Invite to %s: %s",
+                user.email, exc)
+        db.session.add(msg)
+        db.session.commit()
+
     return ts
 
 
@@ -263,7 +290,7 @@ def fire_trigger_events():
         except SMTPRecipientsRefused as e:
             msg = ("Error sending trigger email to {}: "
                    "{}".format(em.recipients, e))
-            current_app.logger.errors(msg)
+            current_app.logger.error(msg)
             result['error'] = msg
             record.append(result)
 
@@ -410,7 +437,7 @@ def empro_staff_qbd_accessor(qnr):
             TriggerState.state.in_(('triggered', 'resolved'))).order_by(
             TriggerState.timestamp)
         if not query.count():
-            current_app.logger.errors(no_match_message)
+            current_app.logger.error(no_match_message)
             return result
 
         match = None

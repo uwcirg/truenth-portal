@@ -58,7 +58,10 @@
           {{profile_macro.longitudinalReport(user)}}
       </div>
     </div>
-    {{profile_macro.postInterventionQuestionnaire(user)}}
+    <!-- post intervention questionnaire, EMPRO only -->
+    {%- if enrolled_in_substudy -%}
+      {{profile_macro.postInterventionQuestionnaire(user)}}
+    {%- endif -%}
   {%- endif -%}
   {{profile_macro.profileDemoDetail(user, current_user)}}
   {{profile_macro.profileCommunications(user, current_user)}}

@@ -77,7 +77,9 @@ def render_patients_list(
             patient.assessment_status = _(qb_status['status'])
             patient.current_qb = qb_status['visit_name']
             if research_study_id == EMPRO_RS_ID:
-                patient.clinician = clinician_name_map[patient.clinician_id]
+                patient.clinician = '; '.join(
+                    (clinician_name_map[c.id] for c in
+                     patient.clinicians))
                 patient.action_state = qb_status['action_state'].title() \
                     if qb_status['action_state'] else ""
             patients_list.append(patient)
@@ -202,10 +204,13 @@ def patient_profile(patient_id):
         if (display.access and display.link_url is not None and
                 display.link_label is not None):
             user_interventions.append({"name": intervention.name})
+    research_study_status = patient_research_study_status(patient)
+    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
 
     return render_template(
         'profile/patient_profile.html', user=patient,
         current_user=user,
+        enrolled_in_substudy=enrolled_in_substudy,
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
 

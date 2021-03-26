@@ -64,12 +64,14 @@ def staff_emails(patient, hard_triggers, initial_notification):
         User.id == UserOrganization.user_id).filter(
         UserOrganization.organization_id == org_id)
 
-    # make sure assigned clinician made the list
-    found = [user.id for user in staff_list if user.id == patient.clinician_id]
-    if not found:
+    # make sure assigned clinicians made the list
+    required = set([c.id for c in patient.clinicians])
+    all = set([user.id for user in staff_list])
+    missing = required - all
+    if missing:
         raise ValueError(
             f"Patient's ({patient.id}) assigned clinician not in distribution"
-            f" list. Check clinician's ({patient.clinician_id}) organization")
+            f" list. Check clinician ({missing}) organizations")
 
     app_text_name = 'empro clinician trigger reminder'
     if initial_notification:
@@ -105,6 +107,7 @@ def staff_emails(patient, hard_triggers, initial_notification):
     args = {
         'clinic_name': clinic,
         'patient_id': patient.id,
+        'study_id': patient.external_study_id,
         'post_intervention_assessment_link': link,
         'triggered_domains': triggered_domains_display
     }
