@@ -94,6 +94,8 @@ class QBD(object):
 
         """
         from .qb_timeline import QBT
+        from .questionnaire_bank import QuestionnaireBank
+        from .questionnaire_response import QuestionnaireResponse
         query = QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.qb_id == self.qb_id).filter(
             QBT.qb_recur_id == self.recur_id).filter(
@@ -103,5 +105,16 @@ class QBD(object):
             raise ValueError(
                 f"Should never find multiple completed for {user_id} {self}")
         if not query.count():
+            # Check indefinite case, which doesn't generate timeline rows
+            if self._questionnaire_bank.classification == 'indefinite':
+                query = QuestionnaireResponse.query.filter(
+                    QuestionnaireResponse.subject_id == user_id).filter(
+                    QuestionnaireResponse.status == 'completed').join(
+                    QuestionnaireBank).filter(
+                    QuestionnaireResponse.questionnaire_bank_id == QuestionnaireBank.id).filter(
+                    QuestionnaireBank.classification == 'indefinite').with_entities(
+                    QuestionnaireResponse.document['authored'].label('authored'))
+                if query.count():
+                    return FHIR_datetime.parse(query.first()[0])
             return None
         return query.first().at
