@@ -114,7 +114,8 @@ class QBD(object):
                     QuestionnaireResponse.questionnaire_bank_id == QuestionnaireBank.id).filter(
                     QuestionnaireBank.classification == 'indefinite').with_entities(
                     QuestionnaireResponse.document['authored'].label('authored'))
-                if query.count():
-                    return FHIR_datetime.parse(query.first()[0])
+                first = query.first()
+                if first:
+                    return FHIR_datetime.parse(first[0])
             return None
         return query.first().at
