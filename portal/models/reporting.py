@@ -10,7 +10,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..date_tools import FHIR_datetime
-from ..trigger_states.models import TriggerState, TriggerStatesReporting
+from ..trigger_states.models import TriggerStatesReporting
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -28,7 +28,7 @@ from .questionnaire_response import (
 from .research_study import EMPRO_RS_ID, ResearchStudy
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
-from .user_consent import latest_consent
+from .user_consent import consent_withdrawal_dates
 
 
 def adherence_report(
@@ -94,10 +94,10 @@ def adherence_report(
             'site': patient.organizations[0].name,
             'status': str(qb_stats.overall_status)}
 
-        consent = latest_consent(
-            user=patient, research_study_id=research_study_id)
-        if consent:
-            row['consent'] = FHIR_datetime.as_fhir(consent.acceptance_date)
+        c_date, w_date = consent_withdrawal_dates(
+                user=patient, research_study_id=research_study_id)
+        consent = c_date if c_date else w_date
+        row['consent'] = FHIR_datetime.as_fhir(consent)
 
         study_id = patient.external_study_id
         if study_id:
@@ -110,7 +110,8 @@ def adherence_report(
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
             if row['status'] == 'Completed':
-                row['completion_date'] = last_viable.completed_date(patient.id)
+                row['completion_date'] = FHIR_datetime.as_fhir(
+                    last_viable.completed_date(patient.id))
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
@@ -155,8 +156,8 @@ def adherence_report(
             historic['qb'] = qbd.questionnaire_bank.name
             historic['visit'] = visit_name(qbd)
             historic['completion_date'] = (
-                qbd.completed_date(patient.id) if status == 'Completed'
-                else '')
+                FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
+                if status == 'Completed' else '')
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
@@ -195,8 +196,8 @@ def adherence_report(
             # Indefinite doesn't have a row in the timeline, look
             # up matching date from QNRs
             indef['completion_date'] = (
-                qbd.completed_date(patient.id) if status == 'Completed'
-                else '')
+                FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
+                if status == 'Completed' else '')
             indef['qb'] = qbd.questionnaire_bank.name
             indef['visit'] = "Indefinite"
             entry_method = QNR_results(
