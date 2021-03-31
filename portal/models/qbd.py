@@ -107,15 +107,17 @@ class QBD(object):
         if not query.count():
             # Check indefinite case, which doesn't generate timeline rows
             if self._questionnaire_bank.classification == 'indefinite':
-                query = QuestionnaireResponse.query.filter(
+                found = QuestionnaireResponse.query.filter(
                     QuestionnaireResponse.subject_id == user_id).filter(
                     QuestionnaireResponse.status == 'completed').join(
                     QuestionnaireBank).filter(
-                    QuestionnaireResponse.questionnaire_bank_id == QuestionnaireBank.id).filter(
-                    QuestionnaireBank.classification == 'indefinite').with_entities(
-                    QuestionnaireResponse.document['authored'].label('authored'))
-                first = query.first()
-                if first:
-                    return FHIR_datetime.parse(first[0])
+                    QuestionnaireResponse.questionnaire_bank_id ==
+                    QuestionnaireBank.id).filter(
+                    QuestionnaireBank.classification ==
+                    'indefinite').with_entities(
+                    QuestionnaireResponse.document['authored'].label(
+                        'authored')).first()
+                if found:
+                    return FHIR_datetime.parse(found[0])
             return None
         return query.first().at
