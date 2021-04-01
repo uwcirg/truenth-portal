@@ -1,8 +1,21 @@
-from celery import Celery
+from celery import Celery, signals
+import logging
+import sys
 
 from ..extensions import db
 
 __celery = None
+
+
+@signals.setup_logging.connect
+def on_setup_logging(**kwargs):
+    logger = logging.getLogger('celery')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.propagate = True
+    logger = logging.getLogger('celery.app.trace')
+    logger.setLevel(logging.INFO)
+    logger.propagate = True
 
 
 def create_celery(app):
