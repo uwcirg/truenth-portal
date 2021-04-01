@@ -246,8 +246,10 @@ def configure_logging(app):  # pragma: no cover
         return
 
     # Configure for JSON logging
-    json_logging.init_flask(enable_json=True)
-    json_logging.init_request_instrument(app)
+    if json_logging._request_util is None:
+        # Ugly internal ref to prevent multiple calls to `init_flask`
+        json_logging.init_flask(enable_json=True)
+        json_logging.init_request_instrument(app)
 
     if app.config.get('LOG_SQL'):
         import portal.sql_logging
