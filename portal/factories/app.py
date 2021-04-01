@@ -1,6 +1,7 @@
 """Portal module"""
 
 import email.parser
+import json_logging
 import logging
 from logging import handlers
 import os
@@ -243,6 +244,10 @@ def configure_logging(app):  # pragma: no cover
     # has already been configured
     if len(app.logger.handlers) > 1:
         return
+
+    # Configure for JSON logging
+    json_logging.init_flask(enable_json=True)
+    json_logging.init_request_instrument(app)
 
     if app.config.get('LOG_SQL'):
         import portal.sql_logging
