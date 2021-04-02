@@ -1724,6 +1724,62 @@
     {
       "extension": [
         {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146162,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-162"
+        }
+      ],
+      "language": "en_US",
+      "name": "Ralph H. Johnson VA Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146163,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-163"
+        }
+      ],
+      "language": "en_US",
+      "name": "Durham VA Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
