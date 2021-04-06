@@ -527,6 +527,7 @@ class TestCase(Base):
         # of an open handle to the test db - perhaps from celery workers.
         close_all_sessions()
         db.session.remove()
+        db.engine.dispose()
         db.drop_all()  # clean up from previous tests
         db.create_all()
         with SessionScope(db):
