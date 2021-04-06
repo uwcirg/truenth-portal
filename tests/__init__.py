@@ -16,6 +16,7 @@ from flask import url_for
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.session import close_all_sessions
 
 from portal.cache import cache
 from portal.config.config import TestConfig
@@ -524,6 +525,7 @@ class TestCase(Base):
         """Reset all tables before testing."""
         # NB - if the drop_all call ever hangs, it's typically a symptom
         # of an open handle to the test db - perhaps from celery workers.
+        close_all_sessions()
         db.drop_all()  # clean up from previous tests
         db.create_all()
         with SessionScope(db):
