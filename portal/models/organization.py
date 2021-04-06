@@ -15,6 +15,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
 from ..system_uri import IETF_LANGUAGE_TAG, SHORTNAME_ID, TRUENTH_RP_EXTENSION
+from ..timeout_lock import LockTimeout, TimeoutLock
 from .app_text import (
     ConsentByOrg_ATMA,
     UndefinedAppText,
@@ -728,7 +729,7 @@ class OrgNode(object):
         """Insert new nodes into the org tree
 
         Designed for this special organization purpose, we expect the
-        tree is built from the top (root) down, so no rebalancing is
+        tree is built from the top (root) down, so no re-balancing is
         necessary.
 
         :param id: of organization to insert
@@ -748,13 +749,11 @@ class OrgNode(object):
             node = OrgNode(id=id, parent=self)
             self.children[id] = node
             return node
-        else:
-            # Could be adding to root node, confirm it's top level
-            assert (self.id is None and partOf_id is None)
-            node = OrgNode(id=id, parent=self)
-            assert id not in self.children
-            self.children[id] = node
-            return node
+
+        # Invalid case if still here
+        raise ValueError(
+            "Bogus OrgTree node insertion attempt "
+            f"{id}: {partOf_id}")
 
     def top_level(self):
         """Lookup top_level organization id from the given node
@@ -767,6 +766,9 @@ class OrgNode(object):
         if self.parent.id is None:
             return self.id
         return self.parent.top_level()
+
+
+ORG_TREE_LOCK_KEY = 'OrgTree-LOCK'
 
 
 class OrgTree(object):
@@ -791,8 +793,13 @@ class OrgTree(object):
 
     def __init__(self):
         # Maintain a singleton root object and lookup_table
-        if not OrgTree.root:
-            self.__reset_cache()
+        try:
+            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300):
+                if not OrgTree.root:
+                    self.__reset_cache()
+        except LockTimeout:
+            current_app.logger.error(
+                f"couldn't acquire {ORG_TREE_LOCK_KEY}")
 
     def __reset_cache(self):
         # Internal method to manage cached org data
@@ -944,7 +951,8 @@ class OrgTree(object):
         while node is not self.root:
             ids.append(node.id)
             if node.parent is None:
-                raise ValueError(f"{node.id} has null parent")
+                raise ValueError(
+                    f"invalid OrgTree state - {node.id} lost parent!")
             node = node.parent
         return ids
 

@@ -107,6 +107,7 @@ def staff_emails(patient, hard_triggers, initial_notification):
     args = {
         'clinic_name': clinic,
         'patient_id': patient.id,
+        'study_id': patient.external_study_id,
         'post_intervention_assessment_link': link,
         'triggered_domains': triggered_domains_display
     }

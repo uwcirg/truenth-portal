@@ -17,6 +17,7 @@ from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization
+from ..models.qb_status import patient_research_study_status
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
@@ -203,10 +204,13 @@ def patient_profile(patient_id):
         if (display.access and display.link_url is not None and
                 display.link_label is not None):
             user_interventions.append({"name": intervention.name})
+    research_study_status = patient_research_study_status(patient)
+    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
 
     return render_template(
         'profile/patient_profile.html', user=patient,
         current_user=user,
+        enrolled_in_substudy=enrolled_in_substudy,
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
 

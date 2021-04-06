@@ -1661,6 +1661,12 @@ def assessment_add(patient_id):
     })
 
     encounter = current_user().current_encounter()
+    if QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.encounter_id == encounter.id).count():
+        # Another QuestionnaireResponse already attached to this encounter,
+        # force a refresh to maintain a discrete QNR <=> Encounter pair.
+        encounter = current_user().current_encounter(force_refresh=True)
+
     if 'entry_method' in request.args:
         encounter_type = getattr(
             EC, request.args['entry_method'].upper()).codings[0]

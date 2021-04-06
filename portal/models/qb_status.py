@@ -52,8 +52,7 @@ class QB_Status(object):
         self._withdrawal_date = withdrawn.at if withdrawn else None
         if self.withdrawn_by(self.as_of_date):
             self._overall_status = OverallStatus.withdrawn
-            trace("found user withdrawn; no valid qbs")
-            return
+            trace("found user withdrawn")
 
         # convert query to list of tuples for easier manipulation
         self.__ordered_qbs = [qbt.qbd() for qbt in users_qbs]
@@ -61,7 +60,7 @@ class QB_Status(object):
             # May have withdrawn prior to first qb
             if self._withdrawal_date:
                 self._overall_status = OverallStatus.withdrawn
-                trace("found user withdrawn; no valid qbs")
+                trace("found user withdrawn prior to start; no valid qbs")
             else:
                 self._overall_status = OverallStatus.expired
                 trace("no qb timeline data for {}".format(self.user))
@@ -111,9 +110,15 @@ class QB_Status(object):
             QBT.qb_iteration == cur_qbd.iteration).order_by(
             QBT.at, QBT.id)
 
+        # If the user has withdrawn, don't update status beyond the user's
+        # withdrawal date.
+        fencepost = (
+            self._withdrawal_date if self.withdrawn_by(self.as_of_date)
+            else self.as_of_date)
+
         # whip through ordered rows picking up available status
         for row in cur_rows:
-            if row.at <= self.as_of_date:
+            if row.at <= fencepost:
                 self._overall_status = row.status
 
             if row.status == OverallStatus.due:
