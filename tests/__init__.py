@@ -526,6 +526,7 @@ class TestCase(Base):
         # NB - if the drop_all call ever hangs, it's typically a symptom
         # of an open handle to the test db - perhaps from celery workers.
         close_all_sessions()
+        db.session.remove()
         db.drop_all()  # clean up from previous tests
         db.create_all()
         with SessionScope(db):
