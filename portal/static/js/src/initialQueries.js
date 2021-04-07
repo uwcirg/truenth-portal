@@ -19,6 +19,7 @@ import Consent from "./modules/Consent.js";
         this.roleRequired = false;
         this.userRoles = [];
         this.CONFIG_REQUIRED_CORE_DATA = null;
+        this.DEFAULT_REQUIRED_CORE_DATA = [];
         this.preselectClinic = "";
         this.defaultSections = {};
         this.mainSections = {};
@@ -213,8 +214,13 @@ import Consent from "./modules/Consent.js";
 
     FieldsChecker.prototype.initConfig = function(callback) {
         var self = this, tnthAjax = self.__getDependency("tnthAjax");
-        tnthAjax.getStillNeededCoreData(self.userId, true, function(data) {
-            self.setConfig(data, callback);
+        tnthAjax.getConfigurationByKey("REQUIRED_CORE_DATA", "", function(data) {
+            //this will get the default required core data array from config
+            self.DEFAULT_REQUIRED_CORE_DATA = data["REQUIRED_CORE_DATA"];
+            tnthAjax.getStillNeededCoreData(self.userId, true, function(data) {
+                //gather still needed data
+                self.setConfig(data, callback);
+            });
         });
     };
 
@@ -224,13 +230,10 @@ import Consent from "./modules/Consent.js";
         }
         dataArray = dataArray || this.CONFIG_REQUIRED_CORE_DATA;
         if (!dataArray || dataArray.length === 0) { return false; }
-        var found = false;
         var ma = configMatch.split(",");
-        ma.forEach(function(item) {
-            if (found) { return true; } /* IMPORTANT, immediately return true. without checking this item, this is in the context of the loop, the sequence matters here, loop still continues*/
-            found = dataArray.indexOf(item) !== -1;
-        });
-        return found;
+        return ma.filter(item => {
+            return dataArray.indexOf(item) !== -1;
+        }).length;
     };
 
     FieldsChecker.prototype.getConfig = function() {
@@ -321,7 +324,12 @@ import Consent from "./modules/Consent.js";
         var availableSections = 0;
         for (var section in self.mainSections) {
             var sectionConfigs = self.getSectionConfigs(section);
+            //do not draw section in progressbar if it is terms of use && it is not part of the default required core data
+            if (section !== "topTerms" && !self.inConfig(sectionConfigs, self.DEFAULT_REQUIRED_CORE_DATA)) {
+                continue;
+            }
             var active = (section === "topTerms" && !self.inConfig(sectionConfigs)) || (self.roleRequired && !self.inConfig(sectionConfigs));
+            
             $("#progressbar").append("<li sectionId='" + section + "'  " + (active ? " class='active'" : "") + ">" + self.mainSections[section].display + "</li>");
             availableSections++;
         }
@@ -1040,4 +1048,3 @@ import Consent from "./modules/Consent.js";
         }
     });
 })();
-
