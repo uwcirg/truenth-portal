@@ -246,7 +246,7 @@ def configure_logging(app):  # pragma: no cover
         return
 
     # Configure for JSON logging
-    if json_logging._request_util is None:
+    if json_logging._current_framework is None:
         # Ugly internal ref to prevent multiple calls to `init_flask`
         json_logging.init_flask(enable_json=True)
         json_logging.init_request_instrument(app)
