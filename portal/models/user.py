@@ -1,10 +1,12 @@
 """User model """
 
-
+import base64
 from html import escape
 from datetime import datetime, timedelta
 from io import StringIO
+import os
 import re
+import onetimepass as otp
 import time
 
 from dateutil import parser
@@ -256,6 +258,11 @@ def validate_email(email):
         raise BadRequest("requires a valid email address")
 
 
+def generate_random_secret():
+    """generate a random secret"""
+    return base64.b32encode(os.urandom(10)).decode('utf-8')
+
+
 class User(db.Model, UserMixin):
     # PLEASE maintain merge_with() as user model changes #
     __tablename__ = 'users'  # Override default 'user'
@@ -303,6 +310,9 @@ class User(db.Model, UserMixin):
     password_verification_failures = \
         db.Column(db.Integer, default=0, nullable=False)
     last_password_verification_failure = db.Column(db.DateTime, nullable=True)
+
+    # For 2FA
+    otp_secret = db.Column(db.String(16), default=generate_random_secret)
 
     user_audits = db.relationship('Audit', cascade='delete',
                                   foreign_keys=[Audit.user_id])
@@ -468,6 +478,28 @@ class User(db.Model, UserMixin):
         if force_refresh:
             return initiate_encounter(self, auth_method=existing.auth_method)
         return existing
+
+    TOKEN_LEN = 4
+    TOKEN_LIFE = 30*60
+
+    def generate_otp(self):
+        """Generate One Time Password for 2FA from user's otp_secret"""
+        if self.otp_secret is None:
+            self.otp_secret = self.generate_random_secret()
+            db.session.commit()
+
+        return otp.get_totp(
+            self.otp_secret,
+            token_length=self.TOKEN_LEN,
+            interval_length=self.TOKEN_LIFE)
+
+    def validate_otp(self, token):
+        assert(self.otp_secret)
+        return otp.valid_totp(
+            token,
+            self.otp_secret,
+            token_length=self.TOKEN_LEN,
+            interval_length=self.TOKEN_LIFE)
 
     @property
     def locale(self):

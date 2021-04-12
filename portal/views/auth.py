@@ -29,9 +29,13 @@ from flask_user.signals import (
     user_registered,
     user_reset_password,
 )
+from flask_wtf import FlaskForm
 import requests
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import BadRequest
+from wtforms import IntegerField
+from wtforms.validators import DataRequired, ValidationError
 
 from ..audit import auditable_event
 from ..csrf import csrf
@@ -50,7 +54,13 @@ from ..models.flaskdanceprovider import (
 from ..models.intervention import Intervention, UserIntervention
 from ..models.login import login_user
 from ..models.role import ROLE
-from ..models.user import User, add_user, current_user, get_user
+from ..models.user import (
+    User,
+    add_user,
+    current_user,
+    get_user,
+    unchecked_get_user,
+)
 from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)
@@ -67,6 +77,38 @@ facebook_blueprint = make_facebook_blueprint(
     scope=['email'],
     login_url='/login/facebook/',
 )
+
+
+class KeyForm(FlaskForm):
+    key = IntegerField('key', validators=[DataRequired()])
+
+    def validate_key(form, field):
+        """Use form validation to verify token"""
+        user = unchecked_get_user(session.get('user_needing_2fa'))
+
+        if user.validate_otp(field.data):
+            current_app.logger.debug(f"{user.id} passed 2FA with valid token")
+        else:
+            current_app.logger.debug(f"{user.id} failed 2FA token validation")
+            raise ValidationError("invalid token")
+
+
+@auth.route('/2fa/verify', methods=('GET', 'POST'))
+def two_factor_auth():
+    try:
+        user = unchecked_get_user(session.get('user_needing_2fa'))
+    except (BadRequest, ValueError):
+        abort(404)
+
+    form = KeyForm()
+    if not form.validate_on_submit():
+        return render_template('flask_user/second_factor.html', form=form)
+
+    # Still here implies validation was successful, resume interrupted login
+    session.pop('user_needing_2fa')
+    session['2FA_verified'] = '2FA verified'
+    login_user(user, auth_method=session.pop('pending_auth_method'))
+    return next_after_login()
 
 
 @auth.route('/test/oauth')
@@ -360,7 +402,7 @@ def deauthorized():
         """url safe base64 decoding method"""
         padding_factor = (4 - len(s) % 4)
         s += "=" * padding_factor
-        return base64.b64decode(unicode(s).translate(
+        return base64.b64decode(s.translate(
             dict(zip(map(ord, '-_'), '+/'))))
 
     encoded_sig, payload = request.form['signed_request'].split('.')
@@ -491,10 +533,14 @@ def next_after_login():
 
     """
     # Without a current_user - can't continue, send back to root for login
+    # or to 2FA verify if that's in process
     user = current_user()
     if not user:
+        if session.get('user_needing_2fa'):
+            return redirect('/2fa/verify')
         current_app.logger.debug("next_after_login: [no user] -> landing")
         return redirect('/')
+    assert not session.get('user_needing_2fa')
 
     # Logged in - take care of pending actions
     if 'challenge_verified_user_id' in session:
