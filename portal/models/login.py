@@ -1,6 +1,7 @@
 """Module for common login hook"""
 
 from flask import current_app, session
+from flask_babel import gettext as _
 from flask_login import (
     current_user as flask_login_current_user,
     login_user as flask_user_login,
@@ -46,8 +47,8 @@ def login_user(user, auth_method=None):
         session['pending_auth_method'] = auth_method
         current_app.logger.debug(f"OTP for {user.id}: {token}")
         email = EmailMessage(
-            subject="TrueNTH Access Token",
-            body=f"One Time Authentication Token: {token}",
+            subject=_("TrueNTH Access Token"),
+            body=_(f"One Time Authentication Token: {token}"),
             recipients=user.email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             user_id=user.id)
