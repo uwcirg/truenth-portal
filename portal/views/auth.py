@@ -90,7 +90,7 @@ class KeyForm(FlaskForm):
             current_app.logger.debug(f"{user.id} passed 2FA with valid token")
         else:
             current_app.logger.debug(f"{user.id} failed 2FA token validation")
-            raise ValidationError("invalid token")
+            raise ValidationError("invalid 2FA token")
 
 
 @auth.route('/2fa/verify', methods=('GET', 'POST'))
