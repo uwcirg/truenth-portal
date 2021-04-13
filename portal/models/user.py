@@ -479,8 +479,8 @@ class User(db.Model, UserMixin):
             return initiate_encounter(self, auth_method=existing.auth_method)
         return existing
 
-    TOKEN_LEN = 4
-    TOKEN_LIFE = 30*60
+    TOTP_TOKEN_LEN = 4
+    TOTP_TOKEN_LIFE = 30*60
 
     def generate_otp(self):
         """Generate One Time Password for 2FA from user's otp_secret"""
