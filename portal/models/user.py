@@ -485,7 +485,7 @@ class User(db.Model, UserMixin):
     def generate_otp(self):
         """Generate One Time Password for 2FA from user's otp_secret"""
         if self.otp_secret is None:
-            self.otp_secret = self.generate_random_secret()
+            self.otp_secret = generate_random_secret()
             db.session.commit()
 
         return otp.get_totp(
