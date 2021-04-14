@@ -27,6 +27,7 @@ def login_user(user, auth_method=None):
     from .message import EmailMessage  # prevent cycle
     # beyond patients and care givers, 2FA is required.  confirm or initiate
     if (
+            current_app.config.get("ENABLE_2FA") and
             not current_app.testing and
             user.has_role(
                     ROLE.ADMIN.value,
