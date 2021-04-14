@@ -49,7 +49,7 @@ def login_user(user, auth_method=None):
         current_app.logger.debug(f"OTP for {user.id}: {token}")
         email = EmailMessage(
             subject=_("TrueNTH Access Token"),
-            body=_("One Time Authentication Token: %s", token),
+            body=_("One Time Authentication Token: %s" % token),
             recipients=user.email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             user_id=user.id)
