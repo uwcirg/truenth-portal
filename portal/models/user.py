@@ -490,16 +490,16 @@ class User(db.Model, UserMixin):
 
         return otp.get_totp(
             self.otp_secret,
-            token_length=self.TOKEN_LEN,
-            interval_length=self.TOKEN_LIFE)
+            token_length=self.TOTP_TOKEN_LEN,
+            interval_length=self.TOTP_TOKEN_LIFE)
 
     def validate_otp(self, token):
         assert(self.otp_secret)
         return otp.valid_totp(
             token,
             self.otp_secret,
-            token_length=self.TOKEN_LEN,
-            interval_length=self.TOKEN_LIFE)
+            token_length=self.TOTP_TOKEN_LEN,
+            interval_length=self.TOTP_TOKEN_LIFE)
 
     @property
     def locale(self):
