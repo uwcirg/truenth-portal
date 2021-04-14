@@ -6,7 +6,7 @@
 
     <p>{{ _("You should receive an email with a token. Enter the token below for access.") }}</p>
 
-    <form action="{{ url_for('two_factor_auth') }}" method="post">
+    <form action="{{ url_for('auth.two_factor_auth') }}" method="post">
         {{ form.hidden_tag() }}
         {{ render_field(form.key, label=_("Token"), tabindex=5) }}
 
