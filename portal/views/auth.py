@@ -608,8 +608,8 @@ def next_after_login():
         if 'next' in session:
             next_url = session['next']
             del session['next']
-            current_app.logger.debug("next_after_login: [have session['next']] "
-                                     "-> {}".format(next_url))
+            current_app.logger.debug(
+                "next_after_login: [have session['next']] -> %s", next_url)
         if 'suspend_initial_queries' in session:
             del session['suspend_initial_queries']
         resp = redirect(next_url)
