@@ -4,13 +4,13 @@
 
     <h3 class="tnth-headline">{{ _("Two Factor Athentication") }}</h3><br />
 
-    <p>{{ _("You should receive an email with a token. Enter the token below for access.") }}</p>
+    <p>{{ _("You should receive an email with a 4 digit code. Enter the code below for access.") }}</p>
 
     <form action="{{ url_for('auth.two_factor_auth') }}" method="post">
         {{ form.hidden_tag() }}
-        {{ render_field(form.key, label=_("Token"), tabindex=5) }}
+        {{ render_field(form.key, label=_("Code"), tabindex=5) }}
 
-        <button type="submit" class="btn btn-tnth-primary">{{ _("Validate Token") }}</button>
+        <button type="submit" class="btn btn-tnth-primary">{{ _("Validate Code") }}</button>
     </form>
 
 {% endblock %}

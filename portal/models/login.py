@@ -43,17 +43,22 @@ def login_user(user, auth_method=None):
         # log user back out, in case a flow already promoted them
         flask_user_logout()
 
-        token = user.generate_otp()
+        code = user.generate_otp()
         session['user_needing_2fa'] = user.id
         session['pending_auth_method'] = auth_method
-        current_app.logger.debug(f"OTP for {user.id}: {token}")
+        current_app.logger.debug(f"2FA OTP for {user.id}: {code}")
         email = EmailMessage(
-            subject=_("TrueNTH Access Token"),
-            body=_("One Time Authentication Token: %s" % token),
+            subject=_("TrueNTH Access Code"),
+            body=_("One Time Authentication Code: %s" % code),
             recipients=user.email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             user_id=user.id)
-        email.send_message()
+        if current_app.config.get("DEV_SYSTEM_WO_EMAIL", None):
+            # Dump to console for easy access
+            print(f"!!!!!!!! 2FA Code: {code} !!!!!!!!")
+        else:
+            email.send_message()
+
         db.session.add(email)
         db.session.commit()
         return
