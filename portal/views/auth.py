@@ -603,11 +603,13 @@ def next_after_login():
     # It's stored in the session to survive the various redirections needed
     # for external auth, etc.  If found in the session, pop and redirect
     # as defined.
-    elif 'next' in session:
-        next_url = session['next']
-        del session['next']
-        current_app.logger.debug("next_after_login: [have session['next']] "
-                                 "-> {}".format(next_url))
+    elif 'next' in session or request.args.get('next'):
+        next_url = request.args.get('next')
+        if 'next' in session:
+            next_url = session['next']
+            del session['next']
+            current_app.logger.debug("next_after_login: [have session['next']] "
+                                     "-> {}".format(next_url))
         if 'suspend_initial_queries' in session:
             del session['suspend_initial_queries']
         resp = redirect(next_url)
