@@ -49,11 +49,11 @@ def login_user(user, auth_method=None):
         current_app.logger.debug(f"2FA OTP for {user.id}: {code}")
         email = EmailMessage(
             subject=_("TrueNTH Access Code"),
-            body=_("One Time Authentication Code: %s" % code),
+            body=_("One Time Authentication Code: %(code)s", code=code),
             recipients=user.email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             user_id=user.id)
-        if current_app.config.get("DEV_SYSTEM_WO_EMAIL", None):
+        if current_app.config.get("MAIL_SUPPRESS_SEND"):
             # Dump to console for easy access
             print(f"!!!!!!!! 2FA Code: {code} !!!!!!!!")
         else:
