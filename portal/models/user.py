@@ -479,7 +479,7 @@ class User(db.Model, UserMixin):
             return initiate_encounter(self, auth_method=existing.auth_method)
         return existing
 
-    TOTP_TOKEN_LEN = 4
+    TOTP_TOKEN_LEN = 6
     TOTP_TOKEN_LIFE = 30*60
 
     def generate_otp(self):
@@ -495,11 +495,19 @@ class User(db.Model, UserMixin):
 
     def validate_otp(self, token):
         assert(self.otp_secret)
-        return otp.valid_totp(
+        valid = otp.valid_totp(
             token,
             self.otp_secret,
             token_length=self.TOTP_TOKEN_LEN,
             interval_length=self.TOTP_TOKEN_LIFE)
+        if valid:
+            # due to the long timeout window, a second request
+            # for a code within the first few minutes will generate
+            # the same code!  patch by altering the user's secret
+            # after a single validation.
+            self.otp_secret = generate_random_secret()
+            db.session.commit()
+        return valid
 
     @property
     def locale(self):
