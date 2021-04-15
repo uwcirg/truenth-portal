@@ -3,7 +3,7 @@
 
 from urllib.parse import urlsplit, urlunsplit
 
-from flask import current_app, flash, redirect, request
+from flask import current_app, flash, redirect, request, session, url_for
 from flask_babel import force_locale, gettext as _
 from flask_user.views import _endpoint_url
 
@@ -26,6 +26,23 @@ def patch_make_safe_url(url):
     no_scheme, no_hostname = '', ''
     safe_url = urlunsplit(
         (no_scheme, no_hostname, parts.path, parts.query, parts.fragment))
+
+    if current_app.config.get('ENABLE_2FA'):
+        # With 2FA enabled, can't simply redirect to `safe_url` after login,
+        # as 2FA hasn't yet been satisfied, i.e. heading straight to desired
+        # target, aka `safe_url` will circumvent the 2FA challenge.
+
+        # Prepend the configured after login endpoint as the "safe_url" for 2FA
+        # flow, including the user's desired target as a `next` parameter
+        after_login_endpoint = url_for(
+            current_app.config['USER_AFTER_LOGIN_ENDPOINT'])
+        if not safe_url.startswith(after_login_endpoint):
+            # Necessary to avoid chaining during multiple redirects, only
+            # prepend configured after login endpoint if not already present
+            safe_url = url_for(
+                current_app.config['USER_AFTER_LOGIN_ENDPOINT'], next=safe_url)
+        return safe_url
+
     return safe_url
 
 
