@@ -14,17 +14,18 @@ pluggy==0.13.1             # via tox
 # use pre-compiled binary for testing, build from source for prod
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 psycopg2-binary==2.8.6
-py==1.8.0                 # via tox
-pygments==2.7.3           # via sphinx
+py==1.10.0                # via tox
+pygments==2.7.4           # via sphinx
 pyparsing==2.4.7          # via packaging
-pytest==5.2.2
+pytest==6.1.0
 pytest-flask==0.15.1
+pytest-timeout==1.4.2
 selenium==3.141.0
 snowballstemmer==2.0.0    # via sphinx
 sphinx-rtd-theme==0.5.1
 sphinx==3.3.1
 sphinxcontrib-websupport==1.1.2  # via sphinx
-tox==3.14.6
+tox==3.23.0
 typing==3.7.4.3             # via sphinx
 virtualenv==20.4.2        # via tox
 waitress==1.4.3           # via webtest

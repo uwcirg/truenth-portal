@@ -559,6 +559,10 @@ def patient_research_study_status(patient, ignore_QB_status=False):
                 # Clear ready status when base has pending work
                 rs_status['ready'] = False
                 rs_status['errors'].append('Pending work in base study')
+            elif not patient.email_ready():
+                # Avoid errors from automated emails, that is, email required
+                rs_status['ready'] = False
+                rs_status['errors'].append('User lacks valid email address')
             elif rs_status['ready']:
                 # As user may have just entered ready status on EMPRO
                 # move trigger_states.state to due

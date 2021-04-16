@@ -1,8 +1,24 @@
-from celery import Celery
+from celery import current_app, Celery, signals
+import logging
+import sys
 
 from ..extensions import db
 
 __celery = None
+
+
+@signals.setup_logging.connect
+def on_setup_logging(**kwargs):
+    # prefer loglevel from flask app config (injected into celery app) over celery CLI option
+    log_level = current_app.conf.get('LOG_LEVEL') or kwargs.get('loglevel')
+
+    logger = logging.getLogger('celery')
+    logger.setLevel(log_level)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.propagate = True
+    logger = logging.getLogger('celery.app.trace')
+    logger.setLevel(log_level)
+    logger.propagate = True
 
 
 def create_celery(app):

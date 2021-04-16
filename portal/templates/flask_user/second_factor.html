@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field %}
+
+    <h3 class="tnth-headline">{{ _("Two Factor Athentication") }}</h3><br />
+
+    <p>{{ _("You should receive an email with a token. Enter the token below for access.") }}</p>
+
+    <form action="{{ url_for('auth.two_factor_auth') }}" method="post">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.key, label=_("Token"), tabindex=5) }}
+
+        <button type="submit" class="btn btn-tnth-primary">{{ _("Validate Token") }}</button>
+    </form>
+
+{% endblock %}

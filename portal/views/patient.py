@@ -522,6 +522,14 @@ def patient_timewarp(patient_id, days):
         changed.append(f'email_message {em.id}')
         em.sent_at = em.sent_at - delta
 
+    # access records in audit
+    from ..models.audit import Audit
+    query = Audit.query.filter(Audit.subject_id == user.id).filter(
+        Audit._context == 'access')
+    for ar in query:
+        changed.append(f"audit {ar.id}")
+        ar.timestamp = ar.timestamp - delta
+
     db.session.commit()
 
     # Recalculate users timeline & qnr associations
