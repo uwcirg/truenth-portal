@@ -451,9 +451,9 @@ a.btn {
   .v-icon__svg {
     fill: @mutedColor;
     font-size: 18px;
-    height: 18px; 
+    height: 18px;
     width: 18px;
-  } 
+  }
 }
 body.landing {
   min-height: 100%;
@@ -1247,7 +1247,7 @@ select:not([multiple]) {
     background-image: @defaultFooterWhiteLogoPath;
     position: relative;
     top: 6px;
-  } 
+  }
 }
 #footerMovember {
   display: inline-block;
@@ -2005,7 +2005,7 @@ div.footer-wrapper.right-panel {
       min-height: 50px;
     }
   }
-  .exportReport__status.active:before, 
+  .exportReport__status.active:before,
   .export__status.active:before {
     position: absolute;
     animation: borderLoader 750ms infinite linear;
@@ -3622,7 +3622,7 @@ section.header {
   position: relative;
   &.active {
     min-height: 250px;
-  } 
+  }
   .loader {
     position: absolute;
     top: 0;
@@ -4678,6 +4678,39 @@ input.clinic {
   input {
     width: 300px;
     max-width: 100%;
+  }
+}
+
+#TwoFAForm {
+  .buttons-container {
+    position: relative;
+    min-height: 56px;
+    .loader {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      background: #FFF;
+      z-index: 10;
+      i {
+        position: absolute;
+        left: 0;
+        top: 8px;
+      }
+      display: none;
+    }
+    .btn {
+      width: 100%;
+    }
+    &.loading {
+      .loader {
+        display: block;
+      }
+      .btn {
+        visibility: hidden;
+      }
+    }
   }
 }
 
