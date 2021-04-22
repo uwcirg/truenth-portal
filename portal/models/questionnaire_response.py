@@ -245,6 +245,21 @@ class QuestionnaireResponse(db.Model):
                 == json.dumps(identifier.value))
         return found.order_by(QuestionnaireResponse.id.desc())
 
+    @staticmethod
+    def qnr_state(user_id):
+        """Useful in tracking changes, capture a dict of user's QNR state"""
+        name_map = QuestionnaireBank.name_map()
+        qnrs = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user_id).with_entities(
+            QuestionnaireResponse.id,
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration)
+
+        return {
+            f"qnr {qnr.id}":
+                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
+            qnr in qnrs}
+
     @property
     def document_identifier(self):
         """Return FHIR identifier(s) found within the document"""
