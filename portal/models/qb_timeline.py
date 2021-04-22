@@ -770,8 +770,10 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
 
     def rp_name_from_qb_id(qb_id):
         return ResearchProtocol.query.join(QuestionnaireBank).filter(
-            QuestionnaireBank.research_protocol_id == ResearchProtocol.id).filter(
-            QuestionnaireBank.id == qb_id).with_entities(ResearchProtocol.name).first()[0]
+            QuestionnaireBank.research_protocol_id ==
+            ResearchProtocol.id).filter(
+            QuestionnaireBank.id == qb_id).with_entities(
+            ResearchProtocol.name).first()[0]
 
     seen = set()
     last_at, previous_key = None, None
@@ -787,19 +789,26 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
             if key in seen:
                 if not (key in reported_on and previous_key in reported_on):
                     overlap = row.at - last_at
-                    qb_id, iteration = [int(x) for x in previous_key.split(':')]
-                    prev_visit = " ".join((visit_name(qbd=QBD(
-                        relative_start=None,
-                        iteration=iteration,
-                        qb_id=qb_id,
-                        recur_id=previous_recur_id)), rp_name_from_qb_id(qb_id)))
-                    visit = " ".join((visit_name(qbd=QBD(
-                        relative_start=None,
-                        iteration=row.qb_iteration,
-                        qb_id=row.qb_id,
-                        recur_id=row.qb_recur_id)), rp_name_from_qb_id(row.qb_id)))
+                    qb_id, iteration = [
+                        int(x) for x in previous_key.split(':')]
+                    prev_visit = " ".join(
+                        (visit_name(qbd=QBD(
+                            relative_start=None,
+                            iteration=iteration,
+                            qb_id=qb_id,
+                            recur_id=previous_recur_id)),
+                         rp_name_from_qb_id(qb_id)))
+                    visit = " ".join(
+                        (visit_name(qbd=QBD(
+                            relative_start=None,
+                            iteration=row.qb_iteration,
+                            qb_id=row.qb_id,
+                            recur_id=row.qb_recur_id)),
+                         rp_name_from_qb_id(row.qb_id)))
 
-                    m = f"{visit}, {prev_visit} overlap by {overlap} for {row.user_id}"
+                    m = (
+                        f"{visit}, {prev_visit} overlap by {overlap} for"
+                        f" {row.user_id}")
                     if cli_presentation:
                         print(m)
                     else:
