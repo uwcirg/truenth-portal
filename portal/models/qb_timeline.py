@@ -67,6 +67,32 @@ class QBT(db.Model):
             relative_start=self.at, iteration=self.qb_iteration,
             recur_id=self.qb_recur_id, qb_id=self.qb_id)
 
+    @staticmethod
+    def timeline_state(user_id):
+        """Return an ordered list of user's QBT state for tracking changes"""
+        from .questionnaire_bank import QuestionnaireBank
+        name_map = QuestionnaireBank.name_map()
+        tl = QBT.query.filter(
+            QBT.user_id == user_id).with_entities(
+            QBT.at,
+            QBT.qb_id,
+            QBT.status,
+            QBT.qb_iteration).order_by(
+            QBT.at)
+
+        results = dict()
+        for i in tl:
+            qb = QuestionnaireBank.query.get(i.qb_id)
+            recur_id = qb.recurs[0].id if qb.recurs else None
+            vn = visit_name(QBD(
+                relative_start=None,
+                questionnaire_bank=qb,
+                iteration=i.qb_iteration,
+                recur_id=recur_id))
+            results[f"{i.at} {i.status}"] = [
+                vn, name_map[i.qb_id], i.qb_iteration]
+        return results
+
 
 class AtOrderedList(list):
     """Specialize ``list`` to maintain insertion order and ``at`` attribute
@@ -736,6 +762,62 @@ def invalidate_users_QBT(user_id, research_study_id):
     db.session.commit()
 
 
+def check_for_overlaps(qbt_rows, cli_presentation=False):
+    """Sanity function to confirm users timeline doesn't contain overlaps"""
+    # Expect ordered rows with increasing `at` values.  Track (QB,iterations)
+    # seen, notify if overlaps are discovered.
+    from .questionnaire_bank import QuestionnaireBank
+
+    def rp_name_from_qb_id(qb_id):
+        return ResearchProtocol.query.join(QuestionnaireBank).filter(
+            QuestionnaireBank.research_protocol_id == ResearchProtocol.id).filter(
+            QuestionnaireBank.id == qb_id).with_entities(ResearchProtocol.name).first()[0]
+
+    seen = set()
+    last_at, previous_key = None, None
+    reported_on = set()
+    for row in qbt_rows:
+        # Confirm expected order
+        if last_at:
+            assert row.at >= last_at
+
+        key = f"{row.qb_id}:{row.qb_iteration}"
+        if previous_key and previous_key != key:
+            # just moved to next visit, confirm it's novel
+            if key in seen:
+                if not (key in reported_on and previous_key in reported_on):
+                    overlap = row.at - last_at
+                    qb_id, iteration = [int(x) for x in previous_key.split(':')]
+                    prev_visit = " ".join((visit_name(qbd=QBD(
+                        relative_start=None,
+                        iteration=iteration,
+                        qb_id=qb_id,
+                        recur_id=previous_recur_id)), rp_name_from_qb_id(qb_id)))
+                    visit = " ".join((visit_name(qbd=QBD(
+                        relative_start=None,
+                        iteration=row.qb_iteration,
+                        qb_id=row.qb_id,
+                        recur_id=row.qb_recur_id)), rp_name_from_qb_id(row.qb_id)))
+
+                    m = f"{visit}, {prev_visit} overlap by {overlap} for {row.user_id}"
+                    if cli_presentation:
+                        print(m)
+                    else:
+                        current_app.logger.error(m)
+
+                # Don't report the back and forth, once is adequate.
+                reported_on.add(key)
+                reported_on.add(previous_key)
+
+        previous_key = key
+        previous_recur_id = row.qb_recur_id
+        seen.add(key)
+        last_at = row.at
+    if reported_on:
+        # Returns true if at least one overlap was found
+        return True
+
+
 def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
     """Populate the QBT rows for given user, research_study
 
@@ -813,6 +895,27 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     "qb_iteration": qbd.iteration,
                     "qb_recur_id": qb_recur_id}
                 start = qbd.relative_start
+                if (
+                        pending_qbts and pending_qbts[-1].at > start and
+                        pending_qbts[-1].status == 'expired'):
+                    # Found overlapping visits.  Move the expired date of
+                    # previous just before start if possible
+                    # (no additional rows with at dates > start)
+                    other_status_after_next_start = False
+                    for i in range(len(pending_qbts)-2, -1, -1):
+                        if pending_qbts[i].at > start:
+                            other_status_after_next_start = True
+                            break
+                        if pending_qbts[i].at < start:
+                            break
+
+                    if other_status_after_next_start:
+                        current_app.logger.error(
+                            "Overlap can't adjust previous as another event"
+                            " occurred since subsequent (%s:%s) qb start for"
+                            " user %d", qbd.qb_id, qbd.qb_iteration, user_id)
+                    else:
+                        pending_qbts[-1].at = start - relativedelta(seconds=1)
 
                 if (
                         pending_qbts and pending_qbts[-1].at > start and
@@ -951,9 +1054,11 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     at=withdrawal_date,
                     status='withdrawn',
                     **kwargs))
+                check_for_overlaps(store_rows)
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
             else:
+                check_for_overlaps(pending_qbts)
                 db.session.add_all(pending_qbts)
                 num_stored = len(pending_qbts)
 
