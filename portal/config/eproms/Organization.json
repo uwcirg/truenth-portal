@@ -2267,6 +2267,34 @@
     {
       "extension": [
         {
+          "timezone": "Europe/Stockholm",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146166,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-166"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Umeå University Hospital",
+      "partOf": {
+        "reference": "api/organization/24000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
