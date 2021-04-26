@@ -2794,19 +2794,11 @@ export default (function() {
                     let roles = data.roles || [];
                     if (!self.isAdmin() && self.isStaffAdmin()) {
                         /*
-                         * admin staff should not be able to edit role(s) for a user that contains other roles
+                         * filter down editable roles for a staff
                          */
-                        let diffRoles = self.userRoles.filter(item => !self.staffEditableRoles.includes(item));
-                        if (diffRoles.length) {
-                            $("#rolesGroup").closest(".profile-item-container").hide();
-                        } else {
-                            /*
-                             * filter down editable roles for a staff
-                             */
-                            roles = roles.filter(item => {
-                                return self.staffEditableRoles.indexOf(item.name) >= 0
-                            });
-                        }
+                        roles = roles.filter(item => {
+                            return self.staffEditableRoles.indexOf(item.name) >= 0
+                        });
                     }
 
                     /*
