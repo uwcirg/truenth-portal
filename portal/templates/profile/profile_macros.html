@@ -406,7 +406,7 @@
                 </div>
             </div>
         {%- endif -%}
-        
+
     {%- elif person and person.has_role(ROLE.CLINICIAN.value, ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -852,7 +852,7 @@
     <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
         <div class='checkbox' v-for="item in roles.data">
             {% raw %}
-                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData">{{item.display_name}}</label>
+                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData" :disabled="isAdminOnlyEditableRole(item.name)">{{item.display_name}}</label>
             {% endraw %}
         </div>
     </div>
@@ -874,7 +874,7 @@
 <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
 <a href="#postInterventionQuestionnaireLoc"></a>
 <div id="postInterventionQuestionnaireLoc">&nbsp;</div>
-<div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowPostTxQuestionnaireSection()"> 
+<div class="row" id="postInterventionQuestionnaireSection" class="eproms-substudy" v-show="shouldShowPostTxQuestionnaireSection()">
     <div class="col-md-12 col-xs-12">
         {% call profileSection(editable=false) %}
         {% call titleSection() -%}{{_("EMPRO Intervention Report")}}{%- endcall %}
@@ -903,9 +903,9 @@
                     </div>
                 </div>
                 <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
-                <!-- 
-                    post intervention questionnaire section 
-                    NOTE: 
+                <!--
+                    post intervention questionnaire section
+                    NOTE:
                     will display triggers were present in the last determined trigger state
                     will be in a disabled state if the action state is "completed"
                 -->
@@ -923,7 +923,7 @@
                         >
                         <!-- boolean type answer-->
                         <input type="checkbox"
-                            class="bool answer" 
+                            class="bool answer"
                             :dataType = "item.type"
                             :linkId="item.linkId"
                             @change="onResponseChangeFieldEvent"
@@ -931,7 +931,7 @@
                         <!-- open-choice (checkboxes) type answer -->
                         <div class="choices answer" v-if="item.type == 'open-choice'">
                             <div class="choice" v-for="option in item.option">
-                                <input 
+                                <input
                                     type="checkbox"
                                     :code="option.valueCoding.code"
                                     :class="{other: /other/gi.test(option.valueCoding.display)}"
@@ -952,7 +952,7 @@
                             </div>
                         </div>
                         <!-- choice (select) type answer -->
-                        <select class="form-control answer" v-if="item.type == 'choice'" 
+                        <select class="form-control answer" v-if="item.type == 'choice'"
                             :linkId="item.linkId"
                             :dataType="item.type"
                             @change="onResponseChangeFieldEvent"
@@ -990,7 +990,7 @@
   </div>
 {%- endmacro -%}
 {% macro profileTreatingClinician(person) %}
-<div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()"> 
+<div class="row" id="treatingCliniciansSection" class="eproms-substudy" v-show="isSubStudyPatient()">
     <div class="col-md-12 col-xs-12">
         {% call profileSection(data_sections="locale, timezone") %}
         {% call titleSection(id="treatingCliniciansLoc") -%}{{_("Treating Clinician")}}{%- endcall %}
