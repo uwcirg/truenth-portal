@@ -775,6 +775,12 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
             QuestionnaireBank.id == qb_id).with_entities(
             ResearchProtocol.name).first()[0]
 
+    def int_or_none(value):
+        """None safe int cast from string"""
+        if value is None or value == 'None':
+            return None
+        return int(value)
+
     seen = set()
     last_at, previous_key = None, None
     reported_on = set()
@@ -790,7 +796,7 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
                 if not (key in reported_on and previous_key in reported_on):
                     overlap = row.at - last_at
                     qb_id, iteration = [
-                        int(x) for x in previous_key.split(':')]
+                        int_or_none(x) for x in previous_key.split(':')]
                     prev_visit = " ".join(
                         (visit_name(qbd=QBD(
                             relative_start=None,
