@@ -116,6 +116,7 @@ export default (function() {
             userRoles: [],
             PIList: [],
             selectedClinicians: [],
+            staffEditableRoles: ["clinician", "primary_investigator", "staff", "staff_admin"],
             adminOnlyEditableRoles: ['access_on_verify', 'write_only', 'promote_without_identity_challenge'],
             userEmailReady: true,
             messages: {
@@ -2797,6 +2798,14 @@ export default (function() {
                 this.modules.tnthAjax.getRoleList({useWorker:true}, function(data) {
                     if (!data.roles) { return false; }
                     let roles = data.roles || [];
+                    if (!self.isAdmin() && self.isStaffAdmin()) {
+                        /*
+                         * filter down editable roles for a staff or an admin
+                         */
+                        roles = roles.filter(item => {
+                            return [...self.staffEditableRoles, ...self.adminOnlyEditableRoles].indexOf(item.name) >= 0
+                        });
+                    }
                     //note the following roles are disabled from editing by staff, editable by ADMIN users only:
                     //['access_on_verify', 'write_only', 'promote_without_identity_challenge']
                     /*
