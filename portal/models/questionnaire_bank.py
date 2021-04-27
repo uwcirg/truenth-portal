@@ -302,6 +302,15 @@ class QuestionnaireBank(db.Model):
 
         return start + RelativeDelta(self.overdue)
 
+    @staticmethod
+    @cache.memoize(timeout=FIVE_MINS)
+    def name_map():
+        """For reporting purposes, generate a map of QB.id to names"""
+        qb_name_map = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
+        # add None to make "safe" for clients w/o checks
+        qb_name_map[None] = "None"
+        return qb_name_map
+
 
 @cache.memoize(timeout=FIVE_MINS)
 def trigger_date(user, research_study_id, qb=None):
