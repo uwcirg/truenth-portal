@@ -472,8 +472,7 @@ def patient_timewarp(patient_id, days):
     from portal.models.questionnaire_response import QuestionnaireResponse
     from portal.models.user_consent import UserConsent
 
-    if current_app.config['SYSTEM_TYPE'] not in (
-            'demo', 'development', 'testing'):
+    if current_app.config['SYSTEM_TYPE'] != "production":
         abort(404)
 
     if days < 1:
