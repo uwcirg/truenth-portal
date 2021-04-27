@@ -736,8 +736,9 @@ def preview_site_update(org_id, retired):
 
     # Update the org's research protocol as requested - assume to the latest
     previous_rp = organization.research_protocols[-1]
-    latest_rp = ResearchProtocol.query.order_by(
-        ResearchProtocol.id.desc()).first()
+    assert previous_rp.name == 'IRONMAN v3'
+    latest_rp = ResearchProtocol.query.filter(
+        ResearchProtocol.name == 'IRONMAN v5').one()
     previous_org_rp = OrganizationResearchProtocol.query.filter(
         OrganizationResearchProtocol.research_protocol_id ==
         previous_rp.id).filter(
