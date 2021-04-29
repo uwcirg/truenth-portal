@@ -852,7 +852,8 @@
     <div class="form-group" id="rolesGroup" data-profile-section-id="roleslist" v-show="roles.data.length > 0" data-loader-container="true">
         <div class='checkbox' v-for="item in roles.data">
             {% raw %}
-                <label><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData" :disabled="isAdminOnlyEditableRole(item.name)">{{item.display_name}}</label>
+                <!-- pre-registration roles e.g. write-only roles are not visible for editing on UI -->
+                <label :class="{hide:isAdminOnlyEditableRole(item.name)}"><input type="checkbox" name="user_type" v-bind:value="item.name" data-save-container-id="rolesGroup" v-on:click="updateRolesData" :class="{hide:isAdminOnlyEditableRole(item.name)}">{{item.display_name}}</label>
             {% endraw %}
         </div>
     </div>

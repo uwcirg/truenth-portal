@@ -2749,14 +2749,15 @@ export default (function() {
                 // });
             },
             updateRolesData: function(event) {
+                var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
                 var roles = $("#rolesGroup input:checkbox:checked").map(function() {
                     return {name: $(this).val()};
                 }).get();
                 /*
                  * check if a role is selected
                  */
-                if (!roles.length) {
-                    //make sure at least one role is selected
+                if (!visibleRoles.length) {
+                    //make sure at least one role among role elements that are visible is selected
                     //admin, staff admin functionality
                     $(".put-roles-error").html("A role must be selected.");
                     return false;
