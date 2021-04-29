@@ -103,7 +103,7 @@ class BaseConfig(object):
         ('assessment_cache_region', 60*60*2),
         ('reporting_cache_region', 60*60*12)]
     SEND_FILE_MAX_AGE_DEFAULT = 60 * 60  # 1 hour, in seconds
-    ENABLE_2FA = os.environ.get('ENABLE_2FA', None)
+    ENABLE_2FA = os.environ.get('ENABLE_2FA', 'false').lower() == 'true'
 
     LOG_CACHE_MISS = False
     LOG_FOLDER = os.environ.get('LOG_FOLDER')
