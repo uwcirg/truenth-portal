@@ -692,7 +692,7 @@ class User(db.Model, UserMixin):
                 "edits to identifiers with system {} not allowed".format(
                     identifier.system))
         if identifier in self._identifiers:
-            # Implement idempotent call, ignore multiple request for same
+            # Idempotent, ignore multiple request for same
             return
 
         # Check (if applicable) that the identifier isn't already
