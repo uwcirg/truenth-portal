@@ -692,8 +692,8 @@ class User(db.Model, UserMixin):
                 "edits to identifiers with system {} not allowed".format(
                     identifier.system))
         if identifier in self._identifiers:
-            raise Conflict("{} already assigned to {}".format(
-                identifier, self))
+            # Implement idempotent call, ignore multiple request for same
+            return
 
         # Check (if applicable) that the identifier isn't already
         # assigned to another user
