@@ -686,6 +686,18 @@ class User(db.Model, UserMixin):
         else:
             self._email = prefix
 
+    def mask_identifier(self, suffix):
+        """Mask identifiers so other user's may re-use
+        """
+        if not self._identifiers:
+            return
+
+        for identifier in self._identifiers:
+            if identifier.system == TRUENTH_EXTERNAL_STUDY_SYSTEM:
+                if identifier.value.endswith(suffix):
+                    continue
+                identifier.value += suffix
+
     def add_identifier(self, identifier):
         if identifier.system in internal_identifier_systems:
             raise Conflict(
@@ -1936,6 +1948,7 @@ class User(db.Model, UserMixin):
 
         self.active = False
         self.mask_email(prefix=DELETED_PREFIX.format(time=int(time.time())))
+        self.mask_identifier(suffix='-deleted')
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self),
                              context='account')
