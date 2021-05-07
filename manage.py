@@ -34,7 +34,11 @@ from portal.models.i18n_utils import (
 )
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
-from portal.models.qb_timeline import invalidate_users_QBT
+from portal.models.qb_timeline import (
+    QBT,
+    invalidate_users_QBT,
+    update_users_QBT,
+)
 from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     add_static_questionnaire_bank,
@@ -604,6 +608,91 @@ def merge_users(src_id, tgt_id, actor):
     print(message)
 
 
+def capture_patient_state(patient_id):
+    """Call to capture QBT and QNR state for patient, used for before/after"""
+    qnrs = QuestionnaireResponse.qnr_state(patient_id)
+    tl = QBT.timeline_state(patient_id)
+    return {'qnrs': qnrs, 'timeline': tl}
+
+
+def present_before_after_state(user_id, external_study_id, before_state):
+    from portal.dict_tools import dict_compare
+    after_qnrs = QuestionnaireResponse.qnr_state(user_id)
+    after_timeline = QBT.timeline_state(user_id)
+
+    # Compare results
+    added_q, removed_q, modified_q, same = dict_compare(
+        after_qnrs, before_state['qnrs'])
+    assert not added_q
+    assert not removed_q
+
+    added_t, removed_t, modified_t, same = dict_compare(
+        after_timeline, before_state['timeline'])
+
+    if any((added_t, removed_t, modified_t, modified_q)):
+        print(f"\nPatient {user_id} ({external_study_id}):")
+    if modified_q:
+        print("\tModified QNRs (old, new)")
+        for mod in sorted(modified_q):
+            print(f"\t\t{mod} {modified_q[mod][1]} ==>"
+                  f" {modified_q[mod][0]}")
+    if added_t:
+        print("\tAdditional timeline rows:")
+        for item in sorted(added_t):
+            print(f"\t\t{item} {after_timeline[item]}")
+    if removed_t:
+        print("\tRemoved timeline rows:")
+        for item in sorted(removed_t):
+            print(
+                f"\t\t{item} "
+                f"{before_state['timeline'][item]}")
+    if modified_t:
+        print(f"\tModified timeline rows: (old, new)")
+        for item in sorted(modified_t):
+            print(f"\t\t{item}")
+            print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
+
+
+@app.cli.command()
+@click.option(
+    '--correct_overlaps', '-c', default=False, is_flag=True,
+    help="Correct overlaps moving previous expired prior to subsequent start")
+@click.option(
+    '--reprocess_qnrs', '-r', default=False, is_flag=True,
+    help="When correcting, also reprocess all QNRs for affected patients")
+def find_overlaps(correct_overlaps, reprocess_qnrs):
+    from portal.models.qb_timeline import check_for_overlaps
+    from portal.models.user import patients_query
+    admin = User.query.filter(User.email == '__system__').one()
+
+    query = patients_query(
+        acting_user=admin,
+        include_test_role=False,
+        include_deleted=False)
+    for patient in query:
+        qbt_rows = QBT.query.filter(
+            QBT.user_id == patient.id).order_by(QBT.at, QBT.id).all()
+        # Check for overlaps prints out any found with given flag
+        if check_for_overlaps(
+                qbt_rows, cli_presentation=True) and correct_overlaps:
+            # Reprocess w/ adjusting expired, report differences
+            b4 = capture_patient_state(patient.id)
+            if reprocess_qnrs:
+                # Extends runtime and makes for noisy audit logs.
+                # Furthermore in practice no QNRs require updates as
+                # expiration isn't moved if QNRs were posted in the overlap.
+                QuestionnaireResponse.purge_qb_relationship(
+                    subject_id=patient.id,
+                    research_study_id=0,
+                    acting_user_id=admin.id,
+                )
+
+            update_users_QBT(
+                patient.id, research_study_id=0, invalidate_existing=True)
+            present_before_after_state(
+                patient.id, patient.external_study_id, b4)
+
+
 @click.option('--org_id', help="Organization (site) ID", required=True)
 @click.option(
     '--retired',
@@ -621,49 +710,12 @@ def preview_site_update(org_id, retired):
     protocol change, and generate a diff report.
 
     """
-    from portal.dict_tools import dict_compare
     from portal.models.organization import (
         Organization,
         OrganizationResearchProtocol,
     )
-    from portal.models.qb_timeline import QBD, QBT, update_users_QBT
-    from portal.models.questionnaire_bank import QuestionnaireBank, visit_name
     from portal.models.research_protocol import ResearchProtocol
     from portal.models.user import patients_query
-
-    def qnr_state(patient, name_map):
-        qnrs = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.subject_id == patient.id).with_entities(
-            QuestionnaireResponse.id,
-            QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration)
-
-        return {
-            f"qnr {qnr.id}":
-                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
-            qnr in qnrs}
-
-    def timeline_state(patient, name_map):
-        tl = QBT.query.filter(
-            QBT.user_id == patient.id).with_entities(
-            QBT.at,
-            QBT.qb_id,
-            QBT.status,
-            QBT.qb_iteration).order_by(
-            QBT.at)
-
-        results = dict()
-        for i in tl:
-            qb = QuestionnaireBank.query.get(i.qb_id)
-            recur_id = qb.recurs[0].id if qb.recurs else None
-            vn = visit_name(QBD(
-                relative_start=None,
-                questionnaire_bank=qb,
-                iteration=i.qb_iteration,
-                recur_id=recur_id))
-            results[f"{i.at} {i.status}"] = [
-                vn, name_map[i.qb_id], i.qb_iteration]
-        return results
 
     if app.config['SYSTEM_TYPE'].lower() == 'production':
         raise RuntimeError("Not to be run on prod: changes user records")
@@ -674,22 +726,19 @@ def preview_site_update(org_id, retired):
     query = patients_query(
         acting_user=admin,
         include_test_role=False,
-        include_deleted=True,
+        include_deleted=False,
         requested_orgs=[org_id])
 
     # Capture state for all potentially affected patients
-    qb_name_map = {qb.id: qb.name for qb in QuestionnaireBank.query.all()}
-    qb_name_map[None] = "None"
     patient_state = {}
     for patient in query:
-        qnrs = qnr_state(patient, name_map=qb_name_map)
-        tl = timeline_state(patient, name_map=qb_name_map)
-        patient_state[patient.id] = {'qnrs': qnrs, 'timeline': tl}
+        patient_state[patient.id] = capture_patient_state(patient.id)
 
     # Update the org's research protocol as requested - assume to the latest
     previous_rp = organization.research_protocols[-1]
-    latest_rp = ResearchProtocol.query.order_by(
-        ResearchProtocol.id.desc()).first()
+    assert previous_rp.name == 'IRONMAN v3'
+    latest_rp = ResearchProtocol.query.filter(
+        ResearchProtocol.name == 'IRONMAN v5').one()
     previous_org_rp = OrganizationResearchProtocol.query.filter(
         OrganizationResearchProtocol.research_protocol_id ==
         previous_rp.id).filter(
@@ -715,41 +764,8 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-
-        after_qnrs = qnr_state(patient, name_map=qb_name_map)
-        after_timeline = timeline_state(patient, name_map=qb_name_map)
-
-        # Compare results
-        added_q, removed_q, modified_q, same = dict_compare(
-            after_qnrs, patient_state[patient.id]['qnrs'])
-        assert not added_q
-        assert not removed_q
-
-        added_t, removed_t, modified_t, same = dict_compare(
-            after_timeline, patient_state[patient.id]['timeline'])
-
-        if any((added_t, removed_t, modified_t, modified_q)):
-            print(f"\nPatient {patient.id} ({patient.external_study_id}):")
-        if modified_q:
-            print("\tModified QNRs (old, new)")
-            for mod in sorted(modified_q):
-                print(f"\t\t{mod} {modified_q[mod][1]} ==>"
-                      f" {modified_q[mod][0]}")
-        if added_t:
-            print("\tAdditional timeline rows:")
-            for item in sorted(added_t):
-                print(f"\t\t{item} {after_timeline[item]}")
-        if removed_t:
-            print("\tRemoved timeline rows:")
-            for item in sorted(removed_t):
-                print(
-                    f"\t\t{item} "
-                    f"{patient_state[patient.id]['timeline'][item]}")
-        if modified_t:
-            print(f"\tModified timeline rows: (old, new)")
-            for item in sorted(modified_t):
-                print(f"\t\t{item}")
-                print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
+        present_before_after_state(
+            patient.id, patient.external_study_id, patient_state[patient.id])
 
     # Restore organization to pre-test RPs
     db.session.delete(new_org_rp)
