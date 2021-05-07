@@ -117,6 +117,7 @@ export default (function() {
             PIList: [],
             selectedClinicians: [],
             staffEditableRoles: ["clinician", "primary_investigator", "staff", "staff_admin"],
+            adminOnlyEditableRoles: ['access_on_verify', 'write_only', 'promote_without_identity_challenge'],
             userEmailReady: true,
             messages: {
                 userEmailReadyMessage: "",
@@ -723,7 +724,7 @@ export default (function() {
                             self.disableInputTextFields();
                             return;
                         }
-                        /*  
+                        /*
                          * enable input text field when in edit view
                          */
                         self.enableInputTextField(container.find("input[type='text']"));
@@ -855,7 +856,7 @@ export default (function() {
                                 var noDataContainer = parent.find(".no-data-container");
                                 var btn = parent.find(".profile-item-edit-btn");
                                 if (section) {
-                                    if ((data.optional).indexOf(section) !== -1) { 
+                                    if ((data.optional).indexOf(section) !== -1) {
                                         sectionElement.show();
                                         noDataContainer.html("");
                                         btn.show();
@@ -1164,7 +1165,7 @@ export default (function() {
                     e.stopPropagation();
                     $("#erroremail").html("");
                 });
-            
+
                 $("#profileForm").on("change postEventUpdate", "#email", function(e) {
                     if (self.updateEmailVis()) { //should only update email if there is no validation error
                         self.postDemoData($(this), self.getTelecomData());
@@ -1416,7 +1417,7 @@ export default (function() {
                                 }
                                 for (let q in lastTriggerItem.triggers.domain[topic]) {
                                     /*
-                                     * HARD triggers ONLY 
+                                     * HARD triggers ONLY
                                      */
                                     if (lastTriggerItem.triggers.domain[topic][q] === "hard"
                                         && domains.indexOf(topic) === -1) {
@@ -1454,7 +1455,7 @@ export default (function() {
                     if (!data.group || !data.group.question) {
                         return;
                     }
-                   
+
                     this.postTxQuestionnaire.answers = data.group.question;
                      (this.postTxQuestionnaire.answers).forEach(item => {
                         let valueCoding = item.answer.filter(answer => {
@@ -1480,7 +1481,7 @@ export default (function() {
                             $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
                             .prop("checked", valueBoolean[0].valueBoolean)
                             .attr("answered", true);
-                            
+
                         }
                         if (valueString.length) {
                             valueString.forEach(subItem => {
@@ -1491,10 +1492,10 @@ export default (function() {
                                     $(this).val(subItem.valueString)
                                     $(this).attr("answered", true);
                                 });
-                                
+
                             });
                         }
-                        
+
                         $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate} GMT").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
                      });
                 });
@@ -1581,7 +1582,7 @@ export default (function() {
                         setTimeout(function() {
                             this.postTxQuestionnaire.loading = false;
                         }.bind(this), 50);
-                       
+
                         if (!data.item) {
                             $(`${containerIdentifier}`).hide();
                             return;
@@ -1817,7 +1818,7 @@ export default (function() {
                             sortOrder: "desc",
                             toolbar: "#emailLogTableToolBar",
                             columns: [
-                            { 
+                            {
                                 field: "id",
                                 visible: false
                             },
@@ -1867,7 +1868,7 @@ export default (function() {
                 /*
                  *  to allow option for sub-study welcome email in the dropdown
                  *  the subject needs to have consented to the sub-study,
-                 *  ready for EMPRO assessment, 
+                 *  ready for EMPRO assessment,
                  *  have a valid email and an assigned treating clinician
                  */
                 return this.isSubStudyReadyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
@@ -2353,7 +2354,7 @@ export default (function() {
                                     visitName = item.visit_name;
                                 }
                             });
-                        } 
+                        }
                         /*
                          *  status as indicated in extension field should take precedence over regular status field
                          */
@@ -2431,7 +2432,7 @@ export default (function() {
                 $("#clinics").on("updated", function() {
                     self.setDemoData("", function(){
                         self.setView().setContent($("#userOrgs_view"), self.getOrgsDisplay());
-                    }); 
+                    });
                     self.reloadConsentList(self.subjectId);
                     self.handlePcaLocalized();
                     if ($("#locale").length > 0) {
@@ -2570,7 +2571,7 @@ export default (function() {
                 //set initial completion date as GMT date/time for today based on user timezone
                 this.setManualEntryDateToToday();
                 //comparing consent date to completion date without the time element
-                if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") === 
+                if (this.modules.tnthDates.formatDateString(this.manualEntry.consentDate, "iso-short") ===
                     this.modules.tnthDates.formatDateString(this.manualEntry.completionDate, "iso-short")) {
                     //set completion date/time to consent date/time if equal
                     this.manualEntry.completionDate = this.manualEntry.consentDate;
@@ -2614,7 +2615,7 @@ export default (function() {
                         var items = $.grep(dataArray, function(item) { //filtered out non-deleted items from all consents
                             return !item.deleted && String(item.status) === "consented";
                         });
-                        if (items.length) { 
+                        if (items.length) {
                             //consent date in GMT
                             self.manualEntry.consentDate = self.modules.tnthDates.formatDateString(items[0].acceptance_date, "system");
                         }
@@ -2663,7 +2664,7 @@ export default (function() {
                         //reset error
                         self.resetManualEntryFormValidationError();
                         $("#meSubmit").attr("disabled", false);
-                    
+
                         var d = $("#qCompletionDay");
                         var m = $("#qCompletionMonth");
                         var y = $("#qCompletionYear");
@@ -2676,7 +2677,7 @@ export default (function() {
                             $("#meSubmit").attr("disabled", true);
                             return false;
                         }
-            
+
                         var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
                         self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
 
@@ -2688,7 +2689,7 @@ export default (function() {
                         //check completion date against consent date
                         //all date/time should be in GMT date/time
                         var completionDate = new Date(self.manualEntry.completionDate);
-                        //noting here that date/time in ISO date with added hours, minutes and seconds separated by T is converted again to UTC by firefox 
+                        //noting here that date/time in ISO date with added hours, minutes and seconds separated by T is converted again to UTC by firefox
                         //so need to use non-ISO date/time format for comparison to avoid additional conversion
                         var cConsentDate = new Date(self.modules.tnthDates.formatDateString(self.manualEntry.consentDate, "mm/dd/yyyy hh:mm:ss"));
                         //Get a copy of the consent date
@@ -2697,13 +2698,13 @@ export default (function() {
                         var oConsentDate = new Date(cConsentDate.getTime());
                         var nCompletionDate = completionDate.setHours(0, 0, 0, 0);
                         var nConsentDate = cConsentDate.setHours(0, 0, 0, 0);
-            
+
                         /*
-                         * set completion date/time to consent date/time IF the two dates are the same 
+                         * set completion date/time to consent date/time IF the two dates are the same
                          */
                         if (nCompletionDate === nConsentDate) {
                             //set completion date to system format, recognized by backend
-                            self.manualEntry.completionDate = self.modules.tnthDates.formatDateString(oConsentDate, "system"); 
+                            self.manualEntry.completionDate = self.modules.tnthDates.formatDateString(oConsentDate, "system");
                         }
                     });
                 });
@@ -2728,7 +2729,7 @@ export default (function() {
                         if (errorMessage) {
                             self.setManualEntryErrorMessage(errorMessage);
                             self.manualEntryModalVis();
-                            //use computed property to assign value to error message here, 
+                            //use computed property to assign value to error message here,
                             //IE is throwing error if it is not done this way, not exactly sure why still
                             self.propManualEntryErrorMessage = errorMessage;
                             return false;
@@ -2748,14 +2749,15 @@ export default (function() {
                 // });
             },
             updateRolesData: function(event) {
+                var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
                 var roles = $("#rolesGroup input:checkbox:checked").map(function() {
                     return {name: $(this).val()};
                 }).get();
                 /*
                  * check if a role is selected
                  */
-                if (!roles.length) {
-                    //make sure at least one role is selected
+                if (!visibleRoles.length) {
+                    //make sure at least one role among role elements that are visible is selected
                     //admin, staff admin functionality
                     $(".put-roles-error").html("A role must be selected.");
                     return false;
@@ -2772,6 +2774,11 @@ export default (function() {
                 roles.forEach(role => {
                     $("#rolesGroup input[value='"+role+"']").attr("checked", true);
                 });
+            },
+            isAdminOnlyEditableRole: function(role) {
+                //return false to not disable the role editing
+                if (this.isAdmin()) return false;
+                return this.adminOnlyEditableRoles.indexOf(role) !== -1;
             },
             initUserRoles: function(params) {
                 if (!this.subjectId) { return false; }
@@ -2794,27 +2801,20 @@ export default (function() {
                     let roles = data.roles || [];
                     if (!self.isAdmin() && self.isStaffAdmin()) {
                         /*
-                         * admin staff should not be able to edit role(s) for a user that contains other roles
+                         * filter down editable roles for a staff or an admin
                          */
-                        let diffRoles = self.userRoles.filter(item => !self.staffEditableRoles.includes(item));
-                        if (diffRoles.length) {
-                            $("#rolesGroup").closest(".profile-item-container").hide();
-                        } else {
-                            /*
-                             * filter down editable roles for a staff
-                             */
-                            roles = roles.filter(item => {
-                                return self.staffEditableRoles.indexOf(item.name) >= 0
-                            });
-                        }
+                        roles = roles.filter(item => {
+                            return [...self.staffEditableRoles, ...self.adminOnlyEditableRoles].indexOf(item.name) >= 0
+                        });
                     }
-
+                    //note the following roles are disabled from editing by staff, editable by ADMIN users only:
+                    //['access_on_verify', 'write_only', 'promote_without_identity_challenge']
                     /*
                      * alphabetize role list by the name property of each item in the array
                      * for ease of viewing and selection
                      */
                     self.roles.data = sortArrayByField(roles, "name");
-                    setTimeout(self.initUserRoles, 50);  
+                    setTimeout(self.initUserRoles, 50);
                 });
             },
             initAuditLogSection: function() {
@@ -2913,7 +2913,7 @@ export default (function() {
                         content: EPROMS_SUBSTUDY_TITLE
                     },
                     {
-                        content: i18next.t("Not consented") + 
+                        content: i18next.t("Not consented") +
                                 this.getConsentEditDisplayIconHTML({
                                     organization_id: currentConsentItem.organization_id,
                                     statusText: "unknown",
@@ -3006,7 +3006,7 @@ export default (function() {
                 }
                 if (!recordedDate && item.recorded) {
                     recordedDate = item.recorded.lastUpdated;
-                } 
+                }
                 return recordedDate ? this.modules.tnthDates.formatDateString(recordedDate, "yyyy-mm-dd hh:mm:ss") : "";
             },
             isDefaultConsent: function(item) {
@@ -3180,7 +3180,7 @@ export default (function() {
                 content = "<div id='consentHistoryWrapper'><table id='consentHistoryTable' class='table-bordered table-condensed table-responsive' style='width: 100%; max-width:100%'>";
                 content += this.getConsentHeaderRow(this.consent.consentHistoryHeaderArray);
                 items = (this.consent.currentItems).concat(this.consent.historyItems); //combine both current and history items and display current items first;
-                var items = items.sort(function(a, b) { 
+                var items = items.sort(function(a, b) {
                     //sort items by last updated date in descending order
                     let bLastUpdated = b.deleted ? b.deleted.lastUpdated : b.recorded.lastUpdated;
                     let aLastUpdated = a.deleted ? a.deleted.lastUpdated : a.recorded.lastUpdated;

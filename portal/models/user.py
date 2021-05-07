@@ -479,7 +479,7 @@ class User(db.Model, UserMixin):
             return initiate_encounter(self, auth_method=existing.auth_method)
         return existing
 
-    TOTP_TOKEN_LEN = 4
+    TOTP_TOKEN_LEN = 6
     TOTP_TOKEN_LIFE = 30*60
 
     def generate_otp(self):
@@ -495,11 +495,19 @@ class User(db.Model, UserMixin):
 
     def validate_otp(self, token):
         assert(self.otp_secret)
-        return otp.valid_totp(
+        valid = otp.valid_totp(
             token,
             self.otp_secret,
             token_length=self.TOTP_TOKEN_LEN,
             interval_length=self.TOTP_TOKEN_LIFE)
+        if valid:
+            # due to the long timeout window, a second request
+            # for a code within the first few minutes will generate
+            # the same code!  patch by altering the user's secret
+            # after a single validation.
+            self.otp_secret = generate_random_secret()
+            db.session.commit()
+        return valid
 
     @property
     def locale(self):
@@ -678,14 +686,26 @@ class User(db.Model, UserMixin):
         else:
             self._email = prefix
 
+    def mask_identifier(self, suffix):
+        """Mask identifiers so other user's may re-use
+        """
+        if not self._identifiers:
+            return
+
+        for identifier in self._identifiers:
+            if identifier.system == TRUENTH_EXTERNAL_STUDY_SYSTEM:
+                if identifier.value.endswith(suffix):
+                    continue
+                identifier.value += suffix
+
     def add_identifier(self, identifier):
         if identifier.system in internal_identifier_systems:
             raise Conflict(
                 "edits to identifiers with system {} not allowed".format(
                     identifier.system))
         if identifier in self._identifiers:
-            raise Conflict("{} already assigned to {}".format(
-                identifier, self))
+            # Idempotent, ignore multiple request for same
+            return
 
         # Check (if applicable) that the identifier isn't already
         # assigned to another user
@@ -1928,6 +1948,7 @@ class User(db.Model, UserMixin):
 
         self.active = False
         self.mask_email(prefix=DELETED_PREFIX.format(time=int(time.time())))
+        self.mask_identifier(suffix='-deleted')
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self),
                              context='account')

@@ -41,6 +41,15 @@ def testPOST(test_user, login, client):
     user = User.query.get(TEST_USER_ID)
     assert len(user.identifiers) == expected
 
+    # Insert the same, expect idempotent reaction
+    response = client.post(
+        '/api/user/{}/identifier'.format(TEST_USER_ID),
+        content_type='application/json', data=json.dumps(data))
+    assert response.status_code == 200
+    assert len(response.json['identifier']) == expected
+    user = User.query.get(TEST_USER_ID)
+    assert len(user.identifiers) == expected
+
 
 def test_unique(add_user, test_user):
     """Try adding a non-unique identifier, expect exception"""

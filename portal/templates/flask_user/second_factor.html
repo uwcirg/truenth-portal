@@ -1,16 +1,22 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
-
-    <h3 class="tnth-headline">{{ _("Two Factor Athentication") }}</h3><br />
-
-    <p>{{ _("You should receive an email with a token. Enter the token below for access.") }}</p>
-
-    <form action="{{ url_for('auth.two_factor_auth') }}" method="post">
-        {{ form.hidden_tag() }}
-        {{ render_field(form.key, label=_("Token"), tabindex=5) }}
-
-        <button type="submit" class="btn btn-tnth-primary">{{ _("Validate Token") }}</button>
-    </form>
-
+    <h3 class="tnth-headline">{{ _("Two Factor Athentication") }}</h3>
+    <p>{{ _("You should receive an email with a %(length)d digit code. Enter the code below for access.", length=6) }}</p>
+    <div class="row">
+        <div class="col-xs-6 col-sm-4 col-md-3">
+            <form id="TwoFAForm" action="{{ url_for('auth.two_factor_auth') }}" method="post">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.key, label=" ", tabindex=5, id="faInput") }}
+                <div class="buttons-container">
+                    <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                    <button id="submitValidationCode" type="button" class="btn btn-tnth-primary">{{ _("Validate Code") }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
+{% block additional_scripts -%}
+    {{super()}}
+    <script src="{{ url_for('static', filename='js/flask_user/2fa.js') }}"></script>
+{%- endblock %}
