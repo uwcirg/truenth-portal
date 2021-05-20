@@ -495,8 +495,8 @@ def update_qnr_authored(qnr_id, authored, actor):
     print(message)
 
 
-@click.option('--src_id', help="Source Patient ID (WILL BE DELETED!)")
-@click.option('--tgt_id', help="Target Patient ID")
+@click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
+@click.option('--tgt_id', type=int, help="Target Patient ID")
 @click.option(
     '--actor',
     help='email address of user taking this action, for audit trail'
@@ -557,7 +557,7 @@ def merge_users(src_id, tgt_id, actor):
             click.confirm("Add consents \n\t{} \nto \n\t{}".format(
                 "\n\t".join((str(i) for i in src_user.valid_consents)),
                 "\n\t".join((str(i) for i in tgt_user.valid_consents))))):
-        tgt_user.merge_other_relationship(src_user, '_consents')
+        tgt_user.merge_others_relationship(src_user, '_consents')
 
     src_tous = ToU.query.join(Audit).filter(Audit.subject_id == src_user.id)
     tgt_tous = ToU.query.join(Audit).filter(Audit.subject_id == tgt_user.id)
