@@ -6,6 +6,10 @@ $(document).ready(function() {
             $("#TwoFAForm").submit();
         }, 50);
     };
+    $("#resendValidationCode").on("click", function(e) {
+        e.stopPropagation();
+        submitForm();
+    });
     $("#submitValidationCode").on("click", function(e) {
         e.stopPropagation();
         submitForm();
