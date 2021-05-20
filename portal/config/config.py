@@ -158,6 +158,7 @@ class BaseConfig(object):
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
+    USER_AUTO_LOGIN_AFTER_RESET_PASSWORD = False
     USER_ENABLE_USERNAME = False  # using email as username
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
