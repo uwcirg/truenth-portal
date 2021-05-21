@@ -11,7 +11,10 @@
                 <div class="buttons-container">
                     <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                     <button id="submitValidationCode" type="button" class="btn btn-tnth-primary">{{ _("Validate Code") }}</button>
+                    <br/><br/>
+                    <button id="resendValidationCode" type="button" class="btn btn-tnth-primary">{{ _("Resend Code") }}</button>
                 </div>
+                <input type="hidden" id="resend_code" name="resend_code" value="false" />
             </form>
         </div>
     </div>
