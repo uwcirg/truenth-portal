@@ -1,6 +1,6 @@
 """Module for common login hook"""
 
-from flask import current_app, session
+from flask import current_app, request, session
 from flask_babel import gettext as _
 from flask_login import (
     current_user as flask_login_current_user,
@@ -49,6 +49,7 @@ def login_user(user, auth_method=None):
     if (
             current_app.config.get("ENABLE_2FA") and
             not current_app.testing and
+            not getattr(getattr(request, 'oauth', None), 'user', None) and
             user.has_role(
                     ROLE.ADMIN.value,
                     ROLE.ANALYST.value,
