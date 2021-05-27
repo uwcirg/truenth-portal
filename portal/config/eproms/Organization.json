@@ -4078,6 +4078,66 @@
           "valueCodeableConcept": {
             "coding": [
               {
+                "code": "nb_NO",
+                "display": "Norwegian Bokmål",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        },
+        {
+          "timezone": "Europe/Oslo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        }
+      ],
+      "id": 32000,
+      "language": "nb_NO",
+      "name": "Norway (Region/Country Site)",
+      "partOf": {
+        "reference": "api/organization/20000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Oslo",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146170,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-170"
+        }
+      ],
+      "language": "nb_NO",
+      "name": "Oslo University Hospital",
+      "partOf": {
+        "reference": "api/organization/32000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
                 "code": "en_AU",
                 "display": "Australian English",
                 "system": "urn:ietf:bcp:47"
