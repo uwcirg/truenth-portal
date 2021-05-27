@@ -1836,6 +1836,34 @@
     {
       "extension": [
         {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146169,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-169"
+        }
+      ],
+      "language": "en_US",
+      "name": "VA of Western New York Healthcare System",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
@@ -3160,11 +3188,6 @@
               {
                 "code": "af_ZA",
                 "display": "Afrikaans",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
                 "system": "urn:ietf:bcp:47"
               },
               {
