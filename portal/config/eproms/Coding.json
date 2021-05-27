@@ -6131,6 +6131,12 @@
       "display": "Italian",
       "resourceType": "Coding",
       "system": "urn:ietf:bcp:47"
+    },
+    {
+      "code": "nb_NO",
+      "display": "Norwegian Bokmål",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
     }
   ],
   "id": "SitePersistence v0.2",
