@@ -83,12 +83,12 @@
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
             {%- if not substudy_assessment_is_ready -%}
                 {%- if substudy_due_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.", 
+                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
                         substudy_title=substudy_title,
                         substudy_due_date=substudy_due_date,
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- else -%}
-                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.", 
+                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
                         registry=_(assessment_status.assigning_authority))}}</div>
                 {%- endif -%}
             {%- else -%}
@@ -186,13 +186,13 @@
     <div class="item">
         <h4>{{_("Your Support Team")}}</h4>
         <p>{{_("If you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help.", organization=organization)}}</p>
-      
+
     </div>
 {%- endmacro -%}
 {%- macro empro_modal_hardTrigger_supportTeam_block(organization="") -%}
     <div class="item">
         <h4>{{_("Your Support Team")}}</h4>
-        <p>{{_("You reported having some particular challenges with: ")}}</p>
+        <p>{{_("You reported experiencing or feeling:")}}</p>
         <ul class="hardTriggersDisplayList">
            <!-- dynamically populated based on user trigger domain(s) -->
         </ul>
@@ -281,4 +281,3 @@
 {%- macro empro_script() -%}
     <script src="{{ url_for('static', filename='js/dist/empro.bundle.js') }}" defer></script>
 {%- endmacro -%}
-

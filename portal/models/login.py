@@ -1,6 +1,6 @@
 """Module for common login hook"""
 
-from flask import current_app, session
+from flask import current_app, request, session
 from flask_babel import gettext as _
 from flask_login import (
     current_user as flask_login_current_user,
@@ -14,6 +14,27 @@ from .encounter import initiate_encounter
 from .role import ROLE
 
 
+def send_2fa_email(user):
+    from .message import EmailMessage  # prevent cycle
+
+    code = user.generate_otp()
+    current_app.logger.debug(f"2FA OTP for {user.id}: {code}")
+    email = EmailMessage(
+        subject=_("TrueNTH Access Code"),
+        body=_("One-time access code: %(code)06d", code=code),
+        recipients=user.email,
+        sender=current_app.config['MAIL_DEFAULT_SENDER'],
+        user_id=user.id)
+    if current_app.config.get("MAIL_SUPPRESS_SEND"):
+        # Dump to console for easy access
+        print(email.body)
+    else:
+        email.send_message()
+
+    db.session.add(email)
+    db.session.commit()
+
+
 def login_user(user, auth_method=None):
     """Common entry point for all login flows - direct here for bookkeeping
 
@@ -24,11 +45,11 @@ def login_user(user, auth_method=None):
     authentication method.
 
     """
-    from .message import EmailMessage  # prevent cycle
     # beyond patients and care givers, 2FA is required.  confirm or initiate
     if (
             current_app.config.get("ENABLE_2FA") and
             not current_app.testing and
+            not getattr(getattr(request, 'oauth', None), 'user', None) and
             user.has_role(
                     ROLE.ADMIN.value,
                     ROLE.ANALYST.value,
@@ -43,24 +64,9 @@ def login_user(user, auth_method=None):
         # log user back out, in case a flow already promoted them
         flask_user_logout()
 
-        code = user.generate_otp()
         session['user_needing_2fa'] = user.id
         session['pending_auth_method'] = auth_method
-        current_app.logger.debug(f"2FA OTP for {user.id}: {code}")
-        email = EmailMessage(
-            subject=_("TrueNTH Access Code"),
-            body=_("One-time access code: %(code)06d", code=code),
-            recipients=user.email,
-            sender=current_app.config['MAIL_DEFAULT_SENDER'],
-            user_id=user.id)
-        if current_app.config.get("MAIL_SUPPRESS_SEND"):
-            # Dump to console for easy access
-            print(email.body)
-        else:
-            email.send_message()
-
-        db.session.add(email)
-        db.session.commit()
+        send_2fa_email(user)
         return
 
     if not _call_or_get(flask_login_current_user.is_authenticated):

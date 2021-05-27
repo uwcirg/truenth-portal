@@ -10,6 +10,7 @@ from flask import (
     Blueprint,
     abort,
     current_app,
+    flash,
     jsonify,
     redirect,
     render_template,
@@ -17,6 +18,7 @@ from flask import (
     session,
     url_for,
 )
+from flask_babel import gettext as _
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.google import make_google_blueprint
@@ -52,7 +54,7 @@ from ..models.flaskdanceprovider import (
     MockFlaskDanceProvider,
 )
 from ..models.intervention import Intervention, UserIntervention
-from ..models.login import login_user
+from ..models.login import login_user, send_2fa_email
 from ..models.role import ROLE
 from ..models.user import (
     User,
@@ -101,6 +103,9 @@ def two_factor_auth():
         abort(404)
 
     form = KeyForm()
+    if request.form.get('resend_code') == 'true':
+        send_2fa_email(user)
+        flash(_("Validation code sent, please check email"), "info")
     if not form.validate_on_submit():
         return render_template('flask_user/second_factor.html', form=form)
 
