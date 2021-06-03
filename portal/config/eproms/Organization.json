@@ -4251,6 +4251,11 @@
                 "code": "es_ES",
                 "display": "Spanish (Spain)",
                 "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "nb_NO",
+                "display": "Norwegian Bokmål",
+                "system": "urn:ietf:bcp:47"
               }
             ]
           }
@@ -4347,6 +4352,11 @@
               {
                 "code": "es_ES",
                 "display": "Spanish (Spain)",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "nb_NO",
+                "display": "Norwegian Bokmål",
                 "system": "urn:ietf:bcp:47"
               }
             ]
