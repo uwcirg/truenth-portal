@@ -43,7 +43,7 @@ shift $((OPTIND-1))
 
 
 if [ -n "$BACKUP" ]; then
-    default_backups_dir=/var/opt/portal
+    default_backups_dir=/backups/truenth-portal
     # write backups to system-wide location, if able
     if [ -w "$default_backups_dir" ]; then
         "${bin_path}"/backup-docker.sh -b "$default_backups_dir"
