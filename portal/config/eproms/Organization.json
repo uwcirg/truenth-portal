@@ -4203,6 +4203,11 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
+                "code": "en_CA",
+                "display": "Canadian English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
                 "code": "en_GB",
                 "display": "English",
                 "system": "urn:ietf:bcp:47"
@@ -4302,6 +4307,11 @@
               {
                 "code": "en_US",
                 "display": "American English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "en_CA",
+                "display": "Canadian English",
                 "system": "urn:ietf:bcp:47"
               },
               {
