@@ -6073,6 +6073,12 @@
       "system": "urn:ietf:bcp:47"
     },
     {
+      "code": "en_CA",
+      "display": "English (Canada)",
+      "resourceType": "Coding",
+      "system": "urn:ietf:bcp:47"
+    },
+    {
       "code": "en_GB",
       "display": "English (United Kingdom)",
       "resourceType": "Coding",
