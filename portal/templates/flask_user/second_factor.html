@@ -2,7 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
     <h3 class="tnth-headline">{{ _("Two Factor Athentication") }}</h3>
-    <p>{{ _("You should receive an email with a %(length)d digit code. Enter the code below for access.", length=6) }}</p>
+    <p>{{ _("You should receive an email with a %(length)d digit code. Enter the code below and select 'validate'.", length=6) }}</p>
     <div class="row">
         <div class="col-xs-6 col-sm-4 col-md-3">
             <form id="TwoFAForm" action="{{ url_for('auth.two_factor_auth') }}" method="post">
