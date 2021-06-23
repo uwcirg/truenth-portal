@@ -928,7 +928,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         current_app.logger.error(
                             "Overlap can't adjust previous as another event"
                             " occurred since subsequent (%s:%s) qb start for"
-                            " user %d", qbd.qb_id, qbd.qb_iteration, user_id)
+                            " user %d", qbd.qb_id, qbd.iteration, user_id)
                     else:
                         pending_qbts[-1].at = start - relativedelta(seconds=1)
 
