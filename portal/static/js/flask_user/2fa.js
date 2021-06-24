@@ -6,6 +6,7 @@ $(document).ready(function() {
         if ($(target).attr("id") == VALIDATE_CODE_BUTTON_ID && !$("#faInput").val()) return;
         //set field value if this is a resend
         if ($(target).attr("id") == RESENT_CODE_BUTTON_ID) {
+            $("#faInput").val("");
             $("#resend_code").val("true");
         } else {
             $("#resend_code").val("false");

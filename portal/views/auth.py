@@ -92,7 +92,7 @@ class KeyForm(FlaskForm):
             current_app.logger.debug(f"{user.id} passed 2FA with valid token")
         else:
             current_app.logger.debug(f"{user.id} failed 2FA token validation")
-            raise ValidationError("invalid 2FA token")
+            raise ValidationError("Invalid access code")
 
 
 @auth.route('/2fa/verify', methods=('GET', 'POST'))
@@ -105,7 +105,7 @@ def two_factor_auth():
     form = KeyForm()
     if request.form.get('resend_code') == 'true':
         send_2fa_email(user)
-        flash(_("Validation code sent, please check email"), "info")
+        flash(_("Access code sent. Please check your email."), "info")
     if not form.validate_on_submit():
         return render_template('flask_user/second_factor.html', form=form)
 

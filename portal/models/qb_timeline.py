@@ -928,7 +928,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         current_app.logger.error(
                             "Overlap can't adjust previous as another event"
                             " occurred since subsequent (%s:%s) qb start for"
-                            " user %d", qbd.qb_id, qbd.qb_iteration, user_id)
+                            " user %d", qbd.qb_id, qbd.iteration, user_id)
                     else:
                         pending_qbts[-1].at = start - relativedelta(seconds=1)
 
@@ -953,7 +953,11 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     if pending_qbts[-1].status == 'partially_completed':
                         # Look back further for status implying last posted
                         last_posted_index -= 1
-                        assert pending_qbts[last_posted_index].status == 'in_progress'
+                        if pending_qbts[last_posted_index].status != 'in_progress':
+                            current_app.logger.warning(
+                                "User %d has invalid QB timeline.  "
+                                "Problematic qbd: %s", user_id, str(qbd))
+                            continue
 
                     # Must double check overlap; may no longer be true, if
                     # last_posted_index was one before...

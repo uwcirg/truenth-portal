@@ -38,6 +38,10 @@ export default {
     {
         name: "United States",
         code: "US"
+    },
+    {
+        name: "Australia",
+        code: "AU"
     }
     ],
     patientRole: "patient",
@@ -46,5 +50,3 @@ export default {
     domainContent: "",
     getContentAttempt: 0
 };
-
-
