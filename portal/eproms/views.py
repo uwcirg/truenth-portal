@@ -227,10 +227,13 @@ def privacy():
     user = current_user()
     if user:
         organization = user.first_top_organization()
-        role = None
-        for r in (ROLE.STAFF.value, ROLE.PATIENT.value):
-            if user.has_role(r):
-                role = r
+
+        # EPROMS only has privacy docs for staff and patient
+        # Give all roles besides patient the staff version
+        role = ROLE.STAFF.value
+        if user.has_role(ROLE.PATIENT.value):
+            role = ROLE.PATIENT.value
+
         # only include role and organization if both are defined
         if not all((role, organization)):
             role, organization = None, None
