@@ -25,7 +25,7 @@ from portal.models.qb_timeline import invalidate_users_QBT
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.research_study import ResearchStudy
 from portal.models.role import ROLE
-from portal.models.user import User, add_role
+from portal.models.user import add_role
 from portal.models.user_consent import UserConsent
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 from tests import TEST_USER_ID, associative_backdate
@@ -234,9 +234,6 @@ def test_clinc_id(initialize_static, test_user):
         db.session.add(org3)
         db.session.commit()
 
-    org1 = db.session.merge(org1)
-    org2 = db.session.merge(org2)
-    org3 = db.session.merge(org3)
     d = {
         'function': 'limit_by_clinic_w_id',
         'kwargs': [{'name': 'identifier_value',
@@ -259,6 +256,7 @@ def test_clinc_id(initialize_static, test_user):
     assert not cp.quick_access_check(user)
 
     # Add association and test again
+    org3 = db.session.merge(org3)
     user.organizations.append(org3)
     with SessionScope(db):
         db.session.commit()
@@ -572,7 +570,7 @@ def test_card_html_update(
 
     # generate questionnaire banks and associate user with
     # metastatic organization
-    mock_questionnairebanks('eproms')
+    mock_questionnairebanks()
     metastatic_org = Organization.query.filter_by(name='metastatic').one()
     test_user = db.session.merge(test_user)
     for o in test_user.organizations:
@@ -630,7 +628,7 @@ def test_expired(client, initialized_patient_logged_in):
 
     # generate questionnaire banks; associate and consent user with
     # localized organization
-    mock_questionnairebanks('eproms')
+    mock_questionnairebanks()
     localized_org = Organization.query.filter_by(name='localized').one()
     test_user = db.session.merge(test_user)
     for o in test_user.organizations:

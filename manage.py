@@ -46,6 +46,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
 from portal.models.research_study import (
+    BASE_RS_ID,
     add_static_research_studies,
     research_study_id_from_questionnaire,
 )
@@ -671,7 +672,9 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
         include_deleted=False)
     for patient in query:
         qbt_rows = QBT.query.filter(
-            QBT.user_id == patient.id).order_by(QBT.at, QBT.id).all()
+            QBT.user_id == patient.id).filter(
+            QBT.research_study_id == BASE_RS_ID).order_by(
+            QBT.at, QBT.id).all()
         # Check for overlaps prints out any found with given flag
         if check_for_overlaps(
                 qbt_rows, cli_presentation=True) and correct_overlaps:

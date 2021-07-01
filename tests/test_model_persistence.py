@@ -54,33 +54,6 @@ class TestModelPersistence(TestCase):
         assert currval == id
         assert nextval > id
 
-    def test_identifier_lookup(self):
-        # setup a minimal communication request
-        from tests.test_communication import mock_communication_request
-        from tests.test_assessment_status import mock_tnth_questionnairebanks
-        from portal.system_uri import TRUENTH_CR_NAME
-        from portal.models.identifier import Identifier
-        mock_tnth_questionnairebanks()
-        cr = mock_communication_request(
-            'symptom_tracker_recurring', '{"days": 14}')
-        cr.identifiers.append(
-            Identifier(value='2 week ST', system=TRUENTH_CR_NAME))
-        with SessionScope(db):
-            db.session.add(cr)
-            db.session.commit()
-        cr = db.session.merge(cr)
-        assert cr.identifiers.count() == 1
-
-        data = cr.as_fhir()
-        mp = ModelPersistence(
-            CommunicationRequest,
-            sequence_name='communication_requests_id_seq',
-            lookup_field='identifier')
-        new_obj = CommunicationRequest.from_fhir(data)
-        match, field_description = mp.lookup_existing(
-            new_obj=new_obj, new_data=data)
-        assert match.name == cr.name
-
     def test_composite_key(self):
         known_coding = Coding(
             system=SNOMED, code='26294005',

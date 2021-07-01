@@ -21,7 +21,7 @@ from portal.models.role import ROLE
 from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
-from tests.test_questionnaire_bank import TestQuestionnaireBank
+from tests.test_questionnaire_bank import TestQuestionnaireBankFixture
 
 
 class TestReporting(TestCase):
@@ -109,7 +109,7 @@ class TestReporting(TestCase):
         assert row[4] == a_s.expired_date
 
 
-class TestQBStats(TestQuestionnaireBank):
+class TestQBStats(TestQuestionnaireBankFixture):
 
     def test_empty(self):
         self.promote_user(role_name=ROLE.STAFF.value)
