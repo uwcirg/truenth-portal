@@ -14,7 +14,6 @@ from .clinical_constants import CC
 from .fhir import bundle_results
 from .intervention import Intervention, INTERVENTION
 from .intervention_strategies import observation_check
-from .procedure_codes import latest_treatment_started_date
 from .qbd import QBD
 from .questionnaire import Questionnaire
 from .recur import Recur
@@ -338,36 +337,12 @@ def trigger_date(user, research_study_id, qb=None):
     from .research_study import EMPRO_RS_ID
     trace("calculate trigger date (not currently cached)")
 
-    def biopsy_date(user):
-        b_date = user.fetch_datetime_for_concept(CC.BIOPSY)
-        if b_date:
-            trace("found biopsy {} for trigger_date".format(b_date))
-            return b_date
-
     def consent_date(user, research_study_id):
         consent = latest_consent(user, research_study_id=research_study_id)
         if consent:
             trace('found valid_consent with trigger_date {}'.format(
                 consent.acceptance_date))
             return consent.acceptance_date
-
-    def tx_date(user):
-        t_date = latest_treatment_started_date(user)
-        if t_date:
-            trace(
-                "found latest treatment date {} for trigger_date".format(
-                    t_date))
-        return t_date
-
-    def intervention_trigger(user):
-        # use the patient's last treatment date, if found
-        t = tx_date(user)
-        # otherwise, use the patient's biopsy date
-        if not t:
-            t = biopsy_date(user)
-        if not t:
-            trace("no treatment or biopsy date, no trigger_date")
-        return t
 
     def completed_global_date(user, consent_date):
         """EMPRO requires a global study completed w/i 4 weeks
@@ -414,10 +389,6 @@ def trigger_date(user, research_study_id, qb=None):
 
     # If given a QB, use its details to determine trigger
     if qb and qb.research_protocol_id:
-        if qb.recurs:
-            # if recurring QB, use the patient's last treatment date, if found
-            trigger = tx_date(user)
-
         if not trigger:
             trigger = consent_date(user, research_study_id=research_study_id)
 
@@ -428,17 +399,9 @@ def trigger_date(user, research_study_id, qb=None):
                     qb.research_protocol_id))
         return trigger
 
-    elif qb and qb.intervention_id:
-        return intervention_trigger(user)
-
-    # Without a qb, use consent date if an RP is found, otherwise try
-    # the intervention method.  (Yes, it's possible the user has neither
-    # intervention nor RP, but the intervention method is too expensive
-    # for a simple trigger date lookup - will be caught in qb_timeline)
+    # Without a qb, use consent date if an RP is found.
     if ResearchProtocol.assigned_to(user, research_study_id):
         return consent_date(user, research_study_id=research_study_id)
-    else:
-        return intervention_trigger(user)
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

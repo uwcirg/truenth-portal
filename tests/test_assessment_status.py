@@ -110,22 +110,9 @@ metastatic_6 = {
 symptom_tracker_instruments = {'epic26', 'eq5d', 'maxpc', 'pam'}
 
 
-def mock_questionnairebanks(eproms_or_tnth):
-    """Create a series of near real world questionnaire banks
-
-    :param eproms_or_tnth: controls which set of questionnairebanks are
-        generated.  As restrictions exist, such as two QBs with the same
-        classification can't have the same instrument, it doesn't work to mix
-        them.
-
-    """
-    if eproms_or_tnth == 'eproms':
-        return mock_eproms_questionnairebanks()
-    elif eproms_or_tnth == 'tnth':
-        return mock_tnth_questionnairebanks()
-    else:
-        raise ValueError('expecting `eproms` or `tntn`, not `{}`'.format(
-            eproms_or_tnth))
+def mock_questionnairebanks():
+    """Create a series of near real world questionnaire banks """
+    return mock_eproms_questionnairebanks()
 
 
 def mock_eproms_questionnairebanks():
@@ -274,60 +261,12 @@ def mock_eproms_questionnairebanks():
         db.session.commit()
 
 
-def mock_tnth_questionnairebanks():
-    for name in (symptom_tracker_instruments):
-        TestCase.add_questionnaire(name=name)
-
-    # Symptom Tracker Baseline
-    self_management = INTERVENTION.SELF_MANAGEMENT
-    st_qb = QuestionnaireBank(
-        name='symptom_tracker',
-        classification='baseline',
-        intervention_id=self_management.id,
-        start='{"days": 0}',
-        expired='{"months": 3}'
-    )
-    for rank, instrument in enumerate(symptom_tracker_instruments):
-        q = Questionnaire.find_by_name(name=instrument)
-        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
-        st_qb.questionnaires.append(qbq)
-
-    # Symptom Tracker Recurrence
-    st_recur = Recur(
-        start='{"months": 3}', cycle_length='{"months": 3}',
-        termination='{"months": 27}')
-
-    with SessionScope(db):
-        db.session.add(st_qb)
-        db.session.add(st_recur)
-        db.session.commit()
-
-    self_management = INTERVENTION.SELF_MANAGEMENT
-    st_recur_qb = QuestionnaireBank(
-        name='symptom_tracker_recurring',
-        classification='recurring',
-        intervention_id=self_management.id,
-        start='{"days": 0}',
-        expired='{"months": 3}',
-        recurs=[st_recur]
-    )
-    for rank, instrument in enumerate(symptom_tracker_instruments):
-        q = Questionnaire.find_by_name(name=instrument)
-        qbq = QuestionnaireBankQuestionnaire(questionnaire=q, rank=rank)
-        st_recur_qb.questionnaires.append(qbq)
-    with SessionScope(db):
-        db.session.add(st_recur_qb)
-        db.session.commit()
-
-
 class TestQuestionnaireSetup(TestCase):
-    "Base for test classes needing mock questionnaire setup"
-
-    eproms_or_tnth = 'eproms'  # modify in child class to test `tnth`
+    """Base for test classes needing mock questionnaire setup"""
 
     def setUp(self):
         super(TestQuestionnaireSetup, self).setUp()
-        mock_questionnairebanks(self.eproms_or_tnth)
+        mock_questionnairebanks()
 
 
 class TestAggregateResponses(TestQuestionnaireSetup):
@@ -895,24 +834,3 @@ class TestQB_Status(TestQuestionnaireSetup):
             research_study_id=0,
             as_of_date=nowish)
         assert a_s.overall_status == OverallStatus.expired
-
-
-class TestTnthQB_Status(TestQuestionnaireSetup):
-    """Tests with Tnth QuestionnaireBanks"""
-
-    eproms_or_tnth = 'tnth'
-
-    def test_no_start_date(self):
-        # W/O a biopsy (i.e. event start date), no questionnaries
-        self.promote_user(role_name=ROLE.PATIENT.value)
-        # toggle default setup - set biopsy false for test user
-        self.login()
-        self.test_user = db.session.merge(self.test_user)
-        self.test_user.save_observation(
-            codeable_concept=CC.BIOPSY, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='final', issued=now)
-        qstats = QB_Status(
-            self.test_user, research_study_id=0, as_of_date=now)
-        assert not qstats.current_qbd()
-        assert not qstats.enrolled_in_classification("baseline")

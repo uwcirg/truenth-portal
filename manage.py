@@ -46,6 +46,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.models.relationship import add_static_relationships
 from portal.models.research_study import (
+    BASE_RS_ID,
     add_static_research_studies,
     research_study_id_from_questionnaire,
 )
@@ -495,8 +496,8 @@ def update_qnr_authored(qnr_id, authored, actor):
     print(message)
 
 
-@click.option('--src_id', help="Source Patient ID (WILL BE DELETED!)")
-@click.option('--tgt_id', help="Target Patient ID")
+@click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
+@click.option('--tgt_id', type=int, help="Target Patient ID")
 @click.option(
     '--actor',
     help='email address of user taking this action, for audit trail'
@@ -557,7 +558,7 @@ def merge_users(src_id, tgt_id, actor):
             click.confirm("Add consents \n\t{} \nto \n\t{}".format(
                 "\n\t".join((str(i) for i in src_user.valid_consents)),
                 "\n\t".join((str(i) for i in tgt_user.valid_consents))))):
-        tgt_user.merge_other_relationship(src_user, '_consents')
+        tgt_user.merge_others_relationship(src_user, '_consents')
 
     src_tous = ToU.query.join(Audit).filter(Audit.subject_id == src_user.id)
     tgt_tous = ToU.query.join(Audit).filter(Audit.subject_id == tgt_user.id)
@@ -671,7 +672,9 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
         include_deleted=False)
     for patient in query:
         qbt_rows = QBT.query.filter(
-            QBT.user_id == patient.id).order_by(QBT.at, QBT.id).all()
+            QBT.user_id == patient.id).filter(
+            QBT.research_study_id == BASE_RS_ID).order_by(
+            QBT.at, QBT.id).all()
         # Check for overlaps prints out any found with given flag
         if check_for_overlaps(
                 qbt_rows, cli_presentation=True) and correct_overlaps:

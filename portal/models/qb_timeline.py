@@ -67,6 +67,12 @@ class QBT(db.Model):
             relative_start=self.at, iteration=self.qb_iteration,
             recur_id=self.qb_recur_id, qb_id=self.qb_id)
 
+    def __repr__(self):
+        """simplifies debugging"""
+        return (
+            f"{visit_name(self.qbd())}({self.qb_id}:{self.qb_iteration})"
+            f" {self.status} @ {self.at}")
+
     @staticmethod
     def timeline_state(user_id):
         """Return an ordered list of user's QBT state for tracking changes"""
@@ -793,8 +799,8 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
         if previous_key and previous_key != key:
             # just moved to next visit, confirm it's novel
             if key in seen:
-                if not (key in reported_on and previous_key in reported_on):
-                    overlap = row.at - last_at
+                overlap = row.at - last_at
+                if overlap and not (key in reported_on and previous_key in reported_on):
                     qb_id, iteration = [
                         int_or_none(x) for x in previous_key.split(':')]
                     prev_visit = " ".join(
@@ -918,9 +924,55 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     # (no additional rows with at dates > start)
                     other_status_after_next_start = False
                     for i in range(len(pending_qbts)-2, -1, -1):
+                        # as we modify len of pending_qbts in special case below
+                        # make sure next iteration is within new bounds
+                        if i > len(pending_qbts)-1:
+                            continue
+
+                        unwanted_count = 0
                         if pending_qbts[i].at > start:
-                            other_status_after_next_start = True
-                            break
+                            # Yet another special case to look for when the
+                            # transition to new RP included an additional
+                            # time-point (say month 33) that doesn't exist in
+                            # the old RP.  This will appear as TWO overlapping
+                            # QBs - one needing to be removed (say the old
+                            # month 36) in favor of the skipped new (say
+                            # month 33), and the last legit old one (say
+                            # month 30) needing it's endpoint adjusted
+                            # further below.
+                            remove_qb_id = pending_qbts[i].qb_id
+                            remove_iteration = pending_qbts[i].qb_iteration
+                            for j in range(i-1, -1, -1):
+                                # keep looking back till we find the prev
+                                if (
+                                        pending_qbts[j].qb_id != remove_qb_id or
+                                        pending_qbts[j].qb_iteration != remove_iteration):
+                                    # To qualify for this special case,
+                                    # having worked back to previous QB, if
+                                    # at > start, take action
+                                    if pending_qbts[j].at > start:
+                                        unwanted_count = len(pending_qbts)-j-1
+                                    break
+
+                                # keep a lookout for work done in old RP
+                                if pending_qbts[j].status in (
+                                        'in_progress',
+                                        'partially_completed',
+                                        'completed'):
+                                    other_status_after_next_start = True
+                                    break
+
+                            if other_status_after_next_start:
+                                break  # from outer loop if set
+
+                            # Remove unwanted from end of pending_qbts
+                            if unwanted_count:
+                                trace(
+                                    "removing overlapping QBs: "
+                                    f"{pending_qbts[-unwanted_count:]}")
+                                del pending_qbts[-unwanted_count:]
+                                continue
+
                         if pending_qbts[i].at < start:
                             break
 
@@ -928,9 +980,11 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         current_app.logger.error(
                             "Overlap can't adjust previous as another event"
                             " occurred since subsequent (%s:%s) qb start for"
-                            " user %d", qbd.qb_id, qbd.qb_iteration, user_id)
+                            " user %d", qbd.qb_id, qbd.iteration, user_id)
                     else:
+                        trace(f"moving overlapping date of {pending_qbts[-1]}")
                         pending_qbts[-1].at = start - relativedelta(seconds=1)
+                        trace(f"  to {pending_qbts[-1]}")
 
                 if (
                         pending_qbts and pending_qbts[-1].at > start and
@@ -953,7 +1007,11 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     if pending_qbts[-1].status == 'partially_completed':
                         # Look back further for status implying last posted
                         last_posted_index -= 1
-                        assert pending_qbts[last_posted_index].status == 'in_progress'
+                        if pending_qbts[last_posted_index].status != 'in_progress':
+                            current_app.logger.warning(
+                                "User %d has invalid QB timeline.  "
+                                "Problematic qbd: %s", user_id, str(qbd))
+                            continue
 
                     # Must double check overlap; may no longer be true, if
                     # last_posted_index was one before...
