@@ -622,11 +622,21 @@ class QNR_results(object):
 
     def entry_method(self):
         """Returns first entry method found in results, or None"""
+        found = set()
         for qnr in self.qnrs:
             if qnr.encounter_id is not None:
                 encounter = Encounter.query.get(qnr.encounter_id)
                 if encounter.type and len(encounter.type):
-                    return encounter.type[0].code
+                    for item in encounter.type:
+                        found.add(item.code)
+                        # work around issue TN-2941, reporting only first
+                        # as the encounter didn't accurately track
+                        break
+                else:
+                    found.add('online')
+            else:
+                found.add('online')
+        return ','.join(found)
 
     def required_qs(self, qb_id):
         """Return required list (order counts) of Questionnaires for QB"""
