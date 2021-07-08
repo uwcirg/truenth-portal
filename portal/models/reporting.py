@@ -33,7 +33,7 @@ from .user_consent import consent_withdrawal_dates
 
 def adherence_report(
         requested_as_of_date, acting_user_id, include_test_role, org_id,
-        research_study_id, response_format, lock_key, celery_task):
+        research_study_id, response_format, lock_key, celery_task, limit):
     """Generates the adherence report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -47,6 +47,7 @@ def adherence_report(
     :param response_format: 'json' or 'csv'
     :param lock_key: name of TimeoutLock key used to throttle requests
     :param celery_task: used to update status when run as a celery task
+    :param limit: limit run to first 'n' patients - used only by testing API
     :return: dictionary of results, easily stored as a task output, including
        any details needed to assist the view method
 
@@ -72,6 +73,11 @@ def adherence_report(
 
         # occasionally update the celery task status if defined
         current += 1
+        if limit:
+            total = limit
+            if current > limit:
+                break
+
         if not current % 25 and celery_task:
             celery_task.update_state(
                 state='PROGRESS', meta={'current': current, 'total': total})
