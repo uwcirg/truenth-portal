@@ -139,6 +139,51 @@ def generate_numbers():
     return output
 
 
+@reporting_api.route('/api/report/questionnaire_status/test')
+@roles_required(
+    [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
+     ROLE.INTERVENTION_STAFF.value, ROLE.CLINICIAN.value])
+@oauth.require_oauth()
+def questionnaire_status_test():
+    """Test interface to generate portion of adherence report
+
+    See questionnaire_status() for real use.
+
+    Include query string parameters to test list of users, etc.
+    """
+    from ..tasks import adherence_report_task
+
+    # This frequently takes over a minute to produce.  Generate a serializable
+    # form of all args for reliable hand off to a background task.
+    kwargs = {
+        'requested_as_of_date': request.args.get('as_of_date'),
+        'acting_user_id': current_user().id,
+        'include_test_role': request.args.get('include_test_role', False),
+        'org_id': request.args.get('org_id', 146999),
+        'limit': request.args.get('limit', 10),
+        'research_study_id': int(request.args.get('research_study_id', 0)),
+        'lock_key': "adherence_report_throttle",
+        'response_format': request.args.get('format', 'csv').lower()
+    }
+
+    # Hand the task off to the job queue, and return 202 with URL for
+    # checking the status of the task
+    try:
+        task = guarded_task_launch(adherence_report_task, **kwargs)
+        return jsonify({
+            'task_status': url_for(
+                'portal.task_status', task_id=task.id, _external=True),
+            'results': url_for(
+                'portal.task_result', task_id=task.id, _external=True)})
+    except LockTimeout:
+        msg = (
+            "The system is busy exporting a report for another user. "
+            "Please try again in a few minutes.")
+        response = make_response(msg, 502)
+        response.mimetype = "text/plain"
+        return response
+
+
 @reporting_api.route('/api/report/questionnaire_status')
 @roles_required(
     [ROLE.ADMIN.value, ROLE.STAFF_ADMIN.value, ROLE.STAFF.value,
@@ -210,6 +255,7 @@ def questionnaire_status():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id'),
+        'limit': None,
         'research_study_id': int(request.args.get('research_study_id', 0)),
         'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'json').lower()

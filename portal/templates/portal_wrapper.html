@@ -64,6 +64,10 @@
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu nav-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
+                            <!-- substudy patient list menu link for clinician -->
+                            {% if user and user.has_role(ROLE.CLINICIAN.value) %}
+                            <li><a href="{{PORTAL}}/patients/substudy">{{ _("Patients") }}</a></li>
+                            {% endif %}
                             {% if 'login_as_id' in session or (user and user.is_registered()) %}
                             <li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
@@ -126,6 +130,10 @@
                 <ul class="tnth-navbar-xs nav-menu" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
+                    <!-- substudy patient list menu link for clinician -->
+                    {% if user and user.has_role(ROLE.CLINICIAN.value) %}
+                        <li><a href="{{PORTAL}}/patients/substudy">{{ _("Patients") }}</a></li>
+                    {% endif %}
                     {% if 'login_as_id' in session or (user and user.is_registered()) %}<li><a href="{{PORTAL}}/profile" class="portal-weak-auth-disabled">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER.value) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
@@ -156,7 +164,7 @@
     </div>
 </div>
 <!-- URL authenticated login modal-->
-<!-- 
+<!--
     The modal will be triggered when user who is URL-authenticated attempts to access a protected link, e.g. profile
     The modal includes content that prompts the user to either login to access the protected link or continue with limited access
 -->

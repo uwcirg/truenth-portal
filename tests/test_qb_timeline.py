@@ -6,8 +6,6 @@ import pytest
 from portal.cache import cache
 from portal.database import db
 from portal.date_tools import FHIR_datetime, utcnow_sans_micro
-from portal.models.audit import Audit
-from portal.models.clinical_constants import CC
 from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
 from portal.models.qb_timeline import (
@@ -27,7 +25,7 @@ from portal.models.questionnaire_response import QuestionnaireResponse
 from portal.views.user import withdraw_consent
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
-from tests.test_questionnaire_bank import TestQuestionnaireBank
+from tests.test_questionnaire_bank import TestQuestionnaireBankFixture
 
 now = utcnow_sans_micro()
 
@@ -45,7 +43,7 @@ def test_sort():
     assert x == 'b'
 
 
-class TestQbTimeline(TestQuestionnaireBank):
+class TestQbTimeline(TestQuestionnaireBankFixture):
 
     def test_empty(self):
         # Basic case, without org, empty list
@@ -67,29 +65,6 @@ class TestQbTimeline(TestQuestionnaireBank):
         expect_baseline = next(gen)
         assert visit_name(expect_baseline) == 'Baseline'
         for n in (3, 6, 9, 15, 18, 21, 30):
-            assert visit_name(next(gen)) == 'Month {}'.format(n)
-
-        with pytest.raises(StopIteration):
-            next(gen)
-
-    def test_intervention_list(self):
-        self.setup_intervention_qbs()
-        self.bless_with_basics()  # pick up a consent, etc.
-        # user with biopsy should return biopsy date
-        self.login()
-        user = db.session.merge(self.test_user)
-        user.save_observation(
-            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='', issued=None)
-        user = db.session.merge(self.test_user)
-
-        gen = ordered_qbs(user=user, research_study_id=0)
-
-        # expect all intervention QBs - baseline then every 3mos
-        expect_baseline = next(gen)
-        assert visit_name(expect_baseline) == 'Baseline'
-        for n in (3, 9, 15, 21, 27):
             assert visit_name(next(gen)) == 'Month {}'.format(n)
 
         with pytest.raises(StopIteration):

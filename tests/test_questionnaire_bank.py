@@ -6,13 +6,10 @@ from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
 import pytest
 
-from portal.cache import cache
 from portal.date_tools import utcnow_sans_micro
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.clinical_constants import CC
 from portal.models.identifier import Identifier
-from portal.models.intervention import Intervention
 from portal.models.organization import (
     Organization,
     OrganizationResearchProtocol,
@@ -31,14 +28,23 @@ from portal.models.recur import Recur
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user_consent import UserConsent
-from portal.system_uri import ICHOM, TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
+from portal.system_uri import TRUENTH_QUESTIONNAIRE_CODE_SYSTEM
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 
 now = utcnow_sans_micro()
 
 
-class TestQuestionnaireBank(TestCase):
+class TestQuestionnaireBankFixture(TestCase):
+    """Fixture class for many QB test classes.
+
+    Sets up what should be done via py.test fixtures, at this time used
+    as an inherited unittest class by several QB test classes.
+
+    NB, this class should NOT define any actual tests, or they will
+    get redundantly run by each inheriting class!
+
+    """
 
     @staticmethod
     def setup_org_n_rp(
@@ -200,63 +206,8 @@ class TestQuestionnaireBank(TestCase):
 
         return db.session.merge(org)
 
-    def setup_intervention_qbs(self, intervention=None):
-        if not intervention:
-            intervention = Intervention(
-                name='symptom tracker', description='test')
-            with SessionScope(db):
-                db.session.add(intervention)
-                db.session.commit()
 
-        eq5d = self.add_questionnaire(name='eq5d')
-        epic26 = self.add_questionnaire(name='epic26')
-        recur6 = Recur(
-            start='{"months": 3, "weeks": -2}',
-            cycle_length='{"months": 6}',
-            termination='{"months": 27}')
-        exists = Recur.query.filter_by(
-            start=recur6.start, cycle_length=recur6.cycle_length,
-            termination=recur6.termination).first()
-        if exists:
-            recur6 = exists
-
-        with SessionScope(db):
-            db.session.add(eq5d)
-            db.session.add(epic26)
-            db.session.add(recur6)
-            db.session.commit()
-        intervention, eq5d, epic26, recur6 = map(
-            db.session.merge, (intervention, eq5d, epic26, recur6))
-
-        qb_base = QuestionnaireBank(
-            name='Symptom Tracker Baseline',
-            classification='baseline',
-            intervention_id=intervention.id,
-            start='{"days": 0}',
-            expired='{"months": 3, "days": -14}')
-        qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
-        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eq5d, rank=1)
-        qb_base.questionnaires.append(qbq)
-        qb_base.questionnaires.append(qbq2)
-
-        qb_r6 = QuestionnaireBank(
-            name='Symptom Tracker Recurring',
-            classification='recurring',
-            intervention_id=intervention.id,
-            start='{"days": 0}',
-            expired='{"months": 3}',
-            recurs=[recur6])
-        qbq = QuestionnaireBankQuestionnaire(questionnaire=epic26, rank=0)
-        qbq2 = QuestionnaireBankQuestionnaire(questionnaire=eq5d, rank=1)
-        qb_r6.questionnaires.append(qbq)
-        qb_r6.questionnaires.append(qbq2)
-
-        with SessionScope(db):
-            db.session.add(qb_base)
-            db.session.add(qb_r6)
-            db.session.commit()
-
-        return db.session.merge(intervention)
+class TestQuestionnaireBank(TestQuestionnaireBankFixture):
 
     def test_display_name(self):
         self.setup_org_qbs()
@@ -280,7 +231,7 @@ class TestQuestionnaireBank(TestCase):
         qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
         qb.questionnaires.append(qbq)
 
-        # user without consents or TX date should return None
+        # user without consents should return None
         assert not trigger_date(self.test_user, research_study_id=0)
 
         # user with consent should return consent date
@@ -288,92 +239,6 @@ class TestQuestionnaireBank(TestCase):
         self.test_user = db.session.merge(self.test_user)
         assert trigger_date(self.test_user, research_study_id=0) == now
         assert trigger_date(self.test_user, research_study_id=0, qb=qb) == now
-
-        # user with consent and TX date should return TX date (if qb.recurs)
-        tx_date = datetime(2017, 6, 10, 20, 00, 00, 000000)
-        self.add_procedure(code='7', display='Focal therapy',
-                           system=ICHOM, setdate=tx_date)
-        self.test_user = db.session.merge(self.test_user)
-        recur = Recur(
-            start='{"months": 3}', cycle_length='{"months": 6}',
-            termination='{"months": 24}')
-        qb.recurs.append(recur)
-        cache.delete_memoized(trigger_date)
-        assert trigger_date(
-            self.test_user, research_study_id=0, qb=qb) == tx_date
-
-    def test_intervention_trigger_date(self):
-        # testing intervention-based QBs
-        q = self.add_questionnaire('q')
-        interv = Intervention(name='interv', description='test')
-        with SessionScope(db):
-            db.session.add(interv)
-            db.session.commit()
-        q, interv, self.test_user = map(db.session.merge,
-                                        (q, interv, self.test_user))
-        qb = QuestionnaireBank(
-            name='qb', intervention_id=interv.id, classification='baseline',
-            start='{"days": 1}', expired='{"days": 2}')
-        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
-        qb.questionnaires.append(qbq)
-
-        # user without biopsy or TX date should return None
-        assert not trigger_date(self.test_user, research_study_id=0)
-
-        # user with biopsy should return biopsy date
-        self.login()
-        self.test_user.save_observation(
-            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='', issued=None)
-        self.test_user = db.session.merge(self.test_user)
-        obs = self.test_user.observations.first()
-        assert obs.codeable_concept.codings[0].display == 'biopsy'
-        assert trigger_date(self.test_user, research_study_id=0) == obs.issued
-
-        # user with biopsy and TX date should return TX date
-        tx_date = datetime.utcnow()
-        self.add_procedure(code='7', display='Focal therapy',
-                           system=ICHOM, setdate=tx_date)
-        self.test_user = db.session.merge(self.test_user)
-        cache.delete_memoized(trigger_date)
-        assert trigger_date(self.test_user, research_study_id=0) == tx_date
-
-    def test_intervention_in_progress(self):
-        # testing intervention-based QBs
-        q = self.add_questionnaire('q')
-        interv = Intervention(name='interv', description='test')
-        with SessionScope(db):
-            db.session.add(interv)
-            db.session.commit()
-        q, interv, self.test_user = map(db.session.merge,
-                                        (q, interv, self.test_user))
-        qb = QuestionnaireBank(
-            name='qb', intervention_id=interv.id, classification='baseline',
-            start='{"days": 0}', expired='{"days": 2}')
-        qbq = QuestionnaireBankQuestionnaire(rank=0, questionnaire=q)
-        qb.questionnaires.append(qbq)
-
-        # user with biopsy should return biopsy date
-        self.login()
-        self.test_user.save_observation(
-            codeable_concept=CC.BIOPSY, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID),
-            status='', issued=now)
-        self.promote_user(role_name=ROLE.PATIENT.value)
-        self.test_user = db.session.merge(self.test_user)
-        obs = self.test_user.observations.first()
-        assert obs.codeable_concept.codings[0].display == 'biopsy'
-        cache.delete_memoized(trigger_date)
-        assert trigger_date(
-            self.test_user, research_study_id=0, qb=qb) == obs.issued
-
-        # add mock in-process QB - confirm current qb is still correct
-        mock_qr('q', 'in-progress', qb=qb)
-        self.test_user, qb = map(db.session.merge, (self.test_user, qb))
-        qb_stat = QB_Status(
-            user=self.test_user, research_study_id=0, as_of_date=now)
-        assert qb_stat.current_qbd().questionnaire_bank == qb
 
     def test_start(self):
         org, rp, rp_id = self.setup_org_n_rp()
@@ -544,45 +409,6 @@ class TestQuestionnaireBank(TestCase):
         # confirm rank sticks
         assert results[0].name == 'epic26'
         assert results[2].name == 'comorb'
-
-    def test_lookup_with_intervention(self):
-        intv = Intervention(name='TEST', description='Test Intervention')
-        epic26 = self.add_questionnaire(name='epic26')
-        eproms_add = self.add_questionnaire(name='eproms_add')
-        with SessionScope(db):
-            db.session.add(intv)
-            db.session.commit()
-        self.test_user, intv, epic26, eproms_add = map(
-            db.session.merge, (self.test_user, intv, epic26, eproms_add))
-
-        bank = QuestionnaireBank(
-            name='CRV', intervention_id=intv.id,
-            start='{"days": 7}',
-            expired='{"days": 90}')
-        for rank, q in enumerate((epic26, eproms_add)):
-            qbq = QuestionnaireBankQuestionnaire(
-                questionnaire_id=q.id,
-                rank=rank)
-            bank.questionnaires.append(qbq)
-
-        self.test_user.interventions.append(intv)
-        self.login()
-        self.add_required_clinical_data()
-        with SessionScope(db):
-            db.session.add(bank)
-            db.session.commit()
-
-        # Patient associated with INTV intervention should generate appropriate
-        # questionnaires as of start date
-        self.promote_user(role_name=ROLE.PATIENT.value)
-        self.test_user = db.session.merge(self.test_user)
-        qb_status = QB_Status(
-            self.test_user,
-            research_study_id=0,
-            as_of_date=now+relativedelta(days=8))
-        qb = qb_status.current_qbd().questionnaire_bank
-        results = list(qb.questionnaires)
-        assert len(results) == 2
 
     def test_questionnaire_gets(self):
         crv, rp, rp_id = self.setup_org_n_rp(org_name='CRV')
