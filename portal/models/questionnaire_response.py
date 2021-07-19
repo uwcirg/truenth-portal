@@ -639,9 +639,11 @@ class QNR_results(object):
         # return only one, namely the most frequent
         # if not all were the same as most frequent, include ratio
         max_key = max(found, key=lambda key: found[key])
-        total_found = sum(value for value in found.values())
-        if found[max_key] != total_found:
-            return f"{max_key} {found[max_key]}:{total_found}"
+        show_ratio = False
+        if show_ratio:
+            total_found = sum(value for value in found.values())
+            if found[max_key] != total_found:
+                return f"{max_key} {found[max_key]}:{total_found}"
         return max_key
 
     def required_qs(self, qb_id):
