@@ -271,7 +271,10 @@ export default (function() {
             },
             computedOptionalCoreData: function() {
                 return this.optionalCoreData;
-            }
+            },
+            subStudyStaffEligible: function() {
+                return this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID] && this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID]["staff_eligible"];
+            },
         },
         methods: {
             registerDependencies: function() {
@@ -633,6 +636,9 @@ export default (function() {
             },
             isSubStudyPatient: function() {
                 return this.computedIsSubStudyPatient;
+            },
+            isSubStudyStaffEligible: function() {
+                return this.subStudyStaffEligible;
             },
             hasSubStudyStatusErrors: function() {
                 return this.hasResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
@@ -1501,7 +1507,10 @@ export default (function() {
                 });
             },
             shouldShowSubstudyPostTx: function() {
-                return this.isSubStudyPatient() && ((!this.hasSubStudyStatusErrors() && this.isPostTxActionRequired()) || this.hasPrevSubStudyPostTx());
+                return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
+            },
+            shouldDisableSubstudyPostTx: function() {
+                return this.isSubStudyTriggersResolved() || !this.isSubStudyStaffEligible();
             },
             getPostTxActionStatus: function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
