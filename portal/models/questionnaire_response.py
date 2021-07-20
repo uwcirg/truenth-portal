@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 import copy
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -621,12 +621,30 @@ class QNR_results(object):
                 return qnr.authored
 
     def entry_method(self):
-        """Returns first entry method found in results, or None"""
+        """Returns most common entry method over set of QNRs in this visit"""
+        found = defaultdict(int)
         for qnr in self.qnrs:
-            if qnr.encounter_id is not None:
-                encounter = Encounter.query.get(qnr.encounter_id)
-                if encounter.type and len(encounter.type):
-                    return encounter.type[0].code
+            encounter = Encounter.query.get(qnr.encounter_id)
+            if encounter.auth_method == 'staff_authenticated':
+                found['staff_authenticated'] += 1
+            elif encounter.type and len(encounter.type):
+                for item in encounter.type:
+                    found[item.code] += 1
+            else:
+                found['online'] += 1
+
+        if not found:
+            return None
+
+        # return only one, namely the most frequent
+        # if not all were the same as most frequent, include ratio
+        max_key = max(found, key=lambda key: found[key])
+        show_ratio = False
+        if show_ratio:
+            total_found = sum(value for value in found.values())
+            if found[max_key] != total_found:
+                return f"{max_key} {found[max_key]}:{total_found}"
+        return max_key
 
     def required_qs(self, qb_id):
         """Return required list (order counts) of Questionnaires for QB"""
