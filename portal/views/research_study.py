@@ -50,6 +50,7 @@ def rs_for_patient(user_id):
                 required:
                   - eligible
                   - ready
+                  - staff_eligible
                 properties:
                   eligible:
                     type: boolean
@@ -57,6 +58,10 @@ def rs_for_patient(user_id):
                   ready:
                     type: boolean
                     description: true if patient is ready for given study
+                  staff_eligible:
+                    type: boolean
+                    description: when false, controls for staff intervention should
+                      be disabled.
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
