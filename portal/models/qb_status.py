@@ -510,7 +510,7 @@ def patient_research_study_status(patient, ignore_QB_status=False):
          have been met, such as assigned clinician if applicable.
      - ready: set True or False based on complex rules.  True means pending
          work user can immediately do.  NOT determined w/ ``ignore_QB_status``
-     - staff_eligible: if false, staff controls should be disabled.
+     - intervention_qnr_eligible: if false, staff controls should be disabled.
          True means no criteria found preventing outstanding staff work.
      - errors: list of strings detailing anything preventing user from being
          "ready"
@@ -527,7 +527,7 @@ def patient_research_study_status(patient, ignore_QB_status=False):
         rs_status = {
             'eligible': True,
             'ready': False,
-            'staff_eligible': True,
+            'intervention_qnr_eligible': True,
             'errors': [],
         }
         results[rs] = rs_status
@@ -535,7 +535,7 @@ def patient_research_study_status(patient, ignore_QB_status=False):
             # Enforce biz rule - must have clinician on file.
             trace("no clinician; not eligible")
             rs_status['eligible'] = False
-            rs_status['staff_eligible'] = False
+            rs_status['intervention_qnr_eligible'] = False
             rs_status['errors'].append("No clinician")
 
         if ignore_QB_status:

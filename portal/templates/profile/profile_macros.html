@@ -908,7 +908,7 @@
                     post intervention questionnaire section
                     NOTE:
                     will display triggers when present in the last determined trigger state
-                    will be in a disabled state if the action state is "completed" or staff_eligible flag is set to false
+                    will be in a disabled state if the action state is "completed" or intervention_qnr_eligible flag is set to false
                 -->
                 <div id="questionsSection" class="content" :class="{disabled: shouldDisableSubstudyPostTx(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                     <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >

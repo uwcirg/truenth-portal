@@ -273,7 +273,7 @@ export default (function() {
                 return this.optionalCoreData;
             },
             subStudyStaffEligible: function() {
-                return this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID] && this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID]["staff_eligible"];
+                return this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID] && this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID]["intervention_qnr_eligible"];
             },
         },
         methods: {
