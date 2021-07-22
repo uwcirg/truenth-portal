@@ -160,7 +160,7 @@ def questionnaire_status_test():
         'acting_user_id': current_user().id,
         'include_test_role': request.args.get('include_test_role', False),
         'org_id': request.args.get('org_id', 146999),
-        'limit': request.args.get('limit', 10),
+        'limit': int(request.args.get('limit', 10)),
         'research_study_id': int(request.args.get('research_study_id', 0)),
         'lock_key': "adherence_report_throttle",
         'response_format': request.args.get('format', 'csv').lower()

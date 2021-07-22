@@ -907,10 +907,10 @@
                 <!--
                     post intervention questionnaire section
                     NOTE:
-                    will display triggers were present in the last determined trigger state
-                    will be in a disabled state if the action state is "completed"
+                    will display triggers when present in the last determined trigger state
+                    will be in a disabled state if the action state is "completed" or intervention_qnr_eligible flag is set to false
                 -->
-                <div id="questionsSection" class="content" :class="{disabled: isSubStudyTriggersResolved() || hasSubStudyStatusErrors(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
+                <div id="questionsSection" class="content" :class="{disabled: shouldDisableSubstudyPostTx(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
                     <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
@@ -980,7 +980,7 @@
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
                 </div>
-                <div class="study-error error-message" v-show="hasSubStudyStatusErrors()">
+                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasSubStudyStatusErrors()">
                     <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
                     <span v-html="getSubStudyStatusErrors()" ></span>
                 </div>
