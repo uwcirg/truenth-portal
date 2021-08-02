@@ -71,7 +71,7 @@ emproObj.prototype.init = function() {
             if (data[EPROMS_SUBSTUDY_ID] &&
                 data[EPROMS_SUBSTUDY_ID].errors &&
                 data[EPROMS_SUBSTUDY_ID].errors.length) {
-                //don't present popup if errors e.g. baseline study due
+                //don't present popup if errors e.g. base study questionnaire due
                 return false;
             }
             tnthAjax.assessmentReport(this.userId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
