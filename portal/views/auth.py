@@ -89,12 +89,13 @@ class KeyForm(FlaskForm):
         user = unchecked_get_user(session.get('user_needing_2fa'))
 
         if user.validate_otp(field.data):
-            current_app.logger.debug(f"{user.id} passed 2FA with valid token")
             auditable_event(
                 message="Successful 2FA verification", context="login",
                 user_id=user.id, subject_id=user.id)
         else:
-            current_app.logger.debug(f"{user.id} failed 2FA token validation")
+            auditable_event(
+                message="FAILED 2FA verification", context="login",
+                user_id=user.id, subject_id=user.id)
             raise ValidationError("Invalid access code")
 
 
