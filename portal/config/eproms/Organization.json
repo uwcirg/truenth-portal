@@ -551,7 +551,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2021-07-29T14:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -2281,6 +2282,34 @@
       ],
       "language": "en_US",
       "name": "University of Mississippi Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146176,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-176"
+        }
+      ],
+      "language": "en_US",
+      "name": "William Jennings Bryan Dorn VAMC",
       "partOf": {
         "reference": "api/organization/22000"
       },
