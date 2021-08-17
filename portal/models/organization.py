@@ -11,6 +11,7 @@ from sqlalchemy.orm import backref
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from . import address
+from ..cache import FIVE_MINS, cache
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..dict_tools import strip_empties
@@ -37,6 +38,17 @@ USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
 ETHNICITY_CODINGS_MASK = 0b0100
 INDIGENOUS_CODINGS_MASK = 0b1000
+
+
+@cache.memoize(timeout=FIVE_MINS)
+def org_country(org_id):
+    """Cache enabled country lookup for given organization ID"""
+    ot = OrgTree()
+    org_ids = ot.at_and_above_ids(org_id)
+    for org in Organization.query.filter(
+            Organization.id.in_(org_ids)).with_entities(Organization.name):
+        if org.name.endswith("(Region/Country Site)"):
+            return org.name[:-len("(Region/Country Site)")]
 
 
 class Organization(db.Model):
@@ -157,6 +169,18 @@ class Organization(db.Model):
             self._phone.value = val
         else:
             self._phone = ContactPoint(system='phone', use='work', value=val)
+
+    @property
+    def country(self):
+        """Return `country` from organization name or parent, if available
+
+        Most patient organizations are children of one with a name pattern
+        such as ``Australia (Region/Country Site)``.  Return the country if
+        such a name pattern is found in the given org, or a parent.
+
+        :returns: country name in org hierarchy if found, or None
+        """
+        return org_country(self.id)
 
     @property
     def default_locale(self):

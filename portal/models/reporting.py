@@ -97,6 +97,7 @@ def adherence_report(
             as_of_date=as_of_date)
         row = {
             'user_id': patient.id,
+            'country': patient.organizations[0].country,
             'site': patient.organizations[0].name,
             'status': str(qb_stats.overall_status)}
 
@@ -230,12 +231,13 @@ def adherence_report(
                 Organization.query.get(org_id).name.replace(' ', '-'))
         results['filename_prefix'] = base_name
         results['column_headers'] = [
-            'user_id', 'study_id', 'status', 'visit', 'entry_method', 'site',
-            'consent', 'completion_date']
+            'user_id', 'study_id', 'status', 'visit', 'entry_method',
+            'country', 'site', 'consent', 'completion_date']
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
                 'user_id',
                 'study_id',
+                'country',
                 'site',
                 'visit',
                 'status',
