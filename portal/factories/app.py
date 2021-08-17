@@ -259,28 +259,6 @@ def configure_logging(app):  # pragma: no cover
     task_logger.setLevel(level)
     app.logger.setLevel(level)
 
-    # Configure Error Emails for high level log messages, only in prod mode
-    # and with email enabled
-
-    if not any((
-            app.debug,
-            app.testing,
-            not app.config.get('ERROR_SENDTO_EMAIL'),
-            app.config.get('MAIL_SUPPRESS_SEND'))):
-        mail_handler = SSLSMTPHandler(
-            mailhost=app.config['MAIL_SERVER'],
-            mailport=app.config['MAIL_PORT'],
-            fromaddr=app.config['MAIL_DEFAULT_SENDER'],
-            toaddrs=app.config['ERROR_SENDTO_EMAIL'],
-            subject='{} Log Message'.format(app.config['SERVER_NAME']),
-            username=app.config['MAIL_USERNAME'],
-            password=app.config['MAIL_PASSWORD'],
-            use_ssl=app.config['MAIL_USE_SSL'],
-        )
-        mail_handler.setLevel(logging.ERROR)
-        app.logger.addHandler(mail_handler)
-        task_logger.addHandler(mail_handler)
-
     if app.testing or not app.config.get('LOG_FOLDER'):
         # Write logs to stdout by default and when testing
         return

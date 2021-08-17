@@ -87,7 +87,6 @@ class BaseConfig(object):
         'MAIL_SUPPRESS_SEND',
         str(TESTING)).lower() == 'true'
     CONTACT_SENDTO_EMAIL = os.environ.get('CONTACT_SENDTO_EMAIL')
-    ERROR_SENDTO_EMAIL = os.environ.get('ERROR_SENDTO_EMAIL')
     FLUSH_CACHE_ON_SYNC = (
             os.environ.get('FLUSH_CACHE_ON_SYNC', 'true').lower() == 'true')
 
