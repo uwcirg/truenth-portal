@@ -22,7 +22,6 @@ from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
-from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.intervention import INTERVENTION
