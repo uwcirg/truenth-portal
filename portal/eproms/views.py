@@ -411,12 +411,11 @@ def empro_resources():
         abort(400, 'user must belong to an organization')
     resources_data = get_any_tag_data("empro-training-material")
     results = resources_data['results']
-    if len(results) > 0:
-        for item in results:
-            content = asset_by_uuid(item['uuid'])
-            item['content'] = content
-    else:
+    if len(results) == 0:
         abort(400, 'resources not found')
+    for item in results:
+        content = asset_by_uuid(item['uuid'])
+        item['content'] = content
     return render_template('eproms/empro_resources.html',
                            results=results)
 
