@@ -418,7 +418,7 @@ def empro_resources():
     else:
         abort(400, 'resources not found')
     return render_template('eproms/empro_resources.html',
-                            results=results)
+                           results=results)
 
 
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])
