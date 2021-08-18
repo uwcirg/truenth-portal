@@ -402,7 +402,7 @@ def resources():
 
 
 @eproms.route('/empro-resources', methods=['GET'])
-@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value])
 @oauth.require_oauth()
 def empro_resources():
     user = current_user()
