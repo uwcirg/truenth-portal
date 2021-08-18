@@ -1,0 +1,19 @@
+{% extends "eproms/base.html" %}
+{% block main %}
+<article id="emproResourcesContentContainer">
+    <h3 class="tnth-headline">{{_("EMPRO Training Resources")}}</h3>
+    {% for item in results %}
+        {% if 'introduction' in item['tags'] %}
+            <section class="intro">{{item['content'] | safe}}</section>
+        {% else %}
+            <section class="item">
+                <h4 class="title collapsible">{{item['title']}}</h4>
+                <div class="collapsible-content">{{item['content'] | safe}}</div>
+            </section>
+        {% endif %}
+    {% endfor %}
+</article>
+{% endblock %}
+{% block additional_scripts %}
+<script src="{{url_for('.static', filename='js/emproResources.js')}}"></script>
+{% endblock %}
