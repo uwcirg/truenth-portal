@@ -18,6 +18,7 @@
     font-style: normal;
 }
 @baseFontSize:    16px;
+@baseLargerFontSize: 18px;
 @baseMobileFontSize:  14px;
 @jumbotranSize:   1.55em;
 @mobileJumbotranSize: 1.45em;
@@ -1155,6 +1156,94 @@ select:not([multiple]) {
   padding: 0 0.5em;
   max-width: 100%;
   overflow: auto;
+}
+#emproResourcesContentContainer {
+  .intro {
+    margin-bottom: 32px;
+    font-size: @baseLargerFontSize;
+    line-height: 1.5;
+  }
+  .description {
+    line-height: 1.5;
+    margin-bottom: 16px;
+    font-size: @baseLargerFontSize;
+  }
+  .collapsible {
+    display: block;
+    width: 100%;
+    padding-left: 16px;
+    padding-top: 16px;
+    margin-bottom: 16px;
+    border-top: 1px solid @muterColor;
+    position: relative;
+    font-weight: bold;
+    cursor: pointer;
+    &:last-of-type {
+      border-bottom: 1px solid @muterColor;
+      padding-bottom: 16px;
+    }
+    &:hover {
+      color: @emproBtnPrimaryColor;
+    }
+    &:after {
+        content: "\f107";
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: 300;
+        color: @mutedColor;
+        display: block;
+        position: absolute;
+        right: 12px;
+        top: 16px;
+        font-size: 20px;
+        transition: transform 0.35s ease;
+    }
+    & + .collapsible-content {
+      display: none;
+
+    }
+    &.open {
+      font-weight: bold;
+      color: @emproBtnPrimaryColor;
+      background-color: #F7F7F7;
+      &:after {
+        transform: rotate(180deg);
+        color: @emproBtnPrimaryColor;
+      }
+      & + .collapsible-content {
+        display: block;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
+  }
+  .collapsible-content {
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 32px;
+    .video {
+      position: relative;
+      height: 0;
+      padding-bottom: 56%;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+  @media (min-width: 1200px) {
+    & {
+      max-width: 1000px;
+      margin: auto;
+    }
+  }
 }
 .form-control {
   height: @inputHeight;

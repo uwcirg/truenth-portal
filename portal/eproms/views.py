@@ -401,6 +401,25 @@ def resources():
         abort(400, 'no resources found')
 
 
+@eproms.route('/empro-resources', methods=['GET'])
+@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value])
+@oauth.require_oauth()
+def empro_resources():
+    user = current_user()
+    org = user.first_top_organization()
+    if not org:
+        abort(400, 'user must belong to an organization')
+    resources_data = get_any_tag_data("empro-training-material")
+    results = resources_data['results']
+    if len(results) == 0:
+        abort(400, 'resources not found')
+    for item in results:
+        content = asset_by_uuid(item['uuid'])
+        item['content'] = content
+    return render_template('eproms/empro_resources.html',
+                           results=results)
+
+
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])
 @roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()

@@ -22,7 +22,6 @@ from ..config.site_persistence import SitePersistence
 from ..csrf import csrf, csrf_blueprint
 from ..database import db
 from ..extensions import babel, mail, oauth, recaptcha, session, user_manager
-from ..logs import SSLSMTPHandler
 from ..models.app_text import app_text
 from ..models.coredata import configure_coredata
 from ..models.intervention import INTERVENTION
@@ -258,28 +257,6 @@ def configure_logging(app):  # pragma: no cover
     from ..tasks import logger as task_logger
     task_logger.setLevel(level)
     app.logger.setLevel(level)
-
-    # Configure Error Emails for high level log messages, only in prod mode
-    # and with email enabled
-
-    if not any((
-            app.debug,
-            app.testing,
-            not app.config.get('ERROR_SENDTO_EMAIL'),
-            app.config.get('MAIL_SUPPRESS_SEND'))):
-        mail_handler = SSLSMTPHandler(
-            mailhost=app.config['MAIL_SERVER'],
-            mailport=app.config['MAIL_PORT'],
-            fromaddr=app.config['MAIL_DEFAULT_SENDER'],
-            toaddrs=app.config['ERROR_SENDTO_EMAIL'],
-            subject='{} Log Message'.format(app.config['SERVER_NAME']),
-            username=app.config['MAIL_USERNAME'],
-            password=app.config['MAIL_PASSWORD'],
-            use_ssl=app.config['MAIL_USE_SSL'],
-        )
-        mail_handler.setLevel(logging.ERROR)
-        app.logger.addHandler(mail_handler)
-        task_logger.addHandler(mail_handler)
 
     if app.testing or not app.config.get('LOG_FOLDER'):
         # Write logs to stdout by default and when testing

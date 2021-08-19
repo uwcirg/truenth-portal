@@ -1,5 +1,5 @@
 import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
-import {EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "./data/common/consts.js";
+import {EPROMS_SUBSTUDY_ID, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "./data/common/consts.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import tnthDate from "./modules/TnthDate.js";
 
@@ -67,51 +67,59 @@ emproObj.prototype.init = function() {
         * construct user report URL
         */
         this.initReportLink();
-        tnthAjax.assessmentReport(this.userId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
-            if (!data || !data.entry || !data.entry.length) {
-               this.initThankyouModal(false);
-               return;
+        tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
+            if (data[EPROMS_SUBSTUDY_ID] &&
+                data[EPROMS_SUBSTUDY_ID].errors &&
+                data[EPROMS_SUBSTUDY_ID].errors.length) {
+                //don't present popup if errors e.g. base study questionnaire due
+                return false;
             }
-            /*
-             * make sure data item with the latest authored date is first
-             */
-            let assessmentData = (data.entry).sort(function(a, b) {
-                return new Date(b.authored) - new Date(a.authored);
-            });
-            let assessmentDate = assessmentData[0]["authored"];
-            let [today, authoredDate, status] = [
-                tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
-                tnthDate.getDateWithTimeZone(new Date(assessmentDate), "yyyy-mm-dd"),
-                assessmentData[0].status];
-            let assessmentCompleted = String(status).toLowerCase() === "completed";
-
-            /*
-             * associating each thank you modal popup accessed by assessment date
-             */
-            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${assessmentDate}`;
-            /*
-             * automatically pops up thank you modal IF sub-study assessment is completed,
-             * and sub-study assessment is completed today and the thank you modal has not already popped up today
-             */
-            let autoShowModal = !localStorage.getItem(cachedAccessKey) && 
-                                assessmentCompleted && 
-                                today === authoredDate;
-            this.initThankyouModal(autoShowModal);
-            if (autoShowModal) {
+            tnthAjax.assessmentReport(this.userId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, (data) => {
+                if (!data || !data.entry || !data.entry.length) {
+                   this.initThankyouModal(false);
+                   return;
+                }
                 /*
-                 * set thank you modal accessed flag here
+                 * make sure data item with the latest authored date is first
                  */
-                localStorage.setItem(cachedAccessKey, `true`);
-            }
-            /*
-             * don't continue on to invoke trigger API if sub-study assessment is not completed
-             */
-            if (!assessmentCompleted) {
-                this.initThankyouModal(false);
-                return;
-            }
-            this.initTriggerDomains();
-        });
+                let assessmentData = (data.entry).sort(function(a, b) {
+                    return new Date(b.authored) - new Date(a.authored);
+                });
+                let assessmentDate = assessmentData[0]["authored"];
+                let [today, authoredDate, status] = [
+                    tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
+                    tnthDate.getDateWithTimeZone(new Date(assessmentDate), "yyyy-mm-dd"),
+                    assessmentData[0].status];
+                let assessmentCompleted = String(status).toLowerCase() === "completed";
+
+                /*
+                 * associating each thank you modal popup accessed by assessment date
+                 */
+                let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${assessmentDate}`;
+                /*
+                 * automatically pops up thank you modal IF sub-study assessment is completed,
+                 * and sub-study assessment is completed today and the thank you modal has not already popped up today
+                 */
+                let autoShowModal = !localStorage.getItem(cachedAccessKey) &&
+                                    assessmentCompleted &&
+                                    today === authoredDate;
+                this.initThankyouModal(autoShowModal);
+                if (autoShowModal) {
+                    /*
+                     * set thank you modal accessed flag here
+                     */
+                    localStorage.setItem(cachedAccessKey, `true`);
+                }
+                /*
+                 * don't continue on to invoke trigger API if sub-study assessment is not completed
+                 */
+                if (!assessmentCompleted) {
+                    this.initThankyouModal(false);
+                    return;
+                }
+                this.initTriggerDomains();
+            });
+        })
     });
 };
 emproObj.prototype.setLoadingVis = function(done) {
