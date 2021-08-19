@@ -361,9 +361,7 @@ def token_janitor():
             subject=subject,
             body=body)
         try:
-            # Copy error account in case owner isn't paying attention
-            em.send_message(
-                cc_address=current_app.config.get('ERROR_SENDTO_EMAIL'))
+            em.send_message()
         except SMTPRecipientsRefused as exc:
             msg = ("Error sending site summary email to {}: "
                    "{}".format(sponsor_email, exc))
