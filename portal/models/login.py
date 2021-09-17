@@ -21,7 +21,7 @@ def send_2fa_email(user):
     current_app.logger.debug(f"2FA OTP for {user.id}: {code}")
     email = EmailMessage(
         subject=_("TrueNTH Access Code"),
-        body=_("Your single-use access code is: %(code)06d", code=code),
+        body=_("Your single-use access code is: %(code)06d<br>Thank you,<br>The TrueNTH Team<br><br>This email has been generated automatically; if you have any questions please contact pcctcironmanregistry@mskcc.org .", code=code),
         recipients=user.email,
         sender=current_app.config['MAIL_DEFAULT_SENDER'],
         user_id=user.id)
