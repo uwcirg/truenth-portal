@@ -7,8 +7,8 @@
             <section class="intro">{{item['content'] | safe}}</section>
         {% else %}
             <section class="item">
-                <h4 class="title collapsible">{{item['title']}}</h4>
-                <div class="collapsible-content">{{item['content'] | safe}}</div>
+                <h4 class="title">{{item['title']}}</h4>
+                <div class="content portal-flex-container">{{item['content'] | safe}}</div>
             </section>
         {% endif %}
     {% endfor %}
