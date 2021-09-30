@@ -523,8 +523,7 @@
           "research_protocols": [
             {"name": "IRONMAN v2", "retired_as_of": "2018-05-22T00:00:00Z"},
             {"name": "IRONMAN v3", "retired_as_of": "2020-10-18T14:00:00Z"},
-            {"name": "IRONMAN v5"},
-            {"name": "EMPRO v1"}
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
