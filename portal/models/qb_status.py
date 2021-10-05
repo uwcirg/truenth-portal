@@ -215,7 +215,7 @@ class QB_Status(object):
             # Special circumstance for completed/partial withdrawn (TN-3014)
             if self._partial_indef:
                 status = OverallStatus.partially_completed
-            if self.completed_indef.issuperset(self._required_indef):
+            if self._completed_indef.issuperset(self._required_indef):
                 status = OverallStatus.completed
 
         elif self._partial_indef:
