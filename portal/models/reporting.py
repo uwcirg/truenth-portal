@@ -66,7 +66,6 @@ def adherence_report(
     patients = patients_query(
         acting_user=acting_user,
         include_test_role=include_test_role,
-        filter_by_ids=[4450],
         requested_orgs=requested_orgs)
     data = []
     current, total = 0, patients.count()
