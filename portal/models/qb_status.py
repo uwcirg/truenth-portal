@@ -212,6 +212,12 @@ class QB_Status(object):
         self._response_lookup()
         if self.overall_status == OverallStatus.withdrawn:
             status = OverallStatus.withdrawn
+            # Special circumstance for completed/partial withdrawn (TN-3014)
+            if self._partial_indef:
+                status = OverallStatus.partially_completed
+            if self._completed_indef.issuperset(self._required_indef):
+                status = OverallStatus.completed
+
         elif self._partial_indef:
             status = OverallStatus.in_progress
         elif self._completed_indef.issuperset(self._required_indef):
