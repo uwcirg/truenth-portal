@@ -50,6 +50,7 @@ def login_user(user, auth_method=None):
             current_app.config.get("ENABLE_2FA") and
             not current_app.testing and
             not getattr(getattr(request, 'oauth', None), 'user', None) and
+            not user.has_role(ROLE.WRITE_ONLY.value) and
             user.has_role(
                     ROLE.ADMIN.value,
                     ROLE.ANALYST.value,

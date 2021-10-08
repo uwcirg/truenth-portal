@@ -579,7 +579,12 @@ def next_after_login():
         logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
+
+        # on this brand new promoted account, must fake/suppress 2fa or we'll
+        # repeat the cycle as part of the `login_user()` call
+        session['2FA_verified'] = '2FA verified'
         login_user(invited_user, 'password_authenticated')
+
         if preserve_next_across_sessions:
             session['next'] = preserve_next_across_sessions
         assert (invited_user == current_user())
