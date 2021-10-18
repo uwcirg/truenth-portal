@@ -65,7 +65,12 @@ def patch_forgot_password():
         email = form.email.data
         user, user_email = user_manager.find_user_by_email(email)
 
-        if user:
+        # Do NOT allow non registered to change password
+        non_registered_roles = set(current_app.config['PRE_REGISTERED_ROLES'])
+        current_roles = {r.name for r in user.roles}
+        disjoint = current_roles.isdisjoint(non_registered_roles)
+
+        if disjoint and user:
             with force_locale(user.locale_code):
                 user_manager.send_reset_password_email(email)
 
