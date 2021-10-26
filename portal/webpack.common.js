@@ -2,6 +2,9 @@ const path = require("path");
 const webpack = require("webpack");
 const JsSrcPath = "./static/js/src";
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const crypto = require("crypto");
+const crypto_orig_createHash = crypto.createHash;
+crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
 module.exports = {
     entry: { /* files to be transpiled and optimized */
         "account": JsSrcPath+"/accountCreation.js",
@@ -53,4 +56,3 @@ module.exports = {
         new VueLoaderPlugin()
     ]
 };
-
