@@ -54,7 +54,7 @@ from ..models.flaskdanceprovider import (
     MockFlaskDanceProvider,
 )
 from ..models.intervention import Intervention, UserIntervention
-from ..models.login import login_user, send_2fa_email
+from ..models.login import login_user, send_2fa_email, user_requires_2fa
 from ..models.role import ROLE
 from ..models.user import (
     User,
@@ -580,9 +580,12 @@ def next_after_login():
         invited_user.promote_to_registered(user)
         db.session.commit()
 
-        # on this brand new promoted account, must fake/suppress 2fa or we'll
-        # repeat the cycle as part of the `login_user()` call
-        session['2FA_verified'] = '2FA verified'
+        # on this brand new promoted account, auto-login users whom do not require 2fa
+        # otherwise, redirect for fresh login to enforce 2fa validation
+        if user_requires_2fa(invited_user):
+            flash(_("Your password has been set. Please log in to proceed."), "info")
+            return redirect('/')
+
         login_user(invited_user, 'password_authenticated')
 
         if preserve_next_across_sessions:
