@@ -559,14 +559,15 @@ def confirm_identity():
         'confirm_identity.html', user=current_user(),
         redirect_url=request.args.get("redirect_url", "/"))
 
+
 @portal.route('/initial-queries', methods=['GET', 'POST'])
 def initial_queries():
     """Initial consent terms, initial queries view function"""
-    user = get_user(current_user().id, 'edit')
-    if not user:
+    if not current_user():
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
         return redirect('/')
+    user = get_user(current_user().id, 'edit')
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     if request.method == 'POST':
