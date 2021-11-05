@@ -523,7 +523,8 @@
           "research_protocols": [
             {"name": "IRONMAN v2", "retired_as_of": "2018-05-22T00:00:00Z"},
             {"name": "IRONMAN v3", "retired_as_of": "2020-10-18T14:00:00Z"},
-            {"name": "IRONMAN v5"}
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1869,8 +1870,8 @@
           "valueCodeableConcept": {
             "coding": [
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_CA",
+                "display": "Canadian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -1882,7 +1883,7 @@
         }
       ],
       "id": 23000,
-      "language": "en_US",
+      "language": "en_CA",
       "name": "Canada (Region/Country Site)",
       "partOf": {
         "reference": "api/organization/20000"
@@ -1912,7 +1913,7 @@
           "value": "146-38"
         }
       ],
-      "language": "en_US",
+      "language": "en_CA",
       "name": "BC Cancer Agency",
       "partOf": {
         "reference": "api/organization/23000"
@@ -1931,8 +1932,8 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_CA",
+                "display": "Canadian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -1977,8 +1978,8 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_CA",
+                "display": "Canadian English",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -2033,7 +2034,7 @@
           "value": "146-52"
         }
       ],
-      "language": "en_US",
+      "language": "en_CA",
       "name": "Juravinski Cancer Centre",
       "partOf": {
         "reference": "api/organization/23000"
@@ -2047,8 +2048,8 @@
           "valueCodeableConcept": {
             "coding": [
               {
-                "code": "en_US",
-                "display": "American English",
+                "code": "en_CA",
+                "display": "Canadian English",
                 "system": "urn:ietf:bcp:47"
               },
               {
@@ -2079,7 +2080,7 @@
           "value": "146-53"
         }
       ],
-      "language": "en_US",
+      "language": "en_CA",
       "name": "Ottawa Hospital Cancer Centre",
       "partOf": {
         "reference": "api/organization/23000"
@@ -2108,7 +2109,7 @@
           "value": "146-48"
         }
       ],
-      "language": "en_US",
+      "language": "en_CA",
       "name": "Cross Cancer Institute (Alberta Health Services)",
       "partOf": {
         "reference": "api/organization/23000"
@@ -2137,7 +2138,7 @@
           "value": "146-49"
         }
       ],
-      "language": "en_US",
+      "language": "en_CA",
       "name": "Princess Margaret Cancer Center",
       "partOf": {
         "reference": "api/organization/23000"
