@@ -2769,7 +2769,7 @@ export default (function() {
                     return false;
                 }
                 var isChecked = $(event.target).is(":checked");
-                var checkedRole = event.target.value;
+                var changedRole = event.target.value;
                 var roles = [];
                 var self = this;
                 $(".put-roles-error").html("");
@@ -2784,12 +2784,12 @@ export default (function() {
                         if (!isChecked) {
                             //removed from existing role list
                             dataRoles = dataRoles.filter(function(role){
-                                return role.name !== checkedRole;
+                                return role.name !== changedRole;
                             });
                             roles = dataRoles;
                         } else {
                             //combine checked role with existing roles
-                            roles = [{name: checkedRole}, ...dataRoles];
+                            roles = [{name: changedRole}, ...dataRoles];
                         }
                     }
                     self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
