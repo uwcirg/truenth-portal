@@ -2759,9 +2759,6 @@ export default (function() {
             },
             updateRolesData: function(event) {
                 var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
-                var roles = $("#rolesGroup input:checkbox:checked").map(function() {
-                    return {name: $(this).val()};
-                }).get();
                 /*
                  * check if a role is selected
                  */
@@ -2771,12 +2768,38 @@ export default (function() {
                     $(".put-roles-error").html("A role must be selected.");
                     return false;
                 }
+                var isChecked = $(event.target).is(":checked");
+                var checkedRole = event.target.value;
+                var roles = [];
+                var self = this;
                 $(".put-roles-error").html("");
-                this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
-                /*
-                 * refresh user roles list since it has been uploaded
-                 */
-                this.initUserRoles({clearCache: true});
+                $("#rolesGroup").addClass("loading");
+                this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
+                    if (data.roles) {
+                        var dataRoles = data.roles.map(function(role) {
+                            return {
+                                name: role.name
+                            };
+                        });
+                        if (!isChecked) {
+                            //removed from existing role list
+                            dataRoles = dataRoles.filter(function(role){
+                                return role.name !== checkedRole;
+                            });
+                            roles = dataRoles;
+                        } else {
+                            //combine checked role with existing roles
+                            roles = [{name: checkedRole}, ...dataRoles];
+                        }
+                    }
+                    self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
+                        $("#rolesGroup").removeClass("loading");
+                         /*
+                        * refresh user roles list since it has been uploaded
+                        */
+                        self.initUserRoles({clearCache: true});
+                    });
+                });
             },
             updateRolesUI: function(roles) {
                 if (!roles) return;
