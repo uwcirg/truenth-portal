@@ -2775,23 +2775,30 @@ export default (function() {
                 $(".put-roles-error").html("");
                 $("#rolesGroup").addClass("loading");
                 this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
+                    var dataRoles = [];
                     if (data.roles) {
-                        var dataRoles = data.roles.map(function(role) {
-                            return {
-                                name: role.name
-                            };
+                        dataRoles = data.roles.map(function(role) {
+                            return role.name;
                         });
                         if (!isChecked) {
                             //removed from existing role list
                             dataRoles = dataRoles.filter(function(role){
-                                return role.name !== changedRole;
+                                return role !== changedRole;
                             });
-                            roles = dataRoles;
                         } else {
                             //combine checked role with existing roles
-                            roles = [{name: changedRole}, ...dataRoles];
+                            dataRoles = [...dataRoles, changedRole];
+                            //remove duplicate role(s)
+                            dataRoles = dataRoles.filter(function(value, index) {
+                                return dataRoles.indexOf(value) === index;
+                            });
                         }
                     }
+                    roles = dataRoles.map(function(role) {
+                        return {
+                            "name": role
+                        }
+                    });
                     self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
                         $("#rolesGroup").removeClass("loading");
                          /*
