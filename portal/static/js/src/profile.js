@@ -3175,7 +3175,10 @@ export default (function() {
                 }
                 //adding a test substudy consent should only be allowed in Test environment
                 if (!this.isTestEnvironment()) {
-                    return false;
+                    //allowed in non-Test environment based on additional check, e.g. user role, patient role, config etc.
+                    if (!this.isConsentEditable()) {
+                        return false;
+                    }
                 }
                 //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
                 return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
