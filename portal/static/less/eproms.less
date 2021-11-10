@@ -4773,6 +4773,24 @@ input.clinic {
     margin-bottom: 4px;
   }
 }
+#rolesGroup {
+  position: relative;
+  &:before {
+    z-index: -1;
+  }
+  &.loading {
+    &:before {
+      position: absolute;
+      content: "";
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background:transparent;
+      z-index: 5;
+    }
+  }
+}
 .create-account-container {
   position: relative;
   padding: 2em;

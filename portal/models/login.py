@@ -35,6 +35,27 @@ def send_2fa_email(user):
     db.session.commit()
 
 
+def user_requires_2fa(user):
+    """Logic to determine if user requires 2FA at this time"""
+    assert user
+    return (
+        current_app.config.get("ENABLE_2FA") and
+        not current_app.testing and
+        not getattr(getattr(request, 'oauth', None), 'user', None) and
+        not user.has_role(ROLE.WRITE_ONLY.value) and
+        user.has_role(
+                ROLE.ADMIN.value,
+                ROLE.ANALYST.value,
+                ROLE.CLINICIAN.value,
+                ROLE.PRIMARY_INVESTIGATOR.value,
+                ROLE.CLINICIAN.value,
+                ROLE.RESEARCHER.value,
+                ROLE.STAFF.value,
+                ROLE.STAFF_ADMIN.value,
+        ) and
+        session.get('2FA_verified') != '2FA verified')
+
+
 def login_user(user, auth_method=None):
     """Common entry point for all login flows - direct here for bookkeeping
 
@@ -46,22 +67,7 @@ def login_user(user, auth_method=None):
 
     """
     # beyond patients and care givers, 2FA is required.  confirm or initiate
-    if (
-            current_app.config.get("ENABLE_2FA") and
-            not current_app.testing and
-            not getattr(getattr(request, 'oauth', None), 'user', None) and
-            not user.has_role(ROLE.WRITE_ONLY.value) and
-            user.has_role(
-                    ROLE.ADMIN.value,
-                    ROLE.ANALYST.value,
-                    ROLE.CLINICIAN.value,
-                    ROLE.PRIMARY_INVESTIGATOR.value,
-                    ROLE.CLINICIAN.value,
-                    ROLE.RESEARCHER.value,
-                    ROLE.STAFF.value,
-                    ROLE.STAFF_ADMIN.value,
-            ) and
-            session.get('2FA_verified') != '2FA verified'):
+    if user_requires_2fa(user):
         # log user back out, in case a flow already promoted them
         flask_user_logout()
 

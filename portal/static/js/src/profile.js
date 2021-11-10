@@ -2759,9 +2759,6 @@ export default (function() {
             },
             updateRolesData: function(event) {
                 var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
-                var roles = $("#rolesGroup input:checkbox:checked").map(function() {
-                    return {name: $(this).val()};
-                }).get();
                 /*
                  * check if a role is selected
                  */
@@ -2771,17 +2768,51 @@ export default (function() {
                     $(".put-roles-error").html("A role must be selected.");
                     return false;
                 }
+                var isChecked = $(event.target).is(":checked");
+                var changedRole = event.target.value;
+                var roles = [];
+                var self = this;
                 $(".put-roles-error").html("");
-                this.modules.tnthAjax.putRoles(this.subjectId, {"roles": roles}, $(event.target));
-                /*
-                 * refresh user roles list since it has been uploaded
-                 */
-                this.initUserRoles({clearCache: true});
+                $("#rolesGroup").addClass("loading");
+                this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
+                    var dataRoles = [];
+                    if (data.roles) {
+                        dataRoles = data.roles.map(function(role) {
+                            return role.name;
+                        });
+                        if (!isChecked) {
+                            //removed from existing role list
+                            dataRoles = dataRoles.filter(function(role){
+                                return role !== changedRole;
+                            });
+                        } else {
+                            //combine checked role with existing roles
+                            dataRoles = [...dataRoles, changedRole];
+                            //remove duplicate role(s)
+                            dataRoles = dataRoles.filter(function(value, index) {
+                                return dataRoles.indexOf(value) === index;
+                            });
+                        }
+                    }
+                    roles = dataRoles.map(function(role) {
+                        return {
+                            "name": role
+                        }
+                    });
+                    self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
+                        $("#rolesGroup").removeClass("loading");
+                         /*
+                        * refresh user roles list since it has been uploaded
+                        */
+                        self.initUserRoles({clearCache: true});
+                    });
+                }, {"clearCache": true});
             },
             updateRolesUI: function(roles) {
                 if (!roles) return;
-                roles.forEach(role => {
-                    $("#rolesGroup input[value='"+role+"']").attr("checked", true);
+                $("#rolesGroup input[type='checkbox']").each(function() {
+                    if (roles.indexOf($(this).val()) !== -1) $(this).attr("checked", true);
+                    else $(this).attr("checked", false);
                 });
             },
             isAdminOnlyEditableRole: function(role) {
@@ -3175,7 +3206,10 @@ export default (function() {
                 }
                 //adding a test substudy consent should only be allowed in Test environment
                 if (!this.isTestEnvironment()) {
-                    return false;
+                    //allowed in non-Test environment based on additional check, e.g. user role, patient role, config etc.
+                    if (!this.isConsentEditable()) {
+                        return false;
+                    }
                 }
                 //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
                 return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
