@@ -2806,12 +2806,13 @@ export default (function() {
                         */
                         self.initUserRoles({clearCache: true});
                     });
-                });
+                }, {"clearCache": true});
             },
             updateRolesUI: function(roles) {
                 if (!roles) return;
-                roles.forEach(role => {
-                    $("#rolesGroup input[value='"+role+"']").attr("checked", true);
+                $("#rolesGroup input[type='checkbox']").each(function() {
+                    if (roles.indexOf($(this).val()) !== -1) $(this).attr("checked", true);
+                    else $(this).attr("checked", false);
                 });
             },
             isAdminOnlyEditableRole: function(role) {
