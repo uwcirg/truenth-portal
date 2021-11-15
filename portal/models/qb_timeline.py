@@ -1270,7 +1270,7 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
     assert isinstance(as_of_date, datetime)
 
     default_status = (
-        "Not yet available" if research_study_id == EMPRO_RS_ID
+        "Not Yet Available" if research_study_id == EMPRO_RS_ID
         else OverallStatus.expired)
     results = {
         'status': default_status,
