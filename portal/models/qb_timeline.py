@@ -1255,7 +1255,8 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
     ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
     a new lookup with each passing moment.
 
-    If no data is available for the user, returns
+    If no data is available for the user, `status` of `Not Yet Available` for
+    the EMPRO study, `expired` for all others, as part of:
      {'status': 'expired', 'visit_name': None, 'action_state': 'not applicable'}
 
     :returns: dictionary with key/values for:
