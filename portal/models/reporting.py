@@ -113,7 +113,11 @@ def adherence_report(
         # if no current, try previous (as current may be expired)
         last_viable = qb_stats.current_qbd(
             even_if_withdrawn=True) or qb_stats.prev_qbd
-        if last_viable:
+        if not last_viable:
+            # Global study default pre-started is Expired.  See TN-3101
+            if row['status'] == "Expired":
+                row['status'] = "Not Yet Available"
+        else:
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
             if row['status'] == 'Completed':
