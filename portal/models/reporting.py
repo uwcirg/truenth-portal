@@ -114,7 +114,7 @@ def adherence_report(
         last_viable = qb_stats.current_qbd(
             even_if_withdrawn=True) or qb_stats.prev_qbd
         if not last_viable:
-            # Global study default pre-started is Expired.  See TN-3101
+            # Global study default pre-started is Expired. See TN-3101
             if row['status'] == "Expired":
                 row['status'] = "Not Yet Available"
         else:
