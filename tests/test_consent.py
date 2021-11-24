@@ -136,6 +136,19 @@ class TestUserConsent(TestCase):
         assert consent.acceptance_date.replace(
             microsecond=0) == consent.acceptance_date
 
+    def test_post_bogus_status_user_consent(self):
+        self.shallow_org_tree()
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        data = {'organization_id': org1.id, 'agreement_url': self.url,
+                'staff_editable': True, 'send_reminders': False, 'status': "bogus"}
+
+        self.login()
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert response.status_code == 400
+
     def test_post_user_consent_dates(self):
         self.shallow_org_tree()
         org1 = Organization.query.filter(Organization.id > 0).first()
