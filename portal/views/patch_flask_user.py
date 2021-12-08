@@ -67,7 +67,7 @@ def patch_forgot_password():
 
         # Do NOT allow non registered to change password
         non_registered_roles = set(current_app.config['PRE_REGISTERED_ROLES'])
-        current_roles = {r.name for r in user.roles} if user else set()
+        current_roles = {r.name for r in user.roles}
         disjoint = current_roles.isdisjoint(non_registered_roles)
 
         if disjoint and user:
