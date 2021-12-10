@@ -145,6 +145,8 @@ class UserConsent(db.Model):
         for attr in ('staff_editable', 'include_in_reports',
                      'send_reminders', 'status', 'research_study_id'):
             if attr in data:
+                if attr == 'status' and data.get(attr) not in status_types:
+                    raise ValueError(f"ill defined user_consent.status: {data.get(attr)}")
                 setattr(obj, attr, data.get(attr))
 
         return obj
