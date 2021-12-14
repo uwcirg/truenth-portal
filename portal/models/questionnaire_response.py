@@ -10,6 +10,7 @@ from flask_swagger import swagger
 import jsonschema
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -878,7 +879,14 @@ def qnr_document_id(
     else:
         qnr = qnr.filter(QuestionnaireResponse.qb_iteration.is_(None))
 
-    return qnr.one()[0]
+    # Should always get exactly one.
+    # Raise attention via error log if not, but continue (TN-3109)
+    try:
+        return qnr.one()[0]
+    except MultipleResultsFound:
+        current_app.logger.error(
+            f"Multiple {status} QNRs found for user {subject_id} on qb_id {questionnaire_bank_id}")
+        return qnr.first()[0]
 
 
 def consolidate_answer_pairs(answers):
