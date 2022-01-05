@@ -1,8 +1,8 @@
 {%- extends "layout.html" -%}
 {% block additional_scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/dist/bootstrapTableExtensions.bundle.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/extensions/export/bootstrap-table-export.min.js"></script>
-<script src="https://cdn.rawgit.com/myadzel/6405e60256df579eda8c/raw/e24a756e168cb82d0798685fd3069a75f191783f/alphanum.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/hhurz/tableExport.jquery.plugin@v1.10.1/tableExport.js" async></script>
 <script src="{{ url_for('static', filename='js/vendor/bootstrap_table_filter_control.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/bootstrap_datatables_extension.js') }}"></script>
