@@ -431,3 +431,12 @@ export function convertArrayToObject (array, key) {
     }, {});
     return array;
 }
+
+export function dateSorter(a, b) {
+    return new Date(a) - new Date(b);
+}
+export function alphanumericSorter(a, b) {
+    return a.toString().localeCompare(b.toString(), "en", { numeric: true });
+    //The localeCompare() method returns 1 if a reference string comes before, -1 it comes after or 0 if the reference string is the same as the given string.
+    //see relevant discussion here, https://stackoverflow.com/questions/4340227/sort-mixed-alpha-numeric-array
+}
