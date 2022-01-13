@@ -232,7 +232,6 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         return false;
                     }
                     let html = $("#exportReportPopoverWrapper").html();
-                    const DELAY_INTERVAL = 50;
                     $("#adminTableContainer .fixed-table-toolbar .columns-right").append(html);
                     $("#exportReportContainer").attr("data-content", $("#exportReportPopoverContent").html());
                     $("#exportReportContainer .data-types li").each(function() {
