@@ -193,7 +193,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 this.exportReportProgressTime = new Date();
                 let pastInfo = this.getCacheReportInfo();
                 if (pastInfo) {
-                    $(".exportReport__history").html(`<a href="${pastInfo.url}" target="_blank">View last result exported on ${tnthDates.formatDateString(pastInfo.date, "iso")}</a>`);
+                    $(".exportReport__history").html(`<a href="${pastInfo.url}" target="_blank">${i18next.t("View last result exported on {date}").replace("{date}", tnthDates.formatDateString(pastInfo.date, "iso"))}</a>`);
                 }
             },
             onAfterExportReportData: function(options) {
@@ -335,10 +335,11 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                             let passedTime = ((new Date()).getTime() - self.exportReportProgressTime.getTime()) / 1000;
                             if (passedTime > 60) {
                                 //more than a minute passed and the task is still in PENDING status
+                                //never advanced to PROGRESS to start the export process
                                 //abort
                                 self.onAfterExportReportData({
                                     "error": true,
-                                    "message": "More than a minute spent in pending status."
+                                    "message": i18next.t("More than a minute spent in pending status.")
                                 });
                                 return;
                             }
