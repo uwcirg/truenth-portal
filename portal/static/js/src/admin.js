@@ -319,6 +319,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         if (exportStatus === "SUCCESS") {
                             setTimeout(function() {
                                 let resultUrl = statusUrl.replace("/status", "");
+                                console.log("resultUrl ", resultUrl);
                                 self.setCacheReportInfo(resultUrl);
                                 window.location.assign(resultUrl);
                             }.bind(self), 50); //wait a bit before retrieving results
