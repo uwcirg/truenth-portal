@@ -112,7 +112,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 loading: false
             },
             exportReportTimeoutID: 0,
-            arrExportReportTimeoutID: []
+            exportReportProgressTime: 0,
+            arrExportReportTimeoutID: [],
+            exportDataType: ""
         },
         methods: {
             injectDependencies: function () {
@@ -169,8 +171,8 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 }
                 $("#patientList .eproms-substudy").hide();
             },
-            getExportReportUrl: function(dataType) {
-                dataType = dataType||"json";
+            getExportReportUrl: function() {
+                let dataType = this.exportDataType||"json";
                 let researchStudyID = this.isSubStudyPatientView() ? EPROMS_SUBSTUDY_ID: EPROMS_MAIN_STUDY_ID;
                 return `/api/report/questionnaire_status?research_study_id=${researchStudyID}&format=${dataType}`;
             },
@@ -187,6 +189,12 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 $("#exportReportContainer").removeClass("open").popover("show");
                 $("#btnExportReport").attr("disabled", true);
                 $(".exportReport__status").addClass("active");
+                this.clearExportReportTimeoutID();
+                this.exportReportProgressTime = new Date();
+                let pastInfo = this.getCacheReportInfo();
+                if (pastInfo) {
+                    $(".exportReport__history").html(`<a href="${pastInfo.url}" target="_blank">${i18next.t("View last result exported on {date}").replace("{date}", tnthDates.formatDateString(pastInfo.date, "iso"))}</a>`);
+                }
             },
             onAfterExportReportData: function(options) {
                 options = options || {};
@@ -196,8 +204,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     this.updateProgressDisplay("", "");
                     $(".exportReport__error .message").html(`Request to export report data failed.${options.message?"<br/>"+options.message: ""}`);
                     $(".exportReport__retry").removeClass("tnth-hide");
+                    this.clearExportReportTimeoutID();
                     return;
-                } 
+                }
                 $("#exportReportContainer").popover("hide");
                 $(".exportReport__error .message").html("");
                 $(".exportReport__retry").addClass("tnth-hide");
@@ -223,14 +232,10 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         return false;
                     }
                     let html = $("#exportReportPopoverWrapper").html();
-                    const DELAY_INTERVAL = 50;
                     $("#adminTableContainer .fixed-table-toolbar .columns-right").append(html);
                     $("#exportReportContainer").attr("data-content", $("#exportReportPopoverContent").html());
                     $("#exportReportContainer .data-types li").each(function() {
-                        $(this).attr("title", self.getExportReportUrl($(this).attr("data-type")));
-                    });
-                    $(window).on("resize", function() {
-                        self.onAfterExportReportData();
+                        $(this).attr("title", self.getExportReportUrl());
                     });
                     $("#exportReportContainer").on("shown.bs.popover", function () {
                         $(".exportReport__retry").off("click").on("click", function(e) {
@@ -246,15 +251,15 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     });
                     $("#exportReportContainer .data-types li").on("click", function(e) {
                         e.stopPropagation();
-                        let dataType = $(this).attr("data-type");
-                        let reportUrl = self.getExportReportUrl(dataType);
+                        self.exportDataType = $(this).attr("data-type");
+                        let reportUrl = self.getExportReportUrl();
                         self.updateProgressDisplay("", "");
-                        setTimeout(function() {
-                            self.onBeforeExportReportData();
-                        }, DELAY_INTERVAL);
                         $.ajax({
-                            type: 'GET',
+                            type: "GET",
                             url: reportUrl,
+                            beforeSend: function() {
+                                self.onBeforeExportReportData();
+                            },
                             success: function(data, status, request) {
                                 let statusUrl= request.getResponseHeader("Location");
                                 self.updateExportProgress(statusUrl, function(data) {
@@ -277,6 +282,18 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 } else {
                     $(".exportReport__loader").addClass("tnth-hide")
                 }
+            },
+            setCacheReportInfo: function(resultUrl) {
+                if (!resultUrl) return false;
+                localStorage.setItem("exportReportInfo_"+this.userId+"_"+this.exportDataType, JSON.stringify({
+                    date: new Date(),
+                    url: resultUrl
+                }));
+            },
+            getCacheReportInfo: function() {
+                let cachedItem = localStorage.getItem("exportReportInfo_"+this.userId+"_"+this.exportDataType);
+                if (!cachedItem) return false;
+                return JSON.parse(cachedItem);
             },
             updateExportProgress: function(statusUrl, callback) {
                 callback = callback || function() {};
@@ -302,6 +319,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         if (exportStatus === "SUCCESS") {
                             setTimeout(function() {
                                 let resultUrl = statusUrl.replace("/status", "");
+                                self.setCacheReportInfo(resultUrl);
                                 window.location.assign(resultUrl);
                             }.bind(self), 50); //wait a bit before retrieving results
                         }
@@ -311,6 +329,20 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         }, 300);
                     }
                     else {
+                        //check how long the status stays in pending
+                        if (exportStatus === "PENDING") {
+                            let passedTime = ((new Date()).getTime() - self.exportReportProgressTime.getTime()) / 1000;
+                            if (passedTime > 60) {
+                                //more than a minute passed and the task is still in PENDING status
+                                //never advanced to PROGRESS to start the export process
+                                //abort
+                                self.onAfterExportReportData({
+                                    "error": true,
+                                    "message": i18next.t("More than a minute spent in pending status.")
+                                });
+                                return;
+                            }
+                        }
                         // rerun in 2 seconds
                         self.exportReportTimeoutID = setTimeout(function() {
                             self.updateExportProgress(statusUrl, callback);
@@ -656,7 +688,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         return data[setting_name] !== org;
                     });
                     //has top org affiliation other than matched org setting
-                    if (nonMatch.length) { 
+                    if (nonMatch.length) {
                         return false;
                     }
                     //has top org affiliation with matched org setting
@@ -677,7 +709,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     return false;
                 }
                 //hide account creation button based on PROTECTED_ORG setting
-                this.setCreateAccountVisByTopOrgSetting("PROTECTED_ORG", params); 
+                this.setCreateAccountVisByTopOrgSetting("PROTECTED_ORG", params);
             },
             /*
              * a function dedicated to handle MUSIC-related UI events/changes
@@ -712,7 +744,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 return this.currentTablePreference &&
                     this.currentTablePreference.filters &&
                     this.currentTablePreference.filters.orgs_filter_control &&
-                    (typeof this.currentTablePreference.filters.orgs_filter_control === 
+                    (typeof this.currentTablePreference.filters.orgs_filter_control ===
                         "object") &&
                     this.currentTablePreference.filters.orgs_filter_control.length;
             },
@@ -803,7 +835,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                                  */
                                 var cn = ot.getHereBelowOrgs([parentOrgId]);
                                 var hasCheckedChilds = cn.filter(function(item) {
-                                    return parseInt(item) !== parseInt(currentOrgId) && 
+                                    return parseInt(item) !== parseInt(currentOrgId) &&
                                         (parseInt(item) !== parseInt(parentOrgId)) &&
                                         (ot.getElementByOrgId(item).prop("checked"));
                                 });
@@ -1011,7 +1043,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     __filters["column_selections"].push($(this).attr("data-field"));
                 });
                 data["filters"] = __filters;
-               
+
                 if (Object.keys(data).length > 0) {
                     tnthAjax.setTablePreference(userId, this.tableIdentifier, {
                         "data": JSON.stringify(data)
