@@ -117,6 +117,12 @@ def adherence_report(
             # Global study default pre-started is Expired. See TN-3101
             if row['status'] == "Expired":
                 row['status'] = "Not Yet Available"
+            # TN-3101 include clinician even if not started on EMPRO
+            if research_study_id == EMPRO_RS_ID and len(patient.clinicians) > 0:
+                row['clinician'] = ';'.join(
+                    clinician.display_name for clinician in
+                    patient.clinicians)
+
         else:
             row['qb'] = last_viable.questionnaire_bank.name
             row['visit'] = visit_name(last_viable)
