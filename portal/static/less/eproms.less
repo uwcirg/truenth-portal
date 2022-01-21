@@ -5485,11 +5485,18 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   margin-top: 1em;
   label {
     position: relative;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     padding: 0;
+    font-size: @mobileSize;
   }
 }
+#manualEntryCompletionDateContainer {
+  border: 1px solid @muterColor;
+  padding-left: 8px;
+  padding-right: 8px;
+}
 #manualEntryVisitContainer {
+  margin-top: 8px;
   margin-bottom: 24px;
   display: flex;
   select {
@@ -5504,8 +5511,11 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
 }
 #manualEntryWarningMessageContainer {
   margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 0.95em;
   &:empty {
     margin-top: 0;
+    margin-bottom: 0;
   }
 }
 #emailBodyModal .body-content {

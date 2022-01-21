@@ -341,11 +341,17 @@ var tnthDates =  { /*global i18next */
         }
         return errorMessage;
     },
+    /*
+     * helper method for determining whether a date  is between dates
+     * @param targetDate, a date string or Date object
+     * @param startDate, a date string or Date object
+     * @param endDate, a date string or Date object
+     */
     isBetweenDates: function(targetDate, startDate, endDate) {
         if (!targetDate) return false;
-        var d1 = new Date(targetDate);
-        var d2 = new Date(startDate);
-        var d3 = new Date(endDate);
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(startDate) ? new Date(startDate) : startDate;
+        var d3 = !this.isDateObj(endDate) ? new Date(endDate) : endDate;
         return (d1.getTime() >= d2.getTime()) && (d1.getTime() <= d3.getTime());
     }
 };

@@ -1328,7 +1328,7 @@
                                                 </div>
                                                 <div class="info text-muted"></div>
                                             </div>
-                                            <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer" v-text="getManualEntryQuestionnaireDateLabel()"></label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
                                                 <div class="flex-item">
                                                     <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}"  data-exempt-from-disabling="true" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" v-model="manualEntry.todayObj.displayDay" required />
@@ -1355,7 +1355,7 @@
                                                 </div>
                                             </div>
                                         {% raw %}
-                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()"></div>
+                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()" v-text="manualEntry.outofWindowMessage"></div>
                                             <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
                                         </div>

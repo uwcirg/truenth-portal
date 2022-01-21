@@ -179,6 +179,7 @@ export default (function() {
                 timeline: [],
                 selectedTimeline: {},
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
+                outofWindowMessage: "",
                 errorMessage: null
             },
             patientEmailForm: {
@@ -2609,54 +2610,85 @@ export default (function() {
                 return this.manualEntry.timeline && this.manualEntry.timeline.length > 0;
             },
             hasSelectedManualEntryVisit: function() {
+                if (!this.manualEntry.method || this.manualEntry.method !== "paper") return true;
                 if (!this.hasTimeline()) return true;
-                return Object.keys(this.manualEntry.selectedTimeline).length > 0;
+                return this.hasTimeline() && Object.keys(this.manualEntry.selectedTimeline).length > 0;
+            },
+            resetManualEntryVisitFields: function() {
+                 //reset selected visit and associated timeline info
+                 this.manualEntry.selectedTimeline = {};
+                 this.manualEntry.outofWindowMessage = "";
+                 this.manualEntry.errorMessage = "";
+                 $("#manualEntryVisitSelector").val("");
+                 $("#manualEntryVisitContainer .info").html("");
             },
             initManualEntryVisits: function() {
                 var self = this;
-                //reset selected visit and associated timeline info
-                this.manualEntry.selectedTimeline = {};
-                $("#manualEntryWarningMessageContainer").html("");
-
+                this.resetManualEntryVisitFields();
+                this.manualEntry.timeline = [];
                 this.modules.tnthAjax.assessmentTimeline(this.subjectId, {sync: false}, function(data) {
-                    if (data && data.timeline && data.timeline.length) {
-                        self.manualEntry.timeline = data.timeline.filter(function(item) {
-                            return String(item.status).toLowerCase() === "due";
-                        }).map(function(item) {
-                            item.startDate = self.modules.tnthDates.formatDateString(item.at, "yyyy-mm-dd");
-                            item.endDate = self.modules.tnthDates.formatDateString(item.expires, "yyyy-mm-dd");
-                            return item;
-                        });
-                        if (!self.hasTimeline()) return;
-                        $("#manualEntryCompletionDateContainer .manualentry-date-label").text(i18next.t("When did the patient actually fill in the paper form"));
-                        $("#manualEntryVisitSelector").on("change", function() {
+                    if (!data && data.timeline && data.timeline.length) {
+                        return ;
+                    }
+                    self.manualEntry.timeline = data.timeline.filter(function(item) {
+                        return String(item.status).toLowerCase() === "due";
+                    }).map(function(item) {
+                        item.startDate = item.at;
+                        item.endDate = item.expires;
+                        return item;
+                    });
+                    if (!self.hasTimeline()) return;
+                    $("#manualEntryVisitSelector").on("change", function() {
+                        if ($(this).val()) {
                             var selectedOption = $(this).find("option:selected");
-                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit begins on {startdate} and ends on {enddate}")
+                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit begins on<br/><b>{startdate}</b> and ends on <b>{enddate}</b>")
                             .replace("{visit}", selectedOption.text())
-                            .replace("{startdate}", selectedOption.attr("data-startdate"))
-                            .replace("{enddate}", selectedOption.attr("data-enddate"))
+                            .replace("{startdate}",self.modules.tnthDates.formatDateString(
+                                selectedOption.attr("data-startdate"), "yyyy-mm-dd"))
+                            .replace("{enddate}", self.modules.tnthDates.formatDateString(
+                                selectedOption.attr("data-enddate"), "yyyy-mm-dd"))
                             );
                             self.manualEntry.selectedTimeline = {
                                 "visit": selectedOption.text(),
                                 "startDate":selectedOption.attr("data-startdate"),
                                 "endDate":  selectedOption.attr("data-enddate")
                             };
-                            self.displayOutofWindowDateMessage();
-                            console.log("selected time line ", self.manualEntry.selectedTimeline)
-                        });
-                    }
+                        } else self.manualEntry.selectedTimeline = {};
+                        self.setOutofWindowDateMessage();
+                    });
                 });
             },
-            displayOutofWindowDateMessage: function() {
-                if (this.hasTimeline() && this.hasSelectedManualEntryVisit()) {
-                    var isBetweenDate = this.modules.tnthDates.isBetweenDates(
-                        this.manualEntry.completionDate,
-                        this.manualEntry.selectedTimeline.startDate,
-                        this.manualEntry.selectedTimeline.endDate);
-                    if (!isBetweenDate) {
-                        $("#manualEntryWarningMessageContainer").html(i18next.t("The date is outside the window for the selected visit. If the date entered is correct, please continue."));
-                    } else $("#manualEntryWarningMessageContainer").html("");
+            getManualEntryQuestionnaireDateLabel: function() {
+                if (this.hasTimeline()) {
+                    return i18next.t("When did the patient actually fill in the paper form");
                 }
+                return i18next.t("Questionnaire completion date");
+            },
+            setOutofWindowDateMessage: function() {
+                if (!this.hasTimeline() || !this.hasSelectedManualEntryVisit()) {
+                    this.manualEntry.outofWindowMessage = "";
+                    return;
+                }
+                //can't compare if no completion date, no start date or no end date
+                if (!this.manualEntry.completionDate ||
+                    !this.manualEntry.selectedTimeline.startDate ||
+                    !this.manualEntry.selectedTimeline.endDate) {
+                    this.manualEntry.outofWindowMessage = "";
+                    return;
+                }
+                //check if the completion date is between visit start date and end date
+                var isBetweenDate = this.modules.tnthDates.isBetweenDates(
+                    this.modules.tnthDates.formatDateString(
+                        this.manualEntry.completionDate, "yyyy-mm-dd"),
+                    this.modules.tnthDates.formatDateString(
+                        this.manualEntry.selectedTimeline.startDate, "yyyy-mm-dd"),
+                    this.modules.tnthDates.formatDateString(
+                        this.manualEntry.selectedTimeline.endDate, "yyyy-mm-dd"));
+                if (!isBetweenDate) {
+                    this.manualEntry.outofWindowMessage = i18next.t("The date is outside the window for the selected visit. If the date entered is correct, please continue.");
+                    return;
+                }
+                this.manualEntry.outofWindowMessage = "";
             },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
@@ -2668,10 +2700,12 @@ export default (function() {
                 });
                 $("#manualEntryModal").on("show.bs.modal", function() {
                     self.manualEntry.initloading = true;
+                    self.manualEntry.method = "";
                     self.resetManualEntryFormValidationError();
+                    //set visits
+                    self.initManualEntryVisits();
                 });
                 $("#manualEntryModal").on("shown.bs.modal", function() {
-                    self.manualEntry.method = "";
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
@@ -2704,13 +2738,12 @@ export default (function() {
                         }
                         //set completion date once consent date/time has been set
                         self.setInitManualEntryCompletionDate();
-                        //set visits
-                        self.initManualEntryVisits();
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
                 });
 
                 $("input[name='entryMethod']").on("click", function() {
+                    self.resetManualEntryVisitFields();
                     self.resetManualEntryFormValidationError();
                     self.manualEntry.method = $(this).val();
                     if ($(this).val() === "interview_assisted") {
@@ -2753,7 +2786,7 @@ export default (function() {
 
 
                         //check is date is within the selected visit
-                        self.displayOutofWindowDateMessage();
+                        self.setOutofWindowDateMessage();
 
                         //add check for consent date
                         if (!self.manualEntry.consentDate) {
