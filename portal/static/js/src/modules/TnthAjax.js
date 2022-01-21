@@ -1095,7 +1095,7 @@ export default { /*global $ */
                 if (!data.error) {
                     callback(data);
                 } else {
-                    callback({"error": i18next.t("Error occurred retrieving assessment timeline.")});
+                    callback({"error": i18next.t("Error occurred retrieving assessment list.")});
                 }
             } else {
                 callback({"error": i18next.t("no data returned")});
