@@ -342,7 +342,7 @@ var tnthDates =  { /*global i18next */
         return errorMessage;
     },
     /*
-     * helper method for determining whether a date  is between dates
+     * helper method for determining whether a date is between dates
      * @param targetDate, a date string or Date object
      * @param startDate, a date string or Date object
      * @param endDate, a date string or Date object

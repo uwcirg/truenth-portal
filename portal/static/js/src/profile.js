@@ -2784,7 +2784,7 @@ export default (function() {
                         self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
 
 
-                        //check is date is within the selected visit
+                        //check if date is within the selected visit
                         self.setOutofWindowDateMessage();
 
                         //add check for consent date
