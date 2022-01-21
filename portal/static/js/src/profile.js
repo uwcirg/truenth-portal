@@ -2565,7 +2565,6 @@ export default (function() {
                         assessment_url +="&visit=" + self.manualEntry.selectedTimeline.visit;
                     }
                 }
-                console.log("assessment url ", assessment_url)
                 var winLocation = assessment_url;
                 if (still_needed) {
                     winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
@@ -2612,7 +2611,7 @@ export default (function() {
             hasSelectedManualEntryVisit: function() {
                 if (!this.manualEntry.method || this.manualEntry.method !== "paper") return true;
                 if (!this.hasTimeline()) return true;
-                return this.hasTimeline() && Object.keys(this.manualEntry.selectedTimeline).length > 0;
+                return Object.keys(this.manualEntry.selectedTimeline).length > 0;
             },
             resetManualEntryVisitFields: function() {
                  //reset selected visit and associated timeline info

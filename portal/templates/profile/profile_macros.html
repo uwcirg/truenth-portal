@@ -1318,7 +1318,7 @@
                                         <div id="manualEntryCompletionDateContainer" class="form-group" v-show="manualEntry.method == 'paper'">
                                             <div id="manualEntryVisitContainer" v-show="hasTimeline()">
                                                 <div>
-                                                    <label class="text-muted" for="qVisit">{{_("Visit")}}</label>
+                                                    <label class="text-muted" for="qVisit">{{_("Please select a visit")}}</label>
                                                     <select class="form-control" id="manualEntryVisitSelector">
                                                         <option value="">{{_("Select")}}</option>
                                                         <option v-for="item in manualEntry.timeline" :value="item.visit"
