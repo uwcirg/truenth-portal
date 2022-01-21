@@ -107,7 +107,7 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
  */
 const cleanEpromsSrc = function(callback) {
   console.log("delete EPROMS source JSON file...");
-  del([translationSourceDir + epromsNameSpace + ".json"]);
+  del.sync([translationSourceDir + epromsNameSpace + ".json"]);
   callback();
 };
 exports.cleanEpromsSrc = series(cleanEpromsSrc);
@@ -116,7 +116,7 @@ exports.cleanEpromsSrc = series(cleanEpromsSrc);
  */
 const cleanTruenthSrc = function(callback) {
   console.log("Delete TRUEnth source JSON file...");
-  del([translationSourceDir + truenthNameSpace + ".json"]);
+  del.sync([translationSourceDir + truenthNameSpace + ".json"]);
   callback();
 };
 exports.cleanTruenthSrc = series(cleanTruenthSrc);
@@ -125,7 +125,7 @@ exports.cleanTruenthSrc = series(cleanTruenthSrc);
  */
 const cleanSrc = function(callback) {
   console.log("Deleting json files in source directory...");
-  del([translationSourceDir + nameSpace + ".json"]);
+  del.sync([translationSourceDir + nameSpace + ".json"]);
   callback();
 };
 exports.cleanSrc = series(cleanSrc);
@@ -135,7 +135,7 @@ exports.cleanSrc = series(cleanSrc);
  */
 const cleanDest = function(callback) {
   console.log("Deleting json files in destination directory...");
-  del([translationDestinationDir + "*/*.json"]);
+  del.sync([translationDestinationDir + "*/*.json"]);
   callback();
 };
 exports.cleanDest = series(cleanDest);
@@ -319,4 +319,3 @@ exports.gil = series(i18nextConvertTruenthJSONToPOT);
    so probably should run "i18nextConvertPOToJSON" task separately
  */
 exports.default = series(i18nextConvertJSONToPOT);
-
