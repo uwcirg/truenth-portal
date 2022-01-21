@@ -176,6 +176,8 @@ export default (function() {
                 method: "",
                 consentDate: "",
                 completionDate: "",
+                timeline: [],
+                selectedTimeline: {},
                 todayObj: { displayDay: "", displayMonth: "", displayYear: ""},
                 errorMessage: null
             },
@@ -2558,7 +2560,11 @@ export default (function() {
                 }
                 if (method === "paper") {
                     assessment_url += "&authored=" + completionDate;
+                    if (self.hasTimeline() && self.hasSelectedManualEntryVisit()) {
+                        assessment_url +="&visit=" + self.manualEntry.selectedTimeline.visit;
+                    }
                 }
+                console.log("assessment url ", assessment_url)
                 var winLocation = assessment_url;
                 if (still_needed) {
                     winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
@@ -2598,6 +2604,59 @@ export default (function() {
                     return;
                 }
                 $("#manualEntryMessageContainer").html(message);
+            },
+            hasTimeline: function() {
+                return this.manualEntry.timeline && this.manualEntry.timeline.length > 0;
+            },
+            hasSelectedManualEntryVisit: function() {
+                if (!this.hasTimeline()) return true;
+                return Object.keys(this.manualEntry.selectedTimeline).length > 0;
+            },
+            initManualEntryVisits: function() {
+                var self = this;
+                //reset selected visit and associated timeline info
+                this.manualEntry.selectedTimeline = {};
+                $("#manualEntryWarningMessageContainer").html("");
+
+                this.modules.tnthAjax.assessmentTimeline(this.subjectId, {sync: false}, function(data) {
+                    if (data && data.timeline && data.timeline.length) {
+                        self.manualEntry.timeline = data.timeline.filter(function(item) {
+                            return String(item.status).toLowerCase() === "due";
+                        }).map(function(item) {
+                            item.startDate = self.modules.tnthDates.formatDateString(item.at, "yyyy-mm-dd");
+                            item.endDate = self.modules.tnthDates.formatDateString(item.expires, "yyyy-mm-dd");
+                            return item;
+                        });
+                        if (!self.hasTimeline()) return;
+                        $("#manualEntryCompletionDateContainer .manualentry-date-label").text(i18next.t("When did the patient actually fill in the paper form"));
+                        $("#manualEntryVisitSelector").on("change", function() {
+                            var selectedOption = $(this).find("option:selected");
+                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit begins on {startdate} and ends on {enddate}")
+                            .replace("{visit}", selectedOption.text())
+                            .replace("{startdate}", selectedOption.attr("data-startdate"))
+                            .replace("{enddate}", selectedOption.attr("data-enddate"))
+                            );
+                            self.manualEntry.selectedTimeline = {
+                                "visit": selectedOption.text(),
+                                "startDate":selectedOption.attr("data-startdate"),
+                                "endDate":  selectedOption.attr("data-enddate")
+                            };
+                            self.displayOutofWindowDateMessage();
+                            console.log("selected time line ", self.manualEntry.selectedTimeline)
+                        });
+                    }
+                });
+            },
+            displayOutofWindowDateMessage: function() {
+                if (this.hasTimeline() && this.hasSelectedManualEntryVisit()) {
+                    var isBetweenDate = this.modules.tnthDates.isBetweenDates(
+                        this.manualEntry.completionDate,
+                        this.manualEntry.selectedTimeline.startDate,
+                        this.manualEntry.selectedTimeline.endDate);
+                    if (!isBetweenDate) {
+                        $("#manualEntryWarningMessageContainer").html(i18next.t("The date is outside the window for the selected visit. If the date entered is correct, please continue."));
+                    } else $("#manualEntryWarningMessageContainer").html("");
+                }
             },
             initCustomPatientDetailSection: function() {
                 var subjectId = this.subjectId, self = this;
@@ -2645,6 +2704,8 @@ export default (function() {
                         }
                         //set completion date once consent date/time has been set
                         self.setInitManualEntryCompletionDate();
+                        //set visits
+                        self.initManualEntryVisits();
                     });
                     setTimeout(function() { self.manualEntry.initloading = false;}, 10);
                 });
@@ -2689,6 +2750,10 @@ export default (function() {
 
                         var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
                         self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
+
+
+                        //check is date is within the selected visit
+                        self.displayOutofWindowDateMessage();
 
                         //add check for consent date
                         if (!self.manualEntry.consentDate) {

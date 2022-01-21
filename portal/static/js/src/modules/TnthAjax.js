@@ -307,7 +307,7 @@ export default { /*global $ */
             return false;
         }
         roleType = roleType || "patient";
-        this.sendRequest(`/api/${roleType}/${userId}/research_study`, "GET", userId, params, 
+        this.sendRequest(`/api/${roleType}/${userId}/research_study`, "GET", userId, params,
         function(data) {
             if (!data || data.error || !data.research_study) {
                 callback({"error": data.error});
@@ -340,7 +340,7 @@ export default { /*global $ */
                 callback({"error": true});
                 return false;
             }
-            
+
             if (params.retryAttempt < params.maxTryAttempts &&
                 //if the trigger data has not been processed, try again until maximum number of attempts has been reached
                 EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
@@ -498,7 +498,7 @@ export default { /*global $ */
                     var expired = tnthDates.getDateDiff(String(item.expires)); /*global tnthDates */
                     return (
                         String(orgId) === String(item.organization_id) &&
-                        String(params.research_study_id) === String(item.research_study_id) && 
+                        String(params.research_study_id) === String(item.research_study_id) &&
                         !item.deleted && !(expired > 0) && String(item.status) === "suspended");
                 });
             }
@@ -682,14 +682,14 @@ export default { /*global $ */
         var self = this;
         callback = callback || function() {};
         this.sendRequest("/api/patient/" + userId + "/procedure", "GET", userId, {sync: true}, function(data) {
-            if (!data || data.error) { 
+            if (!data || data.error) {
                 callback();
                 return false;
             }
             var treatmentData = self.hasTreatment(data);
             if (!treatmentData) {
                 callback();
-                return false; 
+                return false;
             }
             if (String(treatmentData.code) === String(SYSTEM_IDENTIFIER_ENUM.CANCER_TREATMENT_CODE)){
                 self.deleteProc(treatmentData.id, targetField, true, callback);
@@ -1082,6 +1082,24 @@ export default { /*global $ */
         params.data = JSON.stringify(data);
         this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
             callback({data: data});
+        });
+    },
+    "assessmentTimeline": function(userId, params, callback) {
+        callback = callback || function() {};
+        if (!userId) {
+            callback({error: i18next.t("User id is required.")});
+            return false;
+        }
+        this.sendRequest("/api/patient/" + userId + "/timeline", "GET", userId, params, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                } else {
+                    callback({"error": i18next.t("Error occurred retrieving assessment timeline.")});
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
         });
     },
     "assessmentList": function(userId, params, callback) {

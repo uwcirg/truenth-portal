@@ -1316,7 +1316,19 @@
                                             </div>
                                         </div>
                                         <div id="manualEntryCompletionDateContainer" class="form-group" v-show="manualEntry.method == 'paper'">
-                                            <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <div id="manualEntryVisitContainer" v-show="hasTimeline()">
+                                                <div>
+                                                    <label class="text-muted" for="qVisit">{{_("Visit")}}</label>
+                                                    <select class="form-control" id="manualEntryVisitSelector">
+                                                        <option value="">{{_("Select")}}</option>
+                                                        <option v-for="item in manualEntry.timeline" :value="item.visit"
+                                                        :data-startdate="item.startDate"
+                                                        :data-enddate="item.endDate" v-text="item.visit"></option>
+                                                    </select>
+                                                </div>
+                                                <div class="info text-muted"></div>
+                                            </div>
+                                            <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
                                                 <div class="flex-item">
                                                     <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}"  data-exempt-from-disabling="true" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" v-model="manualEntry.todayObj.displayDay" required />
@@ -1343,6 +1355,7 @@
                                                 </div>
                                             </div>
                                         {% raw %}
+                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()"></div>
                                             <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
                                         </div>
@@ -1353,7 +1366,7 @@
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
                                     <div id="manualEntryButtonsContainer" v-show="!manualEntry.loading">
-                                        <a href="#" id="meSubmit" class="btn btn-default" v-bind:disabled="(!manualEntry.method) || manualEntry.errorMessage">{{_("OK")}}</a>
+                                        <a href="#" id="meSubmit" class="btn btn-default" v-bind:disabled="(!manualEntry.method) || manualEntry.errorMessage || !hasSelectedManualEntryVisit()">{{_("OK")}}</a>
                                         <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
                                     </div>
                                 </div>

@@ -5480,12 +5480,32 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     flex-wrap: wrap
   }
 }
+#manualEntryVisitContainer,
 #manualEntryCompletionDateContainer {
   margin-top: 1em;
   label {
     position: relative;
-    top: 2px;
     margin-bottom: 4px;
+    padding: 0;
+  }
+}
+#manualEntryVisitContainer {
+  margin-bottom: 24px;
+  display: flex;
+  select {
+    width: 200px;
+    max-width: 100%;
+  }
+  .info {
+    margin-left: 16px;
+    margin-top: 24px;
+    font-size: @mobileSize;
+  }
+}
+#manualEntryWarningMessageContainer {
+  margin-top: 8px;
+  &:empty {
+    margin-top: 0;
   }
 }
 #emailBodyModal .body-content {

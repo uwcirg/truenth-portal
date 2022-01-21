@@ -340,8 +340,14 @@ var tnthDates =  { /*global i18next */
             errorMessage = i18next.t("Missing value.");
         }
         return errorMessage;
+    },
+    isBetweenDates: function(targetDate, startDate, endDate) {
+        if (!targetDate) return false;
+        var d1 = new Date(targetDate);
+        var d2 = new Date(startDate);
+        var d3 = new Date(endDate);
+        return (d1.getTime() >= d2.getTime()) && (d1.getTime() <= d3.getTime());
     }
 };
 export default tnthDates;
 export var validateDateInputFields = tnthDates.validateDateInputFields; /* generic validation function for global use */
-
