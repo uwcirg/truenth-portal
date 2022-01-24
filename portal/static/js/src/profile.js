@@ -2664,7 +2664,7 @@ export default (function() {
                 return i18next.t("Questionnaire completion date");
             },
             setOutofWindowDateMessage: function() {
-                if (!this.hasTimeline() || !this.hasSelectedManualEntryVisit()) {
+                if (this.manualEntry.errorMessage || !this.hasTimeline() || !this.hasSelectedManualEntryVisit()) {
                     this.manualEntry.outofWindowMessage = "";
                     return;
                 }
@@ -2776,6 +2776,7 @@ export default (function() {
                         if (errorMessage) {
                             self.manualEntry.errorMessage = errorMessage;
                             self.setManualEntryErrorMessage(errorMessage);
+                            self.setOutofWindowDateMessage();
                             $("#meSubmit").attr("disabled", true);
                             return false;
                         }
