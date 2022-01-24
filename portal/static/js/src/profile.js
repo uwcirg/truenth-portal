@@ -2652,7 +2652,7 @@ export default (function() {
                                 "startDate":selectedOption.attr("data-startdate"),
                                 "endDate":  selectedOption.attr("data-enddate")
                             };
-                        } else self.manualEntry.selectedTimeline = {};
+                        } else self.resetManualEntryVisitFields();
                         self.setOutofWindowDateMessage();
                     });
                 });
