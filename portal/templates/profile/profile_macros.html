@@ -1355,7 +1355,7 @@
                                                 </div>
                                             </div>
                                         {% raw %}
-                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()" v-text="manualEntry.outofWindowMessage"></div>
+                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()" v-html="manualEntry.outofWindowMessage"></div>
                                             <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
                                         </div>

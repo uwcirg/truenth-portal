@@ -292,7 +292,9 @@ var tnthDates =  { /*global i18next */
          * param is a date object - calculating UTC date using Date object's timezoneOffset method
          * the method return offset in minutes, so need to convert it to miliseconds - adding the resulting offset will be the UTC date/time
          */
+        if (!dObj) return "";
         format = format || "system";
+        if (!this.isDateObj(dObj)) dObj = new Date(dObj);
         var utcDate = new Date(dObj.getTime() + (dObj.getTimezoneOffset()) * 60 * 1000);
         return this.formatDateString(utcDate, format);  //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
     },
@@ -342,7 +344,7 @@ var tnthDates =  { /*global i18next */
         return errorMessage;
     },
     /*
-     * helper method for determining whether a date is between dates
+     * helper method for determining whether a date is greater than or equal to start date and less than end date
      * @param targetDate, a date string or Date object
      * @param startDate, a date string or Date object
      * @param endDate, a date string or Date object
@@ -352,7 +354,25 @@ var tnthDates =  { /*global i18next */
         var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         var d2 = !this.isDateObj(startDate) ? new Date(startDate) : startDate;
         var d3 = !this.isDateObj(endDate) ? new Date(endDate) : endDate;
-        return (d1.getTime() >= d2.getTime()) && (d1.getTime() <= d3.getTime());
+        return (d1.getTime() >= d2.getTime()) && (d1.getTime() < d3.getTime());
+    },
+    minusDate: function(targetDate, numOfDays) {
+        if (!numOfDays) numOfDays = 0;
+        var dateOffset = (24*60*60*1000) * numOfDays; //day in miliseconds
+        targetDate = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        return targetDate.setTime(targetDate.getTime() - dateOffset);
+    },
+    isLessThanDate: function(targetDate, comparedDate) {
+        if (!targetDate) return false;
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
+        return (d1.getTime() < d2.getTime());
+    },
+    isGreaterThanDate: function(targetDate, comparedDate) {
+        if (!targetDate) return false;
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
+        return (d1.getTime() > d2.getTime());
     }
 };
 export default tnthDates;

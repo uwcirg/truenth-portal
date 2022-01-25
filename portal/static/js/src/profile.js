@@ -2560,11 +2560,14 @@ export default (function() {
                     assessment_url += "?entry_method=" + method;
                 }
                 if (method === "paper") {
-                    assessment_url += "&authored=" + completionDate;
-                    if (self.hasTimeline() && self.hasSelectedManualEntryVisit()) {
-                        assessment_url +="&visit=" + self.manualEntry.selectedTimeline.visit;
+                    if (self.isCompletionDateOutofWindow()) {
+                        assessment_url += "&authored=" + self.getOutOfWindowAuthoredDate();
+                        assessment_url +="&actual=" + completionDate;
+                    } else {
+                        assessment_url += "&authored=" + completionDate;
                     }
                 }
+                console.log("assessment url ", assessment_url);
                 var winLocation = assessment_url;
                 if (still_needed) {
                     winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
@@ -2640,20 +2643,23 @@ export default (function() {
                     $("#manualEntryVisitSelector").on("change", function() {
                         if ($(this).val()) {
                             var selectedOption = $(this).find("option:selected");
-                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit begins on<br/><b>{startdate}</b> and ends on <b>{enddate}</b>")
+                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b>")
                             .replace("{visit}", selectedOption.text())
-                            .replace("{startdate}",self.modules.tnthDates.formatDateString(
-                                selectedOption.attr("data-startdate"), "yyyy-mm-dd"))
-                            .replace("{enddate}", self.modules.tnthDates.formatDateString(
-                                selectedOption.attr("data-enddate"), "yyyy-mm-dd"))
+                            .replace("{startdate}",self.getFormattedManualEntryVisitDate(
+                                new Date(selectedOption.attr("data-startdate"))))
+                            .replace("{enddate}", self.getFormattedManualEntryVisitDate(
+                                new Date(selectedOption.attr("data-enddate"))))
                             );
                             self.manualEntry.selectedTimeline = {
                                 "visit": selectedOption.text(),
                                 "startDate":selectedOption.attr("data-startdate"),
                                 "endDate":  selectedOption.attr("data-enddate")
                             };
-                        } else self.resetManualEntryVisitFields();
-                        self.setOutofWindowDateMessage();
+                            self.setOutofWindowDateMessage();
+                        } else {
+                            self.resetManualEntryVisitFields();
+                            self.setOutofWindowDateMessage();
+                        }
                     });
                 });
             },
@@ -2663,28 +2669,62 @@ export default (function() {
                 }
                 return i18next.t("Questionnaire completion date");
             },
-            setOutofWindowDateMessage: function() {
-                if (this.manualEntry.errorMessage || !this.hasTimeline() || !this.hasSelectedManualEntryVisit()) {
-                    this.manualEntry.outofWindowMessage = "";
-                    return;
+            getFormattedManualEntryVisitDate: function(date) {
+                if (!date) return "";
+                return this.modules.tnthDates.formatDateString(date, "yyyy-mm-dd hh:mm:ss");
+            },
+            getOutOfWindowAuthoredDate: function() {
+                if (!this.isCompletionDateOutofWindow()) {
+                    return this.manualEntry.completedDate;
+                }
+                /***
+                - if the completion date comes before the visit starts, use the picked visit’s start as the authored
+                - if the completion date comes after the visit starts, use the end of the visit date minus one day as the authored
+                ***/
+                var startDate = this.getFormattedManualEntryVisitDate(
+                    this.manualEntry.selectedTimeline.startDate);
+                if (this.modules.tnthDates.isLessThanDate(this.manualEntry.completionDate, startDate)) {
+                    return this.modules.tnthDates.formatDateString(this.manualEntry.selectedTimeline.startDate, "system");
+                }
+                return this.modules.tnthDates.formatDateString(this.manualEntry.selectedTimeline.endDate, "system");
+            },
+            isCompletionDateOutofWindow: function() {
+                if (this.manualEntry.errorMessage ||
+                    !this.hasTimeline() ||
+                    !this.hasSelectedManualEntryVisit()) {
+                    return false;
                 }
                 //can't compare if no completion date, no start date or no end date
                 if (!this.manualEntry.completionDate ||
                     !this.manualEntry.selectedTimeline.startDate ||
                     !this.manualEntry.selectedTimeline.endDate) {
-                    this.manualEntry.outofWindowMessage = "";
-                    return;
+                    return false;
                 }
                 //check if the completion date is between visit start date and end date
+                //start dates ARE inclusive (completion date can == start date)
+                //end dates ARE exclusive (must be strictly less than)
+                //comparison is made down to the second
                 var isBetweenDate = this.modules.tnthDates.isBetweenDates(
-                    this.modules.tnthDates.formatDateString(
-                        this.manualEntry.completionDate, "yyyy-mm-dd"),
-                    this.modules.tnthDates.formatDateString(
-                        this.manualEntry.selectedTimeline.startDate, "yyyy-mm-dd"),
-                    this.modules.tnthDates.formatDateString(
-                        this.manualEntry.selectedTimeline.endDate, "yyyy-mm-dd"));
+                    this.getFormattedManualEntryVisitDate(
+                        this.manualEntry.completionDate
+                    ),
+                    this.getFormattedManualEntryVisitDate(
+                        this.manualEntry.selectedTimeline.startDate
+                    ),
+                    this.getFormattedManualEntryVisitDate(
+                        this.manualEntry.selectedTimeline.endDate
+                    ));
                 if (!isBetweenDate) {
-                    this.manualEntry.outofWindowMessage = i18next.t("The date is outside the window for the selected visit. If the date entered is correct, please continue.");
+                    return true;
+                }
+                return false;
+            },
+            setOutofWindowDateMessage: function() {
+                if (this.isCompletionDateOutofWindow()) {
+                    console.log("completion date? ", this.manualEntry.completionDate)
+                    console.log("start date ", this.manualEntry.selectedTimeline.startDate)
+                    console.log("end date ", this.manualEntry.selectedTimeline.endDate)
+                    this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b>, is outside the window for the selected visit. If the date entered is correct, please continue.").replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "iso"));
                     return;
                 }
                 this.manualEntry.outofWindowMessage = "";
@@ -2708,6 +2748,7 @@ export default (function() {
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
+                            self.manualEntry.initloading = false;
                             return false;
                         }
                         dataArray = data.consent_agreements.sort(function(a, b) {
@@ -2737,8 +2778,8 @@ export default (function() {
                         }
                         //set completion date once consent date/time has been set
                         self.setInitManualEntryCompletionDate();
+                        setTimeout(function() { self.manualEntry.initloading = false;}, 150);
                     });
-                    setTimeout(function() { self.manualEntry.initloading = false;}, 10);
                 });
 
                 $("input[name='entryMethod']").on("click", function() {
@@ -2820,6 +2861,7 @@ export default (function() {
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
                     if (method === "") { return false; }
                     if (method !== "paper") {
+                        self.resetManualEntryFormValidationError();
                         self.continueToAssessment(method, completionDate, linkUrl);
                         return false;
                     }
