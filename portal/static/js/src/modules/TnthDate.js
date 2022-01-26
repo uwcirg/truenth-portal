@@ -396,6 +396,20 @@ var tnthDates =  { /*global i18next */
         var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
         return (d1.getTime() > d2.getTime());
+    },
+    /*
+     * helper function that returns local timezone in text
+     */
+    getTimeZoneDisplay: function() {
+        var localTimezone = "";
+        try {
+            localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } catch(e) {
+            console.log("Intl object not supported ", e);
+            localTimezone = "";
+        }
+        if (localTimezone) return localTimezone;
+        return new Date().toLocaleDateString(undefined, {day:"2-digit",timeZoneName: "long" }).substring(4);
     }
 };
 export default tnthDates;

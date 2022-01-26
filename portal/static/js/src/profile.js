@@ -2560,7 +2560,7 @@ export default (function() {
             setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
                 //set initial completion date as GMT date/time for today based on user timezone
-                this.manualEntry.completionDate = this.manualEntry.todayObj.gmtDate;
+                this.manualEntry.completionDate = this.modules.tnthDates.getDateWithTimeZone((this.manualEntry.todayObj.date).setHours(12,0,0,0));
             },
             setInitManualEntryCompletionDate: function() {
                 //set initial completion date as GMT date/time for today based on user timezone
@@ -2648,12 +2648,13 @@ export default (function() {
                         var selectedOption = $(this).find("option:selected");
                         // display start and end dates for the visit in local date/time
                         $("#manualEntryVisitContainer .info").html(
-                            i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b>")
+                            i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b><br/><span class='small'>( {timezone} )</span>")
                             .replace("{visit}", selectedOption.text())
                             .replace("{startdate}",self.modules.tnthDates.formatDateString(
                                 new Date(selectedOption.attr("data-startdate")), "d M y hh:mm:ss"))
                             .replace("{enddate}", self.modules.tnthDates.formatDateString(
                                 new Date(selectedOption.attr("data-enddate")), "d M y hh:mm:ss"))
+                            .replace("{timezone}", self.modules.tnthDates.getTimeZoneDisplay())
                         );
                         self.manualEntry.selectedTimeline = {
                             "visit": selectedOption.text(),
@@ -2725,7 +2726,9 @@ export default (function() {
             },
             setOutofWindowDateMessage: function() {
                 if (this.isCompletionDateOutofWindow()) {
-                    this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b>, is outside the window for the selected visit. If the date entered is correct, please continue.").replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "d M y hh:mm:ss"));
+                    this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b> <span class='small'>( {timezone} )</span>, is outside the window for the selected visit. If the date entered is correct, please continue.")
+                    .replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "d M y hh:mm:ss"))
+                    .replace("{timezone}",this.modules.tnthDates.getTimeZoneDisplay());
                     return;
                 }
                 this.manualEntry.outofWindowMessage = "";
