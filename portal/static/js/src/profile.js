@@ -2619,14 +2619,19 @@ export default (function() {
                     }
                     /*
                      * gather list of visits where a visit:
+                     * isn't completed
                      * isn't in the future
                      */
                     self.manualEntry.timeline = data.timeline.filter(function(item) {
                         var visit = item.visit;
                         var oStartDate = new Date(item.at);
                         var today = new Date();
+                        var isCompleted = data.timeline.filter(function(item) {
+                            return (String(item.visit).toLowerCase() === String(visit).toLowerCase()) &&
+                            String(item.status).toLowerCase() === "completed"
+                        }).length > 0;
                         var isFuture = oStartDate.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0);
-                        return String(item.status).toLowerCase() === "due" && !isFuture;
+                        return String(item.status).toLowerCase() === "due" && !isCompleted && !isFuture;
                     }).map(function(item) {
                         item.startDate = item.at;
                         item.endDate = item.expires;
