@@ -69,7 +69,7 @@ function replaceStd(fileName) {
         from: "../../$stdin",
         to: "",
     }).then(changes => {
-        console.log("Modified files: ", changes.join(", "));
+        console.log("Modified files: ", (changes.map(result=>result.file)).join(", "));
     }).catch(error => {
         console.log("Error occurred: ", error);
     });
@@ -290,6 +290,6 @@ const watchPsaTrackerLess = () => {
 exports.watchPsaTrackerLess = series(watchPsaTrackerLess);
 
 /*
- * compile all portal less files 
+ * compile all portal less files
  */
 exports.lessAll = series(parallel(epromsLess, portalLess, topnavLess, portalFooterLess, gilLess, psaTrackerLess, orgTreeViewLess, exerciseDietLess));
