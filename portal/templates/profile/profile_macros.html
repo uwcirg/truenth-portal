@@ -1294,10 +1294,10 @@
                                     <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div id="manualEntryBodyLoader" v-show="manualEntry.initloading">
+                                    <div id="manualEntryBodyLoader" v-show="!manualEntry.init">
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
-                                    <div id="manualEntryMain" v-show="!manualEntry.initloading">
+                                    <div id="manualEntryMain" v-show="manualEntry.init">
                                         <p class="text-left">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
                                         <input type="hidden" id="manualEntryConsentDate" v-model="manualEntry.consentDate" />
                                         <input type="hidden" id="qCompletionDate" v-model="manualEntry.completionDate" />
@@ -1326,7 +1326,7 @@
                                                         :data-enddate="item.endDate" v-text="item.visit"></option>
                                                     </select>
                                                 </div>
-                                                <div class="info text-muted"></div>
+                                                <div class="info text-muted" v-show="hasSelectedManualEntryVisit()"></div>
                                             </div>
                                             <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer" v-text="getManualEntryQuestionnaireDateLabel()"></label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
@@ -1355,7 +1355,7 @@
                                                 </div>
                                             </div>
                                         {% raw %}
-                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="hasTimeline()" v-html="manualEntry.outofWindowMessage"></div>
+                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="isCompletionDateOutofWindow()" v-html="manualEntry.outofWindowMessage"></div>
                                             <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
                                         </div>

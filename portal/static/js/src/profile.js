@@ -171,8 +171,8 @@ export default (function() {
                 data: [], hasP3PReport: false
             },
             manualEntry: {
+                init: false,
                 loading: false,
-                initloading: false,
                 method: "",
                 consentDate: "",
                 completionDate: "",
@@ -2531,54 +2531,39 @@ export default (function() {
             initProcedureSection: function() {
                 ProcApp.initViaTemplate();
             },
-            manualEntryModalVis: function(hide) {
-                if (hide) {
-                    /*
-                     * TODO, need to find out why IE is raising vue error here
-                     */
-                    this.manualEntry.loading = true;
-                    $("#manualEntryLoader").show();
-                    $("#manualEntryButtonsContainer").hide();
-                } else {
-                    this.manualEntry.loading = false;
-                    $("#manualEntryLoader").hide();
-                    $("#manualEntryButtonsContainer").show();
-                }
-            },
             continueToAssessment: function(method, completionDate, assessment_url) {
                 if (!assessment_url) {
                     this.manualEntry.errorMessage = i18next.t("The user does not have a valid assessment link.");
                     return false;
                 }
                 var self = this, still_needed = false, subjectId = this.subjectId;
-                this.modules.tnthAjax.getStillNeededCoreData(subjectId, true, function(data) {
+                this.manualEntry.loading = true;
+                this.modules.tnthAjax.getStillNeededCoreData(subjectId, false, function(data) {
                     still_needed = data && data.still_needed && data.still_needed.length;
-                }, method);
-                if (/\?/.test(assessment_url)) { //passing additional query params
-                    assessment_url += "&entry_method=" + method;
-                } else {
-                    assessment_url += "?entry_method=" + method;
-                }
-                if (method === "paper") {
-                    if (self.isCompletionDateOutofWindow()) {
-                        assessment_url += "&authored=" + self.getOutOfWindowAuthoredDate();
-                        assessment_url +="&actual=" + completionDate;
+                    if (/\?/.test(assessment_url)) { //passing additional query params
+                        assessment_url += "&entry_method=" + method;
                     } else {
-                        assessment_url += "&authored=" + completionDate;
+                        assessment_url += "?entry_method=" + method;
                     }
-                }
-                console.log("assessment url ", assessment_url);
-                var winLocation = assessment_url;
-                if (still_needed) {
-                    winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
-                    "&redirect_url=" + encodeURIComponent(assessment_url);
-                }
-                this.manualEntryModalVis(true);
-                window.location = winLocation;
-                setTimeout(function(callback) {
-                    callback = callback || function() {};
-                    if (callback) { callback(); }
-                }, 5000, self.manualEntryModalVis);
+                    if (method === "paper") {
+                        if (self.isCompletionDateOutofWindow()) {
+                            assessment_url += "&authored=" + self.getOutOfWindowAuthoredDate();
+                            assessment_url +="&actual=" + completionDate;
+                        } else {
+                            assessment_url += "&authored=" + completionDate;
+                        }
+                    }
+                    console.log("assessment url ", assessment_url);
+                    var winLocation = assessment_url;
+                    if (still_needed) {
+                        winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
+                        "&redirect_url=" + encodeURIComponent(assessment_url);
+                    }
+                    window.location = winLocation;
+                    setTimeout(function() {
+                        self.manualEntry.loading = false;
+                    },150);
+                }, method);
             },
             setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
@@ -2632,8 +2617,21 @@ export default (function() {
                     if (!data && data.timeline && data.timeline.length) {
                         return ;
                     }
+                    /*
+                     * gather list of visits where a visit:
+                     * isn't completed
+                     * isn't in the future
+                     */
                     self.manualEntry.timeline = data.timeline.filter(function(item) {
-                        return String(item.status).toLowerCase() === "due";
+                        var visit = item.visit;
+                        var oStartDate = new Date(item.at);
+                        var today = new Date();
+                        var isFuture = oStartDate.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0);
+                        var isCompleted = data.timeline.filter(function(item) {
+                            return String(item.visit).toLowerCase() === String(visit).toLowerCase() &&
+                            String(item.status).toLowerCase() === "completed";
+                        }).length > 0;
+                        return String(item.status).toLowerCase() === "due" && !isCompleted && !isFuture;
                     }).map(function(item) {
                         item.startDate = item.at;
                         item.endDate = item.expires;
@@ -2641,31 +2639,33 @@ export default (function() {
                     });
                     if (!self.hasTimeline()) return;
                     $("#manualEntryVisitSelector").on("change", function() {
-                        if ($(this).val()) {
-                            var selectedOption = $(this).find("option:selected");
-                            $("#manualEntryVisitContainer .info").html(i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b>")
+                        if (!$(this).val()) {
+                            self.manualEntry.selectedTimeline = {};
+                            return;
+
+                        }
+                        var selectedOption = $(this).find("option:selected");
+                        // display start and end dates for the visit in local date/time
+                        $("#manualEntryVisitContainer .info").html(
+                            i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b>")
                             .replace("{visit}", selectedOption.text())
                             .replace("{startdate}",self.getFormattedManualEntryVisitDate(
                                 new Date(selectedOption.attr("data-startdate"))))
                             .replace("{enddate}", self.getFormattedManualEntryVisitDate(
                                 new Date(selectedOption.attr("data-enddate"))))
-                            );
-                            self.manualEntry.selectedTimeline = {
-                                "visit": selectedOption.text(),
-                                "startDate":selectedOption.attr("data-startdate"),
-                                "endDate":  selectedOption.attr("data-enddate")
-                            };
-                            self.setOutofWindowDateMessage();
-                        } else {
-                            self.resetManualEntryVisitFields();
-                            self.setOutofWindowDateMessage();
-                        }
+                        );
+                        self.manualEntry.selectedTimeline = {
+                            "visit": selectedOption.text(),
+                            "startDate":selectedOption.attr("data-startdate"),
+                            "endDate":  selectedOption.attr("data-enddate")
+                        };
+                        self.setOutofWindowDateMessage();
                     });
                 });
             },
             getManualEntryQuestionnaireDateLabel: function() {
                 if (this.hasTimeline()) {
-                    return i18next.t("When did the patient actually fill in the paper form");
+                    return i18next.t("When did the patient actually fill in the paper form?");
                 }
                 return i18next.t("Questionnaire completion date");
             },
@@ -2677,16 +2677,19 @@ export default (function() {
                 if (!this.isCompletionDateOutofWindow()) {
                     return this.manualEntry.completedDate;
                 }
-                /***
-                - if the completion date comes before the visit starts, use the picked visit’s start as the authored
-                - if the completion date comes after the visit starts, use the end of the visit date minus one day as the authored
-                ***/
+                /*
+                 * if the completion date comes BEFORE the visit starts,
+                 * use the picked visit’s start as the authored date
+                 * if the completion date comes AFTER the visit ends,
+                 * use the end of the visit date MINUS one day as the authored date
+                 */
                 var startDate = this.getFormattedManualEntryVisitDate(
                     this.manualEntry.selectedTimeline.startDate);
-                if (this.modules.tnthDates.isLessThanDate(this.manualEntry.completionDate, startDate)) {
+                if (this.modules.tnthDates.isLessThanDate(this.getFormattedManualEntryVisitDate(this.manualEntry.completionDate), startDate)) {
                     return this.modules.tnthDates.formatDateString(this.manualEntry.selectedTimeline.startDate, "system");
                 }
-                return this.modules.tnthDates.formatDateString(this.manualEntry.selectedTimeline.endDate, "system");
+                return this.modules.tnthDates.getDateWithTimeZone(
+                    this.modules.tnthDates.minusDate(this.manualEntry.selectedTimeline.endDate, 1), "system");
             },
             isCompletionDateOutofWindow: function() {
                 if (this.manualEntry.errorMessage ||
@@ -2713,7 +2716,7 @@ export default (function() {
                     ),
                     this.getFormattedManualEntryVisitDate(
                         this.manualEntry.selectedTimeline.endDate
-                    ));
+                    ), true, false);
                 if (!isBetweenDate) {
                     return true;
                 }
@@ -2721,9 +2724,6 @@ export default (function() {
             },
             setOutofWindowDateMessage: function() {
                 if (this.isCompletionDateOutofWindow()) {
-                    console.log("completion date? ", this.manualEntry.completionDate)
-                    console.log("start date ", this.manualEntry.selectedTimeline.startDate)
-                    console.log("end date ", this.manualEntry.selectedTimeline.endDate)
                     this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b>, is outside the window for the selected visit. If the date entered is correct, please continue.").replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "iso"));
                     return;
                 }
@@ -2738,7 +2738,7 @@ export default (function() {
                     }
                 });
                 $("#manualEntryModal").on("show.bs.modal", function() {
-                    self.manualEntry.initloading = true;
+                    self.manualEntry.init = true;
                     self.manualEntry.method = "";
                     self.resetManualEntryFormValidationError();
                     //set visits
@@ -2748,7 +2748,7 @@ export default (function() {
                     self.modules.tnthAjax.getConsent(subjectId, {sync: true}, function(data) { //get consent date
                         var dataArray = [];
                         if (!data || !data.consent_agreements || data.consent_agreements.length === 0) {
-                            self.manualEntry.initloading = false;
+                            self.manualEntry.init = false;
                             return false;
                         }
                         dataArray = data.consent_agreements.sort(function(a, b) {
@@ -2778,7 +2778,7 @@ export default (function() {
                         }
                         //set completion date once consent date/time has been set
                         self.setInitManualEntryCompletionDate();
-                        setTimeout(function() { self.manualEntry.initloading = false;}, 150);
+                        setTimeout(function() { self.manualEntry.loading = false;}, 1000);
                     });
                 });
 
@@ -2825,8 +2825,7 @@ export default (function() {
                         var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
                         self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
 
-
-                        //check if date is within the selected visit
+                        //check if date is within the selected visit and display message when applicable
                         self.setOutofWindowDateMessage();
 
                         //add check for consent date
@@ -2860,42 +2859,9 @@ export default (function() {
                     var method = String(self.manualEntry.method), completionDate = self.manualEntry.completionDate;
                     var linkUrl = "/api/present-needed?subject_id=" + $("#manualEntrySubjectId").val();
                     if (method === "") { return false; }
-                    if (method !== "paper") {
-                        self.resetManualEntryFormValidationError();
-                        self.continueToAssessment(method, completionDate, linkUrl);
-                        return false;
-                    }
-                    self.manualEntryModalVis(true);
-                    self.modules.tnthAjax.getCurrentQB(subjectId, completionDate, null, function(data) {
-                        var errorMessage = "";
-                        if (data.error) {
-                            errorMessage = i18next.t("Server error occurred checking questionnaire window");
-                        }
-                        //check questionnaire time windows
-                        if (!data.questionnaire_bank || !Object.keys(data.questionnaire_bank).length) {
-                            errorMessage = i18next.t("Invalid completion date. Date of completion is outside the days allowed.");
-                        }
-                        if (errorMessage) {
-                            self.setManualEntryErrorMessage(errorMessage);
-                            self.manualEntryModalVis();
-                            //use computed property to assign value to error message here,
-                            //IE is throwing error if it is not done this way, not exactly sure why still
-                            self.propManualEntryErrorMessage = errorMessage;
-                            return false;
-                        }
-                        self.resetManualEntryFormValidationError();
-                        self.continueToAssessment(method, completionDate, linkUrl);
-                    });
+                    self.resetManualEntryFormValidationError();
+                    self.continueToAssessment(method, completionDate, linkUrl);
                 });
-
-                /* disabling this to accomodate entry of survey responses on paper */
-                // self.modules.tnthAjax.assessmentStatus(subjectId, function(data) {
-                //     if (!data.error && (data.assessment_status).toUpperCase() === "COMPLETED" &&
-                //         parseInt(data.outstanding_indefinite_work) === 0) {
-                //         $("#assessmentLink").attr("disabled", true);
-                //         $("#enterManualInfoContainer").text(i18next.t("All available questionnaires have been completed."));
-                //     }
-                // });
             },
             updateRolesData: function(event) {
                 var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");

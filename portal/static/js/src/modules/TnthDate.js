@@ -348,27 +348,50 @@ var tnthDates =  { /*global i18next */
      * @param targetDate, a date string or Date object
      * @param startDate, a date string or Date object
      * @param endDate, a date string or Date object
+     * @param startDateInclusive, boolean indicating whether comparison against startdate is inclusive,
+     * i.e. startDate == targetDate
+     * @param endDateInclusive, boolean indicating whether comparison against enddate is inclusive,
+     * i.e. endDate == targetDate
      */
-    isBetweenDates: function(targetDate, startDate, endDate) {
+    isBetweenDates: function(targetDate, startDate, endDate, startDateInclusive, endDateInclusive) {
         if (!targetDate) return false;
         var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         var d2 = !this.isDateObj(startDate) ? new Date(startDate) : startDate;
         var d3 = !this.isDateObj(endDate) ? new Date(endDate) : endDate;
-        return (d1.getTime() >= d2.getTime()) && (d1.getTime() < d3.getTime());
+        var startDateComparison = startDateInclusive ? (d1.getTime() >= d2.getTime()) : (d1.getTime() > d2.getTime());
+        var endDateComparison = endDateInclusive ? (d1.getTime() <= d3.getTime()) : (d1.getTime() < d3.getTime());
+        return startDateComparison && endDateComparison;
     },
+    /*
+     * helper function for subtracting day(s) from a date string or a Date object
+     * @param targetDate, a date string or Date object from which day(s) will be subtracted
+     * @param numOfDays, a number representing the number of days
+     */
     minusDate: function(targetDate, numOfDays) {
         if (!numOfDays) numOfDays = 0;
         var dateOffset = (24*60*60*1000) * numOfDays; //day in miliseconds
         targetDate = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         return targetDate.setTime(targetDate.getTime() - dateOffset);
     },
-    isLessThanDate: function(targetDate, comparedDate) {
+    /*
+     * helper function for determing if a target date string or Date object is less than a given comparison date
+     * @param targetDate a date string or Date object that is used to determine whether it is less than the comparison date
+     * @param comparedDate, a date string or Date object used to compare to target date
+     * @param inclusive boolean, determines whether to allow comparison to be inclusive, i.e. targetDate == comparedDate
+     */
+    isLessThanDate: function(targetDate, comparedDate, inclusive) {
         if (!targetDate) return false;
         var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
-        return (d1.getTime() < d2.getTime());
+        return inclusive ? (d1.getTime() <= d2.getTime()) : (d1.getTime() < d2.getTime());
     },
-    isGreaterThanDate: function(targetDate, comparedDate) {
+    /*
+     * helper function for determing if a target date string or Date object is greater than a given comparison date
+     * @param targetDate a date string or Date object that is used to determine whether it is greater than the comparison date
+     * @param comparedDate, a date string or Date object used to compare to target date
+     * @param inclusive boolean, determines whether to allow comparison to be inclusive, i.e. targetDate == comparedDate
+     */
+    isGreaterThanDate: function(targetDate, comparedDate, inclusive) {
         if (!targetDate) return false;
         var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
         var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
