@@ -244,14 +244,6 @@ export default (function() {
             }
         },
         computed: {
-            propManualEntryErrorMessage: {
-                set: function(newValue) {
-                    this.manualEntry.message = newValue;
-                },
-                get: function() {
-                    return this.manualEntry.message;
-                }
-            },
             computedIsSubStudyPatient: function() {
                 //will re-compute when the dependent prop, this.subjectReseachStudies, updates
                 return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
@@ -2594,7 +2586,13 @@ export default (function() {
                 $("#manualEntryMessageContainer").html(message);
             },
             hasTimeline: function() {
-                return this.manualEntry.timeline && this.manualEntry.timeline.length > 0;
+                if (!this.manualEntry.timeline) return false;
+                //an option is disabled and thus cannot be selected if the visit has been completed
+                var disabledOptions = this.manualEntry.timeline.filter(function(item) {
+                    return item.completed;
+                });
+                if (disabledOptions.length === this.manualEntry.timeline.length) return false;
+                return this.manualEntry.timeline.length > 0;
             },
             hasSelectedManualEntryVisit: function() {
                 if (!this.manualEntry.method || this.manualEntry.method !== "paper") return true;
@@ -2652,10 +2650,10 @@ export default (function() {
                         $("#manualEntryVisitContainer .info").html(
                             i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b>")
                             .replace("{visit}", selectedOption.text())
-                            .replace("{startdate}",self.getFormattedManualEntryVisitDate(
-                                new Date(selectedOption.attr("data-startdate"))))
-                            .replace("{enddate}", self.getFormattedManualEntryVisitDate(
-                                new Date(selectedOption.attr("data-enddate"))))
+                            .replace("{startdate}",self.modules.tnthDates.formatDateString(
+                                new Date(selectedOption.attr("data-startdate")), "d M y hh:mm:ss"))
+                            .replace("{enddate}", self.modules.tnthDates.formatDateString(
+                                new Date(selectedOption.attr("data-enddate")), "d M y hh:mm:ss"))
                         );
                         self.manualEntry.selectedTimeline = {
                             "visit": selectedOption.text(),
@@ -2727,7 +2725,7 @@ export default (function() {
             },
             setOutofWindowDateMessage: function() {
                 if (this.isCompletionDateOutofWindow()) {
-                    this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b>, is outside the window for the selected visit. If the date entered is correct, please continue.").replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "iso"));
+                    this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b>, is outside the window for the selected visit. If the date entered is correct, please continue.").replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "d M y hh:mm:ss"));
                     return;
                 }
                 this.manualEntry.outofWindowMessage = "";
