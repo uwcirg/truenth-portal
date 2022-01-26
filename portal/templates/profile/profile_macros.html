@@ -1322,8 +1322,9 @@
                                                     <select class="form-control" id="manualEntryVisitSelector">
                                                         <option value="">{{_("Select")}}</option>
                                                         <option v-for="item in manualEntry.timeline" :value="item.visit"
+                                                        :disabled="item.completed"
                                                         :data-startdate="item.startDate"
-                                                        :data-enddate="item.endDate" v-text="item.visit"></option>
+                                                        :data-enddate="item.endDate" v-text="item.display"></option>
                                                     </select>
                                                 </div>
                                                 <div class="info text-muted" v-show="hasSelectedManualEntryVisit()"></div>

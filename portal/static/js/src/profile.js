@@ -2626,15 +2626,18 @@ export default (function() {
                         var visit = item.visit;
                         var oStartDate = new Date(item.at);
                         var today = new Date();
+                        var isFuture = oStartDate.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0);
+                        return String(item.status).toLowerCase() === "due" && !isFuture;
+                    }).map(function(item) {
+                        var visit = item.visit;
                         var isCompleted = data.timeline.filter(function(item) {
                             return (String(item.visit).toLowerCase() === String(visit).toLowerCase()) &&
                             String(item.status).toLowerCase() === "completed"
                         }).length > 0;
-                        var isFuture = oStartDate.setHours(0, 0, 0, 0) > today.setHours(0, 0, 0, 0);
-                        return String(item.status).toLowerCase() === "due" && !isCompleted && !isFuture;
-                    }).map(function(item) {
+                        item.completed = isCompleted;
                         item.startDate = item.at;
                         item.endDate = item.expires;
+                        item.display = isCompleted ? (item.visit + " " + i18next.t("(complete)")) : item.visit;
                         return item;
                     });
                     if (!self.hasTimeline()) return;
