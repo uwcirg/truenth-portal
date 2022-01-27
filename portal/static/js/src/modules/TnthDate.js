@@ -401,14 +401,6 @@ var tnthDates =  { /*global i18next */
      * helper function that returns local timezone in text
      */
     getTimeZoneDisplay: function() {
-        var localTimezone = "";
-        try {
-            localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        } catch(e) {
-            console.log("Intl object not supported ", e);
-            localTimezone = "";
-        }
-        if (localTimezone) return localTimezone;
         return new Date().toLocaleDateString(undefined, {day:"2-digit",timeZoneName: "long" }).substring(4);
     }
 };
