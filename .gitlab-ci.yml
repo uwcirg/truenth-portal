@@ -11,7 +11,9 @@ variables:
   POSTGRES_PASSWORD: wplatrop
 stages:
   - test
-  - deploy
+  # TODO re-enable/remove when future of Smartling integration more certain
+  # disable Smartling string uploads
+  # - deploy
 
 before_script:
   - pip install tox
