@@ -1828,14 +1828,14 @@ def present_assessment(instruments=None):
       - name: authored
         in: query
         description: Override QuestionnaireResponse.authored with given
-          datetime. Optionally set to value within desired visit if "actual"
+          datetime. Optionally set to value within desired visit if `actual`
           date is outside
         required: false
         type: string
         format: date-time
       - name: actual
         in: query
-        description: "Actual" date of completion, to be used exclusively
+        description: actual date of completion, to be used exclusively
          outside of visit [start-expires) dates.  In such an event, `authored`
          should be set to valid datetime within desired visit
         required: false
