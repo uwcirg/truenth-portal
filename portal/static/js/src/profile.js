@@ -2651,9 +2651,9 @@ export default (function() {
                             i18next.t("The {visit} visit<br/> begins on <b>{startdate}</b><br/>and ends on <b>{enddate}</b><br/><span class='small'>( {timezone} )</span>")
                             .replace("{visit}", selectedOption.text())
                             .replace("{startdate}",self.modules.tnthDates.formatDateString(
-                                new Date(selectedOption.attr("data-startdate")), "d M y hh:mm:ss"))
+                                new Date(selectedOption.attr("data-startdate")), "d M y hh:mm"))
                             .replace("{enddate}", self.modules.tnthDates.formatDateString(
-                                new Date(selectedOption.attr("data-enddate")), "d M y hh:mm:ss"))
+                                new Date(selectedOption.attr("data-enddate")), "d M y hh:mm"))
                             .replace("{timezone}", self.modules.tnthDates.getTimeZoneDisplay())
                         );
                         self.manualEntry.selectedTimeline = {
@@ -2727,7 +2727,7 @@ export default (function() {
             setOutofWindowDateMessage: function() {
                 if (this.isCompletionDateOutofWindow()) {
                     this.manualEntry.outofWindowMessage = i18next.t("The date, <b>{date}</b> <span class='small'>( {timezone} )</span>, is outside the window for the selected visit. If the date entered is correct, please continue.")
-                    .replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "d M y hh:mm:ss"))
+                    .replace("{date}", this.modules.tnthDates.formatDateString(new Date(this.manualEntry.completionDate), "d M y hh:mm"))
                     .replace("{timezone}",this.modules.tnthDates.getTimeZoneDisplay());
                     return;
                 }

@@ -258,6 +258,10 @@ var tnthDates =  { /*global i18next */
                 nd = this.displayDateString(month, day, year);
                 nd = nd + " " + hours + ":" + minutes + ":" + seconds;
                 break;
+            case "d M y hh:mm":
+                nd = this.displayDateString(month, day, year);
+                nd = nd + " " + hours + ":" + minutes;
+                break;
             case "d M y":
                 nd = this.displayDateString(month, day, year);
                 break;
