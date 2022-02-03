@@ -63,6 +63,9 @@ i18n_test_tnusa:
 # deploy templates
 .i18n_upload_template: &i18n_upload_definition
   stage: deploy
+  # TODO re-enable/remove when future of Smartling integration more certain
+  # disable Smartling string uploads
+  when: manual
   script:
     - tox
     # reuse tox virtual environment to also upload translations
