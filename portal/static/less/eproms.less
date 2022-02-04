@@ -2158,20 +2158,26 @@ div.footer-wrapper.right-panel {
     top: 94%;
   }
 }
+#exportReportPopoverContent + .popover {
+  left: 0 !important;
+  & .arrow {
+    left: calc(~"100% - 32px") !important;
+  }
+}
 .exportReport__popovercontent {
   top: 4px;
-  padding-bottom: 20px;
   position: relative;
   overflow: hidden;
+  min-width: 160px;
 }
 .exportReport__popovercontent,
 #dataDownloadModal {
   .exportReport__display-container,
   .export__display-container {
-    margin-top: 1em;
     .exportReport__retry{
       padding: 0.5em 0.7em;
-      margin-top: 1em;
+      margin-top: 16px;
+      margin-bottom: 16px;
     }
   }
   .exportReport__loader,
@@ -2186,6 +2192,10 @@ div.footer-wrapper.right-panel {
     position: relative;
     padding-top: 4px;
     padding-bottom: 4px;
+    &:empty {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
     &.active {
       min-width: 50px;
       min-height: 50px;
@@ -2211,6 +2221,10 @@ div.footer-wrapper.right-panel {
     .message {
       color: @errorMessageColor;
     }
+  }
+  .exportReport__error,
+  .exportReport__history {
+    margin-bottom: 16px;
   }
 }
 #dataDownloadModal {
@@ -2733,6 +2747,9 @@ div.footer-wrapper.right-panel {
     @media (min-width: 768px) {
       flex-direction: row;
     }
+  }
+  .popover-content {
+    padding: 8px 12px;
   }
   #cacheResetContainer {
     display: inline-block;
