@@ -258,6 +258,10 @@ var tnthDates =  { /*global i18next */
                 nd = this.displayDateString(month, day, year);
                 nd = nd + " " + hours + ":" + minutes + ":" + seconds;
                 break;
+            case "d M y hh:mm":
+                nd = this.displayDateString(month, day, year);
+                nd = nd + " " + hours + ":" + minutes;
+                break;
             case "d M y":
                 nd = this.displayDateString(month, day, year);
                 break;
@@ -292,7 +296,9 @@ var tnthDates =  { /*global i18next */
          * param is a date object - calculating UTC date using Date object's timezoneOffset method
          * the method return offset in minutes, so need to convert it to miliseconds - adding the resulting offset will be the UTC date/time
          */
+        if (!dObj) return "";
         format = format || "system";
+        if (!this.isDateObj(dObj)) dObj = new Date(dObj);
         var utcDate = new Date(dObj.getTime() + (dObj.getTimezoneOffset()) * 60 * 1000);
         return this.formatDateString(utcDate, format);  //I believe this is a valid python date format, will save it as GMT date/time NOTE, conversion already occurred, so there will be no need for backend to convert it again
     },
@@ -340,8 +346,67 @@ var tnthDates =  { /*global i18next */
             errorMessage = i18next.t("Missing value.");
         }
         return errorMessage;
+    },
+    /*
+     * helper method for determining whether a date is greater than or equal to start date and less than end date
+     * @param targetDate, a date string or Date object
+     * @param startDate, a date string or Date object
+     * @param endDate, a date string or Date object
+     * @param startDateInclusive, boolean indicating whether comparison against startdate is inclusive,
+     * i.e. startDate == targetDate
+     * @param endDateInclusive, boolean indicating whether comparison against enddate is inclusive,
+     * i.e. endDate == targetDate
+     */
+    isBetweenDates: function(targetDate, startDate, endDate, startDateInclusive, endDateInclusive) {
+        if (!targetDate) return false;
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(startDate) ? new Date(startDate) : startDate;
+        var d3 = !this.isDateObj(endDate) ? new Date(endDate) : endDate;
+        var startDateComparison = startDateInclusive ? (d1.getTime() >= d2.getTime()) : (d1.getTime() > d2.getTime());
+        var endDateComparison = endDateInclusive ? (d1.getTime() <= d3.getTime()) : (d1.getTime() < d3.getTime());
+        return startDateComparison && endDateComparison;
+    },
+    /*
+     * helper function for subtracting day(s) from a date string or a Date object
+     * @param targetDate, a date string or Date object from which day(s) will be subtracted
+     * @param numOfDays, a number representing the number of days
+     */
+    minusDate: function(targetDate, numOfDays) {
+        if (!numOfDays) numOfDays = 0;
+        var dateOffset = (24*60*60*1000) * numOfDays; //day in miliseconds
+        targetDate = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        return targetDate.setTime(targetDate.getTime() - dateOffset);
+    },
+    /*
+     * helper function for determing if a target date string or Date object is less than a given comparison date
+     * @param targetDate a date string or Date object that is used to determine whether it is less than the comparison date
+     * @param comparedDate, a date string or Date object used to compare to target date
+     * @param inclusive boolean, determines whether to allow comparison to be inclusive, i.e. targetDate == comparedDate
+     */
+    isLessThanDate: function(targetDate, comparedDate, inclusive) {
+        if (!targetDate) return false;
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
+        return inclusive ? (d1.getTime() <= d2.getTime()) : (d1.getTime() < d2.getTime());
+    },
+    /*
+     * helper function for determing if a target date string or Date object is greater than a given comparison date
+     * @param targetDate a date string or Date object that is used to determine whether it is greater than the comparison date
+     * @param comparedDate, a date string or Date object used to compare to target date
+     * @param inclusive boolean, determines whether to allow comparison to be inclusive, i.e. targetDate == comparedDate
+     */
+    isGreaterThanDate: function(targetDate, comparedDate, inclusive) {
+        if (!targetDate) return false;
+        var d1 = !this.isDateObj(targetDate) ? new Date(targetDate) : targetDate;
+        var d2 = !this.isDateObj(comparedDate) ? new Date(comparedDate) : comparedDate;
+        return (d1.getTime() > d2.getTime());
+    },
+    /*
+     * helper function that returns local timezone in text
+     */
+    getTimeZoneDisplay: function() {
+        return new Date().toLocaleDateString(undefined, {day:"2-digit",timeZoneName: "long" }).substring(4);
     }
 };
 export default tnthDates;
 export var validateDateInputFields = tnthDates.validateDateInputFields; /* generic validation function for global use */
-

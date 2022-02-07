@@ -5480,12 +5480,49 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     flex-wrap: wrap
   }
 }
+#manualEntryVisitContainer,
 #manualEntryCompletionDateContainer {
   margin-top: 1em;
   label {
     position: relative;
-    top: 2px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    padding: 0;
+    font-size: @mobileSize;
+  }
+}
+#manualEntryVisitContainer {
+  label {
+    margin-bottom: 6px;
+  }
+}
+#manualEntryCompletionDateContainer {
+  border: 1px solid @muterColor;
+  padding: 8px 16px;
+  select {
+    min-width: 160px;
+  }
+}
+#manualEntryVisitContainer {
+  margin-top: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  select {
+    width: 200px;
+    max-width: 100%;
+  }
+  .info {
+    margin-left: 16px;
+    margin-top: 24px;
+    font-size: @mobileSize;
+  }
+}
+#manualEntryWarningMessageContainer {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+  &:empty {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 #emailBodyModal .body-content {

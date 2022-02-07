@@ -1294,10 +1294,10 @@
                                     <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div id="manualEntryBodyLoader" v-show="manualEntry.initloading">
+                                    <div id="manualEntryBodyLoader" v-show="!manualEntry.init">
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
-                                    <div id="manualEntryMain" v-show="!manualEntry.initloading">
+                                    <div id="manualEntryMain" v-show="manualEntry.init">
                                         <p class="text-left">{{ _("Select the method in which the questionnaire will be completed:") }}</p>
                                         <input type="hidden" id="manualEntryConsentDate" v-model="manualEntry.consentDate" />
                                         <input type="hidden" id="qCompletionDate" v-model="manualEntry.completionDate" />
@@ -1316,7 +1316,20 @@
                                             </div>
                                         </div>
                                         <div id="manualEntryCompletionDateContainer" class="form-group" v-show="manualEntry.method == 'paper'">
-                                            <label class="text-muted" for="manualEntryDateFieldsContainer">{{_("Questionnaire completion date")}}</label>
+                                            <div id="manualEntryVisitContainer" v-show="hasTimeline()">
+                                                <div>
+                                                    <label class="text-muted" for="qVisit">{{_("Please select a visit")}}</label>
+                                                    <select class="form-control" id="manualEntryVisitSelector">
+                                                        <option value="">{{_("Select")}}</option>
+                                                        <option v-for="item in manualEntry.timeline" :value="item.visit"
+                                                        :disabled="item.completed"
+                                                        :data-startdate="item.startDate"
+                                                        :data-enddate="item.endDate" v-text="item.display"></option>
+                                                    </select>
+                                                </div>
+                                                <div class="info text-muted" v-show="hasSelectedManualEntryVisit()"></div>
+                                            </div>
+                                            <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer" v-text="getManualEntryQuestionnaireDateLabel()"></label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
                                                 <div class="flex-item">
                                                     <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}"  data-exempt-from-disabling="true" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" v-model="manualEntry.todayObj.displayDay" required />
@@ -1343,6 +1356,7 @@
                                                 </div>
                                             </div>
                                         {% raw %}
+                                            <div id="manualEntryWarningMessageContainer" class="error-message" v-show="isCompletionDateOutofWindow()" v-html="manualEntry.outofWindowMessage"></div>
                                             <div id="manualEntryMessageContainer" class="error-message help-block with-errors">{{manualEntry.errorMessage}}</div>
                                         {% endraw %}
                                         </div>
@@ -1353,7 +1367,7 @@
                                         <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
                                     </div>
                                     <div id="manualEntryButtonsContainer" v-show="!manualEntry.loading">
-                                        <a href="#" id="meSubmit" class="btn btn-default" v-bind:disabled="(!manualEntry.method) || manualEntry.errorMessage">{{_("OK")}}</a>
+                                        <a href="#" id="meSubmit" class="btn btn-default" v-bind:disabled="(!manualEntry.method) || manualEntry.errorMessage || !hasSelectedManualEntryVisit()">{{_("OK")}}</a>
                                         <button type="button" class="btn btn-default" data-dismiss="modal">{{_("Cancel")}}</button>
                                     </div>
                                 </div>
