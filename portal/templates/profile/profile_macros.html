@@ -1332,10 +1332,10 @@
                                             <label class="text-muted manualentry-date-label" for="manualEntryDateFieldsContainer" v-text="getManualEntryQuestionnaireDateLabel()"></label>
                                             <div id="manualEntryDateFieldsContainer" class="flex">
                                                 <div class="flex-item">
-                                                    <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}"  data-exempt-from-disabling="true" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" v-model="manualEntry.todayObj.displayDay" required />
+                                                    <input class="form-control" id="qCompletionDay" aria-label="{{_('Completion Day')}}"  data-exempt-from-disabling="true" name="qCompletionDay" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Date must be valid and in the required format.')}}" autocomplete="off" data-trigger-event="change" required />
                                                 </div>
                                                 <div class="flex-item" id="qCompletionMonthContainer">
-                                                    <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-exempt-from-disabling="true" data-error="{{_('Date must be valid and in the required format.')}}" v-model="manualEntry.todayObj.displayMonth" data-trigger-event="change" required>
+                                                    <select class="form-control" aria-label="{{_('Month')}}" name="qCompletionMonth" id="qCompletionMonth" data-exempt-from-disabling="true" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" required>
                                                         <option value="">{{_("Month")}}...</option>
                                                         <option value="01">{{_("January")}}</option>
                                                         <option value="02">{{_("February")}}</option>
@@ -1352,7 +1352,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="flex-item" id="qCompletionYearContainer">
-                                                    <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" data-exempt-from-disabling="true" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" v-model="manualEntry.todayObj.displayYear" required />
+                                                    <input class="form-control" id="qCompletionYear" name="qCompletionYear" aria-label="{{_('Completion Year')}}" data-exempt-from-disabling="true" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Date must be valid and in the required format.')}}" data-trigger-event="change" autocomplete="off" required />
                                                 </div>
                                             </div>
                                         {% raw %}
