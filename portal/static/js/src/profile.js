@@ -2545,7 +2545,6 @@ export default (function() {
                             assessment_url += "&authored=" + completionDate;
                         }
                     }
-                    console.log("assessment url ", assessment_url);
                     var winLocation = assessment_url;
                     if (still_needed) {
                         winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
@@ -2797,7 +2796,6 @@ export default (function() {
                     }
                     //paper entry
                     self.manualEntry.completionDate = "";
-                    //self.setInitManualEntryCompletionDate();
                 });
 
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
