@@ -1,5 +1,6 @@
 """QBD (Questionnaire Bank Details) Module"""
 from ..date_tools import FHIR_datetime
+from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 
 
 class QBD(object):
@@ -121,3 +122,46 @@ class QBD(object):
                     return FHIR_datetime.parse(found[0])
             return None
         return query.first().at
+
+    def oow_completed_date(self, user_id):
+        """Specialized query to return datetime of oow completion if applicable
+
+        See ``completed_date`` for typical need.  This is specific to
+        **out of window** completion, exclusive to when the
+        questionnaire_response(s) include the extension used for ``actual``
+        completion date.  Actual (out of window) dates should only be
+        present on QNRs completed outside of the valid visit window.
+
+        :returns: datetime of actual (out of window) completion or None
+
+        """
+        from .questionnaire_response import QuestionnaireResponse
+
+        # Data is only available w/i the QuestionnaireResponses as an extension
+        extensions = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.subject_id == user_id).filter(
+            QuestionnaireResponse.status == 'completed').filter(
+            QuestionnaireResponse.questionnaire_bank_id ==
+            self.qb_id).filter(
+            QuestionnaireResponse.qb_iteration ==
+            self.iteration).with_entities(
+            QuestionnaireResponse.document['extension'].label(
+                'extension'))
+
+        # Without supporting JSON/SQLA syntax to filter, must do by hand
+        valid_extensions = [r[0] for r in extensions if r[0] is not None]
+
+        # Obtain the latest `actual` date if any matching extensions are found.
+        actual = None
+        completion_date_system = '/'.join((TRUENTH_IDENTITY_SYSTEM, "actual-completion-date"))
+        for extension_lists in valid_extensions:
+            for extension in extension_lists:
+                if extension.get('url') != completion_date_system:
+                    continue
+            candidate = FHIR_datetime.parse(extension['valueDateTime'])
+            if not actual:
+                actual = candidate
+            else:
+                actual = max(candidate, actual)
+
+        return actual or ''

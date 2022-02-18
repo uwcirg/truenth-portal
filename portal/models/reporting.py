@@ -129,6 +129,8 @@ def adherence_report(
             if row['status'] == 'Completed':
                 row['completion_date'] = FHIR_datetime.as_fhir(
                     last_viable.completed_date(patient.id))
+                row['oow_completion_date'] = FHIR_datetime.as_fhir(
+                    last_viable.oow_completed_date(patient.id))
             entry_method = QNR_results(
                 patient,
                 research_study_id=research_study_id,
@@ -174,6 +176,9 @@ def adherence_report(
             historic['visit'] = visit_name(qbd)
             historic['completion_date'] = (
                 FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
+                if status == 'Completed' else '')
+            historic['oow_completion_date'] = (
+                FHIR_datetime.as_fhir(qbd.oow_completed_date(patient.id))
                 if status == 'Completed' else '')
             entry_method = QNR_results(
                 patient,
@@ -242,7 +247,7 @@ def adherence_report(
         results['filename_prefix'] = base_name
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method',
-            'country', 'site', 'consent', 'completion_date']
+            'country', 'site', 'consent', 'completion_date', 'oow_completion_date']
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
                 'user_id',
