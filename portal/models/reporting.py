@@ -247,7 +247,8 @@ def adherence_report(
         results['filename_prefix'] = base_name
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method',
-            'country', 'site', 'consent', 'completion_date', 'oow_completion_date']
+            'country', 'site', 'consent', 'completion_date',
+            'oow_completion_date']
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
                 'user_id',

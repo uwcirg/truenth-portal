@@ -153,7 +153,8 @@ class QBD(object):
 
         # Obtain the latest `actual` date if any matching extensions are found.
         actual = None
-        completion_date_system = '/'.join((TRUENTH_IDENTITY_SYSTEM, "actual-completion-date"))
+        completion_date_system = (
+            '/'.join((TRUENTH_IDENTITY_SYSTEM, "actual-completion-date")))
         for extension_lists in valid_extensions:
             for extension in extension_lists:
                 if extension.get('url') != completion_date_system:
