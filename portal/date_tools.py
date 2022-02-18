@@ -31,6 +31,7 @@ def as_fhir(obj):
         return final.isoformat()
     if isinstance(obj, date):
         return obj.isoformat()
+    return obj
 
 
 class FHIR_datetime(object):
