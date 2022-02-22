@@ -2545,7 +2545,6 @@ export default (function() {
                             assessment_url += "&authored=" + completionDate;
                         }
                     }
-                   // console.log("assessment url ", assessment_url);
                     var winLocation = assessment_url;
                     if (still_needed) {
                         winLocation = "/website-consent-script/" + $("#manualEntrySubjectId").val() + "?entry_method=" + method + "&subject_id=" + $("#manualEntrySubjectId").val() +
@@ -2796,7 +2795,7 @@ export default (function() {
                         return;
                     }
                     //paper entry
-                    self.setInitManualEntryCompletionDate();
+                    self.manualEntry.completionDate = "";
                 });
 
                 self.__convertToNumericField($("#qCompletionDay, #qCompletionYear"));
@@ -2815,6 +2814,8 @@ export default (function() {
                         var d = $("#qCompletionDay");
                         var m = $("#qCompletionMonth");
                         var y = $("#qCompletionYear");
+
+                        if (!(d.val() && m.val() && y.val())) return;
 
                         //add true boolean flag to check for future date entry
                         var errorMessage = tnthDates.dateValidator(d.val(), m.val(), y.val(), true);
