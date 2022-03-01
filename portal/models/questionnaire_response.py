@@ -308,6 +308,16 @@ class QuestionnaireResponse(db.Model):
         questionnaire = Questionnaire.find_by_name(name=instrument_id)
         document = copy.deepcopy(self.document)
 
+        def quote_double_quote(value):
+            """returns quoted version of double quotes within a value string
+
+            Double quotes embedded in strings break parsers such as CSV.  Only
+            reliable quoting is a second double quote.
+            """
+            if value and '"' in value and '""' not in value:
+                return value.replace('"', '""')
+            return value
+
         # return copy of original document if no reference Questionnaire
         # available
         if not questionnaire:
@@ -333,6 +343,8 @@ class QuestionnaireResponse(db.Model):
                     )
 
                     text_and_coded_answers.append({'valueString': text_answer})
+                elif 'valueString' in answer and '"' in answer['valueString']:
+                    answer['valueString'] = quote_double_quote(answer['valueString'])
 
                 text_and_coded_answers.append(answer)
             question['answer'] = text_and_coded_answers
