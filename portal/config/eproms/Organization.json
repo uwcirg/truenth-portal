@@ -2773,7 +2773,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2022-02-09T00:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3849,6 +3850,34 @@
       ],
       "language": "es_ES",
       "name": "Instituto Valenciano de Oncologia",
+      "partOf": {
+        "reference": "api/organization/29000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Europe/Madrid",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+			{"name": "IRONMAN v3"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146180,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-180"
+        }
+      ],
+      "language": "es_ES",
+      "name": "Hospital Universitario Miguel Servet (Zaragoza)",
       "partOf": {
         "reference": "api/organization/29000"
       },
