@@ -100,7 +100,7 @@
     {%- from "require_cookies.html" import checkCookieMonster -%}
     {{checkCookieMonster()}}
 <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
-<input type="hidden" id="__CRSF_TOKEN_LIFETIME" value="{{current_app.config.get('WTF_CSRF_TIME_LIMIT')}}"/>
+<input type="hidden" id="__CRSF_TOKEN_LIFETIME" value="{{WTF_CSRF_TIME_LIMIT}}"/>
 <input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/8.4.3/i18next.min.js"></script>
