@@ -117,6 +117,8 @@
     <!-- production version, optimized for size and speed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 {% endif %}
+<!-- csrf token checker csrfTokenCheck-->
+<script src="{{ url_for('static', filename='js/flask_user/CsrfTokenChecker.js') }}"></script>
 {%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
 </body>
 </html>

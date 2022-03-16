@@ -3,6 +3,10 @@ import {convertArrayToObject} from "./Utility.js";
 import Validator from "./Validator.js";
 import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
+var LOGOUT_URL = "/logout";
+var TIMEOUT_URL = "/logout?timeout=1";
+var LOGOUT_STORAGE_KEY = "truenthLoggedOut";
+var TIMEOUT_STORAGE_KEY="truenthTimedOut";
 export default { /*global $ i18next */ /*initializing functions performed only once on page load */
     "init": function(){
         this.registerModules();
@@ -47,8 +51,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         if (LREditElement) {
             this.appendLREditContainer(document.querySelector("#mainHolder .LREditContainer"), LREditElement.value, LREditElement.getAttribute("data-show"));
         }
+        this.clearOldStorage();
         this.prePopulateEmail();
         this.beforeSendAjax();
+        //this.initStorageEvent();
         this.unloadEvent();
         this.footer();
         this.loginAs();
@@ -102,7 +108,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (roles.indexOf("patient") !== -1) {
                         roleType = "patient";
                     }
-                } 
+                }
                 $.ajax({
                     type: "GET",
                     url: `/api/${roleType}/${userId}/research_study`
@@ -136,6 +142,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "beforeSendAjax": function() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
+                if ((typeof CsrfTokenChecker !== "undefined") && !CsrfTokenChecker.checkTokenValidity()) {
+                    //do NOT send CSRFToken if not valid
+                    return;
+                }
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", $("#__CRSF_TOKEN").val());
                 }
@@ -199,7 +209,29 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "handleLogout": function() {
         sessionStorage.clear();
         sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+        localStorage.setItem(LOGOUT_STORAGE_KEY, true);
     },
+    "clearOldStorage": function() {
+        if( window.localStorage.getItem(LOGOUT_STORAGE_KEY) === "true" )
+            localStorage.removeItem(LOGOUT_STORAGE_KEY);
+        if( window.localStorage.getItem(TIMEOUT_STORAGE_KEY) === "true" )
+            localStorage.removeItem(TIMEOUT_STORAGE_KEY);
+    },
+    // "initStorageEvent": function() {
+    //      //listen for timeout or logout event in other tabs
+    //      var cleanUp = function(e) {
+    //         var key = e.key? e.key : e.originalEvent.key;
+    //         var newVal = e.newVal ? e.newValue: e.originalEvent.newValue;
+    //         console.log("Global GET HERE? key ",key, " val ", newVal)
+    //         if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
+    //             window.location = LOGOUT_URL;
+    //         }
+    //         if(key === TIMEOUT_STORAGE_KEY && newVal === "true") {
+    //             window.location = TIMEOUT_URL;
+    //         }
+    //     }
+    //     $(window).on("storage", cleanUp);
+    // },
     "unloadEvent": function() {
         var self = this;
         $(window).on("beforeunload", function() {
@@ -538,4 +570,3 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         Validator.initValidator();
     }
 };
-

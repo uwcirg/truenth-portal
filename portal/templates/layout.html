@@ -97,6 +97,7 @@
         {%- endwith %}
     {% endblock %}
     <input type="hidden" id="__CRSF_TOKEN" value="{{csrf_token()}}"/>
+    <input type="hidden" id="__CRSF_TOKEN_LIFETIME" value="{{WTF_CSRF_TIME_LIMIT}}"/>
     <input type="hidden" id="userSessionLocale" value="{{g.locale_code or ''}}" />
     {%- from "require_cookies.html" import checkCookieMonster -%}
     {{checkCookieMonster()}}
@@ -115,6 +116,8 @@
     <!-- production version, optimized for size and speed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
 {% endif %}
+<!-- csrf token checker csrfTokenCheck-->
+<script src="{{ url_for('static', filename='js/flask_user/CsrfTokenChecker.js') }}"></script>
 {%block additional_scripts %}<!--for any other scripts needed -->{% endblock %}
 </body>
 </html>

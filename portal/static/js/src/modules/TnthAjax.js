@@ -10,6 +10,10 @@ export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
+                if ((typeof CsrfTokenChecker !== "undefined") && !CsrfTokenChecker.checkTokenValidity()) {
+                    //do NOT send CSRFToken if not valid
+                    return;
+                }
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", $("#__CRSF_TOKEN").val());
                 }

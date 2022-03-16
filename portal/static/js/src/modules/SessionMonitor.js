@@ -20,6 +20,7 @@ var SessionMonitorObj = function() { /* global $ */
                     logoutUrl: n + "/logout",
                     timeoutUrl: n + "/logout?timeout=1",
                     ping: function() {
+                        console.log("is it defined? ", CsrfTokenChecker)
                         $.ajax({
                             type: "POST",
                             contentType: "text/plain",
