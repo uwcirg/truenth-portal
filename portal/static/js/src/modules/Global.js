@@ -47,11 +47,8 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         if (LREditElement) {
             this.appendLREditContainer(document.querySelector("#mainHolder .LREditContainer"), LREditElement.value, LREditElement.getAttribute("data-show"));
         }
-        //this.clearOldStorage();
         this.prePopulateEmail();
         this.beforeSendAjax();
-        //this.initStorageEvent();
-        //this.unloadEvent();
         this.footer();
         this.loginAs();
         this.initValidator();
@@ -178,10 +175,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             self.embedPortalWrapperContent(data);
             setTimeout(function() {
                 self.restoreVis();
-                // $("#tnthNavWrapper .logout").on("click", function(event) {
-                //     event.stopImmediatePropagation();
-                //     self.handleLogout();
-                // });
                 self.handleDisableLinks();
                 /*
                  * show sub-study specific resources links, consumed by staff users
@@ -208,48 +201,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "getTimeoutStorageKey": function() {
         return "truenthTimedOut";
     },
-    // "handleLogout": function() {
-    //     sessionStorage.clear();
-    //     sessionStorage.setItem("logout", "true"); //set session storage logout indicator
-    //     console.log("has timeout in url ? ", Utility.getUrlParameter("timed_out"))
-    //     if (Utility.getUrlParameter("timed_out")) {
-    //         localStorage.setItem(this.getTimeoutStorageKey(), true);
-    //         console.log("set timeout ")
-    //         return;
-    //     }
-    //     localStorage.setItem(this.getLogoutStorageKey(), true);
-    // },
-    // "clearOldStorage": function() {
-    //     var LOGOUT_STORAGE_KEY = this.getLogoutStorageKey();
-    //     var TIMEOUT_STORAGE_KEY = this.getTimeoutStorageKey();
-    //     if( window.localStorage.getItem(LOGOUT_STORAGE_KEY) === "true" )
-    //         localStorage.removeItem(LOGOUT_STORAGE_KEY);
-    //     if( window.localStorage.getItem(TIMEOUT_STORAGE_KEY) === "true" )
-    //         localStorage.removeItem(TIMEOUT_STORAGE_KEY);
-    // },
-    // "initStorageEvent": function() {
-    //      //listen for timeout or logout event in other tabs
-    //      var cleanUp = function(e) {
-    //         var key = e.key? e.key : e.originalEvent.key;
-    //         var newVal = e.newVal ? e.newValue: e.originalEvent.newValue;
-    //         console.log("Global GET HERE? key ",key, " val ", newVal)
-    //         if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
-    //             window.location = LOGOUT_URL;
-    //         }
-    //         if(key === TIMEOUT_STORAGE_KEY && newVal === "true") {
-    //             window.location = TIMEOUT_URL;
-    //         }
-    //     }
-    //     $(window).on("storage", cleanUp);
-    // },
-    // "unloadEvent": function() {
-    //     var self = this;
-    //     $(window).on("beforeunload", function() {
-    //         if (Utility.getUrlParameter("logout")) { //taking into consideration that user may type in logout in url
-    //             self.handleLogout();
-    //         }
-    //     });
-    // },
     "localeSessionKey": "currentUserLocale",
     "clearSessionLocale": function() {
         sessionStorage.removeItem(this.localeSessionKey);

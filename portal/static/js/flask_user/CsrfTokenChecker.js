@@ -95,7 +95,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         var startTime = this.getStorageTimeOnLoad();
         var duration = (parseFloat(endTime) - parseFloat(startTime)) / 1000; //seconds
         var aboutToExpireTime = this.lifeTime > 95 ? this.lifeTime - 95: this.lifeTime;
-        console.log("duration ? ", duration, " start ", startTime, " end ", endTime)
+        //console.log("duration ? ", duration, " start ", startTime, " end ", endTime)
         return (duration >= aboutToExpireTime);
     };
 

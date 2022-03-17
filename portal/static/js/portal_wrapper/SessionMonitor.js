@@ -193,7 +193,6 @@ var SessionMonitorObj = function() { /* global $ */
             var originalEvent = e.originalEvent;
             var key = e.key? e.key : (originalEvent ? originalEvent.key : null);
             var newVal = e.newVal ? e.newValue: (originalEvent ? originalEvent.newValue : null);
-            console.log("SESSION MONITOR GET HERE? key ",key, " val ", newVal)
             if(key === TIMEOUT_STORAGE_KEY && newVal === "true") {
                 window.location = TIMEOUT_URL;
             } else if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
