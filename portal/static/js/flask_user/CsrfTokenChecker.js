@@ -1,10 +1,12 @@
-var CsrfTokenChecker = (function() {
+var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
 
     var csrfTokenChecker = function() {
         var tokenLifetimeElement = document.querySelector("#__CRSF_TOKEN_LIFETIME");
+        var tokenElement = document.querySelector("#__CRSF_TOKEN");
+        var tokenId = tokenElement? tokenElement.value : "";
         this.timerId = 0;
         this.modalElementId = "csrfTokenExpiredModal";
-        this.timeOnLoadIdentifier = "truenth_TimeOnLoad";
+        this.timeOnLoadIdentifier = "truenth_TimeOnLoad_"+tokenId;
         this.lifeTime = tokenLifetimeElement ? tokenLifetimeElement.value : 0;
     };
     /*
@@ -36,10 +38,10 @@ var CsrfTokenChecker = (function() {
         var contentHTML = '<div class="modal-dialog">' +
             '<div class="modal-content">' +
                 '<div class="modal-header">' +
-                '<h2 class="modal-title">' + i18next.t("Login Session Expired") + '</h2>' +
+                '<h2 class="modal-title">' + i18next.t("Login Attempt Expired") + '</h2>' +
                 '</div>' +
                 '<div class="modal-body">' +
-                '<h4 class="text-center">' + i18next.t("Login session has timed out. Refreshing the page...") + '</h4><br/>' +
+                '<h4 class="text-center">' + i18next.t("Your login attempt timed out.  Refreshing the page...") + '</h4><br/>' +
                 '<div class="text-center"><button type="button" class="btn btn-default btn-tnth-primary btn-lg" onClick="location.reload()">' + i18next.t("Refresh Page") + '</button></div>'
                 '</div>' +
             '</div>' +
@@ -114,13 +116,14 @@ var CsrfTokenChecker = (function() {
         this.clearCheck();
     };
     /*
-     * timer for periodically check if the CSRF token is about to expire, applicable to pages that POST form
+     * timer for periodically check if the CSRF token is about to expire
+     * applicable to pages that POST form with CSRF token
      */
     csrfTokenChecker.prototype.startTimer = function() {
         if (!this.hasEnoughToProceed()) {
             return;
         }
-        if (!$("form[method='POST']").length) {
+        if (!$("form[method='POST'] #csrf_token").length) {
             return;
         }
         clearInterval(this.timerId);

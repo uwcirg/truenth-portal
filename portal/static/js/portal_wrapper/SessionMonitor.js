@@ -1,11 +1,15 @@
 var SessionMonitorObj = function() { /* global $ */
+
     var LOGOUT_URL = "/logout";
-    var TIMEOUT_URL = "/logout?timeout=1";
+    var TIMEOUT_URL = "/logout?timed_out=1";
     var LOGOUT_STORAGE_KEY = "truenthLoggedOut";
     var TIMEOUT_STORAGE_KEY="truenthTimedOut";
+
     this.init = function() {
-        this.clearLogoutStorage();
+        this.clearStorage();
         this.initStorageEvent();
+        this.initElementEvents();
+        this.initUnloadEvent();
         var expiresIn = $("#sessionMonitorProps").attr("data-expires-in"); //session expires in time period from backend
         var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
         var __BASE_URL = $("#sessionMonitorProps").attr("data-baseurl") || "";
@@ -26,13 +30,9 @@ var SessionMonitorObj = function() { /* global $ */
                     logoutUrl: n + LOGOUT_URL,
                     timeoutUrl: n + TIMEOUT_URL,
                     ping: function() {
-                        console.log("wtf ? ", CsrfTokenChecker);
                         var options = {
                             type: "POST",
                             contentType: "text/plain",
-                            headers: {
-                                "X-CSRFToken": o
-                            },
                             cache: !1,
                             url: l.pingUrl,
                             crossDomain: !0
@@ -146,21 +146,58 @@ var SessionMonitorObj = function() { /* global $ */
         var warningText = ($("#session-warning-modal").find("#remaining-time").text()).replace("{time}", (sessMon.timeBeforeWarning / 1000));
         $("#session-warning-modal").find("#remaining-time").text(warningText);
     };
-    this.clearLogoutStorage = function() {
-        window.localStorage.removeItem(LOGOUT_STORAGE_KEY);
-        window.localStorage.removeItem(TIMEOUT_STORAGE_KEY);
+    this.getUrlParameter = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1]);
+    };
+    this.setLogoutSessionStorage = function() {
+        sessionStorage.clear();
+        sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+    };
+    this.handleLogoutEvent = function() {
+        this.setLogoutSessionStorage();
+        localStorage.setItem(LOGOUT_STORAGE_KEY, true);
+    },
+    this.handleTimeOutEvent = function() {
+        this.setLogoutSessionStorage();
+        localStorage.setItem(TIMEOUT_STORAGE_KEY, true);
+    };
+    this.clearStorage = function() {
+        localStorage.removeItem(LOGOUT_STORAGE_KEY);
+        localStorage.removeItem(TIMEOUT_STORAGE_KEY);
+    };
+    this.initUnloadEvent = function() {
+        $(window).on("beforeunload", function() {
+            //taking into consideration that user may type in logout in url
+            if (this.getUrlParameter("timed_out")) {
+                this.handleTimeOutEvent();
+            } else if (this.getUrlParameter("logout")) {
+                this.handleLogoutEvent();
+            }
+        }.bind(this));
+    },
+    this.initElementEvents = function() {
+        $("#tnthNavWrapper .logout").on("click", function(event) {
+            event.stopImmediatePropagation();
+            this.handleLogoutEvent();
+        }.bind(this));
     };
     this.initStorageEvent = function() {
         //listen for timeout or logout event in other tabs
         var cleanUp = function(e) {
-            var key = e.key? e.key : e.originalEvent.key;
-            var newVal = e.newVal ? e.newValue: e.originalEvent.newValue;
-            console.log("SESSION MONITOR GET HERE? key ",key, " val ", newVal)
-            if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
-                window.location = LOGOUT_URL;
+            if (!e) {
+                return false;
             }
+            var originalEvent = e.originalEvent;
+            var key = e.key? e.key : (originalEvent ? originalEvent.key : null);
+            var newVal = e.newVal ? e.newValue: (originalEvent ? originalEvent.newValue : null);
+            console.log("SESSION MONITOR GET HERE? key ",key, " val ", newVal)
             if(key === TIMEOUT_STORAGE_KEY && newVal === "true") {
                 window.location = TIMEOUT_URL;
+            } else if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
+                window.location = LOGOUT_URL;
             }
         }
         $(window).on("storage", cleanUp);
@@ -174,9 +211,3 @@ var SessionMonitorObj = function() { /* global $ */
         return (calculated * 1000) - (calculated > 10 ? (10 * 1000) : 0);
     };
 };
-// setTimeout(function() {
-//     $(window).on("load", function() {
-//         SessionMonitorObj.clearLogoutStorage();
-//         SessionMonitorObj.initStorageEvent();
-//     });
-// }, 300);
