@@ -1,5 +1,10 @@
+/*
+ * helper object for checking the validity of CSRF token
+ */
 var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
-
+    /*
+     * object with private properties
+     */
     var csrfTokenChecker = function() {
         var tokenLifetimeElement = document.querySelector("#__CRSF_TOKEN_LIFETIME");
         var tokenElement = document.querySelector("#__CRSF_TOKEN");
