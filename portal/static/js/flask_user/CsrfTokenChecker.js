@@ -153,7 +153,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         // initial check to see whether CSRF token has expired
         setTimeout(function() {
             this.handleTokenAboutToExpire();
-             // start timer
+             // start timer if applicable
             this.startTimer();
         }.bind(this), 150);
     };
