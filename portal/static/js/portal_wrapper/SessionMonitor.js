@@ -40,7 +40,6 @@ var SessionMonitorObj = function() { /* global $ */
                         if ((typeof CsrfTokenChecker !== "undefined") &&
                             CsrfTokenChecker.checkTokenValidity()) {
                             //CSRF token is valid
-                            console.log("CSRF token valid");
                             options["headers"] = {
                                 "X-CSRFToken": o
                             };

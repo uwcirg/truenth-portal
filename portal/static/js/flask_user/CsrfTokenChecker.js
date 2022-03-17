@@ -10,8 +10,9 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         var tokenElement = document.querySelector("#__CRSF_TOKEN");
         var tokenId = tokenElement? tokenElement.value : "";
         this.timerId = 0;
+        this.tokenId = tokenId;
         this.modalElementId = "csrfTokenExpiredModal";
-        this.timeOnLoadIdentifier = "truenth_TimeOnLoad_"+tokenId;
+        this.timeOnLoadIdentifier = "truenth-TimeOnLoad_"+tokenId;
         this.lifeTime = tokenLifetimeElement ? tokenLifetimeElement.value : 0;
     };
     /*
@@ -33,6 +34,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         clearInterval(this.timerId);
         localStorage.removeItem(this.timeOnLoadIdentifier);
     };
+
     /*
      * create/initialize dialog element
      */
@@ -84,7 +86,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
      * @return boolean true if valid false if not
      */
     csrfTokenChecker.prototype.checkTokenValidity = function() {
-        if (!this.hasEnoughToProceed()) return true;
+        if (!this.hasEnoughToProceed()) return false;
         var endTime = Date.now();
         var startTime = this.getStorageTimeOnLoad();
         var duration = (endTime - parseFloat(startTime)) / 1000; //seconds
@@ -95,7 +97,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
      * @return boolean true if valid false if not
      */
     csrfTokenChecker.prototype.isTokenAboutToExpire = function() {
-        if (!this.hasEnoughToProceed()) return true;
+        if (!this.hasEnoughToProceed()) return false;
         var endTime = Date.now();
         var startTime = this.getStorageTimeOnLoad();
         var duration = (parseFloat(endTime) - parseFloat(startTime)) / 1000; //seconds
@@ -153,12 +155,12 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         //set start time if not already
         this.setStorageTimeOnLoad();
         this.initEvents();
-        // initialized dialog
+        //initialized dialog
         this.initDialog();
-        // initial check to see whether CSRF token has expired
+        //initial check to see whether CSRF token has expired
         setTimeout(function() {
             this.handleTokenAboutToExpire();
-             // start timer if applicable
+             //start timer if applicable
             this.startTimer();
         }.bind(this), 150);
     };
