@@ -99,6 +99,24 @@ class QBT(db.Model):
                 vn, name_map[i.qb_id], i.qb_iteration]
         return results
 
+    @staticmethod
+    def withdrawn_qbd(user_id, research_study_id):
+        """Returns active QBD at time of user's withdrawal if applicable
+
+        :returns: a QBD representing the visit active at point of withdrawal
+          from given study, or None if n/a
+        """
+        qbt = QBT.query.filter(QBT.user_id == user_id).filter(
+            QBT.research_study_id == research_study_id).filter(
+            QBT.status == OverallStatus.withdrawn).first()
+        if not qbt:
+            return None
+        return QBD(
+            relative_start=None,
+            iteration=qbt.qb_iteration,
+            recur_id=qbt.qb_recur_id,
+            qb_id=qbt.qb_id)
+
 
 class AtOrderedList(list):
     """Specialize ``list`` to maintain insertion order and ``at`` attribute
