@@ -59,7 +59,7 @@ class QuestionnaireResponse(db.Model):
         db.ForeignKey('questionnaire_banks.id'), nullable=True)
     qb_iteration = db.Column(db.Integer(), nullable=True)
 
-    encounter = db.relationship("Encounter", cascade='delete')
+    encounter = db.relationship("Encounter")
     questionnaire_bank = db.relationship("QuestionnaireBank")
 
     # Fields derived from document content
