@@ -264,7 +264,7 @@ def get_actor(actors_email, require_admin=False, editable_ids=None):
 
     if require_admin and not acting_user.has_role(ROLE.ADMIN.value):
         raise ValueError("Actor must be an admin")
-    for others_id in editable_ids:
+    for others_id in editable_ids or []:
         acting_user.check_role(permission='edit', other_id=others_id)
 
     return acting_user
@@ -285,7 +285,7 @@ def get_target(id=None, email=None, error_label="target"):
 
     try:
         if id:
-            target_user = User.get(id)
+            target_user = User.query.get(id)
         else:
             target_user = User.query.filter(
                 func.lower(User.email) == email.lower()).one()
@@ -527,6 +527,92 @@ def update_qnr_authored(qnr_id, authored, actor):
         user_id=acting_user.id,
         subject_id=qnr.subject_id)
     print(message)
+
+
+@click.option('--subject_id', type=int, multiple=True, help="Subject user ID", required=True)
+@click.option(
+    '--actor',
+    default="__system__",
+    required=False,
+    help='email address of user taking this action, for audit trail'
+)
+@app.cli.command()
+def remove_post_withdrawn_qnrs(subject_id, actor):
+    """Remove QNRs posted beyond subject's withdrawal date"""
+    from sqlalchemy import delete
+    from sqlalchemy.types import DateTime
+    from portal.cache import cache
+    from portal.models.questionnaire_bank import trigger_date
+
+    rs_id = 0  # only base study till need arises
+    acting_user = get_actor(actor, require_admin=True)
+
+    for subject_id in subject_id:
+        # Confirm user has withdrawn
+        subject = get_target(id=subject_id)
+        study_id = subject.external_study_id
+
+        # Make sure we're not working w/ stale timeline data
+        if False:
+            QuestionnaireResponse.purge_qb_relationship(
+                subject_id=subject_id,
+                research_study_id=rs_id,
+                acting_user_id=acting_user.id)
+            cache.delete_memoized(trigger_date)
+            update_users_QBT(
+                subject_id,
+                research_study_id=rs_id,
+                invalidate_existing=True)
+
+        withdrawn_visit = QBT.withdrawn_qbd(subject_id, rs_id)
+        if not withdrawn_visit:
+            raise ValueError("Only applicable to withdrawn users")
+
+        # Obtain all QNRs submitted beyond withdrawal date
+        query = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.document["authored"].astext.cast(DateTime) >
+            withdrawn_visit.relative_start
+        ).filter(
+            QuestionnaireResponse.subject_id == subject_id).with_entities(
+            QuestionnaireResponse.id,
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.document["questionnaire"]["reference"].
+                label("instrument"),
+            QuestionnaireResponse.document["authored"].
+                label("authored")
+        ).order_by(QuestionnaireResponse.document["authored"])
+
+        for qnr in query:
+            # match format in bug report for easy diff
+            sub_padding = " "*(11 - len(str(subject_id)))
+            stdy_padding = " "*(12 - len(study_id))
+            out = (
+                f"{sub_padding}{subject_id} | "
+                f"{study_id}{stdy_padding}| "
+                f"{withdrawn_visit.relative_start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}    | "
+                f"{qnr.authored} | ")
+
+            # do not include any belonging to the last active visit
+            if (
+                    qnr.questionnaire_bank_id == withdrawn_visit.qb_id and
+                    qnr.qb_iteration == withdrawn_visit.iteration):
+                print(f"{out}keep")
+                continue
+            if "irondemog" in qnr.instrument:
+                print(f"{out}keep (indefinite)")
+                continue
+            print(f"{out}delete")
+            db.session.delete(QuestionnaireResponse.query.get(qnr.id))
+            auditable_event(
+                message=(
+                    "deleted questionnaire response submitted beyond "
+                    "withdrawal visit as per request by PCCTC"),
+                context="assessment",
+                user_id=acting_user.id,
+                subject_id=subject_id)
+        db.session.commit()
+    return
 
 
 @click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
