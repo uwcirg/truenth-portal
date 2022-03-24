@@ -42,24 +42,49 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         if (document.querySelector("#"+this.modalElementId)) {
             return;
         }
-        var contentHTML = '<div class="modal-dialog">' +
-            '<div class="modal-content">' +
-                '<div class="modal-header">' +
-                '<h2 class="modal-title">' + i18next.t("Login Attempt Expired") + '</h2>' +
-                '</div>' +
-                '<div class="modal-body">' +
-                '<h4 class="text-center">' + i18next.t("Your login attempt timed out.  Refreshing the page...") + '</h4><br/>' +
-                '<div class="text-center"><button type="button" class="btn btn-default btn-tnth-primary btn-lg" onClick="location.reload()">' + i18next.t("Refresh Page") + '</button></div>'
-                '</div>' +
-            '</div>' +
-        '</div>';
+        var modalDialogElement = (document.createElement("div"));
+        modalDialogElement.classList.add("modal-dialog");
+        var modalContentElement = (document.createElement("div"));
+        modalContentElement.classList.add("modal-content");
+        //header
+        var modalHeaderElement = document.createElement("div");
+        modalHeaderElement.classList.add("modal-header");
+        var modalTitleElement = document.createElement("h2");
+        modalTitleElement.classList.add("modal-title");
+        modalTitleElement.appendChild(document.createTextNode(i18next.t("Login Attempt Expired")));
+        modalHeaderElement.appendChild(modalTitleElement);
+        //body
+        var modalBodyElement = (document.createElement("div"));
+        modalBodyElement.classList.add("modal-body");
+        //body text
+        var modalBodyContentElement = (document.createElement("div"));
+        modalBodyContentElement.classList.add("text-center");
+        modalBodyContentElement.appendChild(document.createTextNode(i18next.t("Your login attempt timed out.  Refreshing the page...")));
+        //button
+        var modalButtonContainerElement = (document.createElement("div"));
+        modalButtonContainerElement.classList.add("text-center");
+        var buttonElement = (document.createElement("button"));
+        buttonElement.classList.add("btn", "btn-default", "btn-tnth-primary", "btn-lg");
+        buttonElement.addEventListener("click", function() {
+            location.reload();
+        });
+        buttonElement.appendChild(document.createTextNode(i18next.t("Refresh Page")));
+        modalButtonContainerElement.appendChild(buttonElement);
+        modalBodyElement.appendChild(modalBodyContentElement);
+        modalBodyElement.appendChild(document.createElement("br"));
+        modalBodyElement.appendChild(modalButtonContainerElement);
+        modalContentElement.appendChild(modalHeaderElement);
+        modalContentElement.appendChild(modalBodyElement);
+        modalDialogElement.appendChild(modalContentElement);
+
         var modalElement = document.createElement("div");
         modalElement.setAttribute("id", this.modalElementId);
         modalElement.setAttribute("tabIndex", -1);
         modalElement.setAttribute("role", "dialog");
         modalElement.classList.add("modal");
         modalElement.classList.add("fade");
-        modalElement.innerHTML = contentHTML;
+        modalElement.append(modalDialogElement);
+        
         document.querySelector("body").append(modalElement);
         setTimeout(function() {
             $("#"+this.modalElementId).modal({
