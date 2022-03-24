@@ -104,7 +104,8 @@ class QBT(db.Model):
         """Returns active QBD at time of user's withdrawal if applicable
 
         :returns: a QBD representing the visit active at point of withdrawal
-          from given study, or None if n/a
+          from given study, using `relative_start` to hold date-time of
+          withdrawal; or None if n/a
         """
         qbt = QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).filter(
@@ -112,7 +113,7 @@ class QBT(db.Model):
         if not qbt:
             return None
         return QBD(
-            relative_start=None,
+            relative_start=qbt.at,
             iteration=qbt.qb_iteration,
             recur_id=qbt.qb_recur_id,
             qb_id=qbt.qb_id)
