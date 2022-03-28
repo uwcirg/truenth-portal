@@ -600,13 +600,15 @@
     };
 
     BootstrapTable.prototype.onColumnSearch = function (event) {
+        if (!event) return;
         if ($.inArray(event.keyCode, [37, 38, 39, 40]) > -1) {
             return;
         }
 
         copyValues(this);
-        var text = $.trim($(event.currentTarget).val());
-        var $field = $(event.currentTarget).closest('[data-field]').data('field');
+
+        var text = event.currentTarget ? $.trim($(event.currentTarget).val()) : "";
+        var $field = $(event.currentTarget).length ? $(event.currentTarget).closest('[data-field]').data('field') : null;
 
         if ($.isEmptyObject(this.filterColumnsPartial)) {
             this.filterColumnsPartial = {};
@@ -614,6 +616,7 @@
         if (text) {
             this.filterColumnsPartial[$field] = text;
         } else {
+            if ($field)
             delete this.filterColumnsPartial[$field];
         }
 
@@ -626,6 +629,7 @@
 
         this.options.pageNumber = 1;
         this.onSearch(event);
+        if ($field)
         this.trigger('column-search', $field, text);
     };
 

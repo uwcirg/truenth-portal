@@ -171,6 +171,7 @@ def configure_jinja(app):
     app.jinja_env.globals.update(app_text=app_text)
     app.jinja_env.globals.update(ROLE=ROLE)
     app.jinja_env.globals.update(INTERVENTION=INTERVENTION)
+    app.jinja_env.globals.update(WTF_CSRF_TIME_LIMIT=app.config.get("WTF_CSRF_TIME_LIMIT"))
 
 
 def configure_extensions(app):

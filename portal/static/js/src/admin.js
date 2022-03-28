@@ -36,16 +36,18 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 if ($("#adminTable").length > 0) {
                     self.setLoaderContent();
                     self.rowLinkEvent();
-                    self.setColumnSelections();
                     self.initToggleListEvent();
                     self.initExportReportDataSelector();
-                    self.setTableFilters(self.userId); //set user's preference for filter(s)
                     self.initTableEvents();
-                    self.handleCurrentUser();
                     self.handleDeletedUsersVis();
                     self.setRowItemEvent();
                     self.handleAffiliatedUIVis();
                     self.addFilterPlaceHolders();
+                    if (self.userId) {
+                        self.handleCurrentUser();
+                        self.setColumnSelections();
+                        self.setTableFilters(self.userId); //set user's preference for filter(s)
+                    }
                     setTimeout(function() {
                         self.setContainerVis();
                     }, 350);
@@ -503,17 +505,11 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 });
                 if (this.sortFilterEnabled) {
                     $("#adminTable").on("sort.bs.table", function (e, name, order) {
-                        setTimeout(function () {
-                            self.setTablePreference(self.userId, self.tableIdentifier, name, order);
-                        }, 10);
+                        self.setTablePreference(self.userId, self.tableIdentifier, name, order);
                     }).on("column-search.bs.table", function () {
-                        setTimeout(function () {
-                            self.setTablePreference(self.userId);
-                        }, 10);
+                        self.setTablePreference(self.userId);
                     }).on("column-switch.bs.table", function () {
-                        setTimeout(function () {
-                            self.setTablePreference(self.userId);
-                        }, 10);
+                        self.setTablePreference(self.userId);
                     });
                 }
                 $("#adminTableToolbar .orgs-filter-warning").popover();
@@ -987,6 +983,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         if (prefData.filters[item]) {
                             $(fname).addClass("active");
                         }
+                        if ($(fname).get(0))
                         $(fname).trigger($(fname).get(0).tagName === "INPUT" ? "keyup" : "change");
                     }
                 }
@@ -1025,7 +1022,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     $("#adminTable .filterControl select, #adminTable .filterControl input").each(function () {
                         if ($(this).val()) {
                             var field = $(this).closest("th").attr("data-field");
-                            __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text() : $(this).val();
+                            if ($(this).get(0)) {
+                                __filters[field] = $(this).get(0).nodeName.toLowerCase() === "select" ? $(this).find("option:selected").text() : $(this).val();
+                            }
                         }
                     });
                 }
