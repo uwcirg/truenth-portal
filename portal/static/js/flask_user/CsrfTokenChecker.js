@@ -59,7 +59,7 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
         //body text
         var modalBodyContentElement = (document.createElement("div"));
         modalBodyContentElement.classList.add("text-center");
-        modalBodyContentElement.appendChild(document.createTextNode(i18next.t("Your login attempt timed out.  Refreshing the page...")));
+        modalBodyContentElement.appendChild(document.createTextNode(i18next.t("Your login attempt timed out. Refreshing the page...")));
         //button
         var modalButtonContainerElement = (document.createElement("div"));
         modalButtonContainerElement.classList.add("text-center");
