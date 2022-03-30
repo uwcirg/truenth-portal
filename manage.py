@@ -539,7 +539,6 @@ def update_qnr_authored(qnr_id, authored, actor):
 @app.cli.command()
 def remove_post_withdrawn_qnrs(subject_id, actor):
     """Remove QNRs posted beyond subject's withdrawal date"""
-    from sqlalchemy import delete
     from sqlalchemy.types import DateTime
     from portal.cache import cache
     from portal.models.questionnaire_bank import trigger_date
@@ -553,17 +552,17 @@ def remove_post_withdrawn_qnrs(subject_id, actor):
         study_id = subject.external_study_id
 
         # Make sure we're not working w/ stale timeline data
-        if False:
-            QuestionnaireResponse.purge_qb_relationship(
-                subject_id=subject_id,
-                research_study_id=rs_id,
-                acting_user_id=acting_user.id)
-            cache.delete_memoized(trigger_date)
-            update_users_QBT(
-                subject_id,
-                research_study_id=rs_id,
-                invalidate_existing=True)
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=subject_id,
+            research_study_id=rs_id,
+            acting_user_id=acting_user.id)
+        cache.delete_memoized(trigger_date)
+        update_users_QBT(
+            subject_id,
+            research_study_id=rs_id,
+            invalidate_existing=True)
 
+        deceased_date = None if not subject.deceased else subject.deceased.timestamp
         withdrawn_visit = QBT.withdrawn_qbd(subject_id, rs_id)
         if not withdrawn_visit:
             raise ValueError("Only applicable to withdrawn users")
@@ -593,10 +592,13 @@ def remove_post_withdrawn_qnrs(subject_id, actor):
                 f"{withdrawn_visit.relative_start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}    | "
                 f"{qnr.authored} | ")
 
-            # do not include any belonging to the last active visit
+            # do not include any belonging to the last active visit, unless
+            # they came in after deceased date
             if (
                     qnr.questionnaire_bank_id == withdrawn_visit.qb_id and
-                    qnr.qb_iteration == withdrawn_visit.iteration):
+                    qnr.qb_iteration == withdrawn_visit.iteration and
+                    (not deceased_date or FHIR_datetime.parse(
+                        qnr.authored) < deceased_date)):
                 print(f"{out}keep")
                 continue
             if "irondemog" in qnr.instrument:
