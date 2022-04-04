@@ -247,6 +247,53 @@ def add_user(email, role, password):
         user_id=user.id, subject_id=user.id, context='account')
 
 
+def get_actor(actors_email, require_admin=False, editable_ids=None):
+    """Helper to query for acting user by email and confirm access
+
+    :param actors_email: email address of acting user to lookup
+    :param require_admin: set true if actor must be an admin
+    :param editable_ids: optional list of patient ids actor is allowed to edit
+
+    :raises: if actor isn't found or lacks parameterized access
+    """
+    try:
+        acting_user = User.query.filter(
+            func.lower(User.email) == actors_email.lower()).one()
+    except NoResultFound:
+        raise ValueError("email for acting user <{}> not found".format(actors_email))
+
+    if require_admin and not acting_user.has_role(ROLE.ADMIN.value):
+        raise ValueError("Actor must be an admin")
+    for others_id in editable_ids or []:
+        acting_user.check_role(permission='edit', other_id=others_id)
+
+    return acting_user
+
+
+def get_target(id=None, email=None, error_label="target"):
+    """Helper to get target user by id or email address
+
+    :param id: define if known for lookup, or use email
+    :param email: define for lookup, or use id
+    :param error_label: used in exception text if user isn't found
+
+    :raises ValueError: if not found
+    :returns: User object
+    """
+    if (id and email) or not (id or email):
+        raise ValueError("define exactly one of `id` and `email`")
+
+    try:
+        if id:
+            target_user = User.query.get(id)
+        else:
+            target_user = User.query.filter(
+                func.lower(User.email) == email.lower()).one()
+    except NoResultFound:
+        raise ValueError(f"{error_label} user not found")
+    return target_user
+
+
 @click.option('--email', '-e', help="target user email for password reset")
 @click.option('--password', '-p', help="new password")
 @click.option(
@@ -256,18 +303,8 @@ def add_user(email, role, password):
 @app.cli.command()
 def password_reset(email, password, actor):
     """Reset given user's password """
-    try:
-        acting_user = User.query.filter(
-            func.lower(User.email) == actor.lower()).one()
-    except NoResultFound:
-        raise ValueError("email for acting user <{}> not found".format(actor))
-    try:
-        target_user = User.query.filter(
-            func.lower(User.email) == email.lower()).one()
-    except NoResultFound:
-        raise ValueError("email for target user not found")
-    if not acting_user.has_role(ROLE.ADMIN.value):
-        raise ValueError("Actor must be an admin")
+    acting_user = get_actor(actor, require_admin=True)
+    target_user = get_target(email=email)
     if not password or len(str(password)) < 8:
         raise ValueError("requires a valid password")
 
@@ -323,6 +360,7 @@ def compile_po_files():
     compile_pos()
     click.echo("Compiled backend PO files to MO files")
 
+
 @app.cli.command()
 def translation_upload():
     """Update .pot file on Smartling
@@ -331,6 +369,7 @@ def translation_upload():
     POSTs said .pot file to Smartling via their API
     """
     smartling_upload()
+
 
 @app.cli.command()
 def extract_i18n():
@@ -449,18 +488,12 @@ def no_email(email, actor):
 @app.cli.command()
 def update_qnr_authored(qnr_id, authored, actor):
     """Modify authored date on given Questionnaire Response ID"""
-    try:
-        acting_user = User.query.filter(
-            func.lower(User.email) == actor.lower()).one()
-    except NoResultFound:
-        raise ValueError("email for acting user <{}> not found".format(actor))
     qnr = QuestionnaireResponse.query.get(qnr_id)
     if not qnr:
         raise ValueError(
             "Questionnaire Response {qnr_id} not found".format(qnr_id))
 
-    acting_user.check_role(permission='edit', other_id=qnr.subject_id)
-
+    acting_user = get_actor(actor, editable_ids=[qnr.subject_id])
     document = copy.deepcopy(qnr.document)
     new_authored = FHIR_datetime.parse(authored)
     old_authored = FHIR_datetime.parse(document['authored'])
@@ -496,6 +529,94 @@ def update_qnr_authored(qnr_id, authored, actor):
     print(message)
 
 
+@click.option('--subject_id', type=int, multiple=True, help="Subject user ID", required=True)
+@click.option(
+    '--actor',
+    default="__system__",
+    required=False,
+    help='email address of user taking this action, for audit trail'
+)
+@app.cli.command()
+def remove_post_withdrawn_qnrs(subject_id, actor):
+    """Remove QNRs posted beyond subject's withdrawal date"""
+    from sqlalchemy.types import DateTime
+    from portal.cache import cache
+    from portal.models.questionnaire_bank import trigger_date
+
+    rs_id = 0  # only base study till need arises
+    acting_user = get_actor(actor, require_admin=True)
+
+    for subject_id in subject_id:
+        # Confirm user has withdrawn
+        subject = get_target(id=subject_id)
+        study_id = subject.external_study_id
+
+        # Make sure we're not working w/ stale timeline data
+        QuestionnaireResponse.purge_qb_relationship(
+            subject_id=subject_id,
+            research_study_id=rs_id,
+            acting_user_id=acting_user.id)
+        cache.delete_memoized(trigger_date)
+        update_users_QBT(
+            subject_id,
+            research_study_id=rs_id,
+            invalidate_existing=True)
+
+        deceased_date = None if not subject.deceased else subject.deceased.timestamp
+        withdrawn_visit = QBT.withdrawn_qbd(subject_id, rs_id)
+        if not withdrawn_visit:
+            raise ValueError("Only applicable to withdrawn users")
+
+        # Obtain all QNRs submitted beyond withdrawal date
+        query = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.document["authored"].astext.cast(DateTime) >
+            withdrawn_visit.relative_start
+        ).filter(
+            QuestionnaireResponse.subject_id == subject_id).with_entities(
+            QuestionnaireResponse.id,
+            QuestionnaireResponse.questionnaire_bank_id,
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.document["questionnaire"]["reference"].
+                label("instrument"),
+            QuestionnaireResponse.document["authored"].
+                label("authored")
+        ).order_by(QuestionnaireResponse.document["authored"])
+
+        for qnr in query:
+            # match format in bug report for easy diff
+            sub_padding = " "*(11 - len(str(subject_id)))
+            stdy_padding = " "*(12 - len(study_id))
+            out = (
+                f"{sub_padding}{subject_id} | "
+                f"{study_id}{stdy_padding}| "
+                f"{withdrawn_visit.relative_start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}    | "
+                f"{qnr.authored} | ")
+
+            # do not include any belonging to the last active visit, unless
+            # they came in after deceased date
+            if (
+                    qnr.questionnaire_bank_id == withdrawn_visit.qb_id and
+                    qnr.qb_iteration == withdrawn_visit.iteration and
+                    (not deceased_date or FHIR_datetime.parse(
+                        qnr.authored) < deceased_date)):
+                print(f"{out}keep")
+                continue
+            if "irondemog" in qnr.instrument:
+                print(f"{out}keep (indefinite)")
+                continue
+            print(f"{out}delete")
+            db.session.delete(QuestionnaireResponse.query.get(qnr.id))
+            auditable_event(
+                message=(
+                    "deleted questionnaire response submitted beyond "
+                    "withdrawal visit as per request by PCCTC"),
+                context="assessment",
+                user_id=acting_user.id,
+                subject_id=subject_id)
+        db.session.commit()
+    return
+
+
 @click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
 @click.option('--tgt_id', type=int, help="Target Patient ID")
 @click.option(
@@ -510,17 +631,9 @@ def merge_users(src_id, tgt_id, actor):
     from portal.models.user import internal_identifier_systems
     from portal.models.tou import ToU
 
-    try:
-        acting_user = User.query.filter(
-            func.lower(User.email) == actor.lower()).one()
-    except NoResultFound:
-        raise ValueError("email for acting user <{}> not found".format(actor))
-
-    acting_user.check_role(permission='edit', other_id=src_id)
-    acting_user.check_role(permission='edit', other_id=tgt_id)
-
-    src_user = User.query.get(src_id)
-    tgt_user = User.query.get(tgt_id)
+    acting_user = get_actor(actor, editable_ids=[src_id, tgt_id])
+    src_user = get_target(id=src_id, error_label="<src_id>")
+    tgt_user = get_target(id=tgt_id, error_label="<tgt_id>")
 
     if not all((src_user, tgt_user)) or (
             src_user.birthdate != tgt_user.birthdate):
@@ -664,7 +777,7 @@ def present_before_after_state(user_id, external_study_id, before_state):
 def find_overlaps(correct_overlaps, reprocess_qnrs):
     from portal.models.qb_timeline import check_for_overlaps
     from portal.models.user import patients_query
-    admin = User.query.filter(User.email == '__system__').one()
+    admin = get_actor('__system__', require_admin=True)
 
     query = patients_query(
         acting_user=admin,
@@ -724,7 +837,7 @@ def preview_site_update(org_id, retired):
         raise RuntimeError("Not to be run on prod: changes user records")
 
     organization = Organization.query.get(org_id)
-    admin = User.query.filter(User.email == '__system__').one()
+    admin = get_actor('__system__', require_admin=True)
 
     query = patients_query(
         acting_user=admin,
