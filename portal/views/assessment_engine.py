@@ -1261,6 +1261,11 @@ def assessment_add(patient_id):
                 which answers are provided.
               type: object
               $ref: "#/definitions/Group"
+            extension:
+              description:
+                FHIR Extensions
+              type: object
+              $ref: "#/definitions/ValueDateTimeExtension"
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
@@ -1575,6 +1580,19 @@ def assessment_add(patient_id):
             valueDecimal:
               description: Numeric score value
               type: number
+      - schema:
+          id: ValueDateTimeExtension
+          type: object
+          additionalProperties: false
+          properties:
+            url:
+              description: Reference to extension
+              type: string
+              format: uri
+            valueDecimal:
+              description: actual date of completion
+              type: string
+              format: date-time
     produces:
       - application/json
     parameters:
