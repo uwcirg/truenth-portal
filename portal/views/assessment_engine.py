@@ -952,6 +952,7 @@ def assessment_update(patient_id):
         QuestionnaireResponse.validate_authored(
             FHIR_datetime.parse(updated_qnr.get('authored')))
     except (jsonschema.ValidationError, NoFutureDates) as e:
+        current_app.logger.warning("Failed QNR schema validation, %s", str(e))
         return jsonify({
             'ok': False,
             'message': str(e),
@@ -1644,6 +1645,7 @@ def assessment_add(patient_id):
         QuestionnaireResponse.validate_authored(
             FHIR_datetime.parse(request.json.get('authored')))
     except (jsonschema.ValidationError, NoFutureDates) as e:
+        current_app.logger.warning("Failed QNR schema validation, %s", str(e))
         response = {
             'ok': False,
             'message': str(e),
