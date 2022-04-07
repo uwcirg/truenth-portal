@@ -1591,7 +1591,7 @@ def assessment_add(patient_id):
               description: Reference to extension
               type: string
               format: uri
-            valueDecimal:
+            valueDateTime:
               description: actual date of completion
               type: string
               format: date-time
