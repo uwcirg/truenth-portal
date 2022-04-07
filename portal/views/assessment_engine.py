@@ -1264,8 +1264,10 @@ def assessment_add(patient_id):
             extension:
               description:
                 FHIR Extensions
-              type: object
-              $ref: "#/definitions/ValueDateTimeExtension"
+              type: array
+              items:
+                $ref: "#/definitions/ValueDateTimeExtension"
+
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
