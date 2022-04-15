@@ -1,5 +1,15 @@
 var SessionMonitorObj = function() { /* global $ */
+
+    var LOGOUT_URL = "/logout";
+    var TIMEOUT_URL = "/logout?timed_out=1";
+    var LOGOUT_STORAGE_KEY = "truenthLoggedOut";
+    var TIMEOUT_STORAGE_KEY="truenthTimedOut";
+
     this.init = function() {
+        this.clearStorage();
+        this.initStorageEvent();
+        this.initElementEvents();
+        this.initUnloadEvent();
         var expiresIn = $("#sessionMonitorProps").attr("data-expires-in"); //session expires in time period from backend
         var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
         var __BASE_URL = $("#sessionMonitorProps").attr("data-baseurl") || "";
@@ -17,24 +27,40 @@ var SessionMonitorObj = function() { /* global $ */
                     minPingInterval: 6e4,
                     activityEvents: "mouseup",
                     pingUrl: n + "/api/ping",
-                    logoutUrl: n + "/logout",
-                    timeoutUrl: n + "/logout?timeout=1",
+                    logoutUrl: n + LOGOUT_URL,
+                    timeoutUrl: n + TIMEOUT_URL,
                     ping: function() {
-                        $.ajax({
+                        var options = {
                             type: "POST",
                             contentType: "text/plain",
-                            headers: {
-                                "X-CSRFToken": o
-                            },
                             cache: !1,
                             url: l.pingUrl,
                             crossDomain: !0
-                        });
+                        };
+                        if ((typeof CsrfTokenChecker !== "undefined") &&
+                            CsrfTokenChecker.checkTokenValidity()) {
+                            //CSRF token is valid
+                            options["headers"] = {
+                                "X-CSRFToken": o
+                            };
+                        }
+                        $.ajax(options);
+                    },
+                    setLogoutStorage: function() {
+                        if (typeof localStorage !== "undefined") {
+                            window.localStorage.setItem(LOGOUT_STORAGE_KEY, true);
+                        }
+                    },
+                    setTimeoutStorage: function() {
+                        if (typeof localStorage !== "undefined") {
+                            window.localStorage.setItem(TIMEOUT_STORAGE_KEY, true);
+                        }
                     },
                     logout: function() {
                         if (typeof(sessionStorage) !== "undefined") {
                             sessionStorage.clear();
                         }
+                        l.setLogoutStorage();
                         window.location.href = l.logoutUrl;
                     },
                     onwarning: function() {
@@ -53,10 +79,11 @@ var SessionMonitorObj = function() { /* global $ */
                     },
                     onbeforetimeout: function() {},
                     ontimeout: function() {
-                        window.location.href = l.timeoutUrl;
                         if (typeof(sessionStorage) !== "undefined") {
                             sessionStorage.clear();
                         }
+                        l.setTimeoutStorage();
+                        window.location.href = l.timeoutUrl;
                     }
                 };
 
@@ -101,8 +128,8 @@ var SessionMonitorObj = function() { /* global $ */
             minPingInterval: 6e4,
             activityEvents: "mouseup",
             pingUrl: __BASE_URL + "/api/ping",
-            logoutUrl: __BASE_URL + "/logout",
-            timeoutUrl: __BASE_URL + "/logout?timed_out=1",
+            logoutUrl: __BASE_URL + LOGOUT_URL,
+            timeoutUrl: __BASE_URL + TIMEOUT_URL,
             modalShown: !1,
             intervalMonitor: !1,
             onwarning: function() {
@@ -118,6 +145,61 @@ var SessionMonitorObj = function() { /* global $ */
         var warningText = ($("#session-warning-modal").find("#remaining-time").text()).replace("{time}", (sessMon.timeBeforeWarning / 1000));
         $("#session-warning-modal").find("#remaining-time").text(warningText);
     };
+    this.getUrlParameter = function(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1]);
+    };
+    this.setLogoutSessionStorage = function() {
+        sessionStorage.clear();
+        sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+    };
+    this.handleLogoutEvent = function() {
+        this.setLogoutSessionStorage();
+        localStorage.setItem(LOGOUT_STORAGE_KEY, true);
+    },
+    this.handleTimeOutEvent = function() {
+        this.setLogoutSessionStorage();
+        localStorage.setItem(TIMEOUT_STORAGE_KEY, true);
+    };
+    this.clearStorage = function() {
+        localStorage.removeItem(LOGOUT_STORAGE_KEY);
+        localStorage.removeItem(TIMEOUT_STORAGE_KEY);
+    };
+    this.initUnloadEvent = function() {
+        $(window).on("beforeunload", function() {
+            //taking into consideration that user may type in logout in url
+            if (this.getUrlParameter("timed_out")) {
+                this.handleTimeOutEvent();
+            } else if (this.getUrlParameter("logout")) {
+                this.handleLogoutEvent();
+            }
+        }.bind(this));
+    },
+    this.initElementEvents = function() {
+        $("#tnthNavWrapper .logout").on("click", function(event) {
+            event.stopImmediatePropagation();
+            this.handleLogoutEvent();
+        }.bind(this));
+    };
+    this.initStorageEvent = function() {
+        //listen for timeout or logout event in other tabs
+        var cleanUp = function(e) {
+            if (!e) {
+                return false;
+            }
+            var originalEvent = e.originalEvent;
+            var key = e.key? e.key : (originalEvent ? originalEvent.key : null);
+            var newVal = e.newVal ? e.newValue: (originalEvent ? originalEvent.newValue : null);
+            if(key === TIMEOUT_STORAGE_KEY && newVal === "true") {
+                window.location = TIMEOUT_URL;
+            } else if(key === LOGOUT_STORAGE_KEY && newVal === "true") {
+                window.location = LOGOUT_URL;
+            }
+        }
+        $(window).on("storage", cleanUp);
+    },
     this.calculatedLifeTime = function(configuredLifeTime) {
         var calculated = 15 * 60;
         configuredLifeTime = parseInt(configuredLifeTime);

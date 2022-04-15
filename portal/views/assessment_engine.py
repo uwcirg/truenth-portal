@@ -641,8 +641,9 @@ def assessment(patient_id, instrument_id):
         # Use FHIR `extension`s to pass these fields to clients.
         extensions = qnr.extensions()
         if extensions:
-            assert('extension' not in qnr.document)  # catch future collisions
-            document['extension'] = extensions
+            if 'extension' not in qnr.document:
+                document['extension'] = []
+            document['extension'].extend(extensions)
 
         documents.append(document)
 
@@ -951,6 +952,7 @@ def assessment_update(patient_id):
         QuestionnaireResponse.validate_authored(
             FHIR_datetime.parse(updated_qnr.get('authored')))
     except (jsonschema.ValidationError, NoFutureDates) as e:
+        current_app.logger.warning("Failed QNR schema validation, %s", str(e))
         return jsonify({
             'ok': False,
             'message': str(e),
@@ -1260,6 +1262,13 @@ def assessment_add(patient_id):
                 which answers are provided.
               type: object
               $ref: "#/definitions/Group"
+            extension:
+              description:
+                FHIR Extensions
+              type: array
+              items:
+                $ref: "#/definitions/ValueDateTimeExtension"
+
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-03-11T23:47:28Z'
@@ -1574,6 +1583,19 @@ def assessment_add(patient_id):
             valueDecimal:
               description: Numeric score value
               type: number
+      - schema:
+          id: ValueDateTimeExtension
+          type: object
+          additionalProperties: false
+          properties:
+            url:
+              description: Reference to extension
+              type: string
+              format: uri
+            valueDateTime:
+              description: actual date of completion
+              type: string
+              format: date-time
     produces:
       - application/json
     parameters:
@@ -1623,6 +1645,7 @@ def assessment_add(patient_id):
         QuestionnaireResponse.validate_authored(
             FHIR_datetime.parse(request.json.get('authored')))
     except (jsonschema.ValidationError, NoFutureDates) as e:
+        current_app.logger.warning("Failed QNR schema validation, %s", str(e))
         response = {
             'ok': False,
             'message': str(e),
@@ -1827,7 +1850,17 @@ def present_assessment(instruments=None):
         type: integer
       - name: authored
         in: query
-        description: Override QuestionnaireResponse.authored with given datetime
+        description: Override QuestionnaireResponse.authored with given
+          datetime. Optionally set to value within desired visit if `actual`
+          date is outside
+        required: false
+        type: string
+        format: date-time
+      - name: actual
+        in: query
+        description: actual date of completion, to be used exclusively
+         outside of visit [start-expires) dates.  In such an event, `authored`
+         should be set to valid datetime within desired visit
         required: false
         type: string
         format: date-time
@@ -1880,6 +1913,7 @@ def present_assessment(instruments=None):
         "resume_identifier": ",".join(resume_identifiers),
         "subject_id": request.args.get('subject_id'),
         "authored": request.args.get('authored'),
+        "actual": request.args.get('actual'),
         "entry_method": request.args.get('entry_method'),
     }
     # Clear empty querystring params

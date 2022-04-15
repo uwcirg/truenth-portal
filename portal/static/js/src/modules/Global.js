@@ -49,7 +49,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         }
         this.prePopulateEmail();
         this.beforeSendAjax();
-        this.unloadEvent();
         this.footer();
         this.loginAs();
         this.initValidator();
@@ -102,7 +101,7 @@ export default { /*global $ i18next */ /*initializing functions performed only o
                     if (roles.indexOf("patient") !== -1) {
                         roleType = "patient";
                     }
-                } 
+                }
                 $.ajax({
                     type: "GET",
                     url: `/api/${roleType}/${userId}/research_study`
@@ -136,6 +135,10 @@ export default { /*global $ i18next */ /*initializing functions performed only o
     "beforeSendAjax": function() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
+                if ((typeof CsrfTokenChecker !== "undefined") && !CsrfTokenChecker.checkTokenValidity()) {
+                    //do NOT send CSRFToken if not valid
+                    return;
+                }
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                     xhr.setRequestHeader("X-CSRFToken", $("#__CRSF_TOKEN").val());
                 }
@@ -172,10 +175,6 @@ export default { /*global $ i18next */ /*initializing functions performed only o
             self.embedPortalWrapperContent(data);
             setTimeout(function() {
                 self.restoreVis();
-                $("#tnthNavWrapper .logout").on("click", function(event) {
-                    event.stopImmediatePropagation();
-                    self.handleLogout();
-                });
                 self.handleDisableLinks();
                 /*
                  * show sub-study specific resources links, consumed by staff users
@@ -196,17 +195,11 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         this.getUserLocale(); //need to clear current user locale in session storage when logging in as patient
         Utility.resetBrowserBackHistory(); /*global resetBrowserBackHistory */
     },
-    "handleLogout": function() {
-        sessionStorage.clear();
-        sessionStorage.setItem("logout", "true"); //set session storage logout indicator
+    "getLogoutStorageKey": function() {
+        return "truenthLoggedOut";
     },
-    "unloadEvent": function() {
-        var self = this;
-        $(window).on("beforeunload", function() {
-            if (Utility.getUrlParameter("logout")) { //taking into consideration that user may type in logout in url
-                self.handleLogout();
-            }
-        });
+    "getTimeoutStorageKey": function() {
+        return "truenthTimedOut";
     },
     "localeSessionKey": "currentUserLocale",
     "clearSessionLocale": function() {
@@ -538,4 +531,3 @@ export default { /*global $ i18next */ /*initializing functions performed only o
         Validator.initValidator();
     }
 };
-

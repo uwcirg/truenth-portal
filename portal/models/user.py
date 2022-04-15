@@ -694,6 +694,12 @@ class User(db.Model, UserMixin):
 
         for identifier in self._identifiers:
             if identifier.system == TRUENTH_EXTERNAL_STUDY_SYSTEM:
+                # Don't tag an identifier as deleted if it belongs to another
+                try:
+                    UserIdentifier.check_unique(self, identifier)
+                except Conflict:
+                    # Another (legit) user has this identifier, don't mask.
+                    continue
                 if identifier.value.endswith(suffix):
                     continue
                 identifier.value += suffix
