@@ -62,7 +62,8 @@ def staff_emails(patient, hard_triggers, initial_notification):
         Role.name.in_((ROLE.STAFF.value, ROLE.CLINICIAN.value))).join(
         UserOrganization).filter(
         User.id == UserOrganization.user_id).filter(
-        UserOrganization.organization_id == org_id)
+        UserOrganization.organization_id == org_id).filter(
+        User.deleted_id.is_(None))
 
     # make sure assigned clinicians made the list
     required = set([c.id for c in patient.clinicians])
