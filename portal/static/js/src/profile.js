@@ -2834,7 +2834,7 @@ export default (function() {
                             self.pad(today.getMonth()+1) === self.pad(m.val()) &&
                             self.pad(today.getDate()) === self.pad(d.val())
                         );
-                        // if today's date is entered, just sent in today's date/time
+                        // if today's date is entered, just sent in today's date/time (GMT)
                         if (isToday) self.manualEntry.completionDate = new Date().toISOString();
                         else {
                             var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
