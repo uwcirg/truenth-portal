@@ -1260,7 +1260,7 @@ class User(db.Model, UserMixin):
         from .user_consent import latest_consent
         from .research_study import EMPRO_RS_ID
         consent = latest_consent(self, EMPRO_RS_ID)
-        if consent and len(self.clinicians) == 0:
+        if consent and len([c for c in self.clinicians]) == 0:
             try:
                 pi = User.query.filter(User.roles.any(
                     name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
