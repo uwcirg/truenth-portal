@@ -5,7 +5,7 @@ import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
 from portal.database import db
-from portal.models.role import ROLE
+from portal.models.audit import Audit
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
     evaluate_triggers,
@@ -123,12 +123,11 @@ def test_ts_trigger_lists(mock_triggers):
         ts.soft_trigger_list())
 
 
-def test_fire_trigger_events(initialized_patient, processed_ts, promote_user):
-    # pretend patient is it's own clinician for staff email
+def test_fire_trigger_events(
+        initialized_patient, processed_ts, staff_rp_org_user):
     user = db.session.merge(initialized_patient)
     user_id = user.id
-    user.clinicians.append(user)
-    promote_user(user=user, role_name=ROLE.CLINICIAN.value)
+    user._clinicians.append(staff_rp_org_user)
 
     fire_trigger_events()
 
@@ -140,12 +139,30 @@ def test_fire_trigger_events(initialized_patient, processed_ts, promote_user):
     assert len(ts.triggers['actions']['email']) > 1
 
 
-def test_fire_reminders(initialized_patient, triggered_ts, promote_user):
-    # pretend patient is it's own clinician for staff email
+def test_deleted_staff(
+        initialized_patient, processed_ts, staff_rp_org_user):
+    staff = staff_rp_org_user
+    user = db.session.merge(initialized_patient)
+    user._clinicians.append(staff)
+
+    assert [c for c in user.clinicians] == [staff]
+
+    # mark staff deleted, confirm they're no longer in clinician list
+    audit = Audit(user_id=staff.id, subject_id=staff.id)
+    with SessionScope(db):
+        db.session.add(audit)
+        db.session.commit()
+    staff = db.session.merge(staff)
+    staff.deleted = db.session.merge(audit)
+
+    user = db.session.merge(user)
+    assert [c for c in user.clinicians] == []
+
+
+def test_fire_reminders(initialized_patient, triggered_ts, staff_rp_org_user):
     user = db.session.merge(initialized_patient)
     user_id = user.id
-    user.clinicians.append(user)
-    promote_user(user=user, role_name=ROLE.CLINICIAN.value)
+    user._clinicians.append(staff_rp_org_user)
 
     # back state to `processed` for event processing
     ts = db.session.merge(triggered_ts)
