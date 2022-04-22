@@ -225,7 +225,7 @@
       "kwargs": null,
       "name": "IRONMAN EMPRO Trigger Reminder Emails",
       "resourceType": "ScheduledJob",
-      "schedule": "1 4 * * *",
+      "schedule": "1 4,10,16,22 * * *",
       "task": "process_triggers_task"
     }
   ],
