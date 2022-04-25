@@ -5,7 +5,6 @@ import pytest
 
 from portal.extensions import db
 from portal.models.coredata import Coredata, configure_coredata
-from portal.models.organization import Organization
 from portal.models.role import ROLE
 from tests import TEST_USER_ID
 
@@ -15,18 +14,6 @@ PRIVACY = 'privacy_policy'
 WEB_TOU = 'website_terms_of_use'
 SUBJ_CONSENT = 'subject_website_consent'
 STORED_FORM = 'stored_website_consent_form'
-
-
-@pytest.fixture
-def staff_user(test_user, promote_user):
-    promote_user(role_name=ROLE.STAFF.value)
-    return test_user
-
-
-@pytest.fixture
-def patient_user(test_user, promote_user):
-    promote_user(role_name=ROLE.PATIENT.value)
-    return test_user
 
 
 @pytest.fixture

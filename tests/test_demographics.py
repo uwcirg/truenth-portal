@@ -166,7 +166,6 @@ class TestDemographics(TestCase):
         assert user.organizations[0].name == org_name
         assert user.organizations[1].name == org2_name
         assert user.practitioner_id == pract_id
-        assert len(user.clinicians) == 2
         assert set([c.id for c in user.clinicians]) == set(
             (TEST_USER_ID, pi_id))
 
@@ -349,8 +348,8 @@ class TestDemographics(TestCase):
         pi_id = pi.id
         user = db.session.merge(self.test_user)
 
-        user.clinicians.append(pi)
-        user.clinicians.append(user)
+        user._clinicians.append(pi)
+        user._clinicians.append(user)
 
         just_the_pi = {
             "resourceType": "Patient",
@@ -364,8 +363,8 @@ class TestDemographics(TestCase):
 
         assert response.status_code == 200
         user = db.session.merge(self.test_user)
-        assert len(user.clinicians) == 1
-        assert user.clinicians[0] == pi
+        assert len([c for c in user.clinicians]) == 1
+        assert [c for c in user.clinicians][0] == pi
 
     def test_demographics_delete_ref(self):
         # existing careProvider should get removed

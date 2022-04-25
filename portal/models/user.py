@@ -291,7 +291,7 @@ class User(db.Model, UserMixin):
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deceased_audit_id_fk'), nullable=True)
     practitioner_id = db.Column(db.ForeignKey('practitioners.id'))
-    clinicians = db.relationship(
+    _clinicians = db.relationship(
         'User',
         secondary="user_clinicians",
         primaryjoin=id == UserClinician.patient_id,
@@ -433,6 +433,10 @@ class User(db.Model, UserMixin):
         return [
             c for c in self._consents
             if c.expires > now and c.deleted_id is None]
+
+    @hybrid_property
+    def clinicians(self):
+        return (c for c in self._clinicians if c.deleted_id is None)
 
     @property
     def display_name(self):
@@ -1256,12 +1260,12 @@ class User(db.Model, UserMixin):
         from .user_consent import latest_consent
         from .research_study import EMPRO_RS_ID
         consent = latest_consent(self, EMPRO_RS_ID)
-        if consent and len(self.clinicians) == 0:
+        if consent and len([c for c in self.clinicians]) == 0:
             try:
                 pi = User.query.filter(User.roles.any(
                     name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
                     User.organizations.any(id=consent.organization_id)).one()
-                self.clinicians.append(pi)
+                self._clinicians.append(pi)
                 db.session.commit()
             except NoResultFound:
                 current_app.logger.error(
@@ -1316,9 +1320,9 @@ class User(db.Model, UserMixin):
             if clinician.id in remove_if_not_requested:
                 remove_if_not_requested.pop(clinician.id)
             if clinician not in self.clinicians:
-                self.clinicians.append(clinician)
+                self._clinicians.append(clinician)
         for clinician in remove_if_not_requested.values():
-            self.clinicians.remove(clinician)
+            self._clinicians.remove(clinician)
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
         """Update user's organizations
