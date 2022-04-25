@@ -2559,7 +2559,7 @@ export default (function() {
             setManualEntryDateToToday: function() {
                 this.manualEntry.todayObj = this.modules.tnthDates.getTodayDateObj();
                 //set initial completion date as GMT date/time for today based on user timezone
-                this.manualEntry.completionDate = this.modules.tnthDates.getDateWithTimeZone((this.manualEntry.todayObj.date).setHours(12,0,0,0));
+                this.manualEntry.completionDate = (new Date()).toISOString();
             },
             setInitManualEntryCompletionDate: function() {
                 //set initial completion date as GMT date/time for today based on user timezone
@@ -2827,8 +2827,19 @@ export default (function() {
                             return false;
                         }
 
-                        var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
-                        self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
+                        var today = new Date();
+                        // check if the entered completion date is the same as today's date
+                        var isToday = (
+                            (today.getFullYear()+"") === (y.val()+"") &&
+                            self.pad(today.getMonth()+1) === self.pad(m.val()) &&
+                            self.pad(today.getDate()) === self.pad(d.val())
+                        );
+                        // if today's date is entered, just sent in today's date/time (GMT)
+                        if (isToday) self.manualEntry.completionDate = new Date().toISOString();
+                        else {
+                            var gmtDateObj = tnthDates.getDateObj(y.val(), m.val(), d.val(), 12, 0, 0);
+                            self.manualEntry.completionDate = self.modules.tnthDates.getDateWithTimeZone(gmtDateObj, "system");
+                        }
 
                         //check if date is within the selected visit and display message when applicable
                         self.setOutofWindowDateMessage();
