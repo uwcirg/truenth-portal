@@ -261,9 +261,20 @@ def test_user(app, add_user, initialized_db):
 
 
 @pytest.fixture
+def org_w_test_rp(app, shallow_org_tree):
+    org = Organization.query.filter(
+        Organization.partOf_id.isnot(None)).first()
+    if len(org.research_protocols) < 1:
+        rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'test_rp').one()
+        org.research_protocols.append(rp)
+    return db.session.merge(org)
+
+
+@pytest.fixture
 def initialized_patient(
         app, test_user, initialize_static, initialized_with_research_protocol,
-        shallow_org_tree):
+        org_w_test_rp):
     """returns test patient with data necessary to avoid initial_queries"""
     now = datetime.utcnow()
     test_user = db.session.merge(test_user)
@@ -275,14 +286,8 @@ def initialized_patient(
         db.session.add(UserRoles(user_id=test_user_id, role_id=role_id))
         db.session.commit()
 
-    org = Organization.query.filter(
-        Organization.partOf_id.isnot(None)).first()
-    if len(org.research_protocols) < 1:
-        rp = ResearchProtocol.query.filter(
-            ResearchProtocol.name == 'test_rp').one()
-        org.research_protocols.append(rp)
     test_user = db.session.merge(test_user)
-    test_user.organizations.append(org)
+    test_user.organizations.append(org_w_test_rp)
 
     # Agree to Terms of Use and sign consent
     audit = Audit(user_id=test_user_id, subject_id=test_user_id)
@@ -295,7 +300,7 @@ def initialized_patient(
     privacy = ToU(
         audit=audit, agreement_url='http://not.really.org',
         type='privacy policy')
-    parent_org = OrgTree().find(org.id).top_level()
+    parent_org = OrgTree().find(org_w_test_rp.id).top_level()
     options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                SEND_REMINDERS_MASK)
     add_static_research_studies()
@@ -382,6 +387,12 @@ def add_user(app, initialized_db):
 
 
 @pytest.fixture
+def patient_user(test_user, promote_user):
+    promote_user(role_name=ROLE.PATIENT.value)
+    return test_user
+
+
+@pytest.fixture
 def service_user(initialize_static, test_user):
     sponsor = db.session.merge(test_user)
     service_user = sponsor.add_service_account()
@@ -390,6 +401,23 @@ def service_user(initialize_static, test_user):
         db.session.commit()
 
     return db.session.merge(service_user)
+
+
+@pytest.fixture
+def staff_user(test_user, promote_user):
+    promote_user(role_name=ROLE.STAFF.value)
+    return test_user
+
+
+@pytest.fixture
+def staff_rp_org_user(add_user, promote_user, org_w_test_rp):
+    staff = add_user(username="test_staff_user")
+    promote_user(user=staff, role_name=ROLE.STAFF.value)
+    promote_user(user=staff, role_name=ROLE.CLINICIAN.value)
+    staff = db.session.merge(staff)
+    staff.organizations.append(org_w_test_rp)
+
+    return db.session.merge(staff)
 
 
 @pytest.fixture
