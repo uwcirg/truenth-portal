@@ -1266,6 +1266,13 @@ class User(db.Model, UserMixin):
                     name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
                     User.organizations.any(id=consent.organization_id)).one()
                 self._clinicians.append(pi)
+                audit = Audit(
+                    user_id=self.id,
+                    subject_id=self.id,
+                    comment=f"PI: {pi} assigned as default clinician",
+                    context='account',
+                    timestamp=datetime.utcnow())
+                db.session.add(audit)
                 db.session.commit()
             except NoResultFound:
                 current_app.logger.error(
@@ -1321,8 +1328,23 @@ class User(db.Model, UserMixin):
                 remove_if_not_requested.pop(clinician.id)
             if clinician not in self.clinicians:
                 self._clinicians.append(clinician)
+                audit = Audit(
+                    user_id=self.id,
+                    subject_id=self.id,
+                    comment=f"assigned clinician {clinician}",
+                    context='account',
+                    timestamp=datetime.utcnow())
+                db.session.add(audit)
+
         for clinician in remove_if_not_requested.values():
             self._clinicians.remove(clinician)
+            audit = Audit(
+                user_id=self.id,
+                subject_id=self.id,
+                comment=f"removed clinician {clinician}",
+                context='account',
+                timestamp=datetime.utcnow())
+            db.session.add(audit)
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
         """Update user's organizations
