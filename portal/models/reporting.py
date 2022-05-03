@@ -118,7 +118,7 @@ def adherence_report(
             if row['status'] == "Expired":
                 row['status'] = "Not Yet Available"
             # TN-3101 include clinician even if not started on EMPRO
-            if research_study_id == EMPRO_RS_ID and len(patient.clinicians) > 0:
+            if research_study_id == EMPRO_RS_ID and len([c for c in patient.clinicians]) > 0:
                 row['clinician'] = ';'.join(
                     clinician.display_name for clinician in
                     patient.clinicians)
@@ -144,7 +144,7 @@ def adherence_report(
                 ts_reporting = TriggerStatesReporting(patient_id=patient.id)
 
                 # Add clinician and trigger data for EMPRO reports
-                if len(patient.clinicians) > 0:
+                if len([c for c in patient.clinicians]) > 0:
                     row['clinician'] = ';'.join(
                         clinician.display_name for clinician in
                         patient.clinicians)
