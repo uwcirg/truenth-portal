@@ -14,6 +14,7 @@ from portal.trigger_states.empro_states import (
     users_trigger_state,
 )
 from portal.trigger_states.models import TriggerState
+from portal.views.clinician import clinician_query
 
 
 def test_initial_state(test_user):
@@ -157,6 +158,10 @@ def test_deleted_staff(
 
     user = db.session.merge(user)
     assert [c for c in user.clinicians] == []
+
+    # confirm they don't remain in the "clinicians_query"
+    results = clinician_query(user)
+    assert results.count() == 0
 
 
 def test_fire_reminders(initialized_patient, triggered_ts, staff_rp_org_user):
