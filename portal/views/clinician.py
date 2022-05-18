@@ -18,6 +18,7 @@ clinician_api = Blueprint('clinician_api', __name__)
 def clinician_query(acting_user, org_filter=None):
     """Builds a live query for all clinicians the acting user can view"""
     query = User.query.join(UserRoles).filter(
+        User.deleted_id.is_(None)).filter(
         UserRoles.user_id == User.id).join(Role).filter(
         UserRoles.role_id == Role.id).filter(
         Role.name.in_((
