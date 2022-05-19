@@ -47,7 +47,8 @@ class TriggerState(db.Model):
 
     def __repr__(self):
         return (
-            "TriggerState on user {0.user_id}: {0.state}".format(self))
+            f"TriggerState on user {self.user_id}: {self.state} "
+            f"month: {self.visit_month}")
 
     def insert(self, from_copy=False):
         """Shorthand to create/persist a new row as defined
