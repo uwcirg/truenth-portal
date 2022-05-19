@@ -92,10 +92,10 @@ def enter_user_trigger_critical_section(user_id):
     sm = EMPRO_state(ts)
     sm.begin_process()
     # Record the historical transformation via insert.
-    current_app.logger.debug(
-        "record state change to 'inprocess' from "
-        f"enter_user_trigger_critical_section({user_id})")
     ts.insert(from_copy=True)
+    current_app.logger.debug(
+        "persist-trigger_states-new from enter_user_trigger_critical_section()"
+        f" {ts}")
 
     # Now 'inprocess', obtain the lock to be freed at the conclusion
     # of `evaluate_triggers()`
@@ -145,18 +145,23 @@ def initiate_trigger(user_id):
 
     if ts.state == 'resolved':
         next_visit = int(ts.visit_month) + 1
-        current_app.logger.debug(f"transition to next due for {user_id}")
+        current_app.logger.debug(f"transition from {ts} to next due")
         # generate a new ts, to leave resolved record behind
         ts = TriggerState(user_id=user_id, state='unstarted')
         ts.visit_month = next_visit
+        current_app.logger.debug(
+            "persist-trigger_states-new from initiate_trigger(), "
+            f"resolved clause {ts}")
 
     sm = EMPRO_state(ts)
     sm.initial_available()
 
     # Record the historical transformation via insert
     if ts.id is None:
-        current_app.logger.debug("record state change to 'due' for {user_id}")
         ts.insert()
+        current_app.logger.debug(
+            "persist-trigger_states-new from initiate_trigger(),"
+            f"record historical clause {ts}")
 
     # TN-2863 auto send invite when first available
     if ts.visit_month == 0:
@@ -179,8 +184,8 @@ def initiate_trigger(user_id):
                 "Error sending EMPRO Invite to %s: %s",
                 user.email, exc)
         db.session.add(msg)
-        db.session.commit()
 
+    db.session.commit()
     return ts
 
 
@@ -212,8 +217,8 @@ def evaluate_triggers(qnr, override_state=False):
         if ts.state == 'processed' and override_state:
             # go around state machine, setting directly when requested
             current_app.logger.debug(
-                f"override trigger_state transition from {ts.state} "
-                f"to 'inprocess'")
+                f"override trigger_states transition from {ts.state} "
+                "to 'inprocess'")
             ts.state = 'inprocess'
 
         # typical flow, processing was triggered before SDC handoff
@@ -233,10 +238,10 @@ def evaluate_triggers(qnr, override_state=False):
 
         # transition and persist state
         sm.processed_triggers()
-        current_app.logger.debug(
-            "record state change to 'processed' from "
-            f"evaluate_triggers() for {qnr.subject_id}")
         ts.insert(from_copy=True)
+        current_app.logger.debug(
+            "persist-trigger_states-new record state change to 'processed' "
+            f"from evaluate_triggers() {ts}")
 
         # a submission closes the window of availability for the
         # post-intervention clinician follow up.  mark state if
@@ -250,6 +255,8 @@ def evaluate_triggers(qnr, override_state=False):
             triggers = copy.deepcopy(previous.triggers)
             triggers['action_state'] = 'missed'
             previous.triggers = triggers
+            current_app.logger.debug(
+                f"persist-trigger_states-change previous {previous}")
             db.session.commit()
 
         return ts
@@ -337,6 +344,8 @@ def fire_trigger_events():
             if not hard_triggers:
                 sm.resolve()
 
+        current_app.logger.debug(
+            f"persist-trigger_states-change from fire_trigger_events() {ts}")
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
@@ -369,6 +378,8 @@ def fire_trigger_events():
                 triggers = copy.deepcopy(ts.triggers)
                 triggers['action_state'] = 'withdrawn'
                 ts.triggers = triggers
+                current_app.logger.debug(
+                    f"persist-trigger_states-change withdrawn clause {ts}")
                 continue
 
             if ts.reminder_due():
@@ -385,6 +396,8 @@ def fire_trigger_events():
 
                 # push updated record back into trigger_states
                 ts.triggers = triggers
+                current_app.logger.debug(
+                    f"persist-trigger_states-change reminder_due clause {ts}")
 
         db.session.commit()
 
@@ -461,8 +474,7 @@ def empro_staff_qbd_accessor(qnr):
         if ('resolution' in triggers and
                 triggers['resolution']['qnr_id'] != qnr.id):
             current_app.logger.error(
-                f"Second POST-TX response {qnr.id} not allowed on "
-                f"user {qnr.subject_id}")
+                f"Second POST-TX response {qnr.id} not allowed on {match}")
             return result
 
         triggers['resolution'] = {
@@ -473,6 +485,8 @@ def empro_staff_qbd_accessor(qnr):
         if match.state != 'resolved':
             sm = EMPRO_state(match)
             sm.resolve()
+        current_app.logger.debug(
+            f"persist-trigger_states-change from qbd_accessor {match}")
         db.session.commit()
 
         # Look up post tx match WRT source qb
