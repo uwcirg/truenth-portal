@@ -73,6 +73,38 @@ def test_base_eval(
     assert ts.questionnaire_response_id == initialized_with_ss_qnr.id
     assert ts.triggers['source']['qnr_id'] == ts.questionnaire_response_id
     assert ts.triggers['source']['authored'] == '2020-09-30T00:00:00Z'
+    assert ts.visit_month == 0
+
+
+def test_2nd_eval(
+        test_user, initialized_with_ss_recur_qb, initialized_with_ss_qnr):
+    test_user_id = db.session.merge(test_user).id
+    initiate_trigger(test_user_id)
+
+    # mock 2nd month by bumping the visit on the "due" created in initiate_trigger
+    ts = TriggerState.query.filter(
+        TriggerState.user_id == test_user_id).filter(
+        TriggerState.state == 'due').one()
+    assert ts.visit_month == 0
+    ts.visit_month = 1
+    with SessionScope(db):
+        db.session.commit()
+
+    initiate_trigger(test_user_id)
+
+    initialized_with_ss_qnr = db.session.merge(initialized_with_ss_qnr)
+    evaluate_triggers(initialized_with_ss_qnr)
+    results = users_trigger_state(test_user_id)
+
+    assert 'domain' in results.triggers
+
+    ts = TriggerState.query.filter(
+        TriggerState.user_id == test_user_id).filter(
+        TriggerState.state == 'processed').one()
+    assert ts.questionnaire_response_id == initialized_with_ss_qnr.id
+    assert ts.triggers['source']['qnr_id'] == ts.questionnaire_response_id
+    assert ts.triggers['source']['authored'] == '2020-09-30T00:00:00Z'
+    assert ts.visit_month == 1
 
 
 def test_cur_hard_trigger():
