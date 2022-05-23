@@ -12,7 +12,6 @@ from functools import wraps
 import json
 from traceback import format_exc
 
-from celery.utils.log import get_task_logger
 from flask import current_app
 import redis
 from requests import Request, Session, post
@@ -49,8 +48,6 @@ from .models.user import User, UserRoles
 #   rdb.set_trace()
 # Follow instructions from celery console, i.e. telnet 127.0.0.1 6900
 
-logger = get_task_logger(__name__)
-
 celery = create_celery(create_app())
 LOW_PRIORITY = 'low_priority'
 
@@ -63,7 +60,7 @@ def scheduled_task(func):
 
         if not manual_run and job_id and not check_active(job_id):
             message = "Job id `{}` inactive.".format(job_id)
-            logger.debug(message)
+            current_app.logger.debug(message)
             return message
 
         try:
@@ -78,8 +75,8 @@ def scheduled_task(func):
         except Exception as exc:
             message = ("Unexpected exception in `{}` "
                        "on {} : {}".format(func.__name__, job_id, exc))
-            logger.error(message)
-            logger.error(format_exc())
+            current_app.logger.error(message)
+            current_app.logger.error(format_exc())
 
         if job_id:
             update_job_status(job_id, status=message)
@@ -103,14 +100,14 @@ def info():
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def adherence_report_task(self, **kwargs):
-    logger.debug("launch adherence report task: %s", self.request.id)
+    current_app.logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return adherence_report(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def research_report_task(self, **kwargs):
-    logger.debug("launch research report task: %s", self.request.id)
+    current_app.logger.debug("launch research report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return research_report(**kwargs)
 
@@ -118,7 +115,7 @@ def research_report_task(self, **kwargs):
 @celery.task(name="tasks.post_request", bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
     """Wrap requests.post for asynchronous posts - includes timeout & retry"""
-    logger.debug("task: %s retries:%s", self.request.id, self.request.retries)
+    current_app.logger.debug("task: %s retries:%s", self.request.id, self.request.retries)
 
     s = Session()
     req = Request('POST', url, data=data)
@@ -126,24 +123,24 @@ def post_request(self, url, data, timeout=10, retries=3):
     try:
         resp = s.send(prepped, timeout=timeout)
         if resp.status_code < 400:
-            logger.info("{} received from {}".format(resp.status_code, url))
+            current_app.logger.info("{} received from {}".format(resp.status_code, url))
         else:
-            logger.error("{} received from {}".format(resp.status_code, url))
+            current_app.logger.error("{} received from {}".format(resp.status_code, url))
 
     except RequestException as exc:
         """Typically raised on timeout or connection error
 
         retry after countdown seconds unless retry threshold has been exceeded
         """
-        logger.warn("{} on {}".format(exc.message, url))
+        current_app.logger.warn("{} on {}".format(exc.message, url))
         if self.request.retries < retries:
             raise self.retry(exc=exc, countdown=20)
         else:
-            logger.error(
+            current_app.logger.error(
                 "max retries exceeded for {}, last failure: {}".format(
                     url, exc))
     except Exception as exc:
-        logger.error("Unexpected exception on {} : {}".format(url, exc))
+        current_app.logger.error("Unexpected exception on {} : {}".format(url, exc))
 
 
 @celery.task
@@ -200,7 +197,7 @@ def update_patient_loop(
         sublist = patients[j:j+batchsize]
         if not sublist:
             break
-        logger.debug("Sending sublist {} to update_patients".format(sublist))
+        current_app.logger.debug("Sending sublist {} to update_patients".format(sublist))
         j += batchsize
         kwargs = {
             'patient_list': sublist, 'update_cache': update_cache,
