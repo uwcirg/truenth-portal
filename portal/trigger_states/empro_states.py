@@ -344,8 +344,8 @@ def fire_trigger_events():
             if not hard_triggers:
                 sm.resolve()
 
-        current_app.logger.debug(
-            f"persist-trigger_states-change from fire_trigger_events() {ts}")
+            current_app.logger.debug(
+                f"persist-trigger_states-change from fire_trigger_events() {ts}")
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
