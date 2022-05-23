@@ -91,7 +91,8 @@ export default (function() {
                     var checkFinished = self.initChecks.length === 0;
                     if (checkFinished || (elapsedTime >= 5)) {
                         clearInterval(self.initIntervalId);
-                        //set subject substudy status before initializing sections as the visibilities of some of the sections are dependent on that
+                        //setting subject substudy status BEFORE initializing each section in profile
+                        //as the visibilities of some of the sections are dependent on it
                         self.setSubjectResearchStudies(function() {
                             self.initSections(function() {
                                 self.onSectionsDidLoad();
