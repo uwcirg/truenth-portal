@@ -37,6 +37,7 @@ from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
+from ..models.research_study import EMPRO_RS_ID
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.url_token import url_token
@@ -962,8 +963,6 @@ def delete_user_consents(user_id):
       - ServiceToken: []
 
     """
-    from portal.trigger_states.empro_states import EMPRO_STUDY_ID
-
     current_app.logger.debug('delete user consent called w/: {}'.format(
         request.json))
     user = get_user(user_id, 'edit')
@@ -983,7 +982,7 @@ def delete_user_consents(user_id):
         abort(404, "matching user consent not found")
 
     audit_comment = 'Deleted consent agreement'
-    if research_study_id == EMPRO_STUDY_ID:
+    if research_study_id == EMPRO_RS_ID:
         audit_comment = 'Deleted EMPRO consent agreement'
     remove_uc.deleted = Audit(
         user_id=current_user().id, subject_id=user_id,
