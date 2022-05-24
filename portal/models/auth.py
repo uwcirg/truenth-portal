@@ -362,6 +362,7 @@ def token_janitor():
             body=body)
         try:
             em.send_message()
+            db.session.add(em)
         except SMTPRecipientsRefused as exc:
             msg = ("Error sending site summary email to {}: "
                    "{}".format(sponsor_email, exc))
@@ -369,4 +370,5 @@ def token_janitor():
             for email in exc[0]:
                 error_emails.add(email)
 
+    db.session.commit()
     return list(error_emails)
