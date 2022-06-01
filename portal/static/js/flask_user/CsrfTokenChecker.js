@@ -111,7 +111,8 @@ var CsrfTokenChecker = window.CsrfTokenChecker = (function() {
      * @return boolean true if valid false if not
      */
     csrfTokenChecker.prototype.checkTokenValidity = function() {
-        if (!this.tokenId) return false;
+        var tokenElement = document.querySelector("#__CRSF_TOKEN");
+        if (!tokenElement || !tokenElement.value) return false;
         if (!this.hasEnoughToProceed()) return false;
         var endTime = Date.now();
         var startTime = this.getStorageTimeOnLoad();

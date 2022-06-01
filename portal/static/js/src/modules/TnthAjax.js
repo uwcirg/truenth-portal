@@ -1124,14 +1124,15 @@ export default { /*global $ */
             }
         });
     },
-    "assessmentReport": function(userId, instrumentId, callback) {
+    "assessmentReport": function(userId, instrumentId, callback, params) {
         callback = callback || function() {};
+        params = params || {};
         if (!userId || !instrumentId) {
             callback({error: i18next.t("User id and instrument Id are required.")});
             return false;
         }
         let storageReportKey = `assessmentReport_${instrumentId}_${userId}`;
-        if (sessionStorage.getItem(storageReportKey)) {
+        if (params.cache && sessionStorage.getItem(storageReportKey)) {
             var data = JSON.parse(sessionStorage.getItem(storageReportKey));
             callback(data);
             return true;
