@@ -55,7 +55,6 @@ export default (function() {
             this.registerDependencies();
             this.getOrgTool();
             this.setUserSettings();
-            this.setSubjectResearchStudies();
             this.onBeforeSectionsLoad();
             this.setCurrentUserOrgs();
             this.initStartTime = new Date();
@@ -92,9 +91,13 @@ export default (function() {
                     var checkFinished = self.initChecks.length === 0;
                     if (checkFinished || (elapsedTime >= 5)) {
                         clearInterval(self.initIntervalId);
-                        self.initSections(function() {
-                            self.onSectionsDidLoad();
-                            self.handleOptionalCoreData();});
+                        //setting subject substudy status BEFORE initializing each section in profile
+                        //as the visibilities of some of the sections are dependent on it
+                        self.setSubjectResearchStudies(function() {
+                            self.initSections(function() {
+                                self.onSectionsDidLoad();
+                                self.handleOptionalCoreData();});
+                            });
                     }
                 }, 30);
             });
@@ -570,13 +573,15 @@ export default (function() {
                     this.mode = acoContainer.getAttribute("data-account") === "patient" ? "createPatientAccount": "createUserAccount";
                 }
             },
-            setSubjectResearchStudies: function() {
+            setSubjectResearchStudies: function(callback) {
+                callback = callback||function() {};
                 let roleType = this.isSubjectPatient() ? "patient": "staff";
                 this.modules.tnthAjax.getUserResearchStudies(this.subjectId, roleType, "", data => {
                     if (data) {
                         this.subjectResearchStudyStatuses = data;
                         this.subjectReseachStudies = Object.keys(data).map(item => parseInt(item));
                     }
+                    callback();
                 });
             },
             getOrgTool: function(callback) {
@@ -1382,7 +1387,7 @@ export default (function() {
                         }
                         this.setSubStudyAssessmentData(data.entry);
                         $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
-                });
+                }, {cache: false});
             },
             setSubStudyTriggers: function(callback, params) {
                 callback = callback || function() {};
