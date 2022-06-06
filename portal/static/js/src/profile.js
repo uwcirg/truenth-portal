@@ -1444,7 +1444,7 @@ export default (function() {
                                 completedDate,
                                 i18next.t(
                                     this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
-                                ).replace('{timezone}', this.modules.tnthDates.getTimeZoneDisplay()),
+                                ).replace('{timezone}', this.modules.tnthDates.getTimeZoneDisplay()), //local date/time and time zone display
                                 lastTriggerItem.state,
                                 lastTriggerItem.triggers];
                             callback();
