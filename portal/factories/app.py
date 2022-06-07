@@ -255,6 +255,8 @@ def configure_logging(app):  # pragma: no cover
         import portal.sql_logging
 
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
+    from ..tasks import logger as task_logger
+    task_logger.setLevel(level)
     app.logger.setLevel(level)
 
     if app.testing or not app.config.get('LOG_FOLDER'):
@@ -290,6 +292,7 @@ def configure_logging(app):  # pragma: no cover
     )
 
     app.logger.addHandler(info_file_handler)
+    task_logger.addHandler(info_file_handler)
 
     # OAuth library logging tends to be helpful for connection
     # debugging
