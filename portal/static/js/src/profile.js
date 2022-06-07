@@ -1432,14 +1432,19 @@ export default (function() {
                                 }
                             }
                             let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
+                            completedDate = new Date(completedDate); //convert to local date/time
                             [
                                 this.subStudyTriggers.domains,
                                 this.subStudyTriggers.date,
+                                this.subStudyTriggers.displaydate,
                                 this.subStudyTriggers.state,
                                 this.subStudyTriggers.data
                             ] = [
                                 domains,
-                                this.modules.tnthDates.formatDateString(completedDate),
+                                completedDate,
+                                i18next.t(
+                                    this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
+                                ).replace('{timezone}', this.modules.tnthDates.getTimeZoneDisplay()), //local date/time and time zone display
                                 lastTriggerItem.state,
                                 lastTriggerItem.triggers];
                             callback();
@@ -1608,13 +1613,14 @@ export default (function() {
                                 self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
                             }
                             if (self.isSubStudyTriggersResolved()) return;
+
                             //initialize datepicker
                             $(`${containerIdentifier} .data-datepicker`).datepicker(
                                 {
                                     "format": "dd M yyyy",
                                     "forceParse": false,
                                     "autoclose": true,
-                                    startDate: new Date(self.subStudyTriggers.date), //restrict entry so date entered cannot be before the trigger date
+                                    startDate: self.subStudyTriggers.date, //restrict entry so date entered cannot be before the trigger date
                                     endDate: new Date()}
                             ).on("changeDate", self.onResponseChangeFieldEvent);
                         });
