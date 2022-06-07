@@ -12,6 +12,7 @@ from functools import wraps
 import json
 from traceback import format_exc
 
+from celery.utils.log import get_task_logger
 from flask import current_app
 import redis
 from requests import Request, Session, post
@@ -47,6 +48,8 @@ from .models.user import User, UserRoles
 #   from celery.contrib import rdb
 #   rdb.set_trace()
 # Follow instructions from celery console, i.e. telnet 127.0.0.1 6900
+
+logger = get_task_logger(__name__)
 
 celery = create_celery(create_app())
 LOW_PRIORITY = 'low_priority'
