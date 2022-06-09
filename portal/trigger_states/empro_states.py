@@ -92,7 +92,14 @@ def enter_user_trigger_critical_section(user_id):
     sm = EMPRO_state(ts)
     sm.begin_process()
     # Record the historical transformation via insert.
+    before = ts.visit_month
     ts.insert(from_copy=True)
+    if ts.visit_month != before:
+        # reload to pick up correct row data post copy
+        current_app.logger.debug(
+            "persist-trigger_states-new from_copy lost state; reload")
+        ts = users_trigger_state(user_id)
+    assert ts.visit_month == before
     current_app.logger.debug(
         "persist-trigger_states-new from enter_user_trigger_critical_section()"
         f" {ts}")
@@ -238,7 +245,14 @@ def evaluate_triggers(qnr, override_state=False):
 
         # transition and persist state
         sm.processed_triggers()
+        before = ts.visit_month
         ts.insert(from_copy=True)
+        if ts.visit_month != before:
+            # reload to pick up correct row data post copy
+            current_app.logger.debug(
+                "persist-trigger_states-new from_copy lost state; reload")
+            ts = users_trigger_state(qnr.subject_id)
+        assert ts.visit_month == before
         current_app.logger.debug(
             "persist-trigger_states-new record state change to 'processed' "
             f"from evaluate_triggers() {ts}")
