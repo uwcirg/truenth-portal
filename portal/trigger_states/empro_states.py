@@ -92,6 +92,7 @@ def enter_user_trigger_critical_section(user_id):
     sm = EMPRO_state(ts)
     sm.begin_process()
     # Record the historical transformation via insert.
+    assert ts.visit_month is not None
     before = ts.visit_month
     ts.insert(from_copy=True)
     if ts.visit_month != before:
@@ -124,16 +125,16 @@ def users_trigger_state(user_id):
       - triggered: triggers available in TriggerState.triggers attribute
 
     """
-    # if semaphore is locked for user, return "inprocess"
-    semaphore = TimeoutLock(key=EMPRO_LOCK_KEY.format(user_id=user_id))
-    if semaphore.is_locked():
-        return TriggerState(user_id=user_id, state='inprocess')
-
     ts = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(
         TriggerState.timestamp.desc()).first()
     if not ts:
         ts = TriggerState(user_id=user_id, state='unstarted')
+
+    # if semaphore is locked for user, confirm "inprocess"
+    semaphore = TimeoutLock(key=EMPRO_LOCK_KEY.format(user_id=user_id))
+    if semaphore and ts.state != "inprocess":
+        current_app.logger.error(f"found {ts.state} w/ semaphore locked?!")
     return ts
 
 
@@ -245,6 +246,7 @@ def evaluate_triggers(qnr, override_state=False):
 
         # transition and persist state
         sm.processed_triggers()
+        assert ts.visit_month is not None
         before = ts.visit_month
         ts.insert(from_copy=True)
         if ts.visit_month != before:
