@@ -134,7 +134,8 @@ def users_trigger_state(user_id):
     # if semaphore is locked for user, confirm "inprocess"
     semaphore = TimeoutLock(key=EMPRO_LOCK_KEY.format(user_id=user_id))
     if semaphore and ts.state != "inprocess":
-        current_app.logger.error(f"found {ts.state} w/ semaphore locked?!")
+        current_app.logger.error(
+            f"found {ts.state} for user {ts.user_id} w/ semaphore locked?!")
     return ts
 
 
