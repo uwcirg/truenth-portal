@@ -79,7 +79,7 @@ class EMPRO_state(StateMachine):
 
 
 def users_trigger_state(user_id):
-    """Obtain latest trigger state for given user
+    """Obtain the latest trigger state for given user
 
     Returns latest TriggerState row for user or creates transient if not
      found.
@@ -98,11 +98,6 @@ def users_trigger_state(user_id):
     if not ts:
         ts = TriggerState(user_id=user_id, state='unstarted')
 
-    # if semaphore is locked for user, confirm "inprocess"
-    semaphore = TimeoutLock(key=EMPRO_LOCK_KEY.format(user_id=user_id))
-    if semaphore and ts.state != "inprocess":
-        current_app.logger.error(
-            f"found {ts.state} for user {ts.user_id} w/ semaphore locked?!")
     return ts
 
 
@@ -362,7 +357,8 @@ def fire_trigger_events():
         # evaluated
         for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
             with TimeoutLock(
-                    key=EMPRO_LOCK_KEY.format(user_id=ts.user_id), timeout=NEVER_WAIT):
+                    key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
+                    timeout=NEVER_WAIT):
                 process_processed(ts)
         db.session.commit()
 
@@ -370,7 +366,8 @@ def fire_trigger_events():
         for ts in TriggerState.query.filter(
                 TriggerState.state.in_(('triggered', 'resolved'))):
             with TimeoutLock(
-                    key=EMPRO_LOCK_KEY.format(user_id=ts.user_id), timeout=NEVER_WAIT):
+                    key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
+                    timeout=NEVER_WAIT):
                 process_pending_actions(ts)
         db.session.commit()
 
@@ -485,11 +482,12 @@ def empro_staff_qbd_accessor(qnr):
 
 
 def extract_observations(questionnaire_response_id):
-    """Format and submit QuestionnaireResponse to SDC service; store returned Observations"""
+    """Submit QNR to SDC service; store returned Observations"""
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
 
     # given asynchronous possibility, require user's EMPRO lock
-    with TimeoutLock(key=EMPRO_LOCK_KEY.format(qnr.subject_id), timeout=60):
+    with TimeoutLock(
+            key=EMPRO_LOCK_KEY.format(user_id=qnr.subject_id), timeout=60):
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
         sm.begin_process()
@@ -499,8 +497,8 @@ def extract_observations(questionnaire_response_id):
         ts.questionnaire_response_id = qnr.id
         ts.insert(from_copy=True)
         current_app.logger.debug(
-            "persist-trigger_states-new from enter_user_trigger_critical_section()"
-            f" {ts}")
+            "persist-trigger_states-new from"
+            f" enter_user_trigger_critical_section() {ts}")
 
         qnr_json = qnr.as_sdc_fhir()
 
