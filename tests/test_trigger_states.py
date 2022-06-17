@@ -8,6 +8,7 @@ from portal.database import db
 from portal.models.audit import Audit
 from portal.trigger_states.empro_domains import DomainTriggers
 from portal.trigger_states.empro_states import (
+    EMPRO_state,
     evaluate_triggers,
     fire_trigger_events,
     initiate_trigger,
@@ -62,6 +63,11 @@ def test_base_eval(
     test_user_id = db.session.merge(test_user).id
     initiate_trigger(test_user_id)
 
+    # mock SDC state transformation
+    ts = users_trigger_state(test_user_id)
+    sm = EMPRO_state(ts)
+    sm.begin_process()
+
     evaluate_triggers(initialized_with_ss_qnr)
     results = users_trigger_state(test_user_id)
 
@@ -91,6 +97,11 @@ def test_2nd_eval(
         db.session.commit()
 
     initiate_trigger(test_user_id)
+
+    # mock SDC state transformation
+    ts = users_trigger_state(test_user_id)
+    sm = EMPRO_state(ts)
+    sm.begin_process()
 
     initialized_with_ss_qnr = db.session.merge(initialized_with_ss_qnr)
     evaluate_triggers(initialized_with_ss_qnr)
