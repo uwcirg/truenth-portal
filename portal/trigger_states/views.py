@@ -1,8 +1,6 @@
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify
 from .empro_states import users_trigger_state
 from .models import TriggerState
-from ..database import db
-from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.user import get_user
 from ..views.crossdomain import crossdomain
@@ -15,10 +13,6 @@ trigger_states = Blueprint('trigger_states', __name__)
 @oauth.require_oauth()
 def user_triggers(user_id):
     """Return a JSON object defining the current triggers for user
-
-    Query string parameters supported for additional debugging:
-    :param reprocess_qnr_id: ID for QNR (must belong to matching patient)
-    :param purge: set True to purge observations and rerun through SDC
 
     :returns TriggerState: with ``state`` attribute meaning:
       - unstarted: no info avail for user
@@ -33,46 +27,7 @@ def user_triggers(user_id):
     """
     # confirm view access
     get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
-
-    ts = users_trigger_state(user_id)
-
-    # Debugging parameter - reprocess as if given QNR was just submitted
-    if request.args.get('reprocess_qnr_id'):
-        from .empro_states import evaluate_triggers
-        from ..models.questionnaire_response import QuestionnaireResponse
-        qnr = QuestionnaireResponse.query.get(
-            request.args.get('reprocess_qnr_id'))
-        if qnr.subject_id != user_id:
-            raise ValueError("QNR subject doesn't match requested user")
-
-        if request.args.get("purge", '').lower() == 'true':
-            from portal.tasks import extract_observations
-            qnr.purge_related_observations()
-
-            # reset state to allow processing
-            ts = users_trigger_state(qnr.subject_id)
-            current_app.logger.debug(
-                f"triggers view: force transition from {ts.state} to 'due")
-            ts.state = 'due'
-
-            extract_observations(qnr.id)
-
-        # remove stale / redundant rows for the user from the
-        # time of the requested qnr authored.
-        for ts in TriggerState.query.filter(
-                TriggerState.user_id == user_id).filter(
-                FHIR_datetime.as_fhir(TriggerState.timestamp) >
-                qnr.document['authored']):
-            db.session.delete(ts)
-        db.session.commit()
-
-        current_app.logger.debug(
-            f"triggers view: evaluate_triggers() for {user_id} on request"
-        )
-        evaluate_triggers(qnr, override_state=True)
-        ts = users_trigger_state(user_id)
-
-    return jsonify(ts.as_json())
+    return jsonify(users_trigger_state(user_id).as_json())
 
 
 @trigger_states.route('/api/patient/<int:user_id>/trigger_history')
