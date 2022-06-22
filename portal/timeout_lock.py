@@ -59,6 +59,11 @@ class TimeoutLock(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.redis.delete(self.key)
+        # To avoid interrupting iterative lock use, return truthy
+        # value to stop exception propagation - see PEP
+        if exc_type is not None:
+            current_app.logger.error(f"{exc_type}: {exc_value}; {traceback}")
+        return True
 
     def is_locked(self):
         """Status check - NOT intended to be combined as an atomic check"""

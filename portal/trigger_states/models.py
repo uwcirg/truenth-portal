@@ -66,6 +66,11 @@ class TriggerState(db.Model):
             self.timestamp = None
         db.session.add(self)
         db.session.commit()
+        # following a potential make_transient call, must reload the row
+        # as we intentionally reset the id (to pick up the next in sequence)
+        # and the session.commit() clears all associated object state
+        # see https://github.com/sqlalchemy/sqlalchemy/issues/3640
+        self = db.session.merge(self)
 
     def hard_trigger_list(self):
         """Convenience function to return list of hard trigger domains
