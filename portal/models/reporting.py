@@ -81,7 +81,8 @@ def adherence_report(
 
             if not current % 25 and celery_task:
                 celery_task.update_state(
-                    state='PROGRESS', meta={'current': current, 'total': total})
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
             try:
                 acting_user.check_role('view', other_id=patient.id)
             except Unauthorized:
@@ -109,7 +110,8 @@ def adherence_report(
         d['consent'] = FHIR_datetime.as_fhir(consent)
 
         # EMPRO always gets clinician(s)
-        if research_study_id == EMPRO_RS_ID and len([c for c in patient.clinicians]) > 0:
+        if research_study_id == EMPRO_RS_ID and len(
+                [c for c in patient.clinicians]) > 0:
             d['clinician'] = ';'.join(
                 clinician.display_name for clinician in
                 patient.clinicians)
