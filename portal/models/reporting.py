@@ -121,7 +121,7 @@ def adherence_report(
         """Add general (either study) data for given (patient, qbd)"""
         # purge values that may have previous row data set and aren't certain
         for key in "completion_date", "oow_completion_date", "entry_method":
-            row[key] = ""
+            row.pop(key, None)
 
         row['qb'] = qbd.questionnaire_bank.name
         row['visit'] = visit_name(qbd)
