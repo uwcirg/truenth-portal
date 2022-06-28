@@ -154,6 +154,30 @@ class TriggerStatesReporting:
             self.latest_by_visit[v] = TriggerState.latest_for_visit(
                 patient_id, v)
 
+    def authored_from_visit(self, visit_month):
+        """Extract authored datetime from given visit month"""
+        if not getattr(
+                self.latest_by_visit[visit_month],
+                'triggers',
+                None):
+            return None
+        authored = self.latest_by_visit[visit_month].triggers.get(
+            "source", {}).get("authored")
+        if authored:
+            return FHIR_datetime.parse(authored)
+
+    def resolution_authored_from_visit(self, visit_month):
+        """Extract resolution authored datetime from given visit month"""
+        if not getattr(
+                self.latest_by_visit[visit_month],
+                'triggers',
+                None):
+            return None
+        resolution_authored = self.latest_by_visit[visit_month].triggers.get(
+            "resolution", {}).get("authored")
+        if resolution_authored:
+            return FHIR_datetime.parse(resolution_authored)
+
     def domains_accessed(self, visit_month):
         """Return list of domains accessed for visit_month
 
@@ -163,20 +187,8 @@ class TriggerStatesReporting:
           or None if n/a
 
         """
-        def authored_from_visit(visit_month):
-            """Extract authored datetime from given visit month"""
-            if not getattr(
-                    self.latest_by_visit[visit_month],
-                    'triggers',
-                    None):
-                return None
-            authored = self.latest_by_visit[visit_month].triggers.get(
-                "source", {}).get("authored")
-            if authored:
-                return FHIR_datetime.parse(authored)
-
         # Need datetime boundaries for queries
-        start_date = authored_from_visit(visit_month)
+        start_date = self.authored_from_visit(visit_month)
         if not start_date:
             return None
 
@@ -184,7 +196,7 @@ class TriggerStatesReporting:
         # submission of EMPRO is found, or default to now()
         visit = visit_month + 1
         while visit < self.MAX_VISIT:
-            end_date = authored_from_visit(visit)
+            end_date = self.authored_from_visit(visit)
             visit += 1
             if end_date:
                 break
