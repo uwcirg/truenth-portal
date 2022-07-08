@@ -2,12 +2,14 @@
     helper component for making ajax call to initiate the ajax call for exporting data and display progress status on UI
 -->
 <template>
-    <div class="text-center export__display-container">
-        <div class="text-info text-center export__info"><h4 v-text="requestSubmittedDisplay"></h4></div>
-        <span class="export__status"></span>
-        <span class="export__percentage"></span>
-        <span class="export__result"></span>
-        <div class="export__error text-left"><div class="message"></div></div>
+    <div>
+        <div class="text-center export__display-container">
+            <div class="text-info text-center export__info"><h4 v-text="requestSubmittedDisplay"></h4></div>
+            <span class="export__status"></span>
+            <span class="export__percentage"></span>
+            <span class="export__result"></span>
+            <div class="export__error text-left"><div class="message"></div></div>
+        </div>
     </div>
 </template>
 <script>
@@ -23,6 +25,16 @@
             exportUrl: {
                 type: String,
                 required: true
+            },
+            //unique identifier exports, e.g. substudy vs main study
+            exportIdentifier: {
+                type: String
+            }
+        },
+        watch: {
+            exportIdentifier: function (newValue, oldValue) {
+                //if export identifier changes, stop all running jobs
+                this.clearExportDataTimeoutID();
             }
         },
         data: function() {
@@ -31,7 +43,7 @@
                 exportTimeElapsed: 0,
                 statusDisplayTimeoutID: 0,
                 arrExportDataTimeoutID: [],
-                maximumPendingTime: 45000, //allow 45 seconds of PENDING status
+                maximumPendingTime: 60000, //allow 60 seconds of PENDING status
                 arrIncompleteStatus: ["PENDING", "PROGRESS", "STARTED"],
                 requestSubmittedDisplay: ExportInstrumentsData["requestSubmittedDisplay"],
                 failedRequestDisplay: ExportInstrumentsData["failedRequestDisplay"]
@@ -184,10 +196,11 @@
                     self.updateProgressDisplay(exportStatus, percent, true);
                     if (self.arrIncompleteStatus.indexOf(exportStatus) === -1) {
                         if (self.isSuccessStatus(exportStatus)) {
+                            let resultUrl = statusUrl.replace("/status", "");
+                            self.$emit("doneExport", resultUrl);
                             setTimeout(function() {
-                                let resultUrl = statusUrl.replace("/status", "");
                                 window.location.assign(resultUrl);
-                            }.bind(self), 50); //wait a bit before retrieving results
+                            }, 50); //wait a bit before retrieving results
                         }
                         self.updateProgressDisplay(data["state"], "");
                         setTimeout(function() {

@@ -52,10 +52,25 @@
                         </div>
                         <div id="instrumentsExportErrorMessage" class="error-message"></div>
                         <!-- display export status -->
-                        <ExportDataLoader ref="exportDataLoader" :initElementId="getInitElementId()" :exportUrl="getExportUrl()" v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
+                        <ExportDataLoader 
+                            ref="exportDataLoader"
+                            :initElementId="getInitElementId()"
+                            :exportUrl="getExportUrl()"
+                            :exportIdentifier="currentStudy"
+                            v-on:doneExport="handleAfterExport"
+                            v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
+                        <div class="export__history" v-if="hasExportHistory()">
+                            <div class="text-muted prompt" v-text="exportHistoryTitle"></div>
+                            <div v-if="exportHistory">
+                                <a :href="exportHistory.url" target="_blank">
+                                    <span v-text="exportHistory.instruments.join(', ')"></span>
+                                    <span v-text="exportHistory.date"></span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-default" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
+                        <button class="btn btn-default btn-emphasis" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
                         <button type="button" class="btn btn-default" data-dismiss="modal" v-text="closeLabel"></button>
                     </div>
                 </div>
@@ -69,6 +84,7 @@
 <script>
     import Global from "../modules/Global.js";
     import tnthAjax from "../modules/TnthAjax.js";
+    import CurrentUser from "../mixins/CurrentUser.js";
     import {EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "../data/common/consts.js";
     import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
     import ExportDataLoader from "./asyncExportDataLoader.vue";
@@ -80,11 +96,26 @@
                 mainStudyIdentifier: "main",
                 subStudyIdentifier: "substudy",
                 mainStudyInstrumentsList:[],
-                subStudyInstrumentsList:[]
+                subStudyInstrumentsList:[],
+                exportHistory: null
             }};
         },
+        mixins: [CurrentUser],
         mounted: function() {
-            this.getInstrumentList();
+            this.setCurrentMainStudy();
+            this.initCurrentUser(function() {
+                this.getInstrumentList();
+                this.setExportHistory(this.getCacheExportedDataInfo());
+            }.bind(this));
+        },
+        watch: {
+            currentStudy: function(newVal, oldVal) {
+                console.log("new ? ", newVal, " old ", oldVal)
+                //watch for when study changes
+                this.setExportHistory(this.getCacheExportedDataInfo());
+                this.resetExportError();
+                this.resetInstrumentSelections();
+            },
         },
         methods: {
             getInitElementId: function() {
@@ -107,7 +138,9 @@
                 return this.currentStudy === this.subStudyIdentifier;
             },
             setErrorMessage: function(message) {
-                document.querySelector("#instrumentsExportErrorMessage").innerText = message;
+                var errorEl = document.querySelector("#instrumentsExportErrorMessage");
+                if (!errorEl) return;
+                errorEl.innerText = message;
             },
             getInstrumentList: function () {
                 var self = this;
@@ -129,6 +162,12 @@
                         }.bind(self), 150);
                     });
                 });
+            },
+            getSelectedInstruments: function() {
+                return this.instruments.selected;
+            },
+            getExportIdentifier: function() {
+                return `${this.currentStudy}_`
             },
             isSubStudyInstrument: function(instrument_code) {
                 if (!instrument_code) return false;
@@ -156,7 +195,6 @@
             setInstrumentInputEvent: function() {
                 var self = this;
                 $("#patientsInstrumentList [name='instrument']").on("click", function(event) {
-                    self.instruments.selected = "";
                     let arrSelected = [];
                     $("input[name=instrument]").each(function() {
                         if ($(this).is(":checked")) {
@@ -165,20 +203,14 @@
                         } else $(this).closest("label").removeClass("active");
                     });
                     if (!arrSelected.length) {
-                        self.instruments.selected = "";
+                        self.instruments.selected = [];
                         return;
                     }
-                    self.instruments.selected = arrSelected.map(item => `instrument_id=${item}`).join("&");
+                    self.instruments.selected = arrSelected;
                 });
                 $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
                     //clear pre-existing error
                     self.resetExportError();
-                });
-                //study selector onclick event
-                $("#studyListSelector [name='listSelector']").on("click", function() {
-                    //clear pre-existing error
-                    self.resetExportError();
-                    self.resetInstrumentSelections();
                 });
                 //patientsDownloadTypeList downloadType
                 $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
@@ -189,7 +221,7 @@
                     }
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
-                    self.instruments.selected = "";
+                    self.instruments.selected = [];
                     self.instruments.dataType = "csv";
                     self.resetExportError();
                     self.setInstrumentsListReady();
@@ -215,7 +247,7 @@
             resetInstrumentSelections: function() {
                 $("#patientsInstrumentList [name='instrument']").prop("checked", false);
                 $("#patientsInstrumentList label").removeClass("active");
-                this.instruments.selected = "";
+                this.instruments.selected = [];
             },
             setInstrumentsListReady: function() {
                 Vue.nextTick(function() {
@@ -223,10 +255,45 @@
                 });
             },
             hasInstrumentsSelection: function () {
-                return this.instruments.selected !== "" && this.instruments.dataType !== "";
+                return (this.instruments.selected && this.instruments.selected.length) && this.instruments.dataType !== "";
             },
             getExportUrl: function() {
-                return `/api/patient/assessment?${this.instruments.selected}&format=${this.instruments.dataType}`;
+                if (!this.hasInstrumentsSelection()) return "";
+                var queryStringInstruments = (this.instruments.selected).map(item => `instrument_id=${item}`).join("&");
+                return `/api/patient/assessment?${queryStringInstruments}&format=${this.instruments.dataType}`;
+            },
+            handleAfterExport: function(resultUrl) {
+                console.log("result ", resultUrl);
+                this.setCacheExportedDataInfo(resultUrl);
+            },
+            getCacheExportedDataInfoKey: function() {
+                console.log("user ", this.getUserId(), "identifier ", this.currentStudy)
+                return `exporDataInfo_${this.getUserId()}_${this.currentStudy}}`;
+            },
+            setCacheExportedDataInfo: function(resultUrl) {
+                if (!resultUrl) return false;
+                if (!this.hasInstrumentsSelection()) return;
+                var o = {
+                    study: this.currentStudy,
+                    date: new Date().toLocaleString(),
+                    instruments: this.instruments.selected,
+                    url: resultUrl
+                };
+                localStorage.setItem(this.getCacheExportedDataInfoKey(), JSON.stringify(o));
+                this.setExportHistory(o);
+            },
+            getCacheExportedDataInfo: function() {
+                let cachedItem = localStorage.getItem(this.getCacheExportedDataInfoKey());
+                if (!cachedItem) {
+                    return null;
+                }
+                return JSON.parse(cachedItem);
+            },
+            hasExportHistory: function() {
+                return this.exportHistory || this.getCacheExportedDataInfo();
+            },
+            setExportHistory: function(o) {
+                this.exportHistory = o;
             },
         }
     };
