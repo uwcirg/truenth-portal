@@ -59,6 +59,7 @@
                             :exportIdentifier="currentStudy"
                             v-on:doneExport="handleAfterExport"
                             v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
+                        <!-- display link to the last export -->
                         <div class="export__history" v-if="hasExportHistory()">
                             <div class="text-muted prompt" v-text="exportHistoryTitle"></div>
                             <div v-if="exportHistory">
