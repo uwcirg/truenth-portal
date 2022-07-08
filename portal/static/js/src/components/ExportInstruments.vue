@@ -166,12 +166,6 @@
                     });
                 });
             },
-            getSelectedInstruments: function() {
-                return this.instruments.selected;
-            },
-            getExportIdentifier: function() {
-                return `${this.currentStudy}_`
-            },
             isSubStudyInstrument: function(instrument_code) {
                 if (!instrument_code) return false;
                 let re = new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, "i");
