@@ -110,10 +110,12 @@
         },
         watch: {
             currentStudy: function(newVal, oldVal) {
-                console.log("new ? ", newVal, " old ", oldVal)
                 //watch for when study changes
+                //reset last exported item link as it is specific to each study
                 this.setExportHistory(this.getCacheExportedDataInfo());
+                //reset export error
                 this.resetExportError();
+                //reset instrument(s) selected
                 this.resetInstrumentSelections();
             },
         },
@@ -263,11 +265,11 @@
                 return `/api/patient/assessment?${queryStringInstruments}&format=${this.instruments.dataType}`;
             },
             handleAfterExport: function(resultUrl) {
-                console.log("result ", resultUrl);
+                //export is done, save the last export to local storage
                 this.setCacheExportedDataInfo(resultUrl);
             },
             getCacheExportedDataInfoKey: function() {
-                console.log("user ", this.getUserId(), "identifier ", this.currentStudy)
+                //uniquely identified by each user and the study
                 return `exporDataInfo_${this.getUserId()}_${this.currentStudy}}`;
             },
             setCacheExportedDataInfo: function(resultUrl) {

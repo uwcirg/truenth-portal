@@ -2,14 +2,12 @@
     helper component for making ajax call to initiate the ajax call for exporting data and display progress status on UI
 -->
 <template>
-    <div>
-        <div class="text-center export__display-container">
-            <div class="text-info text-center export__info"><h4 v-text="requestSubmittedDisplay"></h4></div>
-            <span class="export__status"></span>
-            <span class="export__percentage"></span>
-            <span class="export__result"></span>
-            <div class="export__error text-left"><div class="message"></div></div>
-        </div>
+    <div class="text-center export__display-container">
+        <div class="text-info text-center export__info"><h4 v-text="requestSubmittedDisplay"></h4></div>
+        <span class="export__status"></span>
+        <span class="export__percentage"></span>
+        <span class="export__result"></span>
+        <div class="export__error text-left"><div class="message"></div></div>
     </div>
 </template>
 <script>
