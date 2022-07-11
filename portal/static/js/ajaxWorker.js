@@ -1,4 +1,5 @@
 var requestAttempts = 0;
+var WORKER_REQUEST_TIMEOUT_INTERVAL = 5000;
 function sendRequest(url, params, callback) { //XHR request in pure JavaScript
     requestAttempts++;
     var xhr;
@@ -15,7 +16,7 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
         if (requestAttempts < 3) {
             setTimeout(function() {
                 sendRequest(url, params, callback);
-            }, 2000);
+            }, WORKER_REQUEST_TIMEOUT_INTERVAL);
             return;
         }
         requestAttempts = 0;
@@ -46,6 +47,7 @@ function sendRequest(url, params, callback) { //XHR request in pure JavaScript
             function(dataItem){ return encodeURIComponent(dataItem) + '=' + encodeURIComponent(params.data[dataItem]) }
         ).join('&'));
     }
+    xhr.timeout = params.timeout || WORKER_REQUEST_TIMEOUT_INTERVAL;
     xhr.open("GET", url, true);
     if (!params.cache) {
         xhr.setRequestHeader("cache-control", "no-cache");
