@@ -21,9 +21,10 @@ export default {
     instruments: {
         list: [],
         dataType: "csv",
-        selected: "",
+        selected: [],
         message: ""
     },
     requestSubmittedDisplay: i18next.t("Export request submitted"),
-    failedRequestDisplay: i18next.t("Request to export data failed.")
+    failedRequestDisplay: i18next.t("Request to export data failed."),
+    exportHistoryTitle: i18next.t("View last data export:")
 };
