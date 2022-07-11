@@ -60,18 +60,26 @@ def celery_beat_available():
     """Determines whether celery beat is available"""
     rs = redis.from_url(current_app.config['REDIS_URL'])
 
-    # When celery beat is running it pings
-    # our service periodically which sets
-    # 'celery_beat_available' in redis. If
-    # that variable expires it means
-    # we have not received a ping from celery beat
-    # within the allowed window and we must assume
-    # celery beat is not available
+    # Celery beat feeds scheduled jobs (a la cron) to the respective
+    # job queues (standard and low priority).  As a monitor, a job
+    # exists in each queue to set a respective value in redis with
+    # an expiration.
+
+    # If those redis values are present, we assume celery_beat and
+    # both queues are functioning properly.
     last_celery_beat_ping = rs.get('last_celery_beat_ping')
-    if last_celery_beat_ping:
+    last_celery_beat_ping_low_priority_queue = rs.get(
+        'last_celery_beat_ping_low_priority_queue')
+    if last_celery_beat_ping and last_celery_beat_ping_low_priority_queue:
         return True, 'Celery beat is available.'
 
-    return False, 'Celery beat is not available.'
+    detail = "both queues timed out"
+    if last_celery_beat_ping:
+        detail = "low priority queue timed out"
+    elif last_celery_beat_ping_low_priority_queue:
+        detail = "standard queue timed out"
+
+    return False, f"Celery beat is not available, {detail}."
 
 
 def postgresql_available():
