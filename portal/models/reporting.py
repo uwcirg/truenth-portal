@@ -150,7 +150,7 @@ def adherence_report(
         t_status = ts_reporting.latest_action_state(visit_month)
         row['clinician_status'] = (
             t_status.title() if t_status else "")
-        row['intervention_questionnaire_completion_date'] = (
+        row['clinician_survey_completion_date'] = (
             ts_reporting.resolution_authored_from_visit(visit_month) or "")
         ht = ts_reporting.hard_triggers_for_visit(visit_month)
         row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
@@ -247,7 +247,7 @@ def adherence_report(
                 'content_domains_accessed',
                 'clinician',
                 'clinician_status',
-                'intervention_questionnaire_completion_date',
+                'clinician_survey_completion_date',
                 ]
 
     return results
