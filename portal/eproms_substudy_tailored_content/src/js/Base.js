@@ -147,8 +147,15 @@ export default {
             return this.locale.replace('_', '-');
         },
         setLocale(data) {
-            if (!data || !data.communication) {
+            if (!data) {
                 return false;
+            }
+            if (data.locale) {
+                this.locale = data.locale;
+                return;
+            }
+            if (!data.communication) {
+              return false;
             }
             data.communication.forEach(item => {
                 if (item.language &&
@@ -415,11 +422,11 @@ export default {
             this.setResourcesByCountry();
             this.initDebugModeEvent();
         },
-        getDomainContent() {
-            if (this.domainContent) {
-                //already populated
-                this.setInitView();
-                return this.domainContent;
+        getDomainContent(shouldUpdate) {
+            if (!shouldUpdate && this.domainContent) {
+              //already populated
+              this.setInitView();
+              return this.domainContent;
             }
             this.$http(this.getSearchURL()).then(response => {
                 if (response) {
@@ -587,7 +594,6 @@ export default {
                         event.shiftKey &&
                         event.key.toLowerCase() === "d") {
                         this.debugMode = true;
-                        console.log("current data ", this.$data);
                         return false;
                     }
                     

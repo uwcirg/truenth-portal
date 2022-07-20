@@ -30,7 +30,18 @@
             if (!countryCodeSelector) return;
             countryCodeSelector.addEventListener("change", (e) => {
                 if (!e.target.value) return;
-                this.getAppObj().setResourcesByCountry(e.target.value);
+                const countryCodes = this.getAppObj().getEligibleCountryCodes();
+                const countryObj = countryCodes.filter(item => item.code === e.target.value);
+                if (countryObj.length) {
+                    const locale = countryObj[0].locale;
+                    this.getAppObj().setLocale({locale: locale});
+                    this.getAppObj().setCountryCode({"country_code": e.target.value});
+                    this.getAppObj().getDomainContent(true);
+                    setTimeout(() => {
+                        this.getAppObj().onDomainContentDidLoad();
+                    }, 250);
+                    console.log("current locale ", this.getAppObj().locale)
+                }
             });
         },
         methods: {

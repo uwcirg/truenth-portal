@@ -29,19 +29,23 @@ export default {
     userDomains: [],
     eligibleCountryCodes: [{
         name: "United Kingdom",
-        code: "GB"
+        code: "GB",
+        locale: "en_GB"
     },
     {
         name: "Canada",
-        code: "CA"
+        code: "CA",
+        locale: "en_CA"
     },
     {
         name: "United States",
-        code: "US"
+        code: "US",
+        locale: "en_US"
     },
     {
         name: "Australia",
-        code: "AU"
+        code: "AU",
+        locale: "en_AU"
     }
     ],
     patientRole: "patient",
