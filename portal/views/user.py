@@ -720,7 +720,7 @@ def set_user_consents(user_id):
                    "HEADER 'Content-Type: application/json'")
     if ('acceptance_date' in request.json
             and FHIR_datetime.parse(request.json['acceptance_date'])
-            > datetime.utcnow()):
+            > (relativedelta(minutes=90) + datetime.utcnow())):
         abort(400, "Future `acceptance_date` not permitted")
 
     request.json['user_id'] = user_id
