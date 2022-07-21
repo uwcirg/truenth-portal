@@ -225,6 +225,22 @@ class TestUserConsent(TestCase):
         )
         assert response.status_code == 400
 
+    def test_post_user_future_consent_date(self):
+        """Do allow future consent date within 90 min buffer"""
+        self.shallow_org_tree()
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        acceptance_date = datetime.utcnow() + relativedelta(minutes=75)
+        data = {'organization_id': org1.id,
+                'agreement_url': self.url,
+                'acceptance_date': FHIR_datetime.as_fhir(acceptance_date)}
+
+        self.login()
+        response = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert response.status_code == 200
+
     def test_post_replace_user_consent(self):
         """second consent for same user,org should replace existing"""
         self.shallow_org_tree()
