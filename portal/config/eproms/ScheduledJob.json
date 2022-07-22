@@ -57,10 +57,18 @@
     {
       "active": true,
       "kwargs": null,
-      "name": "Celery Beat Health Check",
+      "name": "Celery Beat Health Check (standard queue)",
       "resourceType": "ScheduledJob",
       "schedule": "*/5 * * * *",
       "task": "celery_beat_health_check"
+    },
+    {
+      "active": true,
+      "kwargs": null,
+      "name": "Celery Beat Health Check (low priority queue)",
+      "resourceType": "ScheduledJob",
+      "schedule": "*/5 * * * *",
+      "task": "celery_beat_health_check_low_priority_queue"
     },
     {
       "active": true,

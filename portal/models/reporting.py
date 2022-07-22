@@ -58,112 +58,129 @@ def adherence_report(
     else:
         as_of_date = datetime.utcnow()
 
-    # If limited by org - use org and its children as filter list
-    requested_orgs = (
-        OrgTree().here_and_below_id(organization_id=org_id) if org_id
-        else None)
+    def patient_generator():
+        """Generator for requested patients, updates job status as needed"""
+        # If limited by org - use org and its children as filter list
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=org_id) if org_id
+            else None)
 
-    patients = patients_query(
-        acting_user=acting_user,
-        include_test_role=include_test_role,
-        requested_orgs=requested_orgs)
+        patients = patients_query(
+            acting_user=acting_user,
+            include_test_role=include_test_role,
+            research_study_id=research_study_id,
+            requested_orgs=requested_orgs)
+        current = 0
+        total = limit if limit else patients.count()
+        for patient in patients:
+
+            # occasionally update the celery task status if defined
+            current += 1
+            if current > total:
+                return
+
+            if not current % 25 and celery_task:
+                celery_task.update_state(
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
+            try:
+                acting_user.check_role('view', other_id=patient.id)
+            except Unauthorized:
+                # simply exclude any patients the user can't view
+                continue
+
+            yield patient
+
+    def patient_data(patient):
+        """Returns dict of patient data regardless of qnr status"""
+        # Basic patient data
+        d = {
+            'user_id': patient.id,
+            'country': patient.organizations[0].country,
+            'site': patient.organizations[0].name
+        }
+        study_id = patient.external_study_id
+        if study_id:
+            d['study_id'] = study_id
+
+        # Consent date
+        c_date, w_date = consent_withdrawal_dates(
+                user=patient, research_study_id=research_study_id)
+        consent = c_date if c_date else w_date
+        d['consent'] = FHIR_datetime.as_fhir(consent)
+
+        # EMPRO always gets clinician(s)
+        if research_study_id == EMPRO_RS_ID and len(
+                [c for c in patient.clinicians]) > 0:
+            d['clinician'] = ';'.join(
+                clinician.display_name for clinician in
+                patient.clinicians)
+        return d
+
+    def general_row_detail(row, patient, qbd):
+        """Add general (either study) data for given (patient, qbd)"""
+        # purge values that may have previous row data set and aren't certain
+        for key in "completion_date", "oow_completion_date", "entry_method":
+            row.pop(key, None)
+
+        row['qb'] = qbd.questionnaire_bank.name
+        row['visit'] = visit_name(qbd)
+        if row['status'] == 'Completed':
+            row['completion_date'] = FHIR_datetime.as_fhir(
+                qbd.completed_date(patient.id))
+            row['oow_completion_date'] = FHIR_datetime.as_fhir(
+                qbd.oow_completed_date(patient.id))
+        entry_method = QNR_results(
+            patient,
+            research_study_id=research_study_id,
+            qb_ids=[qbd.qb_id],
+            qb_iteration=qbd.iteration).entry_method()
+        if entry_method:
+            row['entry_method'] = entry_method
+
+    def empro_row_detail(row, ts_reporting):
+        """Add EMPRO specifics"""
+        # Rename column header for EMPRO
+        if 'completion_date' in row:
+            row['EMPRO_questionnaire_completion_date'] = (
+                row.pop('completion_date'))
+
+        # Correct for zero index visit month in db
+        visit_month = int(row['visit'].split()[-1]) - 1
+        t_status = ts_reporting.latest_action_state(visit_month)
+        row['clinician_status'] = (
+            t_status.title() if t_status else "")
+        row['clinician_survey_completion_date'] = (
+            ts_reporting.resolution_authored_from_visit(visit_month) or "")
+        ht = ts_reporting.hard_triggers_for_visit(visit_month)
+        row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
+        st = ts_reporting.soft_triggers_for_visit(visit_month)
+        row['soft_trigger_domains'] = ', '.join(st) if st else ""
+        da = ts_reporting.domains_accessed(visit_month)
+        row['content_domains_accessed'] = ', '.join(da) if da else ""
+
     data = []
-    current, total = 0, patients.count()
-    for patient in patients:
-
-        # occasionally update the celery task status if defined
-        current += 1
-        if limit:
-            total = limit
-            if current > limit:
-                break
-
-        if not current % 25 and celery_task:
-            celery_task.update_state(
-                state='PROGRESS', meta={'current': current, 'total': total})
-
-        if research_study_id not in ResearchStudy.assigned_to(patient):
-            continue
-
-        try:
-            acting_user.check_role('view', other_id=patient.id)
-        except Unauthorized:
-            # simply exclude any patients the user can't view
-            continue
-
+    for patient in patient_generator():
+        row = patient_data(patient)
         qb_stats = QB_Status(
             user=patient,
             research_study_id=research_study_id,
             as_of_date=as_of_date)
-        row = {
-            'user_id': patient.id,
-            'country': patient.organizations[0].country,
-            'site': patient.organizations[0].name,
-            'status': str(qb_stats.overall_status)}
-
-        c_date, w_date = consent_withdrawal_dates(
-                user=patient, research_study_id=research_study_id)
-        consent = c_date if c_date else w_date
-        row['consent'] = FHIR_datetime.as_fhir(consent)
-
-        study_id = patient.external_study_id
-        if study_id:
-            row['study_id'] = study_id
+        status = str(qb_stats.overall_status)
+        if status == "Expired" and research_study_id == EMPRO_RS_ID:
+            row["status"] = "Not Yet Available"
+        else:
+            row["status"] = status
 
         # if no current, try previous (as current may be expired)
         last_viable = qb_stats.current_qbd(
             even_if_withdrawn=True) or qb_stats.prev_qbd
-        if not last_viable:
-            # Global study default pre-started is Expired. See TN-3101
-            if row['status'] == "Expired":
-                row['status'] = "Not Yet Available"
-            # TN-3101 include clinician even if not started on EMPRO
-            if research_study_id == EMPRO_RS_ID and len([c for c in patient.clinicians]) > 0:
-                row['clinician'] = ';'.join(
-                    clinician.display_name for clinician in
-                    patient.clinicians)
-
-        else:
-            row['qb'] = last_viable.questionnaire_bank.name
-            row['visit'] = visit_name(last_viable)
-            if row['status'] == 'Completed':
-                row['completion_date'] = FHIR_datetime.as_fhir(
-                    last_viable.completed_date(patient.id))
-                row['oow_completion_date'] = FHIR_datetime.as_fhir(
-                    last_viable.oow_completed_date(patient.id))
-            entry_method = QNR_results(
-                patient,
-                research_study_id=research_study_id,
-                qb_ids=[last_viable.qb_id],
-                qb_iteration=last_viable.iteration).entry_method()
-            if entry_method:
-                row['entry_method'] = entry_method
-
+        if last_viable:
+            general_row_detail(row, patient, last_viable)
             if research_study_id == EMPRO_RS_ID:
                 # Initialize trigger states reporting for patient
                 ts_reporting = TriggerStatesReporting(patient_id=patient.id)
-
-                # Add clinician and trigger data for EMPRO reports
-                if len([c for c in patient.clinicians]) > 0:
-                    row['clinician'] = ';'.join(
-                        clinician.display_name for clinician in
-                        patient.clinicians)
-                # Rename column header for EMPRO
-                if 'completion_date' in row:
-                    row['EMPRO_questionnaire_completion_date'] = (
-                        row.pop('completion_date'))
-
-                # Correct for zero index visit month in db
-                visit_month = int(row['visit'].split()[-1]) - 1
-                t_status = ts_reporting.latest_action_state(visit_month)
-                row['clinician_status'] = (
-                    t_status.title() if t_status else '')
-                ht = ts_reporting.hard_triggers_for_visit(visit_month)
-                row['hard_trigger_domains'] = ', '.join(ht) if ht else ''
-                st = ts_reporting.soft_triggers_for_visit(visit_month)
-                row['soft_trigger_domains'] = ', '.join(st) if st else ''
-                da = ts_reporting.domains_accessed(visit_month)
-                row['content_domains_accessed'] = ', '.join(da) if da else ''
+                empro_row_detail(row, ts_reporting)
 
         data.append(row)
 
@@ -172,42 +189,11 @@ def adherence_report(
         for qbd, status in qb_stats.older_qbds(last_viable):
             historic = row.copy()
             historic['status'] = status
-            historic['qb'] = qbd.questionnaire_bank.name
-            historic['visit'] = visit_name(qbd)
-            historic['completion_date'] = (
-                FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
-                if status == 'Completed' else '')
-            historic['oow_completion_date'] = (
-                FHIR_datetime.as_fhir(qbd.oow_completed_date(patient.id))
-                if status == 'Completed' else '')
-            entry_method = QNR_results(
-                patient,
-                research_study_id=research_study_id,
-                qb_ids=[qbd.qb_id],
-                qb_iteration=qbd.iteration).entry_method()
-            if entry_method:
-                historic['entry_method'] = entry_method
-            else:
-                historic.pop('entry_method', None)
+            general_row_detail(historic, patient, qbd)
 
             if research_study_id == EMPRO_RS_ID:
-                # Correct for zero index visit month in db
-                visit_month = int(historic['visit'].split()[-1]) - 1
-                t_status = ts_reporting.latest_action_state(visit_month)
-                historic['clinician_status'] = (
-                    t_status.title() if t_status else '')
-                ht = ts_reporting.hard_triggers_for_visit(visit_month)
-                historic['hard_trigger_domains'] = ', '.join(ht) if ht else ''
-                st = ts_reporting.soft_triggers_for_visit(visit_month)
-                historic['soft_trigger_domains'] = ', '.join(st) if st else ''
-                da = ts_reporting.domains_accessed(visit_month)
-                historic['content_domains_accessed'] = (
-                    ', '.join(da) if da else '')
+                empro_row_detail(historic, ts_reporting)
 
-                # Rename column header for EMPRO
-                if 'completion_date' in historic:
-                    historic['EMPRO_questionnaire_completion_date'] = (
-                        historic.pop('completion_date'))
             data.append(historic)
 
         # if user is eligible for indefinite QB, add status
@@ -220,6 +206,7 @@ def adherence_report(
             indef['completion_date'] = (
                 FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
                 if status == 'Completed' else '')
+            indef["oow_completion_date"] = ""
             indef['qb'] = qbd.questionnaire_bank.name
             indef['visit'] = "Indefinite"
             entry_method = QNR_results(
@@ -227,10 +214,7 @@ def adherence_report(
                 research_study_id=research_study_id,
                 qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
-            if entry_method:
-                indef['entry_method'] = entry_method
-            else:
-                indef.pop('entry_method', None)
+            indef['entry_method'] = entry_method if entry_method else ""
             data.append(indef)
 
     results = {
@@ -263,6 +247,7 @@ def adherence_report(
                 'content_domains_accessed',
                 'clinician',
                 'clinician_status',
+                'clinician_survey_completion_date',
                 ]
 
     return results

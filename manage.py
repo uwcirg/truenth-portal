@@ -63,7 +63,10 @@ from portal.models.user import (
     suppress_email,
     validate_email,
 )
-from portal.tasks import celery_beat_health_check
+from portal.tasks import (
+    celery_beat_health_check,
+    celery_beat_health_check_low_priority_queue,
+)
 
 app = create_app()
 
@@ -445,7 +448,9 @@ def config(config_key):
 
 @app.cli.command()
 def set_celery_beat_healthy():
-    return celery_beat_health_check()
+    return (
+        celery_beat_health_check() and
+        celery_beat_health_check_low_priority_queue())
 
 
 @app.cli.command()

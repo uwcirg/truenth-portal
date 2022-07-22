@@ -4,6 +4,7 @@ from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from flask import Blueprint, current_app
 import redis
+from redis.exceptions import ConnectionError
 from sqlalchemy import text
 
 from ..database import db
@@ -18,16 +19,20 @@ healthcheck_blueprint = Blueprint('healthcheck', __name__)
 def celery_beat_ping():
     """Periodically called by a celery beat task
 
-    Updates the last time we recieved a call to this API.
+    Updates the last time we received a call to this API.
     This allows us to monitor whether celery beat tasks are running
     """
-    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
-    rs.setex(
-        name='last_celery_beat_ping',
-        time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
-        value=str(datetime.utcnow()),
-    )
-    return 'PONG'
+    try:
+        rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+        rs.setex(
+            name='last_celery_beat_ping',
+            time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
+            value=str(datetime.utcnow()),
+        )
+        return 'PONG'
+    except ConnectionError as ce:
+        current_app.logger.exception(ce)
+        return None
 
 ##############################
 # Healthcheck functions below
@@ -58,20 +63,32 @@ def celery_available():
 
 def celery_beat_available():
     """Determines whether celery beat is available"""
-    rs = redis.from_url(current_app.config['REDIS_URL'])
+    try:
+        rs = redis.from_url(current_app.config['REDIS_URL'])
 
-    # When celery beat is running it pings
-    # our service periodically which sets
-    # 'celery_beat_available' in redis. If
-    # that variable expires it means
-    # we have not received a ping from celery beat
-    # within the allowed window and we must assume
-    # celery beat is not available
-    last_celery_beat_ping = rs.get('last_celery_beat_ping')
-    if last_celery_beat_ping:
+        # Celery beat feeds scheduled jobs (a la cron) to the respective
+        # job queues (standard and low priority).  As a monitor, a job
+        # exists in each queue to set a respective value in redis with
+        # an expiration.
+
+        # If those redis values are present, we assume celery_beat and
+        # both queues are functioning properly.
+        last_celery_beat_ping = rs.get('last_celery_beat_ping')
+        last_celery_beat_ping_low_priority_queue = rs.get(
+            'last_celery_beat_ping_low_priority_queue')
+    except ConnectionError:
+        return False, "Redis connection failed"
+
+    if last_celery_beat_ping and last_celery_beat_ping_low_priority_queue:
         return True, 'Celery beat is available.'
 
-    return False, 'Celery beat is not available.'
+    detail = "both queues timed out"
+    if last_celery_beat_ping:
+        detail = "low priority queue timed out"
+    elif last_celery_beat_ping_low_priority_queue:
+        detail = "standard queue timed out"
+
+    return False, f"Celery beat is not available, {detail}."
 
 
 def postgresql_available():
@@ -91,8 +108,8 @@ def redis_available():
     # Ping redis. If it succeeds we assume redis
     # is available. Otherwise we assume
     # it's not available
-    rs = redis.from_url(current_app.config["REDIS_URL"])
     try:
+        rs = redis.from_url(current_app.config["REDIS_URL"])
         rs.ping()
         return True, 'Redis is available.'
     except Exception as e:

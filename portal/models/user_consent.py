@@ -201,6 +201,8 @@ def consent_withdrawal_dates(user, research_study_id):
 
     prior_acceptance = None
     for consent in user.all_consents:
+        if consent.research_study_id != research_study_id:
+            continue
         if not withdrawal_date and (
                 consent.status == 'suspended' and not consent.deleted_id):
             withdrawal_date = consent.acceptance_date

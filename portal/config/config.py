@@ -96,7 +96,9 @@ class BaseConfig(object):
         os.environ['CELERYD_MAX_TASKS_PER_CHILD']) if os.environ.get(
         'CELERYD_MAX_TASKS_PER_CHILD') else None
 
-    LAST_CELERY_BEAT_PING_EXPIRATION_TIME = 60 * 15  # 15 mins, in seconds
+    FIFTEEN_MINS = 60 * 15  # 15 mins, in seconds
+    LAST_CELERY_BEAT_PING_EXPIRATION_TIME = os.environ.get(
+        "LAST_CELERY_BEAT_PING_EXPIRATION_TIME", FIFTEEN_MINS)
     CACHE_TYPE = 'redis'
     CACHE_REDIS_URL = REDIS_URL
     DOGPILE_CACHE_REGIONS = [

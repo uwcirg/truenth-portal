@@ -23,6 +23,16 @@
             exportUrl: {
                 type: String,
                 required: true
+            },
+            //unique identifier exports, e.g. substudy vs main study
+            exportIdentifier: {
+                type: String
+            }
+        },
+        watch: {
+            exportIdentifier: function (newValue, oldValue) {
+                //if export identifier changes, stop all running jobs
+                this.clearExportDataTimeoutID();
             }
         },
         data: function() {
@@ -31,7 +41,7 @@
                 exportTimeElapsed: 0,
                 statusDisplayTimeoutID: 0,
                 arrExportDataTimeoutID: [],
-                maximumPendingTime: 45000, //allow 45 seconds of PENDING status
+                maximumPendingTime: 60000, //allow 60 seconds of PENDING status
                 arrIncompleteStatus: ["PENDING", "PROGRESS", "STARTED"],
                 requestSubmittedDisplay: ExportInstrumentsData["requestSubmittedDisplay"],
                 failedRequestDisplay: ExportInstrumentsData["failedRequestDisplay"]
@@ -184,10 +194,11 @@
                     self.updateProgressDisplay(exportStatus, percent, true);
                     if (self.arrIncompleteStatus.indexOf(exportStatus) === -1) {
                         if (self.isSuccessStatus(exportStatus)) {
+                            var resultUrl = statusUrl.replace("/status", "");
+                            self.$emit("doneExport", resultUrl);
                             setTimeout(function() {
-                                let resultUrl = statusUrl.replace("/status", "");
                                 window.location.assign(resultUrl);
-                            }.bind(self), 50); //wait a bit before retrieving results
+                            }, 50); //wait a bit before retrieving results
                         }
                         self.updateProgressDisplay(data["state"], "");
                         setTimeout(function() {
