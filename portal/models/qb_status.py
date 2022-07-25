@@ -198,6 +198,9 @@ class QB_Status(object):
         for q in qbs:
             if self._current_indef is not None:
                 raise RuntimeError("unexpected second indef qb")
+            if q.relative_start > self.as_of_date:
+                # Don't include if the consent date hasn't arrived
+                continue
             self._current_indef = q
 
     def indef_status(self):
