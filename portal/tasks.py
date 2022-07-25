@@ -349,7 +349,7 @@ def token_watchdog(**kwargs):
 @scheduled_task
 def celery_beat_health_check(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
-
+    current_app.logger.info("enter celery_beat_health_check")
     rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping',
@@ -362,7 +362,7 @@ def celery_beat_health_check(**kwargs):
 @scheduled_task
 def celery_beat_health_check_low_priority_queue(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
-
+    current_app.logger.info("enter celery_beat_health_check_low_priority_queue")
     rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping_low_priority_queue',
