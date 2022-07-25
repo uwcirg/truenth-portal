@@ -144,7 +144,8 @@ export default {
             this.userId = id;
         },
         getLocale() {
-            return this.locale.replace('_', '-');
+            // LR expects locale code like, en_CA, en_GBs
+            return this.locale.replace('-', '_');
         },
         setLocale(data) {
             if (!data) {
