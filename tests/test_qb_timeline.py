@@ -559,6 +559,34 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         with pytest.raises(StopIteration):
             next(gen)
 
+    def test_indef_assignment_post_consent(self):
+        org = self.setup_org_qbs(rp_name='v3', include_indef=True)
+        org_id = org.id
+        back7, nowish = associative_backdate(
+            now=now, backdate=relativedelta(months=7))
+        self.consent_with_org(org_id=org_id, setdate=back7)
+        user = db.session.merge(self.test_user)
+
+        a_s = QB_Status(
+            user=user,
+            research_study_id=0,
+            as_of_date=nowish)
+        assert a_s.enrolled_in_classification('indefinite')
+
+    def test_indef_assignment_pre_consent(self):
+        org = self.setup_org_qbs(rp_name='v3', include_indef=True)
+        org_id = org.id
+        tomorrow, nowish = associative_backdate(
+            now=now, backdate=relativedelta(days=-1))
+        self.consent_with_org(org_id=org_id, setdate=tomorrow)
+        user = db.session.merge(self.test_user)
+
+        a_s = QB_Status(
+            user=user,
+            research_study_id=0,
+            as_of_date=nowish)
+        assert a_s.enrolled_in_classification('indefinite') is None
+
 
 class Test_QB_StatusCacheKey(TestCase):
 
