@@ -22,7 +22,7 @@ export default { /*global $ */
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var REQUEST_TIMEOUT_INTERVAL = 10 * 1000; // default timed out at 30 seconds
+        var REQUEST_TIMEOUT_INTERVAL = 10 * 1000; // default timed out at 10 seconds
         var RETRY_INTERVAL = 5000; // wait 5 seconds before retry
         var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
