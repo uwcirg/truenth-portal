@@ -9,6 +9,7 @@ from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..cache import cache
+from ..database import db
 from ..date_tools import FHIR_datetime
 from ..trigger_states.models import TriggerStatesReporting
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
@@ -403,6 +404,7 @@ def generate_and_send_summaries(org_id):
                           body=summary_email.body)
         try:
             em.send_message()
+            db.session.add(em)
         except SMTPRecipientsRefused as exc:
             msg = ("Error sending site summary email to {}: "
                    "{}".format(staff_user.email, exc))
@@ -418,4 +420,5 @@ def generate_and_send_summaries(org_id):
             for email in exc[0]:
                 error_emails.add(email)
 
+    db.session.commit()
     return error_emails or None
