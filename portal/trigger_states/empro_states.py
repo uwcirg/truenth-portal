@@ -24,10 +24,10 @@ from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.observation import Observation
+from ..models.research_study import EMPRO_RS_ID
 from ..models.user import User
 from ..timeout_lock import TimeoutLock
 
-EMPRO_STUDY_ID = 1
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
 
 
@@ -317,7 +317,7 @@ def fire_trigger_events():
         # Withdrawn users should never receive reminders, nor staff
         # about them.
         qb_status = QB_Status(
-            user=patient, research_study_id=EMPRO_STUDY_ID, as_of_date=now)
+            user=patient, research_study_id=EMPRO_RS_ID, as_of_date=now)
         if qb_status.withdrawn_by(now):
             triggers = copy.deepcopy(ts.triggers)
             triggers['action_state'] = 'withdrawn'
