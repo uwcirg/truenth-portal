@@ -318,7 +318,8 @@ def send_user_messages(user, force_update=False):
 def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
-    error_emails = generate_and_send_summaries(org_id)
+    research_study_id = kwargs['research_study_id']
+    error_emails = generate_and_send_summaries(org_id, research_study_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '
                 '{}'.format(', '.join(error_emails)))

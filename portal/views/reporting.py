@@ -51,7 +51,8 @@ def overdue_table(top_org=None):
         user=current_user(), top_org=top_org)
 
 
-def generate_overdue_table_html(overdue_stats, user, top_org):
+def generate_overdue_table_html(
+        overdue_stats, user, top_org, research_study_id):
     """generate html from given statistics
 
     :param overdue_stats: a dict keyed by
@@ -62,6 +63,7 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
       patient visibility
     :param top_org: used to restrict report to a portion of the patients
       for which the given user has view permissions
+    :param research_study_id: necessary to distinguish report format
 
     :returns: report in html
 
