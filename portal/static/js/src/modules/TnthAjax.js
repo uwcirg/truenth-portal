@@ -78,7 +78,7 @@ export default { /*global $ */
                 (function(self, url, method, userId, params, callback) {
                     setTimeout(function () {
                       self.sendRequest(url, method, userId, params, callback);
-                    }, RETRY_INTERVAL); //retry after 5
+                    }, RETRY_INTERVAL); //retry after 5 seconds
                 })(self, url, method, userId, params, callback);
             } else {
                 fieldHelper.showError(targetField);
