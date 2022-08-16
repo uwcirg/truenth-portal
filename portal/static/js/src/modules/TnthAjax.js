@@ -22,8 +22,8 @@ export default { /*global $ */
     },
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
-        var REQUEST_TIMEOUT_INTERVAL = 5000;
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: 5000, data: null, useWorker: false, async: true};
+        var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         params.timeout = params.timeout || REQUEST_TIMEOUT_INTERVAL;
@@ -75,8 +75,8 @@ export default { /*global $ */
         }).fail(function(xhr) {
             if (params.attempts < params.max_attempts) {
                 (function(self, url, method, userId, params, callback) {
-                    setTimeout(function() {
-                        self.sendRequest(url, method, userId, params, callback);
+                    setTimeout(function () {
+                      self.sendRequest(url, method, userId, params, callback);
                     }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
                 })(self, url, method, userId, params, callback);
             } else {
