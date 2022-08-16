@@ -23,7 +23,6 @@ export default { /*global $ */
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
         var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
-        var RETRY_INTERVAL = 5000; // wait 5 seconds before retry
         var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
@@ -78,7 +77,7 @@ export default { /*global $ */
                 (function(self, url, method, userId, params, callback) {
                     setTimeout(function () {
                       self.sendRequest(url, method, userId, params, callback);
-                    }, RETRY_INTERVAL); //retry after 5 seconds
+                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
                 })(self, url, method, userId, params, callback);
             } else {
                 fieldHelper.showError(targetField);
