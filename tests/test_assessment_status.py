@@ -406,7 +406,7 @@ class TestQB_Status(TestQuestionnaireSetup):
 
     def test_enrolled_in_metastatic(self):
         """metastatic should include baseline and indefinite"""
-        self.bless_with_basics(local_metastatic='metastatic')
+        self.bless_with_basics(local_metastatic='metastatic', setdate=now)
         user = db.session.merge(self.test_user)
 
         a_s = QB_Status(

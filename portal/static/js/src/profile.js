@@ -2994,7 +2994,8 @@ export default (function() {
                 var self = this, errorMessage = "";
                 $("#profileAuditLogTable").html(Utility.getLoaderHTML());
                 $("#profileAuditLogTable .loading-message-indicator").show();
-                this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true}, function(data) {
+                // set request times out at 5 minutes
+                this.modules.tnthAjax.auditLog(this.subjectId, {useWorker:true, timeout: 5 * 60 * 1000}, function(data) {
                     if (data.error) {
                         errorMessage = i18next.t("Error retrieving data from server");
                     }
