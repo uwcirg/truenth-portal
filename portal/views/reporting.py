@@ -23,31 +23,55 @@ from ..timeout_lock import LockTimeout, guarded_task_launch
 reporting_api = Blueprint('reporting', __name__)
 
 
-@reporting_api.route('/admin/overdue-table')
+@reporting_api.route('/admin/overdue-table/<int:organization_id>')
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
-def overdue_table(top_org=None):
+def overdue_table(organization_id):
     """View for staff access to generated email content
 
-    Typically called by scheduled job, expected this view is only
-    used for debugging & QA
+    Only for debugging & QA - scheduled jobs generate and send
+    such reports at regular intervals.
 
     The included patients depends on current user's organization
     affiliation, including all patients at and below any level of the
-    organization tree for which the current user has access.  Further
-    limited to the patients below top_org, if defined.
+    organization tree for which the current user has access, at or below
+    given organization_id.
 
-    :param org_id: Top level organization ID to test
+    :param organization_id: Top level organization ID to test
     :returns: html content typically sent directly to site resource
 
     """
     from ..models.reporting import overdue_stats_by_org
-    if not top_org:
-        org_id = request.args.get('org_id', 0)
-        top_org = Organization.query.get_or_404(org_id)
+    top_org = Organization.query.get_or_404(organization_id)
 
     return generate_overdue_table_html(
         overdue_stats=overdue_stats_by_org(),
+        user=current_user(), top_org=top_org)
+
+
+@reporting_api.route('/admin/empro-overdue-table/<int:organization_id>')
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
+@oauth.require_oauth()
+def empro_overdue_table(organization_id):
+    """View for staff access to generated email content
+
+    Only for debugging & QA - scheduled jobs generate and send
+    such reports at regular intervals.
+
+    The included patients depends on current user's organization
+    affiliation, including all patients at and below any level of the
+    organization tree for which the current user has access, at or below
+    given organization_id.
+
+    :param organization_id: Top level organization ID to test
+    :returns: html content typically sent directly to site resource
+
+    """
+    from ..models.reporting import empro_overdue_stats
+    top_org = Organization.query.get_or_404(organization_id)
+
+    return generate_EMPRO_overdue_table_html(
+        overdue_stats=empro_overdue_stats(),
         user=current_user(), top_org=top_org)
 
 
@@ -88,6 +112,37 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
 
     return render_template(
         'site_overdue_table.html', rows=rows)
+
+
+def generate_EMPRO_overdue_table_html(overdue_stats, user, top_org):
+    """EMPRO specific overdue table generation.
+
+    :param overdue_stats: a dict keyed by
+     ``overdue_stats[(org_id, org_name)]``, and for each org, a list
+      of overdue patient namedtuples, respectively containing an
+      ``EmproOverdueRow`` instance
+    :param user: the user generating the table, necessary to determine
+      patient visibility
+    :param top_org: used to restrict report to a portion of the patients
+      for which the given user has view permissions
+
+    :returns: report in html
+
+    """
+    ot = OrgTree()
+    rows = []
+    for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
+        if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
+            continue
+        if not user.can_view_org(org_id):
+            continue
+
+        od_tups = overdue_stats[(org_id, org_name)]
+        for row in od_tups:
+            rows.append(row)
+
+    return render_template(
+        'empro_site_overdue_table.html', rows=rows)
 
 
 @reporting_api.route('/admin/overdue-numbers')
