@@ -1782,7 +1782,9 @@ class User(db.Model, UserMixin):
 
         """
         if not self.has_role(
-                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value):
+                ROLE.STAFF.value,
+                ROLE.STAFF_ADMIN.value,
+                ROLE.CLINICIAN.value):
             raise ValueError(
                 f"limited to staff; user {self.id} lacks adequate role")
 
