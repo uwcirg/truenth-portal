@@ -1781,8 +1781,10 @@ class User(db.Model, UserMixin):
           view patient consented at given org_id, False otherwise
 
         """
-        if not self.has_role(ROLE.STAFF.value):
-            raise ValueError("limited to staff")
+        if not self.has_role(
+                ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value):
+            raise ValueError(
+                f"limited to staff; user {self.id} lacks adequate role")
 
         ot = OrgTree()
         for org in self.organizations:
