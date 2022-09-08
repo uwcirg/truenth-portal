@@ -13,6 +13,7 @@ from flask import (
 )
 from flask_user import roles_required
 
+from ..date_tools import report_format
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
@@ -107,8 +108,8 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
         for user_id, study_id, visit_name, due_date, expired_date in od_tups:
             rows.append((
                 site_spacer, user_id, study_id, visit_name,
-                due_date.strftime("%d-%b-%Y %H:%M:%S"),
-                expired_date.strftime("%d-%b-%Y %H:%M:%S")))
+                report_format(due_date),
+                report_format(expired_date)))
 
     return render_template(
         'site_overdue_table.html', rows=rows)
@@ -123,26 +124,19 @@ def generate_EMPRO_overdue_table_html(overdue_stats, user, top_org):
       ``EmproOverdueRow`` instance
     :param user: the user generating the table, necessary to determine
       patient visibility
-    :param top_org: used to restrict report to a portion of the patients
-      for which the given user has view permissions
+    :param top_org: the specific organization to generate a report for
 
     :returns: report in html
 
     """
-    ot = OrgTree()
     rows = []
-    for org_id, org_name in sorted(overdue_stats, key=lambda x: x[1]):
-        if top_org and not ot.at_or_below_ids(top_org.id, [org_id]):
-            continue
-        if not user.can_view_org(org_id):
-            continue
-
-        od_tups = overdue_stats[(org_id, org_name)]
-        for row in od_tups:
-            rows.append(row)
+    org_id, org_name = [i for i in overdue_stats if i[0] == top_org][0]
+    od_tups = overdue_stats[(org_id, org_name)]
+    for row in od_tups:
+        rows.append(row)
 
     return render_template(
-        'empro_site_overdue_table.html', rows=rows)
+        'empro_site_overdue_table.html', rows=rows, site=org_name)
 
 
 @reporting_api.route('/admin/overdue-numbers')

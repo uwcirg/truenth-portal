@@ -10,7 +10,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..database import db
-from ..date_tools import FHIR_datetime
+from ..date_tools import FHIR_datetime, report_format
 from ..trigger_states.models import TriggerStatesReporting
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
@@ -108,7 +108,7 @@ def adherence_report(
         c_date, w_date = consent_withdrawal_dates(
                 user=patient, research_study_id=research_study_id)
         consent = c_date if c_date else w_date
-        d['consent'] = FHIR_datetime.as_fhir(consent)
+        d['consent'] = report_format(consent)
 
         # EMPRO always gets clinician(s)
         if research_study_id == EMPRO_RS_ID and len(
@@ -127,10 +127,10 @@ def adherence_report(
         row['qb'] = qbd.questionnaire_bank.name
         row['visit'] = visit_name(qbd)
         if row['status'] == 'Completed':
-            row['completion_date'] = FHIR_datetime.as_fhir(
-                qbd.completed_date(patient.id))
-            row['oow_completion_date'] = FHIR_datetime.as_fhir(
-                qbd.oow_completed_date(patient.id))
+            row['completion_date'] = report_format(
+                qbd.completed_date(patient.id)) or ""
+            row['oow_completion_date'] = report_format(
+                qbd.oow_completed_date(patient.id)) or ""
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
@@ -205,7 +205,7 @@ def adherence_report(
             # Indefinite doesn't have a row in the timeline, look
             # up matching date from QNRs
             indef['completion_date'] = (
-                FHIR_datetime.as_fhir(qbd.completed_date(patient.id))
+                report_format(qbd.completed_date(patient.id))
                 if status == 'Completed' else '')
             indef["oow_completion_date"] = ""
             indef['qb'] = qbd.questionnaire_bank.name
@@ -386,6 +386,7 @@ def empro_overdue_stats():
 
     # use system user to avoid pruning any patients during cache population
     sys = User.query.filter_by(email='__system__').one()
+
     for user in patients_query(acting_user=sys, research_study_id=EMPRO_RS_ID):
         qb_stats = QB_Status(
             user=user,
@@ -424,15 +425,15 @@ def empro_overdue_stats():
                     study_id=user.external_study_id or '',
                     visit=visit,
                     status=str(qb_stats.overall_status),
-                    completion_date=FHIR_datetime.as_fhir(
+                    completion_date=report_format(
                         qbd.completed_date(user.id)) or "",
                     clinician=';'.join(
                         clinician.display_name for clinician in
                         user.clinicians),
                     clinician_status=t_status.title() if t_status else "",
-                    clinician_survey_completion_date=FHIR_datetime.as_fhir(
-                            ts_reporting.resolution_authored_from_visit(
-                                visit_month) or "")
+                    clinician_survey_completion_date=report_format(
+                        ts_reporting.resolution_authored_from_visit(
+                            visit_month)) or ""
                 )
             overdue_stats[(org.id, org.name)].append(row)
     return overdue_stats
@@ -446,9 +447,35 @@ def generate_and_send_summaries(org_id, research_study_id):
     if research_study_id == BASE_RS_ID:
         ostats = overdue_stats_by_org()
         html_generation_function = generate_overdue_table_html
+
+        def staff_generator():
+            # Staff centric report - yields each staff user for
+            # email including all respective orgs for given user.
+            for user in User.query.join(
+                    UserRoles).join(Role).filter(
+                    Role.name.in_(ROLE.STAFF.value)).filter(
+                    User.id == UserRoles.user_id).filter(
+                    Role.id == UserRoles.role_id).filter(
+                    User.deleted_id.is_(None)):
+                yield user, None
+
     elif research_study_id == EMPRO_RS_ID:
         ostats = empro_overdue_stats()
         html_generation_function = generate_EMPRO_overdue_table_html
+        org_ids_in_report = [i[0] for i in ostats.keys()]
+
+        def staff_generator():
+            # Org centric report - yields each staff and org id as
+            # each email is specific to one site
+            from ..views.clinician import clinician_query
+            sys = User.query.filter_by(email='__system__').one()
+
+            for org_id in org_ids_in_report:
+                staff_users = clinician_query(
+                    acting_user=sys, org_filter=[org_id], include_staff=True)
+                for user in staff_users:
+                    yield user, org_id
+
     else:
         raise ValueError(f"unknown research study {research_study_id}")
 
@@ -458,19 +485,10 @@ def generate_and_send_summaries(org_id, research_study_id):
     top_org = Organization.query.get(org_id)
     if not top_org:
         raise ValueError("No org with ID {} found.".format(org_id))
-    # TODO need ATMA for EMPRO
-    name_key = SiteSummaryEmail_ATMA.name_key(org=top_org.name)
+    name_key = SiteSummaryEmail_ATMA.name_key(
+        org=top_org.name, research_study=research_study_id)
 
-    roles = [ROLE.STAFF.value]
-    if research_study_id == EMPRO_RS_ID:
-        roles.append(ROLE.CLINICIAN.value)
-
-    for staff_user in User.query.join(
-            UserRoles).join(Role).filter(
-            Role.name.in_(roles)).filter(
-            User.id == UserRoles.user_id).filter(
-            Role.id == UserRoles.role_id).filter(
-            User.deleted_id.is_(None)):
+    for staff_user, org_id in staff_generator():
         if not(
                 staff_user.email_ready()[0] and
                 top_org in ot.find_top_level_orgs(staff_user.organizations)):
@@ -481,7 +499,7 @@ def generate_and_send_summaries(org_id, research_study_id):
             args['eproms_site_summary_table'] = html_generation_function(
                 overdue_stats=ostats,
                 user=staff_user,
-                top_org=top_org,
+                top_org=org_id or top_org,
             )
         summary_email = MailResource(
             app_text(name_key), locale_code=staff_user.locale_code,
