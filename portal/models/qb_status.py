@@ -571,7 +571,7 @@ def patient_research_study_status(patient, ignore_QB_status=False):
             if results[0]['ready']:
                 # Clear ready status when base has pending work
                 rs_status['ready'] = False
-                rs_status['errors'].append('Participant has pending questionnaire in main IRONMAN study')
+                rs_status['errors'].append('Pending work in base study')
             elif not patient.email_ready():
                 # Avoid errors from automated emails, that is, email required
                 rs_status['ready'] = False
