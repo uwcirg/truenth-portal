@@ -53,26 +53,24 @@ def staff_emails(patient, hard_triggers, initial_notification):
             f"Require single org on patient {patient.id} ")
     org_id = patient.organizations[0].id
 
-    # Email every clinician and staff (not staff-admin) directly
+    # Email every staff (not staff-admin) directly
     # associated with the patient's organization
 
-    staff_list = User.query.join(UserRoles).filter(
+    staff_list = [
+        user for user in User.query.join(UserRoles).filter(
         User.id == UserRoles.user_id).join(Role).filter(
         UserRoles.role_id == Role.id).filter(
-        Role.name.in_((ROLE.STAFF.value, ROLE.CLINICIAN.value))).join(
+        Role.name == ROLE.STAFF.value).join(
         UserOrganization).filter(
         User.id == UserOrganization.user_id).filter(
         UserOrganization.organization_id == org_id).filter(
-        User.deleted_id.is_(None))
+        User.deleted_id.is_(None))]
 
-    # make sure assigned clinicians made the list
-    required = set([c.id for c in patient.clinicians])
-    all = set([user.id for user in staff_list])
-    missing = required - all
-    if missing:
-        raise ValueError(
-            f"Patient's ({patient.id}) assigned clinician not in distribution"
-            f" list. Check clinician ({missing}) organizations")
+    # Add (if not already present from staff query) the assigned clinician(s)
+    staff_list_ids = set([user.id for user in staff_list])
+    for c in patient.clinicians:
+        if c.id not in staff_list_ids:
+            staff_list.append(c)
 
     app_text_name = 'empro clinician trigger reminder'
     if initial_notification:
