@@ -269,10 +269,7 @@ export default (function() {
             },
             computedOptionalCoreData: function() {
                 return this.optionalCoreData;
-            },
-            subStudyStaffEligible: function() {
-                return this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID] && this.subjectResearchStudyStatuses[EPROMS_SUBSTUDY_ID]["intervention_qnr_eligible"];
-            },
+            }
         },
         methods: {
             registerDependencies: function() {
@@ -636,9 +633,6 @@ export default (function() {
             },
             isSubStudyPatient: function() {
                 return this.computedIsSubStudyPatient;
-            },
-            isSubStudyStaffEligible: function() {
-                return this.subStudyStaffEligible;
             },
             hasSubStudyStatusErrors: function() {
                 return this.hasResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
@@ -1511,11 +1505,32 @@ export default (function() {
                      });
                 });
             },
+            isPostTxQuestionnaireEligible: function() {
+                const objResearchStudy = this.getResearchStudyStatus(EPROMS_SUBSTUDY_ID);
+                return (
+                  objResearchStudy &&
+                  objResearchStudy["intervention_qnr_eligible"]
+                );
+            },
             shouldShowSubstudyPostTx: function() {
                 return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
             },
             shouldDisableSubstudyPostTx: function() {
-                return this.isSubStudyTriggersResolved() || !this.isSubStudyStaffEligible();
+                return (
+                  !this.isPostTxQuestionnaireEligible() ||
+                  this.isSubStudyTriggersResolved()
+                );
+            },
+            hasPostTxQuestionnaireErrors: function() {
+              // see API /api/patient/[id]/research_study
+              // USE intervention_qnr_eligible flag returned from the API to determine whether to display error(s) related to post tx questionnaire eligibility
+              // the flag is set to FALSE if there is any associated error
+              // NOTE: intervention_qnr_eligible flag is still TRUE even if there is any pending IRONMAN main study questionnaire
+              // that makes sense as staff can still fill in post tx questionnaire
+              return (
+                !this.isPostTxQuestionnaireEligible() &&
+                this.hasSubStudyStatusErrors()
+              );
             },
             getPostTxActionStatus: function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
