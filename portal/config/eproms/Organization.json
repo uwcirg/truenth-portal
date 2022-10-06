@@ -4441,7 +4441,7 @@
     {
       "extension": [
         {
-          "timezone": "America/Nairobi",
+          "timezone": "Africa/Nairobi",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         },
         {
