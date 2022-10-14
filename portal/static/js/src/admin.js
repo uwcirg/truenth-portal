@@ -893,8 +893,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
             },
             onOrgListSelectFilter: function() {
                 this.setTablePreference(this.userId, this.tableIdentifier, null, null, null, function () {
-                  // wait for table filter preference is saved before reloading the page
-                  // so the backend can present patient list based on that preference
+                  // callback from setting the filter preference
+                  // this ensures that the table filter preference is saved before reloading the page
+                  // so the backend can present patient list based on that saved preference
                   setTimeout(function () {
                     this.showLoader();
                     location.reload();
