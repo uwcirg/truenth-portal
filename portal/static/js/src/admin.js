@@ -845,11 +845,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                             clearAll: false,
                             close: false
                         });
-                        self.setTablePreference(self.userId, self.tableIdentifier);
-                        setTimeout(function () {
-                            self.showLoader();
-                            location.reload();
-                        }, 150);
+                        self.onOrgListSelectFilter();
                     });
                 });
                 $("#orglist-selectall-ckbox").on("click touchstart", function (e) {
@@ -866,13 +862,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                             orgsList.push($(this).val());
                         }
                     });
-                    self.setTablePreference(self.userId, self.tableIdentifier); //pre-set user preference for filtering
-                    if (orgsList.length > 0) {
-                        setTimeout(function () {
-                            self.showLoader();
-                            location.reload();
-                        }, 150);
-                    }
+                    if (orgsList.length === 0) return;
+                    self.onOrgListSelectFilter();
+                    
                 });
                 $("#orglist-clearall-ckbox").on("click touchstart", function (e) {
                     e.stopPropagation();
@@ -882,11 +874,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         clearAll: true,
                         close: false
                     });
-                    self.setTablePreference(self.userId, self.tableIdentifier);
-                    setTimeout(function () {
-                        self.showLoader();
-                        location.reload();
-                    }, 150);
+                    self.onOrgListSelectFilter();
                 });
                 $("#orglist-close-ckbox").on("click touchstart", function (e) {
                     e.stopPropagation();
@@ -902,6 +890,16 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
             clearOrgsSelection: function () {
                 $("#userOrgs input[name='organization']").prop("checked", false);
                 this.clearFilterButtons();
+            },
+            onOrgListSelectFilter: function() {
+                this.setTablePreference(this.userId, this.tableIdentifier, null, null, null, function () {
+                  // wait for table filter preference is saved before reloading the page
+                  // so the backend can present patient list based on that preference
+                  setTimeout(function () {
+                    this.showLoader();
+                    location.reload();
+                  }.bind(this), 350);
+                }.bind(this));
             },
             getDefaultTablePreference: function () {
                 return {
@@ -988,7 +986,7 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     }
                 }
             },
-            setTablePreference: function (userId, tableName, sortField, sortOrder, filters) {
+            setTablePreference: function (userId, tableName, sortField, sortOrder, filters, callback) {
                 var tnthAjax = this.getDependency("tnthAjax");
                 tableName = tableName || this.tableIdentifier;
                 if (!tableName) {
@@ -1044,9 +1042,11 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 data["filters"] = __filters;
 
                 if (Object.keys(data).length > 0) {
+                    // make this a synchronous call
                     tnthAjax.setTablePreference(userId, this.tableIdentifier, {
-                        "data": JSON.stringify(data)
-                    });
+                        "data": JSON.stringify(data),
+                        "sync": true
+                    }, callback);
                     this.currentTablePreference = data;
                 }
             },
