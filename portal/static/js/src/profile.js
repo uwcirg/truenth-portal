@@ -3353,6 +3353,9 @@ export default (function() {
                 if (!this.hasSubStudySubjectOrgs()) {
                     return false;
                 }
+                // no user email
+                if (this.userHasNoEmail()) return false;
+            
                 //adding a test substudy consent should only be allowed in Test environment
                 if (!this.isTestEnvironment()) {
                     //allowed in non-Test environment based on additional check, e.g. user role, patient role, config etc.
