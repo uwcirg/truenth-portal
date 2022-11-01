@@ -1321,9 +1321,11 @@ export default (function() {
                     let seletElement = $(
                       "#treatingClinicianContainer .select-list #clinicianSelector"
                     );
+                    seletElement.find("option").remove();
                     seletElement.append(
                       `<option value="">-- ${i18next.t("Add a Clinician")} --</option>`
                     );
+                    // populate list with available clinicians
                     (data.entry).forEach(item => {
                         let cloneItem = JSON.parse(JSON.stringify(item));
                         let isPI = item.identifier.filter(i => {
