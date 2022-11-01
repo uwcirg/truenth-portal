@@ -1293,9 +1293,14 @@ export default (function() {
                     postData.careProvider = filteredSet;
                 }
                 postData.careProvider = [...postData.careProvider, ...this.selectedClinicians];
+                var selectorElement = $("#clinicianSelector");
+                // disabled selector while clinician is being added/removed
+                selectorElement.attr("disabled", true);
                 this.postDemoData($("#treatingClinicianContainer"), postData, () => {
                     /* reset selector value */
-                    $("#clinicianSelector").val("");
+                    selectorElement.val("");
+                    // re-enable selector after data is updated
+                    selectorElement.attr("disabled", false);
                     /*
                         * set research study status after clinician is set
                         */
