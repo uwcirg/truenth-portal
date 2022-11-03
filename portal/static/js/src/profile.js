@@ -244,7 +244,8 @@ export default (function() {
                         css: {"background-color": (index % 2 !== 0 ? "#F9F9F9" : "#FFF")}
                     };
                 }
-            }
+            },
+            updateInProgress: false
         },
         computed: {
             computedIsSubStudyPatient: function() {
@@ -1264,7 +1265,7 @@ export default (function() {
                 this.removeClinicians(targetValue);
             },
             removeClinicians: function(targetValue) {
-                if (!targetValue) return;
+                if (!targetValue || this.updateInProgress) return;
                 let targetIndex = -1;
                 this.selectedClinicians.forEach((item, index) => {
                     if (item.reference == targetValue) {
@@ -1293,9 +1294,13 @@ export default (function() {
                     postData.careProvider = filteredSet;
                 }
                 postData.careProvider = [...postData.careProvider, ...this.selectedClinicians];
+                // set update in progess flag while clinician is being added/removed
+                this.updateInProgress = true;
                 this.postDemoData($("#treatingClinicianContainer"), postData, () => {
                     /* reset selector value */
                     $("#clinicianSelector").val("");
+                    // re-set update in progress flag
+                    this.updateInProgress = false;
                     /*
                         * set research study status after clinician is set
                         */
@@ -1313,8 +1318,14 @@ export default (function() {
                         $("#treatingClinicianContainer .select-list-error").text(errorMessage);
                         return;
                     }
-                    let selectListHTML = `<select id="clinicianSelector" class="form-control">;
-                                            <option value="">-- ${i18next.t("Add a Clinician")} --</option>`;
+                    let seletElement = $(
+                      "#treatingClinicianContainer .select-list #clinicianSelector"
+                    );
+                    seletElement.find("option").remove();
+                    seletElement.append(
+                      `<option value="">-- ${i18next.t("Add a Clinician")} --</option>`
+                    );
+                    // populate list with available clinicians
                     (data.entry).forEach(item => {
                         let cloneItem = JSON.parse(JSON.stringify(item));
                         let isPI = item.identifier.filter(i => {
@@ -1324,11 +1335,8 @@ export default (function() {
                             /* gather a list of PI for use later */
                             self.PIList.push(cloneItem);
                         }
-                        selectListHTML += `<option value="${item.identifier[0].value}" ${isPI.length ? "data-pi": ""}>${item.name[0].given} ${item.name[0].family}</option>`
+                        seletElement.append(`<option value="${item.identifier[0].value}" ${isPI.length ? "data-pi" : ""}>${item.name[0].given} ${item.name[0].family}</option>`);
                     });
-                    selectListHTML += "</select>";
-
-                    $("#treatingClinicianContainer .select-list").append(selectListHTML);
                     $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
                         if ($(this).val() === "") {
                             $("#treatingClinicianContainer .select-list-error").text(i18next.t("You must select a clinician"));

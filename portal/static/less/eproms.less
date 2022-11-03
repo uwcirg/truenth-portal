@@ -430,6 +430,24 @@ a.btn {
   border-radius: 16px;
   margin-right: 12px;
   margin-bottom: 16px;
+  position: relative;
+  &::before {
+    z-index: -1;
+    display: none;
+  }
+  &.inactive:before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #FFF;
+    opacity: 0.4;
+    z-index: 100;
+    right: 0;
+    left: 0;
+  }
   .chip-content {
     align-items: center;
     display: inline-flex;
