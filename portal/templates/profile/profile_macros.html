@@ -980,7 +980,7 @@
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
                 </div>
-                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasSubStudyStatusErrors()">
+                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasPostTxQuestionnaireErrors()">
                     <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
                     <span v-html="getSubStudyStatusErrors()" ></span>
                 </div>
@@ -1002,13 +1002,14 @@
         {%- endcall %}
         {% call editSection() -%}
             <div id="treatingClinicianContainer" class="eproms-substudy" data-profile-section-id="treatingclinician">
-                <div class="select-list"></div>
+                <div class="select-list"><select id="clinicianSelector" class="form-control" :disabled="updateInProgress"></select></div>
                 {% raw %}
                     <div class="chips-list" v-if="selectedClinicians.length">
-                        <span class="chip clinician-item" v-for="(item, index) in selectedClinicians" :key="item.reference + index" :dataValue="item.reference" @click="removeClinicianEvent" :id="item.reference + '_chip'"
+                        <span class="chip clinician-item" v-bind:class="{inactive: updateInProgress}" v-for="(item, index) in selectedClinicians" :key="item.reference + index" :dataValue="item.reference" :id="item.reference + '_chip'"
                         >
                             <span class="chip-content">
-                                <button type="button" class="chip-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" class="v-icon__svg"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"></path></svg>
+                                <!-- delete botón is not shown for PI clinician -->
+                                <button type="button" class="chip-icon" v-show="!isPI(item.reference)" @click="removeClinicianEvent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" class="v-icon__svg"><path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"></path></svg>
                                 </button>
                                 <span v-text="item.display"></span>
                                 <span class="decorator-text" v-if="isPI(item.reference)" v-text="getPIIndicatorText()"></span>
