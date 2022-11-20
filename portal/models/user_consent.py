@@ -197,7 +197,7 @@ def consent_withdrawal_dates(user, research_study_id):
         return consent.acceptance_date, withdrawal_date
 
     # Look for withdrawn case.  If found, also look up the previous
-    # consent date (prior to withdrawn)
+    # consent date (prior to withdrawal)
 
     prior_acceptance = None
     for consent in user.all_consents:
@@ -211,6 +211,7 @@ def consent_withdrawal_dates(user, research_study_id):
                     "don't expect prior acceptance before withdrawal date")
         if consent.status == 'deleted' and withdrawal_date:
             prior_acceptance = consent.acceptance_date
-            break
+            # situation where consent date was changed before withdrawal
+            # requires we continue to look and use last found (don't break!)
 
     return prior_acceptance, withdrawal_date
