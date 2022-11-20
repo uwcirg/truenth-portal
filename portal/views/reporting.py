@@ -17,6 +17,7 @@ from ..date_tools import report_format
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
+from ..models.research_study import BASE_RS_ID
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
 from ..timeout_lock import LockTimeout, guarded_task_launch
@@ -130,7 +131,13 @@ def generate_EMPRO_overdue_table_html(overdue_stats, user, top_org):
 
     """
     rows = []
-    org_id, org_name = [i for i in overdue_stats if i[0] == top_org][0]
+    check = [i for i in overdue_stats if i[0] == top_org.id]
+    if not check:
+        raise ValueError(
+            f"no patient data for organization {top_org}; EMPRO overdue"
+            f" reports per leaf org, not parent.")
+
+    org_id, org_name = [i for i in overdue_stats if i[0] == top_org.id][0]
     od_tups = overdue_stats[(org_id, org_name)]
     for row in od_tups:
         rows.append(row)
@@ -161,8 +168,7 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
-    # TODO: handle research study id; currently only reporting on id==0
-    research_study_id = 0
+    research_study_id = BASE_RS_ID
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
         a_s = QB_Status(
