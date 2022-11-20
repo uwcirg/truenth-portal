@@ -1,4 +1,5 @@
 """Reporting statistics and data module"""
+import functools
 from collections import defaultdict, namedtuple
 from datetime import datetime
 from smtplib import SMTPRecipientsRefused
@@ -186,7 +187,6 @@ def adherence_report(
         data.append(row)
 
         # as we require a full history, continue to add rows for each previous
-        # visit available
         for qbd, status in qb_stats.older_qbds(last_viable):
             historic = row.copy()
             historic['status'] = status
@@ -365,8 +365,16 @@ def overdue_stats_by_org():
 
 
 EmproOverdueRow = namedtuple('EmproOverdueRow', [
-    'user_id', 'study_id', 'visit', 'status', 'completion_date',
-    'clinician', 'clinician_status', 'clinician_survey_completion_date'])
+    'user_id',
+    'study_id',
+    'clinician_status',
+    'clinician_survey_completion_date',
+    'clinician',
+    'status',
+    'completion_date',
+    'due_date',
+    'visit',
+])
 
 
 def empro_overdue_stats():
@@ -409,6 +417,7 @@ def empro_overdue_stats():
                     clinician_status="",
                     clinician_survey_completion_date="",
                     completion_date="",
+                    due_date="",
                     visit="",
                 )
             else:
@@ -419,6 +428,14 @@ def empro_overdue_stats():
                 # Initialize trigger states reporting for patient
                 ts_reporting = TriggerStatesReporting(patient_id=user.id)
                 t_status = ts_reporting.latest_action_state(visit_month)
+                clinician_status = t_status.title() if t_status else ""
+                if not clinician_status:
+                    if qb_stats.overall_status == OverallStatus.withdrawn:
+                        clinician_status = "Withdrawn"
+                    elif qb_stats.overall_status in (OverallStatus.due, OverallStatus.overdue):
+                        clinician_status = "EMPRO not yet completed"
+                    else:
+                        clinician_status = f"wtf {qb_stats.overall_status}"
 
                 row = EmproOverdueRow(
                     user_id=user.id,
@@ -427,15 +444,51 @@ def empro_overdue_stats():
                     status=str(qb_stats.overall_status),
                     completion_date=report_format(
                         qbd.completed_date(user.id)) or "",
+                    due_date=report_format(
+                        qbd.relative_start) or "",
                     clinician=';'.join(
                         clinician.display_name for clinician in
                         user.clinicians),
-                    clinician_status=t_status.title() if t_status else "",
+                    clinician_status=clinician_status,
                     clinician_survey_completion_date=report_format(
                         ts_reporting.resolution_authored_from_visit(
                             visit_month)) or ""
                 )
             overdue_stats[(org.id, org.name)].append(row)
+
+    def stat_compare(x, y):
+        """custom sort to keep overdue and due at top of list"""
+
+        ordered_stat_options = (
+            "overdue",
+            "required",
+            "due",
+            "completed",
+            "empro not yet completed",
+            "not applicable",
+            "",
+            "withdrawn")
+
+        try:
+            x_i = ordered_stat_options.index(x.clinician_status.lower())
+            y_i = ordered_stat_options.index(y.clinician_status.lower())
+        except ValueError:
+            raise ValueError(
+                f"{x.clinician_status} or {y.clinician_status} not expected")
+
+        if x_i == y_i:
+            return 0
+        if x_i < y_i:
+            return -1
+        return 1
+
+    # For each org, order rows by clinician status, with any `overdue`
+    # values coming first
+    for key in overdue_stats.keys():
+        items = overdue_stats[key]
+        overdue_stats[key] = sorted(
+            items, key=functools.cmp_to_key(stat_compare))
+
     return overdue_stats
 
 
