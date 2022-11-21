@@ -430,12 +430,12 @@ def empro_overdue_stats():
                 t_status = ts_reporting.latest_action_state(visit_month)
                 clinician_status = t_status.title() if t_status else ""
                 if not clinician_status:
-                    if qb_stats.overall_status == OverallStatus.withdrawn:
-                        clinician_status = "Withdrawn"
+                    if qb_stats.overall_status in (OverallStatus.withdrawn, OverallStatus.expired):
+                        clinician_status = str(qb_stats.overall_status)
                     elif qb_stats.overall_status in (OverallStatus.due, OverallStatus.overdue):
                         clinician_status = "EMPRO not yet completed"
                     else:
-                        clinician_status = f"wtf {qb_stats.overall_status}"
+                        raise ValueError(f"unexpected status {qb_stats.overall_status}")
 
                 row = EmproOverdueRow(
                     user_id=user.id,
@@ -466,6 +466,7 @@ def empro_overdue_stats():
             "completed",
             "empro not yet completed",
             "not applicable",
+            "expired",
             "",
             "withdrawn")
 
