@@ -111,7 +111,8 @@ def upgrade():
 
     patient_ids = []
     for patient_id in session.execute(
-            "SELECT DISTINCT(user_id) FROM trigger_states"):
+            "SELECT DISTINCT(user_id) FROM trigger_states JOIN users"
+            " ON users.id = user_id WHERE deleted_id IS NULL"):
         patient_ids.append(patient_id[0])
 
     corrections_needed = []
