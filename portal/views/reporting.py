@@ -135,7 +135,8 @@ def generate_EMPRO_overdue_table_html(overdue_stats, user, top_org):
     if not check:
         raise ValueError(
             f"no patient data for organization {top_org}; EMPRO overdue"
-            f" reports per leaf org, not parent.")
+            f" reports per leaf org, not parent."
+            f" Try one of {overdue_stats.keys()}")
 
     org_id, org_name = [i for i in overdue_stats if i[0] == top_org.id][0]
     od_tups = overdue_stats[(org_id, org_name)]
