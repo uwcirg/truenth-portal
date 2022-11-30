@@ -19,7 +19,7 @@ from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
 from .research_protocol import ResearchProtocol
-from .user_consent import latest_consent
+from .user_consent import consent_withdrawal_dates
 
 classification_types = ('baseline', 'recurring', 'indefinite', 'other')
 classification_types_enum = ENUM(
@@ -141,7 +141,7 @@ class QuestionnaireBank(db.Model):
 
         # enforce inability to handle multiple recurs per QB
         # If this is ever needed, several tables will need to
-        # retain the recur associated with the QB_id and iteration
+        # retain the recurrence associated with the QB_id and iteration
         if len(self.recurs) > 1:
             raise ValueError(
                 "System cannot handle multiple recurs per QB. "
@@ -338,11 +338,11 @@ def trigger_date(user, research_study_id, qb=None):
     trace("calculate trigger date (not currently cached)")
 
     def consent_date(user, research_study_id):
-        consent = latest_consent(user, research_study_id=research_study_id)
+        consent, _ = consent_withdrawal_dates(user, research_study_id=research_study_id)
         if consent:
             trace('found valid_consent with trigger_date {}'.format(
-                consent.acceptance_date))
-            return consent.acceptance_date
+                consent))
+            return consent
 
     def completed_global_date(user, consent_date):
         """EMPRO requires a global study completed w/i 4 weeks
