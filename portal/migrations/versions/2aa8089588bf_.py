@@ -10,6 +10,7 @@ from collections import OrderedDict, defaultdict
 from datetime import timedelta
 from sqlalchemy.orm import sessionmaker
 
+from portal.audit import Audit
 from portal.models.user import User, unchecked_get_user
 from portal.models.user_consent import consent_withdrawal_dates
 from portal.models.qb_timeline import update_users_QBT
@@ -77,12 +78,18 @@ def correct_visit(session, patient_id, visit_month):
                 f"UPDATE trigger_states SET visit_month = {desired_month} WHERE id = {row_id}"
             )
 
-        if False:
-            print(f"updating patient({patient_id}) trigger_states({row_id}): "
-                  f"from state {ts_results[row_id][0]}, "
-                  f"timestamp {ts_results[row_id][1]}, "
-                  f"visit_month {visit_month}")
-            print(stmt)
+        if True:
+            message = (
+                f"migration updating trigger_states({row_id}): "
+                f"from state {ts_results[row_id][0]}, "
+                f"timestamp {ts_results[row_id][1]}, "
+                f"visit_month {visit_month}")
+            aud = Audit(
+                comment=message,
+                user_id=patient_id,
+                subject_id=patient_id,
+                _context="assessment")
+            session.add(aud)
         session.execute(stmt)
 
 
@@ -118,6 +125,12 @@ def upgrade():
     corrections_needed = []
     due_dates = {}
     for patient_id in patient_ids:
+        # The following hardcoded user.ids require special handling. They
+        # lost a "completed" global status effecting their EMPRO trigger date,
+        # due to another issue.  See TN-3202 for details
+        if patient_id in (2904, 3015):
+            continue
+
         # Force a timeline clean up - found several out of sync, esp withdrawn
         purge_timeline(patient_id)
 
