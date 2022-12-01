@@ -519,7 +519,7 @@ def generate_and_send_summaries(org_id, research_study_id):
         org_ids_in_report = [i[0] for i in ostats.keys()]
 
         def staff_generator():
-            # Org centric report - yields each staff and org id as
+            # Org centric report - yields each staff and org as
             # each email is specific to one site
             from ..views.clinician import clinician_query
             sys = User.query.filter_by(email='__system__').one()
@@ -528,7 +528,7 @@ def generate_and_send_summaries(org_id, research_study_id):
                 staff_users = clinician_query(
                     acting_user=sys, org_filter=[org_id], include_staff=True)
                 for user in staff_users:
-                    yield user, org_id
+                    yield user, Organization.query.get(org_id)
 
     else:
         raise ValueError(f"unknown research study {research_study_id}")
@@ -542,7 +542,7 @@ def generate_and_send_summaries(org_id, research_study_id):
     name_key = SiteSummaryEmail_ATMA.name_key(
         org=top_org.name, research_study=research_study_id)
 
-    for staff_user, org_id in staff_generator():
+    for staff_user, child_org in staff_generator():
         if not(
                 staff_user.email_ready()[0] and
                 top_org in ot.find_top_level_orgs(staff_user.organizations)):
@@ -553,7 +553,7 @@ def generate_and_send_summaries(org_id, research_study_id):
             args['eproms_site_summary_table'] = html_generation_function(
                 overdue_stats=ostats,
                 user=staff_user,
-                top_org=org_id or top_org,
+                top_org=child_org or top_org,
             )
         summary_email = MailResource(
             app_text(name_key), locale_code=staff_user.locale_code,
