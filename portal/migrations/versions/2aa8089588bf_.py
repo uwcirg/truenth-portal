@@ -156,10 +156,17 @@ def upgrade():
             "WHERE research_study_id = 1 AND status = 'due' "
             f"AND qb_iteration IS NOT NULL AND user_id = {patient_id}")}
         # add baseline
-        start_dates[-1] = session.execute(
+        baseline = session.execute(
             "SELECT at FROM qb_timeline WHERE research_study_id = 1 AND "
             "status = 'due' AND qb_iteration IS NULL "
-            f"AND user_id = {patient_id}").first()[0]
+            f"AND user_id = {patient_id}").first()
+        if not baseline:
+            # Test users without a clinician don't have a timeline
+            patient = unchecked_get_user(patient_id)
+            if next(patient.clinicians, None):
+                raise RuntimeError(f"{patient_id} doesn't have a baseline due date?")
+            continue
+        start_dates[-1] = baseline[0]
 
         for visit_month, rows in ts_by_visit.items():
             for row in rows:
