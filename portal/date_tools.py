@@ -34,6 +34,13 @@ def as_fhir(obj):
     return obj
 
 
+def report_format(value):
+    """None safe helper to generate consistent formatted datetime strings"""
+    if value is None:
+        return
+    return value.strftime("%d-%b-%Y %H:%M:%S")
+
+
 class FHIR_datetime(object):
     """Utility class/namespace for working with FHIR datetimes"""
 

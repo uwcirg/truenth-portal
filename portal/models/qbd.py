@@ -165,4 +165,4 @@ class QBD(object):
             else:
                 actual = max(candidate, actual)
 
-        return actual or ''
+        return actual

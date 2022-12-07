@@ -13,9 +13,11 @@ from flask import (
 )
 from flask_user import roles_required
 
+from ..date_tools import report_format
 from ..extensions import oauth
 from ..models.organization import Organization, OrgTree
 from ..models.qb_status import QB_Status
+from ..models.research_study import BASE_RS_ID
 from ..models.role import ROLE
 from ..models.user import current_user, patients_query
 from ..timeout_lock import LockTimeout, guarded_task_launch
@@ -23,31 +25,55 @@ from ..timeout_lock import LockTimeout, guarded_task_launch
 reporting_api = Blueprint('reporting', __name__)
 
 
-@reporting_api.route('/admin/overdue-table')
+@reporting_api.route('/admin/overdue-table/<int:organization_id>')
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
-def overdue_table(top_org=None):
+def overdue_table(organization_id):
     """View for staff access to generated email content
 
-    Typically called by scheduled job, expected this view is only
-    used for debugging & QA
+    Only for debugging & QA - scheduled jobs generate and send
+    such reports at regular intervals.
 
     The included patients depends on current user's organization
     affiliation, including all patients at and below any level of the
-    organization tree for which the current user has access.  Further
-    limited to the patients below top_org, if defined.
+    organization tree for which the current user has access, at or below
+    given organization_id.
 
-    :param org_id: Top level organization ID to test
+    :param organization_id: Top level organization ID to test
     :returns: html content typically sent directly to site resource
 
     """
     from ..models.reporting import overdue_stats_by_org
-    if not top_org:
-        org_id = request.args.get('org_id', 0)
-        top_org = Organization.query.get_or_404(org_id)
+    top_org = Organization.query.get_or_404(organization_id)
 
     return generate_overdue_table_html(
         overdue_stats=overdue_stats_by_org(),
+        user=current_user(), top_org=top_org)
+
+
+@reporting_api.route('/admin/empro-overdue-table/<int:organization_id>')
+@roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
+@oauth.require_oauth()
+def empro_overdue_table(organization_id):
+    """View for staff access to generated email content
+
+    Only for debugging & QA - scheduled jobs generate and send
+    such reports at regular intervals.
+
+    The included patients depends on current user's organization
+    affiliation, including all patients at and below any level of the
+    organization tree for which the current user has access, at or below
+    given organization_id.
+
+    :param organization_id: Top level organization ID to test
+    :returns: html content typically sent directly to site resource
+
+    """
+    from ..models.reporting import empro_overdue_stats
+    top_org = Organization.query.get_or_404(organization_id)
+
+    return generate_EMPRO_overdue_table_html(
+        overdue_stats=empro_overdue_stats(),
         user=current_user(), top_org=top_org)
 
 
@@ -83,11 +109,42 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
         for user_id, study_id, visit_name, due_date, expired_date in od_tups:
             rows.append((
                 site_spacer, user_id, study_id, visit_name,
-                due_date.strftime("%d-%b-%Y %H:%M:%S"),
-                expired_date.strftime("%d-%b-%Y %H:%M:%S")))
+                report_format(due_date),
+                report_format(expired_date)))
 
     return render_template(
         'site_overdue_table.html', rows=rows)
+
+
+def generate_EMPRO_overdue_table_html(overdue_stats, user, top_org):
+    """EMPRO specific overdue table generation.
+
+    :param overdue_stats: a dict keyed by
+     ``overdue_stats[(org_id, org_name)]``, and for each org, a list
+      of overdue patient namedtuples, respectively containing an
+      ``EmproOverdueRow`` instance
+    :param user: the user generating the table, necessary to determine
+      patient visibility
+    :param top_org: the specific organization to generate a report for
+
+    :returns: report in html
+
+    """
+    rows = []
+    check = [i for i in overdue_stats if i[0] == top_org.id]
+    if not check:
+        raise ValueError(
+            f"no patient data for organization {top_org}; EMPRO overdue"
+            f" reports per leaf org, not parent."
+            f" Try one of {overdue_stats.keys()}")
+
+    org_id, org_name = [i for i in overdue_stats if i[0] == top_org.id][0]
+    od_tups = overdue_stats[(org_id, org_name)]
+    for row in od_tups:
+        rows.append(row)
+
+    return render_template(
+        'empro_site_overdue_table.html', rows=rows, site=org_name)
 
 
 @reporting_api.route('/admin/overdue-numbers')
@@ -112,8 +169,7 @@ def generate_numbers():
         "User ID", "Email", "Questionnaire Bank", "Status",
         "Days Overdue", "Organization"))
 
-    # TODO: handle research study id; currently only reporting on id==0
-    research_study_id = 0
+    research_study_id = BASE_RS_ID
     for user in patients_query(
             acting_user=current_user(), include_test_role=False):
         a_s = QB_Status(

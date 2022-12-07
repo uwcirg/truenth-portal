@@ -1,0 +1,24 @@
+<table>
+    <thead>
+	    <tr>
+	        <th>{{ _("TrueNTH ID") }}</th>
+	        <th>{{ _("Subject ID") }}</th>
+            <th>{{ _("Clinician Action Status") }}</th>
+	        <th>{{ _("Clinician Survey Completion Date") }}</th>
+            <th>{{ _("Treating Clinician") }}</th>
+            <th>{{ _("EMPRO Questionnaire Status") }}</th>
+	        <th>{{ _("EMPRO Questionnaire Completion Date") }}</th>
+	        <th>{{ _("EMPRO Questionnaire Due Date") }}</th>
+	        <th style="min-width: 72px">{{ _("Visit") }}</th>
+	    </tr>
+    </thead>
+    <tbody>
+	    {% for row in rows %}
+	    <tr>
+	    	{% for cell in row %}
+	    	<td>{{ cell }}</td>
+	    	{% endfor %}
+	    </tr>
+	    {% endfor %}
+	</tbody>
+</table>

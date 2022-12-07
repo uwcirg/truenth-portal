@@ -231,6 +231,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=ce786cec-5eeb-9cd0-4b7e-a762b044415a",
+      "name": "site summary email EMPRO",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04",
       "name": "site summary email IRONMAN",
       "resourceType": "AppText"
