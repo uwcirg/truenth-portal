@@ -1,0 +1,26 @@
+# docker-compose ingress overrides for traefik
+---
+version: "3.9"
+services:
+  web:
+    labels:
+      - "traefik.enable=true"
+      # Traefik will route requests with Host matching the SERVER_NAME environment variable (see .env)
+      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.rule=Host(`${SERVER_NAME}`)"
+
+      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls=true"
+      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+    networks:
+      - ingress
+      # TODO rename to internal
+      # internal network
+      - default
+    environment:
+      PREFERRED_URL_SCHEME: https
+
+networks:
+  # ingress network
+  ingress:
+    name: external_web
+    external: "true"
