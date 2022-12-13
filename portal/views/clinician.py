@@ -15,15 +15,16 @@ from .crossdomain import crossdomain
 clinician_api = Blueprint('clinician_api', __name__)
 
 
-def clinician_query(acting_user, org_filter=None):
+def clinician_query(acting_user, org_filter=None, include_staff=False):
     """Builds a live query for all clinicians the acting user can view"""
+    roles = [ROLE.CLINICIAN.value, ROLE.PRIMARY_INVESTIGATOR.value]
+    if include_staff:
+        roles.append(ROLE.STAFF.value)
     query = User.query.join(UserRoles).filter(
         User.deleted_id.is_(None)).filter(
         UserRoles.user_id == User.id).join(Role).filter(
         UserRoles.role_id == Role.id).filter(
-        Role.name.in_((
-            ROLE.CLINICIAN.value,
-            ROLE.PRIMARY_INVESTIGATOR.value)))
+        Role.name.in_(roles))
 
     limit_to_orgs = org_restriction_by_role(acting_user, org_filter)
     if limit_to_orgs:

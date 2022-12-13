@@ -20,6 +20,8 @@ x-service-base: &service_base
 services:
   web:
     <<: *service_base
+    # TODO remove `ports` section
+    # NB `ports` now has its own override: docker-compose.static-ingress.yaml
     ports:
       - target: ${PORT:-8008}
         published: ${EXTERNAL_PORT:-8080}

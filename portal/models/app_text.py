@@ -342,13 +342,18 @@ class SiteSummaryEmail_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
-        # If there's an org specialized version, use it.
-        if kwargs.get('org'):
-            specialized = "site summary email {}".format(kwargs.get('org'))
+        # If there's a specialized version, use it.
+        tag = None
+        if kwargs.get('research_study'):
+            tag = "EMPRO"
+        elif kwargs.get('org'):
+            tag = kwargs.get('org')
 
-        query = AppText.query.filter_by(name=specialized)
-        if query.count() == 1:
-            return specialized
+        if tag:
+            specialized = f"site summary email {tag}"
+            query = AppText.query.filter_by(name=specialized)
+            if query.count() == 1:
+                return specialized
 
         return "site summary email"
 

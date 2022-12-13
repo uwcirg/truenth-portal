@@ -5,11 +5,25 @@
       "args": null,
       "id": 6,
       "kwargs": {
+        "research_study_id": 0,
         "org_id": 20000
       },
       "name": "IRONMAN site summary email",
       "resourceType": "ScheduledJob",
       "schedule": "r 20 * * 0",
+      "task": "send_questionnaire_summary"
+    },
+    {
+      "active": true,
+      "args": null,
+      "id": 6,
+      "kwargs": {
+        "research_study_id": 1,
+        "org_id": 20000
+      },
+      "name": "EMPRO site summary email",
+      "resourceType": "ScheduledJob",
+      "schedule": "r 20 20 * *",
       "task": "send_questionnaire_summary"
     },
     {
@@ -37,6 +51,7 @@
       "args": null,
       "id": 7,
       "kwargs": {
+        "research_study_id": 0,
         "org_id": 10000
       },
       "name": "TNGR site summary email",

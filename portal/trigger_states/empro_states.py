@@ -59,6 +59,9 @@ class EMPRO_state(StateMachine):
       - resolve: actions complete, nothing pending for trigger state
       - next_available: called once the next EMPRO cycle becomes available
 
+    NB: for "skipped" visits, we never transition out of `due`, but rather
+    update the visit_month.
+
     """
 
     # States
@@ -101,10 +104,32 @@ def users_trigger_state(user_id):
     return ts
 
 
+def lookup_visit_month(user_id, as_of_date):
+    """Helper to determine what visit month qb_timeline has for user"""
+    from ..models.qb_timeline import qb_status_visit_name
+    status = qb_status_visit_name(user_id, EMPRO_RS_ID, as_of_date)
+    visit_name = status['visit_name']
+    if visit_name is None:
+        return 0
+    one_index = int(visit_name.split()[1])
+    return one_index - 1
+
+
 def initiate_trigger(user_id):
     """Call when EMPRO becomes available for user or next is due"""
     ts = users_trigger_state(user_id)
     if ts.state == 'due':
+        # Possible the user took no action, as in skipped the last month
+        # (or multiple months may have been skipped if time-warping).
+        # If so, the visit_month and timestamp are updated on the last
+        # `due` row that was found above.
+        visit_month = lookup_visit_month(user_id, datetime.utcnow())
+        if ts.visit_month != visit_month:
+            current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
+            ts.visit_month = visit_month
+            ts.timestamp = datetime.utcnow()
+            db.session.commit()
+
         # Allow idempotent call - skip out if in correct state
         return ts
 

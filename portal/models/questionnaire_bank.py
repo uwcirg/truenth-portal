@@ -10,6 +10,7 @@ from ..cache import FIVE_MINS, TWO_HOURS, cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
+from ..trigger_states.models import TriggerState
 from .clinical_constants import CC
 from .fhir import bundle_results
 from .intervention import Intervention, INTERVENTION
@@ -19,7 +20,7 @@ from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
 from .research_protocol import ResearchProtocol
-from .user_consent import latest_consent
+from .user_consent import consent_withdrawal_dates
 
 classification_types = ('baseline', 'recurring', 'indefinite', 'other')
 classification_types_enum = ENUM(
@@ -141,7 +142,7 @@ class QuestionnaireBank(db.Model):
 
         # enforce inability to handle multiple recurs per QB
         # If this is ever needed, several tables will need to
-        # retain the recur associated with the QB_id and iteration
+        # retain the recurrence associated with the QB_id and iteration
         if len(self.recurs) > 1:
             raise ValueError(
                 "System cannot handle multiple recurs per QB. "
@@ -334,15 +335,16 @@ def trigger_date(user, research_study_id, qb=None):
     :return: UTC datetime for the given user / QB, or None if N/A
 
     """
+    from .qb_timeline import QBT
     from .research_study import EMPRO_RS_ID
     trace("calculate trigger date (not currently cached)")
 
     def consent_date(user, research_study_id):
-        consent = latest_consent(user, research_study_id=research_study_id)
+        consent, _ = consent_withdrawal_dates(user, research_study_id=research_study_id)
         if consent:
             trace('found valid_consent with trigger_date {}'.format(
-                consent.acceptance_date))
-            return consent.acceptance_date
+                consent))
+            return consent
 
     def completed_global_date(user, consent_date):
         """EMPRO requires a global study completed w/i 4 weeks
@@ -353,7 +355,6 @@ def trigger_date(user, research_study_id, qb=None):
           None
 
         """
-        from .qb_timeline import QBT
         four_weeks_back = consent_date - RelativeDelta(weeks=4)
         completed = QBT.query.filter(QBT.user_id == user.id).filter(
             QBT.status == 'completed').filter(
@@ -380,8 +381,37 @@ def trigger_date(user, research_study_id, qb=None):
             return None
         completed_global = completed_global_date(user, c_date)
         if not completed_global:
-            trace(
-                "no completed global study found, therefore not EMPRO ready")
+            # User didn't complete a global study within four weeks prior to
+            # their consent date.  BUT we may be looking this up at a later
+            # date.  In a situation in which, on initial consent, the above
+            # was true, and the next global visit hadn't started yet, the user
+            # could legitimately start their EMPRO.
+            #
+            # However, looking this up at a later date when the subsequent
+            # global visit is due, they would NOT be allowed to begin work
+            # on EMPRO, until that global visit was completed.
+            #
+            # Therefore, if they did start EMPRO before the subsequent became
+            # due, we can't move the trigger date, and must stick with the
+            # original.  Should there be any rows in trigger_states for the
+            # user prior to the subsequent global due date, use consent date.
+            next_global_due = QBT.query.filter(QBT.user_id == user.id).filter(
+                QBT.status == 'due').filter(
+                QBT.research_study_id == 0).filter(
+                QBT.at > c_date).order_by(QBT.at).with_entities(
+                QBT.at).first()
+            if not next_global_due:
+                # No subsequent found - N/A
+                return None
+            trigger_states = TriggerState.query.filter(
+                TriggerState.user_id == user.id).filter(
+                TriggerState.timestamp < next_global_due)
+
+            if trigger_states.count():
+                # Found subsequent global work due and EMPRO work commenced
+                # prior to the subsequent global, return consent date.
+                return c_date
+
             return None
         if completed_global < c_date:
             return c_date
