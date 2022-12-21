@@ -507,7 +507,7 @@ def generate_and_send_summaries(org_id, research_study_id):
             # email including all respective orgs for given user.
             for user in User.query.join(
                     UserRoles).join(Role).filter(
-                    Role.name.in_(ROLE.STAFF.value)).filter(
+                    Role.name == ROLE.STAFF.value).filter(
                     User.id == UserRoles.user_id).filter(
                     Role.id == UserRoles.role_id).filter(
                     User.deleted_id.is_(None)):
