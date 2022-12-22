@@ -114,15 +114,35 @@
   max-width: 100%;
   background-color: @defaultBackgroundColor;
   background-image: url('../img/header_background.jpg');
-  height: 135px;
+  height: 136px;
   background-size: cover;
   margin: 0;
-  padding: 30px;
+  padding: 16px 24px;
 }
 #tnthNavMainContainer {
-  max-width: 720px;
   position: relative;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  #tnthLogo {
+    flex: 1;
+  }
+  #tnthTopLinks {
+    width: 35%;
+  }
+  .spacer {
+    width: 35%;
+  }
+  .text-container {
+    color: #FFF;
+    display: none;
+  }
+  @media (min-width: 992px) {
+    .text-container {
+      display: block;
+    }
+  }
 }
 #tnthNavXs {
   display: none;
@@ -178,14 +198,14 @@
 }
 @media (min-width: 699px) {
   #tnthNavXs {
-    min-height: 72px;
+    min-height: 86px;
+    padding: 16px;
   }
 }
 
 /** Logo **/
 #tnthLogo {
-  width: 500px;
-  margin: 4px auto;
+  margin: 16px auto;
   transition: margin 10ms ease-in;
   text-align: center;
 }
@@ -205,17 +225,22 @@
   }
 }
 #tnthTopLinks {
-  position: absolute;
-  top: 0;
-  left: 0;
+  line-height: 1.65;
+  white-space: normal;
 }
 
 /** Buttons **/
 .tnth-btn-group {
   position: relative;
-  display: inline-block;
-  vertical-align: middle; // match .btn alignment given font-size hack above
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-left: 0.2em;
+}
+@media (min-width: 786px) {
+  .tnth-btn-group {
+    flex-direction: row;
+  }
 }
 .tnth-nav-btn {
   display: inline-block;
@@ -237,11 +262,20 @@
   }
 }
 #tnthUserBtn {
-padding: 0 6px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  .menu-text {
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .profile-img {
+    margin-left: 12px;
+  }
 }
 @media (min-width: 992px) {
   #tnthUserBtn {
-    padding: 0 14px 0 0;
+    padding: 0 16px 0 0;
     height: inherit;
   }
 }
@@ -353,6 +387,23 @@ padding: 0 6px;
 .welcome-text {
   display: block;
   margin: 0.2em 0;
+  white-space: normal;
+  word-break: break-word;
+  .prompt {
+    display: inline-block;
+  }
+}
+@media (min-width: 992px) {
+  .welcome-text {
+    .prompt {
+      display: block;
+    }
+  }
+}
+@media (min-width: 1600px) {
+  .welcome-text {
+    white-space: nowrap;
+  }
 }
 @media all and (-ms-high-contrast: none),(-ms-high-contrast: active) {
   /* IE10+ */
@@ -446,7 +497,7 @@ padding: 0 6px;
 #tnthNavXs {
   display: block;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   #tnthNavMain {
     display: block;
   }
@@ -460,19 +511,8 @@ padding: 0 6px;
   }
 }
 @media (min-width: 992px) {
-  #tnthNavMainContainer {
-    max-width: 940px;
-  }
   #tnthNavWrapper img {
     margin: 0 0.5em;
-    vertical-align: middle;
-  }
-}
-@media (min-width: 1220px) {
-  #tnthNavMainContainer {
-    max-width: 100%;
-  }
-  .welcome-text {
-    display: inline-block;
+    vertical-align: top;
   }
 }

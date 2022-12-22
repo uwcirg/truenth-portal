@@ -50,14 +50,6 @@
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
-            <div id="tnthLogo">
-                {% if enable_links %}<a href="{{PORTAL}}">{% endif %}
-                    <img class="tnth-topnav-wordmark" src="{{PORTAL}}/{{config.BANNER_LOGOS['desktop']}}" alt="{{_('TrueNTH logo')}}"/>
-                {% if enable_links %}</a>{% endif %}
-                {% if branded_logos %}
-                    <img src="{{ branded_logos[0] }}" alt="{{_('brand logo')}}"></img>
-                {% endif %}
-            </div>
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if user %}
@@ -100,24 +92,35 @@
                         </ul>
                         {% endif %}
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
-                            {% if enable_links %}&nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>{% endif %}
+                            {% if enable_links %}<span class="menu-text">{{ _("MENU") }}</span> <i class="fa fa-bars"></i>{% endif %}
                             <img class="profile-img" src="{{movember_profile}}" width="50" height="50" alt="{{_('Profile image')}}"/>
-                            {% if user.current_encounter().auth_method != 'url_authenticated' %}
-                                <span class="welcome-text portal-weak-auth-hide"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
-                            {% endif %}
-                            {% if config.DEBUG_TIMEOUTS %}({{ expires_in }} seconds remaining){% endif %}
                          </button>
-                            {% elif login_url %}<ul class="tnth-dropdown-menu" role="menu"><li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li></ul>
+                         <div class="text-container">
+                            {% if user.current_encounter().auth_method != 'url_authenticated' %}
+                                <span class="welcome-text portal-weak-auth-hide"><span class="prompt"><em>{{ _("Welcome") }}</em></span>{% if user.display_name != "Anonymous" %} {{ user.display_name }}{% endif %}</span>
+                            {% endif %}
+                            {% if config.DEBUG_TIMEOUTS %}<span class="debug-text">({{ expires_in }} seconds remaining)</span>{% endif %}
+                        </div>
+                        {% elif login_url %}<ul class="tnth-dropdown-menu" role="menu"><li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li></ul>
                         <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">{{ _("Welcome") }}</button>
                     {% endif %}
                 </div>
             </div>
+            <div id="tnthLogo">
+                {% if enable_links %}<a href="{{PORTAL}}">{% endif %}
+                    <img class="tnth-topnav-wordmark" src="{{PORTAL}}/{{config.BANNER_LOGOS['desktop']}}" alt="{{_('TrueNTH logo')}}"/>
+                {% if enable_links %}</a>{% endif %}
+                {% if branded_logos %}
+                    <img src="{{ branded_logos[0] }}" alt="{{_('brand logo')}}"></img>
+                {% endif %}
+            </div>
+            <div class="spacer"></div>
         </div>
     </div>
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">{{ _("MENU") }} <img src="{{movember_profile}}" width="45" height="45" class="profile-img" alt="{{_('Profile image')}}" /></div>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}"><span class="menu-text">{{ _("MENU") }}</span> <img src="{{movember_profile}}" width="45" height="45" class="profile-img" alt="{{_('Profile image')}}" /></div>
                 {% if enable_links %}<a id="tnthLogoXs" href="{{PORTAL}}" title="{{ _('Return to TrueNTH home') }}">{% endif %}
                 <img src="{{PORTAL}}/{{config.BANNER_LOGOS['mobile']}}" alt="{{_('TrueNTH logo')}}"/>
                 {% if enable_links %}</a>{% endif %}
