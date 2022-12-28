@@ -429,10 +429,9 @@ class User(db.Model, UserMixin):
     @property
     def valid_consents(self):
         """Access to consents that have neither been deleted or expired"""
-        now = datetime.utcnow()
         return [
             c for c in self._consents
-            if c.expires > now and c.deleted_id is None]
+            if c.deleted_id is None]
 
     @hybrid_property
     def clinicians(self):
@@ -2212,7 +2211,7 @@ def patients_query(
         consent_query = UserConsent.query.filter(and_(
             UserConsent.deleted_id.is_(None),
             UserConsent.research_study_id == research_study_id,
-            UserConsent.expires > datetime.utcnow()))
+        ))
         consented_users = [
             u.user_id for u in consent_query if u.staff_editable]
 
