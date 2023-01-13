@@ -931,18 +931,20 @@
                             v-if="item.type == 'boolean'">
                         <!-- open-choice (checkboxes) type answer -->
                         <div class="choices answer" v-if="item.type == 'open-choice'">
-                            <div class="choice" v-for="option in item.option">
-                                <input
-                                    type="checkbox"
-                                    :code="option.valueCoding.code"
-                                    :class="{other: /other/gi.test(option.valueCoding.display)}"
-                                    :dataType="item.type"
-                                    :linkId="item.linkId"
-                                    :value="option.valueCoding.display"
-                                    @change="onResponseChangeFieldEvent"
-                                >
-                                <span class="text" v-text="option.valueCoding.display"></span>
-                                <textarea
+                            <div v-for="option in item.option">
+                                <div class="choice">
+                                    <input
+                                        type="checkbox"
+                                        :code="option.valueCoding.code"
+                                        :class="{other: /other/gi.test(option.valueCoding.display)}"
+                                        :dataType="item.type"
+                                        :linkId="item.linkId"
+                                        :value="option.valueCoding.display"
+                                        @change="onResponseChangeFieldEvent"
+                                    >
+                                    <span class="text" v-text="option.valueCoding.display"></span>
+                                </div>
+                                 <textarea
                                     class="form-control addl-text other-text"
                                     dataType="string"
                                     :code="option.valueCoding.code"
