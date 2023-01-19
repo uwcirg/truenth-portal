@@ -3471,6 +3471,61 @@
     {
       "extension": [
         {
+          "timezone": "Africa/Johannesburg",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        },
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "af_ZA",
+                "display": "Afrikaans",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "xh_ZA",
+                "display": "Xhosa",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "zu_ZA",
+                "display": "Zulu",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        }
+      ],
+      "id": 146192,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-192"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Groote Schuur Hospital",
+      "partOf": {
+        "reference": "api/organization/27000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
