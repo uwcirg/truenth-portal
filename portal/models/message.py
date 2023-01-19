@@ -2,15 +2,18 @@
 
 from datetime import datetime
 from flask import current_app
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy.ext.hybrid import hybrid_property
 from textwrap import fill
 
 from flask_mail import Message, email_dispatched
 
+from .app_text import MailResource, app_text
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import mail
-from .user import INVITE_PREFIX, User
+from .organization import OrgTree
+from .user import INVITE_PREFIX, User, patients_query
 
 
 def log_message(message, app):
@@ -198,3 +201,46 @@ class EmailMessage(db.Model):
             'body': self.body, 'sent_at': self.sent_at,
             'user_id': self.user_id}
         return d
+
+
+class Newsletter(object):
+    """Manages compiling newsletter content and sending out.
+    """
+
+    def __init__(self, org_id, research_study_id, content_key):
+        self.org_id = org_id
+        self.research_study_id = research_study_id
+        self.content_key = content_key
+
+    def transmit(self):
+        acting_user = User.query.filter_by(email='__system__').one()
+        resource_url = app_text(self.content_key)
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=self.org_id) if self.org_id
+            else None)
+        error_emails = []
+        for patient in patients_query(
+                acting_user=acting_user,
+                research_study_id=self.research_study_id,
+                requested_orgs=requested_orgs):
+            if not patient.email_ready()[0]:
+                continue
+            item = MailResource(resource_url, patient.locale_code)
+            msg = EmailMessage(
+                subject=item.subject,
+                body=item.body,
+                recipients=patient.email,
+                sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                user_id=acting_user.id,
+                recipient_id=patient.id)
+            try:
+                msg.send_message()
+            except SMTPRecipientsRefused as exc:
+                current_app.logger.error(
+                    f"Error sending %s to %s: %s",
+                    self.content_key, patient.email, exc)
+                error_emails.append(patient.email)
+            db.session.add(msg)
+
+        db.session.commit()
+        return error_emails

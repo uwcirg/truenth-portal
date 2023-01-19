@@ -24,6 +24,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.message import Newsletter
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
@@ -233,6 +234,22 @@ def update_patients(patient_list, update_cache, queue_messages):
                         iteration_count=qbd.iteration)
 
             db.session.commit()
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def send_newsletter(**kwargs):
+    """Construct newsletter content and email out"""
+    org_id = kwargs['org_id']
+    research_study_id = kwargs['research_study_id']
+    nl = Newsletter(
+        org_id=kwargs['org_id'],
+        research_study_id=kwargs['research_study_id'],
+        content_key=kwargs['newsletter'])
+    error_emails = nl.transmit()
+    if error_emails:
+        return ('\nUnable to reach recipient(s): '
+                '{}'.format(', '.join(error_emails)))
 
 
 @celery.task(queue=LOW_PRIORITY)
