@@ -27,6 +27,19 @@
       "task": "send_questionnaire_summary"
     },
     {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "org_id": 22000,
+        "newsletter": "IRONMAN newsletter",
+        "research_study_id": 0
+      },
+      "name": "Send Newsletter",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "send_newsletter"
+    },
+    {
       "active": true,
       "args": null,
       "id": 4,
