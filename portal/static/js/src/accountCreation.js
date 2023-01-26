@@ -5,6 +5,10 @@ import SYSTEM_IDENTIFIER_ENUM from "./modules/SYSTEM_IDENTIFIER_ENUM.js";
 import OrgTool from "./modules/OrgTool.js";
 import ProcApp from "./modules/Procedures.js";
 import {CurrentUserObj} from "./mixins/CurrentUser.js";
+import {
+  REQUIRED_PI_ROLES,
+  REQUIRED_PI_ROLES_WARNING_MESSAGE,
+} from "./data/common/consts.js";
 
 (function() {
     var AccountCreationObj = window.AccountCreationObj = function (dependencies) { /*global $ tnthDates Utility*/
@@ -336,6 +340,17 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             }
         };
 
+        this.hasErrorText = function() {
+            var hasError = false;
+            $("#createProfileForm " + HELP_BLOCK_IDENTIFIER).each(function () {
+              if (hasError) {
+                return false;
+              }
+              hasError = $(this).text() !== "";
+            });
+            return hasError;
+        }
+
         this.__checkFields = function() {
            
             var hasError = false;
@@ -362,12 +377,7 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
 
             /* finally check fields to make sure there isn't error, e.g. due to validation error */
               if (!hasError) {
-                $("#createProfileForm " + HELP_BLOCK_IDENTIFIER).each(function() {
-                    if (hasError) {
-                        return false;
-                    }
-                    hasError = ($(this).text() !== "");
-                });
+                hasError = this.hasErrorText();
             }
 
             if (hasError) {
@@ -379,11 +389,20 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             return hasError;
         };
 
+
+        this.isRoleChecked = function(role) {
+            if (!role) return false;
+            return $(`#createProfileForm .input-role[data-role='${role}']`).is(
+              ":checked"
+            );
+        };
+
         this.initFieldEvents = function() {
             let self = this;
             Utility.convertToNumericField($("#date, #year, #phone, #altPhone"));
 
             $("#createProfileForm [required]").on("change", function() {
+                if (self.hasErrorText()) return;
                 $("#updateProfile").attr("disabled", false);
                 setTimeout(function() { self.clearError(); }, 600);
             });
@@ -395,6 +414,44 @@ import {CurrentUserObj} from "./mixins/CurrentUser.js";
             //clear error text when checkbox is checked
             $("#createProfileForm input[type='checkbox']").on("change", function() {
                 $(this).closest(".profile-section").find(HELP_BLOCK_IDENTIFIER).text("").removeClass("error-message");
+            });
+
+            $("#createProfileForm .input-role").on("change", function() {
+                // PI role checked
+                var primaryInvestatorRoleChecked = self.isRoleChecked(
+                  "primary_investigator"
+                );
+
+                if (!primaryInvestatorRoleChecked) {
+                    $(this)
+                    .closest(".profile-section")
+                    .find(HELP_BLOCK_IDENTIFIER)
+                    .text("")
+                    .removeClass("error-message");
+                    $("#updateProfile").attr("disabled", false);
+                    return;
+                }
+                var requiredRolesChecked = REQUIRED_PI_ROLES.filter((role) =>
+                  self.isRoleChecked(role)
+                ).length > 0;
+               
+                if (!requiredRolesChecked) {
+                  $(this)
+                    .closest(".profile-section")
+                    .find(HELP_BLOCK_IDENTIFIER)
+                    .html(REQUIRED_PI_ROLES_WARNING_MESSAGE)
+                    .addClass("error-message");
+                  $("#updateProfile").attr("disabled", true);
+                } else {
+                  $(this)
+                    .closest(".profile-section")
+                    .find(HELP_BLOCK_IDENTIFIER)
+                    .html("")
+                    .addClass("error-message");
+                  $("#updateProfile").attr("disabled", false);
+                }
+    
+                
             });
         };
 
