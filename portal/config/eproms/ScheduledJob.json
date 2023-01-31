@@ -19,11 +19,12 @@
       "id": 6,
       "kwargs": {
         "research_study_id": 1,
+        "run_dates": [15, 16, 17, 18, 19, 20, 21],
         "org_id": 20000
       },
       "name": "EMPRO site summary email",
       "resourceType": "ScheduledJob",
-      "schedule": "r 20 20 * *",
+      "schedule": "r 20 * * 1",
       "task": "send_questionnaire_summary"
     },
     {

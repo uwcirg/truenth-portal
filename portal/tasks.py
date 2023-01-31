@@ -335,6 +335,16 @@ def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
     research_study_id = kwargs['research_study_id']
+    run_dates = kwargs.get('run_dates')
+    if run_dates:
+        # Workaround to run only on certain dates, where cron syntax fails,
+        # such as "every 3rd monday".  Set crontab schedule to run every
+        # monday and restrict run_dates to 15..21
+        today = datetime.utcnow().day
+        if today not in run_dates:
+            # wrong week - skip out
+            return "run_dates suggest NOP this week"
+
     error_emails = generate_and_send_summaries(org_id, research_study_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '
