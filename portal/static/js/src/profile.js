@@ -2938,7 +2938,7 @@ export default (function() {
                 $(event.target).prop("checked", true);
                 return;
               }
-              // if primary investigator is checked
+              // if primary investigator is checked and all other roles are un-checked
               if ($(event.target).val() === "primary_investigator" &&
                   $(event.target).is(":checked")) {
                 if (piRoleChecked && !requiredRolesChecked) {
