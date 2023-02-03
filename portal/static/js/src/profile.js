@@ -2920,9 +2920,10 @@ export default (function() {
               var piRoleChecked = $(
                 "#rolesGroup [value='primary_investigator']"
               ).is(":checked");
-              var requiredRolesChecked = REQUIRED_PI_ROLES.filter((role) =>
-                $("#rolesGroup [value='" + role + "']").is(":checked")
-              ).length > 0;
+              var requiredRolesChecked =
+                REQUIRED_PI_ROLES.filter((role) =>
+                  $("#rolesGroup [value='" + role + "']").is(":checked")
+                ).length > 0;
               if (
                 $(event.target).is(":checked") ||
                 !piRoleChecked ||
@@ -2938,18 +2939,9 @@ export default (function() {
                 $(event.target).prop("checked", true);
                 return;
               }
-              // if primary investigator is checked and all other roles are un-checked
-              if ($("#rolesGroup [value='primary_investigator']").is(":checked")) {
-                if (piRoleChecked && !requiredRolesChecked) {
-                  // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
-                  $(".delete-roles-error").html(
-                    REQUIRED_PI_ROLES_WARNING_MESSAGE
-                  );
-                }
-              }
-                var visibleRoles = $(
-                  "#rolesGroup input:checkbox:checked:visible"
-                );
+              var visibleRoles = $(
+                "#rolesGroup input:checkbox:checked:visible"
+              );
               /*
                * check if a role is selected
                */
@@ -2961,6 +2953,21 @@ export default (function() {
                 $(event.target).prop("checked", true);
                 return false;
               }
+
+              // if primary investigator is checked and all other roles are un-checked
+              if (
+                $("#rolesGroup [value='primary_investigator']").is(":checked")
+              ) {
+                if (piRoleChecked && !requiredRolesChecked) {
+                  // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
+                  $(".delete-roles-error").html(
+                    REQUIRED_PI_ROLES_WARNING_MESSAGE
+                  );
+                  $("#rolesGroup [value='primary_investigator']").prop("checked", false);
+                  return;
+                }
+              }
+
               var isChecked = $(event.target).is(":checked");
               var changedRole = event.target.value;
               var roles = [];
@@ -3001,13 +3008,13 @@ export default (function() {
                     $(event.target),
                     function () {
                       $("#rolesGroup").removeClass("loading");
-                      setTimeout(function() {
+                      setTimeout(function () {
                         $("#rolesGroup [type='checkbox']").attr(
                           "disabled",
                           false
                         );
                       }, 250);
-                      
+
                       /*
                        * refresh user roles list since it has been uploaded
                        */
