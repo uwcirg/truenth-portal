@@ -2938,9 +2938,19 @@ export default (function() {
                 $(event.target).prop("checked", true);
                 return;
               }
-              var visibleRoles = $(
-                "#rolesGroup input:checkbox:checked:visible"
-              );
+              // if primary investigator is checked
+              if ($(event.target).val() === "primary_investigator" &&
+                  $(event.target).is(":checked")) {
+                if (piRoleChecked && !requiredRolesChecked) {
+                  // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
+                  $(".delete-roles-error").html(
+                    REQUIRED_PI_ROLES_WARNING_MESSAGE
+                  );
+                }
+              }
+                var visibleRoles = $(
+                  "#rolesGroup input:checkbox:checked:visible"
+                );
               /*
                * check if a role is selected
                */
@@ -2948,6 +2958,8 @@ export default (function() {
                 //make sure at least one role among role elements that are visible is selected
                 //admin, staff admin functionality
                 $(".put-roles-error").html("A role must be selected.");
+                // prevent the last role from being un-checked until user selects another
+                $(event.target).prop("checked", true);
                 return false;
               }
               var isChecked = $(event.target).is(":checked");
