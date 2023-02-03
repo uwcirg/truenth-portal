@@ -2939,8 +2939,7 @@ export default (function() {
                 return;
               }
               // if primary investigator is checked and all other roles are un-checked
-              if ($(event.target).val() === "primary_investigator" &&
-                  $(event.target).is(":checked")) {
+              if ($("#rolesGroup [value='primary_investigator']").is(":checked")) {
                 if (piRoleChecked && !requiredRolesChecked) {
                   // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
                   $(".delete-roles-error").html(
