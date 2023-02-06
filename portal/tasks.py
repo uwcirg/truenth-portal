@@ -24,6 +24,7 @@ from .factories.app import create_app
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.message import Newsletter
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
@@ -237,6 +238,22 @@ def update_patients(patient_list, update_cache, queue_messages):
 
 @celery.task(queue=LOW_PRIORITY)
 @scheduled_task
+def send_newsletter(**kwargs):
+    """Construct newsletter content and email out"""
+    org_id = kwargs['org_id']
+    research_study_id = kwargs['research_study_id']
+    nl = Newsletter(
+        org_id=kwargs['org_id'],
+        research_study_id=kwargs['research_study_id'],
+        content_key=kwargs['newsletter'])
+    error_emails = nl.transmit()
+    if error_emails:
+        return ('\nUnable to reach recipient(s): '
+                '{}'.format(', '.join(error_emails)))
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
 def send_queued_communications(**kwargs):
     """Look for communication objects ready to send"""
     send_messages(as_task=True)
@@ -318,6 +335,16 @@ def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
     research_study_id = kwargs['research_study_id']
+    run_dates = kwargs.get('run_dates')
+    if run_dates:
+        # Workaround to run only on certain dates, where cron syntax fails,
+        # such as "every 3rd monday".  Set crontab schedule to run every
+        # monday and restrict run_dates to 15..21
+        today = datetime.utcnow().day
+        if today not in run_dates:
+            # wrong week - skip out
+            return "run_dates suggest NOP this week"
+
     error_emails = generate_and_send_summaries(org_id, research_study_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '

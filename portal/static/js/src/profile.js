@@ -8,12 +8,14 @@ import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
 import {sortArrayByField} from "./modules/Utility.js";
 import {
-    EPROMS_SUBSTUDY_ID,
-    EPROMS_SUBSTUDY_TITLE,
-    EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-    EPROMS_SUBSTUDY_SHORT_TITLE,
-    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
-    EMPRO_TRIGGER_UNPROCCESSED_STATES
+  EPROMS_SUBSTUDY_ID,
+  EPROMS_SUBSTUDY_TITLE,
+  EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+  EPROMS_SUBSTUDY_SHORT_TITLE,
+  EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+  EMPRO_TRIGGER_UNPROCCESSED_STATES,
+  REQUIRED_PI_ROLES,
+  REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
 
 /*
@@ -2914,55 +2916,114 @@ export default (function() {
                 });
             },
             updateRolesData: function(event) {
-                var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
-                /*
-                 * check if a role is selected
-                 */
-                if (!visibleRoles.length) {
-                    //make sure at least one role among role elements that are visible is selected
-                    //admin, staff admin functionality
-                    $(".put-roles-error").html("A role must be selected.");
-                    return false;
+              // check required roles for PI role
+              var piRoleChecked = $(
+                "#rolesGroup [value='primary_investigator']"
+              ).is(":checked");
+              var requiredRolesChecked =
+                REQUIRED_PI_ROLES.filter((role) =>
+                  $("#rolesGroup [value='" + role + "']").is(":checked")
+                ).length > 0;
+              if (
+                $(event.target).is(":checked") ||
+                !piRoleChecked ||
+                requiredRolesChecked ||
+                REQUIRED_PI_ROLES.indexOf($(event.target).val()) === -1
+              ) {
+                $(".delete-roles-error").html("");
+              } else {
+                // not allow to continue if the PI role is checked but the other required roles, e.g. staff, aren't
+                $(".delete-roles-error").html(
+                  REQUIRED_PI_ROLES_WARNING_MESSAGE
+                );
+                $(event.target).prop("checked", true);
+                return;
+              }
+              var visibleRoles = $(
+                "#rolesGroup input:checkbox:checked:visible"
+              );
+              /*
+               * check if a role is selected
+               */
+              if (!visibleRoles.length) {
+                //make sure at least one role among role elements that are visible is selected
+                //admin, staff admin functionality
+                $(".put-roles-error").html("A role must be selected.");
+                // prevent the last role from being un-checked until user selects another
+                $(event.target).prop("checked", true);
+                return false;
+              }
+
+              // if primary investigator is checked and all other roles are un-checked
+              if (
+                $("#rolesGroup [value='primary_investigator']").is(":checked")
+              ) {
+                if (piRoleChecked && !requiredRolesChecked) {
+                  // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
+                  $(".delete-roles-error").html(
+                    REQUIRED_PI_ROLES_WARNING_MESSAGE
+                  );
+                  $("#rolesGroup [value='primary_investigator']").prop("checked", false);
+                  return;
                 }
-                var isChecked = $(event.target).is(":checked");
-                var changedRole = event.target.value;
-                var roles = [];
-                var self = this;
-                $(".put-roles-error").html("");
-                $("#rolesGroup").addClass("loading");
-                this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
-                    var dataRoles = [];
-                    if (data.roles) {
-                        dataRoles = data.roles.map(function(role) {
-                            return role.name;
-                        });
-                        if (!isChecked) {
-                            //removed from existing role list
-                            dataRoles = dataRoles.filter(function(role){
-                                return role !== changedRole;
-                            });
-                        } else {
-                            //combine checked role with existing roles
-                            dataRoles = [...dataRoles, changedRole];
-                            //remove duplicate role(s)
-                            dataRoles = dataRoles.filter(function(value, index) {
-                                return dataRoles.indexOf(value) === index;
-                            });
-                        }
+              }
+
+              var isChecked = $(event.target).is(":checked");
+              var changedRole = event.target.value;
+              var roles = [];
+              var self = this;
+              $(".put-roles-error").html("");
+              $("#rolesGroup").addClass("loading");
+              this.modules.tnthAjax.getRoles(
+                this.subjectId,
+                function (data) {
+                  var dataRoles = [];
+                  if (data.roles) {
+                    dataRoles = data.roles.map(function (role) {
+                      return role.name;
+                    });
+                    if (!isChecked) {
+                      //removed from existing role list
+                      dataRoles = dataRoles.filter(function (role) {
+                        return role !== changedRole;
+                      });
+                    } else {
+                      //combine checked role with existing roles
+                      dataRoles = [...dataRoles, changedRole];
+                      //remove duplicate role(s)
+                      dataRoles = dataRoles.filter(function (value, index) {
+                        return dataRoles.indexOf(value) === index;
+                      });
                     }
-                    roles = dataRoles.map(function(role) {
-                        return {
-                            "name": role
-                        }
-                    });
-                    self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
-                        $("#rolesGroup").removeClass("loading");
-                         /*
-                        * refresh user roles list since it has been uploaded
-                        */
-                        self.initUserRoles({clearCache: true});
-                    });
-                }, {"clearCache": true});
+                  }
+                  roles = dataRoles.map(function (role) {
+                    return {
+                      name: role,
+                    };
+                  });
+                  $("#rolesGroup [type='checkbox']").attr("disabled", true);
+                  self.modules.tnthAjax.putRoles(
+                    self.subjectId,
+                    { roles: roles },
+                    $(event.target),
+                    function () {
+                      $("#rolesGroup").removeClass("loading");
+                      setTimeout(function () {
+                        $("#rolesGroup [type='checkbox']").attr(
+                          "disabled",
+                          false
+                        );
+                      }, 250);
+
+                      /*
+                       * refresh user roles list since it has been uploaded
+                       */
+                      self.initUserRoles({ clearCache: true });
+                    }
+                  );
+                },
+                { clearCache: true }
+              );
             },
             updateRolesUI: function(roles) {
                 if (!roles) return;

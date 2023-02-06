@@ -21,6 +21,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=890f6204-2dc8-5a5c-617e-4933fab65353&editorUrl=true",
+      "name": "IRONMAN newsletter",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true",
       "name": "IRONMAN patient terms and conditions URL",
       "resourceType": "AppText"

@@ -771,6 +771,7 @@ def present_before_after_state(user_id, external_study_id, before_state):
             print(f"\t\t{item}")
             print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
 
+    return after_qnrs, after_timeline
 
 @app.cli.command()
 @click.option(
@@ -877,6 +878,10 @@ def preview_site_update(org_id, retired):
 
     # With new RP in place, cycle through patients, purge and
     # refresh timeline and QNR data, and report any diffs
+    total_qnrs, total_qnrs_assigned = 0, 0
+    total_qnrs_completed_b4, total_qnrs_completed_after = 0, 0
+    total_qbs_completed_b4, total_qbs_completed_after = 0, 0
+    patients_with_fewer_assigned = 0
     for patient in query:
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=patient.id,
@@ -885,9 +890,36 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-        present_before_after_state(
+        after_qnrs, after_timeline = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
+        total_qnrs += len(patient_state[patient.id]['qnrs'])
+        total_qbs_completed_b4 += len(
+            [1 for date_status in patient_state[patient.id]['timeline'].keys()
+             if date_status.endswith('Completed') and
+             not date_status.endswith('Partially Completed')])
+        total_qbs_completed_after += len(
+            [1 for date_status in after_timeline.keys()
+             if date_status.endswith('Completed') and
+             not date_status.endswith('Partially Completed')])
+        b4_total = sum(
+            [1 for qb_name in patient_state[patient.id]['qnrs'].values()
+             if qb_name[0] != "none of the above"])
+        total_qnrs_completed_b4 += b4_total
+        after_total = sum(
+            [1 for qb_name in after_qnrs.values()
+             if qb_name[0] != "none of the above"])
+        total_qnrs_completed_after += after_total
+        if b4_total != after_total:
+            patients_with_fewer_assigned += 1
 
+    print(f"{total_qnrs} QuestionnaireResponses for all patients in organization {org_id}")
+    print(organization.name)
+    print(f"  Patients in organization: {len(patient_state)}")
+    print(f"  Patients negatively affected by change: {patients_with_fewer_assigned}")
+    print(f"  Number of those QNRs assigned to a QB before RP change: {total_qnrs_completed_b4}")
+    print(f"  Number of those QNRs assigned to a QB after RP change: {total_qnrs_completed_after}")
+    print(f"  Number of QuestionnaireBanks completed before RP change: {total_qbs_completed_b4}")
+    print(f"  Number of QuestionnaireBanks completed after RP change: {total_qbs_completed_after}")
     # Restore organization to pre-test RPs
     db.session.delete(new_org_rp)
     db.session.commit()
