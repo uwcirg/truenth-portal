@@ -800,6 +800,15 @@ def present_before_after_state(user_id, external_study_id, before_state):
     from portal.dict_tools import dict_compare
     after_qnrs = QuestionnaireResponse.qnr_state(user_id)
     after_timeline = QBT.timeline_state(user_id)
+    qnrs_lost_reference = []
+
+    def visit_from_timeline(qb_name, qb_iteration, timeline_results):
+        """timeline results have computed visit name - quick lookup"""
+        #import pdb; pdb.set_trace()
+        for visit, name, iteration in timeline_results.values():
+            if qb_name == name and qb_iteration == iteration:
+                return visit
+        raise ValueError(f"no visit found for {qb_name}, {qb_iteration}")
 
     # Compare results
     added_q, removed_q, modified_q, same = dict_compare(
@@ -817,6 +826,16 @@ def present_before_after_state(user_id, external_study_id, before_state):
         for mod in sorted(modified_q):
             print(f"\t\t{mod} {modified_q[mod][1]} ==>"
                   f" {modified_q[mod][0]}")
+            # If the QNR previously had a reference QB and since
+            # lost it, capture for reporting.
+            if (
+                    modified_q[mod][1][0] != "none of the above" and
+                    modified_q[mod][0][0] == "none of the above"):
+                visit_name = visit_from_timeline(
+                    modified_q[mod][1][0],
+                    modified_q[mod][1][1],
+                    before_state["timeline"])
+                qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
     if added_t:
         print("\tAdditional timeline rows:")
         for item in sorted(added_t):
@@ -833,7 +852,8 @@ def present_before_after_state(user_id, external_study_id, before_state):
             print(f"\t\t{item}")
             print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
 
-    return after_qnrs, after_timeline
+    return after_qnrs, after_timeline, qnrs_lost_reference
+
 
 @app.cli.command()
 @click.option(
@@ -946,7 +966,7 @@ def preview_site_update(org_id, retired):
     total_qnrs, total_qnrs_assigned = 0, 0
     total_qnrs_completed_b4, total_qnrs_completed_after = 0, 0
     total_qbs_completed_b4, total_qbs_completed_after = 0, 0
-    patients_with_fewer_assigned = 0
+    patients_with_fewer_assigned = []
     for patient in query:
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=patient.id,
@@ -955,7 +975,7 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-        after_qnrs, after_timeline = present_before_after_state(
+        after_qnrs, after_timeline, qnrs_lost_reference = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
         total_qnrs += len(patient_state[patient.id]['qnrs'])
         total_qbs_completed_b4 += len(
@@ -975,16 +995,21 @@ def preview_site_update(org_id, retired):
              if qb_name[0] != "none of the above"])
         total_qnrs_completed_after += after_total
         if b4_total != after_total:
-            patients_with_fewer_assigned += 1
+            patients_with_fewer_assigned.append((patient.id, qnrs_lost_reference))
 
     print(f"{total_qnrs} QuestionnaireResponses for all patients in organization {org_id}")
     print(organization.name)
     print(f"  Patients in organization: {len(patient_state)}")
-    print(f"  Patients negatively affected by change: {patients_with_fewer_assigned}")
+    print(f"  Patients negatively affected by change: {len(patients_with_fewer_assigned)}")
     print(f"  Number of those QNRs assigned to a QB before RP change: {total_qnrs_completed_b4}")
     print(f"  Number of those QNRs assigned to a QB after RP change: {total_qnrs_completed_after}")
     print(f"  Number of QuestionnaireBanks completed before RP change: {total_qbs_completed_b4}")
     print(f"  Number of QuestionnaireBanks completed after RP change: {total_qbs_completed_after}")
+    print(" Details of patients having lost a QuestionnaireResponse association:")
+    for item in patients_with_fewer_assigned:
+        print(f"  Patient {item[0]}")
+        for qnr_deet in item[1]:
+            print(f"    visit: {qnr_deet[0]} questionnaire: {qnr_deet[1]}")
 
     # Restore organization to pre-test RPs
     if new_org_rp:
