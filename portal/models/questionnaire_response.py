@@ -276,12 +276,15 @@ class QuestionnaireResponse(db.Model):
             QuestionnaireResponse.subject_id == user_id).with_entities(
             QuestionnaireResponse.id,
             QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration)
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.document)
 
         return {
             f"qnr {qnr.id}":
-                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
-            qnr in qnrs}
+                [name_map[qnr.questionnaire_bank_id],
+                 qnr.qb_iteration,
+                 qnr.document["questionnaire"]["reference"].split("/")[-1]]
+            for qnr in qnrs}
 
     @property
     def document_identifier(self):
