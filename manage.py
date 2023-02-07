@@ -804,7 +804,6 @@ def present_before_after_state(user_id, external_study_id, before_state):
 
     def visit_from_timeline(qb_name, qb_iteration, timeline_results):
         """timeline results have computed visit name - quick lookup"""
-        #import pdb; pdb.set_trace()
         for visit, name, iteration in timeline_results.values():
             if qb_name == name and qb_iteration == iteration:
                 return visit
