@@ -546,14 +546,14 @@ def update_qnr_authored(qnr_id, authored, actor):
 @click.option(
     '--replacement',
     required=False,
-    help='email address of user taking this action, for audit trail'
+    help='JSON snippet for `answer` replacement.  Use --noop result as template'
 )
 @click.option(
     '--noop',
     is_flag=True,
     show_default=True,
     default=False,
-    help='no op, simply echo current value'
+    help='no op, echo current value for requested linkId'
 )
 @app.cli.command()
 def update_qnr(qnr_id, link_id, actor, noop, replacement):
@@ -564,7 +564,9 @@ def update_qnr(qnr_id, link_id, actor, noop, replacement):
 
     old_value = qnr.link_id(link_id)
     if noop:
-        print(f"'{json.dumps(old_value)}'")
+        if replacement:
+            raise ValueError("--noop & --replacement are mutually exclusive")
+        click.echo(f"'{json.dumps(old_value)}'")
         return
 
     new_value = json.loads(replacement)
@@ -591,7 +593,7 @@ def update_qnr(qnr_id, link_id, actor, noop, replacement):
         context="assessment",
         user_id=acting_user.id,
         subject_id=qnr.subject_id)
-    print(message)
+    click.echo(message)
 
 
 @click.option('--subject_id', type=int, multiple=True, help="Subject user ID", required=True)
