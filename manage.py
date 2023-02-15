@@ -495,8 +495,7 @@ def update_qnr_authored(qnr_id, authored, actor):
     """Modify authored date on given Questionnaire Response ID"""
     qnr = QuestionnaireResponse.query.get(qnr_id)
     if not qnr:
-        raise ValueError(
-            "Questionnaire Response {qnr_id} not found".format(qnr_id))
+        raise ValueError(f"Questionnaire Response {qnr_id} not found")
 
     acting_user = get_actor(actor, editable_ids=[qnr.subject_id])
     document = copy.deepcopy(qnr.document)
@@ -526,6 +525,67 @@ def update_qnr_authored(qnr_id, authored, actor):
         "{new_authored}".format(
             qnr_id=qnr_id, old_authored=old_authored,
             new_authored=new_authored))
+    auditable_event(
+        message=message,
+        context="assessment",
+        user_id=acting_user.id,
+        subject_id=qnr.subject_id)
+    print(message)
+
+
+@click.option('--qnr_id', help="Questionnaire Response ID", required=True)
+@click.option(
+    '--link_id',
+    required=True,
+    help="linkId to correct, format example: irondemog.27")
+@click.option(
+    '--actor',
+    required=True,
+    help='email address of user taking this action, for audit trail'
+)
+@click.option(
+    '--replacement',
+    required=False,
+    help='email address of user taking this action, for audit trail'
+)
+@click.option(
+    '--noop',
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help='no op, simply echo current value'
+)
+@app.cli.command()
+def update_qnr(qnr_id, link_id, actor, noop, replacement):
+    """Modify given linkId in given Questionnaire Response ID"""
+    qnr = QuestionnaireResponse.query.get(qnr_id)
+    if not qnr:
+        raise ValueError(f"Questionnaire Response {qnr_id} not found")
+
+    old_value = qnr.link_id(link_id)
+    if noop:
+        print(f"'{json.dumps(old_value)}'")
+        return
+
+    new_value = json.loads(replacement)
+    acting_user = get_actor(actor, editable_ids=[qnr.subject_id])
+    document = copy.deepcopy(qnr.document)
+    if set(old_value.keys()) != set(new_value.keys()):
+        raise ValueError("inconsistent dictionary keys; can't continue")
+    if old_value["text"] != new_value["text"]:
+        raise ValueError("question text doesn't match existing; can't continue")
+    if old_value["linkId"] != new_value["linkId"]:
+        raise ValueError("linkId doesn't match; can't continue")
+
+    questions = qnr.replace_link_id(link_id, new_value)
+    document["group"]["question"] = questions
+    qnr.document = document
+    assert qnr in db.session
+    db.session.commit()
+
+    message = (
+        f"Updated QNR {qnr_id} {link_id} answer from {old_value['answer']}"
+        f" to {new_value['answer']}")
     auditable_event(
         message=message,
         context="assessment",

@@ -385,6 +385,36 @@ class QuestionnaireResponse(db.Model):
 
         return results
 
+    def link_id(self, link_id):
+        """Return linkId JSON as defined in QuestionnaireResponse
+
+        :param link_id: i.e. irondemog_v3.10
+        :return: JSON for requested linkId
+        """
+        for question in self.document["group"]["question"]:
+            if question["linkId"] == link_id:
+                return question
+
+    def replace_link_id(self, link_id, replacement):
+        """Return modified questions for linkId with given JSON
+
+        NB the changes returned here must be assigned to a *copy* of
+        self.document["group"]["question"] in order to persist.  This
+        method does NOT modify the QNR.
+
+        :param link_id: i.e. irondemog_v3.10
+        :return: modified self.document["group"]["question"], with requested
+         replacement in place of existing for given linkId
+        """
+        questions = []
+        for question in self.document["group"]["question"]:
+            if question["linkId"] == link_id:
+                questions.append(replacement)
+                continue
+            questions.append(replacement)
+        assert len(questions) == len(self.document["group"]["question"])
+        return questions
+
     def as_sdc_fhir(self):
         """
         Return QuestionnaireResponse FHIR in structure expected by SDC $extract service
