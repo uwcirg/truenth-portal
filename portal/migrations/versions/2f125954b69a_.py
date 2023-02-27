@@ -84,7 +84,8 @@ def upgrade():
         "value as study_id from questionnaire_responses join "
         "user_identifiers on user_identifiers.user_id = subject_id join "
         "identifiers on user_identifiers.identifier_id = identifiers.id "
-        "where questionnaire_bank_id is not null and status = 'completed'"
+        "where questionnaire_bank_id is not null and "
+        "questionnaire_bank_id > 0 and status = 'completed'"
         "group by subject_id, study_id, qb_id, qb_iter, instrument "
         "having count(*) > 1 order by subject_id"))
 
