@@ -189,8 +189,10 @@ class QuestionnaireResponse(db.Model):
                     self.questionnaire_bank_id).filter(
                     QuestionnaireResponse.qb_iteration ==
                     self.qb_iteration).filter(
-                    QuestionnaireResponse.document['questionnaire']['reference'] ==
-                    self.document['questionnaire']['reference']).count()
+                    QuestionnaireResponse.document[
+                        ("questionnaire", "reference")
+                    ].astext == self.document['questionnaire']['reference']
+                ).count()
                 if count != 1:
                     current_app.logger.error(
                         "Second submission for an existing QNR dyad received."
