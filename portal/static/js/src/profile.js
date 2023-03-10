@@ -2352,6 +2352,9 @@ export default (function() {
             initAssessmentListSection: function() {
                 var self = this;
                 $("#assessmentListMessage").text(i18next.t("No questionnaire data found."));
+                //test/debug feature to allow time warping patient data
+                //non-production environment ONLY
+                self.initTimeWarpUI();
                 self.modules.tnthAjax.assessmentList(self.subjectId, {useWorker: true}, function(data) {
                     if (data.error) {
                         self.assessment.assessmentListError = i18next.t("Problem retrieving session data from server.");
@@ -2363,9 +2366,6 @@ export default (function() {
                     if (!entries || entries.length === 0) {
                         return false;
                     }
-                    //test/debug feature to allow time warping patient data
-                    //non-production environment ONLY
-                    self.initTimeWarpUI();
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
                         if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
