@@ -185,7 +185,7 @@ class QuestionnaireResponse(db.Model):
             # duplicate.  Ignore if we don't have a valid questionnaire bank
             if self.questionnaire_bank_id > 0:
                 query = db.session.query(QuestionnaireResponse).filter(
-                    QuestionnaireResponse.subject_id == self.subject.id).filter(
+                    QuestionnaireResponse.subject_id == self.subject_id).filter(
                     QuestionnaireResponse.questionnaire_bank_id ==
                     self.questionnaire_bank_id).filter(
                     QuestionnaireResponse.document[
