@@ -184,16 +184,20 @@ class QuestionnaireResponse(db.Model):
             # Generate an error for alerts, should this look to be a fresh
             # duplicate.  Ignore if we don't have a valid questionnaire bank
             if self.questionnaire_bank_id > 0:
-                count = db.session.query(QuestionnaireResponse).filter(
+                query = db.session.query(QuestionnaireResponse).filter(
+                    QuestionnaireResponse.subject_id == self.subject).filter(
                     QuestionnaireResponse.questionnaire_bank_id ==
                     self.questionnaire_bank_id).filter(
-                    QuestionnaireResponse.qb_iteration ==
-                    self.qb_iteration).filter(
                     QuestionnaireResponse.document[
                         ("questionnaire", "reference")
                     ].astext == self.document['questionnaire']['reference']
-                ).count()
-                if count != 1:
+                )
+                if self.qb_iteration is None:
+                    query = query.filter(QuestionnaireResponse.qb_iteration.is_(None))
+                else:
+                    query = query.filter(QuestionnaireResponse.qb_iteration == self.qb_iteration)
+
+                if query.count() != 1:
                     current_app.logger.error(
                         "Second submission for an existing QNR dyad received."
                         f" Patient: {self.subject_id}, QNR {self.id}"
