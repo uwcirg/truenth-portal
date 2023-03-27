@@ -534,7 +534,7 @@ def extract_observations(questionnaire_response_id, override_state=False):
                 f" enter_user_trigger_critical_section() {ts}")
 
         if not ts.state == 'inprocess':
-            raise RuntimeError(
+            raise ValueError(
                 f"invalid state; can't score: {qnr.subject_id}:{qnr.id}")
 
         qnr_json = qnr.as_sdc_fhir()
