@@ -506,8 +506,15 @@ def empro_staff_qbd_accessor(qnr):
     return qbd_accessor
 
 
-def extract_observations(questionnaire_response_id):
-    """Submit QNR to SDC service; store returned Observations"""
+def extract_observations(questionnaire_response_id, override_state=False):
+    """Submit QNR to SDC service; store returned Observations
+
+    :param questionnaire_response_id:  QNR to process
+    :param override_state: set to override transition exceptions.  This
+      is only used in exceptional cases, such as re-processing one that
+      was previously interrupted and left in the `inprocess` state.
+    :return: None
+    """
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
 
     # given asynchronous possibility, require user's EMPRO lock
@@ -515,15 +522,20 @@ def extract_observations(questionnaire_response_id):
             key=EMPRO_LOCK_KEY.format(user_id=qnr.subject_id), timeout=60):
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
-        sm.begin_process()
+        if not override_state:
+            sm.begin_process()
 
-        # Record the historical transition via insert, w/ qnr just in case
-        # SDC service isn't available, or some other exception
-        ts.questionnaire_response_id = qnr.id
-        ts.insert(from_copy=True)
-        current_app.logger.debug(
-            "persist-trigger_states-new from"
-            f" enter_user_trigger_critical_section() {ts}")
+            # Record the historical transition via insert, w/ qnr just in case
+            # SDC service isn't available, or some other exception
+            ts.questionnaire_response_id = qnr.id
+            ts.insert(from_copy=True)
+            current_app.logger.debug(
+                "persist-trigger_states-new from"
+                f" enter_user_trigger_critical_section() {ts}")
+
+        if not ts.state == 'inprocess':
+            raise ValueError(
+                f"invalid state; can't score: {qnr.subject_id}:{qnr.id}")
 
         qnr_json = qnr.as_sdc_fhir()
 
