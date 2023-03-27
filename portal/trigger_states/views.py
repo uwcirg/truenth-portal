@@ -1,11 +1,38 @@
-from flask import Blueprint, jsonify
-from .empro_states import users_trigger_state
+from flask import Blueprint, jsonify, make_response
+from flask_user import roles_required
+
+from .empro_states import extract_observations, users_trigger_state
 from .models import TriggerState
 from ..extensions import oauth
+from ..models.role import ROLE
 from ..models.user import get_user
 from ..views.crossdomain import crossdomain
 
 trigger_states = Blueprint('trigger_states', __name__)
+
+
+@trigger_states.route('/api/questionnaire_response/<int:qnr_id>/$rescore')
+@roles_required([ROLE.ADMIN.value])
+@oauth.require_oauth()
+def rescore_qnr(qnr_id):
+    """Backdoor to force a re-score of a questionnaire_response out of band.
+
+    Typically, a questionnaire response is scored (via SDC) when it is POSTed
+    to the system.  In the event of an exceptional state where one didn't
+    finish or get processed, this API will re-trigger the process.
+
+    NB, it is expected the user's most recent trigger state is stuck in
+    an `inprocess` state.  Exception will be raised if found to be otherwise.
+
+    :param qnr_id:  the questionnaire_response id to re-score.
+    :return: "success"
+    """
+    try:
+        extract_observations(
+            questionnaire_response_id=qnr_id, override_state=True)
+    except (AttributeError, ValueError) as err:
+        return make_response(f"ERROR: {err}", 500)
+    return make_response("success", 200)
 
 
 @trigger_states.route('/api/patient/<int:user_id>/triggers')
