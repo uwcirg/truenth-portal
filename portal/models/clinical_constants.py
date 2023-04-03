@@ -92,7 +92,7 @@ def parse_concepts(elements, system):
 
 def fetch_HL7_V3_Namespace(valueSet):
     """Pull and parse the published FHIR ethnicity namespace"""
-    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
+    src_url = 'http://hl7.org/fhir/STU3/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
         valueSet=valueSet)
     response = requests.get(src_url)
     return parse_concepts(response.json()['concept'],
