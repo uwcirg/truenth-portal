@@ -882,7 +882,8 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
     '--retired',
     required=True,
     help="datetime for site's current protocol expiration,"
-         " format example: 2019-04-09 15:14:43")
+         " format example: 2019-04-09 15:14:43  or the string 'none'"
+         " to generate patient differences without RP change")
 @app.cli.command()
 def preview_site_update(org_id, retired):
     """Preview Timeline changes for affected users
@@ -918,25 +919,27 @@ def preview_site_update(org_id, retired):
     for patient in query:
         patient_state[patient.id] = capture_patient_state(patient.id)
 
-    # Update the org's research protocol as requested - assume to the latest
-    previous_rp = organization.research_protocols[-1]
-    assert previous_rp.name == 'IRONMAN v3'
-    latest_rp = ResearchProtocol.query.filter(
-        ResearchProtocol.name == 'IRONMAN v5').one()
-    previous_org_rp = OrganizationResearchProtocol.query.filter(
-        OrganizationResearchProtocol.research_protocol_id ==
-        previous_rp.id).filter(
-        OrganizationResearchProtocol.organization_id == org_id).one()
-    previous_org_rp.retired_as_of = retired
-    new_org_rp = OrganizationResearchProtocol(
-        research_protocol=latest_rp,
-        organization=organization)
-    db.session.add(new_org_rp)
-    db.session.commit()
-    print(f"Extending Research Protocols for {organization}")
-    print(f"  - Adding RP {latest_rp.name}")
-    print(f"  - {previous_rp.name} now retired as of {retired}")
-    print("-"*80)
+    new_org_rp = None
+    if retired.lower() != 'none':
+        # Update the org's research protocol as requested - assume to the latest
+        previous_rp = organization.research_protocols[-1]
+        assert previous_rp.name == 'IRONMAN v3'
+        latest_rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'IRONMAN v5').one()
+        previous_org_rp = OrganizationResearchProtocol.query.filter(
+            OrganizationResearchProtocol.research_protocol_id ==
+            previous_rp.id).filter(
+            OrganizationResearchProtocol.organization_id == org_id).one()
+        previous_org_rp.retired_as_of = retired
+        new_org_rp = OrganizationResearchProtocol(
+            research_protocol=latest_rp,
+            organization=organization)
+        db.session.add(new_org_rp)
+        db.session.commit()
+        print(f"Extending Research Protocols for {organization}")
+        print(f"  - Adding RP {latest_rp.name}")
+        print(f"  - {previous_rp.name} now retired as of {retired}")
+        print("-"*80)
 
     # With new RP in place, cycle through patients, purge and
     # refresh timeline and QNR data, and report any diffs
@@ -982,6 +985,8 @@ def preview_site_update(org_id, retired):
     print(f"  Number of those QNRs assigned to a QB after RP change: {total_qnrs_completed_after}")
     print(f"  Number of QuestionnaireBanks completed before RP change: {total_qbs_completed_b4}")
     print(f"  Number of QuestionnaireBanks completed after RP change: {total_qbs_completed_after}")
+
     # Restore organization to pre-test RPs
-    db.session.delete(new_org_rp)
-    db.session.commit()
+    if new_org_rp:
+        db.session.delete(new_org_rp)
+        db.session.commit()
