@@ -553,10 +553,14 @@ class QNR_results(object):
             match, laps = None, 0
             for qbd in container:
                 if match:
-                    # once a match is found, only look ahead a
-                    # single QB for a second, overlapping match
+                    # due to the introduction of additional visits
+                    # from protocol changes, i.e. month 33 and 39 in v5
+                    # once a match is found allow look ahead for 3 QBs,
+                    # looking for a subsequent overlapping match.
+                    # such a protocol change generates the ordered array
+                    # [..., month36-v3, month33-v5, month36-v5, ...]
                     laps += 1
-                    if laps > 1:
+                    if laps > 3:
                         return match
                 qb_start = calc_and_adjust_start(
                     user=self.user,
