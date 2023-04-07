@@ -742,6 +742,11 @@ class QNR_indef_results(QNR_results):
     """
 
     def __init__(self, user, research_study_id, qb_id):
+        # define unused attributes from base class:
+        self.qb_ids = None
+        self.qb_iteration = None
+        self.ignore_iteration = None
+
         self.user = user
         self.research_study_id = research_study_id
         # qb_id is the current indef qb - irrelevant if done in previous
