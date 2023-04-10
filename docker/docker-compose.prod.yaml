@@ -54,6 +54,9 @@ services:
   celerybeat:
     restart: unless-stopped
 
+  sdc:
+    restart: unless-stopped
+
   redis:
     restart: unless-stopped
 
