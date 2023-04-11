@@ -56,6 +56,10 @@ services:
 
   sdc:
     restart: unless-stopped
+    healthcheck:
+      test:
+        wget --spider --quiet
+          http://localhost:5000
 
   redis:
     restart: unless-stopped
