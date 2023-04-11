@@ -264,6 +264,17 @@
       "resourceType": "ScheduledJob",
       "schedule": "1 4,10,16,22 * * *",
       "task": "process_triggers_task"
+    },
+    {
+      "active": false,
+      "args": null,
+      "kwargs": {
+        "exception_type": "ValueError"
+      },
+      "name": "Raise Background Exception",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "raise_background_exception_task"
     }
   ],
   "id": "SitePersistence v0.2",

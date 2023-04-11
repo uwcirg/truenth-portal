@@ -413,3 +413,14 @@ def process_triggers_task(**kwargs):
     # Include within function as not all applications include the blueprint
     from portal.trigger_states.empro_states import fire_trigger_events
     fire_trigger_events()
+
+
+@celery.task()
+@scheduled_task
+def raise_background_exception_task(**kwargs):
+    """Manually trigger to verify job raised exceptions are caught"""
+    if kwargs.get("exception_type") == "RuntimeError":
+        raise RuntimeError("intentional RuntimeError raised from task")
+    if kwargs.get("exception_type") == "ValueError":
+        raise ValueError("intentional ValueError raised from task")
+    raise Exception("intentional Exception raised from task")
