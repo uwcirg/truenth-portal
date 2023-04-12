@@ -509,6 +509,8 @@ class User(db.Model, UserMixin):
             self.otp_secret = secret
             db.session.commit()
 
+        current_app.logger.info(
+            f"generated 2FA {secret}:{token} for user {self.id}")
         return token
 
     def validate_otp(self, token):
