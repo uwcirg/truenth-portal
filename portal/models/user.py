@@ -487,14 +487,31 @@ class User(db.Model, UserMixin):
 
     def generate_otp(self):
         """Generate One Time Password for 2FA from user's otp_secret"""
-        if self.otp_secret is None:
-            self.otp_secret = generate_random_secret()
+
+        # having experienced random problems, regenerate if the token doesn't
+        # immediately work
+        secret = self.otp_secret or generate_random_secret()
+        while True:
+            token = otp.get_totp(
+                secret=secret,
+                token_length=self.TOTP_TOKEN_LEN,
+                interval_length=self.TOTP_TOKEN_LIFE)
+            if otp.valid_totp(
+                    token=token,
+                    secret=secret,
+                    token_length=self.TOTP_TOKEN_LEN,
+                    interval_length=self.TOTP_TOKEN_LIFE):
+                break
+            secret = generate_random_secret()
+
+        # persist if the secret had to be regenerated
+        if secret != self.otp_secret:
+            self.otp_secret = secret
             db.session.commit()
 
-        return otp.get_totp(
-            self.otp_secret,
-            token_length=self.TOTP_TOKEN_LEN,
-            interval_length=self.TOTP_TOKEN_LIFE)
+        current_app.logger.info(
+            f"generated 2FA {secret}:{token} for user {self.id}")
+        return token
 
     def validate_otp(self, token):
         assert(self.otp_secret)

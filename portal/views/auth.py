@@ -94,8 +94,8 @@ class KeyForm(FlaskForm):
                 user_id=user.id, subject_id=user.id)
         else:
             auditable_event(
-                message="FAILED 2FA verification", context="login",
-                user_id=user.id, subject_id=user.id)
+                message=f"FAILED 2FA verification {user.otp_secret}:{field}",
+                context="login", user_id=user.id, subject_id=user.id)
             raise ValidationError("Invalid access code")
 
 
