@@ -93,6 +93,13 @@ class KeyForm(FlaskForm):
                 message="Successful 2FA verification", context="login",
                 user_id=user.id, subject_id=user.id)
         else:
+            # Repeated failures for a few users, try again with the "window"
+            # parameter, designed to compensate for system clock skew:
+            if user.validate_otp(field.data, window=1):
+                auditable_event(
+                    message="Successful 2FA verification (window required)",
+                    context="login", user_id=user.id, subject_id=user.id)
+                return
             auditable_event(
                 message=f"FAILED 2FA verification {user.otp_secret}:{field}",
                 context="login", user_id=user.id, subject_id=user.id)
