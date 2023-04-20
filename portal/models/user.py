@@ -485,24 +485,51 @@ class User(db.Model, UserMixin):
     TOTP_TOKEN_LEN = 6
     TOTP_TOKEN_LIFE = 30*60
 
-    def generate_otp(self):
+    def generate_otp(self, clock=None):
         """Generate One Time Password for 2FA from user's otp_secret"""
-        if self.otp_secret is None:
-            self.otp_secret = generate_random_secret()
+
+        # having experienced random problems, regenerate if the token doesn't
+        # immediately work
+        secret = self.otp_secret or generate_random_secret()
+        while True:
+            token = otp.get_totp(
+                secret=secret,
+                token_length=self.TOTP_TOKEN_LEN,
+                interval_length=self.TOTP_TOKEN_LIFE,
+                clock=clock)
+            if otp.valid_totp(
+                    token=token,
+                    secret=secret,
+                    token_length=self.TOTP_TOKEN_LEN,
+                    interval_length=self.TOTP_TOKEN_LIFE,
+                    clock=clock):
+                break
+            secret = generate_random_secret()
+
+        # persist if the secret had to be regenerated
+        if secret != self.otp_secret:
+            self.otp_secret = secret
             db.session.commit()
 
-        return otp.get_totp(
-            self.otp_secret,
-            token_length=self.TOTP_TOKEN_LEN,
-            interval_length=self.TOTP_TOKEN_LIFE)
+        current_app.logger.info(
+            f"generated 2FA {secret}:{token} for user {self.id}")
+        return token
 
-    def validate_otp(self, token):
+    def validate_otp(self, token, window=0):
+        """validate One Time Password token
+
+        :param token: the 6 digit token sent to the user
+        :param window: optional parameter, to check the previous and next
+          number of "windows" of valid time.  Works around clock skew issues
+        :return: True if valid; False otherwise
+        """
         assert(self.otp_secret)
         valid = otp.valid_totp(
             token,
             self.otp_secret,
             token_length=self.TOTP_TOKEN_LEN,
-            interval_length=self.TOTP_TOKEN_LIFE)
+            interval_length=self.TOTP_TOKEN_LIFE,
+            window=window)
         if valid:
             # due to the long timeout window, a second request
             # for a code within the first few minutes will generate
