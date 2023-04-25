@@ -149,7 +149,7 @@ def upgrade():
     print(differences.getvalue())
     if purge_ids:
         print(f"purging duplicates: {purge_ids}")
-        conn.execute(f"delete from questionnaire_responses where id in ({''.join(str(i) for i in tuple(purge_ids))})")
+        conn.execute(f"delete from questionnaire_responses where id in ({','.join(str(i) for i in tuple(purge_ids))})")
     Session = sessionmaker()
     session = Session(bind=op.get_bind())
     for audit in audits:
