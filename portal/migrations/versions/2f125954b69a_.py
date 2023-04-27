@@ -149,7 +149,10 @@ def upgrade():
     print(differences.getvalue())
     if purge_ids:
         print(f"purging duplicates: {purge_ids}")
-        conn.execute(f"delete from questionnaire_responses where id in {tuple(purge_ids)}")
+        if len(purge_ids) > 1:
+            conn.execute(f"delete from questionnaire_responses where id in {tuple(purge_ids)}")
+        else:
+            conn.execute(f"delete from questionnaire_responses where id = {purge_ids[0]}")
     Session = sessionmaker()
     session = Session(bind=op.get_bind())
     for audit in audits:
