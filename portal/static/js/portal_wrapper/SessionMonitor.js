@@ -44,6 +44,17 @@ var SessionMonitorObj = function() { /* global $ */
                                 "X-CSRFToken": o
                             };
                         }
+                        // extra check to ensure that the user's session hasn't gone staled
+                        $.ajax("/api/me")
+                        .done(function() {
+                            console.log("user authorized");
+                        })
+                        .fail(function(xhr) {
+                            // user not authorized
+                            if (parseInt(xhr.status) === 401) {
+                                window.location = l.logoutUrl;
+                            }
+                        });
                         $.ajax(options);
                     },
                     setLogoutStorage: function() {
