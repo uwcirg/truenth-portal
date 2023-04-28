@@ -800,6 +800,14 @@ def present_before_after_state(user_id, external_study_id, before_state):
     from portal.dict_tools import dict_compare
     after_qnrs = QuestionnaireResponse.qnr_state(user_id)
     after_timeline = QBT.timeline_state(user_id)
+    qnrs_lost_reference = []
+
+    def visit_from_timeline(qb_name, qb_iteration, timeline_results):
+        """timeline results have computed visit name - quick lookup"""
+        for visit, name, iteration in timeline_results.values():
+            if qb_name == name and qb_iteration == iteration:
+                return visit
+        raise ValueError(f"no visit found for {qb_name}, {qb_iteration}")
 
     # Compare results
     added_q, removed_q, modified_q, same = dict_compare(
@@ -817,6 +825,16 @@ def present_before_after_state(user_id, external_study_id, before_state):
         for mod in sorted(modified_q):
             print(f"\t\t{mod} {modified_q[mod][1]} ==>"
                   f" {modified_q[mod][0]}")
+            # If the QNR previously had a reference QB and since
+            # lost it, capture for reporting.
+            if (
+                    modified_q[mod][1][0] != "none of the above" and
+                    modified_q[mod][0][0] == "none of the above"):
+                visit_name = visit_from_timeline(
+                    modified_q[mod][1][0],
+                    modified_q[mod][1][1],
+                    before_state["timeline"])
+                qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
     if added_t:
         print("\tAdditional timeline rows:")
         for item in sorted(added_t):
@@ -833,7 +851,8 @@ def present_before_after_state(user_id, external_study_id, before_state):
             print(f"\t\t{item}")
             print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
 
-    return after_qnrs, after_timeline
+    return after_qnrs, after_timeline, qnrs_lost_reference
+
 
 @app.cli.command()
 @click.option(
@@ -882,7 +901,8 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
     '--retired',
     required=True,
     help="datetime for site's current protocol expiration,"
-         " format example: 2019-04-09 15:14:43")
+         " format example: 2019-04-09 15:14:43  or the string 'none'"
+         " to generate patient differences without RP change")
 @app.cli.command()
 def preview_site_update(org_id, retired):
     """Preview Timeline changes for affected users
@@ -918,32 +938,34 @@ def preview_site_update(org_id, retired):
     for patient in query:
         patient_state[patient.id] = capture_patient_state(patient.id)
 
-    # Update the org's research protocol as requested - assume to the latest
-    previous_rp = organization.research_protocols[-1]
-    assert previous_rp.name == 'IRONMAN v3'
-    latest_rp = ResearchProtocol.query.filter(
-        ResearchProtocol.name == 'IRONMAN v5').one()
-    previous_org_rp = OrganizationResearchProtocol.query.filter(
-        OrganizationResearchProtocol.research_protocol_id ==
-        previous_rp.id).filter(
-        OrganizationResearchProtocol.organization_id == org_id).one()
-    previous_org_rp.retired_as_of = retired
-    new_org_rp = OrganizationResearchProtocol(
-        research_protocol=latest_rp,
-        organization=organization)
-    db.session.add(new_org_rp)
-    db.session.commit()
-    print(f"Extending Research Protocols for {organization}")
-    print(f"  - Adding RP {latest_rp.name}")
-    print(f"  - {previous_rp.name} now retired as of {retired}")
-    print("-"*80)
+    new_org_rp = None
+    if retired.lower() != 'none':
+        # Update the org's research protocol as requested - assume to the latest
+        previous_rp = organization.research_protocols[-1]
+        assert previous_rp.name == 'IRONMAN v3'
+        latest_rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'IRONMAN v5').one()
+        previous_org_rp = OrganizationResearchProtocol.query.filter(
+            OrganizationResearchProtocol.research_protocol_id ==
+            previous_rp.id).filter(
+            OrganizationResearchProtocol.organization_id == org_id).one()
+        previous_org_rp.retired_as_of = retired
+        new_org_rp = OrganizationResearchProtocol(
+            research_protocol=latest_rp,
+            organization=organization)
+        db.session.add(new_org_rp)
+        db.session.commit()
+        print(f"Extending Research Protocols for {organization}")
+        print(f"  - Adding RP {latest_rp.name}")
+        print(f"  - {previous_rp.name} now retired as of {retired}")
+        print("-"*80)
 
     # With new RP in place, cycle through patients, purge and
     # refresh timeline and QNR data, and report any diffs
     total_qnrs, total_qnrs_assigned = 0, 0
     total_qnrs_completed_b4, total_qnrs_completed_after = 0, 0
     total_qbs_completed_b4, total_qbs_completed_after = 0, 0
-    patients_with_fewer_assigned = 0
+    patients_with_fewer_assigned = []
     for patient in query:
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=patient.id,
@@ -952,7 +974,7 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-        after_qnrs, after_timeline = present_before_after_state(
+        after_qnrs, after_timeline, qnrs_lost_reference = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
         total_qnrs += len(patient_state[patient.id]['qnrs'])
         total_qbs_completed_b4 += len(
@@ -972,16 +994,23 @@ def preview_site_update(org_id, retired):
              if qb_name[0] != "none of the above"])
         total_qnrs_completed_after += after_total
         if b4_total != after_total:
-            patients_with_fewer_assigned += 1
+            patients_with_fewer_assigned.append((patient.id, qnrs_lost_reference))
 
     print(f"{total_qnrs} QuestionnaireResponses for all patients in organization {org_id}")
     print(organization.name)
     print(f"  Patients in organization: {len(patient_state)}")
-    print(f"  Patients negatively affected by change: {patients_with_fewer_assigned}")
+    print(f"  Patients negatively affected by change: {len(patients_with_fewer_assigned)}")
     print(f"  Number of those QNRs assigned to a QB before RP change: {total_qnrs_completed_b4}")
     print(f"  Number of those QNRs assigned to a QB after RP change: {total_qnrs_completed_after}")
     print(f"  Number of QuestionnaireBanks completed before RP change: {total_qbs_completed_b4}")
     print(f"  Number of QuestionnaireBanks completed after RP change: {total_qbs_completed_after}")
+    print(" Details of patients having lost a QuestionnaireResponse association:")
+    for item in patients_with_fewer_assigned:
+        print(f"  Patient {item[0]}")
+        for qnr_deet in item[1]:
+            print(f"    visit: {qnr_deet[0]} questionnaire: {qnr_deet[1]}")
+
     # Restore organization to pre-test RPs
-    db.session.delete(new_org_rp)
-    db.session.commit()
+    if new_org_rp:
+        db.session.delete(new_org_rp)
+        db.session.commit()

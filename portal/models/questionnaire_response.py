@@ -180,6 +180,28 @@ class QuestionnaireResponse(db.Model):
                 subject_id=self.subject_id, user_id=acting_user_id,
                 context='assessment', comment=msg)
             db.session.add(audit)
+            # TN-3140 multiple QNRs found for visit/questionnaire dyad
+            # Generate an error for alerts, should this look to be a fresh
+            # duplicate.  Ignore if we don't have a valid questionnaire bank
+            if self.questionnaire_bank_id > 0:
+                query = db.session.query(QuestionnaireResponse).filter(
+                    QuestionnaireResponse.subject_id == self.subject_id).filter(
+                    QuestionnaireResponse.questionnaire_bank_id ==
+                    self.questionnaire_bank_id).filter(
+                    QuestionnaireResponse.document[
+                        ("questionnaire", "reference")
+                    ].astext == self.document['questionnaire']['reference']
+                )
+                if self.qb_iteration is None:
+                    query = query.filter(QuestionnaireResponse.qb_iteration.is_(None))
+                else:
+                    query = query.filter(QuestionnaireResponse.qb_iteration == self.qb_iteration)
+
+                if query.count() != 1:
+                    current_app.logger.error(
+                        "Second submission for an existing QNR dyad received."
+                        f" Patient: {self.subject_id}, QNR {self.id}"
+                    )
 
     @staticmethod
     def purge_qb_relationship(
@@ -254,12 +276,15 @@ class QuestionnaireResponse(db.Model):
             QuestionnaireResponse.subject_id == user_id).with_entities(
             QuestionnaireResponse.id,
             QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration)
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.document)
 
         return {
             f"qnr {qnr.id}":
-                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
-            qnr in qnrs}
+                [name_map[qnr.questionnaire_bank_id],
+                 qnr.qb_iteration,
+                 qnr.document["questionnaire"]["reference"].split("/")[-1]]
+            for qnr in qnrs}
 
     @property
     def document_identifier(self):
@@ -553,10 +578,14 @@ class QNR_results(object):
             match, laps = None, 0
             for qbd in container:
                 if match:
-                    # once a match is found, only look ahead a
-                    # single QB for a second, overlapping match
+                    # due to the introduction of additional visits
+                    # from protocol changes, i.e. month 33 and 39 in v5
+                    # once a match is found allow look ahead for 3 QBs,
+                    # looking for a subsequent overlapping match.
+                    # such a protocol change generates the ordered array
+                    # [..., month36-v3, month33-v5, month36-v5, ...]
                     laps += 1
-                    if laps > 1:
+                    if laps > 3:
                         return match
                 qb_start = calc_and_adjust_start(
                     user=self.user,
@@ -738,6 +767,11 @@ class QNR_indef_results(QNR_results):
     """
 
     def __init__(self, user, research_study_id, qb_id):
+        # define unused attributes from base class:
+        self.qb_ids = None
+        self.qb_iteration = None
+        self.ignore_iteration = None
+
         self.user = user
         self.research_study_id = research_study_id
         # qb_id is the current indef qb - irrelevant if done in previous

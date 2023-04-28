@@ -1038,13 +1038,15 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         # For questionnaires with common instrument names that
                         # happen to fit in both QBs, need to now reassign the
                         # QB associations as the second is getting tossed
+                        use_qb_id = pending_qbts[last_posted_index].qb_id
+                        use_qb_iter = pending_qbts[last_posted_index].qb_iteration
                         changed = user_qnrs.reassign_qb_association(
                             existing={
                                 'qb_id': qbd.qb_id,
                                 'iteration': qbd.iteration},
                             desired={
-                                'qb_id': pending_qbts[last_posted_index].qb_id,
-                                'iteration': pending_qbts[last_posted_index].qb_iteration})
+                                'qb_id': use_qb_id,
+                                'iteration': use_qb_iter})
 
                         # IF the reassignment caused a change, AND the previous
                         # visit was in a partially_completed state AND the change
@@ -1053,11 +1055,30 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 changed and
                                 pending_qbts[-1].status == 'partially_completed'):
                             complete_date = user_qnrs.completed_date(
-                                pending_qbts[-1].qb_id,
-                                pending_qbts[-1].qb_iteration)
+                                use_qb_id,
+                                use_qb_iter)
                             if complete_date:
                                 pending_qbts[-1].at = complete_date
                                 pending_qbts[-1].status = 'completed'
+
+                        # IF the reassignment caused a change, the persisted
+                        # time from the first QB submission may be incorrect
+                        # as the questionnaire that uniquely identifies the
+                        # RP may have not been the first submission.
+                        if changed:
+                            # look back while still on correct visit for
+                            # an in_progress, fix time if necessary
+                            i = len(pending_qbts) - 1
+                            while i > 0:
+                                if not (
+                                        pending_qbts[i].qb_id == use_qb_id and
+                                        pending_qbts[i].qb_iteration == use_qb_iter):
+                                    break
+                                if pending_qbts[i].status == 'in_progress':
+                                    pending_qbts[i].at = user_qnrs.earliest_result(
+                                        use_qb_id, use_qb_iter)
+                                    break
+                                i -= 1
 
                         continue  # effectively removes the unwanted visit
                     else:
