@@ -195,6 +195,7 @@ class TriggerStatesReporting:
         # user didn't necessarily fill out next.  continue till another
         # submission of EMPRO is found, or default to now()
         visit = visit_month + 1
+        end_date = None
         while visit < self.MAX_VISIT:
             end_date = self.authored_from_visit(visit)
             visit += 1
