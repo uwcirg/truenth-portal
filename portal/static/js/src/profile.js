@@ -1757,6 +1757,9 @@ export default (function() {
                         $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
                         return;
                     }
+                    // disabled questions section to prevent user from submitting it again
+                    $(`${containerElementIdentifier} #questionsSection`).addClass("disabled");
+                    
                     setTimeout(function() {
                         location.reload();
                     }.bind(this), 2000);
