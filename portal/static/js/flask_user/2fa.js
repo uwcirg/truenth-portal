@@ -36,8 +36,9 @@ $(document).ready(function () {
     }
     return true;
   });
-
-  initRememberMeInputField();
+  if ($(".remember-me-container").length) {
+    initRememberMeInputField();
+  }
   $("#chkRememberMe").on("change", function () {
     if ($(this).is(":checked")) {
       setRememberMeInputValue();
