@@ -45,7 +45,7 @@ var SessionMonitorObj = function() { /* global $ */
                             };
                         }
                         // extra check to ensure that the user's session hasn't gone staled
-                        $.ajax("/api/me")
+                        $.ajax(__BASE_URL+"/api/me")
                         .done(function() {
                             console.log("user authorized");
                         })
