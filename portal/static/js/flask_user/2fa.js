@@ -12,6 +12,10 @@ $(document).ready(function () {
     } else {
       $("#resend_code").val("false");
     }
+    var currentValue = $("#faInput").val();
+    if (currentValue) {
+      $("#faInput").val(currentValue.trim());
+    }
     $(".buttons-container").addClass("loading");
     setTimeout(function () {
       $("#TwoFAForm").submit();

@@ -19,7 +19,7 @@ function getRememberMeInputId() {
 }
 function initRememberMeInputField() {
   var cookieValue = getRememberMeCookieValue() || "";
-  console.log("cookie value ", cookieValue);
+  console.log("2FA remember me cookie value: ", cookieValue);
   var rememberMeInputFieldName = getRememberMeInputId();
   if ($("[name='" + rememberMeInputFieldName + "]").length) {
     $("[name='" + rememberMeInputFieldName + "]").val(cookieValue);
