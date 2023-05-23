@@ -45,16 +45,19 @@ var SessionMonitorObj = function() { /* global $ */
                             };
                         }
                         // extra check to ensure that the user's session hasn't gone staled
-                        $.ajax(__BASE_URL+"/api/me")
-                        .done(function() {
-                            console.log("user authorized");
-                        })
-                        .fail(function(xhr) {
-                            // user not authorized
-                            if (parseInt(xhr.status) === 401) {
-                                window.location = l.logoutUrl;
-                            }
-                        });
+                        if (typeof CsrfTokenChecker !== "undefined") {
+                            // extra check to ensure that the user's session hasn't gone staled
+                            $.ajax(__BASE_URL+"/api/me")
+                            .done(function() {
+                                console.log("user authorized");
+                            })
+                            .fail(function(xhr) {
+                                // user not authorized
+                                if (parseInt(xhr.status) === 401) {
+                                    window.location = l.logoutUrl;
+                                }
+                            });
+                       }
                         $.ajax(options);
                     },
                     setLogoutStorage: function() {
