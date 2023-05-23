@@ -56,5 +56,6 @@
 {% endblock %}
 {% block additional_scripts -%}
 {{super()}}
+<script src="{{ url_for('static', filename='js/flask_user/utility.js') }}"></script>
 <script src="{{ url_for('static', filename='js/flask_user/login.js') }}"></script>
 {%- endblock %}
