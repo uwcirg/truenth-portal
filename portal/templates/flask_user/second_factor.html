@@ -4,10 +4,14 @@
     <h3 class="tnth-headline">{{ _("Two Factor Authentication") }}</h3>
     <p>{{ _("You should receive an email with a %(length)d digit code. Enter the code below and select 'validate'.", length=6) }}</p>
     <div class="row">
-        <div class="col-xs-6 col-sm-4 col-md-3">
+        <div class="col-xs-8 col-sm-6 col-md-6">
             <form id="TwoFAForm" action="{{ url_for('auth.two_factor_auth') }}" method="post">
                 {{ form.hidden_tag() }}
                 {{ render_field(form.key, label=" ", tabindex=5, id="faInput") }}
+                <div class="remember-me-container text-muted">
+                    <div><input type="checkbox" id="chkRememberMe"/></div>
+                    <div>{{_("Remember me on this browser (trusted devices only)")}}</div>
+                </div>
                 <div class="buttons-container">
                     <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                     <button id="submitValidationCode" type="button" class="btn btn-tnth-primary">{{ _("Validate Code") }}</button>
@@ -21,5 +25,6 @@
 {% endblock %}
 {% block additional_scripts -%}
     {{super()}}
+    <script src="{{ url_for('static', filename='js/flask_user/utility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/flask_user/2fa.js') }}"></script>
 {%- endblock %}
