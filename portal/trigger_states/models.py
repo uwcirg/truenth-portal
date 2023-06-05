@@ -231,7 +231,7 @@ class TriggerStatesReporting:
         if not ts or ts.triggers is None:
             return None
 
-        return ts.triggers['action_state']
+        return ts.triggers.get('action_state')
 
     def hard_triggers_for_visit(self, visit_month):
         """Return list of hard triggers for given visit month
