@@ -99,7 +99,8 @@ def adherence_report(
         d = {
             'user_id': patient.id,
             'country': patient.organizations[0].country,
-            'site': patient.organizations[0].name
+            'site': patient.organizations[0].name,
+            'site_code': patient.organizations[0].sitecode
         }
         study_id = patient.external_study_id
         if study_id:
@@ -232,7 +233,7 @@ def adherence_report(
         results['filename_prefix'] = base_name
         results['column_headers'] = [
             'user_id', 'study_id', 'status', 'visit', 'entry_method',
-            'country', 'site', 'consent', 'completion_date',
+            'country', 'site', 'site_code', 'consent', 'completion_date',
             'oow_completion_date']
         if research_study_id == EMPRO_RS_ID:
             results['column_headers'] = [
@@ -240,6 +241,7 @@ def adherence_report(
                 'study_id',
                 'country',
                 'site',
+                'site_code',
                 'visit',
                 'status',
                 'EMPRO_questionnaire_completion_date',
