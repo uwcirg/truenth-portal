@@ -102,7 +102,8 @@ def login_user(user, auth_method=None):
     if 'locale_code' in session:
         del session['locale_code']
 
-    # retain skip 2fa cookie value for subsequent login comparison (if set)
+    # now that login hurdles are clear, retain skip 2fa cookie value (if set)
+    skip_2fa_cookie = request.cookies.get("Truenth2FA_REMEMBERME")
     if skip_2fa_cookie:
         user.remember_me_cookie = skip_2fa_cookie
         db.session.commit()
