@@ -62,7 +62,12 @@ class TimeoutLock(object):
         # To avoid interrupting iterative lock use, return truthy
         # value to stop exception propagation - see PEP
         if exc_type is not None:
-            current_app.logger.error(f"{exc_type}: {exc_value}; {traceback}")
+            error_message = f"{exc_type}"
+            if exc_value:
+                error_message += f": {exc_value}"
+            if traceback:
+                error_message += f"; {traceback}"
+            current_app.logger.error(error_message)
         return True
 
     def is_locked(self):

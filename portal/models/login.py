@@ -38,6 +38,10 @@ def send_2fa_email(user):
 def user_requires_2fa(user):
     """Logic to determine if user requires 2FA at this time"""
     assert user
+    skip_2fa_cookie = request.cookies.get("Truenth2FA_REMEMBERME")
+    if skip_2fa_cookie and skip_2fa_cookie == user.remember_me_cookie:
+        return False
+
     return (
         current_app.config.get("ENABLE_2FA") and
         not current_app.testing and
@@ -66,7 +70,7 @@ def login_user(user, auth_method=None):
     authentication method.
 
     """
-    # beyond patients and care givers, 2FA is required.  confirm or initiate
+    # beyond patients and caregivers, 2FA is required.  confirm or initiate
     if user_requires_2fa(user):
         # log user back out, in case a flow already promoted them
         flask_user_logout()
@@ -97,3 +101,9 @@ def login_user(user, auth_method=None):
     # that we have a user.
     if 'locale_code' in session:
         del session['locale_code']
+
+    # now that login hurdles are clear, retain skip 2fa cookie value (if set)
+    skip_2fa_cookie = request.cookies.get("Truenth2FA_REMEMBERME")
+    if skip_2fa_cookie:
+        user.remember_me_cookie = skip_2fa_cookie
+        db.session.commit()
