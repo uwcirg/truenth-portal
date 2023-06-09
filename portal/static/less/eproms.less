@@ -4930,6 +4930,20 @@ input.clinic {
 }
 
 #TwoFAForm {
+  .form-group {
+      margin-bottom: 8px;
+   }
+   input[type=text] {
+      width: 200px;
+   }
+   .remember-me-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 32px;
+   }
   .buttons-container {
     position: relative;
     min-height: 56px;
@@ -4949,7 +4963,7 @@ input.clinic {
       display: none;
     }
     .btn {
-      width: 100%;
+      min-width: 200px;
     }
     &.loading {
       .loader {

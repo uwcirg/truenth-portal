@@ -210,6 +210,17 @@ class Organization(db.Model):
             self.default_locale_id = coding.id
 
     @property
+    def sitecode(self):
+        """Return site code identifier if found, else empty string"""
+        system = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+        sitecodes = [
+            id for id in self.identifiers if id.system == system]
+        if len(sitecodes) > 1:
+            raise ValueError(
+                "multiple site code identifiers for {}".format(self))
+        return sitecodes[0].value if sitecodes else ""
+
+    @property
     def shortname(self):
         """Return shortname identifier if found, else the org name"""
         shortnames = [

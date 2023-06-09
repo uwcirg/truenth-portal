@@ -313,6 +313,7 @@ class User(db.Model, UserMixin):
 
     # For 2FA
     otp_secret = db.Column(db.String(16), default=generate_random_secret)
+    remember_me_cookie = db.Column(db.String(), default=None)
 
     user_audits = db.relationship('Audit', cascade='delete',
                                   foreign_keys=[Audit.user_id])
