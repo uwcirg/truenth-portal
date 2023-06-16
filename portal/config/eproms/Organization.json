@@ -2275,7 +2275,8 @@
         },
         {
           "research_protocols": [
-            {"name": "IRONMAN v5"}
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}			
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
