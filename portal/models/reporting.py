@@ -191,6 +191,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     qbd = None
     if research_study_id == BASE_RS_ID:
         qbd, status = qb_stats.indef_status()
+<<<<<<< HEAD
     if qbd:
         rs_visit = "0:Indefinite"
         cached_data = AdherenceData.fetch(
