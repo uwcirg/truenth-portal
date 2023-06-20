@@ -13,6 +13,7 @@ from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime, report_format
 from ..trigger_states.models import TriggerStatesReporting
+from .adherence_data import AdherenceData
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -154,7 +155,9 @@ def adherence_report(
         row['clinician_status'] = (
             t_status.title() if t_status else "")
         row['clinician_survey_completion_date'] = (
-            ts_reporting.resolution_authored_from_visit(visit_month) or "")
+            report_format(
+                ts_reporting.resolution_authored_from_visit(visit_month))
+            or "")
         ht = ts_reporting.hard_triggers_for_visit(visit_month)
         row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
         st = ts_reporting.soft_triggers_for_visit(visit_month)
@@ -179,24 +182,44 @@ def adherence_report(
         last_viable = qb_stats.current_qbd(
             even_if_withdrawn=True) or qb_stats.prev_qbd
         if last_viable:
-            general_row_detail(row, patient, last_viable)
-            if research_study_id == EMPRO_RS_ID:
-                # Initialize trigger states reporting for patient
-                ts_reporting = TriggerStatesReporting(patient_id=patient.id)
-                empro_row_detail(row, ts_reporting)
+            rs_visit = AdherenceData.rs_visit_string(
+                research_study_id, visit_name(last_viable))
+            cached_data = AdherenceData.fetch(
+                patient_id=patient.id, rs_id_visit=rs_visit)
+            if not cached_data:
+                general_row_detail(row, patient, last_viable)
+                if research_study_id == EMPRO_RS_ID:
+                    # Initialize trigger states reporting for patient
+                    ts_reporting = TriggerStatesReporting(patient_id=patient.id)
+                    empro_row_detail(row, ts_reporting)
+                cached_data = AdherenceData.persist(
+                    patient_id=patient.id,
+                    rs_id_visit=rs_visit,
+                    valid_for_days=7,
+                    data=row)
 
-        data.append(row)
+        data.append(cached_data.data)
 
         # as we require a full history, continue to add rows for each previous
         for qbd, status in qb_stats.older_qbds(last_viable):
-            historic = row.copy()
-            historic['status'] = status
-            general_row_detail(historic, patient, qbd)
+            rs_visit = AdherenceData.rs_visit_string(
+                research_study_id, visit_name(qbd))
+            cached_data = AdherenceData.fetch(
+                patient_id=patient.id, rs_id_visit=rs_visit)
+            if not cached_data:
+                historic = row.copy()
+                historic['status'] = status
+                general_row_detail(historic, patient, qbd)
 
-            if research_study_id == EMPRO_RS_ID:
-                empro_row_detail(historic, ts_reporting)
+                if research_study_id == EMPRO_RS_ID:
+                    empro_row_detail(historic, ts_reporting)
+                cached_data = AdherenceData.persist(
+                    patient_id=patient.id,
+                    rs_id_visit=rs_visit,
+                    valid_for_days=500,
+                    data=row)
 
-            data.append(historic)
+            data.append(cached_data.data)
 
         # if user is eligible for indefinite QB, add status
         qbd, status = qb_stats.indef_status()
