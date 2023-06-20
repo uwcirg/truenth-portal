@@ -224,23 +224,33 @@ def adherence_report(
         # if user is eligible for indefinite QB, add status
         qbd, status = qb_stats.indef_status()
         if qbd:
-            indef = row.copy()
-            indef['status'] = status
-            # Indefinite doesn't have a row in the timeline, look
-            # up matching date from QNRs
-            indef['completion_date'] = (
-                report_format(qbd.completed_date(patient.id))
-                if status == 'Completed' else '')
-            indef["oow_completion_date"] = ""
-            indef['qb'] = qbd.questionnaire_bank.name
-            indef['visit'] = "Indefinite"
-            entry_method = QNR_results(
-                patient,
-                research_study_id=research_study_id,
-                qb_ids=[qbd.qb_id],
-                qb_iteration=qbd.iteration).entry_method()
-            indef['entry_method'] = entry_method if entry_method else ""
-            data.append(indef)
+            rs_visit = "0:Indefinite"
+            cached_data = AdherenceData.fetch(
+                patient_id=patient.id, rs_id_visit=rs_visit)
+
+            if not cached_data:
+                indef = row.copy()
+                indef['status'] = status
+                # Indefinite doesn't have a row in the timeline, look
+                # up matching date from QNRs
+                indef['completion_date'] = (
+                    report_format(qbd.completed_date(patient.id))
+                    if status == 'Completed' else '')
+                indef["oow_completion_date"] = ""
+                indef['qb'] = qbd.questionnaire_bank.name
+                indef['visit'] = "Indefinite"
+                entry_method = QNR_results(
+                    patient,
+                    research_study_id=research_study_id,
+                    qb_ids=[qbd.qb_id],
+                    qb_iteration=qbd.iteration).entry_method()
+                indef['entry_method'] = entry_method if entry_method else ""
+                cached_data = AdherenceData.persist(
+                    patient_id=patient.id,
+                    rs_id_visit=rs_visit,
+                    valid_for_days=500,
+                    data=indef)
+            data.append(cached_data.data)
 
     results = {
         'data': data,
