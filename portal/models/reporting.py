@@ -35,6 +35,7 @@ from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
+<<<<<<< HEAD
 def single_patient_adherence_data(patient, as_of_date, research_study_id):
     """Update any missing (from cache) adherence data for patient
 
@@ -128,6 +129,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
     added_rows = 0
+<<<<<<< HEAD
     qb_stats = QB_Status(
         user=patient,
         research_study_id=research_study_id,
