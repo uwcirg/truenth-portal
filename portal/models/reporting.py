@@ -34,10 +34,10 @@ from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
-def adherence_report(
+def cache_adherence_data(
         requested_as_of_date, acting_user_id, include_test_role, org_id,
-        research_study_id, response_format, lock_key, celery_task, limit):
-    """Generates the adherence report
+        research_study_id, celery_task, limit):
+    """Populates the adherence data cache for timely reports
 
     Designed to be executed in a background task - all inputs and outputs are
     easily serialized (excluding celery_task parent an obvious exception).
@@ -47,12 +47,9 @@ def adherence_report(
     :param include_test_role: set to include test patients in results
     :param org_id: set to limit to patients belonging to a branch of org tree
     :param research_study_id: research study to report on
-    :param response_format: 'json' or 'csv'
-    :param lock_key: name of TimeoutLock key used to throttle requests
     :param celery_task: used to update status when run as a celery task
     :param limit: limit run to first 'n' patients - used only by testing API
-    :return: dictionary of results, easily stored as a task output, including
-       any details needed to assist the view method
+    :return: number of rows updated in adherence_data table
 
     """
     acting_user = User.query.get(acting_user_id)
@@ -165,7 +162,7 @@ def adherence_report(
         da = ts_reporting.domains_accessed(visit_month)
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
-    data = []
+    added_rows = 0
     for patient in patient_generator():
         row = patient_data(patient)
         qb_stats = QB_Status(
@@ -192,13 +189,12 @@ def adherence_report(
                     # Initialize trigger states reporting for patient
                     ts_reporting = TriggerStatesReporting(patient_id=patient.id)
                     empro_row_detail(row, ts_reporting)
-                cached_data = AdherenceData.persist(
+                AdherenceData.persist(
                     patient_id=patient.id,
                     rs_id_visit=rs_visit,
                     valid_for_days=7,
                     data=row)
-
-        data.append(cached_data.data)
+                added_rows += 1
 
         # as we require a full history, continue to add rows for each previous
         for qbd, status in qb_stats.older_qbds(last_viable):
@@ -213,13 +209,12 @@ def adherence_report(
 
                 if research_study_id == EMPRO_RS_ID:
                     empro_row_detail(historic, ts_reporting)
-                cached_data = AdherenceData.persist(
+                AdherenceData.persist(
                     patient_id=patient.id,
                     rs_id_visit=rs_visit,
                     valid_for_days=500,
                     data=row)
-
-            data.append(cached_data.data)
+                added_rows += 1
 
         # if user is eligible for indefinite QB, add status
         qbd, status = qb_stats.indef_status()
@@ -245,12 +240,106 @@ def adherence_report(
                     qb_ids=[qbd.qb_id],
                     qb_iteration=qbd.iteration).entry_method()
                 indef['entry_method'] = entry_method if entry_method else ""
-                cached_data = AdherenceData.persist(
+                AdherenceData.persist(
                     patient_id=patient.id,
                     rs_id_visit=rs_visit,
                     valid_for_days=500,
                     data=indef)
-            data.append(cached_data.data)
+                added_rows += 1
+
+    return {'added': added_rows}
+
+
+def adherence_report(
+        requested_as_of_date, acting_user_id, include_test_role, org_id,
+        research_study_id, response_format, lock_key, celery_task, limit):
+    """Generates adherence report from previously populated adherence_data
+
+    Designed to be executed in a background task - all inputs and outputs are
+    easily serialized (excluding celery_task parent an obvious exception).
+
+    :param requested_as_of_date: string form of as_of_date, or None to use now
+    :param acting_user_id: id of user evoking request, for permission check
+    :param include_test_role: set to include test patients in results
+    :param org_id: set to limit to patients belonging to a branch of org tree
+    :param research_study_id: research study to report on
+    :param response_format: 'json' or 'csv'
+    :param lock_key: name of TimeoutLock key used to throttle requests
+    :param celery_task: used to update status when run as a celery task
+    :param limit: limit run to first 'n' patients - used only by testing API
+    :return: dictionary of results, easily stored as a task output, including
+       any details needed to assist the view method
+
+    """
+    acting_user = User.query.get(acting_user_id)
+
+    def patient_generator():
+        """Generator for requested patients, updates job status as needed"""
+        # If limited by org - use org and its children as filter list
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=org_id) if org_id
+            else None)
+
+        patients = patients_query(
+            acting_user=acting_user,
+            include_test_role=include_test_role,
+            research_study_id=research_study_id,
+            requested_orgs=requested_orgs)
+        current = 0
+        total = limit if limit else patients.count()
+        for patient in patients:
+
+            # occasionally update the celery task status if defined
+            current += 1
+            if current > total:
+                return
+
+            if not current % 25 and celery_task:
+                celery_task.update_state(
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
+            try:
+                acting_user.check_role('view', other_id=patient.id)
+            except Unauthorized:
+                # simply exclude any patients the user can't view
+                continue
+
+            yield patient
+
+    def sort_by_visit_key(d):
+        """Given dict returns ordered list of values sorted by key
+
+        Sort by key using the following rules:
+        "Baseline" comes first
+        "Indefinite" comes last
+        "Month <n>" in the middle, sorted by integer value
+
+        :returns: list of values sorted by keys
+        """
+        def sort_key(key):
+            if key == 'Baseline':
+                return 0, 0
+            elif key == 'Indefinite':
+                return 2, 0
+            else:
+                month, num = key.split(" ")
+                assert month == "Month"
+                return 1, int(num)
+
+        sorted_keys = sorted(d.keys(), key=sort_key)
+        sorted_values = [d[key] for key in sorted_keys]
+        return sorted_values
+
+    data = []
+    for patient in patient_generator():
+        # Obtain all cached adherence data for (patient, research_study)
+        rows = AdherenceData.query.filter(
+            AdherenceData.patient_id == patient.id).filter(
+            AdherenceData.rs_id_visit.like(f"{research_study_id}%"))
+        # Sort locally, given complicated sort function
+        presorted = {row.rs_id_visit.split(':')[1]: row.data for row in rows}
+        patient_data = sort_by_visit_key(presorted)
+        data.extend(patient_data)
 
     results = {
         'data': data,
