@@ -1243,7 +1243,7 @@ def communicate(email_or_id):
     if not u:
         message = 'no such user'
     elif u.deleted_id:
-        message = 'delted user - not allowed'
+        message = 'deleted user - not allowed'
     else:
         purge = request.args.get('purge', False)
         if purge in ('', '0', 'false', 'False'):
