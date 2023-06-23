@@ -9,13 +9,15 @@ from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
-from ..audit import Audit, auditable_event
+from ..audit import auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
+from ..factories.celery import create_celery
 from ..set_tools import left_center_right
 from ..timeout_lock import TimeoutLock
 from ..trace import trace
+from .adherence_data import AdherenceData
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire_bank import (
@@ -759,7 +761,7 @@ def ordered_qbs(user, research_study_id, classification=None):
 
 
 def invalidate_users_QBT(user_id, research_study_id):
-    """Mark the given user's QBT rows invalid (by deletion)
+    """Mark the given user's QBT rows and adherence_data invalid (by deletion)
 
     :param user_id: user for whom to purge all QBT rows
     :param research_study_id: set to limit invalidation to research study or
@@ -768,9 +770,14 @@ def invalidate_users_QBT(user_id, research_study_id):
     """
     if research_study_id == 'all':
         QBT.query.filter(QBT.user_id == user_id).delete()
+        AdherenceData.query.filter(
+            AdherenceData.patient_id == user_id).delete()
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
+        AdherenceData.query.filter(
+            AdherenceData.patient_id == user_id).filter(
+            AdherenceData.rs_id_visit.like(f"{research_study_id}:%")).delete()
 
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
@@ -1180,6 +1187,16 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     message="qb_timeline updated; {} rows".format(num_stored),
                     user_id=user_id, subject_id=user_id, context="assessment")
             db.session.commit()
+
+            # With fresh calculation of a user's timeline, queue update of
+            # user's adherence data as celery job
+            kwargs = {
+                'patient_id': user_id,
+                'research_study_id': research_study_id}
+            celery = create_celery(current_app)
+            celery.send_task(
+                'tasks.cache_adherence_data_task',
+                kwargs=kwargs)
 
     success = False
     for attempt in range(1, 6):
