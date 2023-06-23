@@ -80,3 +80,38 @@ class AdherenceData(db.Model):
         db.session.add(record)
         db.session.commit()
         return db.session.merge(record)
+
+
+def sort_by_visit_key(d):
+    """Given dict returns ordered list of values sorted by key
+
+    Sort by key using the following rules:
+    "Baseline" comes first
+    "Indefinite" comes last
+    "Month <n>" in the middle, sorted by integer value
+
+    :returns: list of values sorted by keys
+    """
+    def sort_key(key):
+        if key == 'Baseline':
+            return 0, 0
+        elif key == 'Indefinite':
+            return 2, 0
+        else:
+            month, num = key.split(" ")
+            assert month == "Month"
+            return 1, int(num)
+
+    sorted_keys = sorted(d.keys(), key=sort_key)
+    sorted_values = [d[key] for key in sorted_keys]
+    return sorted_values
+
+
+def sorted_adherence_data(patient_id, research_study_id):
+    """Shortcut to obtain ordered list for given patient:research_study"""
+    rows = AdherenceData.query.filter(
+        AdherenceData.patient_id == patient_id).filter(
+        AdherenceData.rs_id_visit.like(f"{research_study_id}%"))
+    # Sort locally, given complicated sort function
+    presorted = {row.rs_id_visit.split(':')[1]: row.data for row in rows}
+    return sort_by_visit_key(presorted)
