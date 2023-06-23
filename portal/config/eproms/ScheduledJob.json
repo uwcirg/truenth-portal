@@ -275,6 +275,31 @@
       "resourceType": "ScheduledJob",
       "schedule": "0 0 0 0 0",
       "task": "raise_background_exception_task"
+    },
+    {
+      "active": true,
+      "args": null,
+      "kwargs": {
+        "include_test_role": true,
+        "research_study_id": 0,
+        "limit": 5000
+      },
+      "name": "Cache Adherence Data -- Global Study",
+      "resourceType": "ScheduledJob",
+      "schedule": "30 21 * * *",
+      "task": "cache_adherence_data_task"
+    },
+    {
+      "active": true,
+      "args": null,
+      "kwargs": {
+        "include_test_role": true,
+        "research_study_id": 1
+      },
+      "name": "Cache Adherence Data -- EMPRO Study",
+      "resourceType": "ScheduledJob",
+      "schedule": "30 14 * * *",
+      "task": "cache_adherence_data_task"
     }
   ],
   "id": "SitePersistence v0.2",
