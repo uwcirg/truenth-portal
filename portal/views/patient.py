@@ -16,6 +16,7 @@ from ..cache import cache
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
+from ..models.adherence_data import sorted_adherence_data
 from ..models.communication import Communication
 from ..models.fhir import bundle_results
 from ..models.identifier import (
@@ -446,14 +447,19 @@ def patient_timeline(patient_id):
         status['indefinite QBD'] = indef_qbd.as_json()
         status['indefinite status'] = indef_status
 
+    adherence_data = sorted_adherence_data(patient_id, research_study_id)
+
     if trace:
         return jsonify(
             rps=rps,
             status=status,
             posted=posted,
             timeline=results,
+            adherence_data=adherence_data,
             trace=dump_trace("END time line lookup"))
-    return jsonify(rps=rps, status=status, posted=posted, timeline=results)
+    return jsonify(
+        rps=rps, status=status, posted=posted, timeline=results,
+        adherence_data=adherence_data)
 
 
 @patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')
