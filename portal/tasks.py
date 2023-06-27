@@ -108,8 +108,8 @@ def info():
         current_app.config.get('BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
 
+
 @celery.task(
-    name="tasks.cache_adherence_data_task",
     queue=LOW_PRIORITY)
 @scheduled_task
 def cache_adherence_data_task(**kwargs):
