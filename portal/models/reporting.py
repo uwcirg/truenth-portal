@@ -12,6 +12,7 @@ from ..audit import auditable_event
 from ..cache import cache
 from ..database import db
 from ..date_tools import report_format
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from ..trigger_states.models import TriggerStatesReporting
 from .adherence_data import AdherenceData, sorted_adherence_data
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
@@ -38,9 +39,22 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     """Update any missing (from cache) adherence data for patient
 
     NB: all changes are side effects, persisted in adherence_data table.
+    To avoid race conditions where a user's timeline triggers an update
+    of adherence_data which triggers a user's timeline update, maintain
+    a set of patient_ids and only update the adherence data for any given
+    patient 1/hour.  Given the scheduled jobs that run and validate
+    against expiration in a user's adherence record, skipped runs will
+    get caught next cycle.
 
     :returns: number of added rows
     """
+    cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+        patient_id=patient.id,
+        research_study_id=research_study_id))
+    if cache_moderation.run_recently():
+        return 0
+    cache_moderation.run_now()
+
     def patient_data(patient):
         """Returns dict of patient data regardless of qnr status"""
         # Basic patient data
@@ -239,12 +253,9 @@ def cache_adherence_data(
     as_of_date = datetime.utcnow()
 
     # Purge any rows that have or will soon expire
-    expired = AdherenceData.query.filter(
-        AdherenceData.valid_till < (as_of_date - timedelta(days=1)))
-    for dead in expired:
-        db.session.remove(dead)
-    if expired.count():
-        db.session.commit()
+    valid = (as_of_date + timedelta(days=1))
+    AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
+    db.session.commit()
 
     def patient_generator():
         """Generator for requested patients, updates job status as needed"""
