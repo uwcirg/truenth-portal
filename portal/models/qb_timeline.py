@@ -15,7 +15,11 @@ from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..factories.celery import create_celery
 from ..set_tools import left_center_right
-from ..timeout_lock import TimeoutLock
+from ..timeout_lock import (
+    ADHERENCE_DATA_KEY,
+    CacheModeration,
+    TimeoutLock,
+)
 from ..trace import trace
 from .adherence_data import AdherenceData
 from .overall_status import OverallStatus
@@ -1189,14 +1193,19 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             db.session.commit()
 
             # With fresh calculation of a user's timeline, queue update of
-            # user's adherence data as celery job
-            kwargs = {
-                'patient_id': user_id,
-                'research_study_id': research_study_id}
-            celery = create_celery(current_app)
-            celery.send_task(
-                'tasks.cache_adherence_data_task',
-                kwargs=kwargs)
+            # user's adherence data as celery job, avoiding recursive issues
+            # if this call happens to be part of an already running update
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=user_id,
+                research_study_id=research_study_id))
+            if not cache_moderation.run_recently():
+                kwargs = {
+                    'patient_id': user_id,
+                    'research_study_id': research_study_id}
+                celery = create_celery(current_app)
+                celery.send_task(
+                    'portal.tasks.cache_adherence_data_task',
+                    kwargs=kwargs)
 
     success = False
     for attempt in range(1, 6):
