@@ -26,13 +26,14 @@ from ..models.identifier import (
 )
 from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
-from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
+from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
 from ..models.research_study import ResearchStudy
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from .crossdomain import crossdomain
 from .demographics import demographics
 
@@ -337,8 +338,14 @@ def patient_timeline(patient_id):
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
-        # questionnaire_response : qb relationships.
+        # questionnaire_response : qb relationships and remove cache lock
+        # on adherence data.
         if purge == 'all':
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=patient_id,
+                research_study_id=research_study_id))
+            cache_moderation.reset()
+
             QuestionnaireResponse.purge_qb_relationship(
                 subject_id=patient_id,
                 research_study_id=research_study_id,
