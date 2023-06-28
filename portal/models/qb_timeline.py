@@ -779,9 +779,12 @@ def invalidate_users_QBT(user_id, research_study_id):
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
-        AdherenceData.query.filter(
+        adh_data = AdherenceData.query.filter(
             AdherenceData.patient_id == user_id).filter(
-            AdherenceData.rs_id_visit.like(f"{research_study_id}:%")).delete()
+            AdherenceData.rs_id_visit.like(f"{research_study_id}:%"))
+        # SQL alchemy can't combine `like` expression with delete op.
+        for ad in adh_data:
+            db.session.delete(ad)
 
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
@@ -894,6 +897,14 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             if invalidate_existing:
                 QBT.query.filter(QBT.user_id == user_id).filter(
                     QBT.research_study_id == research_study_id).delete()
+                adh_data = AdherenceData.query.filter(
+                    AdherenceData.patient_id == user_id).filter(
+                    AdherenceData.rs_id_visit.like(f"{research_study_id}:%")
+                )
+                # SQL alchemy can't combine `like` expression with delete op.
+                for ad in adh_data:
+                    db.session.delete(ad)
+                db.session.commit()
 
             # if any rows are found, assume this user/study is current
             if QBT.query.filter(QBT.user_id == user_id).filter(
