@@ -181,10 +181,10 @@ class TestQBStats(TestQuestionnaireBankFixture):
         # with zero orgs in common, should see empty result set
         assert response.json['total'] == 0
 
-        # Add org to staff to see results from matching patients (2&3)
+        # Add org to staff to see results from matching patiens (2&3)
         self.consent_with_org(org_id=org1_id)
         response = self.results_from_async_call(
-            "/api/report/questionnaire_status", timeout=20)
+            "/api/report/questionnaire_status", timeout=10)
         assert response.json['total'] == 2
 
     def test_results(self):
@@ -239,7 +239,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
         self.consent_with_org(org_id=org_id)
         self.login()
         response = self.results_from_async_call(
-            "/api/report/questionnaire_status", timeout=20)
+            "/api/report/questionnaire_status", timeout=10)
 
         # expect baseline for each plus 3 mo for user4
         assert response.json['total'] == 4
