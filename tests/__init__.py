@@ -585,7 +585,9 @@ class TestCase(Base):
                 break
             sleep(1)
 
-        assert response.json['state'] == 'SUCCESS'
+        if response.json['state'] != 'SUCCESS':
+            print(response.json)
+            raise RuntimeError(response.json)
 
         # done, now pull result (chop /status from status url for task result)
         task_path = status_url[:-len('/status')]

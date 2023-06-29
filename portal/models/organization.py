@@ -213,6 +213,12 @@ class Organization(db.Model):
     def sitecode(self):
         """Return site code identifier if found, else empty string"""
         system = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+        if not system:
+            return ""
+        if isinstance(system, (list, tuple)):
+            # catch need to support more than one
+            assert len(system) == 1
+            system = system[0]
         sitecodes = [
             id for id in self.identifiers if id.system == system]
         if len(sitecodes) > 1:
