@@ -58,11 +58,12 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     def patient_data(patient):
         """Returns dict of patient data regardless of qnr status"""
         # Basic patient data
+        org = patient.organizations[0] if patient.organizations else None
         d = {
             'user_id': patient.id,
-            'country': patient.organizations[0].country,
-            'site': patient.organizations[0].name,
-            'site_code': patient.organizations[0].sitecode
+            'country': org.country if org else "",
+            'site': org.name if org else "",
+            'site_code': org.sitecode if org else ""
         }
         study_id = patient.external_study_id
         if study_id:
