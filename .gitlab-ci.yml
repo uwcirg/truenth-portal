@@ -47,6 +47,11 @@ unit_tests_deadlocks:
     TOXENV: deadlocks
   <<: *unit_test_definition
 
+unit_tests_deadlocks:
+  variables:
+    TOXENV: deadlocks1
+  <<: *unit_test_definition
+
 docgen_test:
   variables:
     TOXENV: docs
