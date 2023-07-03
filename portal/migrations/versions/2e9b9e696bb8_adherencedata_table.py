@@ -22,6 +22,7 @@ def upgrade():
     sa.Column('rs_id_visit', sa.Text(), nullable=False),
     sa.Column('valid_till', sa.DateTime(), nullable=False),
     sa.Column('data', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.ForeignKeyConstraint(['patient_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('patient_id', 'rs_id_visit', name='_adherence_unique_patient_visit')
     )
