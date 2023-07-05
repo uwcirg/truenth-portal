@@ -16,9 +16,11 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBankQuestionnaire,
     trigger_date
 )
+from portal.models.reporting import cache_adherence_data
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
+from portal.timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from tests import TEST_USER_ID, TestCase, associative_backdate
 from tests.test_assessment_status import mock_qr
 from tests.test_questionnaire_bank import TestQuestionnaireBankFixture
@@ -132,6 +134,60 @@ class TestQBStats(TestQuestionnaireBankFixture):
         assert response.status_code == 401
         assert not response.json
 
+    def test_adherence_sort(self):
+        from portal.models.adherence_data import sort_by_visit_key
+        sort_me = {
+            "Month 3": {
+                "qb": "CRV_recurring_3mo_period v2",
+                "site": "CRV",
+                "visit": "Month 3",
+                "status": "Completed",
+                "consent": "11 - Mar - 2023 07: 42: 46 ",
+                "country ": None,
+                "user_id": 4,
+                "site_code": "",
+                "entry_method": "interview_assisted",
+                "completion_date ": "19 - Jun - 2023 07: 42:46 ",
+                "oow_completion_date": ""
+            },
+            "Month 12": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "visit": "Month 12",
+                "status": "Overdue",
+                "consent": "20 - May - 2023 07: 42:46 ",
+                "country ": None,
+                "user_id ": 3,
+                "study_id": "study user 3",
+                "site_code": ""},
+            "Baseline": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "visit": "Baseline",
+                "status": "Due",
+                "consent": "19 - Jun - 2023 07: 42:46",
+                "country ": None,
+                "user_id ": 2,
+                "study_id": "study user 2",
+                "site_code": ""
+            },
+        }
+        results = sort_by_visit_key(sort_me)
+        assert len(results) == 3
+        assert results[0]["visit"] == "Baseline"
+        assert results[1]["visit"] == "Month 3"
+        assert results[2]["visit"] == "Month 12"
+
+    def populate_adherence_cache(self, test_users):
+        """helper method to bring current test user state into adherence cache"""
+        self.add_system_user()
+        for u in test_users:
+            u = db.session.merge(u)
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=u.id, research_study_id=0))
+            cache_moderation.reset()
+            cache_adherence_data(patient_id=u.id)
+
     def test_permissions(self):
         """Shouldn't get results from orgs outside view permissions"""
 
@@ -175,13 +231,16 @@ class TestQBStats(TestQuestionnaireBankFixture):
         self.test_user = db.session.merge(self.test_user)
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
+        self.populate_adherence_cache(test_users=(user2, user3, user4))
         response = self.results_from_async_call(
             "/api/report/questionnaire_status", timeout=10)
 
         # with zero orgs in common, should see empty result set
         assert response.json['total'] == 0
 
-        # Add org to staff to see results from matching patiens (2&3)
+        self.populate_adherence_cache(test_users=(self.test_user, user2, user3, user4))
+
+        # Add org to staff to see results from matching patients (2&3)
         self.consent_with_org(org_id=org1_id)
         response = self.results_from_async_call(
             "/api/report/questionnaire_status", timeout=10)
@@ -238,6 +297,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.consent_with_org(org_id=org_id)
         self.login()
+        self.populate_adherence_cache(test_users=(user2, user3, user4))
         response = self.results_from_async_call(
             "/api/report/questionnaire_status", timeout=10)
 
