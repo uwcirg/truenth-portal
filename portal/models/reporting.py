@@ -184,7 +184,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             patient_id=patient.id,
             rs_id_visit=rs_visit,
             valid_for_days=500,
-            data=row)
+            data=historic)
         added_rows += 1
 
     # if user is eligible for indefinite QB, add status
