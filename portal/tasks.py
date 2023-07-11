@@ -95,6 +95,13 @@ def add(x, y):
     return x + y
 
 
+@celery.task(name="tasks.settings")
+def settings():
+    """similar to /settings view, but from job queue"""
+    config = current_app.config
+    return [f"{k}: {v}" for k, v in config.items()]
+
+
 @celery.task(name="tasks.info", queue=LOW_PRIORITY)
 def info():
     return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
