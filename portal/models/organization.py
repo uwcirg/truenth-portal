@@ -227,7 +227,7 @@ class Organization(db.Model):
         if len(sitecodes) > 1:
             raise ValueError(
                 "multiple site code identifiers for {}".format(self))
-        return sitecodes[0].value if sitecodes else f"no sitecodes defined for {system}"
+        return sitecodes[0].value if sitecodes else ""
 
     @property
     def shortname(self):
