@@ -188,7 +188,9 @@ def generate_site_cfg():
     consistent configuration with the front end, withou the overhead
     of the rest of `sync`
     """
+    app.logger.info("generate-site-cfg begin")
     import_config(target_dir=None)
+    app.logger.info("generate-site-cfg complete")
 
 
 @click.option('--directory', '-d', default=None, help="Export directory")
