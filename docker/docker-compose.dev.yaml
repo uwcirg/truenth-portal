@@ -17,3 +17,17 @@ services:
         target: /mnt/code
         type: bind
         read_only: true
+
+  celeryworker:
+    volumes:
+      - source: ../
+        target: /mnt/code
+        type: bind
+        read_only: true
+
+  celeryworkerslow:
+    volumes:
+      - source: ../
+        target: /mnt/code
+        type: bind
+        read_only: true
