@@ -21,6 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event
 from portal.date_tools import FHIR_datetime
+from portal.config.config_persistence import import_config
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
@@ -176,6 +177,18 @@ def seed(keep_unmentioned=False):
     # import site export file if found
     SitePersistence(target_dir=None).import_(
         keep_unmentioned=keep_unmentioned)
+
+
+@app.cli.command()
+def generate_site_cfg():
+    """Generate only the site.cfg file via site_persistence
+
+    Typically done via `sync` or `seed`, this option exists for the
+    backend job queues to generate the `site.cfg` file to maintain
+    consistent configuration with the front end, withou the overhead
+    of the rest of `sync`
+    """
+    import_config(target_dir=None)
 
 
 @click.option('--directory', '-d', default=None, help="Export directory")
