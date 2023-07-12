@@ -217,7 +217,7 @@ class Organization(db.Model):
         """Return site code identifier if found, else empty string"""
         system = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
         if not system:
-            return "system not defined"
+            return "REPORTING_IDENTIFIER_SYSTEMS not defined"
         if isinstance(system, (list, tuple)):
             # catch need to support more than one
             assert len(system) == 1
@@ -227,7 +227,7 @@ class Organization(db.Model):
         if len(sitecodes) > 1:
             raise ValueError(
                 "multiple site code identifiers for {}".format(self))
-        return sitecodes[0].value if sitecodes else f"no sitecodes defined for {system}"
+        return sitecodes[0].value if sitecodes else ""
 
     @property
     def shortname(self):
