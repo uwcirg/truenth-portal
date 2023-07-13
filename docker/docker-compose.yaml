@@ -42,22 +42,24 @@ services:
 
   celeryworker:
     <<: *service_base
-    command:
+    command: sh -c '
       flask generate-site-cfg &&
       celery worker
         --app portal.celery_worker.celery
         --loglevel debug
+      '
     depends_on:
       - redis
 
   celeryworkerslow:
     <<: *service_base
-    command:
+    command: sh -c '
       flask generate-site-cfg &&
       celery worker
         --app portal.celery_worker.celery
         --queue low_priority
         --loglevel debug
+      '
     depends_on:
       - redis
 
