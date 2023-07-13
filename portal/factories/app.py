@@ -137,6 +137,11 @@ def configure_app(app, config):
     """Load successive configs - overriding defaults"""
     app.config.from_object(DefaultConfig)
     app.config.from_pyfile('base.cfg', silent=True)
+    site_cfg_fullpath = os.path.join(app.config.root_path, SITE_CFG)
+    if not os.path.isfile(site_cfg_fullpath):
+        app.logger.warn(f"{site_cfg_fullpath} not found!!!!!!!!!!!!!")
+    else:
+        app.logger.warn(f"{site_cfg_fullpath} FOUND!!!!!!!!!!!!!!")
     app.config.from_pyfile(SITE_CFG, silent=True)
     app.config.from_pyfile('application.cfg', silent=True)
 
