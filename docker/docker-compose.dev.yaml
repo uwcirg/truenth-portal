@@ -18,12 +18,18 @@ services:
         type: bind
 
   celeryworker:
+    environment:
+      FLASK_DEBUG: 1
+      FLASK_APP: /mnt/code/manage.py
     volumes:
       - source: ../
         target: /mnt/code
         type: bind
 
   celeryworkerslow:
+    environment:
+      FLASK_DEBUG: 1
+      FLASK_APP: /mnt/code/manage.py
     volumes:
       - source: ../
         target: /mnt/code
