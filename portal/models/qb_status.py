@@ -155,7 +155,6 @@ class QB_Status(object):
         # Withdrawn sanity check
         if self.withdrawn_by(self.as_of_date) and (
                 self.overall_status != OverallStatus.withdrawn):
-            from flask import current_app
             current_app.logger.error(
                 "Unexpected state %s, user %d should be withdrawn",
                 self.overall_status, self.user.id)
@@ -188,7 +187,7 @@ class QB_Status(object):
                 QBT.qb_iteration == cur_qbd.iteration).order_by(
                 QBT.at.desc(), QBT.id.desc()).with_entities(
                 QBT.status).first()
-            # production errors seen, where ordered qbs lose data.  likely
+            # production errors seen, where qb_timeline loses data.  likely
             # a race condition where adherence cache is using timeline rows
             # when another thread purges the user's timeline.  log and exit
             if status is None:
@@ -483,7 +482,6 @@ class QB_Status(object):
 
         Once bug is found and resolved, remove!
         """
-        from flask import current_app
         from .questionnaire_response import QuestionnaireResponse
 
         requested = requested_set.intersection(('irondemog', 'irondemog_v3'))
