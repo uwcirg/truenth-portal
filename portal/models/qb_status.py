@@ -3,6 +3,7 @@
 API to lookup user's status with respect to assigned questionnaire banks.
 
 """
+from flask import current_app
 from ..trace import trace
 from .overall_status import OverallStatus
 from .qb_timeline import QBT, ordered_qbs, update_users_QBT
@@ -187,6 +188,13 @@ class QB_Status(object):
                 QBT.qb_iteration == cur_qbd.iteration).order_by(
                 QBT.at.desc(), QBT.id.desc()).with_entities(
                 QBT.status).first()
+            # production errors seen, where ordered qbs lose data.  likely
+            # a race condition where adherence cache is using timeline rows
+            # when another thread purges the user's timeline.  log and exit
+            if status is None:
+                current_app.logger.info(
+                    f"timeline data disappeared mid loop {self.user.id}: {QBT}")
+                return
             yield self.__ordered_qbs[index], str(status[0])
 
     def _indef_init(self):
