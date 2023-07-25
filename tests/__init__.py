@@ -294,8 +294,10 @@ class TestCase(Base):
     def add_system_user(self, sponsor=None):
         """create and return system user expected for some tasks """
         sysusername = '__system__'
-        if not User.query.filter_by(username=sysusername).first():
-            sys_user = self.add_user(sysusername, 'System', 'Admin')
+        sys_user = User.query.filter_by(username=sysusername).first()
+        if sys_user:
+            return sys_user
+        sys_user = self.add_user(sysusername, 'System', 'Admin')
         self.promote_user(sys_user, ROLE.ADMIN.value)
         return sys_user
 

@@ -104,6 +104,7 @@ class QuestionnaireResponse(db.Model):
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
+        research_study_id = None
 
         if qn_name == 'ironman_ss_post_tx':
             # special case for the EMPRO Staff QB
@@ -202,6 +203,8 @@ class QuestionnaireResponse(db.Model):
                         "Second submission for an existing QNR dyad received."
                         f" Patient: {self.subject_id}, QNR {self.id}"
                     )
+        # avoid lengthy lookup in caller
+        return research_study_id
 
     @staticmethod
     def purge_qb_relationship(

@@ -43,6 +43,9 @@ INDIGENOUS_CODINGS_MASK = 0b1000
 @cache.memoize(timeout=FIVE_MINS)
 def org_country(org_id):
     """Cache enabled country lookup for given organization ID"""
+    if org_id == 0:  # None of the above, happens on testing
+        return None
+
     ot = OrgTree()
     org_ids = ot.at_and_above_ids(org_id)
     for org in Organization.query.filter(
@@ -214,7 +217,7 @@ class Organization(db.Model):
         """Return site code identifier if found, else empty string"""
         system = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
         if not system:
-            return ""
+            return "REPORTING_IDENTIFIER_SYSTEMS not defined"
         if isinstance(system, (list, tuple)):
             # catch need to support more than one
             assert len(system) == 1

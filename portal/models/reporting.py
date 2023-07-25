@@ -1,7 +1,7 @@
 """Reporting statistics and data module"""
 import functools
 from collections import defaultdict, namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 from smtplib import SMTPRecipientsRefused
 
 from flask import current_app
@@ -11,8 +11,10 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..cache import cache
 from ..database import db
-from ..date_tools import FHIR_datetime, report_format
+from ..date_tools import report_format
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from ..trigger_states.models import TriggerStatesReporting
+from .adherence_data import AdherenceData, sorted_adherence_data
 from .app_text import MailResource, SiteSummaryEmail_ATMA, app_text
 from .communication import load_template_args
 from .message import EmailMessage
@@ -27,80 +29,41 @@ from .questionnaire_response import (
     qnr_csv_column_headers,
     generate_qnr_csv,
 )
-from .research_study import BASE_RS_ID, EMPRO_RS_ID, ResearchStudy
+from .research_study import BASE_RS_ID, EMPRO_RS_ID
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
-def adherence_report(
-        requested_as_of_date, acting_user_id, include_test_role, org_id,
-        research_study_id, response_format, lock_key, celery_task, limit):
-    """Generates the adherence report
+def single_patient_adherence_data(patient, as_of_date, research_study_id):
+    """Update any missing (from cache) adherence data for patient
 
-    Designed to be executed in a background task - all inputs and outputs are
-    easily serialized (excluding celery_task parent an obvious exception).
+    NB: all changes are side effects, persisted in adherence_data table.
+    To avoid race conditions where a user's timeline triggers an update
+    of adherence_data which triggers a user's timeline update, maintain
+    a set of patient_ids and only update the adherence data for any given
+    patient 1/hour.  Given the scheduled jobs that run and validate
+    against expiration in a user's adherence record, skipped runs will
+    get caught next cycle.
 
-    :param requested_as_of_date: string form of as_of_date, or None to use now
-    :param acting_user_id: id of user evoking request, for permission check
-    :param include_test_role: set to include test patients in results
-    :param org_id: set to limit to patients belonging to a branch of org tree
-    :param research_study_id: research study to report on
-    :param response_format: 'json' or 'csv'
-    :param lock_key: name of TimeoutLock key used to throttle requests
-    :param celery_task: used to update status when run as a celery task
-    :param limit: limit run to first 'n' patients - used only by testing API
-    :return: dictionary of results, easily stored as a task output, including
-       any details needed to assist the view method
-
+    :returns: number of added rows
     """
-    acting_user = User.query.get(acting_user_id)
-    if requested_as_of_date:
-        as_of_date = FHIR_datetime.parse(requested_as_of_date)
-    else:
-        as_of_date = datetime.utcnow()
-
-    def patient_generator():
-        """Generator for requested patients, updates job status as needed"""
-        # If limited by org - use org and its children as filter list
-        requested_orgs = (
-            OrgTree().here_and_below_id(organization_id=org_id) if org_id
-            else None)
-
-        patients = patients_query(
-            acting_user=acting_user,
-            include_test_role=include_test_role,
-            research_study_id=research_study_id,
-            requested_orgs=requested_orgs)
-        current = 0
-        total = limit if limit else patients.count()
-        for patient in patients:
-
-            # occasionally update the celery task status if defined
-            current += 1
-            if current > total:
-                return
-
-            if not current % 25 and celery_task:
-                celery_task.update_state(
-                    state='PROGRESS',
-                    meta={'current': current, 'total': total})
-            try:
-                acting_user.check_role('view', other_id=patient.id)
-            except Unauthorized:
-                # simply exclude any patients the user can't view
-                continue
-
-            yield patient
+    cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+        patient_id=patient.id,
+        research_study_id=research_study_id))
+    if cache_moderation.run_recently():
+        return 0
+    cache_moderation.run_now()
 
     def patient_data(patient):
         """Returns dict of patient data regardless of qnr status"""
         # Basic patient data
+        org = patient.organizations[0] if patient.organizations else None
         d = {
             'user_id': patient.id,
-            'country': patient.organizations[0].country,
-            'site': patient.organizations[0].name,
-            'site_code': patient.organizations[0].sitecode
+            'country': org.country if org else "",
+            'site': org.name if org else "",
+            'site_code': org.sitecode if org else ""
         }
         study_id = patient.external_study_id
         if study_id:
@@ -154,7 +117,9 @@ def adherence_report(
         row['clinician_status'] = (
             t_status.title() if t_status else "")
         row['clinician_survey_completion_date'] = (
-            ts_reporting.resolution_authored_from_visit(visit_month) or "")
+            report_format(
+                ts_reporting.resolution_authored_from_visit(visit_month))
+            or "")
         ht = ts_reporting.hard_triggers_for_visit(visit_month)
         row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
         st = ts_reporting.soft_triggers_for_visit(visit_month)
@@ -162,45 +127,76 @@ def adherence_report(
         da = ts_reporting.domains_accessed(visit_month)
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
-    data = []
-    for patient in patient_generator():
-        row = patient_data(patient)
-        qb_stats = QB_Status(
-            user=patient,
-            research_study_id=research_study_id,
-            as_of_date=as_of_date)
-        status = str(qb_stats.overall_status)
-        if status == "Expired" and research_study_id == EMPRO_RS_ID:
-            row["status"] = "Not Yet Available"
-        else:
-            row["status"] = status
+    added_rows = 0
+    qb_stats = QB_Status(
+        user=patient,
+        research_study_id=research_study_id,
+        as_of_date=as_of_date)
+    # if no current, try previous (as current may be expired)
+    last_viable = qb_stats.current_qbd(
+        even_if_withdrawn=True) or qb_stats.prev_qbd
+    if last_viable:
+        rs_visit = AdherenceData.rs_visit_string(
+            research_study_id, visit_name(last_viable))
+        if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
+            # latest already in cache, done with this patient
+            return added_rows
 
-        # if no current, try previous (as current may be expired)
-        last_viable = qb_stats.current_qbd(
-            even_if_withdrawn=True) or qb_stats.prev_qbd
-        if last_viable:
-            general_row_detail(row, patient, last_viable)
-            if research_study_id == EMPRO_RS_ID:
-                # Initialize trigger states reporting for patient
-                ts_reporting = TriggerStatesReporting(patient_id=patient.id)
-                empro_row_detail(row, ts_reporting)
+    # build up data until we find valid cache for patient's history
+    status = str(qb_stats.overall_status)
+    row = patient_data(patient)
+    if status == "Expired" and research_study_id == EMPRO_RS_ID:
+        row["status"] = "Not Yet Available"
+    else:
+        row["status"] = status
 
-        data.append(row)
+    if last_viable:
+        general_row_detail(row, patient, last_viable)
+        if research_study_id == EMPRO_RS_ID:
+            # Initialize trigger states reporting for patient
+            ts_reporting = TriggerStatesReporting(patient_id=patient.id)
+            empro_row_detail(row, ts_reporting)
 
-        # as we require a full history, continue to add rows for each previous
-        for qbd, status in qb_stats.older_qbds(last_viable):
-            historic = row.copy()
-            historic['status'] = status
-            general_row_detail(historic, patient, qbd)
+        # latest is only valid for a week, unless the user withdrew
+        valid_for = 500 if row['status'] in ('Expired', 'Withdrawn') else 7
+        AdherenceData.persist(
+            patient_id=patient.id,
+            rs_id_visit=rs_visit,
+            valid_for_days=valid_for,
+            data=row)
+        added_rows += 1
 
-            if research_study_id == EMPRO_RS_ID:
-                empro_row_detail(historic, ts_reporting)
+    # as we require a full history, continue to add rows for each previous
+    for qbd, status in qb_stats.older_qbds(last_viable):
+        rs_visit = AdherenceData.rs_visit_string(
+            research_study_id, visit_name(qbd))
+        # once we find cached_data, the rest of the user's history is good
+        if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
+            break
 
-            data.append(historic)
+        historic = row.copy()
+        historic['status'] = status
+        general_row_detail(historic, patient, qbd)
 
-        # if user is eligible for indefinite QB, add status
+        if research_study_id == EMPRO_RS_ID:
+            empro_row_detail(historic, ts_reporting)
+        AdherenceData.persist(
+            patient_id=patient.id,
+            rs_id_visit=rs_visit,
+            valid_for_days=500,
+            data=historic)
+        added_rows += 1
+
+    # if user is eligible for indefinite QB, add status
+    qbd = None
+    if research_study_id == BASE_RS_ID:
         qbd, status = qb_stats.indef_status()
-        if qbd:
+    if qbd:
+        rs_visit = "0:Indefinite"
+        cached_data = AdherenceData.fetch(
+            patient_id=patient.id, rs_id_visit=rs_visit)
+
+        if not cached_data:
             indef = row.copy()
             indef['status'] = status
             # Indefinite doesn't have a row in the timeline, look
@@ -217,7 +213,140 @@ def adherence_report(
                 qb_ids=[qbd.qb_id],
                 qb_iteration=qbd.iteration).entry_method()
             indef['entry_method'] = entry_method if entry_method else ""
-            data.append(indef)
+            AdherenceData.persist(
+                patient_id=patient.id,
+                rs_id_visit=rs_visit,
+                valid_for_days=500,
+                data=indef)
+            added_rows += 1
+
+    return added_rows
+
+
+def cache_adherence_data(
+        include_test_role=False,
+        org_id=None,
+        research_study_id=0,
+        limit=0,
+        patient_id=None,
+        job_id=None,
+        manual_run=None):
+    """Populates the adherence data cache for timely reports
+
+    Designed to be executed as a routine job.  Initially removes any rows that
+    have expired (or will do so in a day to avoid race conditions).  Then works
+    through all patients updating any missing rows.
+
+    :param include_test_role: set to include test patients in results
+    :param org_id: set to limit to patients belonging to a branch of org tree
+    :param research_study_id: research study to report on
+    :param limit: limit run to first 'n' added rows.  effective throttle to
+      limit scope and runtime of task; next run will pick up next block
+    :param patient_id: use to process only a single patient
+    :param job_id: noise ignored from scheduled job fixture
+    :param manual_run: noise ignored from scheduled job fixture
+    :return: dict including number of rows updated in adherence_data table and
+      if limit was hit
+
+    """
+    # For building cache, use system account; skip privilege checks
+    acting_user = User.query.filter_by(email='__system__').one()
+    as_of_date = datetime.utcnow()
+
+    # Purge any rows that have or will soon expire
+    valid = (as_of_date + timedelta(days=1))
+    AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
+    db.session.commit()
+
+    def patient_generator():
+        """Generator for requested patients, updates job status as needed"""
+        # If limited by org - use org and its children as filter list
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=org_id) if org_id
+            else None)
+
+        id_filter = [patient_id] if patient_id else None
+        patients = patients_query(
+            acting_user=acting_user,
+            include_test_role=include_test_role,
+            research_study_id=research_study_id,
+            requested_orgs=requested_orgs,
+            filter_by_ids=id_filter)
+        for patient in patients:
+            yield patient
+
+    added_rows = 0
+    for patient in patient_generator():
+        if added_rows > limit:
+            current_app.logger.info(
+                "pre-mature exit caching adherence data having hit limit")
+            break
+        single_patient_adherence_data(patient, as_of_date, research_study_id)
+
+    return {'added': added_rows, 'limit_hit': limit and added_rows > limit}
+
+
+def adherence_report(
+        requested_as_of_date, acting_user_id, include_test_role, org_id,
+        research_study_id, response_format, lock_key, celery_task, limit):
+    """Generates adherence report from previously populated adherence_data
+
+    Designed to be executed in a background task - all inputs and outputs are
+    easily serialized (excluding celery_task parent an obvious exception).
+
+    :param requested_as_of_date: string form of as_of_date, or None to use now
+    :param acting_user_id: id of user evoking request, for permission check
+    :param include_test_role: set to include test patients in results
+    :param org_id: set to limit to patients belonging to a branch of org tree
+    :param research_study_id: research study to report on
+    :param response_format: 'json' or 'csv'
+    :param lock_key: name of TimeoutLock key used to throttle requests
+    :param celery_task: used to update status when run as a celery task
+    :param limit: limit run to first 'n' patients - used only by testing API
+    :return: dictionary of results, easily stored as a task output, including
+       any details needed to assist the view method
+
+    """
+    acting_user = User.query.get(acting_user_id)
+
+    def patient_generator():
+        """Generator for requested patients, updates job status as needed"""
+        # If limited by org - use org and its children as filter list
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=org_id) if org_id
+            else None)
+
+        patients = patients_query(
+            acting_user=acting_user,
+            include_test_role=include_test_role,
+            research_study_id=research_study_id,
+            requested_orgs=requested_orgs)
+        current = 0
+        total = limit if limit else patients.count()
+        for patient in patients:
+
+            # occasionally update the celery task status if defined
+            current += 1
+            if current > total:
+                return
+
+            if not current % 25 and celery_task:
+                celery_task.update_state(
+                    state='PROGRESS',
+                    meta={'current': current, 'total': total})
+            try:
+                acting_user.check_role('view', other_id=patient.id)
+            except Unauthorized:
+                # simply exclude any patients the user can't view
+                continue
+
+            yield patient
+
+
+    data = []
+    for patient in patient_generator():
+        patient_data = sorted_adherence_data(patient.id, research_study_id)
+        data.extend(patient_data)
 
     results = {
         'data': data,
