@@ -96,3 +96,29 @@ def guarded_task_launch(task, **kwargs):
         result = task.apply_async(kwargs=kwargs)
 
     return result
+
+
+# key used to prevent recursive updates during timeline / adherence
+# append patient id
+ADHERENCE_DATA_KEY = "adherence_data_generated_for:{patient_id}:{research_study_id}"
+
+
+class CacheModeration(object):
+    """Redis key implementation to prevent same key from excessive updates"""
+
+    def __init__(self, key, timeout=3600):
+        self.key = key
+        self.timeout = timeout
+        self.redis = redis.StrictRedis.from_url(
+            current_app.config['REDIS_URL'])
+
+    def run_recently(self):
+        """if key has value in redis (i.e. didn't expire) return value"""
+        return self.redis.get(self.key)
+
+    def run_now(self):
+        """store now as value for key with timeout"""
+        self.redis.setex(name=self.key, time=self.timeout, value=time.time())
+
+    def reset(self):
+        self.redis.delete(self.key)

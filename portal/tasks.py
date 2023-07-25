@@ -29,6 +29,7 @@ from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
     adherence_report,
+    cache_adherence_data,
     generate_and_send_summaries,
     research_report,
 )
@@ -94,11 +95,25 @@ def add(x, y):
     return x + y
 
 
+@celery.task(name="tasks.settings")
+def settings():
+    """similar to /settings view, but from job queue"""
+    config = current_app.config
+    return [f"{k}: {v}" for k, v in config.items()]
+
+
 @celery.task(name="tasks.info", queue=LOW_PRIORITY)
 def info():
     return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
         current_app.config.get('BROKER_URL'),
         current_app.config.get('SERVER_NAME'))
+
+
+@celery.task(
+    queue=LOW_PRIORITY)
+@scheduled_task
+def cache_adherence_data_task(**kwargs):
+    return cache_adherence_data(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)

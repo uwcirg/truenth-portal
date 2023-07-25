@@ -269,7 +269,7 @@ class TestCommunication(TestQuestionnaireSetup):
         assert not expected
 
     def test_create_message(self):
-        self.add_user('__system__')
+        self.add_system_user()
         self.bless_with_basics()
         cr = mock_communication_request(
             'localized', '{"days": 14}',

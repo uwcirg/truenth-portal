@@ -248,7 +248,6 @@ def celery_app(app):
 
 @pytest.fixture
 def test_user(app, add_user, initialized_db):
-    DEFAULT_PASSWORD = 'fakePa$$'
     TEST_USERNAME = 'test@example.com'
     FIRST_NAME = '✓'
     LAST_NAME = 'Last'

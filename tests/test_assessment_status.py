@@ -329,6 +329,7 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         assert set(found) == expected
 
     def test_site_ids(self):
+        self.add_system_user()
         # bless org w/ expected identifier type
         wanted_system = 'http://pcctc.org/'
         unwanted_system = 'http://other.org/'

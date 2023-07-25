@@ -990,7 +990,8 @@ def assessment_update(patient_id):
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
     db.session.commit()
-    existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
+    research_study_id = existing_qnr.assign_qb_relationship(
+        acting_user_id=current_user().id)
 
     # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
     qn_name = existing_qnr.document.get("questionnaire").get("reference", '').split('/')[-1]
@@ -1006,7 +1007,8 @@ def assessment_update(patient_id):
         context='assessment',
     )
     response.update({'message': 'questionnaire response updated successfully'})
-    invalidate_users_QBT(patient.id, research_study_id='all')
+    if research_study_id is not None:
+        invalidate_users_QBT(patient.id, research_study_id=research_study_id)
     return jsonify(response)
 
 
@@ -1704,7 +1706,7 @@ def assessment_add(patient_id):
 
     db.session.add(questionnaire_response)
     db.session.commit()
-    questionnaire_response.assign_qb_relationship(
+    research_study_id = questionnaire_response.assign_qb_relationship(
         acting_user_id=current_user().id)
 
 
@@ -1721,7 +1723,8 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    invalidate_users_QBT(patient.id, research_study_id='all')
+    if research_study_id is not None:
+        invalidate_users_QBT(patient.id, research_study_id=research_study_id)
     return jsonify(response)
 
 
