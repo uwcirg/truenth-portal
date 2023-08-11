@@ -6,7 +6,10 @@ from statemachine.exceptions import TransitionNotAllowed
 
 from portal.database import db
 from portal.models.audit import Audit
-from portal.trigger_states.empro_domains import DomainTriggers
+from portal.trigger_states.empro_domains import (
+    DomainTriggers,
+    sequential_hard_trigger_count_key,
+)
 from portal.trigger_states.empro_states import (
     EMPRO_state,
     evaluate_triggers,
@@ -127,13 +130,14 @@ def test_cur_hard_trigger():
     dt = DomainTriggers(
         domain='anxious',
         current_answers={
-            'ironman_ss.12': (3, None),
-            'ironman_ss.11': (2, None),
-            'ironman_ss.13': (4, 'penultimate')},
+            'ironman_ss.12': ('3', None),
+            'ironman_ss.11': ('2', None),
+            'ironman_ss.13': ('4', 'penultimate')},
         previous_answers=None,
         initial_answers=None)
-    assert len(dt.triggers) == 1
+    assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 1
     assert 'ironman_ss.13' in dt.triggers
+    assert dt.triggers[sequential_hard_trigger_count_key] == 1
 
 
 def test_worsening_soft_trigger():
@@ -144,23 +148,25 @@ def test_worsening_soft_trigger():
         current_answers={
             'ss.15': (3, None), 'ss.12': (3, None), 'ss.21': (1, None)},
         initial_answers=None)
-    assert len(dt.triggers) == 1
+    assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 1
     assert dt.triggers['ss.15'] == 'soft'
+    assert dt.triggers[sequential_hard_trigger_count_key] == 0
 
 
 def test_worsening_baseline():
     # confirm a hard trigger with 2 level worsening
-    initial_answers = {15: (3, None), 21: (1, None)}
-    previous_answers = {12: (1, None), 15: (3, None)}
-    current_answers = {12: (3, None), 15: (3, None), 21: (3, None)}
+    initial_answers = {'15': (3, None), '21': (1, None)}
+    previous_answers = {'12': (1, None), '15': (3, None)}
+    current_answers = {'12': (3, None), '15': (3, None), '21': (3, None)}
     dt = DomainTriggers(
         domain='anxious',
         initial_answers=initial_answers,
         previous_answers=previous_answers,
         current_answers=current_answers)
 
-    assert len(dt.triggers) == 2
-    assert dt.triggers[12] == dt.triggers[21] == 'hard'
+    assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 2
+    assert dt.triggers['12'] == dt.triggers['21'] == 'hard'
+    assert dt.triggers[sequential_hard_trigger_count_key] == 1
 
 
 def test_ts_trigger_lists(mock_triggers):
