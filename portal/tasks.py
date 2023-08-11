@@ -116,13 +116,6 @@ def cache_adherence_data_task(**kwargs):
     return cache_adherence_data(**kwargs)
 
 
-@celery.task(
-    queue=LOW_PRIORITY)
-@scheduled_task
-def cache_adherence_data_task(**kwargs):
-    return cache_adherence_data(**kwargs)
-
-
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def adherence_report_task(self, **kwargs):
     current_app.logger.debug("launch adherence report task: %s", self.request.id)
