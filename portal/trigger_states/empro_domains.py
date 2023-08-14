@@ -10,6 +10,8 @@ EMPRO_DOMAINS = (
     'general_pain', 'joint_pain', 'insomnia', 'fatigue', 'anxious',
     'discouraged', 'sad', 'social_isolation')
 
+sequential_hard_trigger_count_key = '_sequential_hard_trigger_count'
+
 
 class AnswerIdValue(object):
     """Simple container to hold identifier and value for an answer"""
@@ -45,6 +47,10 @@ class DomainTriggers(object):
         """Helper to look for worsening conditions"""
         keyset = set(list(previous.keys()) + list(current.keys()))
         for link_id in keyset:
+            # ignore metadata keys such as '_sequential_hard_trigger_count'
+            if link_id.startswith('_'):
+                continue
+
             if link_id not in previous or link_id not in current:
                 # Without an answer in both, can't compare
                 continue
@@ -79,6 +85,17 @@ class DomainTriggers(object):
         if self.initial_answers:
             self.check_for_worsening(
                 self.initial_answers, self.current_answers)
+
+        # track number of sequential hard triggers for domain
+        sequential_hard_trigger_count = 0
+        if any(self._triggers[k] == 'hard' for k in self._triggers.keys()):
+            sequential_hard_trigger_count = 1
+        if (
+                sequential_hard_trigger_count and
+                self.previous_answers and
+                sequential_hard_trigger_count_key in self.previous_answers):
+            sequential_hard_trigger_count = self.previous_answers[sequential_hard_trigger_count_key] + 1
+        self._triggers[sequential_hard_trigger_count_key] = sequential_hard_trigger_count
 
 
 class DomainManifold(object):
