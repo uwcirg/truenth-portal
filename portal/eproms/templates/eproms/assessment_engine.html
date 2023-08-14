@@ -31,3 +31,7 @@
             <div class="error error-message"></div>
         </div>
 {% endif %}
+{%- from "eproms/assessment_engine/ae_macros.html" import empro_thankyou_modal, empro_optout_modal -%}
+{{empro_optout_modal(user)}}
+{{empro_thankyou_modal(user)}}
+
