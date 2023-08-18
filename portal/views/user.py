@@ -99,8 +99,12 @@ def me():
 
     """
     user = current_user()
-    if user.current_encounter().auth_method == 'url_authenticated':
+
+    # only return user id, if auth came from a URL such as embedded within an email
+    encounter = user.current_encounter(generate_failsafe_if_missing=False)
+    if encounter and encounter.auth_method == 'url_authenticated':
         return jsonify(id=user.id)
+
     return jsonify(
         id=user.id, username=user.username, email=user.email)
 
