@@ -20,7 +20,6 @@ var emproObj = function () {
   this.hasSoftTrigger = false;
   this.userId = 0;
   this.visitMonth = 0;
-
 };
 emproObj.prototype.populateDomainDisplay = function () {
   if (!$("#emproModal .triggersButtonsContainer").hasClass("added")) {
@@ -62,7 +61,7 @@ emproObj.prototype.populateSelectedOptoutUI = function () {
   var contentHTML = this.selectedOptOutDomains.join(", ");
   $("#emproModal #noContactTriggerList").html("<b>" + contentHTML + "</b>");
   $(".no-contact-list-wrapper").show();
-}
+};
 emproObj.prototype.populateOptoutInputItems = function () {
   if (!this.hasThankyouModal()) {
     return;
@@ -87,13 +86,15 @@ emproObj.prototype.initOptOutElementEvents = function () {
     EmproObj.populateSelectedOptoutUI();
     if (EmproObj.selectedOptOutDomains.length) {
       var submitData = {
-        "user_id": EmproObj.userId,
-        "visit_month": EmproObj.visitMonth,
-        "opt_out_domains": EmproObj.selectedOptOutDomains
-      }
+        user_id: EmproObj.userId,
+        visit_month: EmproObj.visitMonth,
+        opt_out_domains: EmproObj.selectedOptOutDomains,
+      };
       // TODO: call API to save
       console.log("data to be submitted ", submitData);
     }
+    // TODO, call API to save selected opt out domains,
+    // if call failed, display error, e.g. $("#emproOptOutModal .error-message").html(message), else go to the thank you modal
     EmproObj.initThankyouModal(true);
   });
 
@@ -110,7 +111,9 @@ emproObj.prototype.initOptOutElementEvents = function () {
         EmproObj.selectedOptOutDomains.push($(this).val());
       }
     } else {
-      EmproObj.selectedOptOutDomains = EmproObj.selectedOptOutDomains.filter((val) => val !== $(this).val());
+      EmproObj.selectedOptOutDomains = EmproObj.selectedOptOutDomains.filter(
+        (val) => val !== $(this).val()
+      );
     }
   });
 };
@@ -175,7 +178,6 @@ emproObj.prototype.init = function () {
           if (result.reason) {
             console.log(reason);
           }
-          // TODO figure out if no triggers affect display of thank you modal
         }
         if (result && result.visit_month) {
           this.visitMonth = result.visit_month;
@@ -232,7 +234,7 @@ emproObj.prototype.init = function () {
               today === authoredDate;
 
             if (!autoShowModal) {
-              // console.log("WHAT?")
+
               // this.initThankyouModal(false);
               // this.initOptOutModal(false);
               return;
