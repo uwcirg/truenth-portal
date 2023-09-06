@@ -986,6 +986,13 @@ def assessment_update(patient_id):
 
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr.first()
+
+    # TN-3184, report any in-process QNRs attempting to change authored dates
+    date_change_snippet = ""
+    if FHIR_datetime.parse(existing_qnr.document["authored"]) != FHIR_datetime.parse(updated_qnr["authored"]):
+        date_change_snippet = f" UNEXPECTED authored change; was previously {existing_qnr.document['authored']}"
+        current_app.logger.warning(date_change_snippet)
+
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
@@ -1001,7 +1008,7 @@ def assessment_update(patient_id):
             kwargs={'questionnaire_response_id': existing_qnr.id}
         )
     auditable_event(
-        "updated {}".format(existing_qnr),
+        f"updated {existing_qnr}{date_change_snippet}",
         user_id=current_user().id,
         subject_id=patient.id,
         context='assessment',
