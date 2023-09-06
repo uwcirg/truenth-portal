@@ -28,7 +28,7 @@ class DomainTriggers(object):
     """
 
     def __init__(
-            self, domain, current_answers, previous_answers, initial_answers):
+            self, domain, current_answers, previous_answers, initial_answers, previous_triggers):
         self.domain = domain
         self._triggers = dict()
 
@@ -37,6 +37,9 @@ class DomainTriggers(object):
         self.current_answers = current_answers or dict()
         self.previous_answers = previous_answers or dict()
         self.initial_answers = initial_answers or dict()
+
+        # Trigger state triggers from previous month, if defined
+        self.previous_triggers = previous_triggers
 
     @property
     def triggers(self):
@@ -92,9 +95,9 @@ class DomainTriggers(object):
             sequential_hard_trigger_count = 1
         if (
                 sequential_hard_trigger_count and
-                self.previous_answers and
-                sequential_hard_trigger_count_key in self.previous_answers):
-            sequential_hard_trigger_count = self.previous_answers[sequential_hard_trigger_count_key] + 1
+                self.previous_triggers and
+                sequential_hard_trigger_count_key in self.previous_triggers):
+            sequential_hard_trigger_count = self.previous_triggers[sequential_hard_trigger_count_key] + 1
         self._triggers[sequential_hard_trigger_count_key] = sequential_hard_trigger_count
 
 
@@ -145,17 +148,19 @@ class DomainManifold(object):
                     results[domain][link_id] = (int(score), severity)
                 setattr(self, f"{timepoint}_obs", results)
 
-    def eval_triggers(self):
+    def eval_triggers(self, previous_triggers):
         triggers = dict()
         triggers['domain'] = dict()
 
         for domain in EMPRO_DOMAINS:
             if domain in self.cur_obs:
+                prev_triggers_for_domain = previous_triggers["domain"][domain] if previous_triggers else None
                 dt = DomainTriggers(
                     domain=domain,
                     current_answers=self.cur_obs[domain],
                     previous_answers=self.prev_obs.get(domain),
-                    initial_answers=self.initial_obs.get(domain)
+                    initial_answers=self.initial_obs.get(domain),
+                    previous_triggers=prev_triggers_for_domain,
                 )
                 triggers['domain'][domain] = dt.triggers
 
