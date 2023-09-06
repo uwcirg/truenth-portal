@@ -210,9 +210,18 @@ def evaluate_triggers(qnr):
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
 
+        # include previous month resolved row, if available
+        previous = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.timestamp.desc()).first()
+
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
-        ts.triggers = dm.eval_triggers()
+        previous_triggers = (
+            previous if previous and previous.visit_month + 1 == ts.visit_month
+            else None)
+        ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
 
         # transition and persist state
@@ -225,10 +234,6 @@ def evaluate_triggers(qnr):
         # a submission closes the window of availability for the
         # post-intervention clinician follow up.  mark state if
         # one is found
-        previous = TriggerState.query.filter(
-            TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state == 'resolved').order_by(
-            TriggerState.timestamp.desc()).first()
         if previous and previous.triggers.get('action_state') not in (
                 'completed', 'missed', 'not applicable', 'withdrawn'):
             triggers = copy.deepcopy(previous.triggers)
