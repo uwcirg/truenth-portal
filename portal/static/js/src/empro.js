@@ -21,26 +21,38 @@ var emproObj = function () {
   this.userId = 0;
   this.visitMonth = 0;
 };
+emproObj.prototype.getDomainDisplay = function (domain) {
+  if (!domain) return "";
+  return domain.replace(/_/g, " ");
+};
 emproObj.prototype.populateDomainDisplay = function () {
-  if (!$("#emproModal .triggersButtonsContainer").hasClass("added")) {
+  var triggerButtonsContainerElement = $(
+    "#emproModal .triggersButtonsContainer"
+  );
+  if (!triggerButtonsContainerElement.hasClass("added")) {
     this.mappedDomains.forEach((domain) => {
-      $("#emproModal .triggersButtonsContainer").append(
-        `<a class="btn btn-empro-primary" href="/substudy-tailored-content#/${domain}" target="_blank">
-                ${i18next
-                  .t("{domain} Tips")
-                  .replace("{domain}", domain.replace(/\_/g, " "))}
-                </a>`
+      triggerButtonsContainerElement.append(
+        `<a class="btn btn-empro-primary" 
+            href="/substudy-tailored-content#/${domain}"
+            target="_blank">
+            ${i18next
+              .t("{domain} Tips")
+              .replace("{domain}", this.getDomainDisplay(domain))}
+        </a>`
       );
     });
-    $("#emproModal .triggersButtonsContainer").addClass("added");
+    triggerButtonsContainerElement.addClass("added");
   }
-  if (!$("#emproModal .hardTriggersDisplayList").hasClass("added")) {
+  var hardTriggersDisplayListElement = $(
+    "#emproModal .hardTriggersDisplayList"
+  );
+  if (!hardTriggersDisplayListElement.hasClass("added")) {
     this.hardTriggerDomains.forEach((domain) => {
-      $("#emproModal .hardTriggersDisplayList").append(
-        `<li>${domain.replace(/\_/g, " ")}</li>`
+      hardTriggersDisplayListElement.append(
+        `<li>${this.getDomainDisplay(domain)}</li>`
       );
     });
-    $("#emproModal .hardTriggersDisplayList").addClass("added");
+    hardTriggersDisplayListElement.addClass("added");
   }
 };
 emproObj.prototype.hasThankyouModal = function () {
@@ -58,7 +70,9 @@ emproObj.prototype.populateSelectedOptoutUI = function () {
     return;
   }
   console.log("selected opt out domains ", this.selectedOptOutDomains);
-  var contentHTML = this.selectedOptOutDomains.join(", ");
+  var contentHTML = this.selectedOptOutDomains
+    .map((domain) => this.getDomainDisplay(domain))
+    .join(", ");
   $("#emproModal #noContactTriggerList").html("<b>" + contentHTML + "</b>");
   $(".no-contact-list-wrapper").show();
 };
@@ -66,12 +80,14 @@ emproObj.prototype.populateOptoutInputItems = function () {
   if (!this.hasThankyouModal()) {
     return;
   }
-  $("#emproOptOutModal .optout-domains-checkbox-list").html("");
+  var optOutDomainsListElement = $(
+    "#emproOptOutModal .optout-domains-checkbox-list"
+  );
+  optOutDomainsListElement.html("");
   this.optOutDomains.forEach((domain) => {
-    $("#emproOptOutModal .optout-domains-checkbox-list").append(`
-            <div class="item"><input type="checkbox" class="ck-input" value="${domain}"><span>${domain.replace(
-      /_/g,
-      " "
+    optOutDomainsListElement.append(`
+            <div class="item"><input type="checkbox" class="ck-input" value="${domain}"><span>${this.getDomainDisplay(
+      domain
     )}</span></div>
         `);
   });
@@ -140,8 +156,6 @@ emproObj.prototype.initTriggerItemsVis = function () {
   if (this.hasHardTrigger) {
     $("#emproModal .hard-trigger").addClass("active");
     $("#emproModal .no-trigger").hide();
-    //present thank you modal if hard trigger present
-    //$("#emproModal").modal("show");
     return;
   }
   if (this.hasSoftTrigger) {
@@ -161,6 +175,8 @@ emproObj.prototype.init = function () {
 
     const isDebugging = getUrlParameter("debug");
 
+    this.setLoadingVis(true);
+
     tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
       if (
         !isDebugging &&
@@ -169,9 +185,9 @@ emproObj.prototype.init = function () {
         data[EPROMS_SUBSTUDY_ID].errors.length
       ) {
         //don't present popup if errors e.g. base study questionnaire due
+        this.setLoadingVis();
         return false;
       }
-      this.setLoadingVis();
       this.initTriggerDomains((result) => {
         if (result && result.error) {
           console.log("Error retrieving trigger data");
@@ -179,19 +195,15 @@ emproObj.prototype.init = function () {
             console.log(reason);
           }
         }
-        if (result && result.visit_month) {
-          this.visitMonth = result.visit_month;
-        }
-
         tnthAjax.assessmentReport(
           this.userId,
           EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
           (data) => {
+            this.setLoadingVis(); // hide loading indicator when done
             if (isDebugging) {
               data = TestResponsesJson;
               data.entry[0].authored = new Date().toISOString();
             }
-            this.setLoadingVis(true);
             console.log("Questionnaire response data: ", data);
             if (!data || !data.entry || !data.entry.length) {
               return;
@@ -223,7 +235,7 @@ emproObj.prototype.init = function () {
             /*
              * associating each thank you modal popup accessed by assessment date
              */
-            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${assessmentDate}`;
+            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}`;
             /*
              * automatically pops up thank you modal IF sub-study assessment is completed,
              * and sub-study assessment is completed today and the thank you modal has not already popped up today
@@ -234,19 +246,15 @@ emproObj.prototype.init = function () {
               today === authoredDate;
 
             if (!autoShowModal) {
-
-              // this.initThankyouModal(false);
-              // this.initOptOutModal(false);
               return;
             }
 
             /*
              * set thank you modal accessed flag here
              */
-            // localStorage.setItem(cachedAccessKey, `true`);
+            localStorage.setItem(cachedAccessKey, `true`);
 
-            // console.log("auto show ? ", autoShowModal);
-            console.log("opt out domain? ", this.optOutDomains);
+            console.log("Opt out domain? ", this.optOutDomains);
             if (this.optOutDomains.length > 0) {
               this.populateOptoutInputItems();
               this.initOptOutElementEvents();
@@ -256,94 +264,94 @@ emproObj.prototype.init = function () {
             }
 
             this.initThankyouModal(true);
-
-            // /*
-            // * don't continue on to invoke trigger API if sub-study assessment is not completed
-            // */
-            // if (!assessmentCompleted) {
-            //     this.initThankyouModal(false);
-            //     return;
-            // }
           }
         );
       });
     });
   });
 };
-emproObj.prototype.setLoadingVis = function (done) {
+emproObj.prototype.setLoadingVis = function (loading) {
   var LOADING_INDICATOR_ID = ".portal-body .loading-container";
-  if (done) {
+  if (!loading) {
     $(LOADING_INDICATOR_ID).addClass("hide");
     return;
   }
   $(LOADING_INDICATOR_ID).removeClass("hide");
 };
+emproObj.prototype.processTriggerData = function (data) {
+  if (!data || data.error || !data.triggers || !data.triggers.domain) {
+    //this.initThankyouModal(false);
+    console.log("No trigger data");
+    return false;
+  }
+  var self = this;
+  console.log("trigger data ", data);
+  for (let key in data.triggers.domain) {
+    if (!Object.keys(data.triggers.domain[key]).length) {
+      continue;
+    }
+    let mappedDomain = EMPRO_DOMAIN_MAPPINGS[key];
+    /*
+     * get all user domains that have related triggers
+     */
+    if (self.domains.indexOf(key) === -1) {
+      self.domains.push(key);
+    }
+    /*
+     * get all mapped domains for tailored content
+     */
+    if (self.mappedDomains.indexOf(mappedDomain) === -1) {
+      self.mappedDomains.push(mappedDomain);
+    }
+    for (let q in data.triggers.domain[key]) {
+      if (
+        q === "_sequential_hard_trigger_count" &&
+        parseInt(data.triggers.domain[key][q]) === 3
+      ) {
+        if (self.optOutDomains.indexOf(key) === -1) {
+          self.optOutDomains.push(key);
+        }
+        // TODO add key to opt out domain(s)
+      }
+      if (data.triggers.domain[key][q] === "hard") {
+        self.hasHardTrigger = true;
+        /*
+         * get all domain topics that have hard trigger
+         */
+        if (self.hardTriggerDomains.indexOf(key) === -1) {
+          self.hardTriggerDomains.push(key);
+        }
+      }
+      if (data.triggers.domain[key][q] === "soft") {
+        self.hasSoftTrigger = true;
+        /*
+         * get all domain topics that have soft trigger
+         */
+        if (self.softTriggerDomains.indexOf(key) === -1) {
+          self.softTriggerDomains.push(key);
+        }
+      }
+    }
+  }
+};
 emproObj.prototype.initTriggerDomains = function (callbackFunc) {
   var callback = callbackFunc || function () {};
-  if (!$("#emproModal").length) {
+  if (!this.hasThankyouModal()) {
     callback({ error: true });
     return;
   }
-  var self = this;
+  //var self = this;
   const isDebugging = getUrlParameter("debug");
   tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: 3 }, (data) => {
     if (isDebugging) {
       data = TestTriggersJson;
     }
     if (!data || data.error || !data.triggers || !data.triggers.domain) {
-      this.initThankyouModal(false);
-      console.log("No trigger data");
       callback({ error: true, reason: "no trigger data" });
       return false;
     }
-    console.log("trigger data ", data);
-    for (let key in data.triggers.domain) {
-      if (!Object.keys(data.triggers.domain[key]).length) {
-        continue;
-      }
-      let mappedDomain = EMPRO_DOMAIN_MAPPINGS[key];
-      /*
-       * get all user domains that have related triggers
-       */
-      if (self.domains.indexOf(key) === -1) {
-        self.domains.push(key);
-      }
-      /*
-       * get all mapped domains for tailored content
-       */
-      if (self.mappedDomains.indexOf(mappedDomain) === -1) {
-        self.mappedDomains.push(mappedDomain);
-      }
-      for (let q in data.triggers.domain[key]) {
-        if (
-          q === "_sequential_hard_trigger_count" &&
-          parseInt(data.triggers.domain[key][q]) === 3
-        ) {
-          if (self.optOutDomains.indexOf(key) === -1) {
-            self.optOutDomains.push(key);
-          }
-          // TODO add key to opt out domain(s)
-        }
-        if (data.triggers.domain[key][q] === "hard") {
-          self.hasHardTrigger = true;
-          /*
-           * get all domain topics that have hard trigger
-           */
-          if (self.hardTriggerDomains.indexOf(key) === -1) {
-            self.hardTriggerDomains.push(key);
-          }
-        }
-        if (data.triggers.domain[key][q] === "soft") {
-          self.hasSoftTrigger = true;
-          /*
-           * get all domain topics that have soft trigger
-           */
-          if (self.softTriggerDomains.indexOf(key) === -1) {
-            self.softTriggerDomains.push(key);
-          }
-        }
-      }
-    }
+
+    this.processTriggerData(data);
 
     /*
      * display user domain topic(s)
@@ -354,8 +362,7 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
      */
     this.initTriggerItemsVis();
 
-    // //finish loading
-    // this.setLoadingVis(true);
+    this.visitMonth = data.visit_month;
 
     callback(data);
 

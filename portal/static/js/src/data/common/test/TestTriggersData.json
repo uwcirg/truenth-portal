@@ -64,7 +64,11 @@
         "ironman_ss.15": "hard",
         "ironman_ss.16": "hard"
       },
-      "fatigue": { "ironman_ss.10": "hard", "ironman_ss.9": "hard", "_sequential_hard_trigger_count": 3 },
+      "fatigue": {
+        "ironman_ss.10": "hard",
+        "ironman_ss.9": "hard",
+        "_sequential_hard_trigger_count": 3
+      },
       "general_pain": {
         "ironman_ss.1": "hard",
         "ironman_ss.2": "hard",
