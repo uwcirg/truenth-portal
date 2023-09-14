@@ -28,6 +28,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
+from ..models.overall_status import OverallStatus
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
@@ -1772,7 +1773,7 @@ def present_needed():
     for rs in ResearchStudy.assigned_to(subject):
         assessment_status = QB_Status(
             subject, research_study_id=rs, as_of_date=as_of_date)
-        if assessment_status.overall_status == 'Withdrawn':
+        if assessment_status.overall_status == OverallStatus.withdrawn:
             abort(400, 'Withdrawn; no pending work found')
 
         args = dict(request.args.items())
