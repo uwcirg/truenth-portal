@@ -247,7 +247,6 @@
                     self.setInProgress(false);
                 });
                 $(window).on("focus", function() {
-                    console.log("onfocus fired")
                     self.handleSetExportHistory();
                 });
             },
