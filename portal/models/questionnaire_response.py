@@ -860,8 +860,10 @@ def aggregate_responses(
         current_user, include_test_role=False).with_entities(User.id)
 
     annotated_questionnaire_responses = []
+    # TN-3250, don't include QNRs without assigned visits, i.e. qb_id > 0
     questionnaire_responses = QuestionnaireResponse.query.filter(
-        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
+        QuestionnaireResponse.subject_id.in_(user_ids)).filter(
+        QuestionnaireResponse.questionnaire_bank_id > 0).order_by(
         QuestionnaireResponse.document['authored'].desc())
 
     if instrument_ids:
