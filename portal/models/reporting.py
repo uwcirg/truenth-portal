@@ -96,6 +96,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
                 qbd.completed_date(patient.id)) or ""
             row['oow_completion_date'] = report_format(
                 qbd.oow_completed_date(patient.id)) or ""
+        if row['status'] == 'Withdrawn':
+            # visit unreliable when withdrawn - clear
+            row['visit'] = ''
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
@@ -110,6 +113,10 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         if 'completion_date' in row:
             row['EMPRO_questionnaire_completion_date'] = (
                 row.pop('completion_date'))
+
+        # If withdrawn, the rest is unreliable
+        if row['status'] == 'Withdrawn':
+            return
 
         # Correct for zero index visit month in db
         visit_month = int(row['visit'].split()[-1]) - 1
