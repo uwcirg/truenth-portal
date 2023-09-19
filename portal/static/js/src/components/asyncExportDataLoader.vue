@@ -87,11 +87,15 @@
             clearTimeElapsed: function() {
                 this.exportTimeElapsed = 0;
             },
-            onBeforeExportData: function() {
+            clearInProgress: function() {
                 this.updateExportProgress("", "");
                 this.clearExportDataTimeoutID();
                 this.clearTimeElapsed();
                 this.clearExportDataUI();
+                this.setInProgress(false);
+            },
+            onBeforeExportData: function() {
+                this.clearInProgress();
                 this.setInProgress(true);
                 $("#" + this.initElementId).attr("disabled", true);
                 $(".export__display-container").addClass("active");
@@ -128,6 +132,7 @@
                         url: exportDataUrl,
                         success: function(data, status, request) {
                             let statusUrl= request.getResponseHeader("Location");
+                          //  console.log("status URL ", statusUrl)
                             self.$emit("initExport", statusUrl);
                             self.updateExportProgress(statusUrl, function(data) {
                                 self.onAfterExportData(data);

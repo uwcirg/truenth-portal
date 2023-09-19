@@ -116,8 +116,8 @@
                 //watch for when study changes
                 //reset last exported item link as it is specific to each study
                 this.handleSetExportHistory();
-                //reset export error
-                this.resetExportError();
+                //reset export display info
+                this.resetExportInfoUI();
                 //reset instrument(s) selected
                 this.resetInstrumentSelections();
             },
@@ -208,8 +208,11 @@
                     self.instruments.selected = arrSelected;
                 });
                 $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
-                    //clear pre-existing error
-                    self.resetExportError();
+                    //clear pre-existing export info display
+                    self.resetExportInfoUI();
+                    if (self.hasInstrumentsSelection()) {
+                        $("#patientsDownloadButton").removeAttr("disabled");
+                    }
                 });
                 //patientsDownloadTypeList downloadType
                 $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
@@ -220,23 +223,23 @@
                     }
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
+                    self.resetExportInfoUI();
+                    self.setInstrumentsListReady();
                     self.instruments.selected = [];
                     self.instruments.dataType = "csv";
-                    self.resetExportError();
-                    self.setInstrumentsListReady();
+                    $(this).find("#patientsInstrumentList label").removeClass("active");
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
             },
-            resetExportError: function() {
-                this.$refs.exportDataLoader.clearExportDataUI();
+            resetExportInfoUI: function() {
+                this.$refs.exportDataLoader.clearInProgress();
             },
             setInProgress: function(inProgress) {
                 if (!inProgress) {
-                    this.$refs.exportDataLoader.setInProgress(false);
-                    this.$refs.exportDataLoader.clearExportDataUI();
+                    this.resetExportInfoUI();
                     return;
                 }
-                this.$refs.asyncDataLoader.setInProgress(true);
+                this.$refs.exportDataLoader.setInProgress(true);
             },
             initExportEvent: function() {
                 /*
@@ -314,9 +317,14 @@
                 }
                 return resultJSON;
             },
+            getFinishedStatusURL: function(url) {
+                if (!url) return "";
+                return url.replace("/status", "");
+            },
             getExportDataInfoFromTask: function(callback) {
                 callback = callback || function() {};
                 const task = this.getCacheTask();
+                const self = this;
                 if (!task) {
                     callback({data: null});
                     return;
@@ -338,14 +346,14 @@
                                     exportStatus === "SUCCESS"? 
                                     {
                                         ...task,
-                                        url: taskURL.replace("/status", "")
+                                        url: self.getFinishedStatusURL(taskURL)
                                     }:
                                     null
                             });
                     // callback({
                     //     data: {
                     //         ...task,
-                    //         url: taskURL.replace("/status", "")
+                    //         url: self.getFinishedStatusURL(taskURL)
                     //     }
                     // })
                 }).fail(function() {
@@ -387,11 +395,16 @@
                 this.exportHistory = o;
             },
             handleSetExportHistory: function() {
+                const self = this;
                 this.getExportDataInfoFromTask(function(data) {
                     if (data && data.data) {
                         this.setExportHistory(data.data);
                         const task = this.getCacheTask();
-                        if (task && task.url && task.url === self.currentTaskUrl) {
+                      //  console.log("current task URL ", self.getFinishedStatusURL(self.currentTaskUrl));
+                      //  console.log("cached task URL ", self.getFinishedStatusURL(task.url));
+                        if (task &&
+                            task.url &&
+                            self.getFinishedStatusURL(task.url) === self.getFinishedStatusURL(self.currentTaskUrl)) {
                             this.setInProgress(false);
                         }
                         return;
