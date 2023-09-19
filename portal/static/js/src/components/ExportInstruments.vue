@@ -57,6 +57,7 @@
                             :initElementId="getInitElementId()"
                             :exportUrl="getExportUrl()"
                             :exportIdentifier="currentStudy"
+                            v-on:initExport="handleInitExport"
                             v-on:doneExport="handleAfterExport"
                             v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                         <!-- display link to the last export -->
@@ -64,7 +65,7 @@
                             <div class="text-muted prompt" v-text="exportHistoryTitle"></div>
                             <div v-if="exportHistory">
                                 <a :href="exportHistory.url" target="_blank">
-                                    <span v-text="exportHistory.instruments.join(', ')"></span>
+                                    <span v-text="(exportHistory.instruments || []).join(', ')"></span>
                                     <span v-text="exportHistory.date"></span>
                                 </a>
                             </div>
@@ -98,7 +99,8 @@
                 subStudyIdentifier: "substudy",
                 mainStudyInstrumentsList:[],
                 subStudyInstrumentsList:[],
-                exportHistory: null
+                exportHistory: null,
+                currentTaskUrl: null
             }};
         },
         mixins: [CurrentUser],
@@ -106,16 +108,16 @@
             this.setCurrentMainStudy();
             this.initCurrentUser(function() {
                 this.getInstrumentList();
-                this.setExportHistory(this.getCacheExportedDataInfo());
+                this.handleSetExportHistory();
             }.bind(this));
         },
         watch: {
             currentStudy: function(newVal, oldVal) {
                 //watch for when study changes
                 //reset last exported item link as it is specific to each study
-                this.setExportHistory(this.getCacheExportedDataInfo());
-                //reset export error
-                this.resetExportError();
+                this.handleSetExportHistory();
+                //reset export display info
+                this.resetExportInfoUI();
                 //reset instrument(s) selected
                 this.resetInstrumentSelections();
             },
@@ -206,8 +208,11 @@
                     self.instruments.selected = arrSelected;
                 });
                 $("#patientsInstrumentList [name='instrument'], #patientsDownloadTypeList [name='downloadType']").on("click", function() {
-                    //clear pre-existing error
-                    self.resetExportError();
+                    //clear pre-existing export info display
+                    self.resetExportInfoUI();
+                    if (self.hasInstrumentsSelection()) {
+                        $("#patientsDownloadButton").removeAttr("disabled");
+                    }
                 });
                 //patientsDownloadTypeList downloadType
                 $("#patientsDownloadTypeList [name='downloadType']").on("click", function() {
@@ -218,15 +223,23 @@
                     }
                 });
                 $("#dataDownloadModal").on("show.bs.modal", function () {
+                    self.resetExportInfoUI();
+                    self.setInstrumentsListReady();
                     self.instruments.selected = [];
                     self.instruments.dataType = "csv";
-                    self.resetExportError();
-                    self.setInstrumentsListReady();
+                    $(this).find("#patientsInstrumentList label").removeClass("active");
                     $(this).find("[name='instrument']").prop("checked", false);
                 });
             },
-            resetExportError: function() {
-                this.$refs.exportDataLoader.clearExportDataUI();
+            resetExportInfoUI: function() {
+                this.$refs.exportDataLoader.clearInProgress();
+            },
+            setInProgress: function(inProgress) {
+                if (!inProgress) {
+                    this.resetExportInfoUI();
+                    return;
+                }
+                this.$refs.exportDataLoader.setInProgress(true);
             },
             initExportEvent: function() {
                 /*
@@ -234,7 +247,10 @@
                  */
                 let self = this;
                  $("#dataDownloadModal").on("hide.bs.modal", function () {
-                    $("#"+self.getInitElementId()).removeAttr("data-export-in-progress");
+                    self.setInProgress(false);
+                });
+                $(window).on("focus", function() {
+                    self.handleSetExportHistory();
                 });
             },
             setDataType: function (event) {
@@ -259,21 +275,100 @@
                 var queryStringInstruments = (this.instruments.selected).map(item => `instrument_id=${item}`).join("&");
                 return `/api/patient/assessment?${queryStringInstruments}&format=${this.instruments.dataType}`;
             },
+            getDefaultExportObj: function() {
+                return {
+                    study: this.currentStudy,
+                    date: new Date().toLocaleString(),
+                    instruments: this.instruments.selected || []
+                }
+            },
+            handleInitExport: function(statusUrl) {
+                if (!statusUrl) return;
+                // whenever the user initiates an export, we cache the associated celery task URL
+                this.setCacheTask({
+                    ...this.getDefaultExportObj(),
+                    url: statusUrl
+                });
+                this.currentTaskUrl = statusUrl;
+            },
             handleAfterExport: function(resultUrl) {
                 //export is done, save the last export to local storage
                 this.setCacheExportedDataInfo(resultUrl);
             },
+            getCacheExportTaskKey: function() {
+                return `export_data_task_${this.getUserId()}_${this.currentStudy}`;
+            },
+            removeCacheTaskURL: function() {
+                localStorage.removeItem(this.getCacheExportTaskKey());
+            },
+            setCacheTask: function(taskObj) {
+                if (!taskObj) return;
+                localStorage.setItem(this.getCacheExportTaskKey(), JSON.stringify(taskObj));
+            },
+            getCacheTask: function() {
+                const task = localStorage.getItem(this.getCacheExportTaskKey());
+                if (!task) return null;
+                let resultJSON = null;
+                try {
+                    resultJSON = JSON.parse(task);
+                } catch(e) {
+                    console.log("Unable to parse task JSON ", e);
+                    resultJSON = null;
+                }
+                return resultJSON;
+            },
+            getFinishedStatusURL: function(url) {
+                if (!url) return "";
+                return url.replace("/status", "");
+            },
+            getExportDataInfoFromTask: function(callback) {
+                callback = callback || function() {};
+                const task = this.getCacheTask();
+                const self = this;
+                if (!task) {
+                    callback({data: null});
+                    return;
+                }
+                const taskURL = task.url;
+                if (!taskURL) {
+                    callback({data: null});
+                    return;
+                }
+                $.getJSON(taskURL, function(data) {
+                    if (!data) {
+                        callback({data: null});
+                        return;
+                    }
+                    // check the status of the celery task and returns the data if it had been successful
+                    const exportStatus = String(data["state"]).toUpperCase();
+                    callback({
+                                data : 
+                                    exportStatus === "SUCCESS"? 
+                                    {
+                                        ...task,
+                                        url: self.getFinishedStatusURL(taskURL)
+                                    }:
+                                    null
+                            });
+                    // callback({
+                    //     data: {
+                    //         ...task,
+                    //         url: self.getFinishedStatusURL(taskURL)
+                    //     }
+                    // })
+                }).fail(function() {
+                    callback({data: null});
+                });
+            },
             getCacheExportedDataInfoKey: function() {
                 //uniquely identified by each user and the study
-                return `exporDataInfo_${this.getUserId()}_${this.currentStudy}}`;
+                return `exporDataInfo_${this.getUserId()}_${this.currentStudy}`;
             },
             setCacheExportedDataInfo: function(resultUrl) {
                 if (!resultUrl) return false;
                 if (!this.hasInstrumentsSelection()) return;
                 var o = {
-                    study: this.currentStudy,
-                    date: new Date().toLocaleString(),
-                    instruments: this.instruments.selected,
+                    ...this.getDefaultExportObj(),
                     url: resultUrl
                 };
                 localStorage.setItem(this.getCacheExportedDataInfoKey(), JSON.stringify(o));
@@ -284,7 +379,14 @@
                 if (!cachedItem) {
                     return null;
                 }
-                return JSON.parse(cachedItem);
+                let resultJSON = null;
+                try {
+                    resultJSON = JSON.parse(cachedItem);
+                } catch(e) {
+                    console.log("Unable to parse cached data export info ", e);
+                    resultJSON = null;
+                }
+                return resultJSON;
             },
             hasExportHistory: function() {
                 return this.exportHistory || this.getCacheExportedDataInfo();
@@ -292,6 +394,27 @@
             setExportHistory: function(o) {
                 this.exportHistory = o;
             },
+            handleSetExportHistory: function() {
+                const self = this;
+                this.getExportDataInfoFromTask(function(data) {
+                    if (data && data.data) {
+                        this.setExportHistory(data.data);
+                        const task = this.getCacheTask();
+                      //  console.log("current task URL ", self.getFinishedStatusURL(self.currentTaskUrl));
+                      //  console.log("cached task URL ", self.getFinishedStatusURL(task.url));
+                        if (task &&
+                            task.url &&
+                            self.getFinishedStatusURL(task.url) === self.getFinishedStatusURL(self.currentTaskUrl)) {
+                            this.setInProgress(false);
+                        }
+                        return;
+                    }
+                    const cachedDataInfo = this.getCacheExportedDataInfo();
+                    if (cachedDataInfo) {
+                        this.setExportHistory(cachedDataInfo);
+                    }
+                }.bind(this));
+            }
         }
     };
 </script>
