@@ -81,4 +81,33 @@ def upgrade():
 
 
 def downgrade():
-    pass  # no value in removing
+    # for each active EMPRO patient with at least 1 hard triggered domain,
+    # remove any sequential counts found
+    bind = op.get_bind()
+    session = Session(bind=bind)
+
+    patient_ids = []
+    for patient_id in session.execute(
+            "SELECT DISTINCT(user_id) FROM trigger_states JOIN users"
+            " ON users.id = user_id WHERE deleted_id IS NULL"):
+        patient_ids.append(patient_id[0])
+
+    output = StringIO()
+    for pid in patient_ids:
+        output.write(f"\n\nPatient: {pid}\n")
+        trigger_states = db.session.query(TriggerState).filter(
+            TriggerState.user_id == pid).filter(
+            TriggerState.state == "resolved").order_by(
+            TriggerState.timestamp.asc())
+        for ts in trigger_states:
+            improved_triggers = deepcopy(ts.triggers)
+            for d in EMPRO_DOMAINS:
+                if sequential_hard_trigger_count_key in improved_triggers["domain"][d]:
+                    del improved_triggers["domain"][d][sequential_hard_trigger_count_key]
+                    output.write(f"  removed sequential from {ts.visit_month}:{d} {improved_triggers['domain'][d]}\n")
+
+            # retain triggers now containing sequential counts
+            ts.triggers = improved_triggers
+
+        db.session.commit()
+        print(output.getvalue())
