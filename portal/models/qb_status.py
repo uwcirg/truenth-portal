@@ -562,6 +562,9 @@ def patient_research_study_status(patient, ignore_QB_status=False):
         if assessment_status.overall_status == OverallStatus.withdrawn:
             rs_status['errors'].append('Withdrawn')
             continue
+        if assessment_status.overall_status == OverallStatus.expired:
+            rs_status['errors'].append('Expired')
+            continue
 
         needing_full = assessment_status.instruments_needing_full_assessment(
             classification='all')
