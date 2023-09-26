@@ -439,7 +439,7 @@ class QuestionnaireResponse(db.Model):
             if question["linkId"] == link_id:
                 questions.append(replacement)
                 continue
-            questions.append(replacement)
+            questions.append(question)
         assert len(questions) == len(self.document["group"]["question"])
         return questions
 
