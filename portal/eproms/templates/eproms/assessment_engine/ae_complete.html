@@ -39,7 +39,10 @@
             {%- endcall -%}
         {%- else -%}
             {%- if substudy_assessment_status.overall_status == OverallStatus.expired -%}
-                {{empro_expired(comp_date=substudy_comp_date)}}
+                {{empro_expired(
+                    user=user,
+                    substudy_assessment_status=substudy_assessment_status
+                )}}
             {%- else -%}
                 <!-- substudy due card -->
                 {{empro_due(

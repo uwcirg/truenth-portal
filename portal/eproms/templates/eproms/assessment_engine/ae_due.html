@@ -33,7 +33,10 @@
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
         {%- if substudy_assessment_status.overall_status == OverallStatus.expired -%}
-            {{empro_expired(comp_date=substudy_comp_date)}}
+            {{empro_expired(
+                user=user,
+                substudy_assessment_status=substudy_assessment_status
+            )}}
         {%- else -%}
             <!-- substudy due card, NOTE if global study work is still due, this tile will be disabled -->
             {{empro_due(
