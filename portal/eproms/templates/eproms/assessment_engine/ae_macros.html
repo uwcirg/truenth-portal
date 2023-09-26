@@ -62,6 +62,21 @@
     {{render_logout()}}
 {%- endmacro -%}
 
+{%- macro empro_expired(comp_date="") -%}
+    {% set substudy_title = "EMPRO" %}
+    {% call render_card_content(title_text=_("%(substudy_title)s Study", substudy_title=substudy_title), card_class="") %}
+        <div class="text-content">
+            {%- if comp_date -%}
+                <a class="portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="longitudinalReportsLoc")}}'>
+                    {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
+                </a>
+            {%- else -%}
+                <!-- verbiage used also for expired main study questionnaire -->
+                <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
+            {%- endif -%}
+        </div>
+    {% endcall %}
+{%- endmacro -%}
 <!-- sub-study macro -->
 {%- macro empro_due(
                     substudy_assessment_is_due=false,
