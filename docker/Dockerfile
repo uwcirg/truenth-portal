@@ -12,7 +12,7 @@ RUN npm run build
 # -----------------------------------------------------------------------------
 
 
-FROM debian:bookworm as builder
+FROM debian:bullseye as builder
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
@@ -51,7 +51,7 @@ RUN \
 
 # -----------------------------------------------------------------------------
 
-FROM debian:bookworm as production
+FROM debian:bullseye as production
 
 LABEL org.opencontainers.image.source https://github.com/uwcirg/truenth-portal
 
