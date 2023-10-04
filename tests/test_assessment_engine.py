@@ -412,7 +412,9 @@ class TestAssessmentEngine(TestCase):
 
         updated_qnr_response = self.results_from_async_call(
             '/api/patient/assessment',
-            query_string={'instrument_id': instrument_id})
+            query_string={
+                'instrument_id': instrument_id,
+                'ignore_qb_requirement': True})
         assert updated_qnr_response.status_code == 200
         assert (
             updated_qnr_response.json['entry'][0]['group']
@@ -457,7 +459,9 @@ class TestAssessmentEngine(TestCase):
 
         response = self.results_from_async_call(
             '/api/patient/assessment',
-            query_string={'instrument_id': instrument_id})
+            query_string={
+                'instrument_id': instrument_id,
+                'ignore_qb_requirement': True})
         assert response.status_code == 200
         response = response.json
 

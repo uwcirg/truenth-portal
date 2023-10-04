@@ -28,6 +28,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
+from ..models.overall_status import OverallStatus
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
@@ -850,6 +851,7 @@ def get_assessments():
 
     research_studies = set()
     questionnaire_list = request.args.getlist('instrument_id')
+    ignore_qb_requirement = request.args.get("ignore_qb_requirement", False)
     for q in questionnaire_list:
         research_studies.add(research_study_id_from_questionnaire(q))
     if len(research_studies) != 1:
@@ -870,6 +872,7 @@ def get_assessments():
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
         'lock_key': "research_report_task_lock",
+        'ignore_qb_requirement': request.args.get("ignore_qb_requirement"),
         'response_format': request.args.get('format', 'json').lower()
     }
 
@@ -1772,7 +1775,7 @@ def present_needed():
     for rs in ResearchStudy.assigned_to(subject):
         assessment_status = QB_Status(
             subject, research_study_id=rs, as_of_date=as_of_date)
-        if assessment_status.overall_status == 'Withdrawn':
+        if assessment_status.overall_status == OverallStatus.withdrawn:
             abort(400, 'Withdrawn; no pending work found')
 
         args = dict(request.args.items())

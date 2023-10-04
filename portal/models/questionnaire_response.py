@@ -842,7 +842,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        celery_task=None):
+        ignore_qb_requirement=False, celery_task=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -850,6 +850,7 @@ def aggregate_responses(
         to list of patients the current_user has permission to see
     :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
+    :param ignore_qb_requirement: set to include all questionnaire responses
     :param celery_task: if defined, send occasional progress updates
 
     """
@@ -863,6 +864,11 @@ def aggregate_responses(
     questionnaire_responses = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
         QuestionnaireResponse.document['authored'].desc())
+
+    # TN-3250, don't include QNRs without assigned visits, i.e. qb_id > 0
+    if not ignore_qb_requirement:
+        questionnaire_responses = questionnaire_responses.filter(
+            QuestionnaireResponse.questionnaire_bank_id > 0)
 
     if instrument_ids:
         instrument_filters = (
