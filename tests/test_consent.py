@@ -519,3 +519,71 @@ class TestUserConsent(TestCase):
         assert resp.status_code == 400
         assert 1 == UserConsent.query.filter_by(
             user_id=TEST_USER_ID, organization_id=org_id).count()
+
+    def test_double_withdrawal(self):
+        """second withdrawal should replace the first"""
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id = org.id
+
+        acceptance_date = FHIR_datetime.parse("2018-06-30 12:12:12")
+        suspend_date = FHIR_datetime.parse("2018-06-30 12:12:15")
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit,
+            acceptance_date=acceptance_date,
+            research_study_id=0)
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 1
+
+        self.login()
+
+        data = {'organization_id': org_id, 'acceptance_date': suspend_date}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 200
+
+        # withdraw a second time with a few invalid values
+        too_early = acceptance_date - timedelta(days=1)
+        too_late = datetime.now() + timedelta(hours=25)
+        just_right = suspend_date + timedelta(days=30)
+
+        data = {'organization_id': org_id, 'acceptance_date': too_early}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 400
+
+        data = {'organization_id': org_id, 'acceptance_date': too_late}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 400
+
+        data = {'organization_id': org_id, 'acceptance_date': just_right}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 200
+
+        # check that old consent is marked as deleted
+        old_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='deleted').first()
+        assert old_consent.deleted_id
+
+        # check withdrawn consent was replaced
+        query = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='suspended')
+        assert query.count() == 1
+        assert query.first().acceptance_date == just_right
