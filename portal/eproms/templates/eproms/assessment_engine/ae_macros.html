@@ -95,21 +95,26 @@
         {%- call render_card_content(
             title_text=_("%(substudy_title)s Questionnaire", substudy_title=substudy_title),
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
-            {%- if not substudy_assessment_is_ready -%}
-                {%- if substudy_due_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        substudy_title=substudy_title,
-                        substudy_due_date=substudy_due_date,
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- else -%}
-                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- endif -%}
+            {%- if substudy_assessment_status.overall_status == OverallStatus.withdrawn -%}
+                <!-- Patient withdrawn, display appropriate text on card -->
+                <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
             {%- else -%}
-                <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- if not substudy_assessment_is_ready -%}
+                    {%- if substudy_due_date -%}
+                        <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            substudy_title=substudy_title,
+                            substudy_due_date=substudy_due_date,
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- else -%}
+                        <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- endif -%}
+                {%- else -%}
+                    <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- endif -%}
+                {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+                    <!-- display any error if for some reason the assessment is not ready -->
             {%- endif -%}
-            {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
-            <!-- display any error if for some reason the assessment is not ready -->
             {%- if substudy_assessment_errors and substudy_assessment_errors|length %}
                 <div class="error-message">
                     <span class='glyphicon glyphicon-alert warning icon' aria-hidden='true'></span>
