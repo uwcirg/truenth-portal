@@ -96,7 +96,7 @@
             title_text=_("%(substudy_title)s Questionnaire", substudy_title=substudy_title),
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
             {%- if substudy_assessment_status.overall_status == OverallStatus.withdrawn -%}
-                {{substudy_assessment_errors}}
+                <!-- Patient withdrawn, display appropriate text on card -->
                 <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
             {%- else -%}
                 {%- if not substudy_assessment_is_ready -%}
