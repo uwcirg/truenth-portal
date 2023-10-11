@@ -1776,7 +1776,11 @@ def present_needed():
         assessment_status = QB_Status(
             subject, research_study_id=rs, as_of_date=as_of_date)
         if assessment_status.overall_status == OverallStatus.withdrawn:
-            abort(400, 'Withdrawn; no pending work found')
+            # As it's possible a user withdrew, then followed an old email
+            # link back in to take the assessment, log this fact and redirect
+            current_app.logger.warning(
+                f'{subject_id} is Withdrawn, no pending work found; redirect home')
+            return redirect('/')
 
         args = dict(request.args.items())
         args['instrument_id'] = (
