@@ -62,6 +62,20 @@
     {{render_logout()}}
 {%- endmacro -%}
 
+{%- macro empro_expired(user=user, substudy_assessment_status={}) -%}
+    {% set substudy_title = "EMPRO" %}
+    {% call render_card_content(title_text=_("%(substudy_title)s Study", substudy_title=substudy_title), card_class="") %}
+        <div class="text-content">
+             <!-- verbiage used also for expired main study questionnaire -->
+             <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
+             {% if substudy_assessment_status.at_least_one_completed %}
+                <div class="button-container">
+                    {{empro_report_link(user)}}
+                </div>
+             {% endif %}
+        </div>
+    {% endcall %}
+{%- endmacro -%}
 <!-- sub-study macro -->
 {%- macro empro_due(
                     substudy_assessment_is_due=false,
@@ -81,21 +95,26 @@
         {%- call render_card_content(
             title_text=_("%(substudy_title)s Questionnaire", substudy_title=substudy_title),
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
-            {%- if not substudy_assessment_is_ready -%}
-                {%- if substudy_due_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        substudy_title=substudy_title,
-                        substudy_due_date=substudy_due_date,
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- else -%}
-                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- endif -%}
+            {%- if substudy_assessment_status.overall_status == OverallStatus.withdrawn -%}
+                <!-- Patient withdrawn, display appropriate text on card -->
+                <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
             {%- else -%}
-                <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- if not substudy_assessment_is_ready -%}
+                    {%- if substudy_due_date -%}
+                        <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            substudy_title=substudy_title,
+                            substudy_due_date=substudy_due_date,
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- else -%}
+                        <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- endif -%}
+                {%- else -%}
+                    <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- endif -%}
+                {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+                    <!-- display any error if for some reason the assessment is not ready -->
             {%- endif -%}
-            {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
-            <!-- display any error if for some reason the assessment is not ready -->
             {%- if substudy_assessment_errors and substudy_assessment_errors|length %}
                 <div class="error-message">
                     <span class='glyphicon glyphicon-alert warning icon' aria-hidden='true'></span>
@@ -139,10 +158,23 @@
                 substudy_assessment_status=substudy_assessment_status,
                 substudy_comp_date=substudy_comp_date,
                 enrolled_in_substudy=enrolled_in_substudy,
-                card_class="" if substudy_overall_completed_status else "disabled"
+                card_class="" if substudy_overall_completed_status or substudy_assessment_status.at_least_one_completed else "disabled"
             )}}
         </div>
     </div>
+{%- endmacro -%}
+{%- macro empro_report_link(user=user, inModal=false) -%}
+    {%- if inModal -%}
+        {%- if user and user.current_encounter().auth_method == 'url_authenticated' -%}
+            <!-- for an url authenticated user, trying to access the report will be prompted to login in -->
+            <a class="btn btn-empro-primary btn-report portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
+        {%- else -%}
+            <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
+        {%- endif -%}
+    {%- else -%}
+        <a class="btn-lg btn-tnth-primary portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
+    {%- endif -%}
+    <!--btn-lg btn-tnth-primary -->
 {%- endmacro -%}
 <!-- sub-study macro -->
 {%- macro empro_completed(
@@ -160,15 +192,21 @@
             title_text = _("%(substudy_title)s Study", substudy_title=substudy_title),
             card_class = card_class if card_class else "portal-description-complete") -%}
             <div class="text-content">
-                <p>{{_("View a summary of your questionnaire responses, as well as key health tips and resources.")}}</p>
                 {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
+                    <p>{{_("View a summary of your questionnaire responses, as well as key health tips and resources.")}}</p>
                     <div class="buttons-container">
                         <br/>
                         <!-- this is an anchor link to open thank you modal -->
                         <a class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#emproModal">{{_("View report and resources", substudy_comp_date=substudy_comp_date)}}</a>
                     </div>
                 {% else %}
-                    <p>{{_("No %(substudy_title)s questionnaire has been completed yet.", substudy_title=substudy_title)}}</p>
+                    {% if substudy_assessment_status.at_least_one_completed %}
+                        <div class="button-container">
+                            {{empro_report_link(user)}}
+                        </div>
+                    {% else %}
+                        <p>{{_("No %(substudy_title)s questionnaire has been completed yet.", substudy_title=substudy_title)}}</p>
+                    {% endif %}
                 {% endif %}
             </div>
         {%- endcall -%}
@@ -207,12 +245,7 @@
         <h4>{{_("Your Report")}}</h4>
         <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
-            {%- if user and user.current_encounter().auth_method == 'url_authenticated' -%}
-                <!-- for an url authenticated user, trying to access the report will be prompted to login in -->
-                <a class="btn btn-empro-primary btn-report portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
-            {%- else -%}
-                <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
-            {%- endif -%}
+            {{empro_report_link(user, true)}}
         </div>
     </div>
 {%- endmacro -%}

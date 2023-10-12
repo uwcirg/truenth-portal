@@ -1,5 +1,5 @@
 """User API view functions"""
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import (
@@ -50,7 +50,7 @@ from ..models.user import (
     permanently_delete_user,
     validate_email,
 )
-from ..models.user_consent import UserConsent
+from ..models.user_consent import UserConsent, consent_withdrawal_dates
 from ..models.user_document import UserDocument
 from ..type_tools import check_int
 from .auth import logout
@@ -866,13 +866,38 @@ def withdraw_consent(
     uc = UserConsent.query.filter_by(
         user_id=user.id, organization_id=org_id, status='consented',
         research_study_id=research_study_id).first()
-
-    if not uc:
-        abort(
-            404,
-            "no UserConsent found for user ID {}, org ID {}, research study "
-            "ID {}".format(user.id, org_id, research_study_id))
     try:
+        if not uc:
+            # Possible replacement of existing withdrawal
+            wc = UserConsent.query.filter_by(
+                user_id=user.id, organization_id=org_id, status='suspended',
+                research_study_id=research_study_id).first()
+
+            if not wc:
+                abort(
+                    404,
+                    "no UserConsent found for user ID {}, org ID {}, research study "
+                    "ID {}".format(user.id, org_id, research_study_id))
+
+            # replace with requested time, provided it's in a valid window
+            prior_consent, prior_withdrawal = consent_withdrawal_dates(user, research_study_id)
+            if acceptance_date == prior_withdrawal:
+                # valid nop, leave.
+                return jsonify(wc.as_json())
+            if acceptance_date < prior_consent:
+                raise ValueError(
+                    f"Can't suspend with acceptance date {acceptance_date} "
+                    f"prior to last valid consent {prior_consent}")
+            if acceptance_date > datetime.utcnow() + timedelta(days=1):
+                raise ValueError(
+                    "Can't suspend with acceptance date in the future")
+            wc.acceptance_date = acceptance_date
+            db.session.commit()
+            # As withdrawal time just changed, force recalculation
+            invalidate_users_QBT(
+                user_id=user.id, research_study_id=research_study_id)
+            return jsonify(wc.as_json())
+
         if not acceptance_date:
             acceptance_date = datetime.utcnow()
         if acceptance_date <= uc.acceptance_date:

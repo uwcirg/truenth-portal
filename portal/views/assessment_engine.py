@@ -28,6 +28,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
+from ..models.overall_status import OverallStatus
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
@@ -850,6 +851,7 @@ def get_assessments():
 
     research_studies = set()
     questionnaire_list = request.args.getlist('instrument_id')
+    ignore_qb_requirement = request.args.get("ignore_qb_requirement", False)
     for q in questionnaire_list:
         research_studies.add(research_study_id_from_questionnaire(q))
     if len(research_studies) != 1:
@@ -870,6 +872,7 @@ def get_assessments():
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
         'lock_key': "research_report_task_lock",
+        'ignore_qb_requirement': request.args.get("ignore_qb_requirement"),
         'response_format': request.args.get('format', 'json').lower()
     }
 
@@ -986,6 +989,13 @@ def assessment_update(patient_id):
 
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr.first()
+
+    # TN-3184, report any in-process QNRs attempting to change authored dates
+    date_change_snippet = ""
+    if FHIR_datetime.parse(existing_qnr.document["authored"]) != FHIR_datetime.parse(updated_qnr["authored"]):
+        date_change_snippet = f" UNEXPECTED authored change; was previously {existing_qnr.document['authored']}"
+        current_app.logger.warning(date_change_snippet)
+
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
@@ -1001,7 +1011,7 @@ def assessment_update(patient_id):
             kwargs={'questionnaire_response_id': existing_qnr.id}
         )
     auditable_event(
-        "updated {}".format(existing_qnr),
+        f"updated {existing_qnr}{date_change_snippet}",
         user_id=current_user().id,
         subject_id=patient.id,
         context='assessment',
@@ -1765,8 +1775,12 @@ def present_needed():
     for rs in ResearchStudy.assigned_to(subject):
         assessment_status = QB_Status(
             subject, research_study_id=rs, as_of_date=as_of_date)
-        if assessment_status.overall_status == 'Withdrawn':
-            abort(400, 'Withdrawn; no pending work found')
+        if assessment_status.overall_status == OverallStatus.withdrawn:
+            # As it's possible a user withdrew, then followed an old email
+            # link back in to take the assessment, log this fact and redirect
+            current_app.logger.warning(
+                f'{subject_id} is Withdrawn, no pending work found; redirect home')
+            return redirect('/')
 
         args = dict(request.args.items())
         args['instrument_id'] = (

@@ -24,6 +24,7 @@ class QB_Status(object):
     def __init__(self, user, research_study_id, as_of_date):
         self.user = user
         self.as_of_date = as_of_date
+        self.at_least_one_completed = False
         self.research_study_id = research_study_id
         for state in OverallStatus:
             setattr(self, "_{}_date".format(state.name), None)
@@ -45,6 +46,11 @@ class QB_Status(object):
         users_qbs = QBT.query.filter(QBT.user_id == self.user.id).filter(
             QBT.research_study_id == self.research_study_id).filter(
             QBT.status == OverallStatus.due).order_by(QBT.at.asc())
+
+        completed = QBT.query.filter(QBT.user_id == self.user.id).filter(
+            QBT.research_study_id == self.research_study_id).filter(
+            QBT.status == OverallStatus.completed).count()
+        self.at_least_one_completed = completed > 0
 
         # Obtain withdrawal date if applicable
         withdrawn = QBT.query.filter(QBT.user_id == self.user.id).filter(
@@ -561,6 +567,9 @@ def patient_research_study_status(patient, ignore_QB_status=False):
             patient, research_study_id=rs, as_of_date=as_of_date)
         if assessment_status.overall_status == OverallStatus.withdrawn:
             rs_status['errors'].append('Withdrawn')
+            continue
+        if assessment_status.overall_status == OverallStatus.expired:
+            rs_status['errors'].append('Expired')
             continue
 
         needing_full = assessment_status.instruments_needing_full_assessment(

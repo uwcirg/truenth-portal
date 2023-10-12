@@ -96,6 +96,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
                 qbd.completed_date(patient.id)) or ""
             row['oow_completion_date'] = report_format(
                 qbd.oow_completed_date(patient.id)) or ""
+        if row['status'] == 'Withdrawn':
+            # visit unreliable when withdrawn - clear
+            row['visit'] = ''
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
@@ -110,6 +113,10 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         if 'completion_date' in row:
             row['EMPRO_questionnaire_completion_date'] = (
                 row.pop('completion_date'))
+
+        # If withdrawn, the rest is unreliable
+        if row['status'] == 'Withdrawn':
+            return
 
         # Correct for zero index visit month in db
         visit_month = int(row['visit'].split()[-1]) - 1
@@ -387,7 +394,8 @@ def adherence_report(
 
 def research_report(
         instrument_ids, research_study_id, acting_user_id, patch_dstu2,
-        request_url, response_format, lock_key, celery_task):
+        request_url, response_format, lock_key, ignore_qb_requirement,
+        celery_task):
     """Generates the research report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -400,6 +408,7 @@ def research_report(
     :param request_url: original request url, for inclusion in FHIR bundle
     :param response_format: 'json' or 'csv'
     :param lock_key: name of TimeoutLock key used to throttle requests
+    :param ignore_qb_requirement: Set to include all questionnaire responses
     :param celery_task: used to update status when run as a celery task
     :return: dictionary of results, easily stored as a task output, including
        any details needed to assist the view method
@@ -414,6 +423,7 @@ def research_report(
         research_study_id=research_study_id,
         current_user=acting_user,
         patch_dstu2=patch_dstu2,
+        ignore_qb_requirement=ignore_qb_requirement,
         celery_task=celery_task
     )
     bundle.update({
