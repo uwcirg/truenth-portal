@@ -846,7 +846,7 @@ def withdraw_user_consent(user_id):
     org_id = request.json.get('organization_id')
     if not org_id:
         abort(400, "missing required organization ID")
-    research_study_id = request.json.get('research_study_id', 0)
+    research_study_id = int(request.json.get('research_study_id', 0))
     acceptance_date = None
     if 'acceptance_date' in request.json:
         acceptance_date = FHIR_datetime.parse(request.json['acceptance_date'])
@@ -881,10 +881,10 @@ def withdraw_consent(
 
             # replace with requested time, provided it's in a valid window
             prior_consent, prior_withdrawal = consent_withdrawal_dates(user, research_study_id)
-            if acceptance_date == prior_withdrawal:
+            if prior_withdrawal and acceptance_date == prior_withdrawal:
                 # valid nop, leave.
                 return jsonify(wc.as_json())
-            if acceptance_date < prior_consent:
+            if prior_consent and acceptance_date < prior_consent:
                 raise ValueError(
                     f"Can't suspend with acceptance date {acceptance_date} "
                     f"prior to last valid consent {prior_consent}")
