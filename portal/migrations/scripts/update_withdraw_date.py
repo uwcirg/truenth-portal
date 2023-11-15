@@ -34,7 +34,7 @@ def convert_date_format(date_str):
 
 # Function to process the csv file
 def process_csv(file_path):
-    with open(file_path, newline='') as csvfile:
+    with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             user_id_data = row['user_id']
