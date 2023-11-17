@@ -374,7 +374,8 @@ def cur_next_rp_gen(user, research_study_id, classification, trigger_date):
             )
             if curRPD.retired == nextRPD.retired:
                 raise ValueError(
-                    "Invalid state: multiple RPs w/ same retire date")
+                    "Invalid state: multiple RPs w/ same retire date: "
+                    f"{next_rp} : {curRPD.retired}")
         else:
             nextRPD = None
         yield curRPD, nextRPD
