@@ -102,6 +102,8 @@ def downgrade():
         for ts in trigger_states:
             improved_triggers = deepcopy(ts.triggers)
             for d in EMPRO_DOMAINS:
+                if d not in improved_triggers["domain"]:
+                    raise RuntimeError(f"{d} missing from {ts.visit_month} for {patient_id}")
                 if sequential_hard_trigger_count_key in improved_triggers["domain"][d]:
                     del improved_triggers["domain"][d][sequential_hard_trigger_count_key]
                     output.write(f"  removed sequential from {ts.visit_month}:{d} {improved_triggers['domain'][d]}\n")
