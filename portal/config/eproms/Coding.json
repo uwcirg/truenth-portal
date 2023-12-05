@@ -6115,12 +6115,6 @@
       "system": "urn:ietf:bcp:47"
     },
     {
-      "code": "zu_ZA",
-      "display": "Zulu",
-      "resourceType": "Coding",
-      "system": "urn:ietf:bcp:47"
-    },
-    {
       "code": "pt_BR",
       "display": "Portuguese (Brazil)",
       "resourceType": "Coding",
