@@ -3614,11 +3614,6 @@
                 "code": "xh_ZA",
                 "display": "Xhosa",
                 "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
-                "system": "urn:ietf:bcp:47"
               }
             ]
           }
@@ -4797,11 +4792,6 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "zu_ZA",
-                "display": "Zulu",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
                 "code": "xh_ZA",
                 "display": "Xhosa",
                 "system": "urn:ietf:bcp:47"
@@ -4901,11 +4891,6 @@
               {
                 "code": "fr_CA",
                 "display": "Canadian French",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
                 "system": "urn:ietf:bcp:47"
               },
               {
