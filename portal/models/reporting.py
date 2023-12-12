@@ -152,10 +152,14 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     # build up data until we find valid cache for patient's history
     status = str(qb_stats.overall_status)
     row = patient_data(patient)
+    row["status"] = status
     if status == "Expired" and research_study_id == EMPRO_RS_ID:
-        row["status"] = "Not Yet Available"
-    else:
-        row["status"] = status
+        # Expired status ambiguous for EMPRO - either not available
+        # due to complex business rules around start or walked off
+        # the end.  Assume if consent + 1year > now, it's the former.
+        consent = datetime.strptime(row["consent"], "%d-%b-%Y %H:%M:%S")
+        if consent + timedelta(days=365) > as_of_date:
+            row["status"] = "Not Yet Available"
 
     if last_viable:
         general_row_detail(row, patient, last_viable)
