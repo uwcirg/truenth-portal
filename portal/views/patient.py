@@ -30,7 +30,8 @@ from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
-from ..models.research_study import ResearchStudy
+from ..models.reporting import single_patient_adherence_data
+from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
@@ -341,6 +342,7 @@ def patient_timeline(patient_id):
         # questionnaire_response : qb relationships and remove cache lock
         # on adherence data.
         if purge == 'all':
+            # remove adherence cache key to allow fresh run
             cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
                 patient_id=patient_id,
                 research_study_id=research_study_id))
@@ -455,6 +457,13 @@ def patient_timeline(patient_id):
         status['indefinite status'] = indef_status
 
     adherence_data = sorted_adherence_data(patient_id, research_study_id)
+    if not adherence_data:
+        # immediately following a cache purge, adherence data is gone and
+        # needs to be recreated.
+        now = datetime.utcnow()
+        single_patient_adherence_data(
+            user, as_of_date=now, research_study_id=EMPRO_RS_ID)
+        adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
     if trace:
         return jsonify(
