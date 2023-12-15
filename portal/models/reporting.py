@@ -168,8 +168,8 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             ts_reporting = TriggerStatesReporting(patient_id=patient.id)
             empro_row_detail(row, ts_reporting)
 
-        # latest is only valid for a week, unless the user withdrew
-        valid_for = 500 if row['status'] in ('Expired', 'Withdrawn') else 7
+        # latest is only valid for a day, unless the user withdrew
+        valid_for = 30 if row['status'] in ('Expired', 'Withdrawn') else 1
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
@@ -181,9 +181,10 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     for qbd, status in qb_stats.older_qbds(last_viable):
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(qbd))
-        # once we find cached_data, the rest of the user's history is good
+        # once we find cached_data, the rest of the user's history is likely
+        # good, but best to verify nothing is stale
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
-            break
+            continue
 
         historic = row.copy()
         historic['status'] = status
@@ -194,7 +195,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
-            valid_for_days=500,
+            valid_for_days=30,
             data=historic)
         added_rows += 1
 
@@ -227,7 +228,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             AdherenceData.persist(
                 patient_id=patient.id,
                 rs_id_visit=rs_visit,
-                valid_for_days=500,
+                valid_for_days=30,
                 data=indef)
             added_rows += 1
 
