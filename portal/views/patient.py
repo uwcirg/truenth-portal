@@ -324,6 +324,7 @@ def patient_timeline(patient_id):
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
     from ..models.questionnaire_bank import visit_name
+    from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
     from ..trace import dump_trace, establish_trace
 
@@ -465,17 +466,41 @@ def patient_timeline(patient_id):
             user, as_of_date=now, research_study_id=EMPRO_RS_ID)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
+    qnr_responses = aggregate_responses(
+        instrument_ids=None,
+        current_user=current_user(),
+        research_study_id=research_study_id,
+        patch_dstu2=True,
+        ignore_qb_requirement=True,
+        patient_ids=[patient_id]
+    )
+    # filter qnr data to a manageable result data set
+    qnr_data = []
+    for row in qnr_responses['entry']:
+        i = {}
+        d = row['resource']
+        i['auth_method'] = d['encounter']['auth_method']
+        i['encounter_period'] = d['encounter']['period']
+        i['document_authored'] = d['authored']
+        i['ae_session'] = d['identifier']['value']
+        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
+        i['status'] = d['status']
+        i['org'] = d['subject']['careProvider'][0]['display']
+        i['visit'] = d['timepoint']
+        qnr_data.append(i)
+
+    kwargs = {
+        "rps": rps,
+        "status": status,
+        "posted": posted,
+        "timeline": results,
+        "adherence_data": adherence_data,
+        "qnr_data": qnr_data
+    }
     if trace:
-        return jsonify(
-            rps=rps,
-            status=status,
-            posted=posted,
-            timeline=results,
-            adherence_data=adherence_data,
-            trace=dump_trace("END time line lookup"))
-    return jsonify(
-        rps=rps, status=status, posted=posted, timeline=results,
-        adherence_data=adherence_data)
+        kwargs["trace"] = dump_trace("END time line lookup")
+
+    return jsonify(**kwargs)
 
 
 @patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')
