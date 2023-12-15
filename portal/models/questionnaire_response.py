@@ -842,7 +842,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        ignore_qb_requirement=False, celery_task=None):
+        ignore_qb_requirement=False, celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -852,13 +852,17 @@ def aggregate_responses(
     :param patch_dstu2: set to make bundle DSTU2 compliant
     :param ignore_qb_requirement: set to include all questionnaire responses
     :param celery_task: if defined, send occasional progress updates
+    :param patient_ids: if defined, limit result set to given patient list
 
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = patients_query(
-        current_user, include_test_role=False).with_entities(User.id)
+        current_user,
+        include_test_role=False,
+        filter_by_ids=patient_ids,
+    ).with_entities(User.id)
 
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(
@@ -920,7 +924,7 @@ def aggregate_responses(
                 'resource': document,
                 # Todo: return URL to individual QuestionnaireResponse resource
                 'fullUrl': url_for(
-                    '.assessment',
+                    'assessment_engine_api.assessment',
                     patient_id=subject.id,
                     _external=True,
                 ),
