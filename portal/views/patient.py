@@ -314,6 +314,7 @@ def patient_timeline(patient_id):
     :param research_study_id: set to alternative research study ID - default 0
     :param trace: set 'true' to view detailed logs generated, works best in
       concert with purge
+    :param only: set to filter all results but top level attribute given
 
     """
     from ..date_tools import FHIR_datetime, RelativeDelta
@@ -500,6 +501,11 @@ def patient_timeline(patient_id):
     if trace:
         kwargs["trace"] = dump_trace("END time line lookup")
 
+    only = request.args.get('only', False)
+    if only:
+        if only not in kwargs:
+            raise ValueError(f"{only} not in {kwargs.keys()}")
+        return jsonify(only, kwargs[only])
     return jsonify(**kwargs)
 
 
