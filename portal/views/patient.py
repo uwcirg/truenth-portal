@@ -31,7 +31,11 @@ from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
 from ..models.reporting import single_patient_adherence_data
-from ..models.research_study import EMPRO_RS_ID, ResearchStudy
+from ..models.research_study import (
+    EMPRO_RS_ID,
+    ResearchStudy,
+    research_study_id_from_questionnaire
+)
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
@@ -480,11 +484,17 @@ def patient_timeline(patient_id):
     for row in qnr_responses['entry']:
         i = {}
         d = row['resource']
+        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
+
+        # qnr_responses return all.  filter to requested research_study
+        study_id = research_study_id_from_questionnaire(i['questionnaire'])
+        if study_id != research_study_id:
+            continue
+
         i['auth_method'] = d['encounter']['auth_method']
         i['encounter_period'] = d['encounter']['period']
         i['document_authored'] = d['authored']
         i['ae_session'] = d['identifier']['value']
-        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
         i['status'] = d['status']
         i['org'] = d['subject']['careProvider'][0]['display']
         i['visit'] = d['timepoint']

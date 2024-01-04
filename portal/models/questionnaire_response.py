@@ -854,6 +854,8 @@ def aggregate_responses(
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
 
+    NB: research_study_id not used to filter / restrict query set, but rather
+    for lookup of visit name.  Use instrument_ids to restrict query set.
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
