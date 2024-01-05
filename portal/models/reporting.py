@@ -272,7 +272,7 @@ def cache_adherence_data(
     as_of_date = datetime.utcnow()
 
     # Purge any rows that have or will soon expire
-    valid = (as_of_date + timedelta(days=1))
+    valid = (as_of_date + timedelta(hours=1))
     AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
     db.session.commit()
 
