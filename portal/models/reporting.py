@@ -22,7 +22,7 @@ from .organization import Organization, OrgTree
 from .overall_status import OverallStatus
 from .questionnaire_response import aggregate_responses
 from .qb_status import QB_Status
-from .qb_timeline import qb_status_visit_name
+from .qb_timeline import QBT, qb_status_visit_name
 from .questionnaire_bank import visit_name
 from .questionnaire_response import (
     QNR_results,
@@ -152,10 +152,20 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     # build up data until we find valid cache for patient's history
     status = str(qb_stats.overall_status)
     row = patient_data(patient)
+    row["status"] = status
     if status == "Expired" and research_study_id == EMPRO_RS_ID:
-        row["status"] = "Not Yet Available"
-    else:
-        row["status"] = status
+        # Expired status ambiguous for EMPRO study.
+        # - If the last available questionnaire in the study is present in
+        #   the user's timeline and the expired date has passed, it is
+        #   legitimately "Expired".
+        # - Otherwise, due to complex business rules around delayed
+        #   start/availability mark as "Not Yet Available"
+        exp_row = QBT.query.filter(QBT.research_study_id == EMPRO_RS_ID).filter(
+            QBT.user_id == patient.id).filter(
+            QBT.status == 'expired').filter(
+            QBT.qb_iteration == 10).first()  # baseline is 1, 11 iterations base 0
+        if not exp_row or exp_row.at > as_of_date:
+            row["status"] = "Not Yet Available"
 
     if last_viable:
         general_row_detail(row, patient, last_viable)
@@ -164,8 +174,8 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             ts_reporting = TriggerStatesReporting(patient_id=patient.id)
             empro_row_detail(row, ts_reporting)
 
-        # latest is only valid for a week, unless the user withdrew
-        valid_for = 500 if row['status'] in ('Expired', 'Withdrawn') else 7
+        # latest is only valid for a day, unless the user withdrew
+        valid_for = 30 if row['status'] in ('Expired', 'Withdrawn') else 1
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
@@ -177,9 +187,10 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     for qbd, status in qb_stats.older_qbds(last_viable):
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(qbd))
-        # once we find cached_data, the rest of the user's history is good
+        # once we find cached_data, the rest of the user's history is likely
+        # good, but best to verify nothing is stale
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
-            break
+            continue
 
         historic = row.copy()
         historic['status'] = status
@@ -190,7 +201,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
-            valid_for_days=500,
+            valid_for_days=30,
             data=historic)
         added_rows += 1
 
@@ -223,7 +234,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             AdherenceData.persist(
                 patient_id=patient.id,
                 rs_id_visit=rs_visit,
-                valid_for_days=500,
+                valid_for_days=30,
                 data=indef)
             added_rows += 1
 
@@ -261,7 +272,7 @@ def cache_adherence_data(
     as_of_date = datetime.utcnow()
 
     # Purge any rows that have or will soon expire
-    valid = (as_of_date + timedelta(days=1))
+    valid = (as_of_date + timedelta(hours=1))
     AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
     db.session.commit()
 
