@@ -95,6 +95,8 @@ class QBT(db.Model):
         results = dict()
         for i in tl:
             qb = QuestionnaireBank.query.get(i.qb_id)
+            if qb is None:
+                continue
             recur_id = qb.recurs[0].id if qb.recurs else None
             vn = visit_name(QBD(
                 relative_start=None,
