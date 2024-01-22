@@ -274,6 +274,7 @@ class TestConfig(BaseConfig):
     MAIL_SUPPRESS_SEND = os.environ.get(
         'MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     SERVER_NAME = 'localhost:5005'
+    SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', 'localhost')
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = testing_sql_url()
