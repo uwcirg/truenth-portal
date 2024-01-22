@@ -193,8 +193,7 @@ class BaseConfig(object):
     # Only set cookies over "secure" channels (HTTPS) for non-dev deployments
     SESSION_COOKIE_SECURE = SYSTEM_TYPE.lower() != 'development'
 
-    # include cookies in cross-domain requests eg portal banner
-    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
     PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'http')
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'
