@@ -194,6 +194,7 @@ class BaseConfig(object):
     SESSION_COOKIE_SECURE = SYSTEM_TYPE.lower() != 'development'
 
     SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
+    SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', SERVER_NAME)
     PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'http')
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'
