@@ -190,8 +190,6 @@ def consent_withdrawal_dates(user, research_study_id):
         may be None if not found.
 
     """
-    if user.id == 1:
-        import pdb; pdb.set_trace()
     withdrawal_date = None
     consent = latest_consent(user, research_study_id=research_study_id)
     if consent:
