@@ -19,12 +19,19 @@ from portal.trigger_states.models import TriggerState
 
 # revision identifiers, used by Alembic.
 revision = '80c3b1e96c45'
-down_revision = '2e9b9e696bb8'
+down_revision = '66368e673005'
 
 Session = sessionmaker()
 
 
 def upgrade():
+    # Add sequential counts to appropriate trigger_states rows.
+
+    # this migration was applied once before, but the code wasn't correctly
+    # maintaining the sequential counts.  start by removing all for a clean
+    # slate via the same `downgrade()` step
+    downgrade()
+
     # for each active EMPRO patient with at least 1 hard triggered domain,
     # walk through their monthly reports, adding the sequential count for
     # the opt-out feature.
@@ -103,7 +110,7 @@ def downgrade():
             improved_triggers = deepcopy(ts.triggers)
             for d in EMPRO_DOMAINS:
                 if d not in improved_triggers["domain"]:
-                    raise RuntimeError(f"{d} missing from {ts.visit_month} for {patient_id}")
+                    raise RuntimeError(f"{d} missing from {ts.visit_month} for {pid}")
                 if sequential_hard_trigger_count_key in improved_triggers["domain"][d]:
                     del improved_triggers["domain"][d][sequential_hard_trigger_count_key]
                     output.write(f"  removed sequential from {ts.visit_month}:{d} {improved_triggers['domain'][d]}\n")
